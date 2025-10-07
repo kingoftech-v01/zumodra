@@ -1,0 +1,96 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+{% block head_title %}
+    {% trans "Email Address" %}
+{% endblock head_title %}
+{% block content %}
+    <h1>{% trans "Email Address" %}</h1>
+    {% if emailaddresses %}
+        {% if current_emailaddress %}
+            <p>
+                {% trans 'The following email address is associated with your account:' %} <a href="mailto:{{ current_emailaddress.email }}">{{ current_emailaddress.email }}</a>
+            </p>
+        {% endif %}
+        {% if new_emailaddress %}
+            <p>
+                {% trans 'Your email address is still pending verification:' %} <a href="mailto:{{ new_emailaddress.email }}">{{ new_emailaddress.email }}</a>
+            </p>
+            <form method="post" action="{% url 'account_email' %}">
+                {% csrf_token %}
+                <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
+                <button type="submit" name="action_send">{% trans 'Re-send Verification' %}</button>
+            </form>
+        {% endif %}
+    {% else %}
+        {% include "account/snippets/warn_no_email.html" %}
+    {% endif %}
+    <h2>{% trans "Change Email Address" %}</h2>
+    <form method="post" action="{% url 'account_email' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="action_add" type="submit">{% trans "Change Email" %}</button>
+    </form>
+{% endblock content %}
+{% extends "account/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {% trans "Email Address" %}
+{% endblock head_title %}
+
+{% block content %}
+<section class="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4 py-12">
+  <div class="bg-white max-w-md w-full p-8 rounded-lg shadow-lg border border-gray-200">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+      {% trans "Email Address" %}
+    </h1>
+
+    {% if emailaddresses %}
+      {% if current_emailaddress %}
+        <p class="text-gray-700 mb-4 text-center">
+          {% trans 'The following email address is associated with your account:' %}
+          <a href="mailto:{{ current_emailaddress.email }}" class="text-primary underline hover:text-primary-dark">
+            {{ current_emailaddress.email }}
+          </a>
+        </p>
+      {% endif %}
+
+      {% if new_emailaddress %}
+        <p class="text-yellow-700 mb-4 text-center font-semibold">
+          {% trans 'Your email address is still pending verification:' %}
+          <a href="mailto:{{ new_emailaddress.email }}" class="underline hover:text-yellow-800">
+            {{ new_emailaddress.email }}
+          </a>
+        </p>
+        <form method="post" action="{% url 'account_email' %}" class="flex justify-center mb-6">
+          {% csrf_token %}
+          <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
+          <button type="submit" name="action_send" class="button-main bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold transition duration-300">
+            {% trans 'Re-send Verification' %}
+          </button>
+        </form>
+      {% endif %}
+    {% else %}
+      {% include "account/snippets/warn_no_email.html" %}
+    {% endif %}
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">
+      {% trans "Change Email Address" %}
+    </h2>
+
+    <form method="post" action="{% url 'account_email' %}" class="space-y-6">
+      {% csrf_token %}
+      <div>
+        {{ form.email.errors }}
+        {{ form.email|add_class:"form-control w-full mt-1 border border-line px-4 h-[50px] rounded-lg" }}
+      </div>
+      <div class="text-center">
+        <button name="action_add" type="submit" class="button-main bg-primary w-full py-3 rounded-lg text-white font-semibold hover:bg-primary-dark transition duration-300">
+          {% trans "Change Email" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock content %}
+

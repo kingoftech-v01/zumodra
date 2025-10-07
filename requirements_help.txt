@@ -1,0 +1,68 @@
+# === Framework principal ===
+Django>=4.1,<5.2          # Framework web principal (backend, routage, ORM)
+
+# === Temps réel et messagerie ===
+channels                  # Support WebSocket/ASGI (messagerie temps réel)
+
+# === Gestion d’images/upload ===
+Pillow                    # Traitement et vérification des images uploadées
+
+# === Paiement et abonnement ===
+stripe                    # Librairie officielle Stripe (gestion des paiements)
+django-stripe-payments    # Intégration Stripe simplifiée pour Django
+
+# === Emails transactionnels et notification ===
+django-anymail            # Intégration des fournisseurs email (Mailgun, Sendgrid…)
+
+# === Stockage cloud/médias ===
+django-storages           # Backend stockage AWS S3, Google Storage, etc.
+boto3                     # SDK AWS (gestion bucket et fichiers S3)
+
+# === Appels API externes ===
+requests                  # Requêtes HTTP (APIs pour KYC, diplômes…)
+
+# === Variables d’environnement/configuration ===
+python-dotenv             # Chargement facile des variables .env locales
+django-environ            # Bonne gestion des variables d’environnement
+dj-database-url           # Configuration dynamique des URLs de base de données
+
+# === Gestion des bases de données ===
+psycopg2-binary           # PostgreSQL driver officiel
+# pyodbc                  # (Décommenter si tu utilises SQL Server, optionnel)
+
+# === Sécurité avancée & 2FA ===
+django-two-factor-auth    # Authentification forte/2FA toutes méthodes courantes  
+django-allauth            # Auth sociale, SSO, intégration Google, email, etc.
+django-allauth-2fa        # Ajoute 2FA à django-allauth (QR, app, TOTP…)
+django-otp                # Backend OTP (combinable avec les modules 2FA ci-dessus)
+
+# === Cryptage et confidentialité ===
+cryptography              # Base cryptographique (RSA, Fernet, chiffrage général)
+django-cryptography       # Intègre le cryptage dans les modèles Django
+PyNaCl                    # Chiffrement moderne, signatures, E2E messaging
+
+# === Asynchrone & tâches de fond ===
+celery                    # Tâches asynchrones et planifiées
+django-celery-results     # Stockage des résultats des tâches Celery en DB
+
+# === Nettoyage, maintenance fichiers/statiques ===
+django-cleanup            # Suppression automatique fichiers liés aux objets supprimés
+whitenoise                # Gestion et compression fichiers statiques en production
+
+# === Filtres et extensions utiles ===
+django-filter             # Filtres avancés pour les vues/queries API
+django-extensions         # Outils de développement : shell, migrations, graphes, etc.
+
+# === Sécurité front/formulaire ===
+django-cors-headers       # Gestion CORS (utile si API/front séparés)
+
+# === Boîtes à outils développeur (optionnel) ===
+django-debug-toolbar      # Débogage amélioré en développement
+
+# === Pour les tests automatiques (optionnel) ===
+pytest-django             # Tests automatisés Django avec pytest
+
+# === Pour la gestion/automatisation des requirements (optionnel) ===
+pip-tools                 # pip-compile, pour générer requirements.txt proprement
+
+# (Ajouter/retirer selon besoins spécifiques et évolutions projet)
