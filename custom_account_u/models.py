@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     anonymous_mode = models.BooleanField(default=False)
     c_u_uuid = models.CharField(default=uuid.uuid4, editable=False, unique=True)
 
+
 # Common Profile Information shared by all users
 class Profile(models.Model):
     """

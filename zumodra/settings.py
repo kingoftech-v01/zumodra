@@ -72,10 +72,10 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     # 'campaign.models.Newsletter',  # newsletter campaigns
     'phonenumber_field',
-    'widget_tweaks',
     'custom_account_u',
     # 'main',
     'channels',
+    'messages_sys',
     # 'configurations',
 ]
 
