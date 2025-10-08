@@ -44,7 +44,6 @@ jobs:
 
     - name: Deploy to Ubuntu server
       run: |
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} -p ${{ secrets.SERVER_P }} << 'EOF'
-          cd /root/root/csources/zumodra_live
-          git pull origin main
-        EOF
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} -p ${{ secrets.SERVER_P }}
+        cd /root/root/csources/zumodra_live
+        git pull origin main
