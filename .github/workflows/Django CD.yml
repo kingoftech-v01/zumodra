@@ -44,7 +44,4 @@ jobs:
 
     - name: Deploy to Ubuntu server
       run: |
-        ssh -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd /root/root/csources/zumodra_live
-          git pull origin main
-        EOF
+        ssh -i ssh_key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}
