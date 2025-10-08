@@ -44,4 +44,4 @@ jobs:
 
     - name: Deploy to Ubuntu server
       run: |
-        ssh -i ssh_key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} -p ${{ secrets.SERVER_P }}
