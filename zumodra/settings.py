@@ -109,7 +109,7 @@ ROOT_URLCONF = 'zumodra.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / 'templates' ],
+        'DIRS': [ BASE_DIR / 'templates', BASE_DIR / 'templates_auth' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -182,6 +182,7 @@ USE_TZ = True
 STATIC_URL = 'static/files/'
 STATICFILES_DIRS = [
     BASE_DIR / "staticfiles",
+    BASE_DIR / "staticfiles_auth",
 ]
 STATIC_ROOT = BASE_DIR / 'static'
 

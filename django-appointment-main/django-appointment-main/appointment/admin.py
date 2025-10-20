@@ -1,11 +1,3 @@
-# admin.py
-# Path: appointment/admin.py
-
-"""
-Author: Adams Pierre David
-Since: 1.0.0
-"""
-
 from django import forms
 from django.contrib import admin
 

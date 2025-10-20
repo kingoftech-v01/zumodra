@@ -1,11 +1,3 @@
-# forms.py
-# Path: appointment/forms.py
-
-"""
-Author: Adams Pierre David
-Since: 1.0.0
-"""
-
 from django import forms
 from django.utils.translation import gettext as _
 from phonenumber_field.formfields import SplitPhoneNumberField
