@@ -1,11 +1,16 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Conversation, Message, Contact, FriendRequest, BlockList, UserStatus
 from django.utils import timezone
 from django.db.models import Q
+
+# Create your views here.
+
+def files_render(request, filename):
+    return render(request, f'message_sys/{filename}')
+
+def js_dir_view(request, file_name):
+    return render(request, file_name)
 
 @login_required
 def chat_view(request):
@@ -62,4 +67,4 @@ def chat_view(request):
         # 'friend_requests': FriendRequest.objects.filter(to_user=user),
     }
 
-    return render(request, 'messages_sys/index.html', context)
+    return render(request, 'message_sys/index.html', context)

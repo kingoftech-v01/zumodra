@@ -56,12 +56,12 @@ INSTALLED_APPS = [
     # 'analytical',                # django-analytical for analytics
     # 'django_user_tracking',      # user tracking
     # 'django_newsletter',         # newsletters
-    'newsletter',                # newsletters
+    # 'newsletter',                # newsletters
     # # 'campaign',                  # django-campaign for newsletter campaigns
     # 'django_campaign_manager',   # ad campaigns (alpha)
     # 'leads',              # leads management
-    'clickify',           # click tracking
-    'simple_history',            # model history
+    # 'clickify',           # click tracking
+    # 'simple_history',            # model history
     'auditlog',                  # audit logs
     'user_agents',               # user agent detection
     # 'geoip2',                    # geo ip lookup
@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     # 'main',
     'channels',
     'messages_sys',
+    'configurations',
     # 'configurations',
 ]
 
@@ -85,7 +86,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -101,6 +101,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'custom_account_u.middleware.AuthSecurityMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'auditlog.middleware.AuditlogMiddleware'
 ]
 
 ROOT_URLCONF = 'zumodra.urls'

@@ -28,5 +28,5 @@ urlpatterns = [
     # path('campaigns/', include('campaign.urls')),               # newsletter campaigns  
     # path('newsletter/', include('django_newsletter.urls')),     # newsletters
     # path('leads/', include('leads.urls')),               # leads management
-    path('assets/js/dir/<str:file_name>', js_dir_view, name='js_dir'), # message json data
+    path('static/js/dir/<str:file_name>', js_dir_view, name='js_dir'), # message json data
 ]
