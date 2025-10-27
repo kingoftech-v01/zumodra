@@ -41,11 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'django.contrib.sitemaps',
+    # 'django.contrib.gis',
+
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_hotp',
     'django_otp.plugins.otp_email',
     'django_otp.plugins.otp_static',
+
     'allauth_2fa',
     'allauth',
     'allauth.mfa',
@@ -53,12 +58,17 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
-    # 'analytical',                # django-analytical for analytics
-    # 'django_user_tracking',      # user tracking
-    # 'django_newsletter',         # newsletters
-    # 'newsletter',                # newsletters
-    # # 'campaign',                  # django-campaign for newsletter campaigns
-    # 'django_campaign_manager',   # ad campaigns (alpha)
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.linkedin',
+
+    'widget_tweaks',
+    'tinymce',
+    # 'leaflet',
+    # 'campaign',
+
+    'analytical',                # django-analytical for analytics
+    'newsletter',                # newsletters
+    'drip',                  # django-campaign for newsletter campaigns
     # 'leads',              # leads management
     # 'clickify',           # click tracking
     # 'simple_history',            # model history
@@ -69,28 +79,52 @@ INSTALLED_APPS = [
     # 'django_celery',             # async tasks
     'rest_framework',            # API framework
     'crispy_forms',              # enhanced forms
-    'sorl.thumbnail',
-    # 'campaign.models.Newsletter',  # newsletter campaigns
+    'sorl.thumbnail',            # thumbnails
     'phonenumber_field',
+
+    'admin_honeypot',
+    'csp',
+    'axes',
+
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+
+    'modelcluster',
+    'taggit',
+
     'custom_account_u',
-    # 'main',
+    'main',
+    'blog',
     'channels',
     'messages_sys',
     'configurations',
-    # 'configurations',
+    'dashboard_service',
+    'dashboard_project',
+    'appointment.apps.AppointmentConfig',
 ]
 
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'axes.backends.AxesStandaloneBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
@@ -101,7 +135,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'custom_account_u.middleware.AuthSecurityMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    'auditlog.middleware.AuditlogMiddleware'
+    'auditlog.middleware.AuditlogMiddleware',
+    'csp.middleware.CSPMiddleware',
+    'axes.middleware.AxesMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'zumodra.urls'
@@ -176,14 +213,28 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
+    ('de', 'German'),
+    ('it', 'Italian'),
+    ('pt', 'Portuguese'),
+    ('ru', 'Russian'),
+    ('zh-hans', 'Simplified Chinese'),
+    ('zh-hant', 'Traditional Chinese'),
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/files/'
+
 STATICFILES_DIRS = [
     BASE_DIR / "staticfiles",
     BASE_DIR / "staticfiles_auth",
 ]
+
 STATIC_ROOT = BASE_DIR / 'static'
 
 # Media files
@@ -227,9 +278,28 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
     },
     'github': {
-        'SCOPE': ['user'], # 'repo', 'read:org'
-    }
+        'SCOPE': ['user', 'user:email'],
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'FIELDS': [
+            'id', 'email', 'name', 'first_name', 'last_name',
+            'verified', 'locale', 'timezone', 'link', 'gender',
+        ],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'VERIFIED_EMAIL': False,
+    },
+    'linkedin': {
+        'SCOPE': ['r_liteprofile', 'r_emailaddress'],
+        'PROFILE_FIELDS': [
+            'id', 'firstName', 'lastName', 'profilePicture(displayImage~:playableStreams)',
+            'emailAddress'
+        ],
+    },
 }
+
 
 # 2FA Settings
 ALLAUTH_2FA_FORCE_2FA = True
@@ -258,9 +328,6 @@ CRAZY_EGG_ACCOUNT_NUMBER = '7654321'
 # django-user-tracking settings
 USER_TRACKING_AUTO_IDENTIFY = True            # Track authenticated users
 USER_TRACKING_EXCLUDE_SUPERUSER = True        # Don't track admin users to reduce noise
-
-# django-newsletter settings example
-NEWSLETTER_SEND_ASYNC = True                   # Use async sending if configured
 
 # django-campaign-manager (alpha) example settings
 CAMPAIGN_MANAGER_USE_API = False                # Using direct DB or API (planned future)
@@ -304,8 +371,10 @@ LOGGING = {
     },
 }
 
-# settings.py
-NEWSLETTER_THUMBNAIL = 'sorl-thumbnail'   # default, or
+# Using sorl-thumbnail
+NEWSLETTER_THUMBNAIL = 'sorl-thumbnail'
+# django-newsletter settings example
+NEWSLETTER_SEND_ASYNC = True                   # Use async sending if configured
 # NEWSLETTER_THUMBNAIL = 'easy-thumbnails'  # alternative supported option
 NEWSLETTER_FROM_EMAIL = DEFAULT_FROM_EMAIL
 NEWSLETTER_UNSUBSCRIBE_CONFIRMATION = True
@@ -331,4 +400,120 @@ CHANNEL_LAYERS = {
 DATA_UPLOAD_MAX_MEMORY_SIZE = 55 * 1024 * 1024  # 55 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 55 * 1024 * 1024  # 55 MB
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
+# wagtail settings
+WAGTAIL_SITE_NAME = 'zumodra'
+WAGTAILADMIN_BASE_URL = 'admin'
+WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
+WAGTAIL_I18N_ENABLED = True
+
+# Axes settings
+AXES_FAILURE_LIMIT = 5
+AXES_NEVER_LOCKOUT_WHITELIST = ['127.0.0.1']
+
+# django-csp settings
+# CSP_REPORT_ONLY = True
+
+#___________________________TinyMCE____________________________________________#
+# TinyMCE settings
+TINYMCE_DEFAULT_CONFIG = {
+    # Taille de l'éditeur
+    'height': 500,
+    'width': '100%',      # Largeur (peut être en pixels ou %)
+    'min_height': 200,    # Hauteur minimale en px
+    'max_height': 800,    # Hauteur maximale en px
+    'min_width': 300,     # Largeur minimale en px
+    'max_width': 1000,    # Largeur maximale en px
+
+    # Barre de menu
+    'menubar': True,      # Affiche la barre de menu en haut
+
+    # Plugins à charger
+    'plugins': '''
+        advlist autolink lists link image charmap print preview anchor
+        searchreplace visualblocks code fullscreen insertdatetime media autoresize save
+        table directionality emoticons paste codesample wordcount spellchecker style a11ychecker
+    ''',
+
+    # Configurer_toolbar (peut être divisé si tu veux plusieurs barres)
+    'toolbar': '''
+        undo redo | styleselect | fontselect fontsizeselect formatselect | bold italic underline strikethrough |
+        forecolor backcolor casechange permanentpen formatpainter | pagebreak | charmap | alignleft aligncenter alignright alignjustify |
+        bullist numlist checklist outdent indent | removeformat | code | link image |
+        preview fullscreen | emoticons wordcount | help | preview save print |
+        insertfile media pageembed template anchor codesample | a11ycheck ltr rtl |
+    ''',
+
+    # # Autres options utiles
+    'statusbar': True,       # Affiche la barre de statut en bas
+    'autoresize_bottom_margin': 20,  # Marge en px pour l'autoresize
+    'resize': True,          # Permet à l'utilisateur de redimensionner l'éditeur
+
+    # # Options spécifiques
+    'branding': False,       # Supprime le branding TinyMCE
+    # 'relative_urls': False,  # Désactive les URLs relatives (utile pour médias)
+    # 'convert_urls': True,    # Convertit les URLs pour correspondre au site
+
+    # # Configurations avancées pour images et médias
+    'image_advtab': True,    # Onglet avancé sur images
+    'file_picker_types': 'image media',  # Types de fichiers autorisés
+
+    # # Sécurité / nettoyage
+    'cleanup_on_startup': True,
+    'valid_elements': '*[*]',  # Accepte tous les éléments (attention)
+
+    'formats': {
+        'p': {'classes': 'mil-mb-30'},
+        'blockquote': {'classes': 'mil-mb-60'},
+        'img': {'classes': 'img-fluid rounded'},
+        "a": {"classes": "mil-link mil-link-hover mil-link-underline mil-link-underline-hover mil-link-underline-hover"},
+        "span": {"classes": "mil-dark-soft"},
+        "ol": {"classes": "mil-mb-15 list-blog"},
+        "ul": {"classes": "mil-mb-15 list-blog"},
+        'h1': {'classes': 'mil-mb-30'},
+        'h2': {'classes': 'mil-mb-30'},
+        'h3': {'classes': 'mil-mb-30'},
+        'h4': {'classes': 'mil-mb-30'},
+        'h5': {'classes': 'mil-mb-30'},
+        'h6': {'classes': 'mil-mb-30'},
+    },
+    'style_formats': [
+        {'title': 'Paragraph (lead)', 'block': 'p', 'classes': 'mil-mb-30 lead'},
+        {'title': 'Muted Text', 'inline': 'span', 'classes': 'mil-dark-soft'},
+        {'title': 'Span Primary Text', 'inline': 'span', 'classes': 'mil-accent'},
+        {'title': 'Uppercase Title', 'block': 'h2', 'classes': 'mil-uppercase mil-mb-30'},
+        {'title': 'Conclusion', 'block': 'p', 'classes': 'mil-mb-60'},
+        {'title': 'Blockquote', 'block': 'blockquote', 'classes': 'mil-mb-60'},
+        {'title': 'Button Style', 'inline': 'a', 'classes': 'mil-button mil-border'},
+        {'title': 'Image Rounded', 'selector': 'img', 'classes': 'img-fluid rounded'},
+        {'title': 'Image Circle', 'selector': 'img', 'classes': 'img-fluid rounded-circle'},
+        {'title': 'Image Blog', 'block': 'div', 'selector': 'img', 'classes': 'img-fluid mil-post-image mil-mb-30'},
+    ],
+    'style_formats_merge': True,
+
+}
+TINYMCE_SPELLCHECKER = True
+
+# Leaflet settings
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (0, 0),      # Centre sur l'intersection de l'équateur et du méridien de Greenwich
+    'DEFAULT_ZOOM': 2,            # Zoom global sur le monde
+    'MIN_ZOOM': 2,
+    'MAX_ZOOM': 18,
+    'SCALE': 'metric',
+}
+
+LEAFLET_MAP_OPTIONS = {
+    'min_zoom': 2,
+    'max_zoom': 18,
+    'min_native_zoom': 2,
+    'max_native_zoom': 18,
+}
+
+# Appointment settings
+
+APPOINTMENT_START_TIME = 8
+APPOINTMENT_END_TIME = 18
+APPOINTMENT_SERVICE_MODEL = 'dashboard_service.Service'

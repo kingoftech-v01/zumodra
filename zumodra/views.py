@@ -16,3 +16,6 @@ def home_view(request):
 
 def js_dir_view(request, file_name):
     return render(request, f'static/js/dir/{file_name}', content_type="application/json")
+
+def auth_test_view(request):
+    return render(request, 'authlab/sign-in.html')

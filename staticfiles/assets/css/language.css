@@ -1,0 +1,22 @@
+.language-switcher-form {
+    @apply inline-block;
+}
+
+.language-select {
+    @apply  rounded-md p-2 text-sm cursor-pointer;
+    transition: border-color 0.3s ease;
+}
+
+.language-select:hover, .language-select:focus {
+    @apply border-primary outline-none;
+}
+
+/* Responsive tweak to keep it nicely placed on smaller screens */
+@media (max-width: 640px) {
+    .language-switcher-form {
+        @apply w-full mt-2;
+    }
+    .language-select {
+        @apply w-full;
+    }
+}

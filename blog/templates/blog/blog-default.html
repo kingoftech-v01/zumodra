@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block head_title %}Blogs - Zumodra{% endblock head_title %}
+
+{% block header %}
+    {% include 'header.html' %}
+{% endblock header %}
+
+{% block content %}
+
+        <!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+                <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                    <img src="{% static '/assets/images/components/breadcrumb_job.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                </div>
+                <div class="container relative h-full">
+                    <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                        <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                            <a href="index.html" class="caption1 text-white">Home</a>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white">Blogs</span>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white opacity-60">Blogs Default</span>
+                        </div>
+                        <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Blogs Default</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- List blogs -->
+        <div class="blogs lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-md:flex-col gap-y-12">
+                <div class="list lg:pr-20 md:pr-12">
+                    <ul class="list_blog grid lg:gap-10 gap-8">
+                        <li class="blog_item">
+                            <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                                <img src="./assets/images/blog/1.webp" alt="1" class="blog_img w-full" />
+                            </a>
+                            <div class="blog_info flex flex-wrap items-center justify-between gap-8 gap-y-2 mt-5">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="date flex items-center gap-2">
+                                        <span class="ph ph-calendar-blank text-2xl"></span>
+                                        <span class="blog_date">February 28, 2024</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <a href="blog-default.html" class="category flex items-center gap-2 duration-300 hover:text-primary">
+                                        <span class="ph ph-tag-simple text-2xl"></span>
+                                        <span class="blog_category">Marketing</span>
+                                    </a>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="comment flex items-center gap-2">
+                                        <span class="ph ph-chats-circle text-2xl"></span>
+                                        <span class="blog_comment">12</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <div class="view flex items-center gap-2">
+                                        <span class="ph ph-eye text-2xl"></span>
+                                        <span class="blog_view">260.2K</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">Developing Authentic Pride Month Marketing Strategies & Inspiring Digital Campaign Examples</a>
+                            <p class="blog_desc mt-2 text-secondary">June is Pride Month, a time to celebrate and support the LGBTQ+ community. In this article, we explore how brands can develop authentic Pride Month marketing strategies that resonate with audiences and demonstrate genuine allyship.</p>
+                        </li>
+                        <li class="blog_item">
+                            <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                                <img src="./assets/images/blog/2.webp" alt="2" class="blog_img w-full" />
+                            </a>
+                            <div class="blog_info flex flex-wrap items-center justify-between gap-8 gap-y-2 mt-5">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="date flex items-center gap-2">
+                                        <span class="ph ph-calendar-blank text-2xl"></span>
+                                        <span class="blog_date">February 28, 2024</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <a href="blog-default.html" class="category flex items-center gap-2 duration-300 hover:text-primary">
+                                        <span class="ph ph-tag-simple text-2xl"></span>
+                                        <span class="blog_category">Development</span>
+                                    </a>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="comment flex items-center gap-2">
+                                        <span class="ph ph-chats-circle text-2xl"></span>
+                                        <span class="blog_comment">12</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <div class="view flex items-center gap-2">
+                                        <span class="ph ph-eye text-2xl"></span>
+                                        <span class="blog_view">260.2K</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">Adaptive UI Design: Optimizing User Interfaces for Dynamic Environments</a>
+                            <p class="blog_desc mt-2 text-secondary">In today's fast-paced digital landscape, user interfaces must adapt to various devices, screen sizes, and contexts. This article explores the concept of adaptive UI design, where interfaces dynamically adjust to different environments, ensuring optimal user experiences.</p>
+                        </li>
+                        <li class="blog_item">
+                            <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                                <img src="./assets/images/blog/3.webp" alt="3" class="blog_img w-full" />
+                            </a>
+                            <div class="blog_info flex flex-wrap items-center justify-between gap-8 gap-y-2 mt-5">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="date flex items-center gap-2">
+                                        <span class="ph ph-calendar-blank text-2xl"></span>
+                                        <span class="blog_date">February 28, 2024</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <a href="blog-default.html" class="category flex items-center gap-2 duration-300 hover:text-primary">
+                                        <span class="ph ph-tag-simple text-2xl"></span>
+                                        <span class="blog_category">Videos Editer</span>
+                                    </a>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="comment flex items-center gap-2">
+                                        <span class="ph ph-chats-circle text-2xl"></span>
+                                        <span class="blog_comment">12</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <div class="view flex items-center gap-2">
+                                        <span class="ph ph-eye text-2xl"></span>
+                                        <span class="blog_view">260.2K</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">Designing for Mobile First: Strategies for Crafting Mobile-Optimized Experiences</a>
+                            <p class="blog_desc mt-2 text-secondary">With the majority of internet users accessing content through mobile devices, designing for mobile-first has become essential for digital success. This article explores strategies for crafting mobile-optimized experiences that prioritize mobile users' needs and preferences.</p>
+                        </li>
+                    </ul>
+                    <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="blog_sidebar flex-shrink-0 lg:w-[360px] md:w-1/3 w-full h-fit">
+                    <form class="form-search overflow-hidden relative w-full h-12 rounded-lg">
+                        <input class="py-2 pl-4 pr-16 w-full h-full border border-line rounded-lg" type="text" placeholder="Search" required />
+                        <button class="flex items-center justify-center absolute top-0 right-0 h-full aspect-square rounded-r-lg bg-primary text-white duration-300 hover:bg-black">
+                            <span class="ph ph-magnifying-glass text-lg"></span>
+                        </button>
+                    </form>
+                    <div class="recent md:mt-10 mt-7">
+                        <h6 class="heading6">Recent Posts</h6>
+                        <ul class="list-recent mt-5">
+                            <li class="blog_item outstanding_blog">
+                                <a href="blog-detail1.html" class="blog_thumb block w-full rounded-lg overflow-hidden">
+                                    <img src="./assets/images/blog/9.webp" alt="blog/9" class="blog_img w-full" />
+                                </a>
+                                <div class="flex flex-wrap items-center gap-2 mt-5 mb-2">
+                                    <div class="date flex items-center gap-2">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="blog_date caption1">February 28, 2024</span>
+                                    </div>
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <a href="blog-default.html" class="category flex items-center gap-2 duration-300 hover:text-primary">
+                                        <span class="ph ph-tag-simple text-xl"></span>
+                                        <span class="blog_category caption1">Freelancers</span>
+                                    </a>
+                                </div>
+                                <a href="blog-detail1.html" class="blog_name heading6 duration-300 hover:text-primary">How does writing influence your personal brand?</a>
+                            </li>
+                            <li class="blog_item flex gap-4 mt-5 pt-5 border-t border-line">
+                                <a href="blog-detail1.html" class="blog_thumb block flex-shrink-0 w-[100px] h-fit rounded overflow-hidden">
+                                    <img src="./assets/images/blog/8.webp" alt="blog/8" class="blog_img w-full" />
+                                </a>
+                                <div>
+                                    <a href="blog-detail1.html" class="blog_name text-button duration-300 hover:text-primary">Strategies for Seamless Digital Journeys</a>
+                                    <div class="flex flex-wrap items-center gap-2 gap-y-1 mt-1.5">
+                                        <span class="blog_date caption1">February 28, 2024</span>
+                                        <div class="line w-px h-3 bg-line"></div>
+                                        <a href="blog-default.html" class="blog_category caption1 duration-300 hover:text-primary">Agency</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="blog_item flex gap-4 mt-5 pt-5 border-t border-line">
+                                <a href="blog-detail1.html" class="blog_thumb block flex-shrink-0 w-[100px] h-fit rounded overflow-hidden">
+                                    <img src="./assets/images/blog/7.webp" alt="blog/7" class="blog_img w-full" />
+                                </a>
+                                <div>
+                                    <a href="blog-detail1.html" class="blog_name text-button duration-300 hover:text-primary">Crafting Compelling Digital Narratives</a>
+                                    <div class="flex flex-wrap items-center gap-2 gap-y-1 mt-1.5">
+                                        <span class="blog_date caption1">February 28, 2024</span>
+                                        <div class="line w-px h-3 bg-line"></div>
+                                        <a href="blog-default.html" class="blog_category caption1 duration-300 hover:text-primary">Freelancer</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="blog_item flex gap-4 mt-5 pt-5 border-t border-line">
+                                <a href="blog-detail1.html" class="blog_thumb block flex-shrink-0 w-[100px] h-fit rounded overflow-hidden">
+                                    <img src="./assets/images/blog/6.webp" alt="blog/6" class="blog_img w-full" />
+                                </a>
+                                <div>
+                                    <a href="blog-detail1.html" class="blog_name text-button duration-300 hover:text-primary">The Role of Empathy in UX/UI Design</a>
+                                    <div class="flex flex-wrap items-center gap-2 gap-y-1 mt-1.5">
+                                        <span class="blog_date caption1">February 28, 2024</span>
+                                        <div class="line w-px h-3 bg-line"></div>
+                                        <a href="blog-default.html" class="blog_category caption1 duration-300 hover:text-primary">Activities</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="blog_item flex gap-4 mt-5 pt-5 border-t border-line">
+                                <a href="blog-detail1.html" class="blog_thumb block flex-shrink-0 w-[100px] h-fit rounded overflow-hidden">
+                                    <img src="./assets/images/blog/10.webp" alt="blog/10" class="blog_img w-full" />
+                                </a>
+                                <div>
+                                    <a href="blog-detail1.html" class="blog_name text-button duration-300 hover:text-primary">Strategies for Seamless Digital Journeys</a>
+                                    <div class="flex flex-wrap items-center gap-2 gap-y-1 mt-1.5">
+                                        <span class="blog_date caption1">February 28, 2024</span>
+                                        <div class="line w-px h-3 bg-line"></div>
+                                        <a href="blog-default.html" class="blog_category caption1 duration-300 hover:text-primary">Agency</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="filter_category md:mt-10 mt-7">
+                        <h6 class="heading6">Categories</h6>
+                        <ul class="list_category flex flex-col gap-3 mt-5" role="tablist">
+                            <li role="presentation">
+                                <button class="tab_btn text-button -before line-before line-black" role="tab" aria-selected="false">Marketing</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tab_btn text-button -before line-before line-black" role="tab" aria-selected="false">Development</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tab_btn text-button -before line-before line-black" role="tab" aria-selected="false">Digital Marketing</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tab_btn text-button -before line-before line-black" role="tab" aria-selected="false">Web design</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tab_btn text-button -before line-before line-black" role="tab" aria-selected="false">Business</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="filter_tags md:mt-10 mt-7">
+                        <h6 class="heading6">Popular Tag</h6>
+                        <ul class="list_tags menu_tab flex items-center flex-wrap gap-3 mt-5" role="tablist">
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Digital Marketing</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Social</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Startup</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Webdesign</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">UX/UI</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">SEO&SEM</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Development</button>
+                            </li>
+                            <li role="presentation">
+                                <button class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab" aria-selected="false">Tips</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll to top -->
+        <button class="scroll-to-top-btn"><span class="ph-bold ph-caret-up"></span></button>
+
+{% endblock content %}
