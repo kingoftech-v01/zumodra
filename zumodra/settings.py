@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     'custom_account_u',
     'main',
     'blog',
+    'finance',
     'channels',
     'messages_sys',
     'configurations',
