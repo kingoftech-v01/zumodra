@@ -68,7 +68,7 @@ INSTALLED_APPS = [
 
     'analytical',                # django-analytical for analytics
     'newsletter',                # newsletters
-    'drip',                  # django-campaign for newsletter campaigns
+    # 'drip',                  # django-campaign for newsletter campaigns
     # 'leads',              # leads management
     # 'clickify',           # click tracking
     # 'simple_history',            # model history
