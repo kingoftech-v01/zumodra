@@ -1,19 +1,47 @@
 from django.db import models
-from django.conf import settings
+from zumodra import settings
 from django.utils import timezone
 import uuid
+from decimal import Decimal
+from django.utils import timezone
 from django.contrib.auth.models import Group, Permission
 
 User = settings.AUTH_USER_MODEL
 
-from django.db import models
-from django.conf import settings
+
+# Create your models here.
+
+class ServiceCategory(models.Model):
+    """
+    Represents the category or sector of service.
+    """
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Skill(models.Model):
+    """
+    Represents a skill or competency.
+    Used to tag service providers and filter clients' needs.
+    """
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+#____________________COMPANY & HR MODELS____________________#
 
 # Entreprise (Company)
 class Company(models.Model): # Alias Organization
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     domain = models.CharField(max_length=255, blank=True, null=True)
+    industry = models.CharField(max_length=120, blank=True)
+    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
@@ -27,8 +55,11 @@ class Site(models.Model):
     country = models.CharField(max_length=64, blank=True)
     phone = models.CharField(max_length=30, blank=True)
     email = models.EmailField(blank=True)
+    established_date = models.DateField(null=True, blank=True)
+    number_of_employees = models.PositiveIntegerField(default=1)
     is_main_office = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('company', 'name')
@@ -38,177 +69,57 @@ class Site(models.Model):
     
 class CompanyProfile(models.Model):
     company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='profile')
-    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
+    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='profiles')
     description = models.TextField(blank=True)
-    website = models.URLField(blank=True)
-    address = models.CharField(max_length=255, blank=True)
-    phone = models.CharField(max_length=40, blank=True)
+    website = models.URLField(blank=True, null=True)
     linkedin_url = models.URLField(blank=True)
-    industry = models.CharField(max_length=120, blank=True)
-    established_date = models.DateField(null=True, blank=True)
-    number_of_employees = models.PositiveIntegerField(default=1)
+    twitter_url = models.URLField(blank=True)
+    facebook_url = models.URLField(blank=True)
+    instagram_url = models.URLField(blank=True)
+
     def __str__(self):
         return f"Profil {self.company.name}"
 
 # Départements rattachés à un ou plusieurs sites (optionnel selon besoin)
 # On considère le lien many to one classique ici (un département dans un seul site)
 class Department(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='departments')
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='departments')
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='departments')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
     class Meta:
-        unique_together = ('company', 'site', 'name')
+        unique_together = ('company', 'name')
 
     def __str__(self):
-        site_name = self.site.name if self.site else "Sans site"
-        return f"{self.name} ({site_name}) - {self.company.name}"
+        return f"{self.name} - {self.company.name}"
     
-
-# Emplois et postes également liés à un site pour localisation précise
-class JobPosition(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='positions')
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='positions')
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='positions')
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_open = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('company', 'site', 'department', 'title')
-
-    def __str__(self):
-        site_name = self.site.name if self.site else "Sans site"
-        dept_name = self.department.name if self.department else "Sans département"
-        return f"{self.title} ({site_name} | {dept_name}) - {self.company.name}"
-
-# Employés (Membership) rattachés à un site
-class Membership(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='memberships')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='memberships')
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='memberships')
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='memberships')
-    role = models.ForeignKey('Role', on_delete=models.SET_NULL, null=True, blank=True, related_name='memberships')
-    job_title = models.CharField(max_length=100, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'company', 'site')
-
-    def __str__(self):
-        return f"{self.user.email} ({self.company.name} | {self.site.name if self.site else 'Sans site'})"
-
 # Poste/Rôle métier (Role) lié à une entreprise, optionnellement à un site
-class Role(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='roles')
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='roles')
-    name = models.CharField(max_length=64)
-    description = models.TextField(blank=True)
-
-    class Meta:
-        unique_together = ('company', 'site', 'name')
-
-    def __str__(self):
-        return f"{self.name} ({self.site.name if self.site else 'Tous sites'}) - {self.company.name}"
-
-
-class Skill(models.Model):
-    """
-    Represents a skill or competency.
-    Used to tag service providers and filter clients' needs.
-    """
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ServiceCategory(models.Model):
-    """
-    Represents the category or sector of service.
-    """
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ServiceProviderProfile(models.Model):
-    """
-    Extending existing profile with skills and service categories.
-    """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    skills = models.ManyToManyField(Skill, blank=True)
-    categories = models.ManyToManyField(ServiceCategory, blank=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
-    completed_jobs = models.PositiveIntegerField(default=0)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return f"Provider: {self.user}"
-
-
-class ClientRequest(models.Model):
-    """
-    Represents a client’s service request including skills required,
-    location preferences, budget, and other parameters.
-    """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
-    required_skills = models.ManyToManyField(Skill, blank=True)
-    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-    remote_allowed = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Request by {self.client} for {self.service_category}"
-
-
-class Match(models.Model):
-    """
-    Stores a match between a ClientRequest and a ServiceProviderProfile,
-    along with a score computed by AI or heuristics.
-    """
-    client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
-    provider_profile = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
-    score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
-    matched_at = models.DateTimeField(auto_now_add=True)
-    viewed_by_client = models.BooleanField(default=False)
-    accepted_by_client = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('client_request', 'provider_profile')
-
-    def __str__(self):
-        return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
-
 class Role(models.Model):
     """
     Modélise un rôle métier (ex: "Manager", "Comptable", "RH", "Employé simple") spécifique à l'application/entreprise
     Possibilité de lier aux Groupes Django natifs pour héritage de permissions
     """
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='roles')
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='roles')
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True)
     group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
+    permissions = models.ManyToManyField(
+        Permission, blank=True, related_name='org_role_permissions'
+    )
+
+    class Meta:
+        unique_together = ('company', 'name')
 
     def __str__(self):
-        return f"{self.name} ({self.company.name})"
+        return f"{self.name} - {self.company.name}"
 
+# Employés (Membership) rattachés à un Profil d’entreprise, avec option de département et rôle   
 class Membership(models.Model):
     """
     'Profil' contextuel : relie un user générique à une entreprise, avec option de département, et gère les rôles/permissions locaux.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='memberships')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='memberships')
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='memberships')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='memberships')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name='memberships')
     job_title = models.CharField(max_length=100, blank=True)
@@ -219,7 +130,7 @@ class Membership(models.Model):
     )
 
     def __str__(self):
-        return f"{self.user.email} ({self.company.name}) -- {self.role.name if self.role else 'No Role'}"
+        return f"{self.user.email} ({self.company.company.name}) -- {self.role.name if self.role else 'No Role'}"
 
     class Meta:
         unique_together = ('user', 'company')
@@ -235,28 +146,44 @@ class Membership(models.Model):
     def has_perm(self, codename):
         return codename in self.get_all_permissions()
 
+#____________________RECRUITMENT & HR MODELS____________________#
 
+# Profil candidat indépendant (CandidateProfile)
+#  Profil principal du candidat associé à un utilisateur
+class CandidateProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='candidate_profile')
+    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
+    bio = models.TextField(blank=True)  # présentation, résumé personnel
+    phone = models.CharField(max_length=30, blank=True)
+    linkedin_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+    skills = models.ManyToManyField(Skill, blank=True)  # competences professionnelles
+    created_at = models.DateTimeField(auto_now_add=True)
 
-# Services offerts par l’entreprise
-class Service(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='services')
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
     def __str__(self):
-        return f"{self.name} ({self.company.name})"
+        return f"Candidat: {self.user.email}"
 
 # Poste au sein d’une entreprise/dept (JobPosition)
+# Emplois et postes également liés à un site pour localisation précise
 class JobPosition(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='positions')
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='positions')
+    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True, related_name='positions')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='positions')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     is_open = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
+    class Meta:
+        unique_together = ('company', 'site', 'department', 'title')
+
     def __str__(self):
-        dept = self.department.name if self.department else "No dept"
-        return f"{self.title} ({self.company.name}, {dept})"
+        site_name = self.site.name if self.site else "Sans site"
+        dept_name = self.department.name if self.department else "Sans département"
+        return f"{self.title} ({site_name} | {dept_name}) - {self.company.name}"
+
+
 
 # Emploi/Annonce d’offre (Job)
 class Job(models.Model):
@@ -270,34 +197,21 @@ class Job(models.Model):
     is_active = models.BooleanField(default=True)
     posted_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
-    service = models.ForeignKey(Service, null=True, blank=True, on_delete=models.SET_NULL, related_name='jobs')
+    # service = models.ForeignKey(Service, null=True, blank=True, on_delete=models.SET_NULL, related_name='jobs')
     def __str__(self):
         return f"{self.title} ({self.company.name})"
 
-# Profil candidat indépendant (CandidateProfile)
-class CandidateProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate_profile')
-    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
-    bio = models.TextField(blank=True)
-    phone = models.CharField(max_length=30, blank=True)
-    linkedin_url = models.URLField(blank=True)
-    github_url = models.URLField(blank=True)
-    portfolio_url = models.URLField(blank=True)
-    skills = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.user.email
-
-# Candidature à un emploi
+# Candidature à un emploi (JobApplication)
 class JobApplication(models.Model):
     candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, related_name='applications')
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications') # Job venant des modèles entreprise/recrutement
     cover_letter = models.TextField(blank=True)
     status = models.CharField(
         choices=[
             ('pending', 'En attente'),
             ('reviewed', 'En cours de traitement'),
             ('interview', 'Entretien'),
+            ('offered', 'Offre envoyée'),
             ('accepted', 'Acceptée'),
             ('rejected', 'Refusée')
         ],
@@ -305,21 +219,30 @@ class JobApplication(models.Model):
         default='pending'
     )
     applied_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
-        return f"{self.candidate.user.email} -> {self.job.title} ({self.status})"
+        return f"Candidature de {self.candidate.user.email} pour {self.job.title} ({self.status})"
 
-
+# Dossier employé lié à une adhésion (Membership)
 class EmployeeRecord(models.Model):
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='employee_records')
     hire_date = models.DateField()
     contract_type = models.CharField(
-        choices=[('cdi','CDI'),('cdd','CDD'),('contract','Contrat'),('intern','Stagiaire')],
+        choices=[
+            ('cdi','CDI'),
+            ('cdd','CDD'),
+            ('contract','Contrat'),
+            ('intern','Stagiaire')
+            ],
         max_length=15, default='cdi'
     )
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
-        choices=[('active','Actif'),('terminated','Terminé'),('on_leave','En congé')],
+        choices=[('active','Actif'),
+                 ('terminated','Terminé'),
+                 ('on_leave','En congé')
+                ],
         max_length=12, default='active'
     )
     resignation_date = models.DateField(null=True, blank=True)
@@ -334,7 +257,8 @@ class ContractDocument(models.Model):
 
 class Interview(models.Model):
     application = models.ForeignKey(JobApplication, on_delete=models.CASCADE, related_name='interviews')
-    interviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    interviewer = models.ForeignKey(Membership, on_delete=models.SET_NULL, null=True)
+    interviewee = models.ForeignKey(CandidateProfile, on_delete=models.SET_NULL, null=True)
     scheduled_at = models.DateTimeField()
     duration_minutes = models.PositiveIntegerField(default=30)
     location = models.CharField(max_length=255, blank=True)
@@ -349,7 +273,7 @@ class Interview(models.Model):
 
 class InterviewNote(models.Model):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='notes')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    author = models.ForeignKey(Membership, on_delete=models.SET_NULL, null=True)
     note = models.TextField()
     rating = models.PositiveSmallIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -400,23 +324,6 @@ class InternalNotification(models.Model):
     is_read = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     is_published = models.BooleanField(default=True)
-
-from django.db import models
-from django.conf import settings
-
-# Profil principal du candidat associé à un utilisateur
-class CandidateProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate_profile')
-    phone = models.CharField(max_length=30, blank=True)
-    bio = models.TextField(blank=True)  # présentation, résumé personnel
-    linkedin_url = models.URLField(blank=True)
-    github_url = models.URLField(blank=True)
-    portfolio_url = models.URLField(blank=True)
-    skills = models.TextField(blank=True)  # description générale des compétences
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Candidat: {self.user.email}"
 
 # Expériences professionnelles du candidat
 class WorkExperience(models.Model):
@@ -469,28 +376,6 @@ class CandidateDocument(models.Model):
     def __str__(self):
         return f"{self.document_type} de {self.candidate.user.email}"
 
-# Candidature à un emploi
-class JobApplication(models.Model):
-    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, related_name='applications')
-    job = models.ForeignKey('Job', on_delete=models.CASCADE, related_name='applications')  # Job venant des modèles entreprise/recrutement
-    cover_letter_text = models.TextField(blank=True)
-    status = models.CharField(
-        choices=[
-            ('pending', 'En attente'),
-            ('reviewed', 'En cours de traitement'),
-            ('interview', 'Entretien'),
-            ('offered', 'Offre envoyée'),
-            ('accepted', 'Acceptée'),
-            ('rejected', 'Refusée')
-        ],
-        max_length=20,
-        default='pending'
-    )
-    applied_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Candidature de {self.candidate.user.email} pour {self.job.title}"
 
 # Notes et échanges sur la candidature
 class ApplicationNote(models.Model):
@@ -506,26 +391,112 @@ class ApplicationMessage(models.Model):
     message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
 
+#____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
+#____________________FREELANCE & MATCHING MODELS____________________#
 
-from django.db import models
-from django.conf import settings
-from decimal import Decimal
-from django.utils import timezone
+class ServicesTags(models.Model):
+    tag = models.CharField(max_length=50)
+    def __str__(self):
+        return f"{self.tag}"
 
+# Services offerts par l’entreprise
+class Service(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='services')
+    serviceCategory = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    price = models.PositiveIntegerField(null=True, blank=True)  # prix indicatif
+    duration_minutes = models.PositiveIntegerField(null=True, blank=True)  # durée estimée
+    thumbnail = models.ImageField(upload_to='service_thumbnails/', blank=True, null=True)
+    images = models.ManyToManyField('ServicesPicture', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.company.name})"
+    
+class ServicesPicture(models.Model):
+    image = models.ImageField(upload_to='service_pictures/')
+    description = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.service.name}"
+    
+class ServiceLike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='liked_services')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='likes')
+    liked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'service')
+
+    def __str__(self):
+        return f"{self.user.email} likes {self.service.name}"
+
+# Prestataires de services (ServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
 class ServiceProviderProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='provider_profile')
+    """
+    Extending existing profile with skills and service categories.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='provider_profile')
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, related_name='providers')
+    skills = models.ManyToManyField(Skill, blank=True)
     bio = models.TextField(blank=True)
-    skills = models.TextField(blank=True)
+    categories = models.ManyToManyField(ServiceCategory, blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
+    completed_jobs = models.PositiveIntegerField(default=0)
+    location_lat = models.FloatField(null=True, blank=True)
+    location_lon = models.FloatField(null=True, blank=True)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
     rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
     total_reviews = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     last_active = models.DateTimeField(auto_now=True)
+    services = models.ManyToManyField(Service, blank=True, related_name='providers')
+    availability_status = models.CharField(max_length=20, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
 
-class Skill(models.Model):
-    name = models.CharField(max_length=100)
+    def __str__(self):
+        return f"Provider: {self.user}"
+
+# Request clients (ClientRequest) avec critères de recherche, budget, localisation, etc.
+class ClientRequest(models.Model):
+    """
+    Represents a client’s service request including skills required,
+    location preferences, budget, and other parameters.
+    """
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
+    required_skills = models.ManyToManyField(Skill, blank=True)
+    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
+    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    location_lat = models.FloatField(null=True, blank=True)
+    location_lon = models.FloatField(null=True, blank=True)
+    remote_allowed = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Request by {self.client} for {self.service_category}"
+
+
+class Match(models.Model):
+    """
+    Stores a match between a ClientRequest and a ServiceProviderProfile,
+    along with a score computed by AI or heuristics.
+    """
+    client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
+    provider_profile = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
+    score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
+    matched_at = models.DateTimeField(auto_now_add=True)
+    viewed_by_client = models.BooleanField(default=False)
+    accepted_by_client = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('client_request', 'provider_profile')
+
+    def __str__(self):
+        return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
 
 class ProviderSkill(models.Model):
     provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='provider_skills')
@@ -573,6 +544,27 @@ class ServiceContract(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+class ProviderReview(models.Model):
+    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='reviews')
+    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('contract', 'reviewer')
+
+class ServiceMessage(models.Model):
+    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    message = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+
+#_______________Gestion des paiements et comptes séquestres________________#
+
 
 class EscrowAccount(models.Model):
     contract = models.OneToOneField(ServiceContract, on_delete=models.CASCADE, related_name='escrow_account')
@@ -598,31 +590,14 @@ class PaymentTransaction(models.Model):
     )
     external_ref = models.CharField(max_length=255, blank=True)
 
-class ProviderReview(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='reviews')
-    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField()
-    comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        unique_together = ('contract', 'reviewer')
-
-class ServiceMessage(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    message = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-
-
 class StatusHistory(models.Model):
     content_type = models.ForeignKey('contenttypes.ContentType', on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = models.GenericForeignKey('content_type', 'object_id')
+    # content_object = models.GenericForeignKey('content_type', 'object_id')
     old_status = models.CharField(max_length=50)
     new_status = models.CharField(max_length=50)
     changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     changed_at = models.DateTimeField(auto_now_add=True)
-
 
 class Dispute(models.Model):
     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='disputes')
@@ -634,14 +609,13 @@ class Dispute(models.Model):
     )
     opened_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
-
+    resolution_notes = models.TextField(blank=True)
 
 class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
 class AvailabilitySlot(models.Model):
     provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='availability_slots')
@@ -657,6 +631,57 @@ class Invoice(models.Model):
     due_date = models.DateField()
     is_paid = models.BooleanField(default=False)
     payment_reference = models.CharField(max_length=255, blank=True)
+
+#____________________ Website Content & Config Models ____________________#
+
+class FAQEntry(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.question
+
+class Patnership(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='partners_logos/')
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+class Testimonial(models.Model):
+    author_name = models.CharField(max_length=255)
+    author_title = models.CharField(max_length=255, blank=True)
+    content = models.TextField()
+    author_photo = models.ImageField(upload_to='testimonials_photos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Testimonial by {self.author_name}"
+    
+class TrustedCompany(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='trusted_companies_logos/')
+    website = models.URLField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+
+
+
+
+
+
+
+
+
+
 
 
 
