@@ -248,6 +248,40 @@ from .models import (
     ServiceComment, ServiceMessage
 )
 
+# In your current models.py (configurations app)
+
+class ClientRequest(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_requests')
+    required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
+    # other fields remain unchanged
+
+class ProviderSkill(models.Model):
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
+    # other fields remain unchanged
+
+class ServiceContract(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_contracts')
+    # other fields remain unchanged
+
+class ServiceLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_liked_services')
+    # other fields remain unchanged
+
+class ServiceMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_servicemessages')
+    # other fields remain unchanged
+
+class ServiceProviderProfile(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
+    # other fields remain unchanged
+
+class ServiceRequest(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_service_requests')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_service_requests')
+    required_skills = models.ManyToManyField(Skill, related_name='config_service_requests', blank=True)
+    # other fields remain unchanged
+
+
 # Enregistrement de tous les modèles
 auditlog.register(ServiceCategory)
 auditlog.register(ServicesTag)

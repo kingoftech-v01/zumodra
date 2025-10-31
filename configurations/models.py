@@ -11,6 +11,7 @@ User = settings.AUTH_USER_MODEL
 
 # Create your models here.
 
+<<<<<<< HEAD
 class ServiceCategory(models.Model):
     """
     Represents the category or sector of service.
@@ -20,6 +21,8 @@ class ServiceCategory(models.Model):
     def __str__(self):
         return self.name
 
+=======
+>>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
 class Skill(models.Model):
     """
     Represents a skill or competency.
@@ -394,6 +397,7 @@ class ApplicationMessage(models.Model):
 #____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
 #____________________FREELANCE & MATCHING MODELS____________________#
 
+<<<<<<< HEAD
 class ServicesTags(models.Model):
     tag = models.CharField(max_length=50)
     def __str__(self):
@@ -508,40 +512,82 @@ class ProviderSkill(models.Model):
     )
     class Meta:
         unique_together = ('provider', 'skill')
+=======
+#_______________Gestion des paiements et comptes séquestres________________#
 
-class ServiceRequest(models.Model):
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='service_requests')
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='service_requests')
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    required_skills = models.ManyToManyField(Skill, related_name='service_requests', blank=True)
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    deadline = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_open = models.BooleanField(default=True)
 
-class ServiceProposal(models.Model):
-    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name='proposals')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='proposals')
-    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    message = models.TextField(blank=True)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    is_accepted = models.BooleanField(default=False)
-    class Meta:
-        unique_together = ('request', 'provider')
+# class EscrowAccount(models.Model):
+#     contract = models.OneToOneField(ServiceContract, on_delete=models.CASCADE, related_name='escrow_account')
+#     amount_held = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+#     is_released = models.BooleanField(default=False)
+#     release_date = models.DateTimeField(null=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-class ServiceContract(models.Model):
-    request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name='contract')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='contracts')
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contracts')
-    agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    agreed_deadline = models.DateField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=[('pending','En attente'), ('active','Active'), ('completed','Terminée'), ('cancelled','Annulée')],
-        default='pending'
-    )
+#     def release_payment(self):
+#         if not self.is_released:
+#             self.is_released = True
+#             self.release_date = timezone.now()
+#             self.save()
+>>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
+
+# class PaymentTransaction(models.Model):
+#     escrow_account = models.ForeignKey(EscrowAccount, on_delete=models.CASCADE, related_name='payments')
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     transaction_date = models.DateTimeField(auto_now_add=True)
+#     description = models.CharField(max_length=255, blank=True)
+#     transaction_type = models.CharField(
+#         max_length=20,
+#         choices=[('deposit','Dépôt'), ('release','Libération'), ('refund','Remboursement')]
+#     )
+#     external_ref = models.CharField(max_length=255, blank=True)
+
+# class StatusHistory(models.Model):
+#     content_type = models.ForeignKey('contenttypes.ContentType', on_delete=models.CASCADE)
+#     object_id = models.PositiveIntegerField()
+#     # content_object = models.GenericForeignKey('content_type', 'object_id')
+#     old_status = models.CharField(max_length=50)
+#     new_status = models.CharField(max_length=50)
+#     changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+#     changed_at = models.DateTimeField(auto_now_add=True)
+
+# class Dispute(models.Model):
+#     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='disputes')
+#     opened_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+#     reason = models.TextField()
+#     status = models.CharField(
+#         choices=[('open','Ouvert'), ('resolved','Résolu'), ('closed','Fermé')],
+#         default='open', max_length=10
+#     )
+#     opened_at = models.DateTimeField(auto_now_add=True)
+#     resolved_at = models.DateTimeField(null=True, blank=True)
+#     resolution_notes = models.TextField(blank=True)
+
+# class Notification(models.Model):
+#     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+#     message = models.TextField()
+#     is_read = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+# class AvailabilitySlot(models.Model):
+#     provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='availability_slots')
+#     start_datetime = models.DateTimeField()
+#     end_datetime = models.DateTimeField()
+#     is_booked = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+# class Invoice(models.Model):
+#     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='invoices')
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     issued_at = models.DateField(auto_now_add=True)
+#     due_date = models.DateField()
+#     is_paid = models.BooleanField(default=False)
+#     payment_reference = models.CharField(max_length=255, blank=True)
+
+#____________________ Website Content & Config Models ____________________#
+
+class FAQEntry(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     started_at = models.DateTimeField(null=True, blank=True)
@@ -566,13 +612,17 @@ class ServiceMessage(models.Model):
 #_______________Gestion des paiements et comptes séquestres________________#
 
 
-class EscrowAccount(models.Model):
-    contract = models.OneToOneField(ServiceContract, on_delete=models.CASCADE, related_name='escrow_account')
-    amount_held = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    is_released = models.BooleanField(default=False)
-    release_date = models.DateTimeField(null=True, blank=True)
+    def __str__(self):
+        return self.question
+
+class Patnership(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='partners_logos/')
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+<<<<<<< HEAD
     def release_payment(self):
         if not self.is_released:
             self.is_released = True
@@ -622,15 +672,40 @@ class AvailabilitySlot(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     is_booked = models.BooleanField(default=False)
+=======
+    def __str__(self):
+        return self.name
+    
+class Testimonial(models.Model):
+    author_name = models.CharField(max_length=255)
+    author_title = models.CharField(max_length=255, blank=True)
+    content = models.TextField()
+    author_photo = models.ImageField(upload_to='testimonials_photos/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Invoice(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='invoices')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    issued_at = models.DateField(auto_now_add=True)
-    due_date = models.DateField()
-    is_paid = models.BooleanField(default=False)
-    payment_reference = models.CharField(max_length=255, blank=True)
+    def __str__(self):
+        return f"Testimonial by {self.author_name}"
+    
+class TrustedCompany(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='trusted_companies_logos/')
+    website = models.URLField(blank=True)
+>>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+
+
+
+
+
+
+
+
+
+
 
 #____________________ Website Content & Config Models ____________________#
 
