@@ -9,7 +9,6 @@
         <title>{% block head_title %}{% endblock head_title %}</title>
         <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
         <link rel="stylesheet" href="{% static '/assets/css/swiper-bundle.min.css' %}" />
-        <link rel="stylesheet" href="{% static '/assets/css/leaflet.css' %}" />
         <link rel="stylesheet" href="{% static '/assets/css/slick.css' %}" />
         <link rel="stylesheet" href="{% static '/assets/css/style.css' %}" />
         <link rel="stylesheet" href="{% static '/dist/output-tailwind.css' %}" />
@@ -20,6 +19,7 @@
         href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
         />
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        {% block extra_head %} {% endblock extra_head %}
     </head>
 
     <body class="flex flex-col min-h-screen">
@@ -37,10 +37,11 @@
         <!-- Footer -->
         {% include 'footer.html' %}
 
+        {% block js %} {% endblock js %}
+
         <script src="{% static '/assets/js/jquery.min.js' %}"></script>
         <script src="{% static '/assets/js/phosphor-icons.js' %}"></script>
         <script src="{% static '/assets/js/slick.min.js' %}"></script>
-        <script src="{% static '/assets/js/leaflet.js' %}"></script>
         <script src="{% static '/assets/js/swiper-bundle.min.js' %}"></script>
         <script src="{% static '/assets/js/main.js' %}"></script>
     </body>

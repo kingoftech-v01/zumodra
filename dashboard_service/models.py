@@ -6,11 +6,15 @@ from decimal import Decimal
 from django.utils import timezone
 from django.contrib.auth.models import Group, Permission
 from configurations.models import *
-# from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.db import models as gis_models
+from geopy.geocoders import Nominatim
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 User = User
 
 # Create your models here.
+
 #____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
 
 class ServiceCategory(models.Model):
@@ -70,21 +74,58 @@ class ServiceProviderProfile(models.Model):
     bio = models.TextField(blank=True)
     categories = models.ManyToManyField(ServiceCategory, blank=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
-    completed_jobs = models.PositiveIntegerField(default=0)
+    completed_jobs_count = models.PositiveIntegerField(default=0)
+    address = models.CharField(max_length=255, help_text="Address line 1 eg. 123 Main Street", blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=15, blank=True)
     location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
+    location_lng = models.FloatField(null=True, blank=True)
+    location = gis_models.PointField(geography=True, null=True, blank=True)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
     rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
     total_reviews = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     last_active = models.DateTimeField(auto_now=True)
     services = models.ManyToManyField('Service', blank=True, related_name='service_providers')
-    availability_status = models.CharField(max_length=20, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
+    availability_status = models.CharField(max_length=25, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
     is_verified = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
+    is_mobile = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Provider: {self.user}"
+        return f"{self.user.username} - {self.address}"
+
+    def get_full_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
+    def get_short_name(self):
+        return f"{self.user.first_name}"
+
+    def get_email(self):
+        return f"{self.user.email}"
+
+    class Meta:
+        verbose_name = _("Service Provider Profile")
+        verbose_name_plural = _("Service Provider Profiles")
+
+    def save(self, *args, **kwargs):
+        if self.address:
+            try:
+                geolocator = Nominatim(user_agent="zumodra_app")
+                location = geolocator.geocode(f"{self.address}, {self.city}, {self.country}")
+                if location:
+                    from django.contrib.gis.geos import Point
+                    self.location = Point(location.longitude, location.latitude)
+                    self.location_lat = location.latitude
+                    self.location_lng = location.longitude
+                else:
+                    raise ValidationError(_("Could not geocode the given address."))
+            except Exception as e:
+                print(f"Geocoding error: {e}")
+
+        super().save(*args, **kwargs)
+
 
 # Services offerts par l’entreprise
 class Service(models.Model):

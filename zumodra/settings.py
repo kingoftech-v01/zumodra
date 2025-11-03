@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django.contrib.sitemaps',
-    # 'django.contrib.gis',
+    'django.contrib.gis',
 
     'django_otp',
     'django_otp.plugins.otp_totp',
@@ -63,7 +63,7 @@ INSTALLED_APPS = [
 
     'widget_tweaks',
     'tinymce',
-    # 'leaflet',
+    'leaflet',
     # 'campaign',
 
     'analytical',                # django-analytical for analytics
@@ -85,6 +85,8 @@ INSTALLED_APPS = [
     'admin_honeypot',
     'csp',
     'axes',
+
+    'django_q',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -518,3 +520,17 @@ LEAFLET_MAP_OPTIONS = {
 APPOINTMENT_START_TIME = 8
 APPOINTMENT_END_TIME = 18
 APPOINTMENT_SERVICE_MODEL = 'dashboard_service.Service'
+
+
+# Django Q
+
+Q_CLUSTER = {
+    'name': 'django-appointment',
+    'workers': 4,
+    'timeout': 90,
+    'retry': 120,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default',
+}
+USE_DJANGO_Q_FOR_EMAILS = True  # Use Django Q for sending ALL emails
