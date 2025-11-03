@@ -50,7 +50,7 @@ class UserSubscription(models.Model):
     Tracks the user's subscription status.
     Linked to Stripe subscription ID and current active status.
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription_status_user')
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.SET_NULL, null=True)
     stripe_subscription_id = models.CharField(max_length=255, unique=True)
     status = models.CharField(max_length=50)  # e.g. active, past_due, canceled

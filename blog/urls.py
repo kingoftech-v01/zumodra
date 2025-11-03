@@ -1,7 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail import urls as wagtail_urls
+from wagtail.documents import urls as wagtaildocs_urls
+
 urlpatterns = [
-    path('posts/', blog_default, name='blog_main'),
-    path('post-detail/<str:slug>', blog_post_detail, name='blog_post_detail'),
+    path('cms/', include(wagtailadmin_urls)),                   # CMS URLs
+    path('documents/', include(wagtaildocs_urls)),
+    path('posts/', include(wagtail_urls)),
 ]

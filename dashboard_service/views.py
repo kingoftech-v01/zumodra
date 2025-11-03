@@ -14,7 +14,7 @@ def browse_service(request):
     service_providers = ServiceProviderProfile.objects.all()
     service_tags = ServicesTag.objects.all()
 
-    paginator = Paginator(services_list_query, 10)
+    paginator = Paginator(services_list_query, 1)
     page_number = request.GET.get('page')
     services = paginator.get_page(page_number)
 

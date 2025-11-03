@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from custom_account_u.models import CustomUser
 from tinymce.models import HTMLField
+from django.contrib import admin
 
 from wagtail.models import Page
 from wagtail.fields import RichTextField
@@ -10,6 +11,14 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel, FieldRowPanel
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
+from modelcluster.tags import ClusterTaggableManager
+from modelcluster.fields import ParentalKey
+
+from django.utils.translation import gettext_lazy as _
+from wagtail.fields import StreamField
+from wagtail import blocks
+from wagtail.images.blocks import ImageBlock
+from wagtail.contrib.table_block.blocks import TableBlock
 
 # Create your models here.
 
@@ -69,31 +78,31 @@ class BlogPost(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-class Comment(models.Model):
-    """
-    Commentaire sur un article de blog, avec possibilité de répondre à un autre commentaire.
-    """
-    post = models.ForeignKey(
-        BlogPost, related_name='comments',
-        on_delete=models.CASCADE,
-        help_text="Article associé au commentaire"
-    )
-    author = models.ForeignKey(
-        CustomUser, on_delete=models.PROTECT,
-        help_text="Auteur du commentaire"
-    )
-    content = models.TextField(help_text="Contenu du commentaire")
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
-    parent = models.ForeignKey(
-        'self',
-        null=True, blank=True,
-        related_name='replies',
-        on_delete=models.CASCADE,
-        help_text="Commentaire parent si ce commentaire est une réponse"
-    )
+# class Comment(models.Model):
+#     """
+#     Commentaire sur un article de blog, avec possibilité de répondre à un autre commentaire.
+#     """
+#     post = models.ForeignKey(
+#         BlogPost, related_name='comments',
+#         on_delete=models.CASCADE,
+#         help_text="Article associé au commentaire"
+#     )
+#     author = models.ForeignKey(
+#         CustomUser, on_delete=models.PROTECT,
+#         help_text="Auteur du commentaire"
+#     )
+#     content = models.TextField(help_text="Contenu du commentaire")
+#     created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
+#     parent = models.ForeignKey(
+#         'self',
+#         null=True, blank=True,
+#         related_name='replies',
+#         on_delete=models.CASCADE,
+#         help_text="Commentaire parent si ce commentaire est une réponse"
+#     )
 
-    def __str__(self):
-        return f'Reply by {self.author} on {self.post}' if self.parent else f'Comment by {self.author} on {self.post}'
+#     def __str__(self):
+#         return f'Reply by {self.author} on {self.post}' if self.parent else f'Comment by {self.author} on {self.post}'
 
 class Category(models.Model):
     """
@@ -125,7 +134,7 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-<<<<<<< HEAD
+
 # class Blog_index_Page(Page):
 #     parent_page_types = ['wagtailcore.Page']
 #     subpage_types = ['blog.BlogPost']
@@ -238,14 +247,29 @@ class Tag(models.Model):
 #         FieldPanel("publishing_date"),
 #         FieldPanel("tags"),
 #     ]
-=======
-class Blog_index_Page(Page):
-    parent_page_types = ['wagtailcore.Page']
-    subpage_types = ['blog.BlogPost']
 
+from wagtail import blocks
+
+class RichTextCellBlock(blocks.RichTextBlock):
+    pass
+
+class TableRowBlock(blocks.StructBlock):
+    cells = blocks.ListBlock(RichTextCellBlock())
+
+class CustomTableBlock(blocks.StructBlock):
+    header = blocks.ListBlock(blocks.CharBlock())
+    rows = blocks.ListBlock(TableRowBlock())
+
+class QuoteBlock(blocks.StructBlock):
+    quote = blocks.BlockQuoteBlock(required=True, help_text="Texte de la citation")
+    author = blocks.RichTextBlock(required=False, help_text="Auteur de la citation")
+    source = blocks.RichTextBlock(required=False, help_text="Source de la citation")
+
+    class Meta:
+        icon = "openquote"
 
 class BlogPostPage(Page):
-    template = "blog/blog_post_page.html"
+    template = "blog/blog-detail1.html"
 
     STATUS_CHOICES = [
         ('draft', 'Brouillon'),
@@ -253,26 +277,41 @@ class BlogPostPage(Page):
         ('finished', 'Terminé'),
         ('published', 'Publié'),
     ]
-
-    content_html = RichTextField(features=["bold", "italic", "link", "image", "code"])
+    body = StreamField([
+        ('heading', blocks.RichTextBlock(form_classname="title")),
+        ('heading2', blocks.RichTextBlock(form_classname="title2")),
+        ('heading3', blocks.RichTextBlock(form_classname="title3")),
+        ('heading4', blocks.RichTextBlock(form_classname="title4")),
+        ('heading5', blocks.RichTextBlock(form_classname="title5")),
+        ('heading6', blocks.RichTextBlock(form_classname="title6")),
+        ('ordered_list', blocks.ListBlock(blocks.RichTextBlock(), icon="list-ol")),
+        ('unordered_list', blocks.ListBlock(blocks.RichTextBlock(), icon="list-ul")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageBlock()),
+        ('quote', QuoteBlock()),
+        ('table', CustomTableBlock()),
+    ], null=True, blank=True)
     excerpt = models.TextField(max_length=300, blank=True)
     featured_image = models.ForeignKey(
         'wagtailimages.Image',
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='+',
+        help_text="Image principale"
     )
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     meta_title = models.CharField(max_length=200, blank=True)
     meta_description = models.TextField(blank=True)
     publishing_date = models.DateTimeField(null=True, blank=True)
+    tags = ClusterTaggableManager(through='BlogPostTag', blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel("content_html"),
+        FieldPanel("body"),
         FieldPanel("excerpt"),
         FieldPanel("featured_image"),
         FieldPanel("status"),
         FieldPanel("publishing_date"),
+        FieldPanel("tags"),
     ]
 
     promote_panels = Page.promote_panels + [
@@ -300,7 +339,11 @@ class BlogIndexPage(Page):
         FieldPanel("intro"),
     ]
 
+    # parent_page_types = ['wagtailcore.Page']
+
     subpage_types = ['blog.BlogPostPage', 'blog.CategoryPage']
+
+    template = "blog/blog-default.html"
 
     def get_context(self, request):
         context = super().get_context(request)
@@ -314,7 +357,7 @@ class Comment(models.Model):
         related_name='comments',
         on_delete=models.CASCADE
     )
-    author_name = models.CharField(max_length=120)
+    author_name = models.CharField(max_length=120, default='', blank=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey(
@@ -339,23 +382,24 @@ class BlogPostTag(TaggedItemBase):
         on_delete=models.CASCADE
     )
 
-class BlogPostPage(Page):
-    ...
-    tags = ClusterTaggableManager(through=BlogPostTag, blank=True)
+# class Comment(models.Model):
+#     post = models.ForeignKey(
+#         'blog.BlogPostPage',
+#         related_name='comments',
+#         on_delete=models.CASCADE
+#     )
+#     author_name = models.CharField(max_length=120)
+#     content = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     parent = models.ForeignKey(
+#         'self',
+#         null=True, blank=True,
+#         related_name='replies',
+#         on_delete=models.CASCADE
+#     )
 
-    content_panels = Page.content_panels + [
-        FieldPanel("content_html"),
-        FieldPanel("excerpt"),
-        FieldPanel("featured_image"),
-        FieldPanel("status"),
-        FieldPanel("publishing_date"),
-        FieldPanel("tags"),
-    ]
->>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
-
-
-
-
+#     def __str__(self):
+#         return f"{self.author_name} - {self.post.title}"
 
 
 

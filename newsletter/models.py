@@ -17,6 +17,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext
 from django.utils.timezone import now
 from django.urls import reverse
+from django.contrib.sites.managers import CurrentSiteManager
 
 from .fields import DynamicImageField
 from .settings import newsletter_settings
@@ -65,6 +66,7 @@ class Newsletter(models.Model):
     )
 
     objects = models.Manager()
+    on_site = CurrentSiteManager('site')
 
     def get_templates(self, action):
         """

@@ -11,18 +11,6 @@ User = settings.AUTH_USER_MODEL
 
 # Create your models here.
 
-<<<<<<< HEAD
-class ServiceCategory(models.Model):
-    """
-    Represents the category or sector of service.
-    """
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-=======
->>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
 class Skill(models.Model):
     """
     Represents a skill or competency.
@@ -394,125 +382,7 @@ class ApplicationMessage(models.Model):
     message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
 
-#____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
-#____________________FREELANCE & MATCHING MODELS____________________#
 
-<<<<<<< HEAD
-class ServicesTags(models.Model):
-    tag = models.CharField(max_length=50)
-    def __str__(self):
-        return f"{self.tag}"
-
-# Services offerts par l’entreprise
-class Service(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='services')
-    serviceCategory = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    price = models.PositiveIntegerField(null=True, blank=True)  # prix indicatif
-    duration_minutes = models.PositiveIntegerField(null=True, blank=True)  # durée estimée
-    thumbnail = models.ImageField(upload_to='service_thumbnails/', blank=True, null=True)
-    images = models.ManyToManyField('ServicesPicture', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.name} ({self.company.name})"
-    
-class ServicesPicture(models.Model):
-    image = models.ImageField(upload_to='service_pictures/')
-    description = models.CharField(max_length=255, blank=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Image for {self.service.name}"
-    
-class ServiceLike(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='liked_services')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='likes')
-    liked_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'service')
-
-    def __str__(self):
-        return f"{self.user.email} likes {self.service.name}"
-
-# Prestataires de services (ServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
-class ServiceProviderProfile(models.Model):
-    """
-    Extending existing profile with skills and service categories.
-    """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='provider_profile')
-    company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, related_name='providers')
-    skills = models.ManyToManyField(Skill, blank=True)
-    bio = models.TextField(blank=True)
-    categories = models.ManyToManyField(ServiceCategory, blank=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
-    completed_jobs = models.PositiveIntegerField(default=0)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
-    total_reviews = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_active = models.DateTimeField(auto_now=True)
-    services = models.ManyToManyField(Service, blank=True, related_name='providers')
-    availability_status = models.CharField(max_length=20, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
-
-    def __str__(self):
-        return f"Provider: {self.user}"
-
-# Request clients (ClientRequest) avec critères de recherche, budget, localisation, etc.
-class ClientRequest(models.Model):
-    """
-    Represents a client’s service request including skills required,
-    location preferences, budget, and other parameters.
-    """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
-    required_skills = models.ManyToManyField(Skill, blank=True)
-    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-    remote_allowed = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Request by {self.client} for {self.service_category}"
-
-
-class Match(models.Model):
-    """
-    Stores a match between a ClientRequest and a ServiceProviderProfile,
-    along with a score computed by AI or heuristics.
-    """
-    client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
-    provider_profile = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
-    score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
-    matched_at = models.DateTimeField(auto_now_add=True)
-    viewed_by_client = models.BooleanField(default=False)
-    accepted_by_client = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('client_request', 'provider_profile')
-
-    def __str__(self):
-        return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
-
-class ProviderSkill(models.Model):
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='provider_skills')
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='provider_skills')
-    level = models.CharField(
-        max_length=20,
-        choices=[('beginner','Débutant'), ('intermediate','Intermédiaire'), ('expert','Expert')],
-        default='beginner'
-    )
-    class Meta:
-        unique_together = ('provider', 'skill')
-=======
 #_______________Gestion des paiements et comptes séquestres________________#
 
 
@@ -528,7 +398,6 @@ class ProviderSkill(models.Model):
 #             self.is_released = True
 #             self.release_date = timezone.now()
 #             self.save()
->>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
 
 # class PaymentTransaction(models.Model):
 #     escrow_account = models.ForeignKey(EscrowAccount, on_delete=models.CASCADE, related_name='payments')
@@ -582,130 +451,6 @@ class ProviderSkill(models.Model):
 #     due_date = models.DateField()
 #     is_paid = models.BooleanField(default=False)
 #     payment_reference = models.CharField(max_length=255, blank=True)
-
-#____________________ Website Content & Config Models ____________________#
-
-class FAQEntry(models.Model):
-    question = models.CharField(max_length=255)
-    answer = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-
-class ProviderReview(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='reviews')
-    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField()
-    comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        unique_together = ('contract', 'reviewer')
-
-class ServiceMessage(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    message = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-
-
-#_______________Gestion des paiements et comptes séquestres________________#
-
-
-    def __str__(self):
-        return self.question
-
-class Patnership(models.Model):
-    name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='partners_logos/')
-    website = models.URLField(blank=True)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-<<<<<<< HEAD
-    def release_payment(self):
-        if not self.is_released:
-            self.is_released = True
-            self.release_date = timezone.now()
-            self.save()
-
-class PaymentTransaction(models.Model):
-    escrow_account = models.ForeignKey(EscrowAccount, on_delete=models.CASCADE, related_name='payments')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_date = models.DateTimeField(auto_now_add=True)
-    description = models.CharField(max_length=255, blank=True)
-    transaction_type = models.CharField(
-        max_length=20,
-        choices=[('deposit','Dépôt'), ('release','Libération'), ('refund','Remboursement')]
-    )
-    external_ref = models.CharField(max_length=255, blank=True)
-
-class StatusHistory(models.Model):
-    content_type = models.ForeignKey('contenttypes.ContentType', on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    # content_object = models.GenericForeignKey('content_type', 'object_id')
-    old_status = models.CharField(max_length=50)
-    new_status = models.CharField(max_length=50)
-    changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    changed_at = models.DateTimeField(auto_now_add=True)
-
-class Dispute(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='disputes')
-    opened_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    reason = models.TextField()
-    status = models.CharField(
-        choices=[('open','Ouvert'), ('resolved','Résolu'), ('closed','Fermé')],
-        default='open', max_length=10
-    )
-    opened_at = models.DateTimeField(auto_now_add=True)
-    resolved_at = models.DateTimeField(null=True, blank=True)
-    resolution_notes = models.TextField(blank=True)
-
-class Notification(models.Model):
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class AvailabilitySlot(models.Model):
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='availability_slots')
-    start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
-    is_booked = models.BooleanField(default=False)
-=======
-    def __str__(self):
-        return self.name
-    
-class Testimonial(models.Model):
-    author_name = models.CharField(max_length=255)
-    author_title = models.CharField(max_length=255, blank=True)
-    content = models.TextField()
-    author_photo = models.ImageField(upload_to='testimonials_photos/', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Testimonial by {self.author_name}"
-    
-class TrustedCompany(models.Model):
-    name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='trusted_companies_logos/')
-    website = models.URLField(blank=True)
->>>>>>> 5c8178b81147c1f40365b414172df210ed6b597d
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-    
-
-
-
-
-
-
-
-
-
-
 
 #____________________ Website Content & Config Models ____________________#
 

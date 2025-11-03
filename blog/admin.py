@@ -30,8 +30,8 @@ class BlogPostAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('author', 'post', 'created_at', 'parent')
-    list_filter = ('created_at', 'author')
+    list_display = ('author_name', 'post', 'created_at', 'parent')
+    list_filter = ('created_at', 'author_name')
     search_fields = ('content', 'author__username', 'post__title')
 
 @admin.register(Category)

@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from configurations.models import *
 # from django.contrib.gis.db import models as gis_models
 
-User = settings.AUTH_USER_MODEL
+User = User
 
 # Create your models here.
 #____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
@@ -49,7 +49,7 @@ class ServicesPicture(models.Model):
 
 class ProviderSkill(models.Model):
     provider = models.ForeignKey('ServiceProviderProfile', on_delete=models.CASCADE, related_name='provider_skills')
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='provider_skills')
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
     level = models.CharField(
         max_length=20,
         choices=[('beginner','Débutant'), ('intermediate','Intermédiaire'), ('expert','Expert')],
@@ -65,7 +65,7 @@ class ServiceProviderProfile(models.Model):
     """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='service_provider_profile')
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='providers')
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
     skills = models.ManyToManyField(ProviderSkill, blank=True)
     bio = models.TextField(blank=True)
     categories = models.ManyToManyField(ServiceCategory, blank=True)
@@ -104,8 +104,8 @@ class Service(models.Model):
         return f"{self.name} ({self.provider.user.first_name} {self.provider.user.last_name})"
     
 class ServiceLike(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='liked_services')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_services_by_user')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='config_liked_services')
     liked_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -120,8 +120,8 @@ class ClientRequest(models.Model):
     Represents a client’s service request including skills required,
     location preferences, budget, and other parameters.
     """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
-    required_skills = models.ManyToManyField(Skill, blank=True)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_user_requests_service')
+    required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
     service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -151,11 +151,12 @@ class Match(models.Model):
         return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
 
 class ServiceRequest(models.Model):
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='service_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='service_requests')
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_service_requests')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_service_requests')
+    required_skills = models.ManyToManyField(Skill, related_name='config_service_requests', blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    required_skills = models.ManyToManyField(Skill, related_name='service_requests', blank=True)
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     deadline = models.DateField(null=True, blank=True)
@@ -174,8 +175,8 @@ class ServiceProposal(models.Model):
 
 class ServiceContract(models.Model):
     request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name='contract')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='contracts')
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contracts')
+    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='config_provider_contracts')
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cconfig_client_contracts')
     agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
     agreed_deadline = models.DateField(null=True, blank=True)
     status = models.CharField(
@@ -209,7 +210,7 @@ class ServiceComment(models.Model):
         help_text="Service associé au commentaire"
     )
     reviewer = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        User, on_delete=models.PROTECT,
         help_text="Auteur du commentaire"
     )
     content = models.TextField(help_text="Contenu du commentaire", blank=True)
@@ -232,7 +233,7 @@ class ServiceComment(models.Model):
 
 class ServiceMessage(models.Model):
     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_servicemessages')
     message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
 
@@ -248,39 +249,21 @@ from .models import (
     ServiceComment, ServiceMessage
 )
 
-# In your current models.py (configurations app)
 
-class ClientRequest(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_requests')
-    required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
-    # other fields remain unchanged
-
-class ProviderSkill(models.Model):
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
-    # other fields remain unchanged
-
-class ServiceContract(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_contracts')
-    # other fields remain unchanged
-
-class ServiceLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_liked_services')
-    # other fields remain unchanged
-
-class ServiceMessage(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_servicemessages')
-    # other fields remain unchanged
-
-class ServiceProviderProfile(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
-    # other fields remain unchanged
-
-class ServiceRequest(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_service_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_service_requests')
-    required_skills = models.ManyToManyField(Skill, related_name='config_service_requests', blank=True)
-    # other fields remain unchanged
-
+# auditlog.register(ServiceCategory)
+# auditlog.register(ServicesTag)
+# auditlog.register(ServicesPicture)
+# auditlog.register(ProviderSkill)
+# auditlog.register(ServiceProviderProfile)
+# auditlog.register(Service)
+# auditlog.register(ServiceLike)
+# auditlog.register(ClientRequest)
+# auditlog.register(Match)
+# auditlog.register(ServiceRequest)
+# auditlog.register(ServiceProposal)
+# auditlog.register(ServiceContract)
+# auditlog.register(ServiceComment)
+# auditlog.register(ServiceMessage)
 
 # Enregistrement de tous les modèles
 auditlog.register(ServiceCategory)

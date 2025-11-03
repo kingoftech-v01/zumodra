@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load wagtailcore_tags %}
+
 
         <!-- Header -->
         <header id="header" class="header sticky top-0 z-50 bg-white shadow-md {% block header_class %}{% endblock header_class %}">
@@ -433,92 +435,9 @@
                     <div class="navigator h-full max-[1400px]:hidden">
                         <ul class="list flex items-center gap-5 h-full">
                             <li class="h-full relative">
-                                <a href="#!" class="flex items-center gap-1 h-full text-white duration-300 active">
+                                <a href="{% url 'home' %}" class="flex items-center gap-1 h-full text-white duration-300">
                                     <span class="text-title relative">Homepages</span>
-                                    <span class="ph-bold ph-caret-down"></span>
                                 </a>
-                                <div class="sub_menu sub_menu_home overflow-x-hidden fixed w-full left-0 top-20 py-10 bg-white rounded-lg">
-                                    <ul class="container grid grid-cols-5 gap-5">
-                                        <li>
-                                            <a href="index.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md active">
-                                                <img src="./assets/images/components/home1.webp" alt="home1" class="w-full rounded" />
-                                                <span>Home Freelancer 01</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer2.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home2.webp" alt="home2" class="w-full rounded" />
-                                                <span>Home Freelancer 02</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer3.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home3.webp" alt="home3" class="w-full rounded" />
-                                                <span>Home Freelancer 03</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer4.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home4.webp" alt="home4" class="w-full rounded" />
-                                                <span>Home Freelancer 04</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer5.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home5.webp" alt="home5" class="w-full rounded" />
-                                                <span>Home Freelancer 05</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer6.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home6.webp" alt="home6" class="w-full rounded" />
-                                                <span>Home Freelancer 06</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer7.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home7.webp" alt="home7" class="w-full rounded" />
-                                                <span>Home Freelancer 07</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="freelancer8.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home8.webp" alt="home8" class="w-full rounded" />
-                                                <span>Home Freelancer 08</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="jobs9.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home9.webp" alt="home9" class="w-full rounded" />
-                                                <span>Home Jobs 09</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="jobs10.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home10.webp" alt="home10" class="w-full rounded" />
-                                                <span>Home Jobs 10</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="jobs11.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home11.webp" alt="home11" class="w-full rounded" />
-                                                <span>Home Jobs 11</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="jobs12.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home12.webp" alt="home12" class="w-full rounded" />
-                                                <span>Home Jobs 12</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="rtl13.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                                <img src="./assets/images/components/home13.webp" alt="home13" class="w-full rounded" />
-                                                <span>Home RTL 13</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
                             <li class="h-full relative">
                                 <a href="#!" class="flex items-center gap-1 h-full text-white duration-300">
@@ -736,7 +655,7 @@
                                 </div>
                             </li>
                             <li class="h-full relative">
-                                <a href="{% url 'blog_main' %}" class="flex items-center gap-1 h-full text-white duration-300">
+                                <a href="{% url 'wagtail_serve' '' %}" class="flex items-center gap-1 h-full text-white duration-300">
                                     <span class="text-title relative">Blogs</span>
                                 </a>
                             </li>

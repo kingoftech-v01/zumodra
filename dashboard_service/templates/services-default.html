@@ -113,35 +113,77 @@
                         <span class="caption1">Clear All</span>
                     </button>
                 </div>
+                {% if services %}
                 <ul class="list_layout_cols list_services grid xl:grid-cols-4 sm:grid-cols-2 md:gap-7.5 gap-5 w-full md:mt-10 mt-7">
                     {% for service in services %}
                     <li class="item h-full">
                         <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <!-- LIKE / FAVORITE BUTTON -->
                             <button class="add_wishlist_btn">
                                 <span class="ph ph-heart text-xl"></span>
                                 <span class="ph-fill ph-heart text-xl"></span>
                             </button>
-                            <a href="services-detail1.html" class="service_thumb">
-                                <img src="./assets/images/service/1.webp" alt="1" class="w-full" />
+
+                            <!-- THUMBNAIL -->
+                            <a href="{% url 'browse_service_detail' service.uuid %}" class="service_thumb block aspect-[4/3] overflow-hidden rounded-lg">
+                                {% if service.thumbnail %}
+                                    <img src="{{ service.thumbnail.url }}" alt="{{ service.name }}" class="w-full h-auto object-cover">
+                                {% else %}
+                                    <img src="{% static 'images/service/default.webp' %}" alt="default service" class="w-full h-auto object-cover">
+                                {% endif %}
                             </a>
+
+                            <!-- INFO BLOCK -->
                             <div class="service_info py-5 px-4">
                                 <div class="flex items-center justify-between">
-                                    <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Graphic & Design</a>
+                                    <!-- CATEGORY -->
+                                    {% if service.serviceCategory %}
+                                        <a href="#" class="tag caption2 bg-surface hover:bg-primary hover:text-white">
+                                            {{ service.serviceCategory.name }}
+                                        </a>
+                                    {% else %}
+                                        <span class="tag caption2 bg-surface">Uncategorized</span>
+                                    {% endif %}
+
+                                    <!-- AVERAGE RATING -->
                                     <div class="rate flex items-center gap-1">
                                         <span class="ph-fill ph-star text-yellow text-xs"></span>
-                                        <strong class="service_rate text-button-sm">4.9</strong>
-                                        <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                        <strong class="service_rate text-button-sm">
+                                            {{ service.provider.rating_avg|default:"0.0" }}
+                                        </strong>
+                                        <span class="service_rate_quantity caption1 text-secondary">
+                                            ({{ service.provider.total_reviews|default:"0" }})
+                                        </span>
                                     </div>
                                 </div>
-                                <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">Professional seo services to boost your website's visibility</a>
+
+                                <!-- TITLE -->
+                                <a href="{% url 'browse_service_detail' service.uuid %}" 
+                                class="service_title text-title pt-2 duration-300 hover:text-primary">
+                                    {{ service.name }}
+                                </a>
+
+                                <!-- BOTTOM INFO: AUTHOR + PRICE -->
                                 <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
-                                    <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
-                                        <img src="./assets/images/avatar/IMG-1.webp" alt="IMG-1" class="service_author_avatar w-8 h-8 rounded-full" />
-                                        <span class="service_author_name -style-1">Floyd Miles</span>
+                                    <a href="#" class="service_author flex items-center gap-2">
+                                        {% if service.provider.user.profile.image %}
+                                            <img src="{{ service.provider.user.profile.image.url }}" 
+                                                alt="{{ service.provider.user.get_full_name }}" 
+                                                class="service_author_avatar w-8 h-8 rounded-full">
+                                        {% else %}
+                                            <img src="{% static 'images/avatar/default.png' %}" 
+                                                alt="default avatar" 
+                                                class="service_author_avatar w-8 h-8 rounded-full">
+                                        {% endif %}
+                                        <span class="service_author_name -style-1">
+                                            {{ service.provider.user.get_full_name|default:service.provider.user.username }}
+                                        </span>
                                     </a>
                                     <div class="service_price whitespace-nowrap">
                                         <span class="text-secondary">From </span>
-                                        <span class="price text-title">$75</span>
+                                        <span class="price text-title">
+                                            ${{ service.price|floatformat:2 }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -150,119 +192,18 @@
                     {% empty %}
                     <li>
                         <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <a href="services-default.html" class="service_thumb">
-                                <img src="./assets/images/service/1.webp" alt="1" class="w-full" />
+                            <a href="#" class="service_thumb">
+                                <img src="{% static 'images/service/default.webp' %}" alt="no service" class="w-full object-cover">
                             </a>
-                            <p class="text-center py-5 px-4">No services</p>
+                            <p class="text-center py-5 px-4">No services found</p>
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
-
-<ul class="list_layout_cols list_services grid xl:grid-cols-4 sm:grid-cols-2 md:gap-7.5 gap-5 w-full md:mt-10 mt-7">
-    {% for service in services %}
-    <li class="item h-full">
-        <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-            <!-- LIKE / FAVORITE BUTTON -->
-            <button class="add_wishlist_btn">
-                <span class="ph ph-heart text-xl"></span>
-                <span class="ph-fill ph-heart text-xl"></span>
-            </button>
-
-            <!-- THUMBNAIL -->
-            <a href="{% url 'browse_service_detail' service.uuid %}" class="service_thumb">
-                {% if service.thumbnail %}
-                    <img src="{{ service.thumbnail.url }}" alt="{{ service.name }}" class="w-full object-cover">
                 {% else %}
-                    <img src="{% static 'images/service/default.webp' %}" alt="default service" class="w-full object-cover">
+                    <p class="text-center py-5 px-4">No services available</p>
                 {% endif %}
-            </a>
-
-            <!-- INFO BLOCK -->
-            <div class="service_info py-5 px-4">
-                <div class="flex items-center justify-between">
-                    <!-- CATEGORY -->
-                    {% if service.serviceCategory %}
-                        <a href="#" class="tag caption2 bg-surface hover:bg-primary hover:text-white">
-                            {{ service.serviceCategory.name }}
-                        </a>
-                    {% else %}
-                        <span class="tag caption2 bg-surface">Uncategorized</span>
-                    {% endif %}
-
-                    <!-- AVERAGE RATING -->
-                    <div class="rate flex items-center gap-1">
-                        <span class="ph-fill ph-star text-yellow text-xs"></span>
-                        <strong class="service_rate text-button-sm">
-                            {{ service.provider.rating_avg|default:"0.0" }}
-                        </strong>
-                        <span class="service_rate_quantity caption1 text-secondary">
-                            ({{ service.provider.total_reviews|default:"0" }})
-                        </span>
-                    </div>
-                </div>
-
-                <!-- TITLE -->
-                <a href="{% url 'browse_service_detail' service.uuid %}" 
-                   class="service_title text-title pt-2 duration-300 hover:text-primary">
-                    {{ service.name }}
-                </a>
-
-                <!-- BOTTOM INFO: AUTHOR + PRICE -->
-                <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
-                    <a href="#" class="service_author flex items-center gap-2">
-                        {% if service.provider.user.profile.image %}
-                            <img src="{{ service.provider.user.profile.image.url }}" 
-                                 alt="{{ service.provider.user.get_full_name }}" 
-                                 class="service_author_avatar w-8 h-8 rounded-full">
-                        {% else %}
-                            <img src="{% static 'images/avatar/default.png' %}" 
-                                 alt="default avatar" 
-                                 class="service_author_avatar w-8 h-8 rounded-full">
-                        {% endif %}
-                        <span class="service_author_name -style-1">
-                            {{ service.provider.user.get_full_name|default:service.provider.user.username }}
-                        </span>
-                    </a>
-                    <div class="service_price whitespace-nowrap">
-                        <span class="text-secondary">From </span>
-                        <span class="price text-title">
-                            ${{ service.price|floatformat:2 }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </li>
-
-    {% empty %}
-    <li>
-        <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-            <a href="#" class="service_thumb">
-                <img src="{% static 'images/service/default.webp' %}" alt="no service" class="w-full object-cover">
-            </a>
-            <p class="text-center py-5 px-4">No services found</p>
-        </div>
-    </li>
-    {% endfor %}
-</ul>
-
-                
-                <!-- <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
-                    <li role="presentation">
-                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
-                    </li>
-                </ul> -->
-
+                <!-- Pagination -->
                 <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
                     <!-- Bouton page précédente -->
                     {% if services.has_previous %}
