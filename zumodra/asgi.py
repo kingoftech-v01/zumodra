@@ -15,11 +15,22 @@ import messages_sys.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zumodra.settings')
 
+# application = ProtocolTypeRouter({
+#     "http": get_asgi_application(),
+#     "websocket": AuthMiddlewareStack(
+#         URLRouter(
+#             messages_sys.routing.websocket_urlpatterns
+#         )
+#     ),
+# })
+
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
-    "websocket": AuthMiddlewareStack(
-        URLRouter(
-            messages_sys.routing.websocket_urlpatterns
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter(
+                your_routing.websocket_urlpatterns + messages_sys.routing.websocket_urlpatterns
+            )
         )
     ),
 })

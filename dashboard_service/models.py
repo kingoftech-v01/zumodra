@@ -86,12 +86,15 @@ class ServiceProviderProfile(models.Model):
     rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
     total_reviews = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     last_active = models.DateTimeField(auto_now=True)
     services = models.ManyToManyField('Service', blank=True, related_name='service_providers')
     availability_status = models.CharField(max_length=25, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
     is_verified = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
     is_mobile = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='service_provider_images/', blank=True, null=True)
+    entity_name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.address}"
@@ -110,6 +113,19 @@ class ServiceProviderProfile(models.Model):
         verbose_name_plural = _("Service Provider Profiles")
 
     def save(self, *args, **kwargs):
+        # if no user is should have a company assigned if no company it should have a user assigned
+        # CREATE  a fonction to get the name of the user or the company assigned
+    # Définir un nom lisible pour l'entité (utilisateur ou entreprise)
+        entity_name = None
+        if self.user:
+            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+            self.entity_name = full_name or self.user.username
+        elif self.company:
+            self.entity_name = self.company.name
+        else:
+            raise ValidationError(_("A service provider must have either an associated user or company."))
+
+        # Géocodage de l’adresse si elle existe
         if self.address:
             try:
                 geolocator = Nominatim(user_agent="zumodra_app")
@@ -125,6 +141,32 @@ class ServiceProviderProfile(models.Model):
                 print(f"Geocoding error: {e}")
 
         super().save(*args, **kwargs)
+
+# from django.core.exceptions import ValidationError
+# from django.contrib.gis.geos import Point
+# from geopy.geocoders import Nominatim
+# from django.utils.translation import gettext_lazy as _
+
+def save(self, *args, **kwargs):
+
+
+    # Géocodage de l’adresse si elle existe et que la position n’est pas déjà définie
+    if self.address and (not self.location_lat or not self.location_lng):
+        full_address = ", ".join(filter(None, [self.address, self.city, self.country]))
+        try:
+            geolocator = Nominatim(user_agent="zumodra_app")
+            location = geolocator.geocode(full_address, timeout=10)
+            if location:
+                self.location = Point(location.longitude, location.latitude)
+                self.location_lat = location.latitude
+                self.location_lng = location.longitude
+            else:
+                raise ValidationError(_("Could not geocode the given address."))
+        except Exception as e:
+            print(f"Geocoding error for {entity_name}: {e}")
+
+    super().save(*args, **kwargs)
+
 
 
 # Services offerts par l’entreprise

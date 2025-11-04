@@ -61,24 +61,26 @@
                             <span class="caption1">Clear All</span>
                         </button>
                     </div>
+                    {% if providers %}
                     <ul class="list_layout_cols list_jobs grid 2xl:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
+                        {% for provider in providers %}
                         <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
                             <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/8.png" alt="company/8" class="jobs_avatar w-full h-full object-cover" />
+                                <a href="{% url 'browse_service_detail' provider.uuid %}" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                    <img src="{{ provider.image.url }}" alt="company/8" class="jobs_avatar w-full h-full object-cover" />
                                 </a>
                                 <div class="jobs_content flex items-center justify-between gap-2 w-full">
                                     <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                        <span class="jobs_company text-sm font-semibold text-primary">{{ provider.entity_name }}</span>
                                         <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
                                         <div class="flex flex-wrap items-center gap-5 gap-y-1">
                                             <div class="jobs_address -style-1 text-secondary">
                                                 <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                <span class="address caption1 align-top">{{ provider.address }}</span>
                                             </div>
                                             <div class="jobs_date text-secondary">
                                                 <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
+                                                <span class="date caption1 align-top">{{ provider.created_at }}</span>
                                             </div>
                                         </div>
                                     </a>
@@ -90,349 +92,28 @@
                             </div>
                             <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
                                 <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                    {% for skill in provider.skills.all %}
+                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ skill.name }}</a>
+                                    {% endfor %}
                                 </div>
                                 <div class="jobs_price">
-                                    <span class="price text-title">$100 - $120</span>
-                                    <span class="text-secondary">/hour</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/7.png" alt="company/7" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">GlobalTech Partners</span>
-                                        <strong class="jobs_name text-title -style-1">Senior DevOps Engineer</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">California, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$60-$80</span>
-                                    <span class="text-secondary">/day</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/6.png" alt="company/6" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
-                                        <strong class="jobs_name text-title -style-1">Senior UI/UX Designer</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Nevada, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Videos</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$850 - $900</span>
-                                    <span class="text-secondary">/month</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/5.png" alt="company/5" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
-                                        <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">New York, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$10 - $15</span>
-                                    <span class="text-secondary">/hour</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/4.png" alt="company/4" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
-                                        <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Las Vegas, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Videos</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$450 - $550</span>
-                                    <span class="text-secondary">/month</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/3.png" alt="company/3" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
-                                        <strong class="jobs_name text-title -style-1">Digital Marketing</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Nevada, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$10 - $15</span>
-                                    <span class="text-secondary">/hour</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/9.png" alt="company/9" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
-                                        <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Las Vegas, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$100 - $120</span>
-                                    <span class="text-secondary">/hour</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/12.png" alt="company/12" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
-                                        <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">New York, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$10 - $15</span>
-                                    <span class="text-secondary">/hour</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/13.png" alt="company/13" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
-                                        <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Las Vegas, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Videos</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$450 - $550</span>
-                                    <span class="text-secondary">/month</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-                                <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
-                                    <img src="./assets/images/company/14.png" alt="company/14" class="jobs_avatar w-full h-full object-cover" />
-                                </a>
-                                <div class="jobs_content flex items-center justify-between gap-2 w-full">
-                                    <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
-                                        <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
-                                        <strong class="jobs_name text-title -style-1">Digital Marketing</strong>
-                                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                                            <div class="jobs_address -style-1 text-secondary">
-                                                <span class="ph ph-map-pin text-lg"></span>
-                                                <span class="address caption1 align-top">Nevada, USA</span>
-                                            </div>
-                                            <div class="jobs_date text-secondary">
-                                                <span class="ph ph-calendar-blank text-lg"></span>
-                                                <span class="date caption1 align-top">2 days ago</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <button class="add_wishlist_btn -relative -border">
-                                        <span class="ph ph-heart text-xl"></span>
-                                        <span class="ph-fill ph-heart text-xl"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
-                                    <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
-                                </div>
-                                <div class="jobs_price">
-                                    <span class="price text-title">$10 - $15</span>
-                                    <span class="text-secondary">/hour</span>
+                                    {% for star in provider.rating_avg %}
+                                        <span class="ph ph-star text-lg"></span>
+                                    {% endfor %}
+                                    {% for star in (5 - provider.rating_avg) %}
+                                    {% if is_verified %}
+                                        <span class="price text-title">Verified</span>
+                                    {% endif %}
+                                    {% if is_mobile %}
+                                        <span class="text-secondary">Mobile</span>
+                                    {% else %}
+                                        <span class="text-secondary">Fixed</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </li>
                     </ul>
+                    {% endif %}
                 </div>
                 <ul class="list_pagination menu_tab flex items-center justify-center gap-2 md:absolute bottom-0 left-0 w-full h-[68px] bg-white" role="tablist">
                     <li role="presentation">
@@ -512,32 +193,32 @@
     {% endfor %}
     
     // Function to add or move user marker
-    function showUserLocation(lat, lng, popupText) {
-        userMarkerLayer.clearLayers();
-        var marker = L.marker([lat, lng], {icon: userIcon}).addTo(userMarkerLayer);
-        marker.bindPopup(popupText).openPopup();
-        map.setView([lat, lng], 13);
-    }
+    // function showUserLocation(lat, lng, popupText) {
+    //     userMarkerLayer.clearLayers();
+    //     var marker = L.marker([lat, lng], {icon: userIcon}).addTo(userMarkerLayer);
+    //     marker.bindPopup(popupText).openPopup();
+    //     map.setView([lat, lng], 13);
+    // }
     
     // Function to show the user location marker and accuracy circle
-    // function showUserLocation(lat, lng, accuracy) {
-    //     userMarkerLayer.clearLayers();
-    //     var latlng = L.latLng(lat, lng);
+    function showUserLocation(lat, lng, accuracy) {
+        userMarkerLayer.clearLayers();
+        var latlng = L.latLng(lat, lng);
 
-    //     var marker = L.marker(latlng, {icon: userIcon}).addTo(userMarkerLayer);
-    //     marker.bindPopup("You are within " + accuracy + " meters from this point").openPopup();
+        var marker = L.marker(latlng, {icon: userIcon}).addTo(userMarkerLayer);
+        marker.bindPopup("You are within " + accuracy + " meters from this point").openPopup();
 
-    //     L.circle(latlng, {radius: accuracy}).addTo(userMarkerLayer);
+        L.circle(latlng, {radius: accuracy}).addTo(userMarkerLayer);
 
-    //     map.setView(latlng, 13);
-    // }
+        map.setView(latlng, 13);
+    }
 
-    // , position.coords.accuracy
+    // 
     // Use the native geolocation API for better accuracy
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                showUserLocation(position.coords.latitude, position.coords.longitude);
+                showUserLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
             },
             function(error) {
                 console.error("Error obtaining location: ", error.message);
@@ -585,3 +266,59 @@
     </script>
     
 {% endblock js %}
+
+
+<!-- // Initialize WebSocket
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const wsUrl = `${protocol}://${window.location.host}/ws/location/`;
+const locationSocket = new WebSocket(wsUrl);
+
+// When connection opens
+locationSocket.onopen = function(event) {
+    // Initial request or triggered by location changes
+    sendLocationUpdate();
+};
+
+// When receiving data
+locationSocket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if (data.providers) {
+        updateProviderList(data.providers);
+        updateMapMarkers(data.providers);
+    }
+};
+
+// Function to send current or new location and filters
+function sendLocationUpdate() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            // Gather filters from UI
+            const skill = document.getElementById('skill-filter').value || null;
+            const category = document.getElementById('category-filter').value || null;
+            const min_hourly = document.getElementById('min-hourly').value || null;
+            const max_hourly = document.getElementById('max-hourly').value || null;
+
+            locationSocket.send(JSON.stringify({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                radius: 10, // Or from a slider/filter UI
+                skill: skill,
+                category: category,
+                min_hourly: min_hourly,
+                max_hourly: max_hourly,
+            }));
+        });
+    }
+}
+
+// Update list and map dynamically
+function updateProviderList(providers) {
+    // Your logic to update the HTML provider list here
+}
+
+function updateMapMarkers(providers) {
+    // Your logic to update Leaflet map markers here
+}
+
+// Optionally re-send on filter change:
+document.getElementById('filter-form').addEventListener('change', sendLocationUpdate); -->

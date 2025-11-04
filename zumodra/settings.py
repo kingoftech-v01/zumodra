@@ -85,8 +85,10 @@ INSTALLED_APPS = [
     'admin_honeypot',
     'csp',
     'axes',
+    'sslserver',
 
     'django_q',
+    'django_extensions',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -98,6 +100,8 @@ INSTALLED_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
+    'wagtail_localize',
+    'wagtail_localize.locales',
     'wagtail',
 
     'modelcluster',
@@ -142,6 +146,9 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'axes.middleware.AxesMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtailtrans.middleware.TranslationMiddleware',
+    # 'wagtail_localize.middleware.LocalizeMiddleware',
 ]
 
 ROOT_URLCONF = 'zumodra.urls'
@@ -153,6 +160,15 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.csrf',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -391,6 +407,15 @@ NEWSLETTER_UNSUBSCRIBE_CONFIRMATION = True
 #         },
 #     },
 # }
+# For scalable production use with Redis, add:
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 # Development only
 CHANNEL_LAYERS = {
     "default": {
@@ -409,6 +434,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_SITE_NAME = 'zumodra'
 WAGTAILADMIN_BASE_URL = 'admin'
 WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
+WAGTAIL_I18N_ENABLED = True
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
 WAGTAIL_I18N_ENABLED = True
 
 # Axes settings
@@ -534,3 +561,8 @@ Q_CLUSTER = {
     'orm': 'default',
 }
 USE_DJANGO_Q_FOR_EMAILS = True  # Use Django Q for sending ALL emails
+
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

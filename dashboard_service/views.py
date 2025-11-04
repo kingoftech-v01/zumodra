@@ -51,13 +51,16 @@ def browse_nearby_services(request):
 
     if lat is None or lng is None:
         # Handle the missing parameter case, e.g. return an error response or default values
-        return redirect('browse_service')
-
+        # return redirect('browse_service')
+        lat = 0
+        lng = 0
+    
     try:
         user_lat = float(lat)
         user_lng = float(lng)
     except ValueError:
-        return HttpResponseBadRequest("Invalid latitude or longitude value")
+        # return HttpResponseBadRequest("Invalid latitude or longitude value")
+        pass
 
     user_location = Point(user_lng, user_lat, srid=4326)
 
