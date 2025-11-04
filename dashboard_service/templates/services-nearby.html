@@ -485,14 +485,14 @@
     
     // Custom icons
     var userIcon = L.icon({
-        iconUrl: '/static/images/user-marker-icon.png',
+        iconUrl: '{% static "assets/images/map/user-marker-icon.png" %}',
         iconSize: [30, 40],
         iconAnchor: [15, 40],
         popupAnchor: [0, -40]
     });
     
     var serviceIcon = L.icon({
-        iconUrl: '/static/images/service-marker-icon.png',
+        iconUrl: '{% static "assets/images/map/service-marker-icon.png" %}',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34]
