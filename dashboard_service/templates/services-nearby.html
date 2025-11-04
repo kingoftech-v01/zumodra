@@ -475,8 +475,8 @@
 {% block js %}
 
 <script>
-    // Initialize map centered roughly on Paris (fallback)
-    var map = L.map('map').setView([48.8566, 2.3522], 6);
+    // Initialize map centered roughly on the center of the world (fallback)
+    var map = L.map('map').setView([0, 0], 6);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -519,6 +519,40 @@
         map.setView([lat, lng], 13);
     }
     
+    // Function to show the user location marker and accuracy circle
+    // function showUserLocation(lat, lng, accuracy) {
+    //     userMarkerLayer.clearLayers();
+    //     var latlng = L.latLng(lat, lng);
+
+    //     var marker = L.marker(latlng, {icon: userIcon}).addTo(userMarkerLayer);
+    //     marker.bindPopup("You are within " + accuracy + " meters from this point").openPopup();
+
+    //     L.circle(latlng, {radius: accuracy}).addTo(userMarkerLayer);
+
+    //     map.setView(latlng, 13);
+    // }
+
+    // , position.coords.accuracy
+    // Use the native geolocation API for better accuracy
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                showUserLocation(position.coords.latitude, position.coords.longitude);
+            },
+            function(error) {
+                console.error("Error obtaining location: ", error.message);
+                alert("Location access denied or unavailable.");
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+
     // Detect user location with Leaflet
     map.locate({setView: false, maxZoom: 16});
     map.on('locationfound', function(e) {
