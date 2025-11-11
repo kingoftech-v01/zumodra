@@ -10,6 +10,8 @@ from django.contrib.gis.db import models as gis_models
 from geopy.geocoders import Nominatim
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.contrib.gis.geos import Point
+
 
 User = User
 
@@ -126,46 +128,39 @@ class ServiceProviderProfile(models.Model):
             raise ValidationError(_("A service provider must have either an associated user or company."))
 
         # Géocodage de l’adresse si elle existe
-        if self.address:
+        # if self.address:
+        #     try:
+        #         geolocator = Nominatim(user_agent="zumodra_app")
+        #         location = geolocator.geocode(f"{self.address}, {self.city}, {self.country}")
+        #         if location:
+        #             from django.contrib.gis.geos import Point
+        #             self.location = Point(location.longitude, location.latitude)
+        #             self.location_lat = location.latitude
+        #             self.location_lng = location.longitude
+        #         else:
+        #             raise ValidationError(_("Could not geocode the given address."))
+        #     except Exception as e:
+        #         print(f"Geocoding error: {e}")
+
+        # super().save(*args, **kwargs)
+
+
+        # Géocodage de l’adresse si elle existe et que la position n’est pas déjà définie
+        if self.address and (not self.location_lat or not self.location_lng):
+            full_address = ", ".join(filter(None, [self.address, self.city, self.country]))
             try:
                 geolocator = Nominatim(user_agent="zumodra_app")
-                location = geolocator.geocode(f"{self.address}, {self.city}, {self.country}")
+                location = geolocator.geocode(full_address, timeout=10)
                 if location:
-                    from django.contrib.gis.geos import Point
                     self.location = Point(location.longitude, location.latitude)
                     self.location_lat = location.latitude
                     self.location_lng = location.longitude
                 else:
                     raise ValidationError(_("Could not geocode the given address."))
             except Exception as e:
-                print(f"Geocoding error: {e}")
+                print(f"Geocoding error for {entity_name}: {e}")
 
         super().save(*args, **kwargs)
-
-# from django.core.exceptions import ValidationError
-# from django.contrib.gis.geos import Point
-# from geopy.geocoders import Nominatim
-# from django.utils.translation import gettext_lazy as _
-
-def save(self, *args, **kwargs):
-
-
-    # Géocodage de l’adresse si elle existe et que la position n’est pas déjà définie
-    if self.address and (not self.location_lat or not self.location_lng):
-        full_address = ", ".join(filter(None, [self.address, self.city, self.country]))
-        try:
-            geolocator = Nominatim(user_agent="zumodra_app")
-            location = geolocator.geocode(full_address, timeout=10)
-            if location:
-                self.location = Point(location.longitude, location.latitude)
-                self.location_lat = location.latitude
-                self.location_lng = location.longitude
-            else:
-                raise ValidationError(_("Could not geocode the given address."))
-        except Exception as e:
-            print(f"Geocoding error for {entity_name}: {e}")
-
-    super().save(*args, **kwargs)
 
 
 
@@ -182,6 +177,7 @@ class Service(models.Model):
     images = models.ManyToManyField(ServicesPicture, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField(ServicesTag, blank=True, related_name='services_with_tag')
 
     def __str__(self):
         return f"{self.name} ({self.provider.user.first_name} {self.provider.user.last_name})"

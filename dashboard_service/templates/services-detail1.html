@@ -19,7 +19,7 @@
                         <img src="./assets/images/avatar/IMG-13.webp" alt="avatar/IMG-13" class="services_avatar w-full h-full object-cover" />
                     </div>
                     <div class="flex flex-col gap-1 lg:w-[760px]">
-                        <h3 class="services_name heading3">I will design wordpress website with elementor pro</h3>
+                        <h3 class="services_name heading3">{{ service.name}}</h3>
                         <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
                             <div class="services_review flex items-center gap-1">
                                 <span class="ph-fill ph-star text-xl text-yellow"></span>
@@ -138,8 +138,7 @@
                     <div class="description md:mt-10 mt-7">
                         <h6 class="heading6">About service</h6>
                         <div class="flex flex-col gap-3 mt-3">
-                            <p class="body2 text-secondary">Hi, I am a front-end website designer. If you need any kind of Figma to HTML, PSD to HTML, Xd to HTML, Sketch to HTML, inVision to HTML, Zeplin to HTML, or anything to HTML CSS website design you can hire me because I professionally work with HTML CSS, bootstrap, tailwind CSS, jQuery, and JavaScript, with all browser – responsive website designs.</p>
-                            <p class="body2 text-secondary">I have 3+ years of experience creating HTML CSS web pages with fully responsive website design. You can give me any kind of design and I will create the page exactly as you need the design.</p>
+                            <p class="body2 text-secondary">{{ service.description }}</p>
                         </div>
                     </div>
                     <div class="services md:mt-10 mt-7">
@@ -171,41 +170,34 @@
                             </li>
                         </ul>
                     </div>
+                    {% if service.tags.exists %}
                     <div class="tags md:mt-10 mt-7">
                         <h6 class="heading6">Tags:</h6>
                         <ul class="list_tags flex flex-wrap gap-3 gap-y-5 mt-4">
+                            {% for tag in service.tags.all %}
                             <li>
-                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Website Design </a>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> {{ tag.name }} </a>
                             </li>
-                            <li>
-                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Mobile App </a>
-                            </li>
-                            <li>
-                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Animation </a>
-                            </li>
-                            <li>
-                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Adobe Photoshop </a>
-                            </li>
-                            <li>
-                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Figma </a>
-                            </li>
+                            {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
+
                     <div class="about md:mt-15 mt-8">
                         <div class="introduce">
-                            <h5 class="heading5">About me</h5>
+                            <h5 class="heading5">About the Service Provider</h5>
                             <div class="flex flex-wrap gap-5 items-center justify-between mt-4">
                                 <a href="candidates-detail1.html" class="info flex items-center gap-5">
                                     <img src="./assets/images/avatar/IMG-13.webp" alt="avatar/IMG-13" class="flex-shrink-0 w-[100px] h-[100px] rounded-lg" />
                                     <div class="flex flex-col gap-2">
-                                        <span class="tag w-fit caption1 bg-background text-success">Available now</span>
+                                        <span class="tag w-fit caption1 bg-background text-success">{{ service.provider.availability_status }}</span>
                                         <div class="flex items-center gap-2">
-                                            <strong class="heading6 duration-300 hover:text-primary">Devon Lane</strong>
+                                            <strong class="heading6 duration-300 hover:text-primary">{{ service.provider.entity_name }}</strong>
                                             <span class="ph-fill ph-crown-simple text-primary text-2xl"></span>
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <span class="ph ph-map-pin text-xl text-secondary"></span>
-                                            <span class="address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                            <span class="address -style-1 caption1 text-secondary">{{ service.provider.city }}, {{ service.provider.country }}</span>
                                         </div>
                                     </div>
                                 </a>
