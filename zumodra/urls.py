@@ -35,8 +35,8 @@ urlpatterns = i18n_patterns(
     # path('campaign/', include('campaign.urls')),               # newsletter campaigns       # newsletters
     # path('leads/', include('leads.urls')),               # leads management
     path('static/js/dir/<str:file_name>', js_dir_view, name='js_dir'), # message json data
-    path('service/', include('dashboard_service.urls')),
-    path('project/', include('dashboard_project.urls')),
+    path('dashboard/', include('dashboard.urls')),
+    path('services/', include('services.urls')),
     path('blog/', include('blog.urls')),
 )
 

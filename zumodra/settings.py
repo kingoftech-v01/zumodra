@@ -33,6 +33,38 @@ DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 # Application definition
+SHARED_APPS = [
+    
+]
+
+TENANT_APPS = [
+    'django.contrib.sites',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'django.contrib.sitemaps',
+    'django.contrib.gis',
+
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_hotp',
+    'django_otp.plugins.otp_email',
+    'django_otp.plugins.otp_static',
+
+    'allauth_2fa',
+    'allauth',
+    'allauth.mfa',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.linkedin',
+]
 
 INSTALLED_APPS = [
     'django.contrib.sites',
@@ -117,8 +149,16 @@ INSTALLED_APPS = [
     'configurations',
     'dashboard_service',
     'dashboard_project',
+    'dashboard',
+    'services',
     'appointment.apps.AppointmentConfig',
 ]
+
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = "main.Tenant"
+
+TENANT_DOMAIN_MODEL = "main.Domain"
 
 SITE_ID = 1
 
@@ -129,6 +169,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -147,8 +188,8 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'axes.middleware.AxesMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'wagtail.core.middleware.SiteMiddleware',
-    'wagtailtrans.middleware.TranslationMiddleware',
+    # 'wagtail.core.middleware.SiteMiddleware',
+    # 'wagtailtrans.middleware.TranslationMiddleware',
     # 'wagtail_localize.middleware.LocalizeMiddleware',
 ]
 
@@ -185,13 +226,25 @@ ASGI_APPLICATION = 'zumodra.asgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'production': {
         'ENGINE': env('DB_ENGINE'),
         'NAME': env('DB_DEFAULT_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_DEFAULT_PORT'),
+    },
+    'default': {
+        'ENGINE': 'django_tenants.postgresql_backend',
+        'NAME': 'zumodra',
+        'USER': 'postgres',
+        'PASSWORD': 'mysecretpassword',
+        'HOST': 'localhost',
+        'PORT': '5433',
     },
     'users': {
         'ENGINE': env('DB_ENGINE'),
@@ -202,6 +255,8 @@ DATABASES = {
         'PORT':env('DB_USER_PORT'),
     }
 }
+
+ORIGINAL_BACKEND = "django.contrib.gis.db.backends.postgis"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -221,6 +276,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ROUTERS FOR TENANTS
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

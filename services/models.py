@@ -17,11 +17,11 @@ User = User
 
 # Create your models here.
 
-#____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
+#____________________PLATEFORME DE DServiceS & GESTION DES CONTRATS____________________#
 
-class ServiceCategory(models.Model):
+class DServiceCategory(models.Model):
     """
-    Catégorisation des services, permet l’imbrication de sous-catégories.
+    Catégorisation des DServices, permet l’imbrication de sous-catégories.
     """
     name = models.CharField(
         max_length=100, unique=True, help_text="Nom de la catégorie"
@@ -40,21 +40,21 @@ class ServiceCategory(models.Model):
         return self.name if not self.parent else f"{self.parent} > {self.name}"
 
 
-class ServicesTag(models.Model):
+class DServicesTag(models.Model):
     tag = models.CharField(max_length=50, unique=True, help_text="Nom du tag (unique)")
     def __str__(self):
         return f"{self.tag}"
 
-class ServicesPicture(models.Model):
-    image = models.ImageField(upload_to='service_pictures/')
+class DServicesPicture(models.Model):
+    image = models.ImageField(upload_to='DService_pictures/')
     description = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Image for {self.service.name}"
+        return f"Image for {self.DService.name}"
 
 class ProviderSkill(models.Model):
-    provider = models.ForeignKey('ServiceProviderProfile', on_delete=models.CASCADE, related_name='provider_skills')
+    provider = models.ForeignKey('DServiceProviderProfile', on_delete=models.CASCADE, related_name='provider_skills')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
     level = models.CharField(
         max_length=20,
@@ -64,17 +64,17 @@ class ProviderSkill(models.Model):
     class Meta:
         unique_together = ('provider', 'skill')
 
-# Prestataires de services (ServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
-class ServiceProviderProfile(models.Model):
+# Prestataires de DServices (DServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
+class DServiceProviderProfile(models.Model):
     """
-    Extending existing profile with skills and service categories.
+    Extending existing profile with skills and DService categories.
     """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='service_provider_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='DService_provider_profile')
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
     skills = models.ManyToManyField(ProviderSkill, blank=True)
     bio = models.TextField(blank=True)
-    categories = models.ManyToManyField(ServiceCategory, blank=True)
+    categories = models.ManyToManyField(DServiceCategory, blank=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
     completed_jobs_count = models.PositiveIntegerField(default=0)
     address = models.CharField(max_length=255, help_text="Address line 1 eg. 123 Main Street", blank=True)
@@ -90,12 +90,12 @@ class ServiceProviderProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_active = models.DateTimeField(auto_now=True)
-    services = models.ManyToManyField('Service', blank=True, related_name='service_providers')
+    DServices = models.ManyToManyField('DService', blank=True, related_name='DService_providers')
     availability_status = models.CharField(max_length=25, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
     is_verified = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
     is_mobile = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='service_provider_images/', blank=True, null=True)
+    image = models.ImageField(upload_to='DService_provider_images/', blank=True, null=True)
     entity_name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
@@ -111,8 +111,8 @@ class ServiceProviderProfile(models.Model):
         return f"{self.user.email}"
 
     class Meta:
-        verbose_name = _("Service Provider Profile")
-        verbose_name_plural = _("Service Provider Profiles")
+        verbose_name = _("DService Provider Profile")
+        verbose_name_plural = _("DService Provider Profiles")
 
     def save(self, *args, **kwargs):
         # if no user is should have a company assigned if no company it should have a user assigned
@@ -125,7 +125,7 @@ class ServiceProviderProfile(models.Model):
         elif self.company:
             self.entity_name = self.company.name
         else:
-            raise ValidationError(_("A service provider must have either an associated user or company."))
+            raise ValidationError(_("A DService provider must have either an associated user or company."))
 
         # Géocodage de l’adresse si elle existe
         # if self.address:
@@ -164,44 +164,44 @@ class ServiceProviderProfile(models.Model):
 
 
 
-# Services offerts par l’entreprise
-class Service(models.Model):
+# DServices offerts par l’entreprise
+class DService(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='services_offered_by_provider')
-    serviceCategory = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
+    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='DServices_offered_by_provider')
+    DServiceCategory = models.ForeignKey(DServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='DServices')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     price = models.PositiveIntegerField(null=True, blank=True)  # prix indicatif
     duration_minutes = models.PositiveIntegerField(null=True, blank=True)  # durée estimée
-    thumbnail = models.ImageField(upload_to='service_thumbnails/', blank=True, null=True)
-    images = models.ManyToManyField(ServicesPicture, blank=True)
+    thumbnail = models.ImageField(upload_to='DService_thumbnails/', blank=True, null=True)
+    images = models.ManyToManyField(DServicesPicture, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField(ServicesTag, blank=True, related_name='services_with_tag')
+    tags = models.ManyToManyField(DServicesTag, blank=True, related_name='DServices_with_tag')
 
     def __str__(self):
         return f"{self.name} ({self.provider.user.first_name} {self.provider.user.last_name})"
     
-class ServiceLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_services_by_user')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='config_liked_services')
+class DServiceLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_DServices_by_user')
+    DService = models.ForeignKey(DService, on_delete=models.CASCADE, related_name='config_liked_DServices')
     liked_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'service')
+        unique_together = ('user', 'DService')
 
     def __str__(self):
-        return f"{self.user.email} likes {self.service.name}"
+        return f"{self.user.email} likes {self.DService.name}"
 
 # Request clients (ClientRequest) avec critères de recherche, budget, localisation, etc.
 class ClientRequest(models.Model):
     """
-    Represents a client’s service request including skills required,
+    Represents a client’s DService request including skills required,
     location preferences, budget, and other parameters.
     """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_user_requests_service')
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_user_requests_DService')
     required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
-    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
+    DService_category = models.ForeignKey(DServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     location_lat = models.FloatField(null=True, blank=True)
@@ -211,16 +211,16 @@ class ClientRequest(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Request by {self.client} for {self.service_category}"
+        return f"Request by {self.client} for {self.DService_category}"
 
 
 class Match(models.Model):
     """
-    Stores a match between a ClientRequest and a ServiceProviderProfile,
+    Stores a match between a ClientRequest and a DServiceProviderProfile,
     along with a score computed by AI or heuristics.
     """
     client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
-    provider_profile = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
+    provider_profile = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
     score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
     matched_at = models.DateTimeField(auto_now_add=True)
     viewed_by_client = models.BooleanField(default=False)
@@ -229,11 +229,11 @@ class Match(models.Model):
     def __str__(self):
         return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
 
-class ServiceRequest(models.Model):
+class DServiceRequest(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_service_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_service_requests')
-    required_skills = models.ManyToManyField(Skill, related_name='config_service_requests', blank=True)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_DService_requests')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_DService_requests')
+    required_skills = models.ManyToManyField(Skill, related_name='config_DService_requests', blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -242,9 +242,9 @@ class ServiceRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_open = models.BooleanField(default=True)
 
-class ServiceProposal(models.Model):
-    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name='proposals')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='proposals')
+class DServiceProposal(models.Model):
+    request = models.ForeignKey(DServiceRequest, on_delete=models.CASCADE, related_name='proposals')
+    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='proposals')
     proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
     message = models.TextField(blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
@@ -252,9 +252,9 @@ class ServiceProposal(models.Model):
     class Meta:
         unique_together = ('request', 'provider')
 
-class ServiceContract(models.Model):
-    request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name='contract')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='config_provider_contracts')
+class DServiceContract(models.Model):
+    request = models.OneToOneField(DServiceRequest, on_delete=models.CASCADE, related_name='contract')
+    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='config_provider_contracts')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cconfig_client_contracts')
     agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
     agreed_deadline = models.DateField(null=True, blank=True)
@@ -269,24 +269,24 @@ class ServiceContract(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
 # class ProviderReport(models.Model):
-#     provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='reports')
-#     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='reports')
+#     provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='reports')
+#     contract = models.ForeignKey(DServiceContract, on_delete=models.CASCADE, related_name='reports')
 #     report = models.TextField()
 #     created_at = models.DateTimeField(auto_now_add=True)
 
-class ServiceComment(models.Model):
+class DServiceComment(models.Model):
     """
-    Review on a Service, avec possibilité de répondre à un autre commentaire.
+    Review on a DService, avec possibilité de répondre à un autre commentaire.
     """
     provider = models.ForeignKey(
-        ServiceProviderProfile, related_name='comments',
+        DServiceProviderProfile, related_name='comments',
         on_delete=models.CASCADE,
         help_text="Professionnel associé au commentaire"
     )
-    service = models.ForeignKey(
-        Service, related_name='comments_service',
+    DService = models.ForeignKey(
+        DService, related_name='comments_DService',
         on_delete=models.CASCADE,
-        help_text="Service associé au commentaire"
+        help_text="DService associé au commentaire"
     )
     reviewer = models.ForeignKey(
         User, on_delete=models.PROTECT,
@@ -305,14 +305,14 @@ class ServiceComment(models.Model):
     )
 
     def __str__(self):
-        return f"Comment by {self.reviewer} on {self.service}"
+        return f"Comment by {self.reviewer} on {self.DService}"
 
     class Meta:
         ordering = ['-created_at']
 
-class ServiceMessage(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_servicemessages')
+class DServiceMessage(models.Model):
+    contract = models.ForeignKey(DServiceContract, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_DServicemessages')
     message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
 
@@ -320,17 +320,17 @@ class ServiceMessage(models.Model):
 from auditlog.registry import auditlog
 
 # Enregistrement de tous les modèles
-auditlog.register(ServiceCategory)
-auditlog.register(ServicesTag)
-auditlog.register(ServicesPicture)
+auditlog.register(DServiceCategory)
+auditlog.register(DServicesTag)
+auditlog.register(DServicesPicture)
 auditlog.register(ProviderSkill)
-auditlog.register(ServiceProviderProfile)
-auditlog.register(Service)
-auditlog.register(ServiceLike)
+auditlog.register(DServiceProviderProfile)
+auditlog.register(DService)
+auditlog.register(DServiceLike)
 auditlog.register(ClientRequest)
 auditlog.register(Match)
-auditlog.register(ServiceRequest)
-auditlog.register(ServiceProposal)
-auditlog.register(ServiceContract)
-auditlog.register(ServiceComment)
-auditlog.register(ServiceMessage)
+auditlog.register(DServiceRequest)
+auditlog.register(DServiceProposal)
+auditlog.register(DServiceContract)
+auditlog.register(DServiceComment)
+auditlog.register(DServiceMessage)

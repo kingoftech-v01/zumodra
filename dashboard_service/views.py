@@ -14,68 +14,20 @@ from geopy.exc import GeocoderUnavailable, GeocoderTimedOut
 geolocator = Nominatim(user_agent="zumodra_geocoder")
 
 # Create your views here.
-def browse_service(request):
-    service_categories = ServiceCategory.objects.all()
-    services_list_query = Service.objects.all()
-    service_providers = ServiceProviderProfile.objects.all()
-    service_tags = ServicesTag.objects.all()
+def service_view(request):
+    return render(request, 'services.html')
 
-    paginator = Paginator(services_list_query, 1)
-    page_number = request.GET.get('page')
-    services = paginator.get_page(page_number)
+def add_service_view(request):
+    return render(request, 'add-service.html')
 
-    request = request.GET.get('request')
+def service_detail_view(request, pk):
+    return render(request, 'service-detail.html')
 
-    if request:
-        service_categories = ServiceCategory.objects.filter(name__icontains=request)
+def update_service_view(request, pk):
+    return render(request, 'update-service.html')
 
-    context = {
-        'service_categories': service_categories,
-        'services': services,
-        'service_providers': service_providers,
-        'service_tags': service_tags,
-    }
-    return render(request, 'services-default.html', context)
-
-
-def browse_service_detail(request, service_uuid):
-    service = get_object_or_404(Service, uuid=service_uuid)
-    context = {
-        'service': service,
-    }
-    return render(request, 'services-detail1.html', context)
-
-def browse_nearby_services(request):
-    lat = request.GET.get('lat')
-    lng = request.GET.get('lng')
-
-    if lat is None or lng is None:
-        # Handle the missing parameter case, e.g. return an error response or default values
-        # return redirect('browse_service')
-        lat = 0
-        lng = 0
-    
-    try:
-        user_lat = float(lat)
-        user_lng = float(lng)
-    except ValueError:
-        # return HttpResponseBadRequest("Invalid latitude or longitude value")
-        pass
-
-    user_location = Point(user_lng, user_lat, srid=4326)
-
-    within_area = request.GET.get('within_area')
-
-    within_area_offset = int(within_area) if within_area else 10
-
-    nearby_providers = (
-        ServiceProviderProfile.objects
-        .filter(location__distance_lte=(user_location, D(km=within_area_offset)))  # within 10km
-        .annotate(distance=Distance('location', user_location))
-        .order_by('distance')
-    )
-
-    return render(request, 'services-nearby.html', {'providers': nearby_providers})
+def delete_service_view(request, pk):
+    return render(request, 'delete-service.html')
 
 def address_to_coords(address):
     """Convert a text address into geographic (lat, lon) coordinates."""
@@ -97,3 +49,46 @@ def coords_to_address(latitude, longitude):
     except (GeocoderUnavailable, GeocoderTimedOut):
         return None
     return None
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import ServiceForm, ServiceProviderProfileForm, ServiceCategoryForm  # importe les forms nécessaires
+
+
+# Ajout d'un service
+def add_service_view(request):
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('browse_service')  # redirige vers la liste ou détail
+    else:
+        form = ServiceForm()
+    return render(request, 'add-service.html', {'form': form})
+
+
+# Modification d'un service
+def update_service_view(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES, instance=service)
+        if form.is_valid():
+            form.save()
+            return redirect('browse_service_detail', service_uuid=service.uuid)
+    else:
+        form = ServiceForm(instance=service)
+    return render(request, 'update-service.html', {'form': form, 'service': service})
+
+
+# Détail d'un service (affichage)
+def service_detail_view(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    return render(request, 'service-detail.html', {'service': service})
+
+
+# Suppression d'un service (confirmation)
+def delete_service_view(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    if request.method == 'POST':
+        service.delete()
+        return redirect('browse_service')
+    return render(request, 'delete-service.html', {'service': service})
