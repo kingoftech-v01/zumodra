@@ -36,8 +36,11 @@ urlpatterns = i18n_patterns(
     # path('leads/', include('leads.urls')),               # leads management
     path('static/js/dir/<str:file_name>', js_dir_view, name='js_dir'), # message json data
     path('dashboard/', include('dashboard.urls')),
-    path('services/', include('services.urls')),
+    # path('services/', include('services.urls')),
     path('blog/', include('blog.urls')),
+    path('term_of_use/', term_of_use_view, name='term_of_use'),
+    path('privacy_policy/', privacy_policy_view, name='privacy_policy'),
+    path('about_us/', about_us_view, name='about'),
 )
 
 # Add url patterns without language prefix, for example the language switcher

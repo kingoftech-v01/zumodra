@@ -19,3 +19,12 @@ def js_dir_view(request, file_name):
 
 def auth_test_view(request):
     return render(request, 'authlab/sign-in.html')
+
+def term_of_use_view(request):
+    return render(request, 'term-of-use.html')
+
+def privacy_policy_view(request):
+    return render(request, 'privacy-policy.html')
+
+def about_us_view(request):
+    return render(request, 'about-us.html')

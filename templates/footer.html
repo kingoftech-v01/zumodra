@@ -6,7 +6,7 @@
                 <div class="container">
                     <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light">
                         <a href="index.html" class="footer_logo">
-                            <img src="./assets/images/logo-white.png" alt="logo-white" class="h-[42px] w-auto" />
+                            <img src="{% static 'assets/images/rhematekC.png' %}" alt="logo-white" class="h-[42px] w-auto" />
                         </a>
                         <div class="list_social flex flex-wrap items-center gap-4">
                             <span class="text-subtitle text-white">Follow Us:</span>
@@ -96,10 +96,10 @@
                                 <strong class="heading block text-button-sm text-white mt-5">Download App</strong>
                                 <div class="list-download flex items-start gap-3 mt-4">
                                     <a href="https://play.google.com/" target="_blank">
-                                        <img src="./assets/images/download/gg_play.png" alt="gg_play" />
+                                        <img src="{% static 'assets/images/download/gg_play.png' %}" alt="gg_play" />
                                     </a>
                                     <a href="https://www.apple.com/app-store/" target="_blank">
-                                        <img src="./assets/images/download/app_store.png" alt="app_store" />
+                                        <img src="{% static 'assets/images/download/app_store.png' %}" alt="app_store" />
                                     </a>
                                 </div>
                             </div>
@@ -107,10 +107,10 @@
                     </div>
                     <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-2 border-t border-light">
                         <div class="left-block flex items-center">
-                            <div class="copyright text-placehover caption1">©2024 FreelanHub. All Rights Reserved.</div>
+                            <div class="copyright text-placehover caption1">©2025 FreelanHub. All Rights Reserved.</div>
                         </div>
                         <div class="nav-link flex items-center gap-2.5">
-                            <a class="text-placehover caption1 hover-underline" href="term-of-use.html">Terms Of Services</a>
+                            <a class="text-placehover caption1 hover-underline" href="{% url 'term_of_use' %}">Terms Of Services</a>
                             <span class="text-placehover caption1">|</span>
                             <a class="text-placehover caption1 hover-underline" href="term-of-use.html">Privacy Policy</a>
                         </div>

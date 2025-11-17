@@ -150,11 +150,11 @@ INSTALLED_APPS = [
     'dashboard_service',
     'dashboard_project',
     'dashboard',
-    'services',
+    # 'services',
     'appointment.apps.AppointmentConfig',
 ]
 
-INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+# INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 TENANT_MODEL = "main.Tenant"
 
@@ -169,7 +169,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',
+    # 'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -189,7 +189,6 @@ MIDDLEWARE = [
     'axes.middleware.AxesMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     # 'wagtail.core.middleware.SiteMiddleware',
-    # 'wagtailtrans.middleware.TranslationMiddleware',
     # 'wagtail_localize.middleware.LocalizeMiddleware',
 ]
 
@@ -230,7 +229,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'production': {
+    'postgres': {
         'ENGINE': env('DB_ENGINE'),
         'NAME': env('DB_DEFAULT_NAME'),
         'USER': env('DB_USER'),
@@ -239,7 +238,7 @@ DATABASES = {
         'PORT': env('DB_DEFAULT_PORT'),
     },
     'default': {
-        'ENGINE': 'django_tenants.postgresql_backend',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', #django_tenants.postgresql_backend
         'NAME': 'zumodra',
         'USER': 'postgres',
         'PASSWORD': 'mysecretpassword',
@@ -277,9 +276,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # ROUTERS FOR TENANTS
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+# DATABASE_ROUTERS = (
+#     'django_tenants.routers.TenantSyncRouter',
+# )
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

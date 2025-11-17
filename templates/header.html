@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load static %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags wagtailuserbar %}
 
 
         <!-- Header -->
@@ -9,8 +9,8 @@
                 <div class="left flex items-center gap-15 max-[1600px]:gap-6 h-full">
                     <h1>
                         <a href="index.html">
-                            <img src="./assets/images/logo-white.png" alt="logo-white" class="logo-white md:h-[42px] h-8 w-auto" />
-                            <img src="./assets/images/logo.png" alt="logo" class="logo-black md:h-[42px] h-8 w-auto hidden" />
+                            <img src="{% static 'assets/images/rhematekCS.png' %}" alt="logo-white" class="logo-white md:h-[42px] h-8 w-auto" />
+                            <img src="{% static 'assets/images/rhematekC.png' %}" alt="logo" class="logo-black md:h-[42px] h-8 w-auto hidden" />
                         </a>
                     </h1>
                     <div class="category_block flex items-center relative h-full">
@@ -436,7 +436,12 @@
                         <ul class="list flex items-center gap-5 h-full">
                             <li class="h-full relative">
                                 <a href="{% url 'home' %}" class="flex items-center gap-1 h-full text-white duration-300">
-                                    <span class="text-title relative">Homepages</span>
+                                    <span class="text-title relative">{% trans 'Home' %}</span>
+                                </a>
+                            </li>
+                            <li class="h-full relative">
+                                <a href="{% url 'about' %}" class="flex items-center gap-1 h-full text-white duration-300">
+                                    <span class="text-title relative">{% trans 'About' %}</span>
                                 </a>
                             </li>
                             <li class="h-full relative">
@@ -708,3 +713,4 @@
                 </div>
             </div>
         </header>
+        {% wagtailuserbar %}

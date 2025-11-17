@@ -7,6 +7,9 @@ urlpatterns = [
     path('service/<int:pk>', service_detail_view, name='service_detail'),
     path('service/<int:pk>/update', update_service_view, name='update_service'),
     path('service/<int:pk>/delete', delete_service_view, name='delete_service'),
+    path('browse-service/', browse_service, name='browse_service'),
+    path('browse-service/detail/<str:service_uuid>', browse_service_detail, name='browse_service_detail'),
+    path('browse-nearby-service/', browse_nearby_services, name='browse_nearby_services'),
 ]
 
 # <script>
