@@ -1,132 +1,15 @@
-
+{% extends 'partials/dashboard/base.html' %}
+{% load static i18n%}
+{% block title %}Bookmarks{% endblock title %}
+{% block header %}
+    {% include 'partials/dashboard/header.html' %}
+{% endblock header %}
+{% block content %}
+{% include 'partials/dashboard/menu-mobile.html' %}
 
         <div class="dashboard_main overflow-hidden lg:w-screen lg:h-screen flex sm:pt-20 pt-16">
             <div class="menu_dashboard overflow-hidden flex-shrink-0 min-[320px]:w-[280px] w-[80vw] h-full bg-white relative z-[2] max-lg:hidden">
-                <div class="inner scrollbar_custom max-h-full py-6 px-3">
-                    <div class="area">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">Overviews</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="candidates-dashboard.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-squares-four text-2xl text-secondary"></span>
-                                    <strong class="text-title">Dashboard</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-messages.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-chats text-2xl text-secondary"></span>
-                                    <strong class="text-title">Messages</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-bookmarks.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background active">
-                                    <span class="ph-duotone ph-bookmarks-simple text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Bookmarks</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-meetings.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-chalkboard-teacher text-2xl text-secondary"></span>
-                                    <strong class="text-title">Video Meetings</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-jobs-alerts.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-bell text-2xl text-secondary"></span>
-                                    <strong class="text-title">Jobs alerts</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-earnings.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-hand-coins text-2xl text-secondary"></span>
-                                    <strong class="text-title">Earnings</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-payouts.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-credit-card text-2xl text-secondary"></span>
-                                    <strong class="text-title">Payouts</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="area mt-6">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">Management</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="candidates-proposals.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-gavel text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Proposals</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-applied.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-notepad text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Applied</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-my-services.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-stack text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Services</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-active-work.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-briefcase text-2xl text-secondary"></span>
-                                    <strong class="text-title">Active Work</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-service-orders.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-clock-countdown text-2xl text-secondary"></span>
-                                    <strong class="text-title">Service Orders</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="area mt-6">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">User</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="candidates-profile.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-user-circle text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Profile</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-profile-setting.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-read-cv-logo text-2xl text-secondary"></span>
-                                    <strong class="text-title">Profile Setting</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-my-packages.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-currency-circle-dollar text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Packages</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-change-passwords.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-lock-key-open text-2xl text-secondary"></span>
-                                    <strong class="text-title">Change Passwords</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-delete-profile.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-trash text-2xl text-secondary"></span>
-                                    <strong class="text-title">Delete Profile</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="login.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-sign-out text-2xl text-secondary"></span>
-                                    <strong class="text-title">Log Out</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {% include 'partials/dashboard/menu.html' %}
             </div>
             <div class="dashboard_bookmarks scrollbar_custom w-full bg-surface">
                 <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
@@ -148,6 +31,12 @@
                                     </li>
                                     <li class="tab_item" role="presentation">
                                         <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="employers_tab03" role="tab" aria-controls="employers_03" aria-selected="false">Employers</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab01" role="tab" aria-controls="services_01" aria-selected="false">Services</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="freelancer_tab02" role="tab" aria-controls="freelancer_02" aria-selected="false">Freelancer</button>
                                     </li>
                                 </ul>
                             </div>
@@ -971,6 +860,664 @@
                                 <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">4</span> of <span class="total">16</span> entries</p>
                             </div>
                         </div>
+                        <div id="services_01" class="tab_list" role="tabpanel" aria-labelledby="services_tab01" aria-hidden="true">
+                            <ul class="list grid xl:grid-cols-4 sm:grid-cols-2 gap-6 p-6">
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/1.webp" alt="1" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Graphic & Design</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">Professional seo services to boost your website's visibility</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG.webp" alt="IMG" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Floyd Miles</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/2.webp" alt="2" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Development</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will create stunning logo designs for your business</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-2.webp" alt="IMG-2" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Cameron</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/3.webp" alt="3" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">UI/UX Design</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will design UI UX design for App in Figma</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-3.webp" alt="IMG-3" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Theresa Webb</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/4.webp" alt="4" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Digital Marketing</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will translate your documents with accuracy and precision</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-4.webp" alt="IMG-4" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Marvin McKinney</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/5.webp" alt="5" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Development</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will do background illustration and environment concept art</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-5.webp" alt="IMG-5" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Kristin Watson</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/6.webp" alt="6" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">UI/UX Design</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will draw vector line art illustration image</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-6.webp" alt="IMG-6" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Courtney Henry</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/7.webp" alt="7" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">UI/UX Design</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will design wordpress website with elementor pro</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-7.webp" alt="IMG-7" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Arlene McCoy</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item">
+                                    <div class="service_item relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <button class="btn_action btn_open_popup btn_delete absolute top-3 right-3 flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full bg-white duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                        <a href="services-detail1.html" class="service_thumb rounded-t-lg overflow-hidden block">
+                                            <img src="./assets/images/service/8.webp" alt="8" class="w-full" />
+                                        </a>
+                                        <div class="service_info py-5 px-4">
+                                            <div class="flex items-center justify-between">
+                                                <a href="services-default.html" class="tag caption2 bg-surface hover:bg-primary hover:text-white">Digital Marketing</a>
+                                                <div class="rate flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                                    <strong class="service_rate text-button-sm">4.9</strong>
+                                                    <span class="service_rate_quantity caption1 text-secondary">(482)</span>
+                                                </div>
+                                            </div>
+                                            <a href="services-detail1.html" class="service_title text-title pt-2 duration-300 hover:text-primary">I will do figma UI UX design for websites & landing page</a>
+                                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                                <a href="candidates-detail1.html" class="service_author flex items-center gap-2">
+                                                    <img src="./assets/images/avatar/IMG-8.webp" alt="IMG-8" class="service_author_avatar w-8 h-8 rounded-full" />
+                                                    <span class="service_author_name -style-1">Robert Fox</span>
+                                                </a>
+                                                <div class="service_price whitespace-nowrap">
+                                                    <span class="text-secondary">From </span>
+                                                    <span class="price text-title">$75</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                    </li>
+                                </ul>
+                                <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">8</span> of <span class="total">16</span> entries</p>
+                            </div>
+                        </div>
+                        <div id="freelancer_02" class="tab_list" role="tabpanel" aria-labelledby="freelancer_tab02" aria-hidden="true">
+                            <ul class="list grid xl:grid-cols-3 sm:grid-cols-2 gap-6 p-6">
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-8.webp" alt="IMG-8" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Kelemen Krisztina</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Las Vegas, USA</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-7.webp" alt="IMG-7" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Sara Smith</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Cape Town, South Africa</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-6.webp" alt="IMG-6" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Katona Beatrix</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Rio de Janeiro, Brazil</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-5.webp" alt="IMG-5" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Kende Lili</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Sydney, Australia</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-4.webp" alt="IMG-4" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Kiss Dorka</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Tokyo, Japan</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-3.webp" alt="IMG-3" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Vincze Nikolett</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Paris, France</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-2.webp" alt="IMG-2" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Del Busquet</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Paris, France</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-1.webp" alt="IMG-1" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Bernaldo Silva</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Paris, France</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="candidates_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                            <img src="./assets/images/avatar/IMG-10.webp" alt="IMG-10" class="candidates_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="candidates_content w-full">
+                                            <div class="flex items-center justify-between gap-2 w-full">
+                                                <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <strong class="candidates_name text-title -style-1">Victoria Bentric</strong>
+                                                    <span class="flex items-center text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="candidates_address -style-1 caption1 pl-1">Paris, France</span>
+                                                    </span>
+                                                </a>
+                                                <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                                <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                    <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                    <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                            <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                        </div>
+                                        <div class="candidates_price">
+                                            <span class="price text-title">$20</span>
+                                            <span class="text-secondary">/Hours</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                    </li>
+                                </ul>
+                                <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">9</span> of <span class="total">16</span> entries</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
@@ -983,131 +1530,7 @@
         <div class="modal">
             <!-- menu_dashboard -->
             <div class="modal_item menu_dashboard -modal overflow-hidden relative flex-shrink-0 min-[320px]:w-[280px] w-[80vw] h-full bg-white" data-type="menu_dashboard">
-                <div class="inner scrollbar_custom max-h-full py-6 px-3">
-                    <div class="area">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">Overviews</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="#!" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-squares-four text-2xl text-secondary"></span>
-                                    <strong class="text-title">Dashboard</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-messages.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-chats text-2xl text-secondary"></span>
-                                    <strong class="text-title">Messages</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-bookmarks.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background active">
-                                    <span class="ph-duotone ph-bookmarks-simple text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Bookmarks</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-meetings.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-chalkboard-teacher text-2xl text-secondary"></span>
-                                    <strong class="text-title">Video Meetings</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-jobs-alerts.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-bell text-2xl text-secondary"></span>
-                                    <strong class="text-title">Jobs alerts</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-earnings.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-hand-coins text-2xl text-secondary"></span>
-                                    <strong class="text-title">Earnings</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-payouts.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-credit-card text-2xl text-secondary"></span>
-                                    <strong class="text-title">Payouts</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="area mt-6">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">Management</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="candidates-proposals.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-gavel text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Proposals</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-applied.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-notepad text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Applied</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-my-services.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-stack text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Services</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-active-work.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-briefcase text-2xl text-secondary"></span>
-                                    <strong class="text-title">Active Work</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-service-orders.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-clock-countdown text-2xl text-secondary"></span>
-                                    <strong class="text-title">Service Orders</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="area mt-6">
-                        <span class="px-6 text-xs font-semibold text-secondary uppercase">User</span>
-                        <ul class="list_link flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="candidates-profile.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-user-circle text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Profile</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-profile-setting.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-read-cv-logo text-2xl text-secondary"></span>
-                                    <strong class="text-title">Profile Setting</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-my-packages.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-currency-circle-dollar text-2xl text-secondary"></span>
-                                    <strong class="text-title">My Packages</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-change-passwords.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-lock-key-open text-2xl text-secondary"></span>
-                                    <strong class="text-title">Change Passwords</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="candidates-delete-profile.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-trash text-2xl text-secondary"></span>
-                                    <strong class="text-title">Delete Profile</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="login.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
-                                    <span class="ph-duotone ph-sign-out text-2xl text-secondary"></span>
-                                    <strong class="text-title">Log Out</strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {% include 'partials/dashboard/menu.html' %}
             </div>
 
             <!-- modal_delete -->
@@ -1128,3 +1551,4 @@
                 </div>
             </div>
         </div>
+{% endblock %}
