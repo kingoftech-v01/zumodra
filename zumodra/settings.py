@@ -229,14 +229,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'postgres': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_DEFAULT_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_DEFAULT_PORT'),
-    },
+    # 'postgres': {
+    #     'ENGINE': env('DB_ENGINE'),
+    #     'NAME': env('DB_DEFAULT_NAME'),
+    #     'USER': env('DB_USER'),
+    #     'PASSWORD': env('DB_PASSWORD'),
+    #     'HOST': env('DB_HOST'),
+    #     'PORT': env('DB_DEFAULT_PORT'),
+    # },
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', #django_tenants.postgresql_backend
         'NAME': 'zumodra',
