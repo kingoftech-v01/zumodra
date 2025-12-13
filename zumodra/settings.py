@@ -245,14 +245,14 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5433',
     },
-    'users': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_USER_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT':env('DB_USER_PORT'),
-    }
+    # 'users': {
+    #     'ENGINE': env('DB_ENGINE'),
+    #     'NAME': env('DB_USER_NAME'),
+    #     'USER': env('DB_USER'),
+    #     'PASSWORD': env('DB_PASSWORD'),
+    #     'HOST': env('DB_HOST'),
+    #     'PORT':env('DB_USER_PORT'),
+    # }
 }
 
 ORIGINAL_BACKEND = "django.contrib.gis.db.backends.postgis"
@@ -328,18 +328,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'custom_account_u.CustomUser'
 
 # Email Settings
-EMAIL_BACKEND = env('EMAIL_BACKEND')
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env.int('EMAIL_PORT')
-EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
-EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "business43.web-hosting.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = "support@rhematek-solutions.com"
+EMAIL_HOST_PASSWORD = "yOoiODNuXIYb"
+DEFAULT_FROM_EMAIL = "support@rhematek-solutions.com"
 
 # Stripe Settings
-STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
-STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = ""
+STRIPE_PUBLIC_KEY = ""
 
 # Allauth Settings
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
