@@ -35,6 +35,18 @@ urlpatterns = i18n_patterns(
     path('app/appointment/', include('appointment.urls')),      # Appointments (hidden)
     path('app/messages/', include('messages_sys.urls')),        # Messages (hidden)
 
+    # Services Marketplace
+    path('services/', include('services.urls')),                # Services marketplace
+
+    # API (REST)
+    path('api/', include('api.urls')),                          # REST API endpoints
+
+    # Notifications
+    path('notifications/', include('notifications.urls')),      # In-app notifications
+
+    # Analytics
+    path('analytics/', include('analytics.urls')),              # Analytics dashboards
+
     # Newsletter
     path('newsletter/', include('newsletter.urls')),
 

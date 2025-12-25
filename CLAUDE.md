@@ -1,281 +1,137 @@
-Planification du projet de programmation
+Zumodra is a multi-tenant SaaS platform combining a freelance services marketplace like Fiverr/Upwork with integrated CRM tools, appointment booking, escrow payments, real-time messaging, email marketing, and a Wagtail CMS for content. It evolved from a Django learning project into a production-ready enterprise solution targeting freelancers, agencies, and businesses needing seamless service matching, financial security, and client management.
 
-Un programmeur ne doit pas seulement apprendre la syntaxe et les concepts d'un langage de programmation. Il doit savoir chercher les ressources nécessaires pour approfondir ses connaissances, il doit concrétiser sa vision en trouvant des idées qui l’intéressent et il doit être capable de s’adapter aux besoins de son équipe de production tout au long de l’évolution de ses projets.
+## Project Purpose
+Zumodra addresses gaps in existing freelance platforms by creating an all-in-one ecosystem where providers list services, clients book appointments or post jobs, payments flow through escrow, and marketing/CRM tools drive retention—all within a multi-tenant architecture for scalability. Unlike standalone marketplaces, it supports enterprise workflows like multi-language support (9 languages), geospatial service matching via PostGIS, and role-based dashboards for clients, providers, and admins.
 
-Vous ne saurez probablement pas tout ce qui est nécessaire à votre programme au moment où vous le commencerez, et c'est normal. Vous serez motivé pour apprendre de nouvelles choses grâce à la volonté d'aboutir au résultat que vous recherchez. Les programmeurs sont constamment en train d'apprendre de nouvelles choses à travers leurs projets, et c'est en partie pour cela qu'on aime tant cette activité.
+## Key Advantages
+Zumodra stands out with built-in escrow via Stripe (beyond Fiverr's 20% flat fees or Upwork's milestone system), real-time WebSocket messaging with typing indicators/file sharing, and Celery-powered async tasks for newsletters/cron jobs—reducing reliance on external tools. Multi-tenancy enables white-label SaaS deployment at lower costs than single-tenant CRMs, with 2FA, audit logging, and CSP for superior security. Its Django/Wagtail stack ensures SEO-optimized content marketing integrated directly into the marketplace.
 
-Avant de commencer votre cheminement en ICS4U/4C, vous devez passer par le processus de planification d’un projet. Pour ce faire, vous devez compléter les six composantes suivantes :
+## Unique Differentiators
+- **Escrow + CRM Fusion**: Combines Upwork-style proposals/contracts with monday CRM-like pipelines, tracking leads from inquiry to review in one system—absent in pure marketplaces.
+- **Geospatial + Multi-Language**: PostGIS for location-based service filtering and i18n for 9 languages, enabling global reach without add-ons.
+- **Real-Time + Analytics**: Channels for chat/typing, integrated with django-analytical for geo-tracked user behavior—more advanced than Fiverr Workspace.
+- **Production-Ready Stack**: Docker/Nginx/Gunicorn/Celery from day one, with Wagtail for dynamic landing pages/blog, unlike template-only competitors.
 
-Phase 1 : Apprentissage
+| Feature | Fiverr/Upwork | Standalone CRMs | Zumodra |
+|---------|---------------|-----------------|---------|
+| Escrow Payments | Milestone-based  | Rare | Full Stripe escrow + refunds  |
+| Real-Time Chat | Basic messaging | No | WebSockets w/ indicators  |
+| Multi-Tenant SaaS | No | Partial  | Native django-tenants ready  |
+| CMS/Marketing | Limited | Separate tools | Wagtail + newsletters  |
+| Geospatial Search | Basic filters | No | PostGIS integration  |
+
+## Core Features
+Completed apps deliver appointment booking, Stripe finance (subscriptions/escrow), real-time messages, newsletters, and security auditing. Partial features include services marketplace, Wagtail blog, and dashboard analytics. Roadmap adds provider profiles, proposals, geofiltered search, ratings, API endpoints, and multi-role dashboards.
+
+## Path to $100M Valuation
+Implementing Phase 1-2 (bug fixes, services views, dashboard logic) unlocks a functional MVP with marketplace + CRM, targeting 20% better sales efficiency via integrated pipelines. Full rollout (Phases 3-5: i18n, testing, mobile API) positions it as a "super-app" for freelancers/agencies, capturing market share from fragmented tools—multi-tenant scalability supports 100K+ users at low cost, with AI matching/video as P3 upsell drivers. Success metrics like 99.9% uptime and 80% test coverage ensure enterprise adoption, mirroring Salesforce's CRM growth trajectory.
+
+
+Zumodra can evolve into a comprehensive freelance management system (FMS) by adding dedicated HR features that streamline contingent workforce operations, leveraging its existing configurations app (with HR/skills taxonomy) and multi-tenant structure. These additions target enterprise HR teams managing freelancers alongside full-time staff, addressing compliance, onboarding, and performance gaps in platforms like Fiverr or Upwork. 
+
+## Essential HR Features
+Integrate these into a new `hr` app or extend `configurations` and `services` for seamless freelancer lifecycle management.
+
+- **Talent Sourcing & Matching**: AI-powered skill matching using existing taxonomy, private talent pools from marketplace data, and integration with job boards—extending PostGIS for location-based hiring.
+- **Automated Onboarding**: Digital contracts with e-signatures, background checks via API (e.g., Checkr), right-to-work verification, and document storage tied to user profiles.
+- **Compliance Tracking**: Worker classification tools, tax form collection (1099-NEC), multi-country compliance rules, and audit logs from the security app.
+
+## Advanced HR Workflows
+Build role-based dashboards for HR admins with analytics from django-analytical.
+
+- **Performance & Ratings**: Verified ratings system post-project, utilization metrics, and re-engagement tracking for top freelancers.
+- **Budget & Spend Analytics**: Real-time spend tracking by department/project, predictive forecasting via Celery tasks, integrated with finance app's escrow data.
+- **Global Payments & Invoicing**: Multi-currency support in Stripe, automated invoice generation, and payroll integration—building on existing subscriptions/refunds.
+
+| Feature | Current Zumodra | Added HR Value | Competitive Edge |
+|---------|-----------------|---------------|------------------|
+| Onboarding | Basic profiles | Automated compliance docs | Reduces 54% productivity lag  |
+| Payments | Escrow/Stripe | Global tax handling | Instant options vs Upwork delays |
+| Analytics | Basic marketing | Spend/utilization dashboards | Predictive forecasting absent in Fiverr |
+| Matching | Service search | AI skill pools | Private networks > public marketplaces |
+
+## Implementation Priority
+Add in Phase 3 (Week 8+): Start with models in `configurations` for `FreelancerProfile` (skills, compliance status), views in `dashboard` for HR metrics, and Celery for automated checks. This transforms Zumodra into an FMS like Worksuite, boosting $100M potential by capturing enterprise HR budgets (projected $10B+ freelance management market).
+
+Zumodra's marketing department can leverage its existing `marketing`, `newsletter`, and Wagtail CMS apps by adding targeted features that drive user acquisition, engagement, and retention in the freelance marketplace. These enhancements position marketing teams to run data-driven campaigns, publish dynamic events for local/global networking, and integrate with the platform's geospatial PostGIS for hyper-local targeting—creating viral growth loops absent in Fiverr/Upwork. 
+
+## Core Marketing Dashboard
+Extend the `dashboard` app with role-specific views for marketers, pulling analytics from `django-analytical` and `user-tracking`.
+
+- **Campaign Analytics**: Track CAC, MRR/ARR, churn rates, activation metrics, and feature adoption via real-time Redis dashboards with A/B testing for emails/landing pages.
+- **Lead Nurturing Automation**: Celery-powered sequences for onboarding emails, re-engagement for inactive freelancers/clients, and personalized nurture flows based on service views or geo-location.
+- **Content Performance**: Wagtail-integrated metrics for blog posts, landing pages, and SEO (sitemaps, meta tags), with predictive analytics for high-engagement topics.
+
+## Event Management System
+Build a new `events` model in `marketing` app, using PostGIS for location-based discovery—marketers publish, users discover nearby opportunities.
+
+- **Event Publishing**: Create webinars, meetups, workshops (virtual/in-person) with RSVPs, ticket sales via Stripe, and live-stream integration (Jitsi). Auto-generate calendars and reminders. 
+- **Geo-Targeted Discovery**: Public event map where users filter by location/skills ("Python devs events in Montreal"), with push notifications via Channels for nearby matches.
+- **Event Analytics**: Track attendance, conversions (e.g., event → service hire), NPS feedback, and follow-up campaigns—turning events into lead pipelines.
+
+## Advanced Growth Features
+- **Feature Marketing**: In-app notifications and email blasts for new platform updates (e.g., HR tools), with video tutorials and dynamic personalization via user behavior data.
+- **Affiliate/Referral Program**: Automated tracking of referrals with tiered commissions, integrated with finance app escrow for payouts.
+- **AI-Powered Personalization**: Enrich CRM data for hyper-targeted ads/emails (e.g., "Services near you"), using existing geoip2 for visitor insights.
+
+| Feature | Current Zumodra | Marketing Boost | Unique Edge |
+|---------|-----------------|---------------|-------------|
+| Events | None | Geo-discovery + RSVPs | Local networking > Upwork forums  |
+| Automation | Newsletters only | Full sequences/A/B | 15%+ sales lift via personalization  |
+| Analytics | Basic tracking | ARR/churn dashboards | Predictive retention absent in Fiverr |
+| Content | Wagtail blog | Event-integrated SEO | Viral local events drive 20% acquisition |
+
+## Implementation Path
+Prioritize in Phase 3 (Week 8-10): Add `Event` model with Leaflet maps, Celery for event reminders, and dashboard views. This unlocks enterprise marketing scale, fueling $100M growth through events as acquisition flywheels and retention via personalized campaigns. 
+
+Zumodra's multi-tenant architecture (using django-tenants in the `main` app) can be fully activated with hierarchical role-based access control (RBAC), enabling each tenant (enterprise) to manage multiple users across roles like HR, marketers, employees, supervisors, and PDG/CEO. Users are scoped to specific "circusales" (business units/divisions) within the tenant, ensuring data isolation via PostGIS-enabled addresses and row-level security—perfect for enterprise-scale freelance/CRM operations. 
+
+## Tenant Structure
+NB: A Tenant is an Entreprise who can a one or Multiple Curcusales and each sur cusale have theire people( employee or other)
+Each tenant represents an enterprise with multiple addresses/circusales (divisions). Extend `configurations` models for this hierarchy.
+
+- **Tenant (Enterprise)**: Owns circusales, users, services, and finances; white-label branding via Wagtail pages.
+- **Circusale (Division)**: Location-specific unit (e.g., "Montreal Sales") with PostGIS coordinates, budgets, and team assignments—users belong to one primary circusale.
+- **User Roles**: PDG (full tenant access), Supervisor (circusale + subordinates), HR/Marketer/Employee (scoped to circusale + role permissions).
+
+## Role-Based Features
+Implement via custom `TenantUser` model extending django-tenant-users, with permissions per tenant/circusale.
+
+- **PDG/CEO**: Manage all circusales, users, budgets, global analytics; approve cross-division hires/services.
+- **Supervisor**: Oversee circusale team, approve local services/contracts, view division P&L from finance app.
+- **HR Personnel**: Onboard freelancers/employees per circusale, compliance checks, performance reviews—tied to new HR features.
+- **Marketers**: Run circusale-specific campaigns/events (geo-targeted via PostGIS), track local leads.
+- **Employees**: Access personal dashboard, submit time sheets, view assigned services/projects.
+
+## Key Implementation Features
+- **Scoped Dashboards**: Dynamic views filter data by `request.tenant` + `user.circusale` (e.g., HR sees only Montreal circusale freelancers).
+- **Permission Middleware**: Custom middleware checks `user.role.permissions` against tenant/circusale context before views.
+- **Multi-Address Management**: Enterprises add circusales with addresses; PostGIS enables "services near this division" matching.
+
+| Role | Tenant Scope | Circusale Scope | Unique Permissions |
+|------|--------------|-----------------|-------------------|
+| PDG | Full | All | User management, budgets  |
+| Supervisor | Full view | Own division | Team approval, local analytics |
+| HR | Hire/view | Assigned | Onboarding, compliance |
+| Marketer | Campaigns | Assigned | Events, geo-leads  |
+| Employee | Personal | Assigned | Timesheets, projects |
+
+## Model Extensions Exemple
+Add to `configurations` app:
+```python
+class Circusale(models.Model):
+    tenant = models.ForeignKey(Tenant, on_delete=CASCADE)
+    name = models.CharField(max_length=100)
+    address = models.PointField()  # PostGIS
+    budget = models.DecimalField()
+
+class TenantUser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    tenant = models.ForeignKey(Tenant)
+    circusale = models.ForeignKey(Circusale)
+    role = models.CharField(choices=[('pdg', 'PDG'), ('supervisor', 'Supervisor'), ...])
+```
+
+## Activation Path
+Enable django-tenants middleware (Phase 1), migrate tenant/circusale models, add RBAC signals for auto-role assignment. This creates true enterprise SaaS—each tenant operates independently with internal hierarchy, driving $100M scale through Fortune 500 adoption. 
 
-Que voulez-vous faire?
-Quelles technologies allez-vous utiliser?
-Élaborez votre plan d’apprentissage
-
-Phase 2 : Exécution
-
-Quelles fonctionnalités devez-vous inclure?
-Comment allez-vous l’implémenter?
-Élaborez votre plan de production
-
-La chose importante est de vous lancer dans la réalisation de vos propres programmes à un moment ou à un autre, car c'est là que vous apprendrez le plus, et également là où vous tirerez le plus de joie, car vous transformerez vos rêves en réalité.
-
-
-Composante 1 – Que voulez-vous faire?
-
-Quand nous songeons à un nouveau projet indépendant que nous pouvons réaliser de notre propre imagination, nous pouvons parfois avoir une multitude d’idées et nous ne savons pas par où commencer. Il se peu fort autant que nous n’avons aucune idée et éprouvons de la difficulté à trouver une piste. 
-
-Répondez aux questions suivantes pour vous aider dans votre réflexion :
-
-Quel est votre jeu préféré : jeu d'arcade, jeu de plateau, jeu de sport? Pouvez-vous en faire une version simplifiée et numérique? Pouvez-vous l'arranger légèrement, comme lui mettre un thème ou des personnages différents?
-
-Quelles sont vos autres matières préférées à l'école? Si vous aimez l'art, pourriez-vous faire un programme artistique? Si vous aimez l'histoire, que pensez-vous d'une chronologie interactive? Si vous aimez les sciences, pourquoi pas une simulation scientifique?
-
-Quel est votre émission de télévision ou votre film favori? Pourriez-vous réaliser la version numérique d'une scène ou d'un personnage s'y rapportant? Peut-être faire un jeu basé sur ce contenu?
-
-Avez-vous un gadget réel que vous adorez? Pourriez-vous concevoir une simulation de celui-ci?
-
-Dès que vous avez sélectionné une idée, vous devez en faire une description par écrit. Par exemple, si vous décidiez de faire un clone de "Breakout", vous auriez à écrire :
-
-Breakout : un jeu dans lequel vous dirigez une raquette en bas de l'écran pour taper sur une balle qui rebondit, vers le haut et sur les angles, et qui casse les briques qu'elle croise sur son chemin. Le but est de détruire toutes les briques, en évitant de rater trop souvent la balle.
-
-Vous étofferez cette description plus tard, mais pour l'instant, elle vous donne suffisamment d'informations pour continuer dans le processus de planification.
-Composante 2 – Quelles technologies allez-vous utiliser?
-
-Dans cette étape, vous devez définir les technologies (langages/bibliothèques/environnements) qui vous sont familières, ou que vous pouvez apprendre facilement, et parmi elles, lesquelles sont les plus adaptées à votre projet. 
-
-Il est important de noter que vous devez apprendre un nouveau langage de programmation dans le cadre de ce cours. Vous devrez ensuite identifier les ressources qui pourront vous aider dans votre cheminement à travers le semestre.
-
-Répondez aux questions suivantes pour vous aider dans votre réflexion :
-
-Quels langages de programmation connaissez-vous? Qu’avez-vous créé avec de ces langues? Élaborer une liste de vos projets et identifier les langages connexes.
-
-Quel nouveau langage de programmation vous intéresse? Serait-il un bon langage pour le projet que vous souhaitez réaliser? Élaborez tous les langages qui vous intéressent ainsi que les outils qui utilisent ce langage (Unity, Unreal, etc.) et procéder à déterminer lequel serait le plus pertinent pour réaliser votre projet.
-
-Quelles ressources aimeriez-vous avoir à votre disposition pour apprendre ce nouveau langage? Faites une recherche des ressources disponibles (manuel, sites, programmes, etc.) que vous souhaitez utiliser pour réaliser votre apprentissage (il se peut que certaines de ses ressources nécessitent un achat (comme Udemy).
-
-Prévoyez-vous l’utilisation d’autres outils pour réaliser votre projet? Présentez tout autre logiciel de création visuelle (Blender, Mudbox, etc.) ou de création musicale que vous souhaitez utiliser dans la création de votre projet.
-
-Dès que vous avez sélectionné votre langage de programmation, vous devez faire une justification de votre choix par écrit ainsi que présenter les outils et ressources que vous désirez utiliser. Assurez-vous d’identifier clairement les ressources que l’enseignant aura à obtenir pour vous.
-
-Composante 3 – Élaborez votre plan d’apprentissage
-
-Combien de temps prévoyez-vous pour l’apprentissage de votre langage de programmation? Combien de semaines et combien d'heures chaque jour? Votre objectif dans cette étape est d'établir un plan d’apprentissage en tenant compte qu’il vous faudra consacrer du temps au plan de production. Il vous permettra ainsi d'estimer le temps qui vous sera nécessaire à création de votre programme.
-
-Établir un plan pour des projets est difficile. En règle générale, considérez qu'il vous faudra plus de temps que vous pensez et ajustez au fur et à mesure. N’oubliez pas que vous n’avez que les lundis et mercredi en classe à consacrer pour votre apprentissage en programmation. Vous pouvez tout de même prévoir de l’avancement les mardis, jeudis et vendredis en fin de journée.
-
-Présentez vos objectifs de cheminement pour chaque semaine dans un tableau :
-
-
-Semaine
-Objectifs
-Heures en classes
-Heures à la maison
-Mars
-4 au 10 mars 2019
-
-Élaboration de mon plan de projet, débuter un cours JavaScript sur CodeAcademy
-
-
-2 heures lundi et 3 heures mercredi
-3 heures après mon DRC
-2 à 4 heures après mes jours COOP.
-11 au 17 mars 2019
-
-Continuer mon cheminement sur CodeAcademy pendant la semaine de relâche.
-
-
-N/A
-Environ 4 heures par jours ou plus.
-18 au 24 mars 2019
-
-Commencer un cours sur Udemy pour création des jeux d’arcades avec JavaScript.
-
-
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-25 au 31 mars 2019
-
-Continuer mon cheminement sur Udemy.
-
-
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-Avril
-1er au 7 avril 2019
-
-Commencer à créer mon logiciel et terminer le cours Udemy.
-
-
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-8 au 14 avril 2019
-Etc…
-Etc…
-Etc…
-
-
-Composante 4 – Quelles fonctionnalités devez-vous inclure?
-
-À partir d’ici, nous entrons pleinement dans la partie la plus amusante : la planification. L'objectif dans cette étape est de déterminer ce que vous allez concrètement réaliser (à quoi le programme va ressembler, quelles fonctionnalités doit-il inclure, quelles fonctionnalités ne doit-il pas contenir, etc.) dans votre logiciel.
-
-La première chose que vous pouvez faire est de réaliser des "maquettes" (des croquis de ce vous voulez faire, mais sans y adjoindre de couleurs ou les dimensions exactes). Vous pouvez les réaliser sur papier ou en utilisant des applications en ligne.
-
-Pour vous donner une idée de ce à quoi des maquettes ressemblent, reprenons l’exemple de Breakout.
-
-Nous avons des croquis de chaque scène séparément et nous les joignons par des flèches pour qu'on puisse voir comment elles mènent les unes aux autres. Ces flèches m'aideront à déterminer quelle logique me sera nécessaire pour naviguer entre les différents états de mon programme.
-
-Vous allez pouvoir utiliser ces maquettes pour vous aider à élaborer une liste de fonctionnalités, toutes les fonctionnalités dont votre programme va avoir besoin.
-Pour mon clone de Breakout, ceci aurait pu être ma liste de fonctionnalités, concentrées par scènes :
-
-Scène de jeu
-
-Raquette contrôlée par l'utilisateur
-Briques aux couleurs multiples
-Mouvements inclinés de la balle
-Détection des collisions
-Affichage de la vie
-Affichage du score
-Effets sonores
-Scène principale
-
-Bouton de lancement du jeu
-Bouton d'aide
-Scène d'aide
-
-Texte
-Bouton de retour
-Scène de victoire
-
-Gros titres
-Animation de feux d'artifice
-Scène de défaite
-
-Texte
-Bouton pour recommencer
-Ainsi, votre planification des fonctionnalités doit inclure une maquette ainsi que la liste propre des fonctionnalités.
-
-Si nous avions tout le temps pour réaliser les programmes qui nous viennent à l'esprit, alors ils incluraient toutes les fonctionnalités de notre liste. Mais nous ne l'avons pas. Nous devons donc décider quelles sont les fonctionnalités les plus importantes, et quelles sont celles que nous inclurions seulement si nous avions le temps. Cela nous aidera à déterminer l'ordre dans lequel nous devons les implémenter, de la plus importante à la moins importante.
-
-Pour vous aider à évaluer l'importance de chaque fonctionnalité, posez-vous les questions suivantes et identifiez les fonctionnalités de la liste qui correspondent à ces critères :
-Si je partage avec un ami, quelles sont les fonctionnalités que je veux absolument voir fonctionner? Déterminer ce que vous voulez absolument montrer à vos amis et à votre enseignant.
-
-Quelles sont les fonctionnalités les plus exaltantes à mettre en place? Déterminer ce qui va prendre le plus de temps et ce qui va prendre le moins de temps.
-
-Quelles sont les fonctionnalités propres à mon programme? Déterminer ce qui rendra le programme unique et qui est essentiel au programme.
-
-Quelles sont les fonctionnalités qui vont m'apprendre le plus? Déterminer ce qui va maximiser votre apprentissage lors de la création de votre programme.
-
-Y a-t-il des fonctionnalités dont la réalisation est au-delà de mes compétences? Identifier ce qui pose les plus grands défis et ce qui pourrait être trop difficile à compléter.
-Puis, parcourez la liste de fonctionnalités que vous avez faites lors de l'étape précédente et ordonnez-la en attribuant des priorités. Il serait bon de faire utilisation de couleurs pour identifier vos critères (questions précédentes) qui justifient la priorité que vous accordez aux différentes fonctionnalités.
-
-Pour la liste de fonctionnalités de mon clone de Breakout, j'ai attribué des "P1", "P2" et "P3" aux fonctionnalités, c'est-à-dire haute priorité (P1), priorité intermédiaire (P2), et priorité moindre (P3). J'ai décidé de donner surtout de l'importance à la mécanique propre du jeu plutôt qu'aux fonctionnalités générales, car c'est ce que je trouvais le plus excitant dans le projet :
-(P1) Scène de jeu
-(P1) Raquette contrôlée par l'utilisateur
-(P1) Briques aux couleurs multiples
-(P1) Mouvements inclinés de la balle
-(P1) Détection des collisions
-(P2) Affichage de la vie
-(P2) Affichage du score
-(P3) Effets sonores
-(P2) Scène principale
-(P2) Bouton de lancement du jeu
-(P3) Bouton d'aide
-(P3) Scène d'aide
-(P3) Texte
-(P3) Bouton de retour
-(P2) Scène de victoire
-(P2) Gros titres
-(P3) Animation de feux d'artifice
-(P2) Scène de défaite
-(P2) Texte
-(P3) Bouton pour recommencer
-De façon générale, voici les fonctionnalités auxquelles il faut donner une faible priorité pour ceux qui font des jeux : les menus, les niveaux multiples et les graphismes en 3D. Concentrez-vous sur ce qui est unique et amusant dans votre jeu, puis ajoutez ensuite ces options.
-Vous pouvez aussi transformer votre liste de priorités en versions de projet, ce qui vous permettra de voir facilement ce qu'il y a à implémenter dans chaque version. Et vous aurez toujours la possibilité de vous arrêter sur une version en considérant que ce que vous avez fait est satisfaisant.
-Ci-après, les versions telles qu'elles apparaîtraient pour mon clone de Breakout :
-V1
-Raquette contrôlée par l'utilisateur
-Briques aux couleurs multiples
-Mouvements inclinés de la balle
-Détection des collisions
-V2
-Affichage de la vie
-Affichage du score
-Scène principale avec bouton de lancement du jeu
-Scène de victoire avec gros titres
-V3
-Effets sonores
-Bouton d'aide
-Feux d'artifice
-Scène de défaite avec bouton pour recommencer
-Composante 5 – Comment allez-vous l’implémenter?
-
-Vous avez maintenant une bonne idée des fonctionnalités que vous allez mettre en place en premier. Mais si vous commencez immédiatement, vous allez vous retrouvez devant une feuille blanche, sans aucun code, et cela peut être intimidant. Quelles variables allez-vous déclarer en premier? Quelles fonctions?
-Un moyen d’approcher ce défi est de réfléchir à une "architecture à haut niveau" de votre programme, en le segmentant en catégories telles que les "objets", la "logique", les "interactions avec l'utilisateur", les "données de l'utilisateur" et les "scènes. Puis réfléchir au moyen de les implémenter, avec par exemple des types d'objets orientés, objet des fonctions ou des variables. Voici en exemple une architecture pour mon clone de Breakout :
-Objets
-Brique (.estTouchee())
-Raquette (.deplacer())
-Balle (.deplacer())
-
-Scènes
-Début
-Jeu
-Fin
-
-Logique
-Collision Balle-Brique (fonction, utilise un rectangle de contour)
-Calcul d'angle Raquette-Balle (fonction, inverse l'angle)
-
-Interactions avec l'utilisateur
-Mouvement de la raquette avec le clavier (keyPressed)
-Boutons pour les changements de scènes (mouseClicked)
-
-Données de l'utilisateur
-Pertes de balles (tableau)
-Touchés de balles (tableau)
-
-
-Une fois que vous aurez pensé à l'architecture à haut-niveau, ce que vous devez coder en premier vous apparaîtra plus clair. Vous pouvez décider d'écrire tout votre programme en pseudo-code dans un premier temps. Il s'agit en fait d'écrire tout son programme en français ou en anglais, à l'intérieur d'un commentaire, puis de tranquillement le transformer en code.
-Composante 6 – Élaborez votre plan de production
-
-Combien de temps avez-vous pour faire ce programme? Combien de semaines et combien d'heures chaque jour? Votre objectif dans cette étape est d'établir un planification pour votre projet, qui est vital si vous avez une date butoir.
-
-Voici une planification pour mon clone de Breakout, en supposant un travail de 6 à 12 heures par semaine :
-
-
-
-Semaine
-Objectifs
-Heures en classes
-Heures à la maison
-Avril
-1er au 7 avril 2019
-Conception et pseudo-code
-2 heures lundi et 3 heures mercredi
-3 heures après mon DRC
-2 à 4 heures après mes jours COOP.
-8 au 14 avril 2019
-Premiers visuels 
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-15 au 21 avril 2019
-Mouvement de la balle/mécanisme des collisions 
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-21 au 28 avril 2019
-Mécanisme de comptabilisation du score 
-3 à 4 heures lundi et mercredi
-Environ 3 heures après mon DRC et mes jours COOP.
-Mai
-Etc…
-Etc…
-Etc…
-Etc…
-Etc…
-Etc…
-Etc…
-Etc…
-
-
-
-Établir une planification de programmation pour des projets est difficile. Des choses qui semblent faciles prennent plus de temps que prévu (comme d'étranges bogues que vous passez des heures à déboguer) et d'autres qui semblent difficiles moins. N’oubliez pas que vous n’avez que les lundis et mercredi en classe à consacrer pour votre apprentissage en programmation. Vous pouvez tout de même prévoir de l’avancement les mardis, jeudis et vendredis en fin de journée. En règle générale, considérez qu'il vous faudra plus de temps que vous pensez et ajustez au fur et à mesure.
