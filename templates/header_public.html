@@ -1,0 +1,89 @@
+{% load i18n %}
+{% load static %}
+
+<!-- Public Header (Non-authenticated users) -->
+<header id="header" class="header sticky top-0 z-50 bg-white shadow-md">
+    <div class="header_inner flex items-center justify-between w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 border-b border-light">
+        <div class="left flex items-center gap-15 max-[1600px]:gap-6 h-full">
+            <!-- Logo -->
+            <h1>
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'assets/images/rhematekCS.png' %}" alt="Zumodra" class="logo-white md:h-[42px] h-8 w-auto" />
+                    <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="logo-black md:h-[42px] h-8 w-auto hidden" />
+                </a>
+            </h1>
+        </div>
+
+        <!-- Navigation -->
+        <div class="right flex items-center gap-6 h-full">
+            <nav class="navigator h-full max-lg:hidden">
+                <ul class="list flex items-center gap-5 h-full">
+                    <li class="h-full relative">
+                        <a href="{% url 'home' %}" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
+                            <span class="text-button">{% trans 'Home' %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'about' %}" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
+                            <span class="text-button">{% trans 'About' %}</span>
+                        </a>
+                    </li>
+                    <!-- Blog link will be added by Wagtail CMS -->
+                    <li class="h-full relative">
+                        <a href="{% url 'privacy_policy' %}" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
+                            <span class="text-button">{% trans 'Privacy' %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'term_of_use' %}" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
+                            <span class="text-button">{% trans 'Terms' %}</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Auth Buttons -->
+            <div class="button-block flex items-center gap-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'account_logout' %}" class="button-main bg-transparent border border-primary text-primary hover:bg-primary hover:text-white">
+                        {% trans 'Logout' %}
+                    </a>
+                    <a href="/app/dashboard/" class="button-main">
+                        {% trans 'Dashboard' %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="button-main bg-transparent border border-primary text-primary hover:bg-primary hover:text-white max-sm:hidden">
+                        {% trans 'Sign In' %}
+                    </a>
+                    <a href="{% url 'account_signup' %}" class="button-main">
+                        {% trans 'Get Started' %}
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="menu_mobile lg:hidden flex items-center justify-center w-10 h-10">
+                <span class="ph-bold ph-list text-2xl"></span>
+                <span class="blind">button open menu mobile</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="menu_mobile_block absolute top-full left-0 w-full bg-white shadow-lg max-lg:block hidden">
+        <ul class="list p-4">
+            <li><a href="{% url 'home' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Home' %}</a></li>
+            <li><a href="{% url 'about' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'About' %}</a></li>
+            <li><a href="{% url 'privacy_policy' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Privacy' %}</a></li>
+            <li><a href="{% url 'term_of_use' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Terms' %}</a></li>
+            {% if not user.is_authenticated %}
+                <li class="border-t border-line mt-2 pt-2">
+                    <a href="{% url 'account_login' %}" class="block py-3 px-4 text-primary">{% trans 'Sign In' %}</a>
+                </li>
+                <li>
+                    <a href="{% url 'account_signup' %}" class="block py-3 px-4 bg-primary text-white rounded-lg text-center">{% trans 'Get Started' %}</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</header>

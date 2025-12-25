@@ -1,0 +1,171 @@
+# Apps to Delete - Zumodra Project
+# Created: December 25, 2025
+
+## ❌ Empty/Duplicate Apps to Remove
+
+### 1. jobs/
+**Reason:** Empty app with no implementation
+**Alternative:** Job models already exist in `configurations` app (configurations.Job, configurations.JobPosition, configurations.JobApplication)
+**Action:** Delete entire directory
+
+### 2. projects/
+**Reason:** Empty app with no implementation
+**Alternative:** Project/service request models exist in `services` app (DServiceRequest, DServiceContract, DServiceProposal)
+**Action:** Delete entire directory
+
+### 3. dashboard_alert/
+**Reason:** Empty placeholder app with no models or views
+**Alternative:** Alert functionality should be part of main `dashboard` app
+**Action:** Delete entire directory
+
+### 4. dashboard_job/
+**Reason:** Empty placeholder app
+**Alternative:** Job dashboard features should be in main `dashboard` app
+**Action:** Delete entire directory
+
+### 5. dashboard_project/
+**Reason:** Empty placeholder app
+**Alternative:** Project dashboard features should be in main `dashboard` app or `services` app
+**Action:** Delete entire directory
+
+### 6. Chatapp-production/ (in git status as deleted)
+**Reason:** Old chat app implementation, replaced by messages_sys
+**Status:** Already marked for deletion in git
+**Action:** Confirm removal and commit deletion
+
+### 7. GreaterWMS-master/ (in git status as deleted)
+**Reason:** External WMS system, not part of Zumodra
+**Status:** Already marked for deletion in git
+**Action:** Confirm removal and commit deletion
+
+### 8. django-crm-main/
+**Reason:** Appears to be external CRM template/boilerplate
+**Status:** Exists in directory listing
+**Action:** Verify if code is being used, if not - delete
+
+---
+
+## ⚠️ Apps to Consolidate (Do Not Delete Yet)
+
+### leads/
+**Issue:** Duplicate Newsletter model with `newsletter` app
+**Action:**
+1. Migrate any leads data to `marketing.Prospect`
+2. Remove Newsletter model from leads
+3. Keep basic lead capture functionality
+4. Or merge entirely into `marketing` app
+
+### marketing/
+**Issue:** Contains duplicate Newsletter models (NewsletterCampaign, NewsletterSubscriber)
+**Action:**
+1. Use `newsletter` app for all email campaigns
+2. Keep analytics and prospect tracking in marketing
+3. Remove duplicate newsletter models
+
+---
+
+## 🔧 Apps Requiring Cleanup
+
+### drip/
+**Status:** Empty or minimal implementation
+**Check:** Verify if django-drip functionality is needed
+**Action:** If not used, remove from INSTALLED_APPS and delete
+
+---
+
+## 📝 Removal Instructions
+
+### Step 1: Backup
+```bash
+# Create backup before deletion
+git add .
+git commit -m "Backup before app cleanup"
+```
+
+### Step 2: Remove from INSTALLED_APPS
+Edit `zumodra/settings.py` and remove:
+```python
+# REMOVE THESE FROM INSTALLED_APPS:
+# 'dashboard_alert'
+# 'dashboard_job'
+# 'dashboard_project'
+```
+
+### Step 3: Remove Apps
+```bash
+# Windows (PowerShell)
+Remove-Item -Recurse -Force jobs
+Remove-Item -Recurse -Force projects
+Remove-Item -Recurse -Force dashboard_alert
+Remove-Item -Recurse -Force dashboard_job
+Remove-Item -Recurse -Force dashboard_project
+
+# Linux/Mac
+rm -rf jobs/
+rm -rf projects/
+rm -rf dashboard_alert/
+rm -rf dashboard_job/
+rm -rf dashboard_project/
+```
+
+### Step 4: Clean Migrations
+```bash
+# After removing apps, create new migration to clean up
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### Step 5: Verify
+```bash
+# Check for any remaining references
+grep -r "dashboard_alert" .
+grep -r "dashboard_job" .
+grep -r "dashboard_project" .
+grep -r "jobs\." .
+grep -r "projects\." .
+```
+
+### Step 6: Commit
+```bash
+git add .
+git commit -m "Remove empty and duplicate apps
+
+- Removed jobs/ (duplicate of configurations.Job)
+- Removed projects/ (duplicate of services models)
+- Removed dashboard_alert, dashboard_job, dashboard_project (empty placeholders)
+- Cleaned up INSTALLED_APPS in settings.py
+"
+```
+
+---
+
+## 📊 Summary
+
+**Total Apps to Delete:** 7-9
+- **Confirmed Deletions:** 5 empty apps
+- **Git Cleanup:** 2 already deleted directories
+- **To Investigate:** 1-2 apps (django-crm-main, drip)
+
+**Space Saved:** Estimated 50-100+ MB
+**Complexity Reduced:** 5 fewer apps to maintain
+**Clarity Improved:** No confusion between similar apps
+
+---
+
+## ⚠️ WARNING
+
+Before deleting, ensure:
+1. ✅ No migrations reference these apps
+2. ✅ No URL patterns import from these apps
+3. ✅ No templates extend from these apps
+4. ✅ No other apps have ForeignKey to models in these apps
+5. ✅ Database has been backed up
+
+If you find any dependencies, document them here and resolve before deletion.
+
+---
+
+**Next Steps After Deletion:**
+1. Run tests to ensure nothing broke
+2. Update PROJECT_PLAN.md to reflect changes
+3. Focus development on core apps (services, dashboard, blog)

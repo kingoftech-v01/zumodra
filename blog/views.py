@@ -1,32 +1,39 @@
+"""
+Blog views - Using Wagtail CMS
+All blog functionality is handled by Wagtail Page models.
+"""
+
 from django.shortcuts import render
-from django.core.paginator import Paginator
-from .models import *
-from django.shortcuts import get_object_or_404
+from wagtail.models import Page
+from .models import BlogPostPage, BlogIndexPage, CategoryPage, Comment
 
-# Create your views here.
-def blog_default(request):
-    blog_posts_query = BlogPost.objects.all()
-    blog_categories = Category.objects.all()
-    blog_tags = Tag.objects.all()
-    # blog_authors = BlogAuthor.objects.all()
-    blog_comments = Comment.objects.all()
+# Wagtail handles routing automatically via Page.serve() method
+# These views are backup/auxiliary views if needed
 
-    paginator = Paginator(blog_posts_query, 10)
-    page_number = request.GET.get('page')
-    blog_posts = paginator.get_page(page_number)
+def blog_list_view(request):
+    """
+    Alternative blog list view (Wagtail BlogIndexPage.get_context handles this normally)
+    """
+    posts = BlogPostPage.objects.live().public().order_by('-first_published_at')
 
     context = {
-        'blog_posts': blog_posts,
-        'blog_categories': blog_categories,
-        'blog_tags': blog_tags,
-        # 'blog_authors': blog_authors,
-        'blog_comments': blog_comments,
+        'posts': posts,
     }
-    return render(request, 'blog/blog-default.html', context)
+    return render(request, 'blog/blog-list.html', context)
 
-def blog_post_detail(request, slug):
-    blog_post = get_object_or_404(BlogPost, slug=slug)
+
+def blog_search_view(request):
+    """
+    Blog search functionality
+    """
+    query = request.GET.get('q', '')
+    posts = BlogPostPage.objects.live().public()
+
+    if query:
+        posts = posts.search(query)
+
     context = {
-        'blog_post': blog_post
+        'posts': posts,
+        'query': query,
     }
-    return render(request, 'blog/blog-post-detail.html', context)
+    return render(request, 'blog/blog-search.html', context)

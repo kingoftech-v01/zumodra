@@ -25,7 +25,7 @@ environ.Env.read_env(str(BASE_DIR / '.env'))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY ="1_v5itzez)b(o-9eb@c4%)%hkgof^%-&7i*h2ne(7d7f-5p(z9"
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
@@ -148,7 +148,6 @@ INSTALLED_APPS = [
     'messages_sys',
     'configurations',
     'dashboard_service',
-    'dashboard_project',
     'dashboard',
     # 'services',
     'appointment.apps.AppointmentConfig',
@@ -225,34 +224,14 @@ ASGI_APPLICATION = 'zumodra.asgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'sqlite': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    # 'postgres': {
-    #     'ENGINE': env('DB_ENGINE'),
-    #     'NAME': env('DB_DEFAULT_NAME'),
-    #     'USER': env('DB_USER'),
-    #     'PASSWORD': env('DB_PASSWORD'),
-    #     'HOST': env('DB_HOST'),
-    #     'PORT': env('DB_DEFAULT_PORT'),
-    # },
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', #django_tenants.postgresql_backend
-        'NAME': 'zumodra',
-        'USER': 'postgres',
-        'PASSWORD': 'mysecretpassword',
-        'HOST': 'localhost',
-        'PORT': '5433',
-    },
-    # 'users': {
-    #     'ENGINE': env('DB_ENGINE'),
-    #     'NAME': env('DB_USER_NAME'),
-    #     'USER': env('DB_USER'),
-    #     'PASSWORD': env('DB_PASSWORD'),
-    #     'HOST': env('DB_HOST'),
-    #     'PORT':env('DB_USER_PORT'),
-    # }
+        'ENGINE': env('DB_ENGINE', default='django.contrib.gis.db.backends.postgis'),
+        'NAME': env('DB_DEFAULT_NAME', default='zumodra'),
+        'USER': env('DB_USER', default='postgres'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST', default='localhost'),
+        'PORT': env('DB_DEFAULT_PORT', default='5433'),
+    }
 }
 
 ORIGINAL_BACKEND = "django.contrib.gis.db.backends.postgis"
@@ -328,18 +307,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'custom_account_u.CustomUser'
 
 # Email Settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "business43.web-hosting.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = "support@rhematek-solutions.com"
-EMAIL_HOST_PASSWORD = "yOoiODNuXIYb"
-DEFAULT_FROM_EMAIL = "support@rhematek-solutions.com"
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='business43.web-hosting.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='support@rhematek-solutions.com')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='support@rhematek-solutions.com')
 
 # Stripe Settings
-STRIPE_SECRET_KEY = ""
-STRIPE_PUBLIC_KEY = ""
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY', default='')
 
 # Allauth Settings
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -621,6 +600,19 @@ Q_CLUSTER = {
 USE_DJANGO_Q_FOR_EMAILS = True  # Use Django Q for sending ALL emails
 
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Security Settings - Only enable in production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    # Development settings
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False

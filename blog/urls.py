@@ -1,12 +1,14 @@
-from django.urls import path, include
-from .views import *
+"""
+Blog URLs - Wagtail handles most routing automatically
+"""
 
-from wagtail.admin import urls as wagtailadmin_urls
-from wagtail import urls as wagtail_urls
-from wagtail.documents import urls as wagtaildocs_urls
+from django.urls import path
+from .views import blog_list_view, blog_search_view
+
+app_name = 'blog'
 
 urlpatterns = [
-    path('cms/', include(wagtailadmin_urls)),                   # CMS URLs
-    path('documents/', include(wagtaildocs_urls)),
-    path('posts/', include(wagtail_urls)),
+    # Optional: Auxiliary views (Wagtail handles main routing)
+    path('search/', blog_search_view, name='search'),
+    # Main blog routing is handled by Wagtail in main urls.py
 ]
