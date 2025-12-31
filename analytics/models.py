@@ -1584,7 +1584,7 @@ class HiringAnalytics(models.Model):
 
     # Department filter (null for aggregate)
     department = models.ForeignKey(
-        'hr_core.Department',
+        'configurations.Department',
         on_delete=models.CASCADE,
         null=True, blank=True,
         related_name='hiring_analytics'
@@ -1727,7 +1727,7 @@ class RecruiterPerformanceMetric(models.Model):
 
     # Recruiter
     recruiter = models.ForeignKey(
-        'accounts.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='recruiter_performance_metrics',
         null=True, blank=True
