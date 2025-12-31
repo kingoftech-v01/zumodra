@@ -899,7 +899,7 @@ class JobAlert(models.Model):
         PAUSED = 'paused', _('Paused')
         UNSUBSCRIBED = 'unsubscribed', _('Unsubscribed')
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     # Link to career site
     career_site = models.ForeignKey(
