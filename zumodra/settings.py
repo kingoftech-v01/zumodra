@@ -46,8 +46,9 @@ SHARED_APPS = [
     'django_tenants',            # Must be first for multi-tenancy
     'django.contrib.contenttypes',
     'django.contrib.sites',
-    'django.contrib.admin',
     'django.contrib.auth',
+    'custom_account_u',          # Custom user model - must be before admin
+    'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
