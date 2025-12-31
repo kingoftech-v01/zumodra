@@ -14,7 +14,7 @@ import uuid
 from babel.numbers import get_currency_symbol
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxLengthValidator, MinLengthValidator, MinValueValidator
+from django.core.validators import MaxLengthValidator, MinLengthValidator, MinValueValidator, FileExtensionValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -83,7 +83,16 @@ class Service(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name=_("Down Payment")
     )
-    image = models.ImageField(upload_to='services/', blank=True, null=True, verbose_name=_('Image'), )
+    image = models.ImageField(
+        upload_to='services/',
+        blank=True,
+        null=True,
+        verbose_name=_('Image'),
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ],
+        help_text=_("Allowed formats: JPG, PNG, GIF, WebP. Max size: 5MB")
+    )
     currency = models.CharField(
         max_length=3,
         default='USD',

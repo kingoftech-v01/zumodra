@@ -1,0 +1,569 @@
+{% comment %}
+Zumodra Loading Skeleton Component Templates
+Usage: {% include "components/loading.html" with variant="text" %}
+
+Available variants: text, title, paragraph, avatar, image, card, table, list, profile, stats, form
+These skeleton loaders provide visual feedback while content is loading.
+{% endcomment %}
+
+{% comment %}
+==============================================================================
+TEXT SKELETON (single line)
+Usage: {% include "components/loading.html" with variant="text" width="60%" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "text" %}
+<div
+    class="skeleton skeleton-text{% if extra_class %} {{ extra_class }}{% endif %}"
+    style="{% if width %}width: {{ width }};{% endif %}{% if height %}height: {{ height }};{% endif %}"
+    role="status"
+    aria-label="Loading..."
+>
+    <span class="sr-only">Loading...</span>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+TITLE SKELETON
+Usage: {% include "components/loading.html" with variant="title" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "title" %}
+<div
+    class="skeleton skeleton-title{% if extra_class %} {{ extra_class }}{% endif %}"
+    style="{% if width %}width: {{ width }};{% else %}width: 40%;{% endif %}"
+    role="status"
+    aria-label="Loading title..."
+>
+    <span class="sr-only">Loading title...</span>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+PARAGRAPH SKELETON (multiple lines)
+Usage: {% include "components/loading.html" with variant="paragraph" lines=4 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "paragraph" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading content..."
+>
+    <span class="sr-only">Loading content...</span>
+    {% for i in "12345"|slice:":"|slice:lines|default:"123" %}
+    <div class="skeleton skeleton-text" style="{% if forloop.last %}width: 60%;{% endif %}"></div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+AVATAR SKELETON
+Usage: {% include "components/loading.html" with variant="avatar" size="lg" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "avatar" %}
+<div
+    class="skeleton skeleton-avatar{% if size == 'sm' %} skeleton-avatar-sm{% elif size == 'lg' %} skeleton-avatar-lg{% elif size == 'xl' %} skeleton-avatar-xl{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    style="{% if size == 'sm' %}width: 32px; height: 32px;{% elif size == 'lg' %}width: 56px; height: 56px;{% elif size == 'xl' %}width: 80px; height: 80px;{% else %}width: 40px; height: 40px;{% endif %}"
+    role="status"
+    aria-label="Loading avatar..."
+>
+    <span class="sr-only">Loading avatar...</span>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+IMAGE SKELETON
+Usage: {% include "components/loading.html" with variant="image" aspect_ratio="16/9" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "image" %}
+<div
+    class="skeleton skeleton-image{% if extra_class %} {{ extra_class }}{% endif %}"
+    style="width: 100%; {% if aspect_ratio %}aspect-ratio: {{ aspect_ratio }};{% else %}height: {{ height|default:'200px' }};{% endif %}"
+    role="status"
+    aria-label="Loading image..."
+>
+    <span class="sr-only">Loading image...</span>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+CARD SKELETON
+Usage: {% include "components/loading.html" with variant="card" show_image=True %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "card" %}
+<div
+    class="card{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading card..."
+>
+    <span class="sr-only">Loading card...</span>
+
+    {% if show_image %}
+    <div class="skeleton skeleton-image" style="height: 160px; border-radius: var(--radius-xl) var(--radius-xl) 0 0;"></div>
+    {% endif %}
+
+    <div class="card-body">
+        <div class="skeleton skeleton-title" style="width: 60%; margin-bottom: var(--spacing-4);"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+
+        {% if show_footer %}
+        <div style="display: flex; gap: var(--spacing-2); margin-top: var(--spacing-4);">
+            <div class="skeleton" style="width: 80px; height: 36px; border-radius: var(--radius-lg);"></div>
+            <div class="skeleton" style="width: 80px; height: 36px; border-radius: var(--radius-lg);"></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+TABLE SKELETON
+Usage: {% include "components/loading.html" with variant="table" rows=5 cols=4 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "table" %}
+<div
+    class="table-container{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading table..."
+>
+    <span class="sr-only">Loading table...</span>
+    <table class="table">
+        <thead>
+            <tr>
+                {% for col in "12345"|slice:":"|slice:cols|default:"1234" %}
+                <th>
+                    <div class="skeleton skeleton-text" style="width: 80px; height: 14px;"></div>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in "1234567890"|slice:":"|slice:rows|default:"12345" %}
+            <tr>
+                {% for col in "12345"|slice:":"|slice:cols|default:"1234" %}
+                <td>
+                    <div class="skeleton skeleton-text" style="width: {% cycle '60%' '80%' '70%' '50%' '90%' %};"></div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+LIST SKELETON
+Usage: {% include "components/loading.html" with variant="list" items=5 show_avatar=True %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "list" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading list..."
+>
+    <span class="sr-only">Loading list...</span>
+    {% for i in "1234567890"|slice:":"|slice:items|default:"12345" %}
+    <div style="display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3) 0; border-bottom: 1px solid var(--color-border-primary);">
+        {% if show_avatar %}
+        <div class="skeleton skeleton-avatar"></div>
+        {% endif %}
+        {% if show_icon %}
+        <div class="skeleton" style="width: 24px; height: 24px; border-radius: var(--radius-md);"></div>
+        {% endif %}
+        <div style="flex: 1;">
+            <div class="skeleton skeleton-text" style="width: 40%; margin-bottom: var(--spacing-1);"></div>
+            <div class="skeleton skeleton-text" style="width: 70%; height: 12px;"></div>
+        </div>
+        {% if show_action %}
+        <div class="skeleton" style="width: 60px; height: 32px; border-radius: var(--radius-lg);"></div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+PROFILE SKELETON
+Usage: {% include "components/loading.html" with variant="profile" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "profile" %}
+<div
+    class="card{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading profile..."
+>
+    <span class="sr-only">Loading profile...</span>
+    <div class="card-body" style="text-align: center; padding: var(--spacing-8);">
+        <div class="skeleton skeleton-avatar" style="width: 80px; height: 80px; margin: 0 auto var(--spacing-4);"></div>
+        <div class="skeleton skeleton-title" style="width: 50%; margin: 0 auto var(--spacing-2);"></div>
+        <div class="skeleton skeleton-text" style="width: 30%; margin: 0 auto var(--spacing-4); height: 12px;"></div>
+        <div class="skeleton skeleton-text" style="width: 70%; margin: 0 auto var(--spacing-4);"></div>
+        <div style="display: flex; gap: var(--spacing-2); justify-content: center;">
+            <div class="skeleton" style="width: 100px; height: 36px; border-radius: var(--radius-lg);"></div>
+            <div class="skeleton" style="width: 100px; height: 36px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+STATS CARD SKELETON
+Usage: {% include "components/loading.html" with variant="stats" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "stats" %}
+<div
+    class="card{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading stats..."
+>
+    <span class="sr-only">Loading stats...</span>
+    <div class="card-body">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <div class="skeleton skeleton-text" style="width: 100px; height: 12px; margin-bottom: var(--spacing-2);"></div>
+                <div class="skeleton" style="width: 120px; height: 32px; margin-bottom: var(--spacing-2);"></div>
+                <div class="skeleton skeleton-text" style="width: 80px; height: 12px;"></div>
+            </div>
+            <div class="skeleton" style="width: 48px; height: 48px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+FORM SKELETON
+Usage: {% include "components/loading.html" with variant="form" fields=4 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "form" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading form..."
+>
+    <span class="sr-only">Loading form...</span>
+    {% for i in "123456"|slice:":"|slice:fields|default:"1234" %}
+    <div class="form-group">
+        <div class="skeleton skeleton-text" style="width: 100px; height: 14px; margin-bottom: var(--spacing-2);"></div>
+        <div class="skeleton" style="width: 100%; height: 40px; border-radius: var(--radius-lg);"></div>
+    </div>
+    {% endfor %}
+    <div style="display: flex; gap: var(--spacing-3); margin-top: var(--spacing-4);">
+        <div class="skeleton" style="width: 100px; height: 40px; border-radius: var(--radius-lg);"></div>
+        <div class="skeleton" style="width: 80px; height: 40px; border-radius: var(--radius-lg);"></div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+GRID OF CARDS SKELETON
+Usage: {% include "components/loading.html" with variant="grid" cards=6 columns=3 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "grid" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    style="display: grid; grid-template-columns: repeat({{ columns|default:3 }}, 1fr); gap: var(--spacing-4);"
+    role="status"
+    aria-label="Loading cards..."
+>
+    <span class="sr-only">Loading cards...</span>
+    {% for i in "123456789012"|slice:":"|slice:cards|default:"123456" %}
+    <div class="card">
+        <div class="skeleton skeleton-image" style="height: 140px; border-radius: var(--radius-xl) var(--radius-xl) 0 0;"></div>
+        <div class="card-body">
+            <div class="skeleton skeleton-title" style="width: 70%; margin-bottom: var(--spacing-3);"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+COMMENT/MESSAGE SKELETON
+Usage: {% include "components/loading.html" with variant="comment" count=3 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "comment" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading comments..."
+>
+    <span class="sr-only">Loading comments...</span>
+    {% for i in "12345"|slice:":"|slice:count|default:"123" %}
+    <div style="display: flex; gap: var(--spacing-3); padding: var(--spacing-4) 0; border-bottom: 1px solid var(--color-border-primary);">
+        <div class="skeleton skeleton-avatar"></div>
+        <div style="flex: 1;">
+            <div style="display: flex; gap: var(--spacing-2); margin-bottom: var(--spacing-2);">
+                <div class="skeleton skeleton-text" style="width: 100px;"></div>
+                <div class="skeleton skeleton-text" style="width: 60px; height: 12px;"></div>
+            </div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width: 70%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+SIDEBAR/NAVIGATION SKELETON
+Usage: {% include "components/loading.html" with variant="sidebar" items=6 %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "sidebar" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    style="padding: var(--spacing-4);"
+    role="status"
+    aria-label="Loading navigation..."
+>
+    <span class="sr-only">Loading navigation...</span>
+    <div class="skeleton skeleton-text" style="width: 60%; height: 20px; margin-bottom: var(--spacing-6);"></div>
+    {% for i in "12345678"|slice:":"|slice:items|default:"123456" %}
+    <div style="display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-2) 0;">
+        <div class="skeleton" style="width: 20px; height: 20px; border-radius: var(--radius-md);"></div>
+        <div class="skeleton skeleton-text" style="width: {% cycle '70%' '50%' '80%' '60%' '75%' '55%' %};"></div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+HEADER SKELETON
+Usage: {% include "components/loading.html" with variant="header" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "header" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-4); border-bottom: 1px solid var(--color-border-primary);"
+    role="status"
+    aria-label="Loading header..."
+>
+    <span class="sr-only">Loading header...</span>
+    <div style="display: flex; align-items: center; gap: var(--spacing-4);">
+        <div class="skeleton" style="width: 120px; height: 32px;"></div>
+        <div class="skeleton skeleton-text" style="width: 200px;"></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+        <div class="skeleton" style="width: 32px; height: 32px; border-radius: var(--radius-md);"></div>
+        <div class="skeleton" style="width: 32px; height: 32px; border-radius: var(--radius-md);"></div>
+        <div class="skeleton skeleton-avatar"></div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+DASHBOARD PAGE SKELETON
+Usage: {% include "components/loading.html" with variant="dashboard" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "dashboard" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading dashboard..."
+>
+    <span class="sr-only">Loading dashboard...</span>
+
+    {# Header #}
+    <div style="margin-bottom: var(--spacing-6);">
+        <div class="skeleton skeleton-title" style="width: 200px; margin-bottom: var(--spacing-2);"></div>
+        <div class="skeleton skeleton-text" style="width: 300px;"></div>
+    </div>
+
+    {# Stats row #}
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
+        {% for i in "1234" %}
+        <div class="card">
+            <div class="card-body">
+                <div class="skeleton skeleton-text" style="width: 80px; height: 12px; margin-bottom: var(--spacing-2);"></div>
+                <div class="skeleton" style="width: 100px; height: 28px; margin-bottom: var(--spacing-2);"></div>
+                <div class="skeleton skeleton-text" style="width: 60px; height: 12px;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Main content area #}
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-4);">
+        {# Chart area #}
+        <div class="card">
+            <div class="card-header">
+                <div class="skeleton skeleton-title" style="width: 150px;"></div>
+            </div>
+            <div class="card-body">
+                <div class="skeleton" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+
+        {# Activity list #}
+        <div class="card">
+            <div class="card-header">
+                <div class="skeleton skeleton-title" style="width: 120px;"></div>
+            </div>
+            <div style="padding: 0;">
+                {% for i in "12345" %}
+                <div style="display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3) var(--spacing-4); border-bottom: 1px solid var(--color-border-primary);">
+                    <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px;"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-text" style="width: 80%; margin-bottom: var(--spacing-1);"></div>
+                        <div class="skeleton skeleton-text" style="width: 50%; height: 10px;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+SPINNER (for inline loading states)
+Usage: {% include "components/loading.html" with variant="spinner" size="lg" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "spinner" %}
+<div
+    class="spinner{% if size %} spinner-{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="status"
+    aria-label="Loading..."
+>
+    <span class="sr-only">Loading...</span>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+FULL PAGE LOADING
+Usage: {% include "components/loading.html" with variant="fullpage" message="Loading your dashboard..." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "fullpage" %}
+<div
+    class="{% if extra_class %}{{ extra_class }}{% endif %}"
+    style="position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--color-bg-primary); z-index: var(--z-index-modal);"
+    role="status"
+    aria-label="{{ message|default:'Loading...' }}"
+>
+    <div class="spinner spinner-xl" style="margin-bottom: var(--spacing-4);"></div>
+    {% if message %}
+    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">{{ message }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+LOADING EXAMPLES - For reference/documentation
+==============================================================================
+
+{# Single text line #}
+{% include "components/loading.html" with variant="text" width="80%" %}
+
+{# Title skeleton #}
+{% include "components/loading.html" with variant="title" %}
+
+{# Paragraph with 4 lines #}
+{% include "components/loading.html" with variant="paragraph" lines=4 %}
+
+{# Avatar (various sizes) #}
+{% include "components/loading.html" with variant="avatar" size="sm" %}
+{% include "components/loading.html" with variant="avatar" %}
+{% include "components/loading.html" with variant="avatar" size="lg" %}
+{% include "components/loading.html" with variant="avatar" size="xl" %}
+
+{# Image placeholder #}
+{% include "components/loading.html" with variant="image" aspect_ratio="16/9" %}
+
+{# Card skeleton #}
+{% include "components/loading.html" with variant="card" show_image=True show_footer=True %}
+
+{# Table skeleton #}
+{% include "components/loading.html" with variant="table" rows=5 cols=4 %}
+
+{# List skeleton #}
+{% include "components/loading.html" with variant="list" items=5 show_avatar=True show_action=True %}
+
+{# Profile card skeleton #}
+{% include "components/loading.html" with variant="profile" %}
+
+{# Stats card skeleton #}
+{% include "components/loading.html" with variant="stats" %}
+
+{# Form skeleton #}
+{% include "components/loading.html" with variant="form" fields=4 %}
+
+{# Grid of cards #}
+{% include "components/loading.html" with variant="grid" cards=6 columns=3 %}
+
+{# Comment/message skeleton #}
+{% include "components/loading.html" with variant="comment" count=3 %}
+
+{# Sidebar skeleton #}
+{% include "components/loading.html" with variant="sidebar" items=6 %}
+
+{# Header skeleton #}
+{% include "components/loading.html" with variant="header" %}
+
+{# Full dashboard skeleton #}
+{% include "components/loading.html" with variant="dashboard" %}
+
+{# Spinner (inline) #}
+{% include "components/loading.html" with variant="spinner" %}
+{% include "components/loading.html" with variant="spinner" size="lg" %}
+
+{# Full page loading #}
+{% include "components/loading.html" with variant="fullpage" message="Loading your dashboard..." %}
+
+{% endcomment %}

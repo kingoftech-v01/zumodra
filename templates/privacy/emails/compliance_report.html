@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Compliance Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #6c757d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .finding {
+            background: white;
+            border-left: 4px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .finding.high {
+            border-left-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        .finding.medium {
+            border-left-color: #ffc107;
+            background-color: #fffdf5;
+        }
+        .finding.low {
+            border-left-color: #17a2b8;
+            background-color: #f5fbfc;
+        }
+        .finding .severity {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .severity.high { background: #dc3545; color: white; }
+        .severity.medium { background: #ffc107; color: #212529; }
+        .severity.low { background: #17a2b8; color: white; }
+        .summary-box {
+            display: inline-block;
+            text-align: center;
+            padding: 15px 25px;
+            margin: 5px;
+            border-radius: 8px;
+        }
+        .summary-box.high { background: #f8d7da; color: #721c24; }
+        .summary-box.medium { background: #fff3cd; color: #856404; }
+        .summary-box.ok { background: #d4edda; color: #155724; }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Privacy Compliance Report</h1>
+        <p style="margin: 0;">{{ report_date|date:"F d, Y" }}</p>
+    </div>
+    <div class="content">
+        <h2>{{ tenant.name }}</h2>
+
+        <!-- Summary -->
+        <div style="text-align: center; margin: 30px 0;">
+            <div class="summary-box {% if high_severity %}high{% elif medium_severity %}medium{% else %}ok{% endif %}">
+                <div style="font-size: 32px; font-weight: bold;">{{ findings|length }}</div>
+                <div>Total Findings</div>
+            </div>
+            {% if high_severity %}
+            <div class="summary-box high">
+                <div style="font-size: 32px; font-weight: bold;">{{ high_severity|length }}</div>
+                <div>High Severity</div>
+            </div>
+            {% endif %}
+            {% if medium_severity %}
+            <div class="summary-box medium">
+                <div style="font-size: 32px; font-weight: bold;">{{ medium_severity|length }}</div>
+                <div>Medium Severity</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if not findings %}
+        <div style="text-align: center; padding: 40px; background: #d4edda; border-radius: 8px;">
+            <h3 style="color: #155724; margin: 0;">All Clear!</h3>
+            <p style="color: #155724; margin: 10px 0 0;">No compliance issues were found.</p>
+        </div>
+        {% else %}
+
+        <!-- High Severity Findings -->
+        {% if high_severity %}
+        <h3 style="color: #dc3545;">High Severity Issues</h3>
+        {% for finding in high_severity %}
+        <div class="finding high">
+            <span class="severity high">{{ finding.severity }}</span>
+            <strong style="margin-left: 10px;">{{ finding.type|title }}</strong>
+            <p style="margin: 10px 0;">{{ finding.message }}</p>
+            <p style="margin: 0; font-size: 14px; color: #666;">
+                <strong>Recommendation:</strong> {{ finding.recommendation }}
+            </p>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Medium Severity Findings -->
+        {% if medium_severity %}
+        <h3 style="color: #856404;">Medium Severity Issues</h3>
+        {% for finding in medium_severity %}
+        <div class="finding medium">
+            <span class="severity medium">{{ finding.severity }}</span>
+            <strong style="margin-left: 10px;">{{ finding.type|title }}</strong>
+            <p style="margin: 10px 0;">{{ finding.message }}</p>
+            <p style="margin: 0; font-size: 14px; color: #666;">
+                <strong>Recommendation:</strong> {{ finding.recommendation }}
+            </p>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% endif %}
+
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
+
+        <h3>Next Steps</h3>
+        <ol>
+            <li>Address high-severity issues immediately</li>
+            <li>Plan remediation for medium-severity issues within 7 days</li>
+            <li>Document all actions taken for audit purposes</li>
+            <li>Schedule a follow-up review if needed</li>
+        </ol>
+
+        <p>
+            For questions about this report or assistance with compliance,
+            please contact your Data Protection Officer.
+        </p>
+    </div>
+    <div class="footer">
+        <p>This automated compliance report was generated by the Zumodra Privacy Module.</p>
+        <p>Report ID: {{ report_id }} | Generated: {{ report_date }}</p>
+        <p>&copy; {{ year }} Zumodra. All rights reserved.</p>
+    </div>
+</body>
+</html>

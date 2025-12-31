@@ -1,0 +1,221 @@
+{% load static i18n %}
+
+{#
+    Data Table Component with HTMX sorting, filtering, and pagination
+
+    Usage:
+    {% include "components/data_table.html" with table_id="jobs-table" columns=columns rows=rows %}
+
+    Context variables:
+    - table_id: Unique ID for the table
+    - columns: List of column definitions [{"key": "name", "label": "Name", "sortable": True}]
+    - rows: QuerySet or list of row data
+    - sort_by: Current sort column
+    - sort_order: 'asc' or 'desc'
+    - search_url: URL for search/filter endpoint
+    - bulk_actions: List of bulk action definitions
+#}
+
+<div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden"
+     id="{{ table_id|default:'data-table' }}"
+     x-data="{
+         selectedRows: [],
+         selectAll: false,
+         bulkActionsOpen: false
+     }">
+
+    <!-- Table Header with Search and Filters -->
+    <div class="px-4 py-4 border-b border-gray-200 dark:border-gray-700 sm:px-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Search -->
+            <div class="relative flex-1 max-w-md">
+                <input type="text"
+                       name="search"
+                       hx-get="{{ search_url|default:'' }}"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#{{ table_id|default:'data-table' }}-body"
+                       hx-swap="innerHTML"
+                       hx-indicator="#{{ table_id|default:'data-table' }}-loading"
+                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                       placeholder="{% trans 'Search...' %}">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Bulk Actions & Filters -->
+            <div class="flex items-center gap-3">
+                <!-- Bulk Actions Dropdown -->
+                <div x-show="selectedRows.length > 0" x-cloak class="relative">
+                    <button @click="bulkActionsOpen = !bulkActionsOpen"
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <span x-text="selectedRows.length + ' {% trans 'selected' %}'"></span>
+                        <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="bulkActionsOpen"
+                         @click.away="bulkActionsOpen = false"
+                         x-transition
+                         class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                        <div class="py-1">
+                            {% for action in bulk_actions %}
+                            <button hx-post="{{ action.url }}"
+                                    hx-vals='js:{"ids": JSON.stringify(selectedRows)}'
+                                    hx-target="#{{ table_id|default:'data-table' }}"
+                                    hx-swap="outerHTML"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                {{ action.label }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Button -->
+                {% if filter_fields %}
+                <button type="button"
+                        hx-get="{{ filter_url|default:'' }}"
+                        hx-target="#filter-panel"
+                        hx-swap="innerHTML"
+                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    {% trans "Filters" %}
+                </button>
+                {% endif %}
+
+                <!-- Export Button -->
+                {% if export_url %}
+                <button type="button"
+                        hx-get="{{ export_url }}"
+                        hx-swap="none"
+                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    {% trans "Export" %}
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Filter Panel (collapsible) -->
+        <div id="filter-panel" class="mt-4"></div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="{{ table_id|default:'data-table' }}-loading" class="htmx-indicator absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10">
+        <svg class="animate-spin h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    </div>
+
+    <!-- Table -->
+    <div class="relative overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700/50">
+                <tr>
+                    <!-- Select All Checkbox -->
+                    <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                        <input type="checkbox"
+                               x-model="selectAll"
+                               @change="selectedRows = selectAll ? {{ row_ids|default:'[]' }} : []"
+                               class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                    </th>
+
+                    {% for column in columns %}
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider {% if column.sortable %}cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600{% endif %}"
+                        {% if column.sortable %}
+                        hx-get="{{ sort_url|default:'' }}?sort={{ column.key }}&order={% if sort_by == column.key and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                        hx-target="#{{ table_id|default:'data-table' }}-body"
+                        hx-swap="innerHTML"
+                        {% endif %}>
+                        <div class="flex items-center space-x-1">
+                            <span>{{ column.label }}</span>
+                            {% if column.sortable %}
+                            <span class="ml-1">
+                                {% if sort_by == column.key %}
+                                    {% if sort_order == 'asc' %}
+                                    <svg class="h-4 w-4 text-gray-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                    </svg>
+                                    {% else %}
+                                    <svg class="h-4 w-4 text-gray-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                    {% endif %}
+                                {% else %}
+                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </th>
+                    {% endfor %}
+
+                    <!-- Actions Column -->
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">{% trans "Actions" %}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="{{ table_id|default:'data-table' }}-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {% block table_body %}
+                {% for row in rows %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td class="relative w-12 px-6 sm:w-16 sm:px-8">
+                        <input type="checkbox"
+                               :value="{{ row.id }}"
+                               x-model="selectedRows"
+                               class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                    </td>
+                    {% for column in columns %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {% if forloop.first %}font-medium text-gray-900 dark:text-white{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+                        {{ row|get_attr:column.key }}
+                    </td>
+                    {% endfor %}
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-2">
+                            {% if row_actions %}
+                            {% for action in row_actions %}
+                            <a href="{{ action.url|format_url:row.id }}"
+                               class="text-{{ action.color|default:'primary' }}-600 hover:text-{{ action.color|default:'primary' }}-900 dark:text-{{ action.color|default:'primary' }}-400 dark:hover:text-{{ action.color|default:'primary' }}-300"
+                               title="{{ action.label }}">
+                                {{ action.icon|safe }}
+                            </a>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ columns|length|add:2 }}" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No data found" %}</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Try adjusting your search or filters." %}</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endblock %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj %}
+    {% include "components/pagination.html" %}
+    {% endif %}
+</div>

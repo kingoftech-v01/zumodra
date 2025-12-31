@@ -1,336 +1,1064 @@
-from django.db import models
-from zumodra import settings
-from django.utils import timezone
+"""
+Services Models - Zumodra Freelance Marketplace
+
+This module implements the core freelance marketplace functionality:
+- Service categories and tags
+- Provider profiles with skills, location, and ratings
+- Services offered by providers
+- Client requests and matching
+- Service contracts with escrow integration
+- Reviews and messaging
+
+All models inherit from TenantAwareModel for multi-tenant isolation.
+
+MIGRATION NOTE: This replaces the previous D-prefixed models.
+Backwards compatibility aliases are provided at the bottom of this file.
+"""
+
 import uuid
 from decimal import Decimal
+
+from django.db import models
+from django.conf import settings
 from django.utils import timezone
-from django.contrib.auth.models import Group, Permission
-from configurations.models import *
-from django.contrib.gis.db import models as gis_models
-from geopy.geocoders import Nominatim
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator, MaxLengthValidator
+from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 
+from core.db.models import TenantAwareModel, TenantSoftDeleteModel
+from core.db.managers import TenantAwareManager
 
-User = User
+# Lazy import to avoid circular imports
+def get_skill_model():
+    from configurations.models import Skill
+    return Skill
 
-# Create your models here.
+def get_company_model():
+    from configurations.models import Company
+    return Company
 
-#____________________PLATEFORME DE DServiceS & GESTION DES CONTRATS____________________#
 
-class DServiceCategory(models.Model):
+# =============================================================================
+# SERVICE CATEGORY & TAXONOMY
+# =============================================================================
+
+class ServiceCategory(TenantAwareModel):
     """
-    Catégorisation des DServices, permet l’imbrication de sous-catégories.
+    Hierarchical categorization of services.
+    Supports nested sub-categories for better organization.
     """
     name = models.CharField(
-        max_length=100, unique=True, help_text="Nom de la catégorie"
+        max_length=100,
+        help_text=_("Category name")
     )
+    slug = models.SlugField(max_length=100, blank=True)
     parent = models.ForeignKey(
-        'self', on_delete=models.SET_NULL,
-        null=True, blank=True,
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='subcategories',
-        help_text="Catégorie parent, pour structure arborescente"
+        help_text=_("Parent category for hierarchy")
     )
-    description = models.TextField(blank=True, help_text="Description facultative")
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
-    updated_at = models.DateTimeField(auto_now=True, help_text="Date de mise à jour")
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True, help_text=_("Icon class name"))
+    color = models.CharField(max_length=7, default='#3B82F6')
+    sort_order = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
-        return self.name if not self.parent else f"{self.parent} > {self.name}"
-
-
-class DServicesTag(models.Model):
-    tag = models.CharField(max_length=50, unique=True, help_text="Nom du tag (unique)")
-    def __str__(self):
-        return f"{self.tag}"
-
-class DServicesPicture(models.Model):
-    image = models.ImageField(upload_to='DService_pictures/')
-    description = models.CharField(max_length=255, blank=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Image for {self.DService.name}"
-
-class ProviderSkill(models.Model):
-    provider = models.ForeignKey('DServiceProviderProfile', on_delete=models.CASCADE, related_name='provider_skills')
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
-    level = models.CharField(
-        max_length=20,
-        choices=[('beginner','Débutant'), ('intermediate','Intermédiaire'), ('expert','Expert')],
-        default='beginner'
-    )
-    class Meta:
-        unique_together = ('provider', 'skill')
-
-# Prestataires de DServices (DServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
-class DServiceProviderProfile(models.Model):
-    """
-    Extending existing profile with skills and DService categories.
-    """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='DService_provider_profile')
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
-    skills = models.ManyToManyField(ProviderSkill, blank=True)
-    bio = models.TextField(blank=True)
-    categories = models.ManyToManyField(DServiceCategory, blank=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
-    completed_jobs_count = models.PositiveIntegerField(default=0)
-    address = models.CharField(max_length=255, help_text="Address line 1 eg. 123 Main Street", blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    country = models.CharField(max_length=100, blank=True)
-    postal_code = models.CharField(max_length=15, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lng = models.FloatField(null=True, blank=True)
-    location = gis_models.PointField(geography=True, null=True, blank=True)
-    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
-    total_reviews = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    last_active = models.DateTimeField(auto_now=True)
-    DServices = models.ManyToManyField('DService', blank=True, related_name='DService_providers')
-    availability_status = models.CharField(max_length=25, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
-    is_verified = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False)
-    is_mobile = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='DService_provider_images/', blank=True, null=True)
-    entity_name = models.CharField(max_length=255, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.address}"
-
-    def get_full_name(self):
-        return f"{self.user.first_name} {self.user.last_name}"
-
-    def get_short_name(self):
-        return f"{self.user.first_name}"
-
-    def get_email(self):
-        return f"{self.user.email}"
+    objects = TenantAwareManager()
 
     class Meta:
-        verbose_name = _("DService Provider Profile")
-        verbose_name_plural = _("DService Provider Profiles")
+        verbose_name = _("Service Category")
+        verbose_name_plural = _("Service Categories")
+        ordering = ['sort_order', 'name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant', 'slug'],
+                name='services_category_unique_tenant_slug'
+            )
+        ]
+
+    def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} > {self.name}"
+        return self.name
 
     def save(self, *args, **kwargs):
-        # if no user is should have a company assigned if no company it should have a user assigned
-        # CREATE  a fonction to get the name of the user or the company assigned
-    # Définir un nom lisible pour l'entité (utilisateur ou entreprise)
-        entity_name = None
-        if self.user:
-            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
-            self.entity_name = full_name or self.user.username
-        elif self.company:
-            self.entity_name = self.company.name
-        else:
-            raise ValidationError(_("A DService provider must have either an associated user or company."))
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)[:100]
+        super().save(*args, **kwargs)
 
-        # Géocodage de l’adresse si elle existe
-        # if self.address:
-        #     try:
-        #         geolocator = Nominatim(user_agent="zumodra_app")
-        #         location = geolocator.geocode(f"{self.address}, {self.city}, {self.country}")
-        #         if location:
-        #             from django.contrib.gis.geos import Point
-        #             self.location = Point(location.longitude, location.latitude)
-        #             self.location_lat = location.latitude
-        #             self.location_lng = location.longitude
-        #         else:
-        #             raise ValidationError(_("Could not geocode the given address."))
-        #     except Exception as e:
-        #         print(f"Geocoding error: {e}")
+    @property
+    def full_path(self) -> str:
+        """Return the full category path."""
+        path_parts = [self.name]
+        parent = self.parent
+        while parent:
+            path_parts.insert(0, parent.name)
+            parent = parent.parent
+        return ' > '.join(path_parts)
 
-        # super().save(*args, **kwargs)
+    @property
+    def depth(self) -> int:
+        """Return depth in hierarchy (0 for root)."""
+        level = 0
+        parent = self.parent
+        while parent:
+            level += 1
+            parent = parent.parent
+        return level
 
 
-        # Géocodage de l’adresse si elle existe et que la position n’est pas déjà définie
+class ServiceTag(TenantAwareModel):
+    """
+    Tags for services to enable search and filtering.
+    """
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=50, blank=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Tag")
+        verbose_name_plural = _("Service Tags")
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant', 'slug'],
+                name='services_tag_unique_tenant_slug'
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)[:50]
+        super().save(*args, **kwargs)
+
+
+class ServiceImage(TenantAwareModel):
+    """
+    Images associated with services.
+    """
+    image = models.ImageField(
+        upload_to='service_images/',
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ],
+        help_text=_("Allowed formats: JPG, PNG, GIF, WebP. Max size: 10MB")
+    )
+    description = models.CharField(max_length=255, blank=True)
+    alt_text = models.CharField(max_length=125, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    def clean(self):
+        super().clean()
+        if self.image and hasattr(self.image, 'size'):
+            if self.image.size > 10 * 1024 * 1024:  # 10MB
+                raise ValidationError(_("Image file size must be less than 10MB."))
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Image")
+        verbose_name_plural = _("Service Images")
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return f"Image: {self.description or self.pk}"
+
+
+# =============================================================================
+# PROVIDER PROFILE
+# =============================================================================
+
+class ProviderSkill(TenantAwareModel):
+    """
+    Links a skill to a provider with proficiency level.
+    """
+    class SkillLevel(models.TextChoices):
+        BEGINNER = 'beginner', _('Beginner')
+        INTERMEDIATE = 'intermediate', _('Intermediate')
+        ADVANCED = 'advanced', _('Advanced')
+        EXPERT = 'expert', _('Expert')
+
+    provider = models.ForeignKey(
+        'ServiceProvider',
+        on_delete=models.CASCADE,
+        related_name='provider_skills'
+    )
+    skill = models.ForeignKey(
+        'configurations.Skill',
+        on_delete=models.CASCADE,
+        related_name='provider_skills'
+    )
+    level = models.CharField(
+        max_length=20,
+        choices=SkillLevel.choices,
+        default=SkillLevel.BEGINNER
+    )
+    years_experience = models.PositiveSmallIntegerField(default=0)
+    is_verified = models.BooleanField(default=False)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Provider Skill")
+        verbose_name_plural = _("Provider Skills")
+        constraints = [
+            models.UniqueConstraint(
+                fields=['provider', 'skill'],
+                name='services_providerskill_unique_provider_skill'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.provider.display_name} - {self.skill.name} ({self.get_level_display()})"
+
+
+class ServiceProvider(TenantAwareModel):
+    """
+    Profile for service providers (freelancers, agencies, consultants).
+
+    Integrates with:
+    - accounts.KYCVerification for identity verification
+    - accounts.TrustScore for reputation scoring
+    - finance.ConnectedAccount for Stripe payouts
+    """
+    class AvailabilityStatus(models.TextChoices):
+        AVAILABLE = 'available', _('Available')
+        BUSY = 'busy', _('Busy')
+        UNAVAILABLE = 'unavailable', _('Unavailable')
+        ON_VACATION = 'on_vacation', _('On Vacation')
+
+    class ProviderType(models.TextChoices):
+        INDIVIDUAL = 'individual', _('Individual Freelancer')
+        AGENCY = 'agency', _('Agency')
+        COMPANY = 'company', _('Company')
+
+    # Identity
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='service_provider'
+    )
+    company = models.ForeignKey(
+        'configurations.Company',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='service_providers'
+    )
+    provider_type = models.CharField(
+        max_length=20,
+        choices=ProviderType.choices,
+        default=ProviderType.INDIVIDUAL
+    )
+    display_name = models.CharField(max_length=255, blank=True)
+
+    # Profile
+    bio = models.TextField(blank=True, validators=[MaxLengthValidator(2000)])
+    tagline = models.CharField(max_length=200, blank=True)
+    avatar = models.ImageField(upload_to='provider_avatars/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='provider_covers/', blank=True, null=True)
+
+    # Categories & Skills
+    categories = models.ManyToManyField(ServiceCategory, blank=True, related_name='providers')
+
+    # Location (PostGIS)
+    address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    country = models.CharField(max_length=100, blank=True, default='CA')
+    location = gis_models.PointField(geography=True, null=True, blank=True, srid=4326)
+    location_lat = models.FloatField(null=True, blank=True)
+    location_lng = models.FloatField(null=True, blank=True)
+
+    # Pricing
+    hourly_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Default hourly rate")
+    )
+    minimum_budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Minimum project budget")
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Ratings & Stats
+    rating_avg = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
+    total_reviews = models.PositiveIntegerField(default=0)
+    completed_jobs_count = models.PositiveIntegerField(default=0)
+    total_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    response_rate = models.PositiveSmallIntegerField(default=0, help_text=_("Response rate %"))
+    avg_response_time_hours = models.PositiveSmallIntegerField(default=24)
+
+    # Status & Verification
+    availability_status = models.CharField(
+        max_length=20,
+        choices=AvailabilityStatus.choices,
+        default=AvailabilityStatus.AVAILABLE
+    )
+    is_verified = models.BooleanField(default=False, help_text=_("KYC verified"))
+    is_featured = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False, help_text=_("Only visible via direct link"))
+    is_accepting_projects = models.BooleanField(default=True)
+    can_work_remotely = models.BooleanField(default=True)
+    can_work_onsite = models.BooleanField(default=False)
+
+    # Stripe Connect
+    stripe_account_id = models.CharField(max_length=255, blank=True)
+    stripe_onboarding_complete = models.BooleanField(default=False)
+    stripe_payouts_enabled = models.BooleanField(default=False)
+
+    # Timestamps
+    last_active_at = models.DateTimeField(null=True, blank=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Provider")
+        verbose_name_plural = _("Service Providers")
+        ordering = ['-rating_avg', '-completed_jobs_count']
+
+    def __str__(self):
+        return self.display_name or self.user.get_full_name() or self.user.email
+
+    def save(self, *args, **kwargs):
+        # Set display name if not provided
+        if not self.display_name:
+            if self.company:
+                self.display_name = self.company.name
+            else:
+                full_name = self.user.get_full_name()
+                self.display_name = full_name or self.user.username
+
+        # Geocode address if changed and location not set
         if self.address and (not self.location_lat or not self.location_lng):
-            full_address = ", ".join(filter(None, [self.address, self.city, self.country]))
-            try:
+            self._geocode_address()
+
+        super().save(*args, **kwargs)
+
+    def _geocode_address(self):
+        """Geocode the address to lat/lng coordinates."""
+        try:
+            from geopy.geocoders import Nominatim
+            full_address = ", ".join(filter(None, [
+                self.address, self.city, self.state, self.postal_code, self.country
+            ]))
+            if full_address:
                 geolocator = Nominatim(user_agent="zumodra_app")
                 location = geolocator.geocode(full_address, timeout=10)
                 if location:
                     self.location = Point(location.longitude, location.latitude)
                     self.location_lat = location.latitude
                     self.location_lng = location.longitude
-                else:
-                    raise ValidationError(_("Could not geocode the given address."))
-            except Exception as e:
-                print(f"Geocoding error for {entity_name}: {e}")
+        except Exception as e:
+            # Log but don't fail - geocoding is optional
+            import logging
+            logging.warning(f"Geocoding failed for {self.display_name}: {e}")
 
+    @property
+    def full_address(self) -> str:
+        """Return formatted full address."""
+        parts = filter(None, [
+            self.address, self.city, self.state, self.postal_code, self.country
+        ])
+        return ', '.join(parts)
+
+    @property
+    def coordinates(self):
+        """Return coordinates as tuple if available."""
+        if self.location_lat and self.location_lng:
+            return (float(self.location_lat), float(self.location_lng))
+        return None
+
+    def update_rating(self):
+        """Recalculate rating from reviews."""
+        from django.db.models import Avg
+        reviews = self.reviews.all()
+        if reviews.exists():
+            avg = reviews.aggregate(avg=Avg('rating'))['avg']
+            self.rating_avg = Decimal(str(round(avg, 2)))
+            self.total_reviews = reviews.count()
+            self.save(update_fields=['rating_avg', 'total_reviews'])
+
+
+# =============================================================================
+# SERVICE
+# =============================================================================
+
+class Service(TenantAwareModel):
+    """
+    A service offered by a provider.
+    """
+    class ServiceType(models.TextChoices):
+        FIXED_PRICE = 'fixed', _('Fixed Price')
+        HOURLY = 'hourly', _('Hourly Rate')
+        CUSTOM = 'custom', _('Custom Quote')
+
+    class DeliveryType(models.TextChoices):
+        REMOTE = 'remote', _('Remote')
+        ONSITE = 'onsite', _('On-Site')
+        HYBRID = 'hybrid', _('Hybrid')
+
+    # Identity
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='services'
+    )
+    category = models.ForeignKey(
+        ServiceCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='services'
+    )
+
+    # Details
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    short_description = models.CharField(max_length=300, blank=True)
+
+    # Pricing
+    service_type = models.CharField(
+        max_length=20,
+        choices=ServiceType.choices,
+        default=ServiceType.FIXED_PRICE
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Price for fixed-price services")
+    )
+    price_min = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Minimum price for custom quotes")
+    )
+    price_max = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Delivery
+    delivery_type = models.CharField(
+        max_length=20,
+        choices=DeliveryType.choices,
+        default=DeliveryType.REMOTE
+    )
+    duration_days = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("Estimated delivery time in days")
+    )
+    revisions_included = models.PositiveSmallIntegerField(default=1)
+
+    # Media
+    thumbnail = models.ImageField(upload_to='service_thumbnails/', blank=True, null=True)
+    images = models.ManyToManyField(ServiceImage, blank=True, related_name='services')
+    video_url = models.URLField(blank=True)
+
+    # Tags
+    tags = models.ManyToManyField(ServiceTag, blank=True, related_name='services')
+
+    # Status
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+
+    # Stats
+    view_count = models.PositiveIntegerField(default=0)
+    order_count = models.PositiveIntegerField(default=0)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service")
+        verbose_name_plural = _("Services")
+        ordering = ['-is_featured', '-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant', 'provider', 'slug'],
+                name='services_service_unique_tenant_provider_slug'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.name} by {self.provider.display_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(self.name)[:240]
+            self.slug = base_slug
         super().save(*args, **kwargs)
 
 
+class ServiceLike(TenantAwareModel):
+    """
+    Tracks users who have liked/favorited a service.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='liked_services'
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
 
-# DServices offerts par l’entreprise
-class DService(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='DServices_offered_by_provider')
-    DServiceCategory = models.ForeignKey(DServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='DServices')
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    price = models.PositiveIntegerField(null=True, blank=True)  # prix indicatif
-    duration_minutes = models.PositiveIntegerField(null=True, blank=True)  # durée estimée
-    thumbnail = models.ImageField(upload_to='DService_thumbnails/', blank=True, null=True)
-    images = models.ManyToManyField(DServicesPicture, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField(DServicesTag, blank=True, related_name='DServices_with_tag')
-
-    def __str__(self):
-        return f"{self.name} ({self.provider.user.first_name} {self.provider.user.last_name})"
-    
-class DServiceLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_DServices_by_user')
-    DService = models.ForeignKey(DService, on_delete=models.CASCADE, related_name='config_liked_DServices')
-    liked_at = models.DateTimeField(auto_now_add=True)
+    objects = TenantAwareManager()
 
     class Meta:
-        unique_together = ('user', 'DService')
+        verbose_name = _("Service Like")
+        verbose_name_plural = _("Service Likes")
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'service'],
+                name='services_like_unique_user_service'
+            )
+        ]
 
     def __str__(self):
-        return f"{self.user.email} likes {self.DService.name}"
+        return f"{self.user.email} likes {self.service.name}"
 
-# Request clients (ClientRequest) avec critères de recherche, budget, localisation, etc.
-class ClientRequest(models.Model):
+
+# =============================================================================
+# CLIENT REQUESTS & MATCHING
+# =============================================================================
+
+class ClientRequest(TenantAwareModel):
     """
-    Represents a client’s DService request including skills required,
-    location preferences, budget, and other parameters.
+    A client's request for services, used for matching with providers.
     """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_user_requests_DService')
-    required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
-    DService_category = models.ForeignKey(DServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-    remote_allowed = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True)
+    class RequestStatus(models.TextChoices):
+        OPEN = 'open', _('Open')
+        IN_PROGRESS = 'in_progress', _('In Progress')
+        CLOSED = 'closed', _('Closed')
+        CANCELLED = 'cancelled', _('Cancelled')
 
-    def __str__(self):
-        return f"Request by {self.client} for {self.DService_category}"
-
-
-class Match(models.Model):
-    """
-    Stores a match between a ClientRequest and a DServiceProviderProfile,
-    along with a score computed by AI or heuristics.
-    """
-    client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
-    provider_profile = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
-    score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
-    matched_at = models.DateTimeField(auto_now_add=True)
-    viewed_by_client = models.BooleanField(default=False)
-    accepted_by_client = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
-
-class DServiceRequest(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_DService_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_DService_requests')
-    required_skills = models.ManyToManyField(Skill, related_name='config_DService_requests', blank=True)
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='service_requests'
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
+    category = models.ForeignKey(
+        ServiceCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    required_skills = models.ManyToManyField(
+        'configurations.Skill',
+        blank=True,
+        related_name='client_requests'
+    )
+
+    # Budget
     budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Location preferences
+    location_lat = models.FloatField(null=True, blank=True)
+    location_lng = models.FloatField(null=True, blank=True)
+    location_radius_km = models.PositiveSmallIntegerField(null=True, blank=True)
+    remote_allowed = models.BooleanField(default=True)
+
+    # Timeline
     deadline = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_open = models.BooleanField(default=True)
 
-class DServiceProposal(models.Model):
-    request = models.ForeignKey(DServiceRequest, on_delete=models.CASCADE, related_name='proposals')
-    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='proposals')
-    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    message = models.TextField(blank=True)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    is_accepted = models.BooleanField(default=False)
-    class Meta:
-        unique_together = ('request', 'provider')
-
-class DServiceContract(models.Model):
-    request = models.OneToOneField(DServiceRequest, on_delete=models.CASCADE, related_name='contract')
-    provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='config_provider_contracts')
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cconfig_client_contracts')
-    agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    agreed_deadline = models.DateField(null=True, blank=True)
+    # Status
     status = models.CharField(
         max_length=20,
-        choices=[('pending','En attente'), ('active','Active'), ('completed','Terminée'), ('cancelled','Annulée')],
-        default='pending'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-
-# class ProviderReport(models.Model):
-#     provider = models.ForeignKey(DServiceProviderProfile, on_delete=models.CASCADE, related_name='reports')
-#     contract = models.ForeignKey(DServiceContract, on_delete=models.CASCADE, related_name='reports')
-#     report = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-class DServiceComment(models.Model):
-    """
-    Review on a DService, avec possibilité de répondre à un autre commentaire.
-    """
-    provider = models.ForeignKey(
-        DServiceProviderProfile, related_name='comments',
-        on_delete=models.CASCADE,
-        help_text="Professionnel associé au commentaire"
-    )
-    DService = models.ForeignKey(
-        DService, related_name='comments_DService',
-        on_delete=models.CASCADE,
-        help_text="DService associé au commentaire"
-    )
-    reviewer = models.ForeignKey(
-        User, on_delete=models.PROTECT,
-        help_text="Auteur du commentaire"
-    )
-    content = models.TextField(help_text="Contenu du commentaire", blank=True)
-    rating = models.PositiveSmallIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
-    updated_at = models.DateTimeField(auto_now=True, help_text="Date de mise à jour")
-    parent = models.ForeignKey(
-        'self',
-        null=True, blank=True,
-        related_name='replies',
-        on_delete=models.CASCADE,
-        help_text="Commentaire parent si ce commentaire est une réponse"
+        choices=RequestStatus.choices,
+        default=RequestStatus.OPEN
     )
 
-    def __str__(self):
-        return f"Comment by {self.reviewer} on {self.DService}"
+    objects = TenantAwareManager()
 
     class Meta:
+        verbose_name = _("Client Request")
+        verbose_name_plural = _("Client Requests")
         ordering = ['-created_at']
 
-class DServiceMessage(models.Model):
-    contract = models.ForeignKey(DServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_DServicemessages')
-    message = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.title} by {self.client.email}"
 
-# Audit logs
-from auditlog.registry import auditlog
 
-# Enregistrement de tous les modèles
-auditlog.register(DServiceCategory)
-auditlog.register(DServicesTag)
-auditlog.register(DServicesPicture)
-auditlog.register(ProviderSkill)
-auditlog.register(DServiceProviderProfile)
-auditlog.register(DService)
-auditlog.register(DServiceLike)
-auditlog.register(ClientRequest)
-auditlog.register(Match)
-auditlog.register(DServiceRequest)
-auditlog.register(DServiceProposal)
-auditlog.register(DServiceContract)
-auditlog.register(DServiceComment)
-auditlog.register(DServiceMessage)
+class ProviderMatch(TenantAwareModel):
+    """
+    Stores a match between a ClientRequest and a ServiceProvider.
+    Score computed by AI or heuristics.
+    """
+    client_request = models.ForeignKey(
+        ClientRequest,
+        on_delete=models.CASCADE,
+        related_name='matches'
+    )
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='matches'
+    )
+    score = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        help_text=_("Match score 0-1")
+    )
+    score_breakdown = models.JSONField(default=dict, blank=True)
+    viewed_by_client = models.BooleanField(default=False)
+    accepted_by_client = models.BooleanField(default=False)
+    rejected_by_client = models.BooleanField(default=False)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Provider Match")
+        verbose_name_plural = _("Provider Matches")
+        ordering = ['-score']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['client_request', 'provider'],
+                name='services_match_unique_request_provider'
+            )
+        ]
+
+    def __str__(self):
+        return f"Match: {self.client_request.title} <> {self.provider.display_name} ({self.score})"
+
+
+# =============================================================================
+# PROPOSALS & CONTRACTS
+# =============================================================================
+
+class ServiceProposal(TenantAwareModel):
+    """
+    A proposal from a provider responding to a client request.
+    """
+    class ProposalStatus(models.TextChoices):
+        PENDING = 'pending', _('Pending')
+        ACCEPTED = 'accepted', _('Accepted')
+        REJECTED = 'rejected', _('Rejected')
+        WITHDRAWN = 'withdrawn', _('Withdrawn')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    client_request = models.ForeignKey(
+        ClientRequest,
+        on_delete=models.CASCADE,
+        related_name='proposals'
+    )
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='proposals'
+    )
+
+    # Pricing
+    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    rate_type = models.CharField(
+        max_length=20,
+        choices=[('fixed', 'Fixed'), ('hourly', 'Hourly')],
+        default='fixed'
+    )
+    estimated_hours = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    # Details
+    cover_letter = models.TextField(validators=[MaxLengthValidator(10000)])
+    proposed_timeline_days = models.PositiveSmallIntegerField(null=True, blank=True)
+    attachments = models.JSONField(default=list, blank=True)
+
+    # Status
+    status = models.CharField(
+        max_length=20,
+        choices=ProposalStatus.choices,
+        default=ProposalStatus.PENDING
+    )
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Proposal")
+        verbose_name_plural = _("Service Proposals")
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['client_request', 'provider'],
+                name='services_proposal_unique_request_provider'
+            )
+        ]
+
+    def __str__(self):
+        return f"Proposal by {self.provider.display_name} for {self.client_request.title}"
+
+
+class ServiceContract(TenantAwareModel):
+    """
+    A contract between client and provider with escrow integration.
+
+    Linked to finance.EscrowTransaction for secure payment handling.
+    """
+    class ContractStatus(models.TextChoices):
+        DRAFT = 'draft', _('Draft')
+        PENDING_PAYMENT = 'pending_payment', _('Pending Payment')
+        FUNDED = 'funded', _('Funded (Escrow)')
+        IN_PROGRESS = 'in_progress', _('In Progress')
+        DELIVERED = 'delivered', _('Delivered')
+        REVISION_REQUESTED = 'revision_requested', _('Revision Requested')
+        COMPLETED = 'completed', _('Completed')
+        DISPUTED = 'disputed', _('Disputed')
+        CANCELLED = 'cancelled', _('Cancelled')
+        REFUNDED = 'refunded', _('Refunded')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    # Parties
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='client_contracts'
+    )
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='provider_contracts'
+    )
+
+    # Origin (optional - may come from proposal or direct booking)
+    proposal = models.OneToOneField(
+        ServiceProposal,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contract'
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contracts'
+    )
+    client_request = models.ForeignKey(
+        ClientRequest,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contracts'
+    )
+
+    # Contract Details
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    rate_type = models.CharField(
+        max_length=20,
+        choices=[('fixed', 'Fixed'), ('hourly', 'Hourly')],
+        default='fixed'
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+    agreed_deadline = models.DateField(null=True, blank=True)
+    revisions_allowed = models.PositiveSmallIntegerField(default=1)
+    revisions_used = models.PositiveSmallIntegerField(default=0)
+
+    # Escrow Integration
+    escrow_transaction = models.OneToOneField(
+        'finance.EscrowTransaction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='service_contract'
+    )
+    platform_fee_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('10.00'),
+        help_text=_("Platform fee percentage")
+    )
+
+    # Status & Dates
+    status = models.CharField(
+        max_length=20,
+        choices=ContractStatus.choices,
+        default=ContractStatus.DRAFT
+    )
+    started_at = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancellation_reason = models.TextField(blank=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Contract")
+        verbose_name_plural = _("Service Contracts")
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Contract: {self.title} ({self.client.email} <> {self.provider.display_name})"
+
+    def start(self):
+        """Start the contract after escrow is funded."""
+        if self.status == self.ContractStatus.FUNDED:
+            self.status = self.ContractStatus.IN_PROGRESS
+            self.started_at = timezone.now()
+            self.save(update_fields=['status', 'started_at'])
+
+    def deliver(self):
+        """Mark as delivered by provider."""
+        if self.status == self.ContractStatus.IN_PROGRESS:
+            self.status = self.ContractStatus.DELIVERED
+            self.delivered_at = timezone.now()
+            self.save(update_fields=['status', 'delivered_at'])
+
+    def complete(self):
+        """Complete the contract and release escrow."""
+        if self.status == self.ContractStatus.DELIVERED:
+            self.status = self.ContractStatus.COMPLETED
+            self.completed_at = timezone.now()
+            self.save(update_fields=['status', 'completed_at'])
+
+            # Release escrow funds
+            if self.escrow_transaction:
+                self.escrow_transaction.status = 'released'
+                self.escrow_transaction.released_at = timezone.now()
+                self.escrow_transaction.save()
+
+    def cancel(self, reason=''):
+        """Cancel the contract."""
+        self.status = self.ContractStatus.CANCELLED
+        self.cancelled_at = timezone.now()
+        self.cancellation_reason = reason
+        self.save(update_fields=['status', 'cancelled_at', 'cancellation_reason'])
+
+    @property
+    def provider_payout_amount(self):
+        """Calculate provider's payout after platform fee."""
+        if self.agreed_rate:
+            fee = self.agreed_rate * (self.platform_fee_percent / 100)
+            return self.agreed_rate - fee
+        return Decimal('0.00')
+
+
+# =============================================================================
+# REVIEWS & MESSAGES
+# =============================================================================
+
+class ServiceReview(TenantAwareModel):
+    """
+    Review for a completed service contract.
+    """
+    contract = models.OneToOneField(
+        ServiceContract,
+        on_delete=models.CASCADE,
+        related_name='review'
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='service_reviews_given'
+    )
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+
+    # Ratings
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    rating_communication = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True
+    )
+    rating_quality = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True
+    )
+    rating_timeliness = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True
+    )
+
+    # Content
+    title = models.CharField(max_length=200, blank=True)
+    content = models.TextField(blank=True, validators=[MaxLengthValidator(5000)])
+
+    # Response
+    provider_response = models.TextField(blank=True, validators=[MaxLengthValidator(5000)])
+    provider_responded_at = models.DateTimeField(null=True, blank=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Review")
+        verbose_name_plural = _("Service Reviews")
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review by {self.reviewer.email} for {self.provider.display_name}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Update provider's rating
+        self.provider.update_rating()
+
+
+class ContractMessage(TenantAwareModel):
+    """
+    Messages exchanged within a service contract.
+    """
+    contract = models.ForeignKey(
+        ServiceContract,
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='contract_messages_sent'
+    )
+    content = models.TextField()
+    attachments = models.JSONField(default=list, blank=True)
+    is_system_message = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Contract Message")
+        verbose_name_plural = _("Contract Messages")
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Message in {self.contract.title} by {self.sender}"
+
+
+# =============================================================================
+# AUDIT LOGGING
+# =============================================================================
+
+try:
+    from auditlog.registry import auditlog
+
+    # Register all models for audit logging
+    auditlog.register(ServiceCategory)
+    auditlog.register(ServiceTag)
+    auditlog.register(ServiceImage)
+    auditlog.register(ProviderSkill)
+    auditlog.register(ServiceProvider)
+    auditlog.register(Service)
+    auditlog.register(ServiceLike)
+    auditlog.register(ClientRequest)
+    auditlog.register(ProviderMatch)
+    auditlog.register(ServiceProposal)
+    auditlog.register(ServiceContract)
+    auditlog.register(ServiceReview)
+    auditlog.register(ContractMessage)
+except ImportError:
+    pass  # auditlog not installed
+
+
+# =============================================================================
+# BACKWARDS COMPATIBILITY ALIASES
+# =============================================================================
+# These aliases maintain backwards compatibility with the old D-prefixed names
+# and the dashboard_service models. New code should use the canonical names above.
+
+# Old services app aliases (D-prefixed)
+DServiceCategory = ServiceCategory
+DServicesTag = ServiceTag
+DServicesPicture = ServiceImage
+DServiceProviderProfile = ServiceProvider
+DService = Service
+DServiceLike = ServiceLike
+DServiceRequest = ClientRequest
+DServiceProposal = ServiceProposal
+DServiceContract = ServiceContract
+DServiceComment = ServiceReview
+DServiceMessage = ContractMessage
+Match = ProviderMatch
+
+# dashboard_service aliases
+ServiceProviderProfile = ServiceProvider
+ServicesTag = ServiceTag
+ServicesPicture = ServiceImage
+ServiceRequest = ClientRequest
+ServiceComment = ServiceReview
+ServiceMessage = ContractMessage
+
+__all__ = [
+    # Canonical names
+    'ServiceCategory',
+    'ServiceTag',
+    'ServiceImage',
+    'ProviderSkill',
+    'ServiceProvider',
+    'Service',
+    'ServiceLike',
+    'ClientRequest',
+    'ProviderMatch',
+    'ServiceProposal',
+    'ServiceContract',
+    'ServiceReview',
+    'ContractMessage',
+
+    # Backwards compatibility
+    'DServiceCategory',
+    'DServicesTag',
+    'DServicesPicture',
+    'DServiceProviderProfile',
+    'DService',
+    'DServiceLike',
+    'DServiceRequest',
+    'DServiceProposal',
+    'DServiceContract',
+    'DServiceComment',
+    'DServiceMessage',
+    'Match',
+    'ServiceProviderProfile',
+    'ServicesTag',
+    'ServicesPicture',
+    'ServiceRequest',
+    'ServiceComment',
+    'ServiceMessage',
+]

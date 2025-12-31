@@ -1,0 +1,142 @@
+{% load i18n %}
+{#
+    CV Selector Component - allows user to select which CV to use when applying
+
+    Usage:
+    {% include "components/cv_selector.html" with cvs=user.cvs.all recommended_cv=recommended selected_cv_id=selected %}
+
+    Context variables:
+    - cvs: QuerySet of CandidateCV objects
+    - recommended_cv: AI-recommended CV for this job (optional)
+    - selected_cv_id: Currently selected CV ID (optional)
+    - job: Job object for matching keywords (optional)
+#}
+
+<div class="cv-selector" x-data="{ selectedCv: '{{ selected_cv_id|default:'' }}', showAll: false }">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        {% trans "Select CV to Submit" %}
+    </label>
+
+    {% if recommended_cv %}
+    <!-- AI Recommendation Banner -->
+    <div class="mb-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
+                {% trans "AI Recommendation:" %}
+            </span>
+            <span class="text-sm text-primary-600 dark:text-primary-400">
+                "{{ recommended_cv.name }}" {% trans "is the best match for this job" %}
+            </span>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if cvs %}
+    <div class="space-y-3">
+        {% for cv in cvs %}
+        <label class="block relative cursor-pointer"
+               :class="selectedCv === '{{ cv.id }}' ? 'ring-2 ring-primary-500' : ''"
+               {% if not forloop.first and forloop.counter > 3 %}x-show="showAll"{% endif %}>
+            <input type="radio"
+                   name="cv_id"
+                   value="{{ cv.id }}"
+                   class="sr-only"
+                   x-model="selectedCv"
+                   {% if cv.id == selected_cv_id or cv.is_primary and not selected_cv_id %}checked{% endif %}>
+
+            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-600 transition-colors">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ cv.name }}</span>
+                            {% if cv.is_primary %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                                {% trans "Primary" %}
+                            </span>
+                            {% endif %}
+                            {% if cv == recommended_cv %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                <svg class="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                {% trans "Best Match" %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        {% if cv.headline %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ cv.headline|truncatewords:10 }}</p>
+                        {% endif %}
+
+                        {% if cv.target_job_types %}
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            {% for job_type in cv.target_job_types|slice:":2" %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-400">
+                                {{ job_type }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="ml-4 flex flex-col items-end">
+                        <!-- Selection Indicator -->
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                             :class="selectedCv === '{{ cv.id }}' ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-gray-500'">
+                            <svg x-show="selectedCv === '{{ cv.id }}'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+
+                        <!-- CV Score -->
+                        {% if cv.ai_score %}
+                        <div class="mt-2 text-center">
+                            <span class="text-sm font-bold {% if cv.ai_score >= 80 %}text-green-600{% elif cv.ai_score >= 60 %}text-yellow-600{% else %}text-gray-400{% endif %}">
+                                {{ cv.ai_score|floatformat:0 }}
+                            </span>
+                            <span class="text-xs text-gray-500">/100</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </label>
+        {% endfor %}
+
+        {% if cvs|length > 3 %}
+        <button type="button"
+                @click="showAll = !showAll"
+                class="w-full text-sm text-primary-600 dark:text-primary-400 hover:underline py-2">
+            <span x-text="showAll ? '{% trans "Show Less" %}' : '{% trans "Show All" %} ({{ cvs|length }})'"></span>
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Quick Links -->
+    <div class="mt-4 flex items-center justify-between text-sm">
+        <a href="{% url 'accounts:cv_list' %}" target="_blank"
+           class="text-primary-600 dark:text-primary-400 hover:underline">
+            {% trans "Manage CVs" %}
+        </a>
+        <a href="{% url 'accounts:cv_create' %}" target="_blank"
+           class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+            + {% trans "Create New" %}
+        </a>
+    </div>
+    {% else %}
+    <!-- No CVs State -->
+    <div class="bg-gray-50 dark:bg-gray-700/50 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{% trans "You don't have any CVs yet." %}</p>
+        <a href="{% url 'accounts:cv_create' %}"
+           class="mt-3 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+            {% trans "Create Your CV" %}
+        </a>
+    </div>
+    {% endif %}
+</div>

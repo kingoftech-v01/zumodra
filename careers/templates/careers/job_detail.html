@@ -1,0 +1,360 @@
+{% extends "careers/base.html" %}
+{% load static i18n security_filters %}
+
+{% block title %}{{ job.job.title }} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block meta_description %}{{ job.job.meta_description|default:job.job.description|truncatechars:160 }}{% endblock %}
+
+{% block extra_head %}
+<!-- JSON-LD Structured Data for Google Jobs -->
+<script type="application/ld+json">
+{{ structured_data|safe_json }}
+</script>
+
+<!-- Breadcrumb Structured Data -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "{% trans 'Careers' %}",
+            "item": "{% url 'careers:template:home' %}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "{{ job.job.title }}",
+            "item": "{{ request.build_absolute_uri }}"
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4" aria-label="Breadcrumb">
+    <ol class="flex items-center space-x-2 text-sm">
+        <li>
+            <a href="{% url 'careers:template:home' %}" class="text-gray-500 hover:text-primary">
+                {% trans "Careers" %}
+            </a>
+        </li>
+        <li class="text-gray-400">/</li>
+        {% if job.job.category %}
+        <li>
+            <a href="{% url 'careers:template:home' %}?category={{ job.job.category.slug }}" class="text-gray-500 hover:text-primary">
+                {{ job.job.category.name }}
+            </a>
+        </li>
+        <li class="text-gray-400">/</li>
+        {% endif %}
+        <li class="text-gray-900 font-medium">{{ job.job.title }}</li>
+    </ol>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Job Header -->
+            <header class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    {% if job.is_featured %}
+                    <span class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                        <span class="mdi mdi-star text-yellow-500 mr-1"></span>
+                        {% trans "Featured" %}
+                    </span>
+                    {% endif %}
+
+                    {% if job.published_at %}
+                    {% with days_ago=job.published_at|timesince %}
+                    {% if "day" not in days_ago or "1 day" in days_ago %}
+                    <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                        {% trans "New" %}
+                    </span>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+
+                    {% if job.job.category %}
+                    <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full"
+                          style="background-color: {{ job.job.category.color }}20; color: {{ job.job.category.color }};">
+                        {{ job.job.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    {{ job.job.title }}
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-6 text-gray-600">
+                    <span class="inline-flex items-center">
+                        <span class="mdi mdi-map-marker-outline mr-2 text-xl text-primary"></span>
+                        {{ job.job.location_city|default:job.job.location_country|default:"Remote" }}
+                    </span>
+                    <span class="inline-flex items-center">
+                        <span class="mdi mdi-clock-outline mr-2 text-xl text-primary"></span>
+                        {{ job.job.get_job_type_display }}
+                    </span>
+                    {% if job.job.remote_policy != 'on_site' %}
+                    <span class="inline-flex items-center">
+                        <span class="mdi mdi-home-outline mr-2 text-xl text-primary"></span>
+                        {{ job.job.get_remote_policy_display }}
+                    </span>
+                    {% endif %}
+                    <span class="inline-flex items-center">
+                        <span class="mdi mdi-account-outline mr-2 text-xl text-primary"></span>
+                        {{ job.job.get_experience_level_display }}
+                    </span>
+                </div>
+
+                {% if job.job.show_salary and job.job.salary_min and job.job.salary_max and site.show_salary_range %}
+                <div class="mt-4 inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium">
+                    <span class="mdi mdi-currency-usd mr-2"></span>
+                    {{ job.job.salary_currency }} {{ job.job.salary_min|floatformat:0 }} - {{ job.job.salary_max|floatformat:0 }} / {{ job.job.salary_period }}
+                </div>
+                {% endif %}
+
+                <!-- Reference Code -->
+                <div class="mt-4 text-sm text-gray-500">
+                    {% trans "Reference" %}: {{ job.job.reference_code }}
+                </div>
+            </header>
+
+            <!-- Job Description -->
+            <section class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">{% trans "About This Role" %}</h2>
+                <div class="prose prose-lg max-w-none text-gray-600">
+                    {{ job.job.description|sanitize_rich_html }}
+                </div>
+            </section>
+
+            <!-- Responsibilities -->
+            {% if job.job.responsibilities %}
+            <section class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <span class="mdi mdi-clipboard-list-outline mr-2 text-primary"></span>
+                    {% trans "Responsibilities" %}
+                </h2>
+                <div class="prose prose-lg max-w-none text-gray-600">
+                    {{ job.job.responsibilities|sanitize_rich_html }}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Requirements -->
+            {% if job.job.requirements %}
+            <section class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <span class="mdi mdi-checkbox-marked-outline mr-2 text-primary"></span>
+                    {% trans "Requirements" %}
+                </h2>
+                <div class="prose prose-lg max-w-none text-gray-600">
+                    {{ job.job.requirements|sanitize_rich_html }}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Nice to Have -->
+            {% if job.job.nice_to_have %}
+            <section class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <span class="mdi mdi-star-outline mr-2 text-primary"></span>
+                    {% trans "Nice to Have" %}
+                </h2>
+                <div class="prose prose-lg max-w-none text-gray-600">
+                    {{ job.job.nice_to_have|sanitize_rich_html }}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Skills -->
+            {% if job.job.required_skills or job.job.preferred_skills %}
+            <section class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <span class="mdi mdi-tools mr-2 text-primary"></span>
+                    {% trans "Skills" %}
+                </h2>
+
+                {% if job.job.required_skills %}
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">{% trans "Required Skills" %}</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for skill in job.job.required_skills %}
+                        <span class="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                            {{ skill }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if job.job.preferred_skills %}
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">{% trans "Preferred Skills" %}</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for skill in job.job.preferred_skills %}
+                        <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                            {{ skill }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            <!-- Benefits -->
+            {% if job.job.benefits %}
+            <section class="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border border-primary/20 p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <span class="mdi mdi-gift-outline mr-2 text-primary"></span>
+                    {% trans "Benefits" %}
+                </h2>
+                <div class="prose prose-lg max-w-none text-gray-600">
+                    {{ job.job.benefits|sanitize_rich_html }}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+            <!-- Apply Card (Sticky) -->
+            <div class="sticky top-24">
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">{% trans "Apply Now" %}</h3>
+
+                    {% if job.expires_at %}
+                    <div class="flex items-center text-amber-600 mb-4">
+                        <span class="mdi mdi-clock-alert-outline mr-2"></span>
+                        <span class="text-sm">
+                            {% trans "Closes" %}: {{ job.expires_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'careers:template:apply' pk=job.pk %}"
+                       class="w-full inline-flex items-center justify-center px-6 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors text-lg">
+                        <span class="mdi mdi-send mr-2"></span>
+                        {% trans "Submit Application" %}
+                    </a>
+
+                    <p class="text-gray-500 text-sm mt-4 text-center">
+                        {% trans "Takes about 5 minutes" %}
+                    </p>
+                </div>
+
+                <!-- Job Details Card -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Job Details" %}</h3>
+
+                    <dl class="space-y-4">
+                        <div>
+                            <dt class="text-sm text-gray-500">{% trans "Posted" %}</dt>
+                            <dd class="text-gray-900 font-medium">{{ job.published_at|date:"M d, Y" }}</dd>
+                        </div>
+
+                        {% if job.job.team %}
+                        <div>
+                            <dt class="text-sm text-gray-500">{% trans "Team" %}</dt>
+                            <dd class="text-gray-900 font-medium">{{ job.job.team }}</dd>
+                        </div>
+                        {% endif %}
+
+                        {% if job.job.reports_to %}
+                        <div>
+                            <dt class="text-sm text-gray-500">{% trans "Reports To" %}</dt>
+                            <dd class="text-gray-900 font-medium">{{ job.job.reports_to }}</dd>
+                        </div>
+                        {% endif %}
+
+                        {% if job.job.positions_count > 1 %}
+                        <div>
+                            <dt class="text-sm text-gray-500">{% trans "Open Positions" %}</dt>
+                            <dd class="text-gray-900 font-medium">{{ job.job.positions_count }}</dd>
+                        </div>
+                        {% endif %}
+
+                        {% if job.job.languages_required %}
+                        <div>
+                            <dt class="text-sm text-gray-500">{% trans "Languages" %}</dt>
+                            <dd class="text-gray-900 font-medium">
+                                {{ job.job.languages_required|join:", " }}
+                            </dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                </div>
+
+                <!-- Share Card -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Share This Job" %}</h3>
+
+                    <div class="flex gap-3">
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}"
+                           target="_blank" rel="noopener noreferrer"
+                           class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-[#0077B5] text-white rounded-lg hover:bg-[#006399] transition-colors"
+                           aria-label="Share on LinkedIn">
+                            <span class="mdi mdi-linkedin"></span>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ job.job.title|urlencode }}"
+                           target="_blank" rel="noopener noreferrer"
+                           class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#0c85d0] transition-colors"
+                           aria-label="Share on Twitter">
+                            <span class="mdi mdi-twitter"></span>
+                        </a>
+                        <button onclick="copyJobUrl()" type="button"
+                                class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                aria-label="Copy link">
+                            <span class="mdi mdi-link-variant"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Jobs -->
+    {% if related_jobs %}
+    <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">{% trans "Similar Positions" %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for rjob in related_jobs %}
+            <a href="{% url 'careers:template:job-detail' pk=rjob.id %}"
+               class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all">
+                <h3 class="text-lg font-semibold text-gray-900 hover:text-primary transition-colors">
+                    {{ rjob.title }}
+                </h3>
+                <p class="text-gray-600 mt-1">{{ rjob.department }}</p>
+                <div class="mt-4 flex items-center text-sm text-gray-500">
+                    <span class="mdi mdi-map-marker-outline mr-1"></span>
+                    {{ rjob.location_display }}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copyJobUrl() {
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            // Show toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 fade-in';
+            toast.innerHTML = '<span class="mdi mdi-check mr-2"></span>{% trans "Link copied to clipboard" %}';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        });
+    }
+</script>
+{% endblock %}

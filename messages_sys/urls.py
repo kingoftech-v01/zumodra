@@ -1,14 +1,17 @@
-from django.urls import path, include
-from .views import *
+"""
+Messages System URLs - Real-time messaging with WebSocket support.
 
-urlpatterns = [
-    path('', chat_view, name='messages_index'),
-]
+This module provides URL routing for the messaging system:
+- Main chat view
+- Conversation management
+- Message operations
+"""
 
-from django.contrib import admin
 from django.urls import path
-from .views import *
+from .views import chat_view
+
+app_name = 'messages_sys'
 
 urlpatterns = [
-    path ('', chat_view, name='dashboard'),
+    path('', chat_view, name='index'),
 ]

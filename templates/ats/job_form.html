@@ -1,0 +1,330 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n widget_tweaks %}
+
+{% block title %}{% if job %}{% trans "Edit Job" %}{% else %}{% trans "Post New Job" %}{% endif %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'ats:job_list' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Jobs" %}</a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% if job %}{% trans "Edit" %}{% else %}{% trans "New Job" %}{% endif %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% if job %}{% trans "Edit Job" %}{% else %}{% trans "Post New Job" %}{% endif %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% if job %}{% trans "Update job details and requirements." %}{% else %}{% trans "Create a new job posting to attract candidates." %}{% endif %}
+</p>
+{% endblock %}
+
+{% block content %}
+<form method="post"
+      hx-post="{{ request.path }}"
+      hx-target="#main-content"
+      hx-swap="innerHTML"
+      class="space-y-6"
+      id="job-form">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Form -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Basic Info -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Basic Information" %}</h2>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <!-- Job Title -->
+                    <div>
+                        <label for="id_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Job Title" %} <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="title"
+                               id="id_title"
+                               value="{{ form.title.value|default:'' }}"
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm {% if form.title.errors %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}"
+                               placeholder="{% trans 'e.g., Senior Software Engineer' %}"
+                               required>
+                        {% if form.title.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Department & Location -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_department" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Department" %}
+                            </label>
+                            <select name="department"
+                                    id="id_department"
+                                    class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                <option value="">{% trans "Select department" %}</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if form.department.value == dept.id %}selected{% endif %}>{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="id_location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Location" %}
+                            </label>
+                            <select name="location"
+                                    id="id_location"
+                                    class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                <option value="">{% trans "Select location" %}</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc.id }}" {% if form.location.value == loc.id %}selected{% endif %}>{{ loc.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Employment Type & Experience -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_employment_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Employment Type" %}
+                            </label>
+                            <select name="employment_type"
+                                    id="id_employment_type"
+                                    class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                <option value="full_time" {% if form.employment_type.value == 'full_time' %}selected{% endif %}>{% trans "Full-time" %}</option>
+                                <option value="part_time" {% if form.employment_type.value == 'part_time' %}selected{% endif %}>{% trans "Part-time" %}</option>
+                                <option value="contract" {% if form.employment_type.value == 'contract' %}selected{% endif %}>{% trans "Contract" %}</option>
+                                <option value="internship" {% if form.employment_type.value == 'internship' %}selected{% endif %}>{% trans "Internship" %}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="id_experience_level" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Experience Level" %}
+                            </label>
+                            <select name="experience_level"
+                                    id="id_experience_level"
+                                    class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                <option value="entry" {% if form.experience_level.value == 'entry' %}selected{% endif %}>{% trans "Entry Level" %}</option>
+                                <option value="mid" {% if form.experience_level.value == 'mid' %}selected{% endif %}>{% trans "Mid Level" %}</option>
+                                <option value="senior" {% if form.experience_level.value == 'senior' %}selected{% endif %}>{% trans "Senior Level" %}</option>
+                                <option value="executive" {% if form.experience_level.value == 'executive' %}selected{% endif %}>{% trans "Executive" %}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Job Description" %}</h2>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <div>
+                        <label for="id_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Description" %} <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="description"
+                                  id="id_description"
+                                  rows="8"
+                                  class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                  placeholder="{% trans 'Describe the role, responsibilities, and what makes it exciting...' %}"
+                                  required>{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="id_requirements" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Requirements" %}
+                        </label>
+                        <textarea name="requirements"
+                                  id="id_requirements"
+                                  rows="6"
+                                  class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                  placeholder="{% trans 'List the skills, qualifications, and experience required...' %}">{{ form.requirements.value|default:'' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label for="id_benefits" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Benefits" %}
+                        </label>
+                        <textarea name="benefits"
+                                  id="id_benefits"
+                                  rows="4"
+                                  class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                  placeholder="{% trans 'Describe compensation, perks, and benefits...' %}">{{ form.benefits.value|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Salary & Positions -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Compensation" %}</h2>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_salary_min" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Min Salary" %}
+                            </label>
+                            <div class="mt-1 relative rounded-lg shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number"
+                                       name="salary_min"
+                                       id="id_salary_min"
+                                       value="{{ form.salary_min.value|default:'' }}"
+                                       class="block w-full pl-7 pr-3 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                       placeholder="50,000">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="id_salary_max" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {% trans "Max Salary" %}
+                            </label>
+                            <div class="mt-1 relative rounded-lg shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number"
+                                       name="salary_max"
+                                       id="id_salary_max"
+                                       value="{{ form.salary_max.value|default:'' }}"
+                                       class="block w-full pl-7 pr-3 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                       placeholder="80,000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="id_positions_available" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Positions Available" %}
+                        </label>
+                        <input type="number"
+                               name="positions_available"
+                               id="id_positions_available"
+                               value="{{ form.positions_available.value|default:1 }}"
+                               min="1"
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Timeline" %}</h2>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <div>
+                        <label for="id_closes_at" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Application Deadline" %}
+                        </label>
+                        <input type="date"
+                               name="closes_at"
+                               id="id_closes_at"
+                               value="{{ form.closes_at.value|date:'Y-m-d' }}"
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hiring Team -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Hiring Team" %}</h2>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="space-y-3"
+                         x-data="{ members: {{ hiring_team_json|default:'[]'|safe }} }">
+                        <template x-for="(member, index) in members" :key="index">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-medium" x-text="member.name.charAt(0)"></div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="member.name"></p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400" x-text="member.role"></p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="members.splice(index, 1)" class="text-gray-400 hover:text-red-500">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+                        <button type="button"
+                                hx-get="{% url 'ats:team_member_search' %}"
+                                hx-target="#modal-container"
+                                hx-swap="innerHTML"
+                                class="w-full flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-primary-500 hover:text-primary-600 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            {% trans "Add Team Member" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 space-y-3">
+                    <button type="submit"
+                            name="action"
+                            value="publish"
+                            class="w-full flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {% trans "Publish Job" %}
+                    </button>
+                    <button type="submit"
+                            name="action"
+                            value="draft"
+                            class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        {% trans "Save as Draft" %}
+                    </button>
+                    <a href="{% url 'ats:job_list' %}"
+                       class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                        {% trans "Cancel" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Initialize TinyMCE for rich text fields if available
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: '#id_description, #id_requirements, #id_benefits',
+            height: 300,
+            menubar: false,
+            plugins: 'lists link',
+            toolbar: 'undo redo | formatselect | bold italic | bullist numlist | link',
+            content_css: 'default'
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Time Off Requests" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Time Off" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Time Off Requests" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Manage time off requests and approvals." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<div class="flex items-center space-x-3">
+    <a href="{% url 'hr:timeoff-calendar' %}"
+       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        {% trans "Calendar View" %}
+    </a>
+    <a href="{% url 'hr:timeoff-request' %}"
+       class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        {% trans "Request Time Off" %}
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="main-content" x-data="{ activeTab: 'pending' }">
+    {# Stats Cards #}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Pending" %}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.pending|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Approved (This Month)" %}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.approved_month|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "On Leave Today" %}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.on_leave_today|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Upcoming (7 Days)" %}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.upcoming|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Filters #}
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {# Search #}
+            <div class="relative flex-1 max-w-md">
+                <input type="text"
+                       name="q"
+                       value="{{ current_filters.q }}"
+                       hx-get="{% url 'hr:timeoff-list' %}"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#timeoff-container"
+                       hx-swap="innerHTML"
+                       hx-include="[name='status'], [name='department'], [name='type']"
+                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                       placeholder="{% trans 'Search by employee name...' %}">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                {# Status Filter #}
+                <select name="status"
+                        hx-get="{% url 'hr:timeoff-list' %}"
+                        hx-trigger="change"
+                        hx-target="#timeoff-container"
+                        hx-swap="innerHTML"
+                        hx-include="[name='q'], [name='department'], [name='type']"
+                        class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <option value="">{% trans "All Status" %}</option>
+                    <option value="pending" {% if current_filters.status == 'pending' %}selected{% endif %}>{% trans "Pending" %}</option>
+                    <option value="approved" {% if current_filters.status == 'approved' %}selected{% endif %}>{% trans "Approved" %}</option>
+                    <option value="rejected" {% if current_filters.status == 'rejected' %}selected{% endif %}>{% trans "Rejected" %}</option>
+                    <option value="cancelled" {% if current_filters.status == 'cancelled' %}selected{% endif %}>{% trans "Cancelled" %}</option>
+                </select>
+
+                {# Department Filter #}
+                <select name="department"
+                        hx-get="{% url 'hr:timeoff-list' %}"
+                        hx-trigger="change"
+                        hx-target="#timeoff-container"
+                        hx-swap="innerHTML"
+                        hx-include="[name='q'], [name='status'], [name='type']"
+                        class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <option value="">{% trans "All Departments" %}</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if current_filters.department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+
+                {# Time Off Type Filter #}
+                <select name="type"
+                        hx-get="{% url 'hr:timeoff-list' %}"
+                        hx-trigger="change"
+                        hx-target="#timeoff-container"
+                        hx-swap="innerHTML"
+                        hx-include="[name='q'], [name='status'], [name='department']"
+                        class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <option value="">{% trans "All Types" %}</option>
+                    {% for type in time_off_types %}
+                    <option value="{{ type.id }}" {% if current_filters.type == type.id|stringformat:"s" %}selected{% endif %}>{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+
+                {# Date Range #}
+                <div class="flex items-center space-x-2">
+                    <input type="date"
+                           name="start_date"
+                           value="{{ current_filters.start_date }}"
+                           hx-get="{% url 'hr:timeoff-list' %}"
+                           hx-trigger="change"
+                           hx-target="#timeoff-container"
+                           hx-swap="innerHTML"
+                           hx-include="[name='q'], [name='status'], [name='department'], [name='type'], [name='end_date']"
+                           class="block pl-3 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <span class="text-gray-400">-</span>
+                    <input type="date"
+                           name="end_date"
+                           value="{{ current_filters.end_date }}"
+                           hx-get="{% url 'hr:timeoff-list' %}"
+                           hx-trigger="change"
+                           hx-target="#timeoff-container"
+                           hx-swap="innerHTML"
+                           hx-include="[name='q'], [name='status'], [name='department'], [name='type'], [name='start_date']"
+                           class="block pl-3 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Time Off Requests Container #}
+    <div id="timeoff-container">
+        {% include "hr/partials/_timeoff_list.html" with requests=time_off_requests can_approve=can_approve %}
+    </div>
+
+    {# Pagination #}
+    {% if page_obj %}
+    <div class="mt-6">
+        {% include "components/pagination.html" %}
+    </div>
+    {% endif %}
+
+    {# Who's Out Section #}
+    {% if on_leave_today %}
+    <div class="mt-8">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Who's Out Today" %}</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for request in on_leave_today %}
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 flex items-center">
+                {% if request.employee.user.profile_picture %}
+                <img class="h-10 w-10 rounded-full object-cover" src="{{ request.employee.user.profile_picture.url }}" alt="">
+                {% else %}
+                <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+                    <span class="text-white font-medium text-sm">{{ request.employee.user.first_name|slice:":1" }}{{ request.employee.user.last_name|slice:":1" }}</span>
+                </div>
+                {% endif %}
+                <div class="ml-3 overflow-hidden">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ request.employee.full_name }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <span class="w-2 h-2 rounded-full mr-1.5" style="background-color: {{ request.time_off_type.color|default:'#3b82f6' }};"></span>
+                        {{ request.time_off_type.name }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for time off updates via HTMX
+    document.body.addEventListener('timeOffUpdated', function(evt) {
+        // Refresh the list after approval/rejection
+        htmx.trigger('#timeoff-container', 'refresh');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Time Off Calendar" %} - Zumodra{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .calendar-day {
+        min-height: 100px;
+    }
+    .time-off-event {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-bottom: 2px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Time Off" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Time Off Calendar" %}{% endblock %}
+
+{% block page_actions %}
+<button hx-get="{% url 'hr:time_off_request_create' %}"
+        hx-target="#modal-container"
+        hx-swap="innerHTML"
+        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    {% trans "Request Time Off" %}
+</button>
+{% endblock %}
+
+{% block content %}
+<div id="main-content" x-data="{ currentMonth: new Date(), view: 'month' }">
+    <!-- Time Off Balance Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Vacation" %}</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ vacation_balance|default:"15" }} {% trans "days" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Sick Leave" %}</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ sick_balance|default:"10" }} {% trans "days" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Personal" %}</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ personal_balance|default:"3" }} {% trans "days" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Pending Requests" %}</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pending_requests|default:"2" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <!-- Calendar Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white"
+                        id="calendar-title">
+                        {{ current_month|date:"F Y" }}
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <button hx-get="{% url 'hr:time_off_calendar' %}?month={{ prev_month }}"
+                                hx-target="#calendar-grid"
+                                hx-swap="innerHTML"
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <button hx-get="{% url 'hr:time_off_calendar' %}?month={{ today_month }}"
+                                hx-target="#calendar-grid"
+                                hx-swap="innerHTML"
+                                class="px-3 py-1 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                            {% trans "Today" %}
+                        </button>
+                        <button hx-get="{% url 'hr:time_off_calendar' %}?month={{ next_month }}"
+                                hx-target="#calendar-grid"
+                                hx-swap="innerHTML"
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Department Filter -->
+                <select name="department"
+                        hx-get="{% url 'hr:time_off_calendar' %}"
+                        hx-trigger="change"
+                        hx-target="#calendar-grid"
+                        hx-swap="innerHTML"
+                        class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="">{% trans "All Teams" %}</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div id="calendar-grid" class="p-4">
+            <!-- Day Headers -->
+            <div class="grid grid-cols-7 gap-px mb-2">
+                {% for day in weekdays %}
+                <div class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2">{{ day }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Calendar Days -->
+            <div class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                {% for week in calendar_weeks %}
+                {% for day in week %}
+                <div class="calendar-day bg-white dark:bg-gray-800 p-2 {% if day.is_today %}ring-2 ring-primary-500 ring-inset{% endif %} {% if not day.is_current_month %}bg-gray-50 dark:bg-gray-900{% endif %}">
+                    <div class="text-sm {% if day.is_today %}font-bold text-primary-600 dark:text-primary-400{% elif not day.is_current_month %}text-gray-400 dark:text-gray-600{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                        {{ day.date.day }}
+                    </div>
+
+                    <!-- Time Off Events -->
+                    <div class="mt-1 space-y-1">
+                        {% for event in day.events|slice:":3" %}
+                        <div class="time-off-event truncate
+                                    {% if event.type == 'vacation' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300{% elif event.type == 'sick' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300{% else %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300{% endif %}"
+                             hx-get="{% url 'hr:time_off_detail' event.id %}"
+                             hx-target="#modal-container"
+                             hx-swap="innerHTML">
+                            {{ event.employee_name }}
+                        </div>
+                        {% endfor %}
+                        {% if day.events|length > 3 %}
+                        <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                            +{{ day.events|length|add:"-3" }} {% trans "more" %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded bg-blue-500 mr-2"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Vacation" %}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded bg-red-500 mr-2"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Sick Leave" %}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded bg-purple-500 mr-2"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Personal" %}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded bg-gray-400 mr-2"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Holiday" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals (for managers) -->
+    {% if is_manager and pending_approval_requests %}
+    <div class="mt-6 bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Pending Approvals" %}</h3>
+        </div>
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for request in pending_approval_requests %}
+            <li class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        {% if request.employee.user.profile_picture %}
+                        <img class="h-10 w-10 rounded-full" src="{{ request.employee.user.profile_picture.url }}" alt="">
+                        {% else %}
+                        <div class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-medium">
+                            {{ request.employee.user.first_name|slice:":1" }}
+                        </div>
+                        {% endif %}
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ request.employee.user.get_full_name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ request.get_type_display }} - {{ request.start_date|date:"M d" }} to {{ request.end_date|date:"M d, Y" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button hx-post="{% url 'hr:time_off_approve' request.id %}"
+                                hx-swap="outerHTML"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                            {% trans "Approve" %}
+                        </button>
+                        <button hx-post="{% url 'hr:time_off_reject' request.id %}"
+                                hx-swap="outerHTML"
+                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            {% trans "Reject" %}
+                        </button>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

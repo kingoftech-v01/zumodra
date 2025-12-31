@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Required: Review Your Privacy Consents</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #ffc107;
+            color: #212529;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .consent-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .consent-item .type {
+            font-weight: bold;
+            color: #333;
+        }
+        .consent-item .expires {
+            color: #dc3545;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Review Your Privacy Consents</h1>
+    </div>
+    <div class="content">
+        <p>Dear {{ user.first_name|default:user.email }},</p>
+
+        <p>Some of your privacy consents are expiring soon. To continue using our services
+        without interruption, please review and renew your consents.</p>
+
+        <h3>Consents Expiring Soon:</h3>
+
+        {% for consent in consents %}
+        <div class="consent-item">
+            <div class="type">{{ consent.get_consent_type_display }}</div>
+            <div class="expires">
+                Expires: {{ consent.expires_at|date:"F d, Y" }}
+            </div>
+        </div>
+        {% endfor %}
+
+        <p style="margin-top: 20px;">
+            Click the button below to review and update your privacy preferences:
+        </p>
+
+        <a href="{{ renewal_url }}" class="button">Review My Consents</a>
+
+        <p style="margin-top: 20px; font-size: 14px; color: #666;">
+            If you do not renew your consents before they expire, we may not be able
+            to provide certain services or communications to you.
+        </p>
+
+        <p>Best regards,<br>The {{ tenant.name }} Privacy Team</p>
+    </div>
+    <div class="footer">
+        <p>You received this email because you have an account with {{ tenant.name }}.</p>
+        <p>
+            To manage your email preferences, visit your
+            <a href="{{ renewal_url }}">privacy dashboard</a>.
+        </p>
+        <p>&copy; {{ year }} {{ tenant.name }}. All rights reserved.</p>
+    </div>
+</body>
+</html>

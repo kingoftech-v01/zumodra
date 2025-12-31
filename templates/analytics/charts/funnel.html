@@ -1,0 +1,74 @@
+{% load static i18n humanize %}
+
+{#
+    Recruiting Funnel Chart Component
+
+    Usage: {% include "analytics/charts/funnel.html" %}
+
+    Context:
+    - funnel_data: List of stages with counts and percentages
+#}
+
+<div class="space-y-4">
+    {% for stage in funnel_data %}
+    <div class="relative">
+        <!-- Stage Bar -->
+        <div class="flex items-center">
+            <div class="w-32 flex-shrink-0">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ stage.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ stage.count|intcomma }} {% trans "candidates" %}</p>
+            </div>
+            <div class="flex-1 ml-4">
+                <div class="relative">
+                    <!-- Background bar -->
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-8"></div>
+                    <!-- Progress bar -->
+                    <div class="absolute inset-y-0 left-0 rounded-full h-8 flex items-center justify-end pr-3 transition-all duration-500"
+                         style="width: {{ stage.percentage }}%; background-color: {{ stage.color|default:'#3b82f6' }};">
+                        <span class="text-xs font-medium text-white">{{ stage.percentage }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversion arrow -->
+        {% if not forloop.last %}
+        <div class="flex items-center ml-32 pl-4 my-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+            <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                {{ stage.conversion_rate }}% {% trans "conversion" %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="text-center py-8">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% trans "No funnel data available" %}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Funnel Summary -->
+{% if funnel_data %}
+<div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Total Applicants" %}</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ total_applicants|intcomma }}</p>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Hired" %}</p>
+            <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ total_hired|intcomma }}</p>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Overall Conversion" %}</p>
+            <p class="text-lg font-semibold text-primary-600 dark:text-primary-400">{{ overall_conversion }}%</p>
+        </div>
+    </div>
+</div>
+{% endif %}

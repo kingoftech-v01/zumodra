@@ -1,0 +1,332 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Request Time Off" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'hr:my-time-off' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+        {% trans "My Time Off" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "New Request" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Request Time Off" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Submit a new time off request for approval." %}
+</p>
+{% endblock %}
+
+{% block content %}
+<div id="main-content" x-data="timeOffRequest()">
+    <div class="max-w-3xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {# Left: Form #}
+            <div class="lg:col-span-2">
+                <form hx-post="{% url 'hr:timeoff-request' %}"
+                      hx-target="#form-response"
+                      hx-swap="innerHTML"
+                      @htmx:after-request="if(event.detail.successful && event.detail.xhr.status === 200) $dispatch('timeoff-submitted')"
+                      class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    {% csrf_token %}
+
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Time Off Details" %}</h3>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        {# Time Off Type #}
+                        <div>
+                            <label for="time_off_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {% trans "Type of Time Off" %} <span class="text-red-500">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {% for type in time_off_types %}
+                                <label class="relative">
+                                    <input type="radio" name="time_off_type" value="{{ type.id }}"
+                                           x-model="selectedType"
+                                           @change="checkBalance({{ type.id }})"
+                                           class="peer sr-only" required>
+                                    <div class="p-4 border-2 rounded-lg cursor-pointer transition-all
+                                                peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20
+                                                border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500">
+                                        <div class="flex items-center">
+                                            <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ type.color|default:'#3b82f6' }};"></span>
+                                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ type.name }}</span>
+                                        </div>
+                                        {% for balance in balances %}
+                                        {% if balance.time_off_type.id == type.id %}
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            {{ balance.balance|floatformat:1 }} {% trans "days available" %}
+                                        </p>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Date Selection #}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    {% trans "Start Date" %} <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date"
+                                       id="start_date"
+                                       name="start_date"
+                                       x-model="startDate"
+                                       @change="calculateDays()"
+                                       min="{{ today }}"
+                                       required
+                                       class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                            </div>
+                            <div>
+                                <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    {% trans "End Date" %} <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date"
+                                       id="end_date"
+                                       name="end_date"
+                                       x-model="endDate"
+                                       @change="calculateDays()"
+                                       :min="startDate || '{{ today }}'"
+                                       required
+                                       class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                            </div>
+                        </div>
+
+                        {# Half Day Option #}
+                        <div x-show="startDate === endDate && startDate !== ''" x-transition>
+                            <div class="flex items-center space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox"
+                                           name="is_half_day"
+                                           x-model="isHalfDay"
+                                           @change="calculateDays()"
+                                           value="true"
+                                           class="w-4 h-4 text-primary-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500">
+                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{% trans "Half day only" %}</span>
+                                </label>
+                                <div x-show="isHalfDay" x-transition class="flex items-center space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="half_day_period" value="am" x-model="halfDayPeriod"
+                                               class="w-4 h-4 text-primary-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{% trans "Morning" %}</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="half_day_period" value="pm" x-model="halfDayPeriod"
+                                               class="w-4 h-4 text-primary-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{% trans "Afternoon" %}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Calculated Days Display #}
+                        <div x-show="totalDays > 0" x-transition
+                             class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-primary-900 dark:text-primary-100">{% trans "Total Time Off" %}</span>
+                                <span class="text-lg font-semibold text-primary-700 dark:text-primary-300" x-text="totalDays + ' ' + (totalDays == 1 ? '{% trans "day" %}' : '{% trans "days" %}')"></span>
+                            </div>
+                        </div>
+
+                        {# Reason #}
+                        <div>
+                            <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {% trans "Reason" %} <span class="text-gray-400">({% trans "optional" %})</span>
+                            </label>
+                            <textarea id="reason"
+                                      name="reason"
+                                      rows="3"
+                                      class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-none"
+                                      placeholder="{% trans 'Add any notes or reason for this time off request...' %}"></textarea>
+                        </div>
+
+                        {# Supporting Document #}
+                        <div>
+                            <label for="document" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {% trans "Supporting Document" %} <span class="text-gray-400">({% trans "optional" %})</span>
+                            </label>
+                            <div class="flex items-center justify-center w-full">
+                                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="font-semibold">{% trans "Click to upload" %}</span> {% trans "or drag and drop" %}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "PDF, PNG, JPG (MAX. 10MB)" %}</p>
+                                    </div>
+                                    <input id="document" name="document" type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                                </label>
+                            </div>
+                        </div>
+
+                        {# Form Response Area #}
+                        <div id="form-response"></div>
+                    </div>
+
+                    {# Form Actions #}
+                    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end space-x-3">
+                        <a href="{% url 'hr:my-time-off' %}"
+                           class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            {% trans "Cancel" %}
+                        </a>
+                        <button type="submit"
+                                :disabled="!isValid"
+                                :class="isValid ? 'bg-primary-600 hover:bg-primary-700' : 'bg-gray-400 cursor-not-allowed'"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            <svg class="w-4 h-4 mr-2 -ml-1 htmx-indicator" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            {% trans "Submit Request" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {# Right: Balance Summary #}
+            <div>
+                {# Current Balances #}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Your Balances" %}</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        {% for balance in balances %}
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full mr-2" style="background-color: {{ balance.time_off_type.color|default:'#3b82f6' }};"></span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ balance.time_off_type.name }}</span>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">{{ balance.balance|floatformat:1 }}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                {% widthratio balance.balance balance.time_off_type.max_balance 100 as balance_percent %}
+                                <div class="h-1.5 rounded-full" style="width: {{ balance_percent|default:100 }}%; background-color: {{ balance.time_off_type.color|default:'#3b82f6' }};"></div>
+                            </div>
+                            {% if balance.pending > 0 %}
+                            <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                                {{ balance.pending|floatformat:1 }} {% trans "days pending" %}
+                            </p>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center">{% trans "No balances found." %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {# Request Guidelines #}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Guidelines" %}</h3>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{% trans "Submit requests at least 2 weeks in advance when possible" %}</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{% trans "Your manager will be notified automatically" %}</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{% trans "Sick leave may require documentation after 3 consecutive days" %}</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{% trans "Check blackout dates before requesting time during peak periods" %}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+function timeOffRequest() {
+    return {
+        selectedType: '',
+        startDate: '',
+        endDate: '',
+        isHalfDay: false,
+        halfDayPeriod: 'am',
+        totalDays: 0,
+        balances: {{ balances_json|default:"{}"|safe }},
+
+        get isValid() {
+            return this.selectedType && this.startDate && this.endDate && this.totalDays > 0;
+        },
+
+        calculateDays() {
+            if (!this.startDate || !this.endDate) {
+                this.totalDays = 0;
+                return;
+            }
+
+            const start = new Date(this.startDate);
+            const end = new Date(this.endDate);
+
+            if (end < start) {
+                this.totalDays = 0;
+                return;
+            }
+
+            if (this.isHalfDay && this.startDate === this.endDate) {
+                this.totalDays = 0.5;
+                return;
+            }
+
+            // Count weekdays only
+            let days = 0;
+            const current = new Date(start);
+            while (current <= end) {
+                const dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday (0) or Saturday (6)
+                    days++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            this.totalDays = days;
+        },
+
+        checkBalance(typeId) {
+            // Could add balance validation here
+            this.calculateDays();
+        }
+    }
+}
+</script>
+{% endblock %}

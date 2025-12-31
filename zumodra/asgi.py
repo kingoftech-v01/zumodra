@@ -10,26 +10,26 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 import os
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
+from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
-import messages_sys.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zumodra.settings')
 
-# application = ProtocolTypeRouter({
-#     "http": get_asgi_application(),
-#     "websocket": AuthMiddlewareStack(
-#         URLRouter(
-#             messages_sys.routing.websocket_urlpatterns
-#         )
-#     ),
-# })
+# Initialize Django ASGI application early to ensure the AppRegistry
+# is populated before importing code that may import ORM models.
+django_asgi_app = get_asgi_application()
+
+# Import routing after Django is initialized
+import messages_sys.routing
+import notifications.routing
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                your_routing.websocket_urlpatterns + messages_sys.routing.websocket_urlpatterns
+                messages_sys.routing.websocket_urlpatterns +
+                notifications.routing.websocket_urlpatterns
             )
         )
     ),

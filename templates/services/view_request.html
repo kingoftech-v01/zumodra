@@ -1,0 +1,228 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{{ request.title }} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'my_requests' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {% trans "My Requests" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{{ request.title|truncatewords:5 }}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{{ request.title }}{% endblock %}
+
+{% block page_description %}
+<div class="flex items-center gap-3 mt-1">
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        {% if request.status == 'open' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+        {% elif request.status == 'in_progress' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+        {% elif request.status == 'closed' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+        {% else %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300{% endif %}">
+        {{ request.get_status_display }}
+    </span>
+    <span class="text-sm text-gray-500 dark:text-gray-400">
+        {% trans "Posted" %} {{ request.created_at|timesince }} {% trans "ago" %}
+    </span>
+</div>
+{% endblock %}
+
+{% block page_actions %}
+{% if not is_owner %}
+<a href="{% url 'submit_proposal' request.uuid %}"
+   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+    {% trans "Submit Proposal" %}
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Request Details -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Request Details" %}</h2>
+            <div class="prose dark:prose-invert max-w-none mb-6">
+                {{ request.description|linebreaks }}
+            </div>
+
+            <!-- Required Skills -->
+            {% if request.required_skills.exists %}
+            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{% trans "Required Skills" %}</h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for skill in request.required_skills.all %}
+                    <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                        {{ skill.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Proposals -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {% trans "Proposals" %} ({{ proposals.count }})
+                </h2>
+            </div>
+
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for proposal in proposals %}
+                <div class="p-6">
+                    <div class="flex items-start gap-4">
+                        <!-- Provider Avatar -->
+                        {% if proposal.provider.avatar %}
+                        <img src="{{ proposal.provider.avatar.url }}"
+                             alt="{{ proposal.provider.display_name }}"
+                             class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+                            <span class="text-lg font-medium text-primary-600 dark:text-primary-400">
+                                {{ proposal.provider.display_name|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <a href="{% url 'provider_profile' proposal.provider.uuid %}" class="text-base font-semibold text-gray-900 dark:text-white hover:text-primary-600">
+                                        {{ proposal.provider.display_name }}
+                                        {% if proposal.provider.is_verified %}
+                                        <svg class="inline w-4 h-4 text-blue-500 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {% endif %}
+                                    </a>
+                                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            {{ proposal.provider.rating_avg|floatformat:1 }}
+                                        </div>
+                                        <span>|</span>
+                                        <span>{{ proposal.provider.completed_jobs_count }} {% trans "jobs" %}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">${{ proposal.proposed_rate|intcomma }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ proposal.created_at|timesince }} {% trans "ago" %}</p>
+                                </div>
+                            </div>
+
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">{{ proposal.cover_letter|truncatewords:50 }}</p>
+
+                            {% if is_owner and not proposal.is_accepted %}
+                            <div class="flex items-center gap-3">
+                                <a href="{% url 'accept_proposal' proposal.id %}"
+                                   class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                                    {% trans "Accept Proposal" %}
+                                </a>
+                                <a href="{% url 'provider_profile' proposal.provider.uuid %}"
+                                   class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                    {% trans "View Profile" %}
+                                </a>
+                            </div>
+                            {% elif proposal.is_accepted %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                {% trans "Accepted" %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-12 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No proposals yet" %}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Proposals from providers will appear here." %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-6">
+            <!-- Request Info Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Request Info" %}</h3>
+                <dl class="space-y-4">
+                    {% if request.budget_min or request.budget_max %}
+                    <div>
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Budget" %}</dt>
+                        <dd class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                            {% if request.budget_min and request.budget_max %}
+                            ${{ request.budget_min|intcomma }} - ${{ request.budget_max|intcomma }}
+                            {% elif request.budget_min %}
+                            {% trans "From" %} ${{ request.budget_min|intcomma }}
+                            {% else %}
+                            {% trans "Up to" %} ${{ request.budget_max|intcomma }}
+                            {% endif %}
+                        </dd>
+                    </div>
+                    {% endif %}
+
+                    {% if request.deadline %}
+                    <div>
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Deadline" %}</dt>
+                        <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ request.deadline|date:"F d, Y" }}</dd>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Posted" %}</dt>
+                        <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ request.created_at|date:"F d, Y" }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Proposals" %}</dt>
+                        <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ proposals.count }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Client Info (for providers) -->
+            {% if not is_owner %}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Posted By" %}</h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                        <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
+                            {{ request.client.get_full_name|slice:":1"|upper|default:request.client.email|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                            {{ request.client.get_full_name|default:request.client.email }}
+                        </p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Client" %}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

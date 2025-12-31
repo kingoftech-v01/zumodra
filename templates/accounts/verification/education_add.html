@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Add Education" %} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="mb-8">
+        <a href="{% url 'frontend:accounts:education-list' %}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+            &larr; {% trans "Back to Education History" %}
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {% trans "Add Education" %}
+        </h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {% trans "Add your educational background for verification." %}
+        </p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label for="id_institution_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Institution Name" %} *
+                    </label>
+                    {{ form.institution_name }}
+                    {% if form.institution_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.institution_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_institution_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Institution Type" %}
+                    </label>
+                    {{ form.institution_type }}
+                </div>
+
+                <div>
+                    <label for="id_degree_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Degree Type" %} *
+                    </label>
+                    {{ form.degree_type }}
+                    {% if form.degree_type.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.degree_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label for="id_field_of_study" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Field of Study" %} *
+                </label>
+                {{ form.field_of_study }}
+                {% if form.field_of_study.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.field_of_study.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Start Date" %} *
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "End Date" %}
+                    </label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="flex items-center">
+                    {{ form.is_current }}
+                    <label for="id_is_current" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {% trans "Currently enrolled" %}
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    {{ form.graduated }}
+                    <label for="id_graduated" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {% trans "Graduated" %}
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_gpa" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "GPA" %}
+                    </label>
+                    {{ form.gpa }}
+                </div>
+
+                <div>
+                    <label for="id_honors" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Honors" %}
+                    </label>
+                    {{ form.honors }}
+                </div>
+            </div>
+
+            <hr class="border-gray-200 dark:border-gray-700">
+
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {% trans "Verification Information (Optional)" %}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {% trans "Provide registrar contact or upload a transcript for verification." %}
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_registrar_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Registrar Email" %}
+                    </label>
+                    {{ form.registrar_email }}
+                </div>
+
+                <div>
+                    <label for="id_institution_domain" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Institution Domain" %}
+                    </label>
+                    {{ form.institution_domain }}
+                </div>
+            </div>
+
+            <div>
+                <label for="id_student_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Student ID" %}
+                </label>
+                {{ form.student_id }}
+            </div>
+
+            <div class="flex justify-end gap-4 pt-4">
+                <a href="{% url 'frontend:accounts:education-list' %}"
+                   class="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    {% trans "Add Education" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Notifications" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="text-gray-400">/</li>
+<li><a href="{% url 'notifications:notification_list' %}" class="text-gray-600 dark:text-gray-400">{% trans "Notifications" %}</a></li>
+{% endblock %}
+
+{% block page_title %}{% trans "Notifications" %}{% endblock %}
+{% block page_description %}
+{% if unread_count %}
+{% blocktrans count counter=unread_count %}
+{{ counter }} unread notification
+{% plural %}
+{{ counter }} unread notifications
+{% endblocktrans %}
+{% else %}
+{% trans "All caught up!" %}
+{% endif %}
+{% endblock %}
+
+{% block page_actions %}
+<div class="flex items-center space-x-3">
+    <a href="{% url 'notifications:mark_all_read' %}"
+       class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+        {% trans "Mark all as read" %}
+    </a>
+    <a href="{% url 'notifications:notification_preferences' %}"
+       class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+        {% trans "Preferences" %}
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <!-- Filter Tabs -->
+    <div class="border-b border-gray-200 dark:border-gray-700 px-4">
+        <nav class="flex space-x-8" aria-label="Filters">
+            <a href="?filter=all"
+               class="py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                      {% if filter_type == 'all' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                {% trans "All" %}
+            </a>
+            <a href="?filter=unread"
+               class="py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                      {% if filter_type == 'unread' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                {% trans "Unread" %}
+                {% if unread_count %}
+                <span class="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-200">
+                    {{ unread_count }}
+                </span>
+                {% endif %}
+            </a>
+            <a href="?filter=read"
+               class="py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                      {% if filter_type == 'read' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                {% trans "Read" %}
+            </a>
+        </nav>
+    </div>
+
+    <!-- Notification List -->
+    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        {% for notification in notifications %}
+        <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors {% if not notification.is_read %}bg-primary-50/50 dark:bg-primary-900/10{% endif %}">
+            <div class="flex items-start space-x-4">
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    {% if notification.notification_type == 'info' %}
+                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    {% elif notification.notification_type == 'success' %}
+                    <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    {% elif notification.notification_type == 'warning' %}
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    {% elif notification.notification_type == 'error' %}
+                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ notification.title }}
+                        </p>
+                        <div class="flex items-center space-x-2">
+                            <time class="text-xs text-gray-500 dark:text-gray-400" datetime="{{ notification.created_at|date:'c' }}">
+                                {{ notification.created_at|timesince }} {% trans "ago" %}
+                            </time>
+                            {% if not notification.is_read %}
+                            <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        {{ notification.message }}
+                    </p>
+                    {% if notification.action_url %}
+                    <div class="mt-2">
+                        <a href="{{ notification.action_url }}"
+                           class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
+                            {% trans "View details" %} &rarr;
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="flex-shrink-0 flex items-center space-x-2">
+                    {% if not notification.is_read %}
+                    <a href="{% url 'notifications:mark_read' notification.id %}"
+                       class="p-1.5 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                       title="{% trans 'Mark as read' %}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'notifications:delete' notification.id %}"
+                       class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                       title="{% trans 'Delete' %}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                {% trans "No notifications" %}
+            </h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+                {% if filter_type == 'unread' %}
+                {% trans "You're all caught up! No unread notifications." %}
+                {% else %}
+                {% trans "You don't have any notifications yet." %}
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if notifications.has_other_pages %}
+    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+        <nav class="flex items-center justify-between">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if notifications.has_previous %}
+                <a href="?page={{ notifications.previous_page_number }}&filter={{ filter_type }}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    {% trans "Previous" %}
+                </a>
+                {% endif %}
+                {% if notifications.has_next %}
+                <a href="?page={{ notifications.next_page_number }}&filter={{ filter_type }}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    {% trans "Next" %}
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        {% trans "Page" %} <span class="font-medium">{{ notifications.number }}</span>
+                        {% trans "of" %} <span class="font-medium">{{ notifications.paginator.num_pages }}</span>
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {% if notifications.has_previous %}
+                        <a href="?page={{ notifications.previous_page_number }}&filter={{ filter_type }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <span class="sr-only">{% trans "Previous" %}</span>
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        {% if notifications.has_next %}
+                        <a href="?page={{ notifications.next_page_number }}&filter={{ filter_type }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <span class="sr-only">{% trans "Next" %}</span>
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

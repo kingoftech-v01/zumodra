@@ -1,0 +1,27 @@
+Review Your Privacy Consents
+=============================
+
+Dear {{ user.first_name|default:user.email }},
+
+Some of your privacy consents are expiring soon. To continue using our
+services without interruption, please review and renew your consents.
+
+Consents Expiring Soon:
+{% for consent in consents %}
+- {{ consent.get_consent_type_display }}
+  Expires: {{ consent.expires_at|date:"F d, Y" }}
+{% endfor %}
+
+Please review and update your privacy preferences by visiting:
+{{ renewal_url }}
+
+If you do not renew your consents before they expire, we may not be able
+to provide certain services or communications to you.
+
+Best regards,
+The {{ tenant.name }} Privacy Team
+
+---
+You received this email because you have an account with {{ tenant.name }}.
+To manage your email preferences, visit your privacy dashboard.
+(c) {{ year }} {{ tenant.name }}. All rights reserved.

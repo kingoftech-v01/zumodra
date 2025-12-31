@@ -1,44 +1,66 @@
-from django.forms import ModelForm
-from .models import *
-from django import forms
-from .models import (
-    ServiceCategory, ServicesTag, ServicesPicture, ProviderSkill,
-    ServiceProviderProfile, Service, ServiceLike, ClientRequest,
-    Match, ServiceRequest, ServiceProposal, ServiceContract,
-    ServiceComment, ServiceMessage
+"""
+Dashboard Service Forms - DEPRECATED
+
+This module is deprecated. All forms should be created in the `services` app.
+
+MIGRATION NOTE:
+- Create forms in `services.forms` instead
+- This file re-exports models for backwards compatibility only
+"""
+
+import warnings
+
+warnings.warn(
+    "dashboard_service.forms is deprecated. "
+    "Create forms in services.forms instead.",
+    DeprecationWarning,
+    stacklevel=2
 )
-from django.core.mail import send_mail
 
-# class serviceForm(ModelForm):
-#     class Meta:
-#         model = service
-#         fields = '__all__'
+from django import forms
+
+# Import models from services (canonical location)
+from services.models import (
+    ServiceCategory,
+    ServiceTag,
+    ServiceImage,
+    ProviderSkill,
+    ServiceProvider,
+    Service,
+    ServiceLike,
+    ClientRequest,
+    ProviderMatch,
+    ServiceProposal,
+    ServiceContract,
+    ServiceReview,
+    ContractMessage,
+    # Backwards compatibility aliases
+    ServicesTag,
+    ServicesPicture,
+    ServiceProviderProfile,
+    Match,
+    ServiceRequest,
+    ServiceComment,
+    ServiceMessage,
+)
 
 
-#     def save(self, commit=True):
-#         service = super(serviceForm, self).save(commit=False)
-#         if commit:
-#             service.save()
-#         return service
-
-
-
-# Catégories de services
+# Form classes using canonical model names
 class ServiceCategoryForm(forms.ModelForm):
     class Meta:
         model = ServiceCategory
         fields = '__all__'
 
 
-class ServicesTagForm(forms.ModelForm):
+class ServiceTagForm(forms.ModelForm):
     class Meta:
-        model = ServicesTag
+        model = ServiceTag
         fields = '__all__'
 
 
-class ServicesPictureForm(forms.ModelForm):
+class ServiceImageForm(forms.ModelForm):
     class Meta:
-        model = ServicesPicture
+        model = ServiceImage
         fields = '__all__'
 
 
@@ -48,10 +70,10 @@ class ProviderSkillForm(forms.ModelForm):
         fields = '__all__'
 
 
-class ServiceProviderProfileForm(forms.ModelForm):
+class ServiceProviderForm(forms.ModelForm):
     class Meta:
-        model = ServiceProviderProfile
-        exclude = ['uuid', 'created_at', 'updated_at', 'last_active', 'entity_name']
+        model = ServiceProvider
+        exclude = ['uuid', 'created_at', 'updated_at', 'last_active_at']
 
 
 class ServiceForm(forms.ModelForm):
@@ -72,15 +94,9 @@ class ClientRequestForm(forms.ModelForm):
         fields = '__all__'
 
 
-class MatchForm(forms.ModelForm):
+class ProviderMatchForm(forms.ModelForm):
     class Meta:
-        model = Match
-        fields = '__all__'
-
-
-class ServiceRequestForm(forms.ModelForm):
-    class Meta:
-        model = ServiceRequest
+        model = ProviderMatch
         fields = '__all__'
 
 
@@ -96,13 +112,23 @@ class ServiceContractForm(forms.ModelForm):
         fields = '__all__'
 
 
-class ServiceCommentForm(forms.ModelForm):
+class ServiceReviewForm(forms.ModelForm):
     class Meta:
-        model = ServiceComment
+        model = ServiceReview
         fields = '__all__'
 
 
-class ServiceMessageForm(forms.ModelForm):
+class ContractMessageForm(forms.ModelForm):
     class Meta:
-        model = ServiceMessage
+        model = ContractMessage
         fields = '__all__'
+
+
+# Backwards compatibility aliases
+ServicesTagForm = ServiceTagForm
+ServicesPictureForm = ServiceImageForm
+ServiceProviderProfileForm = ServiceProviderForm
+MatchForm = ProviderMatchForm
+ServiceRequestForm = ClientRequestForm
+ServiceCommentForm = ServiceReviewForm
+ServiceMessageForm = ContractMessageForm

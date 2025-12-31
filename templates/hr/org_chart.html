@@ -1,0 +1,446 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Organization Chart" %} - Zumodra{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* Organization Tree Styles */
+    .org-tree {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .org-node {
+        position: relative;
+    }
+    .org-node::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background: #d1d5db;
+    }
+    .org-node:first-child::before {
+        display: none;
+    }
+    .org-children {
+        display: flex;
+        justify-content: center;
+        padding-top: 20px;
+        position: relative;
+    }
+    .org-children::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background: #d1d5db;
+    }
+    .org-children > .org-node {
+        padding: 0 20px;
+    }
+    .org-children > .org-node::after {
+        content: '';
+        position: absolute;
+        top: -20px;
+        width: 100%;
+        height: 2px;
+        background: #d1d5db;
+        left: 0;
+    }
+    .org-children > .org-node:first-child::after {
+        left: 50%;
+        width: 50%;
+    }
+    .org-children > .org-node:last-child::after {
+        width: 50%;
+    }
+    .org-children > .org-node:only-child::after {
+        display: none;
+    }
+
+    .dark .org-node::before,
+    .dark .org-children::before,
+    .dark .org-children > .org-node::after {
+        background: #4b5563;
+    }
+
+    /* Expand/Collapse Button */
+    .expand-btn {
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    /* Highlight animation for searched nodes */
+    @keyframes highlight-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+        50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+    }
+    .org-highlight {
+        animation: highlight-pulse 1.5s ease-in-out 3;
+    }
+
+    /* Tree view alternative styles */
+    .tree-view .tree-branch {
+        padding-left: 1.5rem;
+        border-left: 2px solid #e5e7eb;
+        margin-left: 0.75rem;
+    }
+    .dark .tree-view .tree-branch {
+        border-left-color: #4b5563;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Org Chart" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Organization Chart" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Visualize your company's organizational structure." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<div class="flex items-center space-x-3">
+    {# Search Employee #}
+    <div class="relative">
+        <input type="text"
+               id="org-search"
+               placeholder="{% trans 'Search employee...' %}"
+               class="block w-48 pl-10 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </div>
+    </div>
+
+    {# Department Filter #}
+    <select id="department-filter"
+            hx-get="{% url 'hr:org-chart' %}"
+            hx-trigger="change"
+            hx-target="#org-chart-container"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+            name="department"
+            class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+        <option value="">{% trans "All Departments" %}</option>
+        {% for dept in departments %}
+        <option value="{{ dept.id }}" {% if request.GET.department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+        {% endfor %}
+    </select>
+
+    {# View Toggle #}
+    <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
+        <button id="view-tree"
+                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors bg-gray-100 dark:bg-gray-600"
+                title="{% trans 'Tree View' %}">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+        </button>
+        <button id="view-list"
+                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors"
+                title="{% trans 'List View' %}">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+        </button>
+    </div>
+
+    {# Zoom Controls #}
+    <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+        <button id="zoom-out" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-l-lg" title="{% trans 'Zoom Out' %}">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+            </svg>
+        </button>
+        <span id="zoom-level" class="px-2 text-sm text-gray-700 dark:text-gray-300 min-w-[48px] text-center">100%</span>
+        <button id="zoom-in" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-r-lg" title="{% trans 'Zoom In' %}">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+        </button>
+    </div>
+
+    {# Expand/Collapse All #}
+    <button id="expand-all"
+            class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        </svg>
+        {% trans "Expand All" %}
+    </button>
+
+    {# Export #}
+    <button id="export-org-chart"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        {% trans "Export" %}
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="main-content">
+    <!-- Org Chart Container -->
+    <div id="org-chart-container" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-8 overflow-x-auto">
+        <div id="org-chart" class="org-tree min-w-max" style="transform-origin: top center;">
+            <!-- CEO / Top Level -->
+            {% if root_employee %}
+            <div class="org-node">
+                {% include "hr/_org_card.html" with employee=root_employee %}
+
+                {% if root_employee.direct_reports.all %}
+                <div class="org-children">
+                    {% for report in root_employee.direct_reports.all %}
+                    <div class="org-node">
+                        {% include "hr/_org_card.html" with employee=report %}
+
+                        {% if report.direct_reports.all %}
+                        <div class="org-children">
+                            {% for subreport in report.direct_reports.all %}
+                            <div class="org-node">
+                                {% include "hr/_org_card.html" with employee=subreport compact=True %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No organization structure" %}</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Set up reporting relationships in employee profiles." %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Department Summary -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for dept in departments %}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ dept.name }}</h3>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">{{ dept.employee_count }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "employees" %}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: {{ dept.color|default:'#3b82f6' }}20;">
+                    <svg class="w-6 h-6" style="color: {{ dept.color|default:'#3b82f6' }};" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const orgChart = document.getElementById('org-chart');
+    const orgChartContainer = document.getElementById('org-chart-container');
+    const zoomIn = document.getElementById('zoom-in');
+    const zoomOut = document.getElementById('zoom-out');
+    const zoomLevel = document.getElementById('zoom-level');
+    const searchInput = document.getElementById('org-search');
+    const viewTree = document.getElementById('view-tree');
+    const viewList = document.getElementById('view-list');
+    const expandAllBtn = document.getElementById('expand-all');
+
+    let currentZoom = 100;
+    let allExpanded = true;
+
+    // Zoom controls
+    zoomIn.addEventListener('click', function() {
+        if (currentZoom < 150) {
+            currentZoom += 10;
+            orgChart.style.transform = `scale(${currentZoom / 100})`;
+            zoomLevel.textContent = currentZoom + '%';
+        }
+    });
+
+    zoomOut.addEventListener('click', function() {
+        if (currentZoom > 50) {
+            currentZoom -= 10;
+            orgChart.style.transform = `scale(${currentZoom / 100})`;
+            zoomLevel.textContent = currentZoom + '%';
+        }
+    });
+
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('[data-employee-name]');
+
+            cards.forEach(card => {
+                const name = card.dataset.employeeName.toLowerCase();
+                const title = (card.dataset.employeeTitle || '').toLowerCase();
+
+                if (searchTerm === '') {
+                    card.classList.remove('org-highlight', 'opacity-30');
+                } else if (name.includes(searchTerm) || title.includes(searchTerm)) {
+                    card.classList.add('org-highlight');
+                    card.classList.remove('opacity-30');
+                    // Scroll into view
+                    if (searchTerm.length >= 2) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    card.classList.remove('org-highlight');
+                    card.classList.add('opacity-30');
+                }
+            });
+        });
+    }
+
+    // View toggle
+    if (viewTree && viewList) {
+        viewTree.addEventListener('click', function() {
+            viewTree.classList.add('bg-gray-100', 'dark:bg-gray-600');
+            viewList.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+            document.querySelector('.org-tree-view')?.classList.remove('hidden');
+            document.querySelector('.org-list-view')?.classList.add('hidden');
+        });
+
+        viewList.addEventListener('click', function() {
+            viewList.classList.add('bg-gray-100', 'dark:bg-gray-600');
+            viewTree.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+            document.querySelector('.org-tree-view')?.classList.add('hidden');
+            document.querySelector('.org-list-view')?.classList.remove('hidden');
+        });
+    }
+
+    // Expand/Collapse all
+    if (expandAllBtn) {
+        expandAllBtn.addEventListener('click', function() {
+            const expandButtons = document.querySelectorAll('[data-expand-btn]');
+            allExpanded = !allExpanded;
+
+            expandButtons.forEach(btn => {
+                const target = document.querySelector(btn.dataset.expandTarget);
+                if (target) {
+                    if (allExpanded) {
+                        target.classList.remove('hidden');
+                        btn.querySelector('svg').style.transform = 'rotate(180deg)';
+                    } else {
+                        target.classList.add('hidden');
+                        btn.querySelector('svg').style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+
+            expandAllBtn.innerHTML = allExpanded
+                ? '<svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 20l-4-4m0 0l-4 4m4-4v12M4 4l4 4m0 0l4-4M8 8V-4"/></svg>{% trans "Collapse All" %}'
+                : '<svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>{% trans "Expand All" %}';
+        });
+    }
+
+    // Export functionality
+    document.getElementById('export-org-chart').addEventListener('click', function() {
+        // In production, integrate with html2canvas or similar
+        window.dispatchEvent(new CustomEvent('toast', {
+            detail: { message: '{% trans "Export feature coming soon" %}', type: 'info' }
+        }));
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === '+' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            zoomIn.click();
+        } else if (e.key === '-' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            zoomOut.click();
+        } else if (e.key === '0' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            currentZoom = 100;
+            orgChart.style.transform = 'scale(1)';
+            zoomLevel.textContent = '100%';
+        }
+    });
+
+    // Drag to pan (for large charts)
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    if (orgChartContainer) {
+        orgChartContainer.addEventListener('mousedown', (e) => {
+            if (e.target === orgChartContainer || e.target === orgChart) {
+                isDragging = true;
+                orgChartContainer.style.cursor = 'grabbing';
+                startX = e.pageX - orgChartContainer.offsetLeft;
+                startY = e.pageY - orgChartContainer.offsetTop;
+                scrollLeft = orgChartContainer.scrollLeft;
+                scrollTop = orgChartContainer.scrollTop;
+            }
+        });
+
+        orgChartContainer.addEventListener('mouseleave', () => {
+            isDragging = false;
+            orgChartContainer.style.cursor = 'default';
+        });
+
+        orgChartContainer.addEventListener('mouseup', () => {
+            isDragging = false;
+            orgChartContainer.style.cursor = 'default';
+        });
+
+        orgChartContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - orgChartContainer.offsetLeft;
+            const y = e.pageY - orgChartContainer.offsetTop;
+            const walkX = (x - startX) * 1.5;
+            const walkY = (y - startY) * 1.5;
+            orgChartContainer.scrollLeft = scrollLeft - walkX;
+            orgChartContainer.scrollTop = scrollTop - walkY;
+        });
+    }
+
+    // Highlight employee from URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    const highlightId = urlParams.get('highlight');
+    if (highlightId) {
+        const card = document.querySelector(`[data-employee-id="${highlightId}"]`);
+        if (card) {
+            card.classList.add('org-highlight');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+</script>
+{% endblock %}

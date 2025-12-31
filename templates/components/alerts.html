@@ -1,0 +1,409 @@
+{% comment %}
+Zumodra Alert Component Templates
+Usage: {% include "components/alerts.html" with variant="info" title="Information" message="This is an info alert." %}
+
+Available variants: info, success, warning, error
+Options: dismissible (shows close button), icon (custom icon)
+{% endcomment %}
+
+{% comment %}
+==============================================================================
+INFO ALERT
+Usage: {% include "components/alerts.html" with variant="info" title="Information" message="This is helpful information." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "info" %}
+<div
+    class="alert alert-info{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if icon %}
+        {{ icon|safe }}
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        {% if message %}<p class="alert-message">{{ message }}</p>{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+SUCCESS ALERT
+Usage: {% include "components/alerts.html" with variant="success" title="Success!" message="Your changes have been saved." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "success" %}
+<div
+    class="alert alert-success{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if icon %}
+        {{ icon|safe }}
+        {% else %}
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        {% if message %}<p class="alert-message">{{ message }}</p>{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+WARNING ALERT
+Usage: {% include "components/alerts.html" with variant="warning" title="Warning" message="Please review before continuing." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "warning" %}
+<div
+    class="alert alert-warning{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if icon %}
+        {{ icon|safe }}
+        {% else %}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        {% if message %}<p class="alert-message">{{ message }}</p>{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ERROR ALERT
+Usage: {% include "components/alerts.html" with variant="error" title="Error" message="Something went wrong. Please try again." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "error" %}
+<div
+    class="alert alert-error{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    aria-live="assertive"
+    {% if id %}id="{{ id }}"{% endif %}
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if icon %}
+        {{ icon|safe }}
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        {% if message %}<p class="alert-message">{{ message }}</p>{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+BANNER ALERT (full-width, typically at top of page)
+Usage: {% include "components/alerts.html" with variant="banner" type="info" message="Site maintenance scheduled for tonight." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "banner" %}
+<div
+    class="alert alert-{{ type|default:'info' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+    style="border-radius: 0; margin: 0; justify-content: center;"
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;">
+        {% if type == "success" %}
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        {% elif type == "warning" %}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        {% elif type == "error" %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content" style="flex: none;">
+        {% if message %}<p class="alert-message" style="margin: 0;">{{ message }}</p>{% endif %}
+        {% if link_text and link_url %}
+        <a href="{{ link_url }}" style="margin-left: var(--spacing-2); font-weight: var(--font-weight-medium); text-decoration: underline;">{{ link_text }}</a>
+        {% endif %}
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss style="position: absolute; right: var(--spacing-4);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+INLINE ALERT (compact, for form validation etc.)
+Usage: {% include "components/alerts.html" with variant="inline" type="error" message="This field is required." %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "inline" %}
+<div
+    class="alert alert-{{ type|default:'info' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+    style="padding: var(--spacing-2) var(--spacing-3); gap: var(--spacing-2);"
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 16px; height: 16px;">
+        {% if type == "success" %}
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        {% elif type == "warning" %}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        {% elif type == "error" %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        <p class="alert-message" style="font-size: var(--font-size-xs); margin: 0;">{{ message }}</p>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ALERT WITH ACTION
+Usage: {% include "components/alerts.html" with variant="action" type="warning" title="Subscription expiring" message="Your subscription expires in 3 days." action_text="Renew Now" action_url="/billing" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "action" %}
+<div
+    class="alert alert-{{ type|default:'info' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+    style="flex-wrap: wrap;"
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if type == "success" %}
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        {% elif type == "warning" %}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        {% elif type == "error" %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content" style="flex: 1;">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        {% if message %}<p class="alert-message">{{ message }}</p>{% endif %}
+    </div>
+    <div style="display: flex; gap: var(--spacing-2); align-items: center;">
+        {% if action_text and action_url %}
+        <a href="{{ action_url }}" class="btn btn-sm btn-{{ type|default:'primary' }}">{{ action_text }}</a>
+        {% endif %}
+        {% if secondary_action_text %}
+        <button type="button" class="btn btn-sm btn-ghost" {% if secondary_action_dismiss %}data-alert-dismiss{% endif %}>{{ secondary_action_text }}</button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ALERT LIST (multiple related messages)
+Usage: {% include "components/alerts.html" with variant="list" type="error" title="Form Errors" messages=error_list %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "list" %}
+<div
+    class="alert alert-{{ type|default:'error' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+    role="alert"
+    {% if id %}id="{{ id }}"{% endif %}
+>
+    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {% if type == "success" %}
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        {% elif type == "warning" %}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        {% elif type == "error" %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+        {% else %}
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        {% endif %}
+    </svg>
+    <div class="alert-content">
+        {% if title %}<h4 class="alert-title">{{ title }}</h4>{% endif %}
+        <ul style="margin: var(--spacing-2) 0 0 0; padding-left: var(--spacing-4); font-size: var(--font-size-sm);">
+            {% for msg in messages %}
+            <li style="margin-bottom: var(--spacing-1);">{{ msg }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% if dismissible %}
+    <button type="button" class="alert-close" aria-label="Dismiss alert" data-alert-dismiss>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ALERT JAVASCRIPT HELPER
+Include this once in your base template to enable dismiss functionality
+==============================================================================
+{% endcomment %}
+
+{% if variant == "script" %}
+<script>
+(function() {
+    'use strict';
+
+    document.addEventListener('click', function(e) {
+        const dismissBtn = e.target.closest('[data-alert-dismiss]');
+        if (dismissBtn) {
+            const alert = dismissBtn.closest('.alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-10px)';
+                alert.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                setTimeout(function() {
+                    alert.remove();
+                }, 200);
+            }
+        }
+    });
+})();
+</script>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ALERT EXAMPLES - For reference/documentation
+==============================================================================
+
+{# Basic info alert #}
+{% include "components/alerts.html" with variant="info" title="Did you know?" message="You can customize your dashboard in settings." %}
+
+{# Success alert with dismiss #}
+{% include "components/alerts.html" with variant="success" title="Success!" message="Your profile has been updated." dismissible=True %}
+
+{# Warning alert #}
+{% include "components/alerts.html" with variant="warning" title="Warning" message="Your session will expire in 5 minutes." %}
+
+{# Error alert #}
+{% include "components/alerts.html" with variant="error" title="Error" message="Failed to save changes. Please try again." %}
+
+{# Banner alert at top of page #}
+{% include "components/alerts.html" with variant="banner" type="info" message="New feature available! Check out our improved dashboard." link_text="Learn more" link_url="/changelog" dismissible=True %}
+
+{# Inline validation error #}
+{% include "components/alerts.html" with variant="inline" type="error" message="This email is already registered." %}
+
+{# Alert with action button #}
+{% include "components/alerts.html" with variant="action" type="warning" title="Subscription expiring" message="Your subscription expires in 3 days." action_text="Renew Now" action_url="/billing" secondary_action_text="Dismiss" secondary_action_dismiss=True %}
+
+{# Error list for form validation #}
+{% with error_list=form.errors.values %}
+{% include "components/alerts.html" with variant="list" type="error" title="Please fix the following errors:" messages=error_list %}
+{% endwith %}
+
+{# Include script once in base template #}
+{% include "components/alerts.html" with variant="script" %}
+
+{% endcomment %}

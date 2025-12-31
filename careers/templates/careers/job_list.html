@@ -1,0 +1,379 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ meta_title|default:"Careers" }} - {{ total_jobs }} {% trans "Open Positions" %}{% endblock %}
+
+{% block meta_description %}{{ meta_description|default:"Explore our open positions and join our team. We are hiring!" }}{% endblock %}
+
+{% block extra_head %}
+<!-- JSON-LD for Organization -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{ site.title }}",
+    "description": "{{ site.company_description|truncatechars:160 }}",
+    {% if site_serialized.logo_url %}"logo": "{{ site_serialized.logo_url }}",{% endif %}
+    "sameAs": [
+        {% for link in site_serialized.social_links %}
+        "{{ link.url }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary to-secondary text-white py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {% if site_serialized.cover_image_url %}
+        <div class="absolute inset-0 opacity-20" style="background-image: url('{{ site_serialized.cover_image_url }}'); background-size: cover; background-position: center;"></div>
+        {% endif %}
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 relative">
+            {{ site.title|default:"Join Our Team" }}
+        </h1>
+        <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto relative">
+            {{ site.tagline|default:"Discover exciting career opportunities" }}
+        </p>
+        <div class="mt-8 relative">
+            <span class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur rounded-full text-lg">
+                <span class="mdi mdi-briefcase-outline mr-2"></span>
+                {{ total_jobs }} {% trans "open position" %}{{ total_jobs|pluralize }}
+            </span>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filters -->
+<section class="bg-white shadow-md -mt-8 relative z-10 mx-4 lg:mx-auto max-w-6xl rounded-xl">
+    <form method="get" action="{% url 'careers:template:home' %}" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Search -->
+            <div class="md:col-span-2">
+                <label for="search" class="sr-only">{% trans "Search jobs" %}</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <span class="mdi mdi-magnify text-gray-400"></span>
+                    </span>
+                    <input type="text" name="search" id="search" value="{{ current_search }}"
+                           class="form-input pl-10"
+                           placeholder="{% trans 'Search jobs, skills, keywords...' %}">
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div>
+                <label for="category" class="sr-only">{% trans "Category" %}</label>
+                <select name="category" id="category" class="form-select">
+                    <option value="">{% trans "All Categories" %}</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }} ({{ cat.job_count }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Location Filter -->
+            <div>
+                <label for="location" class="sr-only">{% trans "Location" %}</label>
+                <select name="location" id="location" class="form-select">
+                    <option value="">{% trans "All Locations" %}</option>
+                    {% for loc in locations %}
+                    <option value="{{ loc }}" {% if current_location == loc %}selected{% endif %}>
+                        {{ loc }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Additional Filters Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <!-- Job Type -->
+            <div>
+                <label for="job_type" class="sr-only">{% trans "Job Type" %}</label>
+                <select name="job_type" id="job_type" class="form-select">
+                    <option value="">{% trans "All Job Types" %}</option>
+                    {% for type_key, type_name in job_types %}
+                    <option value="{{ type_key }}" {% if current_job_type == type_key %}selected{% endif %}>
+                        {{ type_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Remote Only -->
+            <div class="flex items-center">
+                <input type="checkbox" name="remote" value="true" id="remote" class="form-checkbox"
+                       {% if current_remote == 'true' %}checked{% endif %}>
+                <label for="remote" class="ml-2 text-gray-700">{% trans "Remote friendly" %}</label>
+            </div>
+
+            <!-- Submit -->
+            <div class="md:col-span-2 flex justify-end">
+                <button type="submit" class="w-full md:w-auto px-8 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors">
+                    <span class="mdi mdi-filter-outline mr-2"></span>
+                    {% trans "Filter Jobs" %}
+                </button>
+            </div>
+        </div>
+    </form>
+</section>
+
+<!-- Featured Jobs (if any) -->
+{% if featured_jobs %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        <span class="mdi mdi-star text-yellow-500 mr-2"></span>
+        {% trans "Featured Positions" %}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for job in featured_jobs %}
+        <a href="{% url 'careers:template:job-detail' pk=job.pk %}" class="block bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 hover:shadow-lg hover:border-primary/40 transition-all group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full mb-3">
+                        <span class="mdi mdi-star text-yellow-500 mr-1"></span>
+                        {% trans "Featured" %}
+                    </span>
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                        {{ job.job.title }}
+                    </h3>
+                    <p class="text-gray-600 mt-1">
+                        {% if job.job.category %}{{ job.job.category.name }}{% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="inline-flex items-center text-sm text-gray-500">
+                    <span class="mdi mdi-map-marker-outline mr-1"></span>
+                    {{ job.job.location_city|default:job.job.location_country|default:"Remote" }}
+                </span>
+                <span class="inline-flex items-center text-sm text-gray-500">
+                    <span class="mdi mdi-clock-outline mr-1"></span>
+                    {{ job.job.get_job_type_display }}
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Job Listings -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">
+            {% if current_search or current_category or current_location or current_job_type %}
+                {% trans "Search Results" %}
+            {% else %}
+                {% trans "All Open Positions" %}
+            {% endif %}
+        </h2>
+        <span class="text-gray-500">{{ total_jobs }} {% trans "job" %}{{ total_jobs|pluralize }}</span>
+    </div>
+
+    {% if jobs %}
+    <div class="space-y-4">
+        {% for job in jobs %}
+        <article class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all fade-in">
+            <a href="{% url 'careers:template:job-detail' pk=job.pk %}" class="block">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <!-- Job Info -->
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2 mb-2">
+                            {% if job.is_featured %}
+                            <span class="inline-flex items-center px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                                <span class="mdi mdi-star text-yellow-500 mr-1"></span>
+                                {% trans "Featured" %}
+                            </span>
+                            {% endif %}
+
+                            {% if job.published_at %}
+                            {% with days_ago=job.published_at|timesince %}
+                            {% if "day" not in days_ago or "1 day" in days_ago %}
+                            <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                {% trans "New" %}
+                            </span>
+                            {% endif %}
+                            {% endwith %}
+                            {% endif %}
+
+                            {% if job.job.category %}
+                            <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
+                                  style="background-color: {{ job.job.category.color }}20; color: {{ job.job.category.color }};">
+                                {{ job.job.category.name }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-900 hover:text-primary transition-colors">
+                            {{ job.job.title }}
+                        </h3>
+
+                        <div class="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
+                            <span class="inline-flex items-center">
+                                <span class="mdi mdi-map-marker-outline mr-1"></span>
+                                {{ job.job.location_city|default:job.job.location_country|default:"Remote" }}
+                            </span>
+                            <span class="inline-flex items-center">
+                                <span class="mdi mdi-clock-outline mr-1"></span>
+                                {{ job.job.get_job_type_display }}
+                            </span>
+                            {% if job.job.remote_policy != 'on_site' %}
+                            <span class="inline-flex items-center">
+                                <span class="mdi mdi-home-outline mr-1"></span>
+                                {{ job.job.get_remote_policy_display }}
+                            </span>
+                            {% endif %}
+                            <span class="inline-flex items-center">
+                                <span class="mdi mdi-account-outline mr-1"></span>
+                                {{ job.job.get_experience_level_display }}
+                            </span>
+                        </div>
+
+                        {% if job.job.show_salary and job.job.salary_min and job.job.salary_max and site.show_salary_range %}
+                        <div class="mt-2 text-sm font-medium text-green-600">
+                            <span class="mdi mdi-currency-usd mr-1"></span>
+                            {{ job.job.salary_currency }} {{ job.job.salary_min|floatformat:0 }} - {{ job.job.salary_max|floatformat:0 }} / {{ job.job.salary_period }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Apply Button -->
+                    <div class="flex items-center gap-4">
+                        {% if job.show_application_count and job.public_applications.count >= job.application_count_threshold %}
+                        <span class="text-sm text-gray-400">
+                            {{ job.application_count_threshold }}+ {% trans "applicants" %}
+                        </span>
+                        {% endif %}
+
+                        <span class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition-colors whitespace-nowrap">
+                            {% trans "View & Apply" %}
+                            <span class="mdi mdi-arrow-right ml-2"></span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if jobs.has_other_pages %}
+    <nav class="mt-12 flex justify-center" aria-label="{% trans 'Pagination' %}">
+        <ul class="inline-flex items-center gap-2">
+            {% if jobs.has_previous %}
+            <li>
+                <a href="?page={{ jobs.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}{% if current_job_type %}&job_type={{ current_job_type }}{% endif %}{% if current_remote %}&remote={{ current_remote }}{% endif %}"
+                   class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <span class="mdi mdi-chevron-left"></span>
+                    {% trans "Previous" %}
+                </a>
+            </li>
+            {% endif %}
+
+            {% for page_num in jobs.paginator.page_range %}
+            {% if page_num == jobs.number %}
+            <li>
+                <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_num }}</span>
+            </li>
+            {% elif page_num > jobs.number|add:'-3' and page_num < jobs.number|add:'3' %}
+            <li>
+                <a href="?page={{ page_num }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}{% if current_job_type %}&job_type={{ current_job_type }}{% endif %}{% if current_remote %}&remote={{ current_remote }}{% endif %}"
+                   class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if jobs.has_next %}
+            <li>
+                <a href="?page={{ jobs.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}{% if current_job_type %}&job_type={{ current_job_type }}{% endif %}{% if current_remote %}&remote={{ current_remote }}{% endif %}"
+                   class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    {% trans "Next" %}
+                    <span class="mdi mdi-chevron-right"></span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Jobs Found -->
+    <div class="text-center py-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
+            <span class="mdi mdi-briefcase-search-outline text-4xl text-gray-400"></span>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{% trans "No jobs found" %}</h3>
+        <p class="text-gray-500 mb-6">{% trans "Try adjusting your search or filters to find what you're looking for." %}</p>
+        <a href="{% url 'careers:template:home' %}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition-colors">
+            <span class="mdi mdi-refresh mr-2"></span>
+            {% trans "Clear Filters" %}
+        </a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- About Company Section -->
+{% if site.show_company_info and site.company_description %}
+<section id="about" class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">{% trans "About Us" %}</h2>
+        <div class="prose prose-lg max-w-4xl mx-auto text-gray-600">
+            {{ site.company_description|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Company Values -->
+{% if site.show_values and site.values_content %}
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">{% trans "Our Values" %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for value in site.values_content %}
+            <div class="text-center p-6">
+                {% if value.icon %}
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                    <span class="mdi {{ value.icon }} text-3xl text-primary"></span>
+                </div>
+                {% endif %}
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ value.title }}</h3>
+                <p class="text-gray-600">{{ value.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Benefits Section -->
+{% if site.show_benefits and site.benefits_content %}
+<section id="benefits" class="bg-gradient-to-r from-primary to-secondary text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">{% trans "Why Work With Us" %}</h2>
+        <div class="prose prose-lg prose-invert max-w-4xl mx-auto">
+            {{ site.benefits_content|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Job Alert CTA -->
+<section class="bg-gray-900 text-white py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">{% trans "Don't See the Right Role?" %}</h2>
+        <p class="text-gray-300 text-lg mb-8">{% trans "Sign up for job alerts and be the first to know about new opportunities." %}</p>
+        <a href="{% url 'careers:template:alert-subscribe' %}" class="inline-flex items-center px-8 py-4 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            <span class="mdi mdi-bell-outline mr-2"></span>
+            {% trans "Get Job Alerts" %}
+        </a>
+    </div>
+</section>
+{% endblock %}

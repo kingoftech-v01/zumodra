@@ -1,0 +1,28 @@
+{% load static i18n %}
+
+{#
+    Time to Hire Chart Component
+
+    Usage: {% include "analytics/charts/time_to_hire.html" %}
+
+    This template returns JSON data for HTMX chart updates
+#}
+
+<script type="application/json">
+{
+    "labels": {{ time_labels|safe }},
+    "datasets": [{
+        "label": "{% trans 'Time to Hire (Days)' %}",
+        "data": {{ time_data|safe }},
+        "fill": true,
+        "backgroundColor": "rgba(59, 130, 246, 0.1)",
+        "borderColor": "rgb(59, 130, 246)",
+        "borderWidth": 2,
+        "tension": 0.4,
+        "pointRadius": 4,
+        "pointBackgroundColor": "rgb(59, 130, 246)",
+        "pointBorderColor": "#fff",
+        "pointBorderWidth": 2
+    }]
+}
+</script>

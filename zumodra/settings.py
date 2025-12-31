@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
+
 import environ
 from django.utils.translation import gettext_lazy as _
 
@@ -30,11 +33,28 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+# SECURITY: ALLOWED_HOSTS should be explicitly set in production
+# Default to localhost for development only - NEVER use '*' in production
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.localhost'])
 
-# Application definition
+# =============================================================================
+# MULTI-TENANT CONFIGURATION
+# =============================================================================
+# django-tenants: Shared apps run on public schema, tenant apps on tenant schemas
+
 SHARED_APPS = [
-    
+    'django_tenants',            # Must be first for multi-tenancy
+    'django.contrib.contenttypes',
+    'django.contrib.sites',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Tenant management apps (shared across all tenants)
+    'tenants',
+    'main',
 ]
 
 TENANT_APPS = [
@@ -66,7 +86,12 @@ TENANT_APPS = [
     'allauth.socialaccount.providers.linkedin',
 ]
 
+# Combined list of all installed apps
 INSTALLED_APPS = [
+    # Django Tenants (must be first)
+    'django_tenants',
+
+    # Django Core Apps
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -78,12 +103,14 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.gis',
 
+    # Two-Factor Authentication
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_hotp',
     'django_otp.plugins.otp_email',
     'django_otp.plugins.otp_static',
 
+    # Allauth Authentication
     'allauth_2fa',
     'allauth',
     'allauth.mfa',
@@ -94,35 +121,32 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.linkedin',
 
+    # Third-Party UI/Forms
     'widget_tweaks',
     'tinymce',
     'leaflet',
-    # 'campaign',
+    'crispy_forms',
 
-    'analytical',                # django-analytical for analytics
-    'newsletter',                # newsletters
-    # 'drip',                  # django-campaign for newsletter campaigns
-    # 'leads',              # leads management
-    # 'clickify',           # click tracking
-    # 'simple_history',            # model history
-    'auditlog',                  # audit logs
-    'user_agents',               # user agent detection
-    # 'geoip2',                    # geo ip lookup
-    'import_export',             # admin import/export
-    # 'django_celery',             # async tasks
-    'rest_framework',            # API framework
-    'crispy_forms',              # enhanced forms
-    'sorl.thumbnail',            # thumbnails
+    # Analytics & Tracking
+    'analytical',
+    'newsletter',
+    'auditlog',
+    'user_agents',
+    'import_export',
+    'sorl.thumbnail',
     'phonenumber_field',
 
+    # Security
     'admin_honeypot',
     'csp',
     'axes',
     'sslserver',
 
+    # Task Scheduling
     'django_q',
     'django_extensions',
 
+    # Wagtail CMS
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -140,11 +164,21 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
 
+    # REST API & Documentation
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'django_filters',
+    'corsheaders',
+    'drf_spectacular',
+
+    # WebSockets
+    'channels',
+
+    # Zumodra Core Apps
     'custom_account_u',
     'main',
     'blog',
     'finance',
-    'channels',
     'messages_sys',
     'configurations',
     'dashboard_service',
@@ -152,23 +186,33 @@ INSTALLED_APPS = [
     'services',
     'appointment.apps.AppointmentConfig',
 
-    # REST API
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'django_filters',
-    'corsheaders',
-
-    # New apps
+    # API & Features
     'api',
     'notifications',
     'analytics',
+
+    # HR & ATS apps
+    'ats',
+    'careers',
+    'hr_core',
+    'tenants',
+    'accounts',
+    'ai_matching',
+    'integrations',
+
+    # Infrastructure & Utilities
+    'core',
+    'security',
+    'marketing',
 ]
 
 # INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
-TENANT_MODEL = "main.Tenant"
-
-TENANT_DOMAIN_MODEL = "main.Domain"
+# Multi-tenant model configuration
+# NOTE: Models are defined in tenants.models but re-exported from main.models
+# for backwards compatibility. Either path works due to the re-export.
+TENANT_MODEL = "tenants.Tenant"
+TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 SITE_ID = 1
 
@@ -179,27 +223,46 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
-    # 'django_tenants.middleware.main.TenantMainMiddleware',
+    # Multi-Tenancy (must be first)
+    'django_tenants.middleware.main.TenantMainMiddleware',
+
+    # Security
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # CORS (must be before CommonMiddleware)
+    'corsheaders.middleware.CorsMiddleware',
+
+    # Session & Common
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
+    # Authentication
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'custom_account_u.middleware.Require2FAMiddleware',
     'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
+
+    # Messages & Security
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'custom_account_u.middleware.AuthSecurityMiddleware',
+
+    # Audit & History
     'simple_history.middleware.HistoryRequestMiddleware',
     'auditlog.middleware.AuditlogMiddleware',
+
+    # Content Security Policy
     'csp.middleware.CSPMiddleware',
+
+    # Rate Limiting
     'axes.middleware.AxesMiddleware',
+
+    # Wagtail
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    # 'wagtail.core.middleware.SiteMiddleware',
-    # 'wagtail_localize.middleware.LocalizeMiddleware',
 ]
 
 ROOT_URLCONF = 'zumodra.urls'
@@ -236,7 +299,8 @@ ASGI_APPLICATION = 'zumodra.asgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE', default='django.contrib.gis.db.backends.postgis'),
+        # Use django-tenants database backend wrapper for PostGIS
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': env('DB_DEFAULT_NAME', default='zumodra'),
         'USER': env('DB_USER', default='postgres'),
         'PASSWORD': env('DB_PASSWORD'),
@@ -245,7 +309,13 @@ DATABASES = {
     }
 }
 
+# Original backend for django-tenants to wrap (PostGIS for geospatial support)
 ORIGINAL_BACKEND = "django.contrib.gis.db.backends.postgis"
+
+# Database routers for multi-tenancy
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -379,9 +449,13 @@ LOGOUT_REDIRECT_URL = '/'
 
 LOGIN_URL = '/accounts/login/'
 
-# Session Settings
-SESSION_COOKIE_AGE = 1209600  # Two weeks in seconds
+# Session Settings - SECURITY HARDENED
+# Reduced session age from 2 weeks to 8 hours for security
+SESSION_COOKIE_AGE = 28800  # 8 hours in seconds
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection for cross-site requests
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Session persists for SESSION_COOKIE_AGE
 
 # Custom Settings
 MAX_LOGIN_ATTEMPTS = 7
@@ -400,21 +474,86 @@ USER_TRACKING_EXCLUDE_SUPERUSER = True        # Don't track admin users to reduc
 # django-campaign-manager (alpha) example settings
 CAMPAIGN_MANAGER_USE_API = False                # Using direct DB or API (planned future)
 
-# django-celery example configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+# ==================== CELERY CONFIGURATION ====================
+
+# Broker settings (Redis)
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/1')
+
+# Serialization
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
-# REST framework example settings
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ),
+# Timezone
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+
+# Task result settings
+CELERY_RESULT_EXPIRES = 86400  # 24 hours
+CELERY_RESULT_EXTENDED = True
+
+# Task execution settings
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_TASK_TIME_LIMIT = 3600  # 1 hour hard limit
+CELERY_TASK_SOFT_TIME_LIMIT = 3300  # 55 minutes soft limit
+
+# Worker settings
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
+CELERY_WORKER_PREFETCH_MULTIPLIER = 4
+CELERY_WORKER_CONCURRENCY = env.int('CELERY_WORKER_CONCURRENCY', default=4)
+
+# Compression
+CELERY_TASK_COMPRESSION = 'gzip'
+CELERY_RESULT_COMPRESSION = 'gzip'
+
+# Retry settings
+CELERY_TASK_DEFAULT_RETRY_DELAY = 60  # 1 minute
+CELERY_TASK_MAX_RETRIES = 3
+
+# Task routing
+CELERY_TASK_ROUTES = {
+    # Email tasks
+    'newsletter.tasks.*': {'queue': 'emails'},
+    'notifications.tasks.send_*': {'queue': 'emails'},
+    'zumodra.tasks.send_daily_digest': {'queue': 'emails'},
+
+    # Payment tasks
+    'finance.tasks.*': {'queue': 'payments'},
+    'tenants.tasks.process_subscription_*': {'queue': 'payments'},
+
+    # Analytics tasks
+    'analytics.tasks.*': {'queue': 'analytics'},
+
+    # Notification tasks
+    'notifications.tasks.*': {'queue': 'notifications'},
+    'messages_sys.tasks.*': {'queue': 'notifications'},
+
+    # HR tasks
+    'hr_core.tasks.*': {'queue': 'hr'},
+    'accounts.tasks.*': {'queue': 'hr'},
+
+    # ATS tasks
+    'ats.tasks.*': {'queue': 'ats'},
+    'careers.tasks.*': {'queue': 'ats'},
 }
+
+# Task rate limits
+CELERY_TASK_ANNOTATIONS = {
+    'newsletter.tasks.send_newsletter': {'rate_limit': '50/m'},
+    'notifications.tasks.send_email_notification': {'rate_limit': '100/m'},
+    'finance.tasks.process_payment': {'rate_limit': '30/m'},
+    'analytics.tasks.calculate_daily_metrics': {'rate_limit': '2/m'},
+    'ats.tasks.calculate_match_scores': {'rate_limit': '20/m'},
+}
+
+# Celery Beat scheduler
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# ==================== END CELERY CONFIGURATION ====================
+
 
 # crispy forms layout setting
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -447,31 +586,7 @@ NEWSLETTER_SEND_ASYNC = True                   # Use async sending if configured
 NEWSLETTER_FROM_EMAIL = DEFAULT_FROM_EMAIL
 NEWSLETTER_UNSUBSCRIBE_CONFIRMATION = True
 
-# Channels
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',  # for production
-#         'CONFIG': {
-#             "hosts": [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
-# For scalable production use with Redis, add:
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
-#     },
-# }
-# Development only
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
-}
-# End Channels
+# Channels configuration is defined in the CHANNELS / WEBSOCKET CONFIGURATION section below
 
 # Messaging system settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 55 * 1024 * 1024  # 55 MB
@@ -537,9 +652,28 @@ TINYMCE_DEFAULT_CONFIG = {
     'image_advtab': True,    # Onglet avancé sur images
     'file_picker_types': 'image media',  # Types de fichiers autorisés
 
-    # # Sécurité / nettoyage
+    # # Sécurité / nettoyage - SECURITY HARDENED
     'cleanup_on_startup': True,
-    'valid_elements': '*[*]',  # Accepte tous les éléments (attention)
+    # SECURITY: Whitelist only safe HTML elements to prevent XSS
+    # This replaces the dangerous '*[*]' that allowed any HTML
+    'valid_elements': (
+        'p[class],br,strong/b,em/i,u,s,strike,sub,sup,'
+        'h1[class],h2[class],h3[class],h4[class],h5[class],h6[class],'
+        'blockquote[class],pre,code,'
+        'ul[class],ol[class],li,'
+        'a[href|target|class|rel],img[src|alt|class|width|height],'
+        'table[class],thead,tbody,tr,th[class],td[class],'
+        'div[class],span[class],'
+        'hr,figure[class],figcaption'
+    ),
+    # Block dangerous attributes that could execute scripts
+    'invalid_elements': 'script,iframe,object,embed,form,input,button,select,textarea,style,link,meta',
+    # Sanitize pasted content
+    'paste_data_images': True,
+    'paste_remove_styles_if_webkit': True,
+    'paste_strip_class_attributes': 'mso',
+    # Remove event handlers from pasted content
+    'extended_valid_elements': 'a[href|target=_blank|class|rel=noopener]',
 
     'formats': {
         'p': {'classes': 'mil-mb-30'},
@@ -631,37 +765,67 @@ else:
 # ==================== REST FRAMEWORK CONFIGURATION ====================
 
 REST_FRAMEWORK = {
+    # Schema for API documentation
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+
+    # Permissions - Default to IsAuthenticated for security
+    # Public endpoints must explicitly use IsAuthenticatedOrReadOnly or AllowAny
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
+
+    # Pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+
+    # Filtering
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+
+    # Rate Limiting - Stricter for security
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',
-        'user': '1000/hour'
+        'user': '1000/hour',
+        # Strict rate limits for sensitive endpoints
+        'auth': '5/minute',           # Login/logout
+        'token': '10/minute',         # JWT token endpoints
+        'password': '3/minute',       # Password reset/change
+        'registration': '5/hour',     # User registration
+        'file_upload': '20/hour',     # File uploads
+        'export': '10/hour',          # Data exports
     },
+
+    # Renderers - BrowsableAPIRenderer disabled in production for security
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ],
+    ] + (
+        ['rest_framework.renderers.BrowsableAPIRenderer'] if DEBUG else []
+    ),
+
+    # Versioning
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
+
+    # Exception Handling
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 }
 
 # ==================== JWT CONFIGURATION ====================
-
-from datetime import timedelta
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
@@ -681,12 +845,17 @@ SIMPLE_JWT = {
 
 # ==================== CORS CONFIGURATION ====================
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React dev server
-    "http://localhost:8080",  # Vue dev server  
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8080",
-]
+# Production CORS origins - configure via environment variable
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
+
+# Development CORS origins - only in DEBUG mode
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://localhost:3000",  # React dev server
+        "http://localhost:8080",  # Vue dev server
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8080",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -768,26 +937,258 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 # Add to MIDDLEWARE (already exists, but noting for reference)
 # 'analytics.middleware.AnalyticsMiddleware',  # Track page views
 
-# ==================== CELERY TASK ROUTING ====================
+# ==================== API DOCUMENTATION (drf-spectacular) ====================
 
-CELERY_TASK_ROUTES = {
-    'analytics.tasks.*': {'queue': 'analytics'},
-    'notifications.tasks.*': {'queue': 'notifications'},
-    'services.tasks.*': {'queue': 'services'},
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Zumodra API',
+    'DESCRIPTION': '''
+    Zumodra Multi-Tenant SaaS Platform REST API
+
+    A comprehensive freelance services marketplace with integrated CRM tools,
+    appointment booking, escrow payments, real-time messaging, email marketing,
+    and content management.
+
+    ## Features
+    - Multi-tenant architecture for enterprise scalability
+    - JWT and Session authentication
+    - Role-based access control (RBAC)
+    - Real-time WebSocket messaging
+    - Geospatial service matching via PostGIS
+    - Stripe escrow payments and subscriptions
+    - HR/ATS workflow management
+
+    ## Authentication
+    Use Bearer token authentication for API requests:
+    ```
+    Authorization: Bearer <your-access-token>
+    ```
+    ''',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    # Schema configuration
+    'SCHEMA_PATH_PREFIX': r'/api/v[0-9]',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAdminUser'],
+
+    # Swagger UI settings
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'filter': True,
+    },
+
+    # ReDoc settings
+    'REDOC_UI_SETTINGS': {
+        'hideDownloadButton': False,
+    },
+
+    # Contact information
+    'CONTACT': {
+        'name': 'Zumodra Support',
+        'email': 'support@zumodra.com',
+    },
+
+    # License
+    'LICENSE': {
+        'name': 'Proprietary',
+    },
+
+    # Tags for API organization
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User authentication and JWT token management'},
+        {'name': 'Users', 'description': 'User profile and account management'},
+        {'name': 'Services', 'description': 'Service listing and marketplace operations'},
+        {'name': 'Appointments', 'description': 'Appointment booking and scheduling'},
+        {'name': 'Finance', 'description': 'Payments, escrow, and subscriptions'},
+        {'name': 'Messages', 'description': 'Real-time messaging system'},
+        {'name': 'HR', 'description': 'Human resources and talent management'},
+        {'name': 'ATS', 'description': 'Applicant tracking system'},
+        {'name': 'Analytics', 'description': 'Platform analytics and reporting'},
+        {'name': 'Tenants', 'description': 'Multi-tenant management'},
+    ],
+
+    # Component split for better organization
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+
+    # Enum naming
+    'ENUM_NAME_OVERRIDES': {},
+
+    # Extensions
+    'EXTENSIONS_INFO': {},
 }
 
-# ==================== API DOCUMENTATION ====================
+# ==================== CELERY CONFIGURATION ====================
 
-# Optional: Add drf-spectacular for OpenAPI/Swagger documentation
-# Uncomment after installing: pip install drf-spectacular
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_CONCURRENCY = 4
 
-# INSTALLED_APPS += ['drf_spectacular']
+# Celery Beat schedule for periodic tasks
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-expired-sessions': {
+        'task': 'main.tasks.cleanup_expired_sessions',
+        'schedule': 3600.0,  # Every hour
+    },
+    'send-scheduled-newsletters': {
+        'task': 'newsletter.tasks.send_scheduled_newsletters',
+        'schedule': 300.0,  # Every 5 minutes
+    },
+    'update-analytics': {
+        'task': 'analytics.tasks.update_daily_analytics',
+        'schedule': 86400.0,  # Every day
+    },
+}
 
-# REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+# ==================== CHANNELS / WEBSOCKET CONFIGURATION ====================
+# Optimized for 500K concurrent users
 
-# SPECTACULAR_SETTINGS = {
-#     'TITLE': 'Zumodra API',
-#     'DESCRIPTION': 'Zumodra Service Marketplace REST API',
-#     'VERSION': '1.0.0',
-#     'SERVE_INCLUDE_SCHEMA': False,
+# Parse Redis hosts for potential cluster configuration
+REDIS_CHANNEL_URL = env('REDIS_CHANNEL_URL', default=env('REDIS_URL', default='redis://127.0.0.1:6379/1'))
+
+# Production Redis configuration (scaled for 500K concurrent users)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_CHANNEL_URL],
+            # Capacity: Max messages per channel before oldest are dropped
+            # For 500K users: ~100K concurrent connections per server
+            'capacity': 100000,
+            # Expiry: How long messages stay in channel (seconds)
+            'expiry': 60,
+            # Group expiry: How long group membership lasts
+            'group_expiry': 86400,  # 24 hours
+            # Symmetric encryption key (set in production for security)
+            # 'symmetric_encryption_keys': [env('CHANNEL_ENCRYPTION_KEY', default='')],
+        },
+    },
+}
+
+# Redis connection pool settings for high concurrency
+CHANNEL_REDIS_CONNECTION_POOL_SIZE = env.int('CHANNEL_REDIS_POOL_SIZE', default=100)
+
+# WebSocket rate limiting settings
+WEBSOCKET_MAX_MESSAGES_PER_SECOND = env.int('WEBSOCKET_RATE_LIMIT', default=10)
+WEBSOCKET_MAX_FILE_SIZE_MB = env.int('WEBSOCKET_MAX_FILE_MB', default=50)
+
+# Development configuration (InMemory - uncomment for local dev without Redis)
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     }
 # }
+
+# ==================== CACHING CONFIGURATION ====================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': env('REDIS_URL', default='redis://127.0.0.1:6379/2'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'zumodra',
+    },
+    'axes': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': env('REDIS_URL', default='redis://127.0.0.1:6379/3'),
+    },
+}
+
+# Session backend using cache
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+# ==================== FILE STORAGE CONFIGURATION ====================
+
+# AWS S3 Configuration (enable for production)
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default='')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default='')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default='zumodra-media')
+AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_FILE_OVERWRITE = False
+
+# Use S3 for media storage in production
+if not DEBUG and AWS_ACCESS_KEY_ID:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# ==================== TWILIO CONFIGURATION ====================
+
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
+
+# ==================== OPENAI CONFIGURATION ====================
+
+OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
+OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4')
+
+# ==================== TENANT CONFIGURATION ====================
+
+# Public schema URL routing
+PUBLIC_SCHEMA_URLCONF = 'zumodra.urls_public'
+
+# Default tenant schema
+DEFAULT_SCHEMA_NAME = 'public'
+
+# Auto-create public tenant
+AUTO_CREATE_PUBLIC_SCHEMA = True
+
+# Tenant subfolder prefix for static/media
+MULTITENANT_RELATIVE_MEDIA_ROOT = '%s/media'
+
+# ==================== SECURITY HEADERS ====================
+
+# Content Security Policy (configured via django-csp middleware)
+# Note: unsafe-inline/unsafe-eval needed for HTMX and some JS libraries
+# In strict production, use nonces instead and remove these directives
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+    "https://js.stripe.com",
+) + (("'unsafe-inline'", "'unsafe-eval'") if DEBUG else ())
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",  # Required for HTMX dynamic styles
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+)
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com", "data:")
+CSP_IMG_SRC = ("'self'", "data:", "https:", "blob:")
+CSP_CONNECT_SRC = (
+    "'self'",
+    "wss:",
+    "https:",
+    "https://api.stripe.com",
+)
+CSP_FRAME_SRC = ("'self'", "https://js.stripe.com")
+CSP_FRAME_ANCESTORS = ("'self'",)
+CSP_OBJECT_SRC = ("'none'",)
+CSP_BASE_URI = ("'self'",)
+CSP_FORM_ACTION = ("'self'",)
+
+# ==================== FEATURE FLAGS ====================
+
+FEATURE_FLAGS = {
+    'ENABLE_2FA': env.bool('FEATURE_ENABLE_2FA', default=True),
+    'ENABLE_ESCROW': env.bool('FEATURE_ENABLE_ESCROW', default=True),
+    'ENABLE_WEBSOCKETS': env.bool('FEATURE_ENABLE_WEBSOCKETS', default=True),
+    'ENABLE_AI_MATCHING': env.bool('FEATURE_ENABLE_AI_MATCHING', default=False),
+    'ENABLE_SMS_NOTIFICATIONS': env.bool('FEATURE_ENABLE_SMS_NOTIFICATIONS', default=False),
+}

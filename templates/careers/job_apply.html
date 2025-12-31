@@ -1,0 +1,249 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Apply" %} - {{ job.title }} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'careers:job_list' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {% trans "Jobs" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'careers:job_detail' job.id %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {{ job.title|truncatewords:3 }}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Apply" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Apply for Position" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Application Form -->
+        <div class="lg:col-span-2">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- CV Selection -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Resume / CV" %}</h2>
+
+                    {% include "components/cv_selector.html" with cvs=user_cvs recommended_cv=recommended_cv %}
+
+                    <!-- Or Upload New -->
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{% trans "Or upload a different resume:" %}</p>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="resume_file" class="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="font-medium">{% trans "Click to upload" %}</span> {% trans "or drag and drop" %}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PDF, DOC, DOCX (MAX. 10MB)</p>
+                                </div>
+                                <input id="resume_file" name="resume_file" type="file" class="hidden" accept=".pdf,.doc,.docx">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cover Letter -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Cover Letter" %}</h2>
+
+                    <div>
+                        <label for="cover_letter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {% trans "Why are you interested in this position?" %}
+                        </label>
+                        <textarea id="cover_letter"
+                                  name="cover_letter"
+                                  rows="6"
+                                  class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                                  placeholder="{% trans 'Tell us about your relevant experience and why you would be a great fit...' %}">{{ form.cover_letter.value|default:"" }}</textarea>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Tip: Mention specific skills and experiences that match the job requirements." %}</p>
+                    </div>
+                </div>
+
+                <!-- Additional Questions -->
+                {% if job.screening_questions %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Screening Questions" %}</h2>
+
+                    <div class="space-y-6">
+                        {% for question in job.screening_questions %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {{ question.question }}
+                                {% if question.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            {% if question.type == 'text' %}
+                            <input type="text"
+                                   name="q_{{ question.id }}"
+                                   {% if question.required %}required{% endif %}
+                                   class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            {% elif question.type == 'textarea' %}
+                            <textarea name="q_{{ question.id }}"
+                                      rows="3"
+                                      {% if question.required %}required{% endif %}
+                                      class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"></textarea>
+                            {% elif question.type == 'select' %}
+                            <select name="q_{{ question.id }}"
+                                    {% if question.required %}required{% endif %}
+                                    class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <option value="">{% trans "Select an option" %}</option>
+                                {% for option in question.options %}
+                                <option value="{{ option }}">{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif question.type == 'yesno' %}
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="q_{{ question.id }}" value="yes" {% if question.required %}required{% endif %}
+                                           class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "Yes" %}</span>
+                                </label>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="q_{{ question.id }}" value="no"
+                                           class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "No" %}</span>
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Availability -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Availability" %}</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="available_start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {% trans "Earliest Start Date" %}
+                            </label>
+                            <input type="date"
+                                   id="available_start_date"
+                                   name="available_start_date"
+                                   class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="salary_expectation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {% trans "Salary Expectation" %} <span class="text-gray-400">({% trans "optional" %})</span>
+                            </label>
+                            <input type="text"
+                                   id="salary_expectation"
+                                   name="salary_expectation"
+                                   placeholder="{% trans 'e.g., $60,000 - $70,000' %}"
+                                   class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex items-center justify-between">
+                    <a href="{% url 'careers:job_detail' job.id %}"
+                       class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        {% trans "Cancel" %}
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-8 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-sm transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {% trans "Submit Application" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Job Summary Sidebar -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-24 space-y-6">
+                <!-- Job Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ job.title }}</h3>
+
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            {{ job.company_name }}
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            </svg>
+                            {{ job.location|default:"Remote" }}
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ job.salary_range|default:"Competitive" }}
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            {{ job.get_job_type_display }}
+                        </div>
+                    </div>
+
+                    {% if job.deadline %}
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Application Deadline" %}</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ job.deadline|date:"F d, Y" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tips -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                    <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">{% trans "Application Tips" %}</h4>
+                    <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Choose the CV that best matches this role" %}
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Personalize your cover letter" %}
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Answer all required questions" %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,295 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}{{ meta_title|default:"Careers" }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ meta_description|default:"Join our team. View open positions and apply." }}{% endblock %}">
+    {% if meta_keywords %}<meta name="keywords" content="{{ meta_keywords }}">{% endif %}
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ meta_title|default:'Careers' }}">
+    <meta property="og:description" content="{{ meta_description|default:'Join our team' }}">
+    {% if site.og_image %}<meta property="og:image" content="{{ site_serialized.og_image_url }}">{% endif %}
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta_title|default:'Careers' }}">
+    <meta name="twitter:description" content="{{ meta_description|default:'Join our team' }}">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <!-- Favicon -->
+    {% if site_serialized.favicon_url %}
+    <link rel="icon" href="{{ site_serialized.favicon_url }}" type="image/x-icon">
+    {% else %}
+    <link rel="icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
+    {% endif %}
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '{{ site.primary_color|default:"#3B82F6" }}',
+                        secondary: '{{ site.secondary_color|default:"#1E40AF" }}',
+                        accent: '{{ site.accent_color|default:"#10B981" }}',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Dynamic CSS Variables for Branding -->
+    <style>
+        :root {
+            --primary-color: {{ site.primary_color|default:"#3B82F6" }};
+            --secondary-color: {{ site.secondary_color|default:"#1E40AF" }};
+            --accent-color: {{ site.accent_color|default:"#10B981" }};
+            --text-color: {{ site.text_color|default:"#1F2937" }};
+            --background-color: {{ site.background_color|default:"#FFFFFF" }};
+        }
+
+        body {
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .text-primary {
+            color: var(--primary-color);
+        }
+
+        .bg-primary {
+            background-color: var(--primary-color);
+        }
+
+        .border-primary {
+            border-color: var(--primary-color);
+        }
+
+        .ring-primary:focus {
+            --tw-ring-color: var(--primary-color);
+        }
+
+        /* RTL Support */
+        [dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
+        [dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
+        [dir="rtl"] .text-left { text-align: right; }
+        [dir="rtl"] .text-right { text-align: left; }
+
+        /* Form Styles */
+        .form-input, .form-textarea, .form-select {
+            @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors;
+        }
+
+        .form-checkbox {
+            @apply w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary;
+        }
+
+        .form-file {
+            @apply w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-secondary;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        {{ site.custom_css|safe }}
+    </style>
+
+    {% block extra_head %}{% endblock %}
+
+    <!-- Analytics -->
+    {% if site.google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ site.google_analytics_id }}');
+    </script>
+    {% endif %}
+
+    {% if site.facebook_pixel_id %}
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ site.facebook_pixel_id }}');
+        fbq('track', 'PageView');
+    </script>
+    {% endif %}
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded">
+        {% trans "Skip to main content" %}
+    </a>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="{% url 'careers:template:home' %}" class="flex items-center">
+                    {% if site_serialized.logo_url %}
+                    <img src="{{ site_serialized.logo_url }}" alt="{{ site.title }}" class="h-10 w-auto">
+                    {% else %}
+                    <span class="text-2xl font-bold" style="color: var(--primary-color);">{{ site.title|default:"Careers" }}</span>
+                    {% endif %}
+                </a>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="{% url 'careers:template:home' %}" class="text-gray-600 hover:text-primary font-medium transition-colors">
+                        {% trans "All Jobs" %}
+                    </a>
+                    {% if site.show_company_info %}
+                    <a href="#about" class="text-gray-600 hover:text-primary font-medium transition-colors">
+                        {% trans "About Us" %}
+                    </a>
+                    {% endif %}
+                    {% if site.show_benefits %}
+                    <a href="#benefits" class="text-gray-600 hover:text-primary font-medium transition-colors">
+                        {% trans "Benefits" %}
+                    </a>
+                    {% endif %}
+                </nav>
+
+                <!-- Mobile menu button -->
+                <button type="button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100" onclick="toggleMobileMenu()">
+                    <span class="sr-only">{% trans "Open menu" %}</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{% url 'careers:template:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">
+                    {% trans "All Jobs" %}
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Company Info -->
+                <div>
+                    {% if site_serialized.logo_url %}
+                    <img src="{{ site_serialized.logo_url }}" alt="{{ site.title }}" class="h-10 w-auto mb-4 brightness-0 invert">
+                    {% else %}
+                    <span class="text-2xl font-bold">{{ site.title|default:"Careers" }}</span>
+                    {% endif %}
+                    <p class="text-gray-400 mt-4">{{ site.tagline|default:"Join our amazing team" }}</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">{% trans "Quick Links" %}</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{% url 'careers:template:home' %}" class="text-gray-400 hover:text-white transition-colors">
+                                {% trans "View All Jobs" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'careers:template:alert-subscribe' %}" class="text-gray-400 hover:text-white transition-colors">
+                                {% trans "Job Alerts" %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">{% trans "Connect With Us" %}</h3>
+                    <div class="flex space-x-4">
+                        {% for link in site_serialized.social_links %}
+                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors" aria-label="{{ link.platform }}">
+                            <span class="mdi {{ link.icon }} text-2xl"></span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; {% now "Y" %} {{ site.title|default:"Company" }}. {% trans "All rights reserved." %}</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+Your Data Request is Complete
+=============================
+
+Dear {{ user.first_name|default:user.email }},
+
+Good news! Your {{ request_type }} request has been processed successfully.
+
+Request Details:
+- Request ID: {{ request.uuid }}
+- Submitted: {{ request.submitted_at }}
+- Completed: {{ request.completed_at }}
+
+{% if request.response_file %}
+Your data export is ready for download. Please note that the download link
+will expire in 30 days.
+
+Download URL: {{ download_url }}
+
+SECURITY REMINDER: This export contains your personal information.
+Please store it securely and delete it when no longer needed.
+{% endif %}
+
+If you have any questions about your data or this request, please contact
+our Data Protection Officer.
+
+Best regards,
+The Privacy Team
+
+---
+This email was sent in response to your data subject request under GDPR.
+(c) {{ year }} Zumodra. All rights reserved.

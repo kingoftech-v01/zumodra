@@ -1,0 +1,233 @@
+{# =============================================================================
+   ZUMODRA DASHBOARD BASE TEMPLATE
+   =============================================================================
+
+   File: templates/base/dashboard_base.html
+   Purpose: Base template for all authenticated dashboard pages
+
+   EXTENDS: base/base.html
+
+   TEMPLATE HIERARCHY:
+   base/base.html
+   └── base/dashboard_base.html (this file)
+       └── ats/job_list.html, hr/employee_list.html, etc.
+
+   BLOCKS AVAILABLE (inherited + new):
+   - breadcrumb: Navigation breadcrumb items
+   - page_header: Override entire page header section
+   - page_title: Page heading text
+   - page_description: Subtitle/description under heading
+   - page_actions: Action buttons (New, Export, etc.)
+   - content: Main page content area
+
+   LAYOUT STRUCTURE:
+   ┌─────────────────────────────────────────────┐
+   │ Sidebar │ Header (with search & user menu) │
+   │         ├─────────────────────────────────────┤
+   │         │ Breadcrumb                          │
+   │         ├─────────────────────────────────────┤
+   │         │ Page Title          [Page Actions] │
+   │         ├─────────────────────────────────────┤
+   │         │ Flash Messages                      │
+   │         ├─────────────────────────────────────┤
+   │         │ Content Area                        │
+   │         │                                     │
+   └─────────┴─────────────────────────────────────┘
+
+   COMPONENTS INCLUDED:
+   - components/sidebar.html: Left navigation menu
+   - components/header.html: Top bar with search, notifications, user
+
+   FEATURES:
+   - Collapsible sidebar (sidebarOpen state)
+   - Keyboard shortcuts (Cmd/Ctrl+K for search, Escape to close)
+   - Flash message display with dismiss
+   - Modal container for HTMX modals
+
+   KEYBOARD SHORTCUTS:
+   - Cmd/Ctrl + K: Focus global search
+   - Escape: Close modals and dropdowns
+
+   Author: Rhematek Solutions
+   Last Updated: 2025-12-30
+   ============================================================================= #}
+
+{% extends "base/base.html" %}
+{% load static i18n %}
+
+{% block body %}
+{# ===== DASHBOARD LAYOUT CONTAINER ===== #}
+{# Flexbox layout with fixed sidebar and scrollable content area #}
+<div class="flex h-screen overflow-hidden">
+
+    {# ===== SIDEBAR NAVIGATION ===== #}
+    {# Collapsible left navigation menu #}
+    {# State controlled by sidebarOpen variable from parent template #}
+    {% include "components/sidebar.html" %}
+
+    {# ===== MAIN CONTENT AREA ===== #}
+    {# Flex column layout: header (fixed) + scrollable content #}
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        {# ===== TOP HEADER BAR ===== #}
+        {# Contains: hamburger menu, search, notifications, user menu #}
+        {% include "components/header.html" %}
+
+        {# ===== SCROLLABLE MAIN CONTENT ===== #}
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+
+            {# ===== BREADCRUMB NAVIGATION ===== #}
+            {# Hierarchical navigation showing current location #}
+            {# Home icon is always first, child templates add additional items #}
+            <div class="px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2">
+                        {# Home/Dashboard link - always present #}
+                        <li>
+                            <a href="{% url 'dashboard:index' %}" class="text-gray-400 hover:text-gray-500">
+                                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                                </svg>
+                            </a>
+                        </li>
+                        {# Additional breadcrumb items from child templates #}
+                        {# Example usage:
+                           {% block breadcrumb %}
+                           <li><span class="text-gray-400">/</span></li>
+                           <li><a href="{% url 'ats:jobs' %}" class="text-gray-500">Jobs</a></li>
+                           <li><span class="text-gray-400">/</span></li>
+                           <li><span class="text-gray-900">Current Page</span></li>
+                           {% endblock %}
+                        #}
+                        {% block breadcrumb %}{% endblock %}
+                    </ol>
+                </nav>
+            </div>
+
+            {# ===== PAGE HEADER SECTION ===== #}
+            {# Contains page title, description, and action buttons #}
+            {# Override entire block with page_header, or use sub-blocks #}
+            {% block page_header %}
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="md:flex md:items-center md:justify-between">
+                    {# Left side: Title and description #}
+                    <div class="flex-1 min-w-0">
+                        {# Page title - required for every page #}
+                        <h1 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
+                            {% block page_title %}Dashboard{% endblock %}
+                        </h1>
+                        {# Optional subtitle/description #}
+                        {# Example: <p class="mt-1 text-sm text-gray-500">Manage your job postings</p> #}
+                        {% block page_description %}{% endblock %}
+                    </div>
+                    {# Right side: Action buttons #}
+                    {# Example usage:
+                       {% block page_actions %}
+                       <a href="{% url 'ats:job_create' %}" class="btn btn-primary">
+                           + New Job
+                       </a>
+                       {% endblock %}
+                    #}
+                    <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+                        {% block page_actions %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+
+            {# ===== PAGE CONTENT AREA ===== #}
+            <div class="px-4 sm:px-6 lg:px-8 pb-8">
+
+                {# ===== FLASH MESSAGES ===== #}
+                {# Django messages framework integration #}
+                {# Displays success, error, warning, info messages from views #}
+                {# Each message is dismissible with Alpine.js #}
+                {% if messages %}
+                <div class="mb-4 space-y-2">
+                    {% for message in messages %}
+                    <div class="rounded-md p-4 {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/20{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/20{% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-900/20{% else %}bg-blue-50 dark:bg-blue-900/20{% endif %}"
+                         x-data="{ show: true }" x-show="show" x-transition>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if message.tags == 'success' %}
+                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                {% elif message.tags == 'error' %}
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                {% else %}
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <p class="text-sm font-medium {% if message.tags == 'success' %}text-green-800 dark:text-green-200{% elif message.tags == 'error' %}text-red-800 dark:text-red-200{% elif message.tags == 'warning' %}text-yellow-800 dark:text-yellow-200{% else %}text-blue-800 dark:text-blue-200{% endif %}">
+                                    {{ message }}
+                                </p>
+                            </div>
+                            <div class="ml-auto pl-3">
+                                <button @click="show = false" class="inline-flex rounded-md p-1.5 {% if message.tags == 'success' %}text-green-500 hover:bg-green-100 dark:hover:bg-green-800{% elif message.tags == 'error' %}text-red-500 hover:bg-red-100 dark:hover:bg-red-800{% else %}text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800{% endif %} focus:outline-none">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {# ===== MAIN CONTENT BLOCK ===== #}
+                {# Child templates insert their content here #}
+                {# This is where tables, forms, cards, etc. go #}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+{# ===== MODAL CONTAINER ===== #}
+{# HTMX loads modal content into this container #}
+{# Usage: hx-target="#modal-container" hx-swap="innerHTML" #}
+<div id="modal-container"></div>
+
+{% endblock %}
+
+{# ===== DASHBOARD-SPECIFIC JAVASCRIPT ===== #}
+{% block extra_js %}
+{{ block.super }}
+<script>
+    /**
+     * Dashboard Keyboard Shortcuts and Event Handlers
+     *
+     * Shortcuts:
+     * - Cmd/Ctrl + K: Open global search
+     * - Escape: Close modals and dropdowns
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Global keyboard shortcut handler
+        document.addEventListener('keydown', function(e) {
+            // Cmd/Ctrl + K: Focus global search input
+            // Common pattern from Slack, GitHub, VS Code
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('global-search')?.focus();
+            }
+
+            // Escape key: Close all open modals and dropdowns
+            // Works with Alpine.js x-data components that have 'open' state
+            if (e.key === 'Escape') {
+                document.querySelectorAll('[x-data]').forEach(el => {
+                    if (el.__x && el.__x.$data.open) {
+                        el.__x.$data.open = false;
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

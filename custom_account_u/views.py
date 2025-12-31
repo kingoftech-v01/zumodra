@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
 import requests
 from django.http import HttpResponse, HttpResponseServerError
 import hmac
@@ -6,18 +8,19 @@ import hashlib
 import json
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
-import requests
-import requests
 
-MY_API_KEY = 'VOTRE_API_KEY'
-MY_API_SECRET = 'VOTRE_API_SECRET'
+# Get API keys from settings (never hardcode secrets)
+MY_API_KEY = getattr(settings, 'IDENFY_API_KEY', '')
+MY_API_SECRET = getattr(settings, 'IDENFY_API_SECRET', '')
 IDENFY_GENERATE_TOKEN_URL = 'https://ivs.idenfy.com/api/v2/token'
 IDENFY_REDIRECT_URL = 'https://ivs.idenfy.com/api/v2/redirect'
 IDENFY_KYB_URL = 'https://ivs.idenfy.com/api/v2/kyb'
-SECRET_WEBHOOK_KEY = 'VOTRE_CALLBACK_SIGN_KEY'
+SECRET_WEBHOOK_KEY = getattr(settings, 'IDENFY_WEBHOOK_SECRET', '')
 
-# Create your views here.
+
+@login_required
 def launch_kyc_view(request):
+    """Launch KYC verification page - requires authentication."""
     return render(request, 'accounts/launch_kyc.html')
 
 def create_identification_token():
@@ -35,7 +38,9 @@ def create_identification_token():
         print(f"Erreur création token iDenfy : {e}")
         return None
 
+@login_required
 def start_kyc(request):
+    """Start KYC process - requires authentication."""
     token = create_identification_token()
     if token:
         url = f"{IDENFY_REDIRECT_URL}?authToken={token}"
@@ -63,13 +68,15 @@ def generate_face_auth_token(scanRef):
     print("Jeton d’authentification faciale :", response.json())
     return response.json()
 
-def start_face_auth(scanRef):
+@login_required
+def start_face_auth(request, scanRef):
+    """Start face authentication - requires authentication."""
     token = generate_face_auth_token(scanRef)
     if token:
         url = f"https://ivs.idenfy.com/identification/facial-auth/{scanRef}/start/?authToken={token['authToken']}"
         return redirect(url)
     else:
-        return HttpResponseServerError("Erreur lors de la génération du jeton d’authentification faciale.")
+        return HttpResponseServerError("Erreur lors de la génération du jeton d'authentification faciale.")
     
 # utils/kyb_verification.py
 def verify_business(legal_name, registration_number, country_code):
@@ -92,7 +99,9 @@ def verify_business(legal_name, registration_number, country_code):
         print(f"Erreur KYB iDenfy : {e}")
         return None
 
+@login_required
 def start_kyb(request):
+    """Start KYB (Know Your Business) verification - requires authentication."""
     legal_name = request.POST.get('legal_name')
     registration_number = request.POST.get('registration_number')
     country_code = request.POST.get('country_code')

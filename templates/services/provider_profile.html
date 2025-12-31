@@ -1,0 +1,303 @@
+{% extends "base/public_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{{ provider.display_name }} - Zumodra{% endblock %}
+
+{% block meta_description %}{{ provider.bio|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="{% url 'browse_services' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600">
+                        {% trans "Services" %}
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-gray-900 dark:text-white font-medium">{{ provider.display_name }}</span>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="lg:grid lg:grid-cols-3 lg:gap-8">
+            <!-- Sidebar - Provider Info -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24 space-y-6">
+                    <!-- Profile Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 text-center">
+                        <!-- Avatar -->
+                        {% if provider.avatar %}
+                        <img src="{{ provider.avatar.url }}"
+                             alt="{{ provider.display_name }}"
+                             class="w-32 h-32 rounded-full object-cover mx-auto mb-4 ring-4 ring-gray-100 dark:ring-gray-700">
+                        {% else %}
+                        <div class="w-32 h-32 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4 ring-4 ring-gray-100 dark:ring-gray-700">
+                            <span class="text-4xl font-medium text-primary-600 dark:text-primary-400">
+                                {{ provider.display_name|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Name & Verification -->
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                            {{ provider.display_name }}
+                            {% if provider.is_verified %}
+                            <svg class="inline w-6 h-6 text-blue-500 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% endif %}
+                        </h1>
+
+                        <!-- Tagline -->
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">{{ provider.tagline }}</p>
+
+                        <!-- Status Badge -->
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {% if provider.availability_status == 'available' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                            {% elif provider.availability_status == 'busy' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                            {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                            {{ provider.get_availability_status_display }}
+                        </span>
+
+                        <!-- Stats -->
+                        <div class="grid grid-cols-3 gap-4 py-6 mt-6 border-t border-gray-200 dark:border-gray-700">
+                            <div class="text-center">
+                                <div class="flex items-center justify-center gap-1 text-lg font-bold text-gray-900 dark:text-white">
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    {{ avg_rating }}
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{% trans "Rating" %}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ provider.total_reviews }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{% trans "Reviews" %}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ provider.completed_jobs_count }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{% trans "Jobs" %}</p>
+                            </div>
+                        </div>
+
+                        <!-- Contact Button -->
+                        <button type="button"
+                                class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
+                            {% trans "Contact Me" %}
+                        </button>
+                    </div>
+
+                    <!-- Details Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Details" %}</h3>
+                        <dl class="space-y-4">
+                            {% if provider.city %}
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <div>
+                                    <dt class="sr-only">{% trans "Location" %}</dt>
+                                    <dd class="text-gray-600 dark:text-gray-300">{{ provider.city }}{% if provider.country %}, {{ provider.country }}{% endif %}</dd>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if provider.hourly_rate %}
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <dt class="sr-only">{% trans "Hourly Rate" %}</dt>
+                                    <dd class="text-gray-600 dark:text-gray-300">${{ provider.hourly_rate|intcomma }}/{% trans "hr" %}</dd>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <dt class="sr-only">{% trans "Response Time" %}</dt>
+                                    <dd class="text-gray-600 dark:text-gray-300">{% blocktrans with hours=provider.avg_response_time_hours %}Responds in {{ hours }} hours{% endblocktrans %}</dd>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                <div>
+                                    <dt class="sr-only">{% trans "Response Rate" %}</dt>
+                                    <dd class="text-gray-600 dark:text-gray-300">{{ provider.response_rate }}% {% trans "response rate" %}</dd>
+                                </div>
+                            </div>
+
+                            {% if provider.can_work_remotely %}
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <dd class="text-gray-600 dark:text-gray-300">{% trans "Available for remote work" %}</dd>
+                            </div>
+                            {% endif %}
+
+                            {% if provider.can_work_onsite %}
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <dd class="text-gray-600 dark:text-gray-300">{% trans "Available for on-site work" %}</dd>
+                            </div>
+                            {% endif %}
+                        </dl>
+                    </div>
+
+                    <!-- Trust & Verification Card -->
+                    {% if provider.user and provider.user.trust_score %}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Trust & Verification" %}</h3>
+                            <a href="{% url 'accounts:trust-score' %}"
+                               class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                                {% trans "Details" %}
+                            </a>
+                        </div>
+                        {% include "components/trust_badge.html" with trust_score=provider.user.trust_score size="lg" show_details=True %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="mt-8 lg:mt-0 lg:col-span-2 space-y-8">
+                <!-- About Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{% trans "About" %}</h2>
+                    <div class="prose dark:prose-invert max-w-none">
+                        {{ provider.bio|linebreaks }}
+                    </div>
+
+                    <!-- Categories -->
+                    {% if provider.categories.exists %}
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{% trans "Specializations" %}</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for category in provider.categories.all %}
+                            <span class="px-3 py-1 text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full">
+                                {{ category.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Services Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Services" %} ({{ services.count }})</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6">
+                        {% for service in services %}
+                        <a href="{% url 'service_detail' service.uuid %}"
+                           class="group flex flex-col bg-gray-50 dark:bg-gray-700/50 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+                                {% if service.thumbnail %}
+                                <img src="{{ service.thumbnail.url }}"
+                                     alt="{{ service.name }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 line-clamp-2">
+                                    {{ service.name }}
+                                </h3>
+                                <p class="text-lg font-bold text-gray-900 dark:text-white mt-2">
+                                    ${{ service.price|intcomma }}
+                                </p>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="col-span-full py-8 text-center text-gray-500 dark:text-gray-400">
+                            {% trans "No services available at the moment." %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Reviews" %} ({{ reviews.count }})</h2>
+                    </div>
+                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for review in reviews %}
+                        <div class="p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
+                                            {{ review.reviewer.get_full_name|slice:":1"|upper|default:review.reviewer.email|slice:":1"|upper }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ review.reviewer.get_full_name|default:review.reviewer.email }}
+                                        </h4>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ review.created_at|timesince }} {% trans "ago" %}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-1 mb-2">
+                                        {% for i in "12345" %}
+                                        <svg class="w-4 h-4 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        {% endfor %}
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">{{ review.content }}</p>
+
+                                    {% if review.provider_response %}
+                                    <div class="mt-4 ml-4 pl-4 border-l-2 border-primary-200 dark:border-primary-800">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                            {% trans "Response from provider" %}
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ review.provider_response }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% trans "No reviews yet." %}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

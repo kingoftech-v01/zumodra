@@ -1,0 +1,127 @@
+{% load static i18n %}
+
+{#
+    HTMX-powered Pagination Component
+
+    Usage:
+    {% include "components/pagination.html" with page_obj=page_obj %}
+
+    Context variables:
+    - page_obj: Django Page object from Paginator
+    - paginate_url: Base URL for pagination (optional, uses current URL if not provided)
+    - target_id: HTMX target for content swap (default: #main-content)
+#}
+
+{% if page_obj.has_other_pages %}
+<nav class="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6"
+     aria-label="Pagination">
+
+    <!-- Mobile Pagination -->
+    <div class="flex-1 flex justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           hx-get="{{ paginate_url|default:'' }}?page={{ page_obj.previous_page_number }}"
+           hx-target="{{ target_id|default:'#main-content' }}"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            {% trans "Previous" %}
+        </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           hx-get="{{ paginate_url|default:'' }}?page={{ page_obj.next_page_number }}"
+           hx-target="{{ target_id|default:'#main-content' }}"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            {% trans "Next" %}
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Desktop Pagination -->
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <!-- Results count -->
+        <div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+                {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
+                Showing <span class="font-medium">{{ start }}</span> to <span class="font-medium">{{ end }}</span> of <span class="font-medium">{{ total }}</span> results
+                {% endblocktrans %}
+            </p>
+        </div>
+
+        <!-- Page Numbers -->
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <!-- Previous Button -->
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   hx-get="{{ paginate_url|default:'' }}?page={{ page_obj.previous_page_number }}"
+                   hx-target="{{ target_id|default:'#main-content' }}"
+                   hx-swap="innerHTML"
+                   hx-push-url="true"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <span class="sr-only">{% trans "Previous" %}</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                    <span class="sr-only">{% trans "Previous" %}</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </span>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span aria-current="page"
+                          class="z-10 bg-primary-50 dark:bg-primary-900/20 border-primary-500 text-primary-600 dark:text-primary-400 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        {{ num }}
+                    </span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}"
+                       hx-get="{{ paginate_url|default:'' }}?page={{ num }}"
+                       hx-target="{{ target_id|default:'#main-content' }}"
+                       hx-swap="innerHTML"
+                       hx-push-url="true"
+                       class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        {{ num }}
+                    </a>
+                    {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        ...
+                    </span>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Button -->
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   hx-get="{{ paginate_url|default:'' }}?page={{ page_obj.next_page_number }}"
+                   hx-target="{{ target_id|default:'#main-content' }}"
+                   hx-swap="innerHTML"
+                   hx-push-url="true"
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <span class="sr-only">{% trans "Next" %}</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                    <span class="sr-only">{% trans "Next" %}</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</nav>
+{% endif %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Data Request is Complete</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Your Data Request is Complete</h1>
+    </div>
+    <div class="content">
+        <p>Dear {{ user.first_name|default:user.email }},</p>
+
+        <p>Good news! Your <strong>{{ request_type }}</strong> request has been processed successfully.</p>
+
+        <p>
+            <strong>Request ID:</strong> {{ request.uuid }}<br>
+            <strong>Submitted:</strong> {{ request.submitted_at }}<br>
+            <strong>Completed:</strong> {{ request.completed_at }}
+        </p>
+
+        {% if request.response_file %}
+        <p>Your data export is ready for download. Please note that the download link will expire in 30 days.</p>
+
+        <a href="{{ download_url }}" class="button">Download Your Data</a>
+
+        <p style="margin-top: 20px; font-size: 14px; color: #666;">
+            <strong>Security Reminder:</strong> This export contains your personal information.
+            Please store it securely and delete it when no longer needed.
+        </p>
+        {% endif %}
+
+        <p>If you have any questions about your data or this request, please contact our Data Protection Officer.</p>
+
+        <p>Best regards,<br>The Privacy Team</p>
+    </div>
+    <div class="footer">
+        <p>This email was sent in response to your data subject request under GDPR.</p>
+        <p>&copy; {{ year }} Zumodra. All rights reserved.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# =============================================================================
+# Grafana Dashboard Provisioning Configuration
+# =============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: 'Zumodra Dashboards'
+    orgId: 1
+    folder: 'Zumodra'
+    folderUid: 'zumodra'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

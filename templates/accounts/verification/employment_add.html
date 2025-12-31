@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Add Employment" %} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="mb-8">
+        <a href="{% url 'frontend:accounts:employment-list' %}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+            &larr; {% trans "Back to Employment History" %}
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {% trans "Add Employment" %}
+        </h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {% trans "Add a job to your employment history for verification." %}
+        </p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_company_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Company Name" %} *
+                    </label>
+                    {{ form.company_name }}
+                    {% if form.company_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.company_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_job_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Job Title" %} *
+                    </label>
+                    {{ form.job_title }}
+                    {% if form.job_title.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.job_title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Start Date" %} *
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "End Date" %}
+                    </label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.end_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center">
+                    {{ form.is_current }}
+                    <label for="id_is_current" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {% trans "I currently work here" %}
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label for="id_employment_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Employment Type" %}
+                </label>
+                {{ form.employment_type }}
+                {% if form.employment_type.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.employment_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Description" %}
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <hr class="border-gray-200 dark:border-gray-700">
+
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {% trans "Verification Contact (Optional)" %}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {% trans "Provide HR contact details to enable email-based verification." %}
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_hr_contact_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "HR Contact Name" %}
+                    </label>
+                    {{ form.hr_contact_name }}
+                </div>
+
+                <div>
+                    <label for="id_hr_contact_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "HR Contact Email" %}
+                    </label>
+                    {{ form.hr_contact_email }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_hr_contact_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "HR Contact Phone" %}
+                    </label>
+                    {{ form.hr_contact_phone }}
+                </div>
+
+                <div>
+                    <label for="id_company_domain" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Company Domain" %}
+                    </label>
+                    {{ form.company_domain }}
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-4 pt-4">
+                <a href="{% url 'frontend:accounts:employment-list' %}"
+                   class="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    {% trans "Add Employment" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% load i18n %}<!DOCTYPE html>
+{% load i18n security_filters %}<!DOCTYPE html>
 
 <html>
 <head>
@@ -13,7 +13,7 @@
 
         {% include thumbnail_template %}
 
-        <div>{{ article.text|safe }}</div>
+        <div>{{ article.text|sanitize_rich_html }}</div>
 
         {% if article.url %}
             <div><a href="{{ article.url }}">{% trans "Read more" %}</a></div>

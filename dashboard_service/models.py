@@ -1,336 +1,87 @@
-from django.db import models
-from zumodra import settings
-from django.utils import timezone
-import uuid
-from decimal import Decimal
-from django.utils import timezone
-from django.contrib.auth.models import Group, Permission
-from configurations.models import *
-from django.contrib.gis.db import models as gis_models
-from geopy.geocoders import Nominatim
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from django.contrib.gis.geos import Point
+"""
+dashboard_service Models - DEPRECATED
 
+This module is deprecated. All models have been consolidated into the `services` app.
 
-User = User
+MIGRATION NOTE:
+- All models from this app now live in `services.models`
+- Import from `services.models` instead of `dashboard_service.models`
+- This file re-exports models for backwards compatibility only
 
-# Create your models here.
+The following models have been renamed:
+- ServiceCategory -> services.ServiceCategory
+- ServicesTag -> services.ServiceTag
+- ServicesPicture -> services.ServiceImage
+- ProviderSkill -> services.ProviderSkill
+- ServiceProviderProfile -> services.ServiceProvider
+- Service -> services.Service
+- ServiceLike -> services.ServiceLike
+- ClientRequest -> services.ClientRequest
+- Match -> services.ProviderMatch
+- ServiceRequest -> services.ClientRequest
+- ServiceProposal -> services.ServiceProposal
+- ServiceContract -> services.ServiceContract
+- ServiceComment -> services.ServiceReview
+- ServiceMessage -> services.ContractMessage
+"""
 
-#____________________PLATEFORME DE SERVICES & GESTION DES CONTRATS____________________#
+import warnings
 
-class ServiceCategory(models.Model):
-    """
-    Catégorisation des services, permet l’imbrication de sous-catégories.
-    """
-    name = models.CharField(
-        max_length=100, unique=True, help_text="Nom de la catégorie"
-    )
-    parent = models.ForeignKey(
-        'self', on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name='subcategories',
-        help_text="Catégorie parent, pour structure arborescente"
-    )
-    description = models.TextField(blank=True, help_text="Description facultative")
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
-    updated_at = models.DateTimeField(auto_now=True, help_text="Date de mise à jour")
+# Emit deprecation warning on import
+warnings.warn(
+    "dashboard_service.models is deprecated. "
+    "Import from services.models instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
-    def __str__(self):
-        return self.name if not self.parent else f"{self.parent} > {self.name}"
+# Re-export all models from services for backwards compatibility
+from services.models import (
+    # Canonical names
+    ServiceCategory,
+    ServiceTag,
+    ServiceImage,
+    ProviderSkill,
+    ServiceProvider,
+    Service,
+    ServiceLike,
+    ClientRequest,
+    ProviderMatch,
+    ServiceProposal,
+    ServiceContract,
+    ServiceReview,
+    ContractMessage,
 
+    # Backwards compatibility aliases
+    ServicesTag,
+    ServicesPicture,
+    ServiceProviderProfile,
+    Match,
+    ServiceRequest,
+    ServiceComment,
+    ServiceMessage,
+)
 
-class ServicesTag(models.Model):
-    tag = models.CharField(max_length=50, unique=True, help_text="Nom du tag (unique)")
-    def __str__(self):
-        return f"{self.tag}"
-
-class ServicesPicture(models.Model):
-    image = models.ImageField(upload_to='service_pictures/')
-    description = models.CharField(max_length=255, blank=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Image for {self.service.name}"
-
-class ProviderSkill(models.Model):
-    provider = models.ForeignKey('ServiceProviderProfile', on_delete=models.CASCADE, related_name='provider_skills')
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='config_provider_skills')
-    level = models.CharField(
-        max_length=20,
-        choices=[('beginner','Débutant'), ('intermediate','Intermédiaire'), ('expert','Expert')],
-        default='beginner'
-    )
-    class Meta:
-        unique_together = ('provider', 'skill')
-
-# Prestataires de services (ServiceProviderProfile) avec compétences, catégories, localisation, tarifs, etc.
-class ServiceProviderProfile(models.Model):
-    """
-    Extending existing profile with skills and service categories.
-    """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='service_provider_profile')
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='config_providers')
-    skills = models.ManyToManyField(ProviderSkill, blank=True)
-    bio = models.TextField(blank=True)
-    categories = models.ManyToManyField(ServiceCategory, blank=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)  # aggregated rating 0-5
-    completed_jobs_count = models.PositiveIntegerField(default=0)
-    address = models.CharField(max_length=255, help_text="Address line 1 eg. 123 Main Street", blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    country = models.CharField(max_length=100, blank=True)
-    postal_code = models.CharField(max_length=15, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lng = models.FloatField(null=True, blank=True)
-    location = gis_models.PointField(geography=True, null=True, blank=True)
-    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
-    total_reviews = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    last_active = models.DateTimeField(auto_now=True)
-    services = models.ManyToManyField('Service', blank=True, related_name='service_providers')
-    availability_status = models.CharField(max_length=25, choices=[('available', 'Available'), ('unavailable', 'Unavailable')], default='available')
-    is_verified = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False)
-    is_mobile = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='service_provider_images/', blank=True, null=True)
-    entity_name = models.CharField(max_length=255, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.address}"
-
-    def get_full_name(self):
-        return f"{self.user.first_name} {self.user.last_name}"
-
-    def get_short_name(self):
-        return f"{self.user.first_name}"
-
-    def get_email(self):
-        return f"{self.user.email}"
-
-    class Meta:
-        verbose_name = _("Service Provider Profile")
-        verbose_name_plural = _("Service Provider Profiles")
-
-    def save(self, *args, **kwargs):
-        # if no user is should have a company assigned if no company it should have a user assigned
-        # CREATE  a fonction to get the name of the user or the company assigned
-    # Définir un nom lisible pour l'entité (utilisateur ou entreprise)
-        entity_name = None
-        if self.user:
-            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
-            self.entity_name = full_name or self.user.username
-        elif self.company:
-            self.entity_name = self.company.name
-        else:
-            raise ValidationError(_("A service provider must have either an associated user or company."))
-
-        # Géocodage de l’adresse si elle existe
-        # if self.address:
-        #     try:
-        #         geolocator = Nominatim(user_agent="zumodra_app")
-        #         location = geolocator.geocode(f"{self.address}, {self.city}, {self.country}")
-        #         if location:
-        #             from django.contrib.gis.geos import Point
-        #             self.location = Point(location.longitude, location.latitude)
-        #             self.location_lat = location.latitude
-        #             self.location_lng = location.longitude
-        #         else:
-        #             raise ValidationError(_("Could not geocode the given address."))
-        #     except Exception as e:
-        #         print(f"Geocoding error: {e}")
-
-        # super().save(*args, **kwargs)
-
-
-        # Géocodage de l’adresse si elle existe et que la position n’est pas déjà définie
-        if self.address and (not self.location_lat or not self.location_lng):
-            full_address = ", ".join(filter(None, [self.address, self.city, self.country]))
-            try:
-                geolocator = Nominatim(user_agent="zumodra_app")
-                location = geolocator.geocode(full_address, timeout=10)
-                if location:
-                    self.location = Point(location.longitude, location.latitude)
-                    self.location_lat = location.latitude
-                    self.location_lng = location.longitude
-                else:
-                    raise ValidationError(_("Could not geocode the given address."))
-            except Exception as e:
-                print(f"Geocoding error for {entity_name}: {e}")
-
-        super().save(*args, **kwargs)
-
-
-
-# Services offerts par l’entreprise
-class Service(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='services_offered_by_provider')
-    serviceCategory = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    price = models.PositiveIntegerField(null=True, blank=True)  # prix indicatif
-    duration_minutes = models.PositiveIntegerField(null=True, blank=True)  # durée estimée
-    thumbnail = models.ImageField(upload_to='service_thumbnails/', blank=True, null=True)
-    images = models.ManyToManyField(ServicesPicture, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField(ServicesTag, blank=True, related_name='services_with_tag')
-
-    def __str__(self):
-        return f"{self.name} ({self.provider.user.first_name} {self.provider.user.last_name})"
-    
-class ServiceLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_services_by_user')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='config_liked_services')
-    liked_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'service')
-
-    def __str__(self):
-        return f"{self.user.email} likes {self.service.name}"
-
-# Request clients (ClientRequest) avec critères de recherche, budget, localisation, etc.
-class ClientRequest(models.Model):
-    """
-    Represents a client’s service request including skills required,
-    location preferences, budget, and other parameters.
-    """
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_user_requests_service')
-    required_skills = models.ManyToManyField(Skill, blank=True, related_name='config_client_requests')
-    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True)
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    location_lat = models.FloatField(null=True, blank=True)
-    location_lon = models.FloatField(null=True, blank=True)
-    remote_allowed = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Request by {self.client} for {self.service_category}"
-
-
-class Match(models.Model):
-    """
-    Stores a match between a ClientRequest and a ServiceProviderProfile,
-    along with a score computed by AI or heuristics.
-    """
-    client_request = models.ForeignKey(ClientRequest, on_delete=models.CASCADE, related_name='matches')
-    provider_profile = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='matches')
-    score = models.DecimalField(max_digits=5, decimal_places=4)  # value between 0 and 1 or 0 and 100
-    matched_at = models.DateTimeField(auto_now_add=True)
-    viewed_by_client = models.BooleanField(default=False)
-    accepted_by_client = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Match {self.client_request} - {self.provider_profile} : {self.score}"
-
-class ServiceRequest(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='config_service_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='config_service_requests')
-    required_skills = models.ManyToManyField(Skill, related_name='config_service_requests', blank=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    deadline = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_open = models.BooleanField(default=True)
-
-class ServiceProposal(models.Model):
-    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name='proposals')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='proposals')
-    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    message = models.TextField(blank=True)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    is_accepted = models.BooleanField(default=False)
-    class Meta:
-        unique_together = ('request', 'provider')
-
-class ServiceContract(models.Model):
-    request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name='contract')
-    provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='config_provider_contracts')
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cconfig_client_contracts')
-    agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
-    agreed_deadline = models.DateField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=[('pending','En attente'), ('active','Active'), ('completed','Terminée'), ('cancelled','Annulée')],
-        default='pending'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-
-# class ProviderReport(models.Model):
-#     provider = models.ForeignKey(ServiceProviderProfile, on_delete=models.CASCADE, related_name='reports')
-#     contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='reports')
-#     report = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-class ServiceComment(models.Model):
-    """
-    Review on a Service, avec possibilité de répondre à un autre commentaire.
-    """
-    provider = models.ForeignKey(
-        ServiceProviderProfile, related_name='comments',
-        on_delete=models.CASCADE,
-        help_text="Professionnel associé au commentaire"
-    )
-    service = models.ForeignKey(
-        Service, related_name='comments_service',
-        on_delete=models.CASCADE,
-        help_text="Service associé au commentaire"
-    )
-    reviewer = models.ForeignKey(
-        User, on_delete=models.PROTECT,
-        help_text="Auteur du commentaire"
-    )
-    content = models.TextField(help_text="Contenu du commentaire", blank=True)
-    rating = models.PositiveSmallIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Date de création")
-    updated_at = models.DateTimeField(auto_now=True, help_text="Date de mise à jour")
-    parent = models.ForeignKey(
-        'self',
-        null=True, blank=True,
-        related_name='replies',
-        on_delete=models.CASCADE,
-        help_text="Commentaire parent si ce commentaire est une réponse"
-    )
-
-    def __str__(self):
-        return f"Comment by {self.reviewer} on {self.service}"
-
-    class Meta:
-        ordering = ['-created_at']
-
-class ServiceMessage(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='config_servicemessages')
-    message = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-
-# Audit logs
-from auditlog.registry import auditlog
-
-# Enregistrement de tous les modèles
-auditlog.register(ServiceCategory)
-auditlog.register(ServicesTag)
-auditlog.register(ServicesPicture)
-auditlog.register(ProviderSkill)
-auditlog.register(ServiceProviderProfile)
-auditlog.register(Service)
-auditlog.register(ServiceLike)
-auditlog.register(ClientRequest)
-auditlog.register(Match)
-auditlog.register(ServiceRequest)
-auditlog.register(ServiceProposal)
-auditlog.register(ServiceContract)
-auditlog.register(ServiceComment)
-auditlog.register(ServiceMessage)
+__all__ = [
+    'ServiceCategory',
+    'ServiceTag',
+    'ServiceImage',
+    'ProviderSkill',
+    'ServiceProvider',
+    'Service',
+    'ServiceLike',
+    'ClientRequest',
+    'ProviderMatch',
+    'ServiceProposal',
+    'ServiceContract',
+    'ServiceReview',
+    'ContractMessage',
+    # Old aliases
+    'ServicesTag',
+    'ServicesPicture',
+    'ServiceProviderProfile',
+    'Match',
+    'ServiceRequest',
+    'ServiceComment',
+    'ServiceMessage',
+]

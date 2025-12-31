@@ -1,0 +1,289 @@
+{# =============================================================================
+   ZUMODRA DASHBOARD INDEX TEMPLATE
+   =============================================================================
+
+   File: templates/dashboard/index.html
+   Purpose: Main dashboard homepage with widgets and metrics
+
+   EXTENDS: base/dashboard_base.html
+
+   CONTEXT VARIABLES (from DashboardView):
+   - stats (dict): Quick stats counts
+     - open_jobs: Number of open job postings
+     - total_candidates: Total candidates in system
+     - new_candidates_week: New candidates this week
+     - active_applications: Applications in progress
+     - pending_interviews: Scheduled interviews
+     - total_employees: Active employee count
+     - pending_time_off: Pending time off requests
+   - upcoming_interviews (queryset): Next 5 interviews
+   - recent_activity (queryset): Recent notifications
+   - unread_notifications (int): Unread notification count
+
+   HTMX ENDPOINTS:
+   - dashboard:htmx-quick-stats: Refresh quick stats
+   - dashboard:htmx-recent-activity: Refresh activity feed
+   - dashboard:htmx-upcoming-interviews: Refresh interviews
+
+   Author: Rhematek Solutions
+   Last Updated: 2025-12-30
+   ============================================================================= #}
+
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block page_title %}{% trans "Dashboard" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Welcome back! Here's an overview of your workspace." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<button type="button"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        hx-get="{% url 'dashboard:htmx-quick-stats' %}"
+        hx-target="#quick-stats-container"
+        hx-swap="innerHTML"
+        hx-indicator="#refresh-indicator">
+    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+    </svg>
+    {% trans "Refresh" %}
+    <svg id="refresh-indicator" class="htmx-indicator ml-2 h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</button>
+{% endblock %}
+
+{% block content %}
+<div x-data="{
+    showAllStats: false,
+    refreshInterval: null,
+    startAutoRefresh() {
+        this.refreshInterval = setInterval(() => {
+            htmx.trigger('#quick-stats-container', 'refresh');
+        }, 300000); // Refresh every 5 minutes
+    },
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+    }
+}"
+x-init="startAutoRefresh()"
+x-on:beforeunload.window="stopAutoRefresh()">
+
+    {# ===== QUICK STATS SECTION ===== #}
+    <section class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                {% trans "Quick Stats" %}
+            </h2>
+            <button @click="showAllStats = !showAllStats"
+                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                <span x-show="!showAllStats">{% trans "Show All" %}</span>
+                <span x-show="showAllStats">{% trans "Show Less" %}</span>
+            </button>
+        </div>
+
+        <div id="quick-stats-container"
+             hx-get="{% url 'dashboard:htmx-quick-stats' %}"
+             hx-trigger="refresh"
+             hx-swap="innerHTML">
+            {% include "dashboard/partials/_quick_stats.html" %}
+        </div>
+    </section>
+
+    {# ===== MAIN DASHBOARD GRID ===== #}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {# ===== UPCOMING INTERVIEWS WIDGET ===== #}
+        <section class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            {% trans "Upcoming Interviews" %}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {% trans "Scheduled for the next 7 days" %}
+                        </p>
+                    </div>
+                    <button type="button"
+                            class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                            hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
+                            hx-target="#upcoming-interviews-container"
+                            hx-swap="innerHTML"
+                            hx-indicator="#interviews-indicator">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <svg id="interviews-indicator" class="htmx-indicator h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="upcoming-interviews-container"
+                     hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
+                     hx-trigger="load delay:100ms"
+                     hx-swap="innerHTML">
+                    {% include "dashboard/partials/_upcoming_interviews.html" %}
+                </div>
+            </div>
+        </section>
+
+        {# ===== RECENT ACTIVITY WIDGET ===== #}
+        <section class="lg:col-span-1">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                            {% trans "Recent Activity" %}
+                        </h3>
+                        {% if unread_notifications > 0 %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                            {{ unread_notifications }} {% trans "unread" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <button type="button"
+                            class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                            hx-get="{% url 'dashboard:htmx-recent-activity' %}"
+                            hx-target="#recent-activity-container"
+                            hx-swap="innerHTML"
+                            hx-indicator="#activity-indicator">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <svg id="activity-indicator" class="htmx-indicator h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="recent-activity-container"
+                     hx-get="{% url 'dashboard:htmx-recent-activity' %}"
+                     hx-trigger="load delay:200ms"
+                     hx-swap="innerHTML"
+                     class="max-h-96 overflow-y-auto">
+                    {% include "dashboard/partials/_recent_activity.html" %}
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    {# ===== QUICK ACTIONS SECTION ===== #}
+    <section class="mt-8">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            {% trans "Quick Actions" %}
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {# Post New Job #}
+            <a href="{% url 'ats:job_create' %}"
+               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            {% trans "Post New Job" %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+            {# View Candidates #}
+            <a href="{% url 'ats:candidates' %}"
+               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">
+                            {% trans "View Candidates" %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+            {# Schedule Interview #}
+            <a href="{% url 'ats:applications' %}"
+               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400">
+                            {% trans "Applications" %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+
+            {# Employee Directory #}
+            <a href="{% url 'hr:employees' %}"
+               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                            {% trans "Employees" %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Dashboard-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Listen for HTMX events for analytics/logging
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if (evt.detail.target.id === 'quick-stats-container') {
+                console.log('Quick stats refreshed');
+            }
+        });
+
+        // Handle keyboard shortcuts for dashboard
+        document.addEventListener('keydown', function(e) {
+            // R key to refresh stats (when not in input)
+            if (e.key === 'r' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                htmx.trigger('#quick-stats-container', 'refresh');
+            }
+        });
+    });
+</script>
+{% endblock %}

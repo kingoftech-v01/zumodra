@@ -1,0 +1,154 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% trans "Server Error" %} - Zumodra</title>
+
+    <!-- Tailwind CSS (inline for reliability during errors) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
+      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
+      :class="{ 'dark': darkMode }">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header with Logo -->
+        <header class="p-6 flex justify-between items-center">
+            <a href="/" class="inline-flex items-center">
+                <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">Zumodra</span>
+            </a>
+            <!-- Dark Mode Toggle -->
+            <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
+                    class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <svg x-show="!darkMode" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+                <svg x-show="darkMode" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-lg w-full text-center">
+                <!-- Illustration -->
+                <div class="mb-8">
+                    <svg class="mx-auto h-40 w-40 text-red-500 dark:text-red-400 animate-pulse-slow" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Server Icon -->
+                        <rect x="40" y="50" width="120" height="100" rx="8" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <line x1="40" y1="90" x2="160" y2="90" stroke="currentColor" stroke-width="3"/>
+                        <line x1="40" y1="120" x2="160" y2="120" stroke="currentColor" stroke-width="3"/>
+                        <!-- Status lights -->
+                        <circle cx="60" cy="70" r="6" fill="currentColor"/>
+                        <circle cx="80" cy="70" r="6" fill="currentColor" opacity="0.4"/>
+                        <circle cx="60" cy="105" r="6" fill="currentColor"/>
+                        <circle cx="80" cy="105" r="6" fill="currentColor" opacity="0.4"/>
+                        <circle cx="60" cy="135" r="6" fill="currentColor" opacity="0.4"/>
+                        <circle cx="80" cy="135" r="6" fill="currentColor" opacity="0.4"/>
+                        <!-- Warning Triangle -->
+                        <path d="M100 20L120 55H80L100 20Z" fill="currentColor"/>
+                        <text x="100" y="48" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text>
+                    </svg>
+                </div>
+
+                <!-- Error Message -->
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+                    {% trans "Something Went Wrong" %}
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                    {% trans "We're sorry, but something unexpected happened on our end. Our team has been notified and is working to fix the issue." %}
+                </p>
+
+                <!-- Error Reference ID -->
+                {% if error_id %}
+                <div class="mb-8 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg inline-block">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {% trans "Error Reference ID:" %}
+                        <code class="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-gray-800 dark:text-gray-200 font-mono text-xs">
+                            {{ error_id }}
+                        </code>
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <button onclick="window.location.reload()"
+                            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
+                        <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        {% trans "Try Again" %}
+                    </button>
+                    <a href="/"
+                       class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
+                        <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        {% trans "Go Home" %}
+                    </a>
+                </div>
+
+                <!-- Support Contact -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        {% trans "If this problem persists, please contact our support team:" %}
+                    </p>
+                    <a href="mailto:support@rhematek-solutions.com?subject=Error%20Report%20{% if error_id %}({{ error_id }}){% endif %}"
+                       class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                        <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        support@rhematek-solutions.com
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-6 text-center">
+            <p class="text-xs text-gray-400 dark:text-gray-500">
+                &copy; {% now "Y" %} Zumodra. {% trans "All rights reserved." %}
+            </p>
+        </footer>
+    </div>
+
+    <!-- Alpine.js for dark mode -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>

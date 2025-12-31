@@ -1,0 +1,418 @@
+"""
+Careers Models - Public Career Pages
+
+This module implements:
+- Tenant-branded career pages
+- Public job listings
+- Application forms
+- Candidate portal
+"""
+
+import uuid
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+
+class CareerPage(models.Model):
+    """
+    Tenant-specific career page configuration.
+    Controls branding, content, and settings for public job pages.
+    """
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    # Basic Info
+    title = models.CharField(max_length=200, default='Careers')
+    tagline = models.CharField(max_length=300, blank=True)
+    description = models.TextField(blank=True)
+
+    # Branding
+    logo = models.ImageField(upload_to='career_logos/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='career_covers/', blank=True, null=True)
+    favicon = models.ImageField(upload_to='career_favicons/', blank=True, null=True)
+
+    # Colors
+    primary_color = models.CharField(max_length=7, default='#3B82F6')
+    secondary_color = models.CharField(max_length=7, default='#1E40AF')
+    accent_color = models.CharField(max_length=7, default='#10B981')
+    text_color = models.CharField(max_length=7, default='#1F2937')
+    background_color = models.CharField(max_length=7, default='#FFFFFF')
+
+    # Custom CSS
+    custom_css = models.TextField(blank=True)
+
+    # Content Sections
+    show_company_info = models.BooleanField(default=True)
+    company_description = models.TextField(blank=True)
+    show_benefits = models.BooleanField(default=True)
+    benefits_content = models.TextField(blank=True)
+    show_culture = models.BooleanField(default=True)
+    culture_content = models.TextField(blank=True)
+    show_values = models.BooleanField(default=True)
+    values_content = models.JSONField(default=list, blank=True)
+    show_team = models.BooleanField(default=False)
+    team_members = models.JSONField(default=list, blank=True)
+
+    # Social Links
+    linkedin_url = models.URLField(blank=True)
+    twitter_url = models.URLField(blank=True)
+    facebook_url = models.URLField(blank=True)
+    instagram_url = models.URLField(blank=True)
+    glassdoor_url = models.URLField(blank=True)
+
+    # SEO
+    meta_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.TextField(blank=True, max_length=500)
+    meta_keywords = models.CharField(max_length=500, blank=True)
+    og_image = models.ImageField(upload_to='career_og/', blank=True, null=True)
+
+    # Settings
+    is_active = models.BooleanField(default=True)
+    require_account = models.BooleanField(
+        default=False,
+        help_text=_('Require candidates to create account before applying')
+    )
+    show_salary_range = models.BooleanField(default=False)
+    allow_general_applications = models.BooleanField(
+        default=True,
+        help_text=_('Allow applications even without specific job')
+    )
+    gdpr_consent_text = models.TextField(
+        blank=True,
+        help_text=_('Custom GDPR/privacy consent text')
+    )
+
+    # Analytics
+    google_analytics_id = models.CharField(max_length=50, blank=True)
+    facebook_pixel_id = models.CharField(max_length=50, blank=True)
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Career Page')
+        verbose_name_plural = _('Career Pages')
+
+    def __str__(self):
+        return self.title
+
+
+class CareerPageSection(models.Model):
+    """Custom content sections for career pages."""
+
+    class SectionType(models.TextChoices):
+        TEXT = 'text', _('Text Block')
+        IMAGE = 'image', _('Image')
+        VIDEO = 'video', _('Video')
+        TESTIMONIAL = 'testimonial', _('Testimonial')
+        FAQ = 'faq', _('FAQ')
+        CTA = 'cta', _('Call to Action')
+        STATS = 'stats', _('Statistics')
+        GALLERY = 'gallery', _('Image Gallery')
+
+    career_page = models.ForeignKey(
+        CareerPage,
+        on_delete=models.CASCADE,
+        related_name='sections'
+    )
+    title = models.CharField(max_length=200)
+    section_type = models.CharField(
+        max_length=20,
+        choices=SectionType.choices,
+        default=SectionType.TEXT
+    )
+    content = models.JSONField(default=dict)
+    order = models.PositiveIntegerField(default=0)
+    is_visible = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Career Page Section')
+        verbose_name_plural = _('Career Page Sections')
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.career_page.title} - {self.title}"
+
+
+class JobListing(models.Model):
+    """
+    Public-facing job listing view.
+    Wraps JobPosting with public display settings.
+    """
+
+    job = models.OneToOneField(
+        'ats.JobPosting',
+        on_delete=models.CASCADE,
+        related_name='public_listing'
+    )
+
+    # Custom URL
+    custom_slug = models.SlugField(max_length=200, blank=True)
+
+    # Display Settings
+    show_company_name = models.BooleanField(default=True)
+    show_department = models.BooleanField(default=True)
+    show_team_size = models.BooleanField(default=False)
+    show_application_count = models.BooleanField(default=False)
+    application_count_threshold = models.PositiveIntegerField(
+        default=10,
+        help_text=_('Show "10+ applicants" instead of exact count')
+    )
+
+    # Application Form
+    custom_application_form = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text=_('Custom form fields configuration')
+    )
+
+    # Visibility
+    is_featured = models.BooleanField(default=False)
+    feature_priority = models.PositiveIntegerField(default=0)
+
+    # Tracking
+    view_count = models.PositiveIntegerField(default=0)
+    apply_click_count = models.PositiveIntegerField(default=0)
+
+    # Timestamps
+    published_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('Job Listing')
+        verbose_name_plural = _('Job Listings')
+        ordering = ['-is_featured', '-feature_priority', '-published_at']
+
+    def __str__(self):
+        return self.job.title
+
+    @property
+    def is_expired(self):
+        if not self.expires_at:
+            return False
+        return timezone.now() > self.expires_at
+
+    def increment_view(self):
+        self.view_count += 1
+        self.save(update_fields=['view_count'])
+
+
+class PublicApplication(models.Model):
+    """
+    Public job application from career page.
+    Creates Candidate and Application records in ATS.
+    """
+
+    class ApplicationStatus(models.TextChoices):
+        PENDING = 'pending', _('Pending Processing')
+        PROCESSED = 'processed', _('Processed to ATS')
+        DUPLICATE = 'duplicate', _('Duplicate Application')
+        SPAM = 'spam', _('Marked as Spam')
+        ERROR = 'error', _('Processing Error')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    job_listing = models.ForeignKey(
+        JobListing,
+        on_delete=models.CASCADE,
+        related_name='public_applications',
+        null=True,
+        blank=True
+    )
+
+    # Applicant Info
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30, blank=True)
+
+    # Application Content
+    resume = models.FileField(upload_to='public_resumes/')
+    cover_letter = models.TextField(blank=True)
+    custom_answers = models.JSONField(default=dict, blank=True)
+    linkedin_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+
+    # Consent
+    privacy_consent = models.BooleanField(default=False)
+    marketing_consent = models.BooleanField(default=False)
+    consent_timestamp = models.DateTimeField(null=True, blank=True)
+    consent_ip = models.GenericIPAddressField(null=True, blank=True)
+
+    # Processing
+    status = models.CharField(
+        max_length=20,
+        choices=ApplicationStatus.choices,
+        default=ApplicationStatus.PENDING
+    )
+    processed_at = models.DateTimeField(null=True, blank=True)
+    ats_candidate = models.ForeignKey(
+        'ats.Candidate',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    ats_application = models.ForeignKey(
+        'ats.Application',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    processing_error = models.TextField(blank=True)
+
+    # Tracking
+    source = models.CharField(max_length=100, blank=True)
+    utm_source = models.CharField(max_length=100, blank=True)
+    utm_medium = models.CharField(max_length=100, blank=True)
+    utm_campaign = models.CharField(max_length=100, blank=True)
+    referrer = models.URLField(blank=True)
+    user_agent = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    # Timestamps
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('Public Application')
+        verbose_name_plural = _('Public Applications')
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        job_title = self.job_listing.job.title if self.job_listing else 'General'
+        return f"{self.first_name} {self.last_name} - {job_title}"
+
+    def process_to_ats(self):
+        """
+        Process public application into ATS system.
+        Creates or updates Candidate and creates Application.
+        """
+        from ats.models import Candidate, Application
+
+        try:
+            # Find or create candidate
+            candidate, created = Candidate.objects.get_or_create(
+                email=self.email,
+                defaults={
+                    'first_name': self.first_name,
+                    'last_name': self.last_name,
+                    'phone': self.phone,
+                    'resume': self.resume,
+                    'linkedin_url': self.linkedin_url,
+                    'source': Candidate.Source.CAREER_PAGE,
+                    'source_detail': self.source or self.utm_source or '',
+                }
+            )
+
+            if not created:
+                # Update existing candidate info
+                candidate.phone = self.phone or candidate.phone
+                candidate.linkedin_url = self.linkedin_url or candidate.linkedin_url
+                candidate.save()
+
+            self.ats_candidate = candidate
+
+            # Create application if job specified
+            if self.job_listing:
+                # Check for duplicate application
+                existing = Application.objects.filter(
+                    candidate=candidate,
+                    job=self.job_listing.job
+                ).first()
+
+                if existing:
+                    self.status = self.ApplicationStatus.DUPLICATE
+                    self.ats_application = existing
+                else:
+                    application = Application.objects.create(
+                        candidate=candidate,
+                        job=self.job_listing.job,
+                        cover_letter=self.cover_letter,
+                        custom_answers=self.custom_answers,
+                        utm_source=self.utm_source,
+                        utm_medium=self.utm_medium,
+                        utm_campaign=self.utm_campaign,
+                        referrer_url=self.referrer,
+                    )
+                    self.ats_application = application
+                    self.status = self.ApplicationStatus.PROCESSED
+
+            else:
+                self.status = self.ApplicationStatus.PROCESSED
+
+            self.processed_at = timezone.now()
+            self.save()
+
+            return True
+
+        except Exception as e:
+            self.status = self.ApplicationStatus.ERROR
+            self.processing_error = str(e)
+            self.save()
+            return False
+
+
+class TalentPool(models.Model):
+    """
+    Talent pools for organizing candidates.
+    Allows recruiters to save candidates for future opportunities.
+    """
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    is_public = models.BooleanField(
+        default=False,
+        help_text=_('Allow candidates to self-join')
+    )
+    auto_add_criteria = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text=_('Auto-add candidates matching criteria')
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Talent Pool')
+        verbose_name_plural = _('Talent Pools')
+
+    def __str__(self):
+        return self.name
+
+
+class TalentPoolMember(models.Model):
+    """Candidates in a talent pool."""
+
+    pool = models.ForeignKey(
+        TalentPool,
+        on_delete=models.CASCADE,
+        related_name='members'
+    )
+    candidate = models.ForeignKey(
+        'ats.Candidate',
+        on_delete=models.CASCADE,
+        related_name='talent_pools'
+    )
+    added_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = _('Talent Pool Member')
+        verbose_name_plural = _('Talent Pool Members')
+        unique_together = ['pool', 'candidate']
+
+    def __str__(self):
+        return f"{self.candidate.full_name} in {self.pool.name}"

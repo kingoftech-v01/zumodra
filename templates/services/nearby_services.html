@@ -1,0 +1,333 @@
+{% extends "base/public_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Services Near You" %} - Zumodra{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map { height: 400px; width: 100%; }
+    .leaflet-popup-content-wrapper { border-radius: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="{% url 'browse_services' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600">
+                        {% trans "Services" %}
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-gray-900 dark:text-white font-medium">{% trans "Nearby Services" %}</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {% trans "Services Near You" %}
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                {% trans "Find service providers within your area" %}
+            </p>
+        </div>
+
+        <!-- Location Search -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+            <form method="get" action="" class="flex flex-col md:flex-row gap-4" id="location-form">
+                <div class="flex-1">
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Your Location" %}
+                    </label>
+                    <div class="relative">
+                        <input type="text"
+                               id="address"
+                               name="address"
+                               placeholder="{% trans 'Enter address or city...' %}"
+                               class="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-48">
+                    <label for="within_area" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% trans "Distance" %}
+                    </label>
+                    <select name="within_area"
+                            id="within_area"
+                            class="block w-full py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <option value="5" {% if within_area == 5 %}selected{% endif %}>5 km</option>
+                        <option value="10" {% if within_area == 10 %}selected{% endif %}>10 km</option>
+                        <option value="25" {% if within_area == 25 %}selected{% endif %}>25 km</option>
+                        <option value="50" {% if within_area == 50 %}selected{% endif %}>50 km</option>
+                        <option value="100" {% if within_area == 100 %}selected{% endif %}>100 km</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="button"
+                            id="use-my-location"
+                            class="w-full md:w-auto px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {% trans "Use My Location" %}
+                    </button>
+                </div>
+                <input type="hidden" name="lat" id="lat" value="{{ search_location.lat }}">
+                <input type="hidden" name="lng" id="lng" value="{{ search_location.lng }}">
+            </form>
+        </div>
+
+        <!-- Map & Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Map -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                <div id="map" class="w-full h-96 lg:h-full min-h-[400px]"></div>
+            </div>
+
+            <!-- Provider List -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        {% trans "Nearby Providers" %}
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                            ({{ providers.count }} {% trans "found" %})
+                        </span>
+                    </h2>
+                </div>
+
+                <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    {% for provider in providers %}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow provider-card"
+                         data-lat="{{ provider.location_lat }}"
+                         data-lng="{{ provider.location_lng }}"
+                         data-name="{{ provider.display_name }}">
+                        <div class="flex items-start gap-4">
+                            <!-- Avatar -->
+                            {% if provider.avatar %}
+                            <img src="{{ provider.avatar.url }}"
+                                 alt="{{ provider.display_name }}"
+                                 class="w-14 h-14 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-14 h-14 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+                                <span class="text-lg font-medium text-primary-600 dark:text-primary-400">
+                                    {{ provider.display_name|slice:":1"|upper }}
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <a href="{% url 'provider_profile' provider.uuid %}"
+                                       class="text-lg font-semibold text-gray-900 dark:text-white hover:text-primary-600">
+                                        {{ provider.display_name }}
+                                    </a>
+                                    {% if provider.is_verified %}
+                                    <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {% endif %}
+                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full
+                                        {% if provider.availability_status == 'available' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                        {% elif provider.availability_status == 'busy' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                        {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                        {{ provider.get_availability_status_display }}
+                                    </span>
+                                </div>
+
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ provider.tagline|default:provider.bio|truncatewords:15 }}</p>
+
+                                <!-- Distance & Location -->
+                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    {% if provider.distance %}
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        </svg>
+                                        {{ provider.distance.km|floatformat:1 }} km
+                                    </span>
+                                    {% endif %}
+                                    {% if provider.city %}
+                                    <span>{{ provider.city }}{% if provider.country %}, {{ provider.country }}{% endif %}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Rating & Stats -->
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ provider.rating_avg|floatformat:1 }}</span>
+                                        <span class="text-gray-500 dark:text-gray-400">({{ provider.total_reviews }})</span>
+                                    </div>
+                                    <span class="text-gray-500 dark:text-gray-400">{{ provider.completed_jobs_count }} {% trans "jobs" %}</span>
+                                    {% if provider.hourly_rate %}
+                                    <span class="text-gray-500 dark:text-gray-400">${{ provider.hourly_rate|intcomma }}/{% trans "hr" %}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex items-center gap-3 mt-4">
+                                    <a href="{% url 'provider_profile' provider.uuid %}"
+                                       class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                                        {% trans "View Profile" %}
+                                    </a>
+                                    <button type="button"
+                                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                        {% trans "Contact" %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No providers found" %}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {% trans "Try expanding your search radius or changing location." %}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Nearby Services Grid -->
+        {% if services %}
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                {% trans "Available Services Nearby" %}
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for service in services %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow group">
+                    <a href="{% url 'service_detail' service.uuid %}" class="block">
+                        <div class="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+                            {% if service.thumbnail %}
+                            <img src="{{ service.thumbnail.url }}"
+                                 alt="{{ service.name }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="p-4">
+                        <a href="{% url 'service_detail' service.uuid %}">
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-primary-600">
+                                {{ service.name }}
+                            </h3>
+                        </a>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ service.provider.display_name }}</p>
+                        <p class="font-bold text-gray-900 dark:text-white">${{ service.price|intcomma }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const defaultLat = {{ search_location.lat|default:'45.5017' }};
+    const defaultLng = {{ search_location.lng|default:'-73.5673' }};
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 12);
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add user location marker
+    const userIcon = L.divIcon({
+        html: '<div class="bg-primary-600 w-4 h-4 rounded-full border-2 border-white shadow-lg"></div>',
+        className: 'user-marker',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+    });
+
+    L.marker([defaultLat, defaultLng], {icon: userIcon}).addTo(map)
+        .bindPopup('{% trans "Your Location" %}');
+
+    // Add provider markers
+    const providerCards = document.querySelectorAll('.provider-card');
+    const markers = [];
+
+    providerCards.forEach(function(card) {
+        const lat = parseFloat(card.dataset.lat);
+        const lng = parseFloat(card.dataset.lng);
+        const name = card.dataset.name;
+
+        if (lat && lng) {
+            const marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup('<strong>' + name + '</strong>');
+            markers.push(marker);
+
+            // Highlight card on marker click
+            marker.on('click', function() {
+                card.scrollIntoView({behavior: 'smooth', block: 'center'});
+                card.classList.add('ring-2', 'ring-primary-500');
+                setTimeout(() => card.classList.remove('ring-2', 'ring-primary-500'), 2000);
+            });
+
+            // Highlight marker on card hover
+            card.addEventListener('mouseenter', function() {
+                marker.openPopup();
+            });
+        }
+    });
+
+    // Fit map to markers if any
+    if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+
+    // Use My Location button
+    document.getElementById('use-my-location').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                document.getElementById('lat').value = position.coords.latitude;
+                document.getElementById('lng').value = position.coords.longitude;
+                document.getElementById('location-form').submit();
+            }, function(error) {
+                alert('{% trans "Unable to get your location. Please enter an address manually." %}');
+            });
+        } else {
+            alert('{% trans "Geolocation is not supported by your browser." %}');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Offers" %} - ATS - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Offers" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Offers" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Manage job offers sent to candidates." %}
+</p>
+{% endblock %}
+
+{% block content %}
+<div id="main-content">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {% include "components/stats_card.html" with title="Total Offers" value=total_offers icon="offers" icon_color="blue" %}
+        {% include "components/stats_card.html" with title="Pending" value=pending_offers icon="pending" icon_color="yellow" %}
+        {% include "components/stats_card.html" with title="Accepted" value=accepted_offers icon="accepted" icon_color="green" %}
+        {% include "components/stats_card.html" with title="Declined" value=declined_offers icon="declined" icon_color="red" %}
+    </div>
+
+    <!-- Offers Table -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <!-- Filter Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex -mb-px" aria-label="Tabs">
+                <a href="?status=all"
+                   hx-get="{% url 'ats:offer-list' %}?status=all"
+                   hx-target="#offers-table-body"
+                   hx-swap="innerHTML"
+                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
+                          {% if status == 'all' or not status %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                    {% trans "All Offers" %}
+                </a>
+                <a href="?status=pending"
+                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
+                          {% if status == 'pending' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                    {% trans "Pending" %}
+                </a>
+                <a href="?status=accepted"
+                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
+                          {% if status == 'accepted' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                    {% trans "Accepted" %}
+                </a>
+                <a href="?status=declined"
+                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
+                          {% if status == 'declined' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
+                    {% trans "Declined" %}
+                </a>
+            </nav>
+        </div>
+
+        <!-- Offers List -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Candidate" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Position" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Salary" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Status" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Sent" %}
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">{% trans "Actions" %}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="offers-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for offer in offers %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
+                                            {{ offer.application.candidate.full_name|slice:":1"|upper }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <a href="{% url 'ats:application-detail' offer.application.pk %}"
+                                       class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                                        {{ offer.application.candidate.full_name }}
+                                    </a>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ offer.application.candidate.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'ats:job-detail' offer.application.job.pk %}"
+                               class="text-sm text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                                {{ offer.application.job.title }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                ${{ offer.salary|intcomma }}
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">/ {% trans "year" %}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if offer.status == 'pending' or offer.status == 'sent' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                {% elif offer.status == 'accepted' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                {% elif offer.status == 'declined' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                                {% elif offer.status == 'withdrawn' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                {% else %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300{% endif %}">
+                                {{ offer.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {% if offer.sent_at %}
+                            {{ offer.sent_at|date:"M d, Y" }}
+                            {% else %}
+                            <span class="text-gray-400">{% trans "Not sent" %}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'ats:offer-detail' offer.pk %}"
+                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                                {% trans "View" %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No offers yet" %}</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    {% trans "Create offers from the application pipeline." %}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj %}
+        {% include "components/pagination.html" %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,237 +1,293 @@
-# Zumodra - Multi-Tenant CRM & Freelance Services Marketplace
+# Zumodra - Multi-Tenant HR & Freelance Services Platform
 
-**A comprehensive Django-based platform combining CRM functionality with a freelance services marketplace, appointment booking, and content management.**
+**Enterprise-grade SaaS platform combining Applicant Tracking System (ATS), Freelance Marketplace with Escrow, HR Management, and CRM functionality.**
+
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-5.2-green.svg)](https://djangoproject.com)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
 ---
 
-## 🚀 Quick Start
+## Overview
 
-### Option 1: Docker (Recommended)
+Zumodra is a comprehensive multi-tenant platform that combines:
+
+- **Applicant Tracking System (ATS)** - Full hiring pipeline from job posting to offer
+- **Freelance Marketplace** - Service listings with proposals and escrow payments
+- **HR Core** - Employee management, time-off, onboarding, performance reviews
+- **Trust & Verification** - KYC verification and trust scoring
+- **Real-time Messaging** - WebSocket-powered chat system
+- **Co-op/Internship Management** - Student, employer, and coordinator dashboards
+
+---
+
+## Quick Start
+
+### Docker (Recommended)
 
 ```bash
-# 1. Clone and navigate to project
+# Clone repository
+git clone https://github.com/rhematek/zumodra.git
 cd zumodra
 
-# 2. Copy environment file and configure
+# Configure environment
 cp .env.example .env
 # Edit .env with your credentials
 
-# 3. Build and start all services
-docker-compose up --build
+# Start all services
+docker compose up -d
 
-# 4. Run migrations (in another terminal)
-docker-compose exec web python manage.py migrate
+# Run migrations
+docker compose exec web python manage.py migrate
 
-# 5. Create superuser
-docker-compose exec web python manage.py createsuperuser
+# Create superuser
+docker compose exec web python manage.py createsuperuser
 
-# 6. Access application
-# - Application: http://localhost:8000
-# - Admin Panel: http://localhost:8000/admin-panel/
-# - Nginx Proxy: http://localhost:80
+# Access application
+# Web: http://localhost:8000
+# API Docs: http://localhost:8000/api/docs/
+# Admin: http://localhost:8000/admin-panel/
 ```
 
-### Option 2: Local Development
+### Local Development
 
 ```bash
-# 1. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# 2. Set up environment
+# Configure environment
 cp .env.example .env
-# Edit .env with your credentials
 
-# 3. Run migrations
+# Run migrations
 python manage.py migrate
 
-# 4. Create superuser
-python manage.py createsuperuser
-
-# 5. Collect static files
-python manage.py collectstatic
-
-# 6. Run development server
+# Start development server
 python manage.py runserver
 
-# 7. Run Celery (in separate terminals)
+# Start Celery (separate terminals)
 celery -A zumodra worker --loglevel=info
 celery -A zumodra beat --loglevel=info
 ```
 
 ---
 
-## 📋 Features
+## Features
 
-### Core Features ✅
-- **Appointment Booking System** - Full-featured booking with Stripe payments
-- **Finance Management** - Payments, subscriptions, escrow, refunds
-- **Real-time Messaging** - Chat system with file uploads and typing indicators
-- **Email Marketing** - Newsletter campaigns with analytics
-- **Security** - 2FA, audit logging, brute force protection, honeypot
-- **Content Management** - Wagtail CMS for blog and landing pages
+### Core Modules
 
-### In Development ⚠️
-- **Service Marketplace** - Freelance services platform (models complete, views needed)
-- **Dashboard** - Analytics and metrics (templates ready, logic needed)
-- **Multi-language Support** - i18n configured for 9 languages
+| Module | Status | Description |
+|--------|--------|-------------|
+| **ATS** | Production | Job postings, pipelines, interviews, offers |
+| **Marketplace** | Production | Services, proposals, contracts, escrow |
+| **HR Core** | Production | Employees, time-off, onboarding |
+| **Finance** | Production | Stripe payments, escrow, subscriptions |
+| **Messaging** | Production | Real-time WebSocket chat |
+| **Notifications** | Production | Multi-channel notifications |
+| **KYC/Verification** | Production | Identity and career verification |
+| **Trust Scores** | Production | Multi-dimensional trust scoring |
+| **Co-op Management** | Production | Student/employer/coordinator UIs |
+| **Multi-CV** | Production | CV management with AI scoring |
+
+### Security Features
+
+- Two-Factor Authentication (mandatory)
+- JWT API authentication with token rotation
+- Brute force protection (django-axes)
+- Content Security Policy headers
+- Admin honeypot protection
+- Comprehensive audit logging
+- Rate limiting per user tier
+- Input sanitization and XSS prevention
 
 ---
 
-## 🏗️ Technology Stack
+## Technology Stack
 
-**Backend:**
-- Django 5.2.7 with Python 3.x
-- PostgreSQL 16 with PostGIS
+### Backend
+- Python 3.11+
+- Django 5.2 with GeoDjango
 - Django REST Framework
-- Celery 5.5.3 + Redis
+- PostgreSQL 16 + PostGIS
+- Redis 7 (cache, sessions, Celery)
+- RabbitMQ (message broker)
+- Celery 5.x (async tasks)
 - Django Channels (WebSockets)
 
-**Authentication:**
-- Django Allauth (email + social)
-- 2FA with django-allauth-2fa
-- django-otp
+### Frontend
+- Django Templates with HTMX
+- Alpine.js for interactivity
+- Tailwind CSS
+- Wagtail CMS
 
-**Infrastructure:**
+### Infrastructure
 - Docker + Docker Compose
-- Gunicorn (WSGI)
-- Nginx (reverse proxy)
-- Redis (cache, Celery, Channels)
-- Whitenoise (static files)
-
-**CMS & Content:**
-- Wagtail 7.1.2
-- TinyMCE editor
-- Multilingual via wagtail-localize
-
-**Payments:**
-- Stripe integration
+- Nginx reverse proxy
+- Gunicorn + Uvicorn (ASGI)
+- Prometheus + Grafana (monitoring)
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 zumodra/
-├── appointment/          # ✅ Appointment booking system
-├── finance/             # ✅ Payment processing
-├── messages_sys/        # ✅ Real-time chat
-├── newsletter/          # ✅ Email campaigns
-├── security/            # ✅ Audit & security logging
-├── blog/                # ⚠️ Wagtail CMS blog
-├── services/            # ⚠️ Freelance marketplace (needs work)
-├── dashboard/           # ⚠️ Analytics dashboard (needs work)
-├── custom_account_u/    # ✅ Custom user model
-├── configurations/      # Global settings
-├── main/                # Core models
-├── docker/              # Docker configurations
-│   └── nginx/          # Nginx config
-├── zumodra/             # Django project settings
-│   ├── settings.py     # Main settings
-│   ├── celery.py       # Celery configuration
-│   └── urls.py         # URL routing
-├── templates/           # Global templates
-├── staticfiles/         # Static source files
-├── media/              # User uploads
-└── locale/             # Translations
+├── accounts/           # User accounts, KYC, trust scores
+├── ats/                # Applicant Tracking System
+├── hr_core/            # HR management, onboarding
+├── services/           # Freelance marketplace
+├── finance/            # Payments, escrow, subscriptions
+├── messages_sys/       # Real-time messaging
+├── notifications/      # Notification system
+├── careers/            # Public career pages
+├── ai_matching/        # AI-powered matching
+├── integrations/       # Third-party integrations
+├── tenants/            # Multi-tenant management
+├── api/                # REST API infrastructure
+├── core/               # Shared utilities
+├── security/           # Security middleware
+├── templates/          # Django templates
+├── tests/              # Test suite
+├── docker/             # Docker configurations
+├── docs/               # Documentation
+└── zumodra/            # Django project settings
 ```
 
 ---
 
-## 🔧 Configuration
+## API Documentation
 
-### Environment Variables
+### Interactive Docs
 
-Copy `.env.example` to `.env` and configure:
+- **Swagger UI:** http://localhost:8000/api/docs/
+- **ReDoc:** http://localhost:8000/api/redoc/
+- **OpenAPI Schema:** http://localhost:8000/api/schema/
+
+### Authentication
+
+```bash
+# Get JWT token
+curl -X POST http://localhost:8000/api/v1/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password"}'
+
+# Use token
+curl http://localhost:8000/api/v1/ats/jobs/ \
+  -H "Authorization: Bearer <access_token>"
+```
+
+See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for complete API reference.
+
+---
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov
+
+# Run specific test file
+pytest tests/test_ats_flows.py
+
+# Run by marker
+pytest -m workflow     # End-to-end workflows
+pytest -m security     # Security tests
+pytest -m integration  # Integration tests
+
+# Check deployment readiness
+python manage.py check --deploy
+```
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | Complete API reference |
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment guide |
+| [SECURITY.md](SECURITY.md) | Security policy and practices |
+| [QA_SCENARIOS.md](docs/QA_SCENARIOS.md) | End-to-end test scenarios |
+| [TENANT_ONBOARDING.md](docs/TENANT_ONBOARDING.md) | New tenant setup guide |
+| [domain_model.md](docs/domain_model.md) | Domain model documentation |
+
+---
+
+## Docker Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| web | 8000 | Django application |
+| channels | 8001 | WebSocket server |
+| nginx | 80/443 | Reverse proxy |
+| db | 5433 | PostgreSQL + PostGIS |
+| redis | 6379 | Cache and sessions |
+| rabbitmq | 5672 | Message broker |
+| celery_worker | - | Background tasks |
+| celery_beat | - | Scheduled tasks |
+| mailhog | 8025 | Email testing (dev) |
+| prometheus | 9090 | Metrics (optional) |
+| grafana | 3000 | Dashboards (optional) |
+
+---
+
+## Environment Variables
+
+Key configuration options (see `.env.example` for complete list):
 
 ```env
 # Django
 SECRET_KEY=your-secret-key
-DEBUG=True
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Database
-DB_NAME=zumodra
+DB_DEFAULT_NAME=zumodra
 DB_USER=postgres
 DB_PASSWORD=your-password
-DB_HOST=localhost
-DB_PORT=5433
+DB_HOST=db
 
-# Email
-EMAIL_HOST_PASSWORD=your-email-password
+# Redis
+REDIS_URL=redis://redis:6379/0
 
 # Stripe
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_PUBLIC_KEY=pk_test_...
+
+# Feature Flags
+FEATURE_ENABLE_2FA=True
+FEATURE_ENABLE_ESCROW=True
+FEATURE_ENABLE_AI_MATCHING=False
 ```
 
-### Services (Docker)
+---
 
-The project includes the following Docker services:
+## Multi-Tenancy
 
-- **db** - PostgreSQL with PostGIS
-- **redis** - Redis for caching and Celery
-- **web** - Django application
-- **celery_worker** - Background task processor
-- **celery_beat** - Scheduled tasks
-- **nginx** - Reverse proxy
+Zumodra supports full multi-tenant architecture:
+
+- **Tenant Isolation** - Each tenant has isolated data
+- **Custom Domains** - Per-tenant domain support
+- **Role-Based Access** - PDG, Supervisor, HR, Recruiter, Employee, Viewer
+- **Plan-Based Features** - Feature flags per subscription tier
+
+```python
+# Tenant roles
+TENANT_ROLES = [
+    'pdg',          # Full tenant access
+    'supervisor',   # Circusale + subordinates
+    'hr_manager',   # HR operations
+    'recruiter',    # ATS access
+    'employee',     # Self-service
+    'viewer',       # Read-only
+]
+```
 
 ---
 
-## 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [SETUP_SUMMARY.md](SETUP_SUMMARY.md) | Quick setup guide and current status |
-| [PROJECT_PLAN.md](PROJECT_PLAN.md) | Comprehensive project plan and roadmap |
-| [BUGS_AND_FIXES.md](BUGS_AND_FIXES.md) | Known issues and how to fix them |
-| [APPS_TO_DELETE.txt](APPS_TO_DELETE.txt) | Unnecessary apps to remove |
-| [CLAUDE.md](CLAUDE.md) | Original planning document (French) |
-
----
-
-## 🐛 Known Issues
-
-### Critical
-1. **Blog app** - Model/View mismatch (Wagtail models, Django views)
-2. **Services app** - 99% incomplete (models done, views needed)
-3. **Dashboard** - Template-only views (no backend logic)
-
-See [BUGS_AND_FIXES.md](BUGS_AND_FIXES.md) for complete list and fixes.
-
----
-
-## 🚀 Development Roadmap
-
-### Phase 1: Foundation (Weeks 1-3)
-- [x] Fix hardcoded secrets
-- [x] Configure Celery
-- [x] Set up Nginx
-- [x] Update Docker Compose
-- [ ] Delete empty apps
-- [ ] Fix blog architecture
-
-### Phase 2: Core Features (Weeks 4-7)
-- [ ] Implement services marketplace views
-- [ ] Add dashboard backend logic
-- [ ] Consolidate newsletter apps
-- [ ] Create API endpoints
-
-### Phase 3: Enhancement (Weeks 8-12)
-- [ ] Configure Wagtail CMS properly
-- [ ] Set up multilingual support
-- [ ] Payment enhancements
-- [ ] Messaging upgrades
-
-### Phase 4: Production (Weeks 13-15)
-- [ ] Testing & optimization
-- [ ] Security audit
-- [ ] Deployment setup
-- [ ] Monitoring configuration
-
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for detailed roadmap.
-
----
-
-## 🌍 Supported Languages
+## Supported Languages
 
 - English (en)
 - Spanish (es)
@@ -245,95 +301,31 @@ See [PROJECT_PLAN.md](PROJECT_PLAN.md) for detailed roadmap.
 
 ---
 
-## 🧪 Testing
+## Contributing
 
-```bash
-# Run tests
-python manage.py test
-
-# Check for issues
-python manage.py check
-
-# Check deployment readiness
-python manage.py check --deploy
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`pytest`)
+5. Commit (`git commit -m 'Add amazing feature'`)
+6. Push (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ---
 
-## 📦 Database
+## Support
 
-The project uses PostgreSQL with PostGIS extension for geospatial features.
-
-```bash
-# Backup database
-docker-compose exec db pg_dump -U postgres zumodra > backup.sql
-
-# Restore database
-docker-compose exec -T db psql -U postgres zumodra < backup.sql
-```
+- **Documentation:** https://docs.zumodra.com
+- **API Status:** https://status.zumodra.com
+- **Support Email:** support@zumodra.com
 
 ---
 
-## 🔐 Security Features
+## License
 
-- **2FA Required** - All users must enable two-factor authentication
-- **Django Axes** - Brute force protection
-- **Admin Honeypot** - Fake admin panel to trap attackers
-- **CSP Headers** - Content Security Policy
-- **Audit Logging** - Complete audit trail with django-auditlog
-- **SSL Ready** - HTTPS configuration for production
+Proprietary - All Rights Reserved
 
 ---
 
-## 📧 Contact & Support
-
-- **Admin Panel:** `/admin-panel/`
-- **Wagtail CMS:** `/cms/`
-- **API Docs:** `/api/docs/` (when implemented)
-
----
-
-## ⚠️ Important Notes
-
-1. **Never commit `.env` file** - Contains sensitive credentials
-2. **Backup before major changes** - Especially before deleting apps
-3. **Test in development first** - Don't deploy untested code
-4. **Services app is critical** - Core marketplace functionality needs completion
-5. **Multi-tenancy disabled** - Can be enabled via django-tenants if needed
-
----
-
-## 🤝 Contributing
-
-1. Create feature branch
-2. Make changes
-3. Test thoroughly
-4. Submit pull request
-
----
-
-## 📄 License
-
-[Your License Here]
-
----
-
-## 🎯 Project Goals
-
-**Short-term:**
-- Fix critical bugs
-- Complete services marketplace
-- Deploy to production
-
-**Long-term:**
-- Mobile app (React Native/Flutter)
-- AI-powered service matching
-- Advanced analytics
-- Multi-currency support
-
----
-
-**Status:** In Active Development
-**Last Updated:** December 25, 2025
-
-For detailed setup instructions, see [SETUP_SUMMARY.md](SETUP_SUMMARY.md)
+**Version:** 1.0.0
+**Last Updated:** December 2025

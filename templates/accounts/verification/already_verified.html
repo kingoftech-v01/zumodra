@@ -1,0 +1,47 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Already Verified" %} - Zumodra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4 max-w-md">
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">
+                {% trans "Already Verified" %}
+            </h1>
+
+            <p class="text-gray-600 mb-6">
+                {% blocktrans with company=verification.company_name title=verification.job_title %}
+                This employment at <strong>{{ company }}</strong> as <strong>{{ title }}</strong> has already been verified.
+                {% endblocktrans %}
+            </p>
+
+            <div class="bg-green-50 rounded-lg p-4">
+                <p class="text-green-800 text-sm">
+                    {% if verification.verified_at %}
+                    {% blocktrans with date=verification.verified_at|date:"M d, Y" %}
+                    Verified on {{ date }}
+                    {% endblocktrans %}
+                    {% else %}
+                    {% trans "Verification complete" %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-6 text-sm text-gray-500">
+            <p>Zumodra - {% trans "Building Trust in Professional Networks" %}</p>
+        </div>
+    </div>
+</body>
+</html>

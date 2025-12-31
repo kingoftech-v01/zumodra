@@ -1,52 +1,133 @@
+{# =============================================================================
+   ZUMODRA BASE TEMPLATE (Legacy/Public Version)
+   =============================================================================
+
+   File: templates/base.html
+   Purpose: Root template for public-facing pages with legacy FreelanHub styling
+
+   TEMPLATE HIERARCHY:
+   - This is the LEGACY base template for public marketplace pages
+   - For modern dashboard pages, use: templates/base/dashboard_base.html
+   - For modern public pages, use: templates/base/public_base.html
+
+   BLOCKS AVAILABLE:
+   - head_title: Page title (appears in browser tab)
+   - extra_head: Additional <head> content (CSS, meta tags)
+   - header: Navigation header area
+   - content: Main page content
+   - js: Additional JavaScript before closing </body>
+
+   DEPENDENCIES:
+   - jQuery (for legacy components)
+   - Swiper.js (carousels/sliders)
+   - Slick (alternative slider)
+   - ApexCharts (data visualization)
+   - Quill.js (rich text editor)
+   - Tailwind CSS (utility styles)
+   - Material Design Icons (icon set)
+   - Phosphor Icons (icon set)
+
+   STATIC ASSETS:
+   - assets/css/: Third-party CSS libraries
+   - dist/: Compiled Tailwind and SCSS output
+
+   NOTE: This template uses the old "FreelanHub" branding in meta description.
+   Update to "Zumodra" for production deployment.
+
+   Author: Rhematek Solutions
+   Last Updated: 2025-12-30
+   ============================================================================= #}
+
 {% load static i18n %}
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        {# ===== META TAGS ===== #}
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {# TODO: Update description to Zumodra branding #}
         <meta name="description" content="FreelanHub - Job Board & Freelance Marketplace" />
+
+        {# ===== PAGE TITLE ===== #}
         <title>{% block head_title %}{% endblock head_title %}</title>
+
+        {# ===== FAVICON ===== #}
         <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
+
+        {# ===== CSS LIBRARIES ===== #}
+        {# Swiper - Touch-enabled carousel/slider #}
         <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}" />
+        {# Slick - Alternative carousel library #}
         <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}" />
+        {# Main custom styles #}
         <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+        {# Compiled Tailwind CSS output #}
         <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}" />
+        {# Compiled SCSS output #}
         <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}" />
+        {# Language selector styles #}
         <link rel="stylesheet" href="{% static 'assets/css/language.css' %}">
+        {# ApexCharts - Data visualization #}
         <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}" />
+        {# Quill - Rich text editor styles #}
         <link rel="stylesheet" href="{% static 'assets/css/quill.snow.css' %}" />
+        {# Material Design Icons - CDN #}
         <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
         />
+
+        {# ===== TAILWIND BROWSER RUNTIME ===== #}
+        {# NOTE: For production, replace with pre-compiled Tailwind CSS #}
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+        {# ===== ADDITIONAL HEAD CONTENT ===== #}
+        {# Child templates can inject additional CSS/meta tags here #}
         {% block extra_head %} {% endblock extra_head %}
     </head>
 
     <body class="flex flex-col min-h-screen">
-        <!-- Header -->
+        {# ===== HEADER SECTION ===== #}
+        {# Override in child templates to include navigation #}
         {% block header %}
         {% endblock header %}
 
         <main class="flex-grow">
-        <!-- Content -->
-        {% block content %} {% endblock content %}
+            {# ===== MAIN CONTENT AREA ===== #}
+            {# Primary content block - all page content goes here #}
+            {% block content %} {% endblock content %}
 
-        <!-- Scroll to top -->
-        <button class="scroll-to-top-btn"><span class="ph-bold ph-caret-up"></span></button>
+            {# ===== SCROLL TO TOP BUTTON ===== #}
+            {# Floating button that appears when user scrolls down #}
+            {# Uses Phosphor Icons for the up arrow #}
+            <button class="scroll-to-top-btn" aria-label="Scroll to top">
+                <span class="ph-bold ph-caret-up"></span>
+            </button>
         </main>
-        <!-- Footer -->
+
+        {# ===== FOOTER ===== #}
+        {# Global footer included on all pages #}
         {% include 'footer.html' %}
 
+        {# ===== ADDITIONAL PAGE SCRIPTS ===== #}
+        {# Child templates can add page-specific JavaScript here #}
         {% block js %} {% endblock js %}
 
+        {# ===== JAVASCRIPT LIBRARIES ===== #}
+        {# jQuery - Required for legacy components and plugins #}
         <script src="{% static '/assets/js/jquery.min.js' %}"></script>
+        {# Phosphor Icons - Icon library initialization #}
         <script src="{% static '/assets/js/phosphor-icons.js' %}"></script>
+        {# Slick Carousel - Slider functionality #}
         <script src="{% static '/assets/js/slick.min.js' %}"></script>
+        {# Swiper - Touch slider #}
         <script src="{% static '/assets/js/swiper-bundle.min.js' %}"></script>
+        {# ApexCharts - Charts and graphs #}
         <script src="{% static '/assets/js/apexcharts.js' %}"></script>
+        {# Main custom JavaScript #}
         <script src="{% static '/assets/js/main.js' %}"></script>
+        {# Quill Editor - Rich text editing #}
         <script src="{% static '/assets/js/quill.js' %}"></script>
     </body>
 </html>

@@ -1,0 +1,667 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize security_filters %}
+
+{% block title %}{{ candidate.full_name }} - {% trans "Candidates" %} - Zumodra{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .timeline-item:last-child .timeline-line {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'ats:candidate_list' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Candidates" %}</a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{{ candidate.full_name|truncatechars:30 }}</span>
+</li>
+{% endblock %}
+
+{% block page_header %}{% endblock %}
+
+{% block content %}
+<div id="main-content" class="space-y-6" x-data="{ activeTab: 'overview' }">
+    <!-- Candidate Profile Header -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-5">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                <!-- Profile Info -->
+                <div class="flex items-start">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0">
+                        {% if candidate.photo %}
+                        <img class="h-20 w-20 rounded-full object-cover ring-4 ring-white dark:ring-gray-700"
+                             src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}">
+                        {% else %}
+                        <div class="h-20 w-20 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center ring-4 ring-white dark:ring-gray-700">
+                            <span class="text-2xl font-bold text-white">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="ml-6">
+                        <div class="flex items-center">
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ candidate.full_name }}</h1>
+                            {% if candidate.status == 'active' %}
+                            <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                {% trans "Active" %}
+                            </span>
+                            {% elif candidate.status == 'hired' %}
+                            <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                {% trans "Hired" %}
+                            </span>
+                            {% elif candidate.status == 'archived' %}
+                            <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                {% trans "Archived" %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="mt-1 text-lg text-gray-600 dark:text-gray-400">
+                            {{ candidate.current_title|default:"N/A" }}
+                            {% if candidate.current_company %}
+                            <span class="text-gray-400 dark:text-gray-500">{% trans "at" %}</span> {{ candidate.current_company }}
+                            {% endif %}
+                        </p>
+
+                        <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            {% if candidate.email %}
+                            <a href="mailto:{{ candidate.email }}" class="flex items-center hover:text-primary-600 dark:hover:text-primary-400">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                {{ candidate.email }}
+                            </a>
+                            {% endif %}
+
+                            {% if candidate.phone %}
+                            <a href="tel:{{ candidate.phone }}" class="flex items-center hover:text-primary-600 dark:hover:text-primary-400">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                </svg>
+                                {{ candidate.phone }}
+                            </a>
+                            {% endif %}
+
+                            {% if candidate.location %}
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ candidate.location }}
+                            </span>
+                            {% endif %}
+
+                            {% if candidate.linkedin_url %}
+                            <a href="{{ candidate.linkedin_url }}" target="_blank" rel="noopener" class="flex items-center hover:text-blue-600">
+                                <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                </svg>
+                                LinkedIn
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 lg:mt-0 flex flex-wrap items-center gap-3">
+                    <button hx-get="{% url 'ats:candidate_add_to_job' candidate.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML"
+                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        {% trans "Add to Job" %}
+                    </button>
+
+                    <a href="{% url 'ats:candidate_edit' candidate.id %}"
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        {% trans "Edit" %}
+                    </a>
+
+                    <!-- More Actions Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                             class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                            <div class="py-1">
+                                <a href="mailto:{{ candidate.email }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    {% trans "Send Email" %}
+                                </a>
+                                {% if candidate.resume %}
+                                <a href="{{ candidate.resume.url }}" target="_blank" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    {% trans "Download Resume" %}
+                                </a>
+                                {% endif %}
+                                <hr class="my-1 border-gray-200 dark:border-gray-700">
+                                <button hx-post="{% url 'ats:candidate_archive' candidate.id %}"
+                                        hx-confirm="{% trans 'Are you sure you want to archive this candidate?' %}"
+                                        class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                    </svg>
+                                    {% trans "Archive" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 px-6 py-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ applications|length }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Applications" %}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ upcoming_interviews|length }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Upcoming Interviews" %}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ candidate.created_at|timesince }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "In Talent Pool" %}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ candidate.source.name|default:"Direct" }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Source" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="border-t border-gray-200 dark:border-gray-700">
+            <nav class="flex -mb-px overflow-x-auto" aria-label="Tabs">
+                <button @click="activeTab = 'overview'"
+                        :class="activeTab === 'overview' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'"
+                        class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
+                    {% trans "Overview" %}
+                </button>
+                <button @click="activeTab = 'applications'"
+                        :class="activeTab === 'applications' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'"
+                        class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
+                    {% trans "Applications" %}
+                    <span class="ml-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 py-0.5 px-2 rounded-full text-xs">{{ applications|length }}</span>
+                </button>
+                <button @click="activeTab = 'timeline'"
+                        :class="activeTab === 'timeline' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'"
+                        class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
+                    {% trans "Activity Timeline" %}
+                </button>
+                <button @click="activeTab = 'documents'"
+                        :class="activeTab === 'documents' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'"
+                        class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
+                    {% trans "Documents" %}
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content Area -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Overview Tab -->
+            <div x-show="activeTab === 'overview'" x-transition>
+                <!-- Skills -->
+                {% if candidate.skills %}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Skills" %}</h2>
+                    </div>
+                    <div class="px-6 py-4">
+                        <div class="flex flex-wrap gap-2">
+                            {% for skill in candidate.skills %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
+                                {{ skill }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Summary / About -->
+                {% if candidate.summary %}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "About" %}</h2>
+                    </div>
+                    <div class="px-6 py-4 prose dark:prose-invert max-w-none">
+                        {{ candidate.summary|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Experience -->
+                {% if candidate.experience %}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Experience" %}</h2>
+                    </div>
+                    <div class="px-6 py-4 prose dark:prose-invert max-w-none">
+                        {{ candidate.experience|sanitize_rich_html }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Education -->
+                {% if candidate.education %}
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Education" %}</h2>
+                    </div>
+                    <div class="px-6 py-4 prose dark:prose-invert max-w-none">
+                        {{ candidate.education|sanitize_rich_html }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Applications Tab -->
+            <div x-show="activeTab === 'applications'" x-transition x-cloak>
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Job Applications" %}</h2>
+                    </div>
+
+                    {% if applications %}
+                    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for app in applications %}
+                        <li class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <a href="{% url 'ats:application_detail' app.id %}"
+                                       class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                                        {{ app.job.title }}
+                                    </a>
+                                    <div class="mt-1 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            {% trans "Applied" %} {{ app.created_at|date:"M d, Y" }}
+                                        </span>
+                                        {% if app.current_stage %}
+                                        <span class="flex items-center">
+                                            <span class="w-2 h-2 rounded-full mr-1.5" style="background-color: {{ app.current_stage.color|default:'#6b7280' }};"></span>
+                                            {{ app.current_stage.name }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    {% if app.status == 'new' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                        {% trans "New" %}
+                                    </span>
+                                    {% elif app.status == 'in_review' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                        {% trans "In Review" %}
+                                    </span>
+                                    {% elif app.status == 'interviewing' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                                        {% trans "Interviewing" %}
+                                    </span>
+                                    {% elif app.status == 'offer' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        {% trans "Offer" %}
+                                    </span>
+                                    {% elif app.status == 'hired' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        {% trans "Hired" %}
+                                    </span>
+                                    {% elif app.status == 'rejected' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                        {% trans "Rejected" %}
+                                    </span>
+                                    {% endif %}
+
+                                    <a href="{% url 'ats:application_detail' app.id %}"
+                                       class="text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="px-6 py-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No applications yet" %}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Add this candidate to a job to create an application." %}</p>
+                        <div class="mt-6">
+                            <button hx-get="{% url 'ats:candidate_add_to_job' candidate.id %}"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
+                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                {% trans "Add to Job" %}
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div x-show="activeTab === 'timeline'" x-transition x-cloak>
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Activity Timeline" %}</h2>
+                    </div>
+
+                    {% if timeline %}
+                    <div class="flow-root px-6 py-4">
+                        <ul class="-mb-8">
+                            {% for item in timeline %}
+                            <li class="timeline-item">
+                                <div class="relative pb-8">
+                                    <span class="timeline-line absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true"></span>
+                                    <div class="relative flex space-x-3">
+                                        <div>
+                                            {% if item.type == 'activity' %}
+                                            <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-4 ring-white dark:ring-gray-800">
+                                                <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                            </span>
+                                            {% elif item.type == 'note' %}
+                                            <span class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center ring-4 ring-white dark:ring-gray-800">
+                                                <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ item.description }}
+                                                    {% if item.application %}
+                                                    <span class="text-gray-400">-</span>
+                                                    <a href="{% url 'ats:application_detail' item.application.id %}" class="text-primary-600 dark:text-primary-400 hover:underline">{{ item.application.job.title }}</a>
+                                                    {% endif %}
+                                                </p>
+                                                <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                                                    {% if item.user %}{{ item.user.get_full_name|default:item.user.email }} - {% endif %}{{ item.date|naturaltime }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="px-6 py-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No activity yet" %}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Activity will appear here as you interact with this candidate." %}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Documents Tab -->
+            <div x-show="activeTab === 'documents'" x-transition x-cloak>
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Documents" %}</h2>
+                        <button hx-get="{% url 'ats:candidate_upload_document' candidate.id %}"
+                                hx-target="#modal-container"
+                                hx-swap="innerHTML"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                            {% trans "Upload" %}
+                        </button>
+                    </div>
+
+                    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                        {% if candidate.resume %}
+                        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-10 w-10 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Resume" %}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ candidate.resume.name|slice:"-30:" }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ candidate.resume.url }}" target="_blank"
+                               class="inline-flex items-center text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                {% trans "Download" %}
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for doc in candidate.documents.all %}
+                        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-10 w-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ doc.name }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Uploaded" %} {{ doc.created_at|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ doc.file.url }}" target="_blank"
+                               class="inline-flex items-center text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                {% trans "Download" %}
+                            </a>
+                        </li>
+                        {% empty %}
+                        {% if not candidate.resume %}
+                        <li class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No documents" %}</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Upload a resume or other documents." %}</p>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Upcoming Interviews -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Upcoming Interviews" %}</h2>
+                </div>
+
+                {% if upcoming_interviews %}
+                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for interview in upcoming_interviews %}
+                    <li class="px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ interview.get_interview_type_display }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ interview.application.job.title }}</p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                {{ interview.scheduled_start|date:"M d, g:i A" }}
+                            </span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "No upcoming interviews" %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Trust & Verification -->
+            {% if candidate.user and candidate.user.trust_score %}
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Trust & Verification" %}</h2>
+                    <a href="{% url 'accounts:trust-score' %}"
+                       class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                        {% trans "Details" %}
+                    </a>
+                </div>
+                <div class="p-4">
+                    {% include "components/trust_badge.html" with trust_score=candidate.user.trust_score size="md" show_details=True %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Tags -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Tags" %}</h2>
+                    <button hx-get="{% url 'ats:candidate_edit_tags' candidate.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML"
+                            class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                        {% trans "Edit" %}
+                    </button>
+                </div>
+                <div class="px-6 py-4">
+                    {% if candidate.tags.all %}
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in candidate.tags.all %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                              style="background-color: {{ tag.color|default:'#e5e7eb' }}20; color: {{ tag.color|default:'#6b7280' }};">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "No tags added" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Notes -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Quick Note" %}</h2>
+                </div>
+                <div class="px-6 py-4">
+                    <form hx-post="{% url 'ats:candidate_add_note' candidate.id %}"
+                          hx-swap="none"
+                          hx-on::after-request="this.reset()">
+                        {% csrf_token %}
+                        <textarea name="content"
+                                  rows="3"
+                                  class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                  placeholder="{% trans 'Add a note about this candidate...' %}"></textarea>
+                        <div class="mt-3 flex justify-end">
+                            <button type="submit"
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
+                                {% trans "Add Note" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Candidate Details -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Details" %}</h2>
+                </div>
+                <dl class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Added" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.created_at|date:"M d, Y" }}</dd>
+                    </div>
+                    {% if candidate.created_by %}
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Added by" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.created_by.get_full_name|default:candidate.created_by.email }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if candidate.source %}
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Source" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.source.name }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if candidate.years_of_experience %}
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Experience" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.years_of_experience }} {% trans "years" %}</dd>
+                    </div>
+                    {% endif %}
+                    {% if candidate.expected_salary %}
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Expected Salary" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">${{ candidate.expected_salary|intcomma }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if candidate.availability %}
+                    <div class="px-6 py-3 flex justify-between">
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Availability" %}</dt>
+                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.availability }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

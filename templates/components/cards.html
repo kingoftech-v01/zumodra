@@ -1,0 +1,435 @@
+{% comment %}
+Zumodra Card Component Templates
+Usage: {% include "components/cards.html" with variant="default" title="Card Title" %}
+
+Available variants: default, hover, clickable, flat, elevated, outlined
+Color accents: primary, secondary, success, warning, error
+{% endcomment %}
+
+{% comment %}
+==============================================================================
+DEFAULT CARD
+Usage: {% include "components/cards.html" with variant="default" title="Card Title" body="Card content here" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "default" %}
+<div class="card{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if header or title %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+HOVER CARD (with hover effects)
+Usage: {% include "components/cards.html" with variant="hover" title="Hover Card" body="Hover to see effect" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "hover" %}
+<div class="card card-hover{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if image %}
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    {% endif %}
+
+    {% if header or title %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+CLICKABLE CARD (interactive, link to another page)
+Usage: {% include "components/cards.html" with variant="clickable" title="Click Me" href="/destination" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "clickable" %}
+<a href="{{ href|default:'#' }}" class="card card-clickable{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" style="text-decoration: none; color: inherit; display: block;"{% if id %} id="{{ id }}"{% endif %}{% if target %} target="{{ target }}"{% endif %}>
+    {% if image %}
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    {% endif %}
+
+    {% if title or subtitle %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+</a>
+{% endif %}
+
+{% comment %}
+==============================================================================
+FLAT CARD (no shadow)
+Usage: {% include "components/cards.html" with variant="flat" title="Flat Card" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "flat" %}
+<div class="card card-flat{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if header or title %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ELEVATED CARD (stronger shadow)
+Usage: {% include "components/cards.html" with variant="elevated" title="Elevated Card" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "elevated" %}
+<div class="card card-elevated{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if image %}
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    {% endif %}
+
+    {% if header or title %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+OUTLINED CARD (stronger border)
+Usage: {% include "components/cards.html" with variant="outlined" title="Outlined Card" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "outlined" %}
+<div class="card card-outlined{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if header or title %}
+    <div class="card-header">
+        <div>
+            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="card-body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+IMAGE CARD (with featured image)
+Usage: {% include "components/cards.html" with variant="image" image="/path/to/image.jpg" title="Featured" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "image" %}
+<div class="card card-hover{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if image %}
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top" loading="lazy">
+    {% endif %}
+
+    <div class="card-body">
+        {% if title %}<h3 class="card-header-title" style="margin-bottom: var(--spacing-2);">{{ title }}</h3>{% endif %}
+        {% if subtitle %}<p class="card-header-subtitle" style="margin-bottom: var(--spacing-3);">{{ subtitle }}</p>{% endif %}
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+STATS CARD (for dashboard metrics)
+Usage: {% include "components/cards.html" with variant="stats" title="Total Users" value="1,234" change="+12%" trend="up" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "stats" %}
+<div class="card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="card-body">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0 0 var(--spacing-1) 0;">{{ title }}</p>
+                <p style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin: 0;">{{ value }}</p>
+                {% if change %}
+                <p style="font-size: var(--font-size-sm); margin: var(--spacing-2) 0 0 0; display: flex; align-items: center; gap: var(--spacing-1);">
+                    {% if trend == "up" %}
+                    <span style="color: var(--color-success);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        {{ change }}
+                    </span>
+                    {% elif trend == "down" %}
+                    <span style="color: var(--color-error);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                            <polyline points="17 18 23 18 23 12"></polyline>
+                        </svg>
+                        {{ change }}
+                    </span>
+                    {% else %}
+                    <span style="color: var(--color-text-tertiary);">{{ change }}</span>
+                    {% endif %}
+                    {% if period %}<span style="color: var(--color-text-tertiary);">{{ period }}</span>{% endif %}
+                </p>
+                {% endif %}
+            </div>
+            {% if icon %}
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-lg); background-color: var(--color-{{ icon_color|default:'primary' }}-light); display: flex; align-items: center; justify-content: center; color: var(--color-{{ icon_color|default:'primary' }});">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    {{ icon|safe }}
+                </svg>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+PROFILE CARD
+Usage: {% include "components/cards.html" with variant="profile" name="John Doe" role="Developer" avatar="/path/to/avatar.jpg" %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "profile" %}
+<div class="card card-hover{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="card-body" style="text-align: center; padding: var(--spacing-8);">
+        <div class="avatar avatar-xl" style="margin: 0 auto var(--spacing-4);">
+            {% if avatar %}
+            <img src="{{ avatar }}" alt="{{ name }}">
+            {% else %}
+            {{ name|slice:":2"|upper }}
+            {% endif %}
+        </div>
+        <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0 0 var(--spacing-1) 0;">{{ name }}</h3>
+        {% if role %}<p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0 0 var(--spacing-3) 0;">{{ role }}</p>{% endif %}
+        {% if bio %}<p style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 var(--spacing-4) 0;">{{ bio }}</p>{% endif %}
+        {% if actions %}
+        <div style="display: flex; gap: var(--spacing-2); justify-content: center;">
+            {{ actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+LIST CARD (card with list items)
+Usage: {% include "components/cards.html" with variant="list" title="Recent Activity" items=items_list %}
+==============================================================================
+{% endcomment %}
+
+{% if variant == "list" %}
+<div class="card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if title %}
+    <div class="card-header">
+        <h3 class="card-header-title">{{ title }}</h3>
+        {% if header_actions %}
+        <div class="card-header-actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div style="padding: 0;">
+        {% for item in items %}
+        <div style="display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3) var(--spacing-4); border-bottom: 1px solid var(--color-border-primary);">
+            {% if item.icon %}
+            <div style="flex-shrink: 0; color: var(--color-{{ item.icon_color|default:'text-tertiary' }});">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    {{ item.icon|safe }}
+                </svg>
+            </div>
+            {% endif %}
+            <div style="flex: 1; min-width: 0;">
+                <p style="font-size: var(--font-size-sm); color: var(--color-text-primary); margin: 0;">{{ item.title }}</p>
+                {% if item.subtitle %}<p style="font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin: var(--spacing-0-5) 0 0 0;">{{ item.subtitle }}</p>{% endif %}
+            </div>
+            {% if item.action %}
+            <div style="flex-shrink: 0;">
+                {{ item.action|safe }}
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="padding: var(--spacing-8); text-align: center; color: var(--color-text-tertiary);">
+            <p style="margin: 0;">{{ empty_message|default:"No items to display" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+CARD EXAMPLES - For reference/documentation
+==============================================================================
+
+{# Basic card #}
+{% include "components/cards.html" with variant="default" title="Card Title" body="<p>Card content goes here</p>" %}
+
+{# Card with subtitle and footer #}
+{% include "components/cards.html" with variant="default" title="Card Title" subtitle="Supporting text" body="<p>Main content</p>" footer="<button class='btn btn-primary'>Action</button>" %}
+
+{# Hover effect card #}
+{% include "components/cards.html" with variant="hover" title="Hover Me" body="<p>Hover to see the effect</p>" %}
+
+{# Clickable card #}
+{% include "components/cards.html" with variant="clickable" title="Click Me" body="<p>Click anywhere on the card</p>" href="/destination" %}
+
+{# Card with color accent #}
+{% include "components/cards.html" with variant="default" title="Important Notice" body="<p>This card has a color accent</p>" color="primary" %}
+
+{# Image card #}
+{% include "components/cards.html" with variant="image" image="/static/images/cover.jpg" title="Featured Article" body="<p>Article excerpt...</p>" %}
+
+{# Stats card #}
+{% include "components/cards.html" with variant="stats" title="Revenue" value="$12,345" change="+15%" trend="up" period="vs last month" icon="<path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/>" %}
+
+{# Profile card #}
+{% include "components/cards.html" with variant="profile" name="Jane Smith" role="Product Designer" avatar="/static/avatars/jane.jpg" bio="Creating delightful user experiences" %}
+
+{# List card #}
+{% with items=recent_activities %}
+{% include "components/cards.html" with variant="list" title="Recent Activity" items=items %}
+{% endwith %}
+
+{% endcomment %}

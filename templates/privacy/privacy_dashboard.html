@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Privacy Dashboard" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-user-shield me-2"></i>
+                    {% trans "Privacy Dashboard" %}
+                </h2>
+                <a href="{% url 'privacy:export' %}" class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i>
+                    {% trans "Export My Data" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Privacy Policy Status -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract text-primary me-2"></i>
+                        {% trans "Privacy Policy" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if privacy_policy %}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">{{ privacy_policy.title }}</h6>
+                            <p class="text-muted small mb-0">
+                                {% trans "Version" %} {{ privacy_policy.version }}
+                                ({% trans "Effective" %} {{ privacy_policy.effective_date|date:"M d, Y" }})
+                            </p>
+                        </div>
+                        {% if policy_accepted %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>
+                            {% trans "Accepted" %}
+                        </span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            {% trans "Action Required" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'privacy:policy' %}" class="btn btn-sm btn-outline-primary">
+                        {% trans "Read Policy" %}
+                    </a>
+                    {% if not policy_accepted %}
+                    <a href="{% url 'privacy:consent' 'privacy_policy' %}" class="btn btn-sm btn-primary ms-2">
+                        {% trans "Accept Policy" %}
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">{% trans "No privacy policy published." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        {% trans "Your Rights" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{% url 'privacy:request_create' %}?type=access" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-eye d-block mb-2 fa-lg"></i>
+                                {% trans "Access My Data" %}
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'privacy:export' %}" class="btn btn-outline-success w-100 py-3">
+                                <i class="fas fa-file-export d-block mb-2 fa-lg"></i>
+                                {% trans "Export Data" %}
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'privacy:request_create' %}?type=rectification" class="btn btn-outline-info w-100 py-3">
+                                <i class="fas fa-edit d-block mb-2 fa-lg"></i>
+                                {% trans "Correct Data" %}
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'privacy:request_create' %}?type=erasure" class="btn btn-outline-danger w-100 py-3">
+                                <i class="fas fa-trash-alt d-block mb-2 fa-lg"></i>
+                                {% trans "Delete My Data" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Active Consents -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        {% trans "Your Consents" %}
+                    </h5>
+                    <span class="badge bg-primary">
+                        {{ active_consents|length }} {% trans "Active" %}
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Purpose" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th>{% trans "Given On" %}</th>
+                                    <th>{% trans "Expires" %}</th>
+                                    <th class="text-end">{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consent_type, consent in active_consents.items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ consent.get_consent_type_display }}</strong>
+                                        {% if consent.purpose %}
+                                        <br><small class="text-muted">{{ consent.purpose.name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if consent.is_valid %}
+                                        <span class="badge bg-success">{% trans "Active" %}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{% trans "Expired" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ consent.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if consent.expires_at %}
+                                        {{ consent.expires_at|date:"M d, Y" }}
+                                        {% else %}
+                                        <span class="text-muted">{% trans "No expiry" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'privacy:consent' consent.consent_type %}"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            {% trans "Manage" %}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        {% trans "No active consents found." %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Subject Requests -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt text-info me-2"></i>
+                        {% trans "Your Requests" %}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if pending_dsrs %}
+                    <ul class="list-group list-group-flush">
+                        {% for dsr in pending_dsrs %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ dsr.get_request_type_display }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ dsr.submitted_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge {% if dsr.is_overdue %}bg-danger{% else %}bg-info{% endif %}">
+                                        {{ dsr.get_status_display }}
+                                    </span>
+                                    {% if dsr.days_remaining %}
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ dsr.days_remaining }} {% trans "days left" %}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        {% trans "No pending requests." %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% if completed_dsrs %}
+                <div class="card-footer bg-light">
+                    <h6 class="mb-2">{% trans "Recent Completed" %}</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        {% for dsr in completed_dsrs %}
+                        <li class="mb-1">
+                            {{ dsr.get_request_type_display }} -
+                            {{ dsr.completed_at|date:"M d" }}
+                            {% if dsr.response_file %}
+                            <a href="{% url 'privacy:download_export' dsr.pk %}" class="ms-1">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Consent History -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history text-secondary me-2"></i>
+                        {% trans "Consent History" %}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Date" %}</th>
+                                    <th>{% trans "Consent Type" %}</th>
+                                    <th>{% trans "Action" %}</th>
+                                    <th>{% trans "Version" %}</th>
+                                    <th>{% trans "Method" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consent in consent_history %}
+                                <tr>
+                                    <td>{{ consent.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>{{ consent.get_consent_type_display }}</td>
+                                    <td>
+                                        {% if consent.granted and not consent.withdrawn %}
+                                        <span class="badge bg-success">{% trans "Granted" %}</span>
+                                        {% elif consent.withdrawn %}
+                                        <span class="badge bg-secondary">{% trans "Withdrawn" %}</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">{% trans "Denied" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>v{{ consent.consent_text_version }}</td>
+                                    <td>
+                                        <small class="text-muted">{{ consent.collection_method }}</small>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-3 text-muted">
+                                        {% trans "No consent history available." %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Processing Purposes -->
+    {% if purpose_consents %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-database text-primary me-2"></i>
+                        {% trans "Data Processing Purposes" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for item in purpose_consents %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border {% if item.has_consent %}border-success{% else %}border-secondary{% endif %}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="card-title">{{ item.purpose.name }}</h6>
+                                        {% if item.has_consent %}
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        {% else %}
+                                        <i class="fas fa-times-circle text-secondary"></i>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text small text-muted">
+                                        {{ item.purpose.description|truncatewords:20 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-light text-dark">
+                                            {{ item.purpose.get_legal_basis_display }}
+                                        </span>
+                                        <a href="{% url 'privacy:consent' item.purpose.code %}"
+                                           class="btn btn-sm {% if item.has_consent %}btn-outline-success{% else %}btn-primary{% endif %}">
+                                            {% if item.has_consent %}
+                                            {% trans "Manage" %}
+                                            {% else %}
+                                            {% trans "Review" %}
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

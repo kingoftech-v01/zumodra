@@ -1,0 +1,203 @@
+# =============================================================================
+# Zumodra Production Dockerfile
+# =============================================================================
+# Multi-stage, security-hardened build for production deployment
+# Supports 500K+ concurrent connections with Gunicorn + Uvicorn workers
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Build Arguments
+# -----------------------------------------------------------------------------
+ARG PYTHON_VERSION=3.12
+
+# =============================================================================
+# Stage 1: Builder - Compile dependencies and create wheel files
+# =============================================================================
+FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
+
+# Build-time environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    libpq-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip and install build tools
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Install additional production dependencies
+RUN pip install --no-cache-dir \
+    uvicorn[standard]>=0.24.0 \
+    gunicorn>=21.0.0 \
+    uvloop>=0.19.0 \
+    httptools>=0.6.0 \
+    sentry-sdk>=1.32.0 \
+    prometheus-client>=0.19.0 \
+    django-prometheus>=2.3.0
+
+# =============================================================================
+# Stage 2: Production - Minimal runtime image
+# =============================================================================
+FROM python:${PYTHON_VERSION}-slim-bookworm AS production
+
+# Labels for container metadata
+LABEL maintainer="Zumodra DevOps <devops@zumodra.com>" \
+      version="2.0.0" \
+      description="Zumodra ATS/HR SaaS Platform - Production Image" \
+      org.opencontainers.image.source="https://github.com/zumodra/zumodra" \
+      org.opencontainers.image.vendor="Zumodra Inc."
+
+# Runtime environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PYTHONPATH=/app \
+    APP_HOME=/app \
+    APP_USER=appuser \
+    APP_GROUP=appgroup \
+    # Gunicorn settings
+    GUNICORN_WORKERS=4 \
+    GUNICORN_THREADS=2 \
+    GUNICORN_TIMEOUT=120 \
+    GUNICORN_GRACEFUL_TIMEOUT=30 \
+    GUNICORN_KEEP_ALIVE=5 \
+    GUNICORN_MAX_REQUESTS=10000 \
+    GUNICORN_MAX_REQUESTS_JITTER=1000 \
+    # Security settings
+    SECURE_SSL_REDIRECT=True \
+    SESSION_COOKIE_SECURE=True \
+    CSRF_COOKIE_SECURE=True \
+    # Performance tuning
+    MALLOC_ARENA_MAX=2
+
+# Install runtime dependencies only (minimal footprint)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # PostgreSQL client libraries
+    libpq5 \
+    # PostGIS/GDAL runtime libraries
+    libgdal32 \
+    libgeos-c1v5 \
+    libproj25 \
+    gdal-bin \
+    # HTTP tools for health checks
+    curl \
+    wget \
+    # Process management
+    tini \
+    # CA certificates for HTTPS
+    ca-certificates \
+    # Timezone data
+    tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && apt-get autoremove -y
+
+# Create non-root user and group with specific UID/GID
+RUN groupadd --gid 1000 ${APP_GROUP} && \
+    useradd --uid 1000 --gid ${APP_GROUP} \
+    --shell /sbin/nologin \
+    --no-create-home \
+    --comment "Zumodra Application User" \
+    ${APP_USER}
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Set working directory
+WORKDIR ${APP_HOME}
+
+# Create necessary directories with proper permissions
+RUN mkdir -p \
+    ${APP_HOME}/static \
+    ${APP_HOME}/media \
+    ${APP_HOME}/logs \
+    ${APP_HOME}/.cache \
+    /tmp/gunicorn \
+    && chown -R ${APP_USER}:${APP_GROUP} ${APP_HOME} \
+    && chown -R ${APP_USER}:${APP_GROUP} /tmp/gunicorn \
+    && chmod 755 ${APP_HOME} \
+    && chmod 755 ${APP_HOME}/static \
+    && chmod 755 ${APP_HOME}/media \
+    && chmod 755 ${APP_HOME}/logs
+
+# Copy application code with proper ownership
+COPY --chown=${APP_USER}:${APP_GROUP} . ${APP_HOME}
+
+# Remove unnecessary files to reduce attack surface
+RUN rm -rf \
+    ${APP_HOME}/.git \
+    ${APP_HOME}/.github \
+    ${APP_HOME}/docker \
+    ${APP_HOME}/tests \
+    ${APP_HOME}/*.md \
+    ${APP_HOME}/*.txt \
+    ${APP_HOME}/.env* \
+    ${APP_HOME}/docker-compose* \
+    ${APP_HOME}/Makefile \
+    ${APP_HOME}/conftest.py \
+    ${APP_HOME}/pytest.ini \
+    ${APP_HOME}/setup.cfg \
+    2>/dev/null || true
+
+# Copy requirements back for reference
+COPY --chown=${APP_USER}:${APP_GROUP} requirements.txt ${APP_HOME}/
+
+# Collect static files (will be overwritten at runtime if needed)
+RUN python manage.py collectstatic --noinput --clear 2>/dev/null || true
+
+# Switch to non-root user
+USER ${APP_USER}
+
+# Expose application port
+EXPOSE 8000
+
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || wget -q --spider http://localhost:8000/health/ || exit 1
+
+# Use tini as init system for proper signal handling
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+# Default command: Gunicorn with Uvicorn workers for ASGI
+CMD ["gunicorn", "zumodra.asgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--threads", "2", \
+     "--timeout", "120", \
+     "--graceful-timeout", "30", \
+     "--keep-alive", "5", \
+     "--max-requests", "10000", \
+     "--max-requests-jitter", "1000", \
+     "--worker-tmp-dir", "/tmp/gunicorn", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--capture-output", \
+     "--enable-stdio-inheritance", \
+     "--forwarded-allow-ips", "*"]

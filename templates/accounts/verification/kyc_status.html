@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ verification.get_verification_type_display }} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="mb-8">
+        <a href="{% url 'frontend:accounts:kyc-list' %}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+            &larr; {% trans "Back to Verifications" %}
+        </a>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        {{ verification.get_verification_type_display }}
+                    </h1>
+                    {% if verification.status == 'verified' %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        {% trans "Verified" %}
+                    </span>
+                    {% elif verification.status == 'pending' %}
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                        {% trans "Pending" %}
+                    </span>
+                    {% elif verification.status == 'in_progress' %}
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium animate-pulse">
+                        {% trans "In Progress" %}
+                    </span>
+                    {% elif verification.status == 'rejected' %}
+                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                        {% trans "Rejected" %}
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                        {{ verification.get_status_display }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">{{ verification.get_level_display }} {% trans "Verification" %}</p>
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Document Type" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.document_type|default:"-" }}</dd>
+            </div>
+
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Document Country" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.document_country|default:"-" }}</dd>
+            </div>
+
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Submitted" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.created_at|date:"M d, Y H:i" }}</dd>
+            </div>
+
+            {% if verification.document_expiry %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Document Expiry" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.document_expiry|date:"M d, Y" }}</dd>
+            </div>
+            {% endif %}
+
+            {% if verification.verified_at %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Verified On" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.verified_at|date:"M d, Y H:i" }}</dd>
+            </div>
+            {% endif %}
+
+            {% if verification.expires_at %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Verification Expires" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.expires_at|date:"M d, Y" }}</dd>
+            </div>
+            {% endif %}
+
+            {% if verification.confidence_score %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Confidence Score" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.confidence_score|floatformat:1 }}%</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+
+    <!-- Status Messages -->
+    {% if verification.status == 'verified' %}
+    <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-8 h-8 text-green-600 mr-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="font-semibold text-green-800 dark:text-green-200 text-lg">{% trans "Verification Complete" %}</h3>
+                <p class="text-green-700 dark:text-green-300">
+                    {% trans "Your identity has been successfully verified. Your trust score has been updated." %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% elif verification.status == 'in_progress' %}
+    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-8 h-8 text-blue-600 mr-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div>
+                <h3 class="font-semibold text-blue-800 dark:text-blue-200 text-lg">{% trans "Verification In Progress" %}</h3>
+                <p class="text-blue-700 dark:text-blue-300">
+                    {% trans "Your verification is being processed. This usually takes a few minutes." %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% elif verification.status == 'pending' %}
+    <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-8 h-8 text-yellow-600 mr-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="font-semibold text-yellow-800 dark:text-yellow-200 text-lg">{% trans "Pending Review" %}</h3>
+                <p class="text-yellow-700 dark:text-yellow-300">
+                    {% trans "Your verification request is pending. We'll notify you when there's an update." %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% elif verification.status == 'rejected' %}
+    <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-8 h-8 text-red-600 mr-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="font-semibold text-red-800 dark:text-red-200 text-lg">{% trans "Verification Rejected" %}</h3>
+                {% if verification.rejection_reason %}
+                <p class="text-red-700 dark:text-red-300">{{ verification.rejection_reason }}</p>
+                {% else %}
+                <p class="text-red-700 dark:text-red-300">{% trans "Your verification could not be completed. Please try again with clearer documents." %}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="{% url 'frontend:accounts:kyc-start' %}"
+               class="inline-block px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                {% trans "Try Again" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Provider Information (if available) -->
+    {% if verification.provider %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Technical Details" %}</h3>
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <dt class="font-medium text-gray-500 dark:text-gray-400">{% trans "Provider" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.provider }}</dd>
+            </div>
+            {% if verification.provider_reference_id %}
+            <div>
+                <dt class="font-medium text-gray-500 dark:text-gray-400">{% trans "Reference ID" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white font-mono text-xs">{{ verification.provider_reference_id }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

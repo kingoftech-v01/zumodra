@@ -1,211 +1,54 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
-from django.http import HttpResponse
-from .models import *
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.measure import D
-from django.db.models import Q
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderUnavailable, GeocoderTimedOut
+"""
+Dashboard Service Views - DEPRECATED
 
-geolocator = Nominatim(user_agent="zumodra_geocoder")
+This module is deprecated. All views have been consolidated into the `services` app.
 
-# Create your views here.
-def service_view(request):
-    return render(request, 'services.html')
+MIGRATION NOTE:
+- Import views from `services.views` instead
+- This file maintains backwards compatibility only
+"""
 
-def add_service_view(request):
-    return render(request, 'add-service.html')
+import warnings
 
-def service_detail_view(request, pk):
-    return render(request, 'service-detail.html')
+warnings.warn(
+    "dashboard_service.views is deprecated. "
+    "Import views from services.views instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
-def update_service_view(request, pk):
-    return render(request, 'update-service.html')
+# Re-export views from services for backwards compatibility
+from services.views import (
+    browse_services,
+    service_detail,
+    like_service,
+    browse_nearby_services,
+    provider_dashboard,
+    create_provider_profile,
+    edit_provider_profile,
+    provider_profile_view,
+    create_service,
+    edit_service,
+    delete_service,
+    create_service_request,
+    my_requests,
+    view_request,
+    submit_proposal,
+    accept_proposal,
+    view_contract,
+    my_contracts,
+    update_contract_status,
+    add_review,
+    address_to_coords,
+    coords_to_address,
+    search_services_ajax,
+)
 
-def delete_service_view(request, pk):
-    return render(request, 'delete-service.html')
-
-def address_to_coords(address):
-    """Convert a text address into geographic (lat, lon) coordinates."""
-    try:
-        location = geolocator.geocode(address)
-        if location:
-            return (location.latitude, location.longitude)
-    except (GeocoderUnavailable, GeocoderTimedOut):
-        return None
-    return None
-
-
-def coords_to_address(latitude, longitude):
-    """Convert (lat, lon) coordinates back into a readable address."""
-    try:
-        location = geolocator.reverse((latitude, longitude))
-        if location:
-            return location.address
-    except (GeocoderUnavailable, GeocoderTimedOut):
-        return None
-    return None
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ServiceForm, ServiceProviderProfileForm, ServiceCategoryForm  # importe les forms nécessaires
-
-
-# Ajout d'un service
-def add_service_view(request):
-    if request.method == 'POST':
-        form = ServiceForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('browse_service')  # redirige vers la liste ou détail
-    else:
-        form = ServiceForm()
-    return render(request, 'add-service.html', {'form': form})
-
-
-# Modification d'un service
-def update_service_view(request, pk):
-    service = get_object_or_404(Service, pk=pk)
-    if request.method == 'POST':
-        form = ServiceForm(request.POST, request.FILES, instance=service)
-        if form.is_valid():
-            form.save()
-            return redirect('browse_service_detail', service_uuid=service.uuid)
-    else:
-        form = ServiceForm(instance=service)
-    return render(request, 'update-service.html', {'form': form, 'service': service})
-
-
-# Détail d'un service (affichage)
-def service_detail_view(request, pk):
-    service = get_object_or_404(Service, pk=pk)
-    return render(request, 'service-detail.html', {'service': service})
-
-
-# Suppression d'un service (confirmation)
-def delete_service_view(request, pk):
-    service = get_object_or_404(Service, pk=pk)
-    if request.method == 'POST':
-        service.delete()
-        return redirect('browse_service')
-    return render(request, 'delete-service.html', {'service': service})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    from django.shortcuts import render
-from django.shortcuts import redirect
-from django.http import HttpResponse
-from .models import *
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.measure import D
-from django.db.models import Q
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderUnavailable, GeocoderTimedOut
-
-# Create your views here.
-def browse_service(request):
-    DService_categories = DServiceCategory.objects.all()
-    DServices_list_query = DService.objects.all()
-    DService_providers = DServiceProviderProfile.objects.all()
-    DService_tags = DServicesTag.objects.all()
-
-    paginator = Paginator(DServices_list_query, 1)
-    page_number = request.GET.get('page')
-    DServices = paginator.get_page(page_number)
-
-    request = request.GET.get('request')
-
-    if request:
-        DService_categories = DServiceCategory.objects.filter(name__icontains=request)
-
-    context = {
-        'DService_categories': DService_categories,
-        'DServices': DServices,
-        'DService_providers': DService_providers,
-        'DService_tags': DService_tags,
-    }
-    return render(request, 'services-default.html', context)
-
-
-def browse_service_detail(request, DService_uuid):
-    DService = get_object_or_404(DService, uuid=DService_uuid)
-    context = {
-        'DService': DService,
-    }
-    return render(request, 'services-detail1.html', context)
-
-def browse_nearby_services(request):
-    lat = request.GET.get('lat')
-    lng = request.GET.get('lng')
-
-    if lat is None or lng is None:
-        # Handle the missing parameter case, e.g. return an error response or default values
-        # return redirect('browse_DService')
-        lat = 0
-        lng = 0
-    
-    try:
-        user_lat = float(lat)
-        user_lng = float(lng)
-    except ValueError:
-        # return HttpResponseBadRequest("Invalid latitude or longitude value")
-        pass
-
-    user_location = Point(user_lng, user_lat, srid=4326)
-
-    within_area = request.GET.get('within_area')
-
-    within_area_offset = int(within_area) if within_area else 10
-
-    nearby_providers = (
-        DServiceProviderProfile.objects
-        .filter(location__distance_lte=(user_location, D(km=within_area_offset)))  # within 10km
-        .annotate(distance=Distance('location', user_location))
-        .order_by('distance')
-    )
-
-    return render(request, 'services-nearby.html', {'providers': nearby_providers})
-    
-
-def address_to_coords(address):
-    """Convert a text address into geographic (lat, lon) coordinates."""
-    try:
-        location = geolocator.geocode(address)
-        if location:
-            return (location.latitude, location.longitude)
-    except (GeocoderUnavailable, GeocoderTimedOut):
-        return None
-    return None
-
-
-def coords_to_address(latitude, longitude):
-    """Convert (lat, lon) coordinates back into a readable address."""
-    try:
-        location = geolocator.reverse((latitude, longitude))
-        if location:
-            return location.address
-    except (GeocoderUnavailable, GeocoderTimedOut):
-        return None
-    return None
-
+# Backwards compatibility aliases
+service_view = provider_dashboard
+add_service_view = create_service
+service_detail_view = service_detail
+update_service_view = edit_service
+delete_service_view = delete_service
+browse_service = browse_services
+browse_service_detail = service_detail

@@ -1,0 +1,427 @@
+{% comment %}
+Dark Mode Theme Toggle Component
+
+A WCAG 2.1 AA compliant theme toggle button that allows users to switch
+between light and dark color schemes.
+
+Usage:
+    {% include "components/theme-toggle.html" %}
+
+    Or with custom options:
+    {% include "components/theme-toggle.html" with variant="icon-only" size="lg" %}
+
+Variants:
+    - "default": Icon with text label
+    - "icon-only": Icon button only (with sr-only label)
+    - "switch": Toggle switch style
+
+Sizes:
+    - "sm": Small
+    - "md": Medium (default)
+    - "lg": Large
+
+Requirements:
+    - Include theme-toggle.js in <head> or before </body>
+    - Include dark-mode.css for dark mode styles
+    - Include accessibility.css for a11y features
+{% endcomment %}
+
+{% load i18n %}
+
+{# Default values #}
+{% with variant=variant|default:"default" %}
+{% with size=size|default:"md" %}
+{% with position=position|default:"" %}
+{% with show_system_option=show_system_option|default:False %}
+
+{# Icon-only variant #}
+{% if variant == "icon-only" %}
+<button type="button"
+        class="theme-toggle theme-toggle--icon-only theme-toggle--{{ size }} {% if position %}theme-toggle--{{ position }}{% endif %}"
+        data-theme-toggle="toggle"
+        aria-pressed="false"
+        aria-label="{% trans 'Switch to dark mode' %}"
+        title="{% trans 'Toggle dark mode' %}">
+    <span class="theme-toggle__icon" aria-hidden="true">
+        {# Sun icon (shown in dark mode - click to go light) #}
+        <svg class="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        {# Moon icon (shown in light mode - click to go dark) #}
+        <svg class="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </span>
+    <span class="sr-only" id="theme-toggle-status">{% trans 'Currently light mode' %}</span>
+</button>
+
+{# Switch variant #}
+{% elif variant == "switch" %}
+<div class="theme-toggle theme-toggle--switch theme-toggle--{{ size }} {% if position %}theme-toggle--{{ position }}{% endif %}">
+    <label class="theme-toggle__label">
+        <span class="theme-toggle__label-text">{% trans 'Dark mode' %}</span>
+        <div class="theme-toggle__switch-wrapper">
+            <input type="checkbox"
+                   class="theme-toggle__input sr-only"
+                   data-theme-toggle="toggle"
+                   role="switch"
+                   aria-checked="false"
+                   aria-label="{% trans 'Toggle dark mode' %}">
+            <span class="theme-toggle__track">
+                <span class="theme-toggle__thumb">
+                    {# Sun icon #}
+                    <svg class="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                    </svg>
+                    {# Moon icon #}
+                    <svg class="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </span>
+            </span>
+        </div>
+    </label>
+</div>
+
+{# Default variant with dropdown for system option #}
+{% elif show_system_option %}
+<div class="theme-toggle theme-toggle--dropdown theme-toggle--{{ size }} {% if position %}theme-toggle--{{ position }}{% endif %}" role="group" aria-label="{% trans 'Theme selection' %}">
+    <button type="button"
+            class="theme-toggle__trigger"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-label="{% trans 'Select theme' %}">
+        <span class="theme-toggle__icon" aria-hidden="true">
+            <svg class="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </span>
+        <span class="theme-toggle__text">{% trans 'Theme' %}</span>
+        <svg class="theme-toggle__chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+    <ul class="theme-toggle__menu" role="listbox" aria-label="{% trans 'Theme options' %}">
+        <li role="option" aria-selected="false">
+            <button type="button" data-theme-toggle="light" class="theme-toggle__option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <span>{% trans 'Light' %}</span>
+            </button>
+        </li>
+        <li role="option" aria-selected="false">
+            <button type="button" data-theme-toggle="dark" class="theme-toggle__option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span>{% trans 'Dark' %}</span>
+            </button>
+        </li>
+        <li role="option" aria-selected="false">
+            <button type="button" data-theme-toggle="system" class="theme-toggle__option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <span>{% trans 'System' %}</span>
+            </button>
+        </li>
+    </ul>
+</div>
+
+{# Default variant #}
+{% else %}
+<button type="button"
+        class="theme-toggle theme-toggle--default theme-toggle--{{ size }} {% if position %}theme-toggle--{{ position }}{% endif %}"
+        data-theme-toggle="toggle"
+        aria-pressed="false"
+        aria-label="{% trans 'Switch to dark mode' %}">
+    <span class="theme-toggle__icon" aria-hidden="true">
+        {# Sun icon (shown in dark mode) #}
+        <svg class="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        {# Moon icon (shown in light mode) #}
+        <svg class="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </span>
+    <span class="theme-toggle__text">{% trans 'Dark mode' %}</span>
+</button>
+{% endif %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{# Inline styles for theme toggle (can be moved to separate CSS file) #}
+<style>
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-primary, #dee2e6);
+    border-radius: 0.5rem;
+    background-color: var(--bg-elevated, #ffffff);
+    color: var(--text-primary, #212529);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.theme-toggle:focus-visible {
+    outline: 3px solid var(--focus-ring-color, #005fcc);
+    outline-offset: 2px;
+}
+
+.theme-toggle:active {
+    transform: scale(0.98);
+}
+
+/* Icon-only variant */
+.theme-toggle--icon-only {
+    padding: 0.625rem;
+    border-radius: 50%;
+}
+
+.theme-toggle--icon-only .theme-toggle__text {
+    display: none;
+}
+
+/* Sizes */
+.theme-toggle--sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.theme-toggle--sm.theme-toggle--icon-only {
+    padding: 0.5rem;
+}
+
+.theme-toggle--lg {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+
+.theme-toggle--lg.theme-toggle--icon-only {
+    padding: 0.875rem;
+}
+
+/* Fixed positions */
+.theme-toggle--fixed-top-right {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.theme-toggle--fixed-bottom-right {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+/* Icon animation */
+.theme-toggle__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-toggle__icon {
+    transform: rotate(15deg);
+}
+
+/* Switch variant styles */
+.theme-toggle--switch {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.theme-toggle--switch:hover {
+    background: transparent;
+}
+
+.theme-toggle__label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.theme-toggle__switch-wrapper {
+    position: relative;
+}
+
+.theme-toggle__track {
+    display: block;
+    width: 3rem;
+    height: 1.5rem;
+    background-color: var(--bg-tertiary, #e9ecef);
+    border-radius: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.theme-toggle__input:checked + .theme-toggle__track {
+    background-color: var(--brand-primary, #0d6efd);
+}
+
+.theme-toggle__input:focus-visible + .theme-toggle__track {
+    outline: 3px solid var(--focus-ring-color, #005fcc);
+    outline-offset: 2px;
+}
+
+.theme-toggle__thumb {
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle__input:checked ~ .theme-toggle__track .theme-toggle__thumb {
+    transform: translateX(1.5rem);
+}
+
+/* Dropdown variant styles */
+.theme-toggle--dropdown {
+    position: relative;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.theme-toggle--dropdown:hover {
+    background: transparent;
+}
+
+.theme-toggle__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-primary, #dee2e6);
+    border-radius: 0.5rem;
+    background-color: var(--bg-elevated, #ffffff);
+    color: var(--text-primary, #212529);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.theme-toggle__trigger:hover {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.theme-toggle__chevron {
+    transition: transform 0.2s ease;
+}
+
+.theme-toggle__trigger[aria-expanded="true"] .theme-toggle__chevron {
+    transform: rotate(180deg);
+}
+
+.theme-toggle__menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    min-width: 10rem;
+    background-color: var(--dropdown-bg, #ffffff);
+    border: 1px solid var(--border-primary, #dee2e6);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-lg, 0 10px 15px rgba(0, 0, 0, 0.1));
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.5rem);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    z-index: 100;
+}
+
+.theme-toggle__trigger[aria-expanded="true"] + .theme-toggle__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.theme-toggle__option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--text-primary, #212529);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.theme-toggle__option:hover,
+.theme-toggle__option:focus {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+[role="option"][aria-selected="true"] .theme-toggle__option {
+    background-color: var(--brand-primary, #0d6efd);
+    color: #ffffff;
+}
+</style>

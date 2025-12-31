@@ -1,0 +1,124 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Application Submitted" %} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <!-- Success Animation -->
+    <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-8">
+        <span class="mdi mdi-check-circle text-6xl text-green-500 animate-pulse"></span>
+    </div>
+
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {% trans "Application Submitted!" %}
+    </h1>
+
+    <p class="text-xl text-gray-600 mb-8">
+        {% trans "Thank you for your interest in joining our team." %}
+    </p>
+
+    <!-- Application Details -->
+    {% if application %}
+    <div class="bg-white rounded-xl border border-gray-200 p-8 mb-8 text-left">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{% trans "Application Details" %}</h2>
+
+        <dl class="space-y-3">
+            {% if job %}
+            <div class="flex justify-between">
+                <dt class="text-gray-500">{% trans "Position" %}</dt>
+                <dd class="text-gray-900 font-medium">{{ job.job.title }}</dd>
+            </div>
+            {% endif %}
+
+            <div class="flex justify-between">
+                <dt class="text-gray-500">{% trans "Submitted" %}</dt>
+                <dd class="text-gray-900 font-medium">{{ application.submitted_at|date:"M d, Y \a\t H:i" }}</dd>
+            </div>
+
+            <div class="flex justify-between">
+                <dt class="text-gray-500">{% trans "Application ID" %}</dt>
+                <dd class="text-gray-900 font-mono text-sm">{{ application.uuid|slice:":8" }}...</dd>
+            </div>
+        </dl>
+    </div>
+    {% endif %}
+
+    <!-- What's Next -->
+    <div class="bg-blue-50 rounded-xl p-8 mb-8 text-left">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">
+            <span class="mdi mdi-information-outline mr-2 text-blue-500"></span>
+            {% trans "What Happens Next?" %}
+        </h2>
+
+        <ol class="space-y-4">
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full text-blue-600 font-bold mr-3">1</span>
+                <div>
+                    <strong class="text-gray-900">{% trans "Application Review" %}</strong>
+                    <p class="text-gray-600 text-sm">{% trans "Our hiring team will review your application within 5-7 business days." %}</p>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full text-blue-600 font-bold mr-3">2</span>
+                <div>
+                    <strong class="text-gray-900">{% trans "Initial Screening" %}</strong>
+                    <p class="text-gray-600 text-sm">{% trans "If selected, you'll receive an email to schedule an initial call." %}</p>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full text-blue-600 font-bold mr-3">3</span>
+                <div>
+                    <strong class="text-gray-900">{% trans "Interview Process" %}</strong>
+                    <p class="text-gray-600 text-sm">{% trans "Further rounds may include technical assessments and team interviews." %}</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Check Spam Notice -->
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-left">
+        <div class="flex items-center text-amber-700">
+            <span class="mdi mdi-email-alert-outline mr-2 text-xl"></span>
+            <span class="text-sm">{% trans "Please check your spam folder if you don't receive our emails. Add our domain to your safe senders list." %}</span>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="{% url 'careers:template:home' %}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors">
+            <span class="mdi mdi-briefcase-search-outline mr-2"></span>
+            {% trans "Browse More Jobs" %}
+        </a>
+
+        <a href="{% url 'careers:template:alert-subscribe' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+            <span class="mdi mdi-bell-outline mr-2"></span>
+            {% trans "Get Job Alerts" %}
+        </a>
+    </div>
+
+    <!-- Social Share -->
+    <div class="mt-12 pt-8 border-t border-gray-200">
+        <p class="text-gray-500 mb-4">{% trans "Know someone who would be a great fit?" %}</p>
+        <div class="flex justify-center gap-3">
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center justify-center w-10 h-10 bg-[#0077B5] text-white rounded-full hover:opacity-90 transition-opacity"
+               aria-label="Share on LinkedIn">
+                <span class="mdi mdi-linkedin"></span>
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={% trans 'Check out this job opportunity!' %}"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center justify-center w-10 h-10 bg-[#1DA1F2] text-white rounded-full hover:opacity-90 transition-opacity"
+               aria-label="Share on Twitter">
+                <span class="mdi mdi-twitter"></span>
+            </a>
+            <a href="mailto:?subject={% trans 'Job Opportunity' %}&body={{ request.build_absolute_uri|urlencode }}"
+               class="inline-flex items-center justify-center w-10 h-10 bg-gray-600 text-white rounded-full hover:opacity-90 transition-opacity"
+               aria-label="Share via Email">
+                <span class="mdi mdi-email-outline"></span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

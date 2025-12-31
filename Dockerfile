@@ -1,51 +1,114 @@
+# =============================================================================
+# ZUMODRA MULTI-TENANT ATS/HR SAAS PLATFORM
+# =============================================================================
+# Production-ready Dockerfile with multi-stage build
+# Includes: migrations, static collection, health checks
+# =============================================================================
+
 # syntax=docker/dockerfile:1
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+# -----------------------------------------------------------------------------
+# Build Arguments
+# -----------------------------------------------------------------------------
+ARG PYTHON_VERSION=3.11
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
+# =============================================================================
+# STAGE 1: Builder - Install dependencies
+# =============================================================================
+FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
 
-ARG PYTHON_VERSION=3.13.0
-FROM python:${PYTHON_VERSION}-slim as base
+# Environment variables for build
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
+# Install build dependencies (needed for psycopg2, GDAL, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
 
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-WORKDIR /app
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements.txt
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
+# =============================================================================
+# STAGE 2: Production - Runtime image
+# =============================================================================
+FROM python:${PYTHON_VERSION}-slim-bookworm AS production
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+# Labels
+LABEL maintainer="Rhematek Solutions <support@rhematek-solutions.com>" \
+      version="1.0.0" \
+      description="Zumodra Multi-Tenant ATS/HR SaaS Platform"
 
-# Switch to the non-privileged user to run the application.
-USER appuser
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    APP_HOME=/app \
+    APP_USER=zumodra
 
-# Copy the source code into the container.
-COPY . .
+# Install runtime dependencies only (no build tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libgdal32 \
+    libgeos-c1v5 \
+    libproj25 \
+    gdal-bin \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Expose the port that the application listens on.
+# Create non-root user for security
+RUN groupadd --gid 1000 ${APP_USER} && \
+    useradd --uid 1000 --gid ${APP_USER} --shell /bin/bash --create-home ${APP_USER}
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Set working directory
+WORKDIR ${APP_HOME}
+
+# Create necessary directories with proper permissions
+RUN mkdir -p ${APP_HOME}/staticfiles \
+             ${APP_HOME}/media \
+             ${APP_HOME}/logs && \
+    chown -R ${APP_USER}:${APP_USER} ${APP_HOME}
+
+# Copy application code
+COPY --chown=${APP_USER}:${APP_USER} . ${APP_HOME}
+
+# Switch to non-root user
+USER ${APP_USER}
+
+# Expose port
 EXPOSE 8000
 
-# Run the application.
-CMD gunicorn 'zumodra.wsgi' --bind=0.0.0.0:7000
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# =============================================================================
+# ENTRYPOINT: Run migrations, collect static files, then start Gunicorn
+# =============================================================================
+CMD sh -c "python manage.py migrate --noinput && \
+           python manage.py collectstatic --noinput && \
+           gunicorn 'zumodra.wsgi:application' \
+               --bind=0.0.0.0:8000 \
+               --workers=4 \
+               --threads=2 \
+               --timeout=120 \
+               --access-logfile=- \
+               --error-logfile=-"

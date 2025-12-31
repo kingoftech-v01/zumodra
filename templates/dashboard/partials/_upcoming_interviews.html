@@ -1,0 +1,177 @@
+{# =============================================================================
+   DASHBOARD UPCOMING INTERVIEWS PARTIAL
+   =============================================================================
+
+   File: templates/dashboard/partials/_upcoming_interviews.html
+   Purpose: Widget showing upcoming scheduled interviews
+
+   CONTEXT VARIABLES:
+   - upcoming_interviews (queryset): List of Interview objects
+     - interview.scheduled_start: DateTime of interview
+     - interview.scheduled_end: DateTime end (optional)
+     - interview.interview_type: Type (phone, video, onsite)
+     - interview.status: Status (scheduled, confirmed, completed, etc.)
+     - interview.application.candidate: Related Candidate
+     - interview.application.job: Related JobPosting
+     - interview.location: Interview location
+     - interview.meeting_link: Video meeting URL
+
+   HTMX:
+   - This partial is loaded via HTMX from dashboard:htmx-upcoming-interviews
+   - Can be refreshed independently
+
+   Author: Rhematek Solutions
+   Last Updated: 2025-12-30
+   ============================================================================= #}
+
+{% load i18n humanize %}
+
+<div class="divide-y divide-gray-200 dark:divide-gray-700">
+    {% if upcoming_interviews %}
+        {% for interview in upcoming_interviews %}
+        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
+             x-data="{ showActions: false }"
+             @mouseenter="showActions = true"
+             @mouseleave="showActions = false">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    {# Interview Type Icon #}
+                    <div class="flex-shrink-0">
+                        {% if interview.interview_type == 'video' %}
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        {% elif interview.interview_type == 'phone' %}
+                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# Interview Details #}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                {{ interview.application.candidate.full_name|default:"Unknown Candidate" }}
+                            </p>
+                            {# Status Badge #}
+                            {% if interview.status == 'confirmed' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
+                                {% trans "Confirmed" %}
+                            </span>
+                            {% elif interview.status == 'scheduled' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
+                                {% trans "Pending" %}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                            {{ interview.application.job.title|default:"No Position" }}
+                        </p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400 dark:text-gray-500 space-x-3">
+                            {# Date/Time #}
+                            <span class="flex items-center">
+                                <svg class="mr-1 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                {{ interview.scheduled_start|date:"M j" }}
+                            </span>
+                            <span class="flex items-center">
+                                <svg class="mr-1 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                {{ interview.scheduled_start|time:"g:i A" }}
+                            </span>
+                            {# Interview Type #}
+                            <span class="capitalize">
+                                {{ interview.interview_type|default:"Interview" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Action Buttons #}
+                <div class="flex items-center space-x-2"
+                     x-show="showActions"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100">
+                    {% if interview.meeting_link %}
+                    <a href="{{ interview.meeting_link }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
+                       title="{% trans 'Join Meeting' %}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'ats:interview_detail' interview.uuid %}"
+                       class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                       title="{% trans 'View Details' %}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </a>
+                </div>
+
+                {# Time Until Interview #}
+                <div class="flex-shrink-0 ml-4 text-right" x-show="!showActions">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ interview.scheduled_start|naturaltime }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ interview.scheduled_start|date:"l" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {# View All Link #}
+        <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 sm:px-6">
+            <a href="{% url 'ats:interviews' %}"
+               class="flex items-center justify-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                {% trans "View all interviews" %}
+                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+    {% else %}
+        {# Empty State #}
+        <div class="px-4 py-12 sm:px-6 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                {% trans "No upcoming interviews" %}
+            </h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {% trans "Interviews scheduled for the next 7 days will appear here." %}
+            </p>
+            <div class="mt-6">
+                <a href="{% url 'ats:applications' %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    {% trans "Schedule Interview" %}
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>

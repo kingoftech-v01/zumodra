@@ -1,0 +1,119 @@
+{% extends "base/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Access Denied" %} - Zumodra{% endblock %}
+{% block meta_description %}{% trans "You do not have permission to access this page." %}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <!-- Header with Logo -->
+    <header class="p-6 flex justify-between items-center">
+        <a href="/" class="inline-flex items-center">
+            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">Zumodra</span>
+        </a>
+        <!-- Dark Mode Toggle -->
+        <button @click="darkMode = !darkMode"
+                class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <svg x-show="!darkMode" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            </svg>
+            <svg x-show="darkMode" x-cloak class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div class="max-w-lg w-full text-center">
+            <!-- Illustration -->
+            <div class="mb-8">
+                <svg class="mx-auto h-40 w-40 text-amber-500 dark:text-amber-400" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Shield with Lock -->
+                    <path d="M100 20L40 50V100C40 140 70 175 100 185C130 175 160 140 160 100V50L100 20Z"
+                          stroke="currentColor" stroke-width="4" fill="none"/>
+                    <!-- Lock body -->
+                    <rect x="75" y="95" width="50" height="40" rx="4" stroke="currentColor" stroke-width="4" fill="none"/>
+                    <!-- Lock shackle -->
+                    <path d="M85 95V80C85 71.7157 91.7157 65 100 65C108.284 65 115 71.7157 115 80V95"
+                          stroke="currentColor" stroke-width="4" fill="none"/>
+                    <!-- Keyhole -->
+                    <circle cx="100" cy="110" r="6" fill="currentColor"/>
+                    <rect x="97" y="110" width="6" height="12" fill="currentColor"/>
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+                {% trans "Access Denied" %}
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                {% trans "You don't have permission to access this page. This might be because:" %}
+            </p>
+
+            <!-- Reasons List -->
+            <ul class="text-left text-gray-600 dark:text-gray-300 space-y-3 mb-8 max-w-md mx-auto">
+                <li class="flex items-start">
+                    <svg class="flex-shrink-0 h-6 w-6 text-amber-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>{% trans "You need to sign in to your account" %}</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="flex-shrink-0 h-6 w-6 text-amber-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>{% trans "Your account doesn't have the required role or permissions" %}</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="flex-shrink-0 h-6 w-6 text-amber-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>{% trans "This resource is restricted to certain users or organizations" %}</span>
+                </li>
+            </ul>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
+                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    {% trans "Sign In" %}
+                </a>
+                {% endif %}
+                <a href="/"
+                   class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    {% trans "Go Home" %}
+                </a>
+            </div>
+
+            <!-- Contact Admin -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    {% trans "If you believe you should have access to this page, please contact your administrator:" %}
+                </p>
+                <a href="mailto:support@rhematek-solutions.com?subject=Access%20Request%20-%20{{ request.path|urlencode }}"
+                   class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                    <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    {% trans "Request Access" %}
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-6 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500">
+            &copy; {% now "Y" %} Zumodra. {% trans "All rights reserved." %}
+        </p>
+    </footer>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% load static i18n humanize %}
+
+{#
+    Stats Card Component
+
+    Usage:
+    {% include "components/stats_card.html" with title="Total Revenue" value="$12,345" change="+12.5%" change_type="increase" icon="currency" %}
+
+    Context variables:
+    - title: Card title
+    - value: Main statistic value
+    - change: Change percentage (optional)
+    - change_type: 'increase', 'decrease', or 'neutral'
+    - icon: Icon type (currency, users, jobs, applications, etc.)
+    - detail_url: Link to detailed view (optional)
+    - loading: Show loading state (optional)
+#}
+
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow"
+     {% if detail_url %}
+     hx-get="{{ detail_url }}"
+     hx-target="#modal-container"
+     hx-swap="innerHTML"
+     class="cursor-pointer"
+     {% endif %}>
+    <div class="p-5">
+        <div class="flex items-center">
+            <!-- Icon -->
+            <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center
+                            {% if icon_color %}bg-{{ icon_color }}-100 dark:bg-{{ icon_color }}-900/20{% else %}bg-primary-100 dark:bg-primary-900/20{% endif %}">
+                    {% if icon == 'currency' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {% elif icon == 'users' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    {% elif icon == 'jobs' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    {% elif icon == 'applications' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    {% elif icon == 'interviews' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    {% elif icon == 'time' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {% elif icon == 'chart' %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    {% else %}
+                    <svg class="w-6 h-6 {% if icon_color %}text-{{ icon_color }}-600 dark:text-{{ icon_color }}-400{% else %}text-primary-600 dark:text-primary-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="ml-5 w-0 flex-1">
+                <dl>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                        {{ title }}
+                    </dt>
+                    <dd class="flex items-baseline">
+                        {% if loading %}
+                        <div class="animate-pulse">
+                            <div class="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        </div>
+                        {% else %}
+                        <div class="text-2xl font-semibold text-gray-900 dark:text-white">
+                            {{ value }}
+                        </div>
+                        {% if change %}
+                        <div class="ml-2 flex items-baseline text-sm font-semibold
+                                    {% if change_type == 'increase' %}text-green-600 dark:text-green-400{% elif change_type == 'decrease' %}text-red-600 dark:text-red-400{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+                            {% if change_type == 'increase' %}
+                            <svg class="self-center flex-shrink-0 h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            {% elif change_type == 'decrease' %}
+                            <svg class="self-center flex-shrink-0 h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            {% endif %}
+                            <span class="ml-1">{{ change }}</span>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        {% if subtitle %}
+        <div class="mt-3">
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ subtitle }}</p>
+        </div>
+        {% endif %}
+
+        {% if progress is not None %}
+        <div class="mt-4">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-500 dark:text-gray-400">{{ progress_label|default:"Progress" }}</span>
+                <span class="font-medium text-gray-900 dark:text-white">{{ progress }}%</span>
+            </div>
+            <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div class="{% if progress_color %}bg-{{ progress_color }}-600{% else %}bg-primary-600{% endif %} h-2 rounded-full transition-all duration-300"
+                     style="width: {{ progress }}%"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if detail_url %}
+    <div class="bg-gray-50 dark:bg-gray-700/50 px-5 py-3">
+        <a href="{{ detail_url }}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+            {% trans "View details" %}
+            <span aria-hidden="true"> &rarr;</span>
+        </a>
+    </div>
+    {% endif %}
+</div>

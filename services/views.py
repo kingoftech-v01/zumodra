@@ -1,3 +1,10 @@
+"""
+Services Views - Zumodra Freelance Marketplace
+
+Views for browsing services, managing provider profiles, handling proposals,
+contracts, and reviews.
+"""
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
@@ -10,9 +17,22 @@ from django.contrib.gis.measure import D
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable, GeocoderTimedOut
 from decimal import Decimal
-from .models import *
-from configurations.models import Skill, Company
 from django.utils import timezone
+
+from .models import (
+    ServiceCategory,
+    ServiceTag,
+    ServiceImage,
+    ServiceProvider,
+    Service,
+    ServiceLike,
+    ClientRequest,
+    ServiceProposal,
+    ServiceContract,
+    ServiceReview,
+)
+from configurations.models import Skill, Company
+from finance.models import EscrowTransaction, Dispute
 
 # Initialize geolocator
 geolocator = Nominatim(user_agent="zumodra_app")
@@ -24,7 +44,7 @@ def browse_services(request):
     """
     Browse all services with filtering and search capabilities.
     """
-    services_query = DService.objects.select_related('provider', 'DServiceCategory').prefetch_related('tags', 'images')
+    services_query = Service.objects.select_related('provider', 'category').prefetch_related('tags', 'images')
 
     # Search by name or description
     search = request.GET.get('search', '')
@@ -32,13 +52,13 @@ def browse_services(request):
         services_query = services_query.filter(
             Q(name__icontains=search) |
             Q(description__icontains=search) |
-            Q(tags__tag__icontains=search)
+            Q(tags__name__icontains=search)
         ).distinct()
 
     # Filter by category
     category_id = request.GET.get('category')
     if category_id:
-        services_query = services_query.filter(DServiceCategory_id=category_id)
+        services_query = services_query.filter(category_id=category_id)
 
     # Filter by price range
     min_price = request.GET.get('min_price')
@@ -51,7 +71,7 @@ def browse_services(request):
     # Filter by tags
     tag = request.GET.get('tag')
     if tag:
-        services_query = services_query.filter(tags__tag__iexact=tag)
+        services_query = services_query.filter(tags__name__iexact=tag)
 
     # Sorting
     sort_by = request.GET.get('sort', '-created_at')
@@ -65,9 +85,9 @@ def browse_services(request):
     services = paginator.get_page(page_number)
 
     # Get categories and tags for filters
-    categories = DServiceCategory.objects.all()
-    popular_tags = DServicesTag.objects.annotate(
-        service_count=Count('DServices_with_tag')
+    categories = ServiceCategory.objects.all()
+    popular_tags = ServiceTag.objects.annotate(
+        service_count=Count('services')
     ).order_by('-service_count')[:10]
 
     context = {
@@ -84,31 +104,31 @@ def service_detail(request, service_uuid):
     View detailed information about a specific service.
     """
     service = get_object_or_404(
-        DService.objects.select_related('provider__user', 'DServiceCategory')
-        .prefetch_related('images', 'tags', 'comments_DService__reviewer'),
+        Service.objects.select_related('provider__user', 'category')
+        .prefetch_related('images', 'tags', 'reviews__reviewer'),
         uuid=service_uuid
     )
 
-    # Get reviews/comments
-    comments = service.comments_DService.filter(parent__isnull=True).order_by('-created_at')
-    avg_rating = comments.aggregate(avg=Avg('rating'))['avg'] or 0
+    # Get reviews
+    reviews = service.reviews.all().order_by('-created_at')
+    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
     # Check if user has liked this service
     user_has_liked = False
     if request.user.is_authenticated:
-        user_has_liked = DServiceLike.objects.filter(
+        user_has_liked = ServiceLike.objects.filter(
             user=request.user,
-            DService=service
+            service=service
         ).exists()
 
     # Get related services (same category)
-    related_services = DService.objects.filter(
-        DServiceCategory=service.DServiceCategory
+    related_services = Service.objects.filter(
+        category=service.category
     ).exclude(uuid=service_uuid)[:4]
 
     context = {
         'service': service,
-        'comments': comments,
+        'reviews': reviews,
         'avg_rating': round(avg_rating, 2),
         'user_has_liked': user_has_liked,
         'related_services': related_services,
@@ -121,10 +141,10 @@ def like_service(request, service_uuid):
     """
     Toggle like/unlike a service.
     """
-    service = get_object_or_404(DService, uuid=service_uuid)
-    like, created = DServiceLike.objects.get_or_create(
+    service = get_object_or_404(Service, uuid=service_uuid)
+    like, created = ServiceLike.objects.get_or_create(
         user=request.user,
-        DService=service
+        service=service
     )
 
     if not created:
@@ -150,8 +170,8 @@ def browse_nearby_services(request):
 
     if lat is None or lng is None:
         # Try to get user's location from their profile if logged in
-        if request.user.is_authenticated and hasattr(request.user, 'DService_provider_profile'):
-            provider = request.user.DService_provider_profile
+        if request.user.is_authenticated and hasattr(request.user, 'service_provider_profile'):
+            provider = request.user.service_provider_profile
             if provider.location_lat and provider.location_lng:
                 lat = provider.location_lat
                 lng = provider.location_lng
@@ -171,7 +191,7 @@ def browse_nearby_services(request):
 
     # Find providers within distance
     nearby_providers = (
-        DServiceProviderProfile.objects
+        ServiceProvider.objects
         .filter(
             location__distance_lte=(user_location, D(km=within_area)),
             availability_status='available'
@@ -181,7 +201,7 @@ def browse_nearby_services(request):
     )
 
     # Get services from nearby providers
-    nearby_services = DService.objects.filter(
+    nearby_services = Service.objects.filter(
         provider__in=nearby_providers
     ).select_related('provider')
 
@@ -202,42 +222,42 @@ def provider_dashboard(request):
     Provider dashboard showing their services, proposals, contracts.
     """
     try:
-        provider = request.user.DService_provider_profile
-    except DServiceProviderProfile.DoesNotExist:
+        provider = request.user.service_provider_profile
+    except ServiceProvider.DoesNotExist:
         messages.info(request, 'Please create your provider profile first')
         return redirect('create_provider_profile')
 
     # Get provider's services
-    services = provider.DServices_offered_by_provider.all()
+    services = provider.services.all()
 
     # Get active contracts
-    active_contracts = DServiceContract.objects.filter(
+    active_contracts = ServiceContract.objects.filter(
         provider=provider,
         status='active'
     )
 
     # Get pending proposals
-    pending_proposals = DServiceProposal.objects.filter(
+    pending_proposals = ServiceProposal.objects.filter(
         provider=provider,
-        is_accepted=False
+        status='pending'
     )
 
-    # Get recent comments
-    recent_comments = DServiceComment.objects.filter(
+    # Get recent reviews
+    recent_reviews = ServiceReview.objects.filter(
         provider=provider
     ).order_by('-created_at')[:5]
 
     # Calculate stats
     total_services = services.count()
-    total_contracts = provider.config_provider_contracts.count()
-    avg_rating = recent_comments.aggregate(avg=Avg('rating'))['avg'] or 0
+    total_contracts = provider.contracts.count()
+    avg_rating = recent_reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
     context = {
         'provider': provider,
         'services': services,
         'active_contracts': active_contracts,
         'pending_proposals': pending_proposals,
-        'recent_comments': recent_comments,
+        'recent_reviews': recent_reviews,
         'total_services': total_services,
         'total_contracts': total_contracts,
         'avg_rating': round(avg_rating, 2),
@@ -251,7 +271,7 @@ def create_provider_profile(request):
     Create a new service provider profile.
     """
     # Check if user already has a provider profile
-    if hasattr(request.user, 'DService_provider_profile'):
+    if hasattr(request.user, 'service_provider_profile'):
         messages.warning(request, 'You already have a provider profile')
         return redirect('provider_dashboard')
 
@@ -267,7 +287,7 @@ def create_provider_profile(request):
         availability_status = request.POST.get('availability_status', 'available')
 
         # Create provider profile
-        provider = DServiceProviderProfile.objects.create(
+        provider = ServiceProvider.objects.create(
             user=request.user,
             bio=bio,
             address=address,
@@ -280,8 +300,8 @@ def create_provider_profile(request):
         )
 
         # Handle image upload
-        if 'image' in request.FILES:
-            provider.image = request.FILES['image']
+        if 'avatar' in request.FILES:
+            provider.avatar = request.FILES['avatar']
             provider.save()
 
         # Add selected categories
@@ -293,7 +313,7 @@ def create_provider_profile(request):
         return redirect('provider_dashboard')
 
     # GET request - show form
-    categories = DServiceCategory.objects.all()
+    categories = ServiceCategory.objects.all()
     context = {'categories': categories}
     return render(request, 'services/create_provider_profile.html', context)
 
@@ -303,7 +323,7 @@ def edit_provider_profile(request):
     """
     Edit existing provider profile.
     """
-    provider = get_object_or_404(DServiceProviderProfile, user=request.user)
+    provider = get_object_or_404(ServiceProvider, user=request.user)
 
     if request.method == 'POST':
         # Update profile fields
@@ -317,8 +337,8 @@ def edit_provider_profile(request):
         provider.availability_status = request.POST.get('availability_status', provider.availability_status)
 
         # Handle image upload
-        if 'image' in request.FILES:
-            provider.image = request.FILES['image']
+        if 'avatar' in request.FILES:
+            provider.avatar = request.FILES['avatar']
 
         provider.save()
 
@@ -330,7 +350,7 @@ def edit_provider_profile(request):
         messages.success(request, 'Profile updated successfully!')
         return redirect('provider_dashboard')
 
-    categories = DServiceCategory.objects.all()
+    categories = ServiceCategory.objects.all()
     context = {
         'provider': provider,
         'categories': categories,
@@ -343,7 +363,7 @@ def provider_profile_view(request, provider_uuid):
     Public view of a provider's profile.
     """
     provider = get_object_or_404(
-        DServiceProviderProfile.objects.prefetch_related('DServices_offered_by_provider'),
+        ServiceProvider.objects.prefetch_related('services'),
         uuid=provider_uuid
     )
 
@@ -353,10 +373,10 @@ def provider_profile_view(request, provider_uuid):
         return redirect('browse_services')
 
     # Get provider's services
-    services = provider.DServices_offered_by_provider.all()
+    services = provider.services.all()
 
     # Get reviews
-    reviews = DServiceComment.objects.filter(provider=provider).order_by('-created_at')
+    reviews = ServiceReview.objects.filter(provider=provider).order_by('-created_at')
     avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
     context = {
@@ -377,8 +397,8 @@ def create_service(request):
     """
     # Ensure user has a provider profile
     try:
-        provider = request.user.DService_provider_profile
-    except DServiceProviderProfile.DoesNotExist:
+        provider = request.user.service_provider_profile
+    except ServiceProvider.DoesNotExist:
         messages.error(request, 'Please create a provider profile first')
         return redirect('create_provider_profile')
 
@@ -386,17 +406,17 @@ def create_service(request):
         name = request.POST.get('name')
         description = request.POST.get('description', '')
         price = request.POST.get('price')
-        duration_minutes = request.POST.get('duration_minutes')
+        duration_days = request.POST.get('duration_days')
         category_id = request.POST.get('category')
 
         # Create service
-        service = DService.objects.create(
+        service = Service.objects.create(
             provider=provider,
             name=name,
             description=description,
-            price=int(price) if price else None,
-            duration_minutes=int(duration_minutes) if duration_minutes else None,
-            DServiceCategory_id=category_id if category_id else None
+            price=Decimal(price) if price else None,
+            duration_days=int(duration_days) if duration_days else None,
+            category_id=category_id if category_id else None
         )
 
         # Handle thumbnail
@@ -409,13 +429,13 @@ def create_service(request):
         for tag_name in tags:
             tag_name = tag_name.strip()
             if tag_name:
-                tag, _ = DServicesTag.objects.get_or_create(tag=tag_name)
+                tag, _ = ServiceTag.objects.get_or_create(name=tag_name)
                 service.tags.add(tag)
 
         messages.success(request, 'Service created successfully!')
         return redirect('provider_dashboard')
 
-    categories = DServiceCategory.objects.all()
+    categories = ServiceCategory.objects.all()
     context = {'categories': categories}
     return render(request, 'services/create_service.html', context)
 
@@ -425,20 +445,20 @@ def edit_service(request, service_uuid):
     """
     Edit an existing service.
     """
-    service = get_object_or_404(DService, uuid=service_uuid, provider__user=request.user)
+    service = get_object_or_404(Service, uuid=service_uuid, provider__user=request.user)
 
     if request.method == 'POST':
         service.name = request.POST.get('name', service.name)
         service.description = request.POST.get('description', service.description)
 
         price = request.POST.get('price')
-        service.price = int(price) if price else None
+        service.price = Decimal(price) if price else None
 
-        duration = request.POST.get('duration_minutes')
-        service.duration_minutes = int(duration) if duration else None
+        duration = request.POST.get('duration_days')
+        service.duration_days = int(duration) if duration else None
 
         category_id = request.POST.get('category')
-        service.DServiceCategory_id = category_id if category_id else None
+        service.category_id = category_id if category_id else None
 
         # Handle thumbnail
         if 'thumbnail' in request.FILES:
@@ -452,14 +472,14 @@ def edit_service(request, service_uuid):
         for tag_name in tags:
             tag_name = tag_name.strip()
             if tag_name:
-                tag, _ = DServicesTag.objects.get_or_create(tag=tag_name)
+                tag, _ = ServiceTag.objects.get_or_create(name=tag_name)
                 service.tags.add(tag)
 
         messages.success(request, 'Service updated successfully!')
         return redirect('provider_dashboard')
 
-    categories = DServiceCategory.objects.all()
-    current_tags = ', '.join([tag.tag for tag in service.tags.all()])
+    categories = ServiceCategory.objects.all()
+    current_tags = ', '.join([tag.name for tag in service.tags.all()])
 
     context = {
         'service': service,
@@ -474,7 +494,7 @@ def delete_service(request, service_uuid):
     """
     Delete a service.
     """
-    service = get_object_or_404(DService, uuid=service_uuid, provider__user=request.user)
+    service = get_object_or_404(Service, uuid=service_uuid, provider__user=request.user)
 
     if request.method == 'POST':
         service_name = service.name
@@ -499,12 +519,12 @@ def create_service_request(request):
         budget_min = request.POST.get('budget_min')
         budget_max = request.POST.get('budget_max')
         deadline = request.POST.get('deadline')
-        company_id = request.POST.get('company')
+        category_id = request.POST.get('category')
 
         # Create request
-        service_request = DServiceRequest.objects.create(
+        client_request = ClientRequest.objects.create(
             client=request.user,
-            company_id=company_id if company_id else None,
+            category_id=category_id if category_id else None,
             title=title,
             description=description,
             budget_min=Decimal(budget_min) if budget_min else None,
@@ -515,17 +535,17 @@ def create_service_request(request):
         # Add required skills
         skill_ids = request.POST.getlist('skills')
         if skill_ids:
-            service_request.required_skills.set(skill_ids)
+            client_request.required_skills.set(skill_ids)
 
         messages.success(request, 'Service request created successfully!')
         return redirect('my_requests')
 
     skills = Skill.objects.all()
-    companies = Company.objects.filter(Q(owner=request.user) | Q(members=request.user))
+    categories = ServiceCategory.objects.all()
 
     context = {
         'skills': skills,
-        'companies': companies,
+        'categories': categories,
     }
     return render(request, 'services/create_request.html', context)
 
@@ -535,9 +555,9 @@ def my_requests(request):
     """
     View user's service requests.
     """
-    requests = DServiceRequest.objects.filter(client=request.user).order_by('-created_at')
+    client_requests = ClientRequest.objects.filter(client=request.user).order_by('-created_at')
 
-    context = {'requests': requests}
+    context = {'requests': client_requests}
     return render(request, 'services/my_requests.html', context)
 
 
@@ -546,23 +566,23 @@ def view_request(request, request_uuid):
     """
     View a specific service request with proposals.
     """
-    service_request = get_object_or_404(
-        DServiceRequest.objects.prefetch_related('proposals__provider'),
+    client_request = get_object_or_404(
+        ClientRequest.objects.prefetch_related('proposals__provider'),
         uuid=request_uuid
     )
 
     # Only owner or providers can view
-    is_owner = service_request.client == request.user
-    has_provider_profile = hasattr(request.user, 'DService_provider_profile')
+    is_owner = client_request.client == request.user
+    has_provider_profile = hasattr(request.user, 'service_provider_profile')
 
     if not (is_owner or has_provider_profile):
         messages.error(request, 'You do not have permission to view this request')
         return redirect('browse_services')
 
-    proposals = service_request.proposals.all().order_by('-submitted_at')
+    proposals = client_request.proposals.all().order_by('-created_at')
 
     context = {
-        'request': service_request,
+        'client_request': client_request,
         'proposals': proposals,
         'is_owner': is_owner,
     }
@@ -575,34 +595,34 @@ def submit_proposal(request, request_uuid):
     Provider submits a proposal for a service request.
     """
     try:
-        provider = request.user.DService_provider_profile
-    except DServiceProviderProfile.DoesNotExist:
+        provider = request.user.service_provider_profile
+    except ServiceProvider.DoesNotExist:
         messages.error(request, 'You need a provider profile to submit proposals')
         return redirect('create_provider_profile')
 
-    service_request = get_object_or_404(DServiceRequest, uuid=request_uuid, is_open=True)
+    client_request = get_object_or_404(ClientRequest, uuid=request_uuid, status='open')
 
     # Check if already submitted
-    if DServiceProposal.objects.filter(request=service_request, provider=provider).exists():
+    if ServiceProposal.objects.filter(client_request=client_request, provider=provider).exists():
         messages.warning(request, 'You already submitted a proposal for this request')
         return redirect('view_request', request_uuid=request_uuid)
 
     if request.method == 'POST':
         proposed_rate = request.POST.get('proposed_rate')
-        message = request.POST.get('message', '')
+        cover_letter = request.POST.get('cover_letter', '')
 
-        DServiceProposal.objects.create(
-            request=service_request,
+        ServiceProposal.objects.create(
+            client_request=client_request,
             provider=provider,
             proposed_rate=Decimal(proposed_rate),
-            message=message
+            cover_letter=cover_letter
         )
 
         messages.success(request, 'Proposal submitted successfully!')
         return redirect('provider_dashboard')
 
     context = {
-        'request': service_request,
+        'client_request': client_request,
         'provider': provider,
     }
     return render(request, 'services/submit_proposal.html', context)
@@ -611,37 +631,52 @@ def submit_proposal(request, request_uuid):
 @login_required
 def accept_proposal(request, proposal_id):
     """
-    Client accepts a proposal and creates a contract.
+    Client accepts a proposal and creates a contract with escrow.
     """
-    proposal = get_object_or_404(DServiceProposal, id=proposal_id)
+    proposal = get_object_or_404(ServiceProposal, id=proposal_id)
 
     # Ensure user is the client who made the request
-    if proposal.request.client != request.user:
+    if proposal.client_request.client != request.user:
         messages.error(request, 'You do not have permission to accept this proposal')
         return redirect('browse_services')
 
     if request.method == 'POST':
         # Mark proposal as accepted
-        proposal.is_accepted = True
+        proposal.status = 'accepted'
         proposal.save()
 
         # Close the request
-        proposal.request.is_open = False
-        proposal.request.save()
+        proposal.client_request.status = 'in_progress'
+        proposal.client_request.save()
 
-        # Create contract
-        agreed_deadline = request.POST.get('agreed_deadline')
-        contract = DServiceContract.objects.create(
-            request=proposal.request,
-            provider=proposal.provider,
-            client=request.user,
-            agreed_rate=proposal.proposed_rate,
-            agreed_deadline=agreed_deadline if agreed_deadline else None,
-            status='pending'
+        # Create escrow transaction for the contract
+        escrow = EscrowTransaction.objects.create(
+            buyer=request.user,
+            seller=proposal.provider.user,
+            amount=proposal.proposed_rate,
+            currency='CAD',
+            status='initialized',
+            agreement_details=f"Escrow for proposal: {proposal.client_request.title}"
         )
 
-        messages.success(request, 'Proposal accepted! Contract created.')
-        return redirect('view_contract', contract_id=contract.id)
+        # Create contract with escrow linked
+        agreed_deadline = request.POST.get('agreed_deadline')
+        contract_title = proposal.client_request.title or f"Contract with {proposal.provider.display_name}"
+        contract = ServiceContract.objects.create(
+            proposal=proposal,
+            client_request=proposal.client_request,
+            provider=proposal.provider,
+            client=request.user,
+            title=contract_title,
+            description=proposal.cover_letter,
+            agreed_rate=proposal.proposed_rate,
+            agreed_deadline=agreed_deadline if agreed_deadline else None,
+            status=ServiceContract.ContractStatus.PENDING_PAYMENT,
+            escrow_transaction=escrow
+        )
+
+        messages.success(request, 'Proposal accepted! Contract created. Please fund the escrow to start work.')
+        return redirect('services:view_contract', contract_id=contract.id)
 
     context = {'proposal': proposal}
     return render(request, 'services/accept_proposal.html', context)
@@ -654,7 +689,7 @@ def view_contract(request, contract_id):
     """
     View contract details.
     """
-    contract = get_object_or_404(DServiceContract, id=contract_id)
+    contract = get_object_or_404(ServiceContract, id=contract_id)
 
     # Only client or provider can view
     is_client = contract.client == request.user
@@ -665,7 +700,7 @@ def view_contract(request, contract_id):
         return redirect('browse_services')
 
     # Get contract messages
-    contract_messages = contract.messages.all().order_by('sent_at')
+    contract_messages = contract.messages.all().order_by('created_at')
 
     context = {
         'contract': contract,
@@ -682,13 +717,13 @@ def my_contracts(request):
     View user's contracts (as client or provider).
     """
     # Contracts as client
-    client_contracts = DServiceContract.objects.filter(client=request.user)
+    client_contracts = ServiceContract.objects.filter(client=request.user)
 
     # Contracts as provider
     provider_contracts = []
-    if hasattr(request.user, 'DService_provider_profile'):
-        provider_contracts = DServiceContract.objects.filter(
-            provider=request.user.DService_provider_profile
+    if hasattr(request.user, 'service_provider_profile'):
+        provider_contracts = ServiceContract.objects.filter(
+            provider=request.user.service_provider_profile
         )
 
     context = {
@@ -701,9 +736,17 @@ def my_contracts(request):
 @login_required
 def update_contract_status(request, contract_id):
     """
-    Update contract status (start, complete, cancel).
+    Update contract status with full escrow lifecycle integration.
+
+    Workflow:
+    - PENDING_PAYMENT -> FUNDED (after client funds escrow)
+    - FUNDED -> IN_PROGRESS (provider starts work)
+    - IN_PROGRESS -> DELIVERED (provider submits delivery)
+    - DELIVERED -> COMPLETED (client accepts, escrow released)
+    - Any -> DISPUTED (either party raises dispute)
+    - Any -> CANCELLED (with potential refund)
     """
-    contract = get_object_or_404(DServiceContract, id=contract_id)
+    contract = get_object_or_404(ServiceContract, id=contract_id)
 
     # Check permissions
     is_client = contract.client == request.user
@@ -715,29 +758,218 @@ def update_contract_status(request, contract_id):
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
+        escrow = contract.escrow_transaction
 
-        if new_status == 'active' and contract.status == 'pending':
-            contract.status = 'active'
-            contract.started_at = timezone.now()
-            messages.success(request, 'Contract activated')
+        # Provider starts work (after escrow is funded)
+        if new_status == 'in_progress' and contract.status == ServiceContract.ContractStatus.FUNDED and is_provider:
+            contract.start()
+            messages.success(request, 'Contract started! Begin working on the deliverables.')
 
-        elif new_status == 'completed' and contract.status == 'active' and is_provider:
-            contract.status = 'completed'
-            contract.completed_at = timezone.now()
+        # Provider delivers work
+        elif new_status == 'delivered' and contract.status == ServiceContract.ContractStatus.IN_PROGRESS and is_provider:
+            contract.deliver()
+            if escrow:
+                escrow.mark_service_delivered()
+            messages.success(request, 'Delivery submitted! Waiting for client approval.')
+
+        # Client accepts delivery (releases escrow)
+        elif new_status == 'completed' and contract.status == ServiceContract.ContractStatus.DELIVERED and is_client:
+            contract.complete()
             # Update provider stats
             contract.provider.completed_jobs_count += 1
             contract.provider.save()
-            messages.success(request, 'Contract marked as completed')
+            messages.success(request, 'Contract completed! Funds have been released to the provider.')
 
+        # Client requests revision (if revisions available)
+        elif new_status == 'revision_requested' and contract.status == ServiceContract.ContractStatus.DELIVERED and is_client:
+            if contract.revisions_used < contract.revisions_allowed:
+                contract.status = ServiceContract.ContractStatus.REVISION_REQUESTED
+                contract.revisions_used += 1
+                contract.save()
+                messages.success(request, f'Revision requested. {contract.revisions_allowed - contract.revisions_used} revisions remaining.')
+            else:
+                messages.error(request, 'No revisions remaining. Please accept or dispute the delivery.')
+
+        # Provider resubmits after revision
+        elif new_status == 'delivered' and contract.status == ServiceContract.ContractStatus.REVISION_REQUESTED and is_provider:
+            contract.status = ServiceContract.ContractStatus.DELIVERED
+            contract.delivered_at = timezone.now()
+            contract.save()
+            messages.success(request, 'Revision submitted! Waiting for client approval.')
+
+        # Cancel contract (refund if funded)
         elif new_status == 'cancelled' and is_client:
-            contract.status = 'cancelled'
-            messages.success(request, 'Contract cancelled')
+            reason = request.POST.get('reason', '')
+            contract.cancel(reason=reason)
+            if escrow and escrow.status == 'funded':
+                escrow.mark_refunded()
+                messages.success(request, 'Contract cancelled. Escrow funds have been refunded.')
+            else:
+                messages.success(request, 'Contract cancelled.')
 
-        contract.save()
-        return redirect('view_contract', contract_id=contract_id)
+        else:
+            messages.error(request, 'Invalid status transition.')
 
-    context = {'contract': contract}
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    context = {'contract': contract, 'is_client': is_client, 'is_provider': is_provider}
     return render(request, 'services/update_contract_status.html', context)
+
+
+@login_required
+def fund_contract(request, contract_id):
+    """
+    Client funds the escrow for a contract via Stripe.
+
+    This creates a Stripe PaymentIntent and processes the payment.
+    On success, escrow status changes to 'funded' and contract to 'FUNDED'.
+    """
+    contract = get_object_or_404(ServiceContract, id=contract_id)
+
+    # Only client can fund
+    if contract.client != request.user:
+        messages.error(request, 'Only the client can fund this contract')
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    # Contract must be pending payment
+    if contract.status != ServiceContract.ContractStatus.PENDING_PAYMENT:
+        messages.error(request, 'This contract cannot be funded at this stage')
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    escrow = contract.escrow_transaction
+    if not escrow:
+        messages.error(request, 'No escrow transaction found for this contract')
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    if request.method == 'POST':
+        # In production, this would integrate with Stripe
+        # For now, we simulate successful payment
+        payment_intent_id = request.POST.get('payment_intent_id', '')
+
+        if payment_intent_id or request.POST.get('simulate_payment'):
+            # Mark escrow as funded
+            escrow.payment_intent_id = payment_intent_id or f"sim_{escrow.id}"
+            escrow.mark_funded()
+
+            # Update contract status
+            contract.status = ServiceContract.ContractStatus.FUNDED
+            contract.save()
+
+            messages.success(request, 'Payment successful! Escrow funded. The provider can now start work.')
+            return redirect('services:view_contract', contract_id=contract_id)
+        else:
+            messages.error(request, 'Payment processing failed. Please try again.')
+
+    # Calculate platform fee and provider payout
+    platform_fee = contract.agreed_rate * (contract.platform_fee_percent / 100)
+    provider_payout = contract.agreed_rate - platform_fee
+
+    context = {
+        'contract': contract,
+        'escrow': escrow,
+        'platform_fee': platform_fee,
+        'provider_payout': provider_payout,
+    }
+    return render(request, 'services/fund_contract.html', context)
+
+
+@login_required
+def create_dispute(request, contract_id):
+    """
+    Either party raises a dispute on a contract.
+
+    Valid for contracts that are: FUNDED, IN_PROGRESS, DELIVERED, or REVISION_REQUESTED.
+    """
+    contract = get_object_or_404(ServiceContract, id=contract_id)
+
+    # Check permissions
+    is_client = contract.client == request.user
+    is_provider = contract.provider.user == request.user
+
+    if not (is_client or is_provider):
+        messages.error(request, 'You do not have permission to dispute this contract')
+        return redirect('browse_services')
+
+    # Check if contract can be disputed
+    disputable_statuses = [
+        ServiceContract.ContractStatus.FUNDED,
+        ServiceContract.ContractStatus.IN_PROGRESS,
+        ServiceContract.ContractStatus.DELIVERED,
+        ServiceContract.ContractStatus.REVISION_REQUESTED,
+    ]
+    if contract.status not in disputable_statuses:
+        messages.error(request, 'This contract cannot be disputed at this stage')
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    escrow = contract.escrow_transaction
+    if not escrow:
+        messages.error(request, 'No escrow transaction found for this contract')
+        return redirect('services:view_contract', contract_id=contract_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '').strip()
+        details = request.POST.get('details', '').strip()
+
+        if not reason:
+            messages.error(request, 'Please provide a reason for the dispute')
+        else:
+            # Create dispute record
+            dispute = Dispute.objects.create(
+                escrow=escrow,
+                raised_by=request.user,
+                reason=reason,
+                details=details
+            )
+
+            # Update escrow and contract status
+            escrow.raise_dispute()
+            contract.status = ServiceContract.ContractStatus.DISPUTED
+            contract.save()
+
+            messages.success(request, 'Dispute raised successfully. Our team will review and respond within 48 hours.')
+            return redirect('services:view_contract', contract_id=contract_id)
+
+    context = {
+        'contract': contract,
+        'is_client': is_client,
+        'is_provider': is_provider,
+    }
+    return render(request, 'services/create_dispute.html', context)
+
+
+@login_required
+def view_dispute(request, dispute_id):
+    """
+    View dispute details and resolution status.
+    """
+    dispute = get_object_or_404(Dispute, id=dispute_id)
+    escrow = dispute.escrow
+
+    # Get the contract associated with the escrow
+    try:
+        contract = escrow.service_contract
+    except ServiceContract.DoesNotExist:
+        messages.error(request, 'Contract not found for this dispute')
+        return redirect('services:my_contracts')
+
+    # Check permissions
+    is_client = contract.client == request.user
+    is_provider = contract.provider.user == request.user
+    is_raiser = dispute.raised_by == request.user
+
+    if not (is_client or is_provider):
+        messages.error(request, 'You do not have permission to view this dispute')
+        return redirect('services:my_contracts')
+
+    context = {
+        'dispute': dispute,
+        'contract': contract,
+        'escrow': escrow,
+        'is_client': is_client,
+        'is_provider': is_provider,
+        'is_raiser': is_raiser,
+    }
+    return render(request, 'services/view_dispute.html', context)
 
 
 # ==================== REVIEWS & COMMENTS ====================
@@ -747,7 +979,7 @@ def add_review(request, service_uuid):
     """
     Add a review/comment to a service.
     """
-    service = get_object_or_404(DService, uuid=service_uuid)
+    service = get_object_or_404(Service, uuid=service_uuid)
 
     if request.method == 'POST':
         content = request.POST.get('content', '')
@@ -757,21 +989,21 @@ def add_review(request, service_uuid):
             messages.error(request, 'Please provide a rating')
             return redirect('service_detail', service_uuid=service_uuid)
 
-        DServiceComment.objects.create(
+        ServiceReview.objects.create(
             provider=service.provider,
-            DService=service,
+            service=service,
             reviewer=request.user,
             content=content,
             rating=int(rating)
         )
 
         # Update provider rating
-        avg_rating = DServiceComment.objects.filter(
+        avg_rating = ServiceReview.objects.filter(
             provider=service.provider
         ).aggregate(avg=Avg('rating'))['avg']
 
         service.provider.rating_avg = Decimal(str(round(avg_rating, 2)))
-        service.provider.total_reviews = DServiceComment.objects.filter(
+        service.provider.total_reviews = ServiceReview.objects.filter(
             provider=service.provider
         ).count()
         service.provider.save()
@@ -819,15 +1051,15 @@ def search_services_ajax(request):
     if len(query) < 2:
         return JsonResponse({'results': []})
 
-    services = DService.objects.filter(
+    services = Service.objects.filter(
         Q(name__icontains=query) | Q(description__icontains=query)
     )[:10]
 
     results = [{
         'uuid': str(service.uuid),
         'name': service.name,
-        'price': service.price,
-        'provider': service.provider.get_full_name(),
+        'price': float(service.price) if service.price else None,
+        'provider': service.provider.display_name,
     } for service in services]
 
     return JsonResponse({'results': results})

@@ -1,0 +1,203 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "My CVs" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "My CVs" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "My CVs" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Manage multiple CV versions tailored to different job types." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'accounts:cv_create' %}"
+   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    {% trans "Create New CV" %}
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Tips Banner -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">{% trans "Pro Tip: Multiple CVs Win Jobs" %}</h4>
+                <p class="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                    {% trans "Candidates with tailored CVs for different roles get 40% more interviews. Create versions for each job type you're targeting." %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CV Grid -->
+    {% if cvs %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for cv in cvs %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <!-- CV Header -->
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        {% if cv.is_primary %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                            {% trans "Primary" %}
+                        </span>
+                        {% endif %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                            {% if cv.status == 'active' %}bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400
+                            {% elif cv.status == 'draft' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
+                            {% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400{% endif %}">
+                            {{ cv.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
+                            <a href="{% url 'accounts:cv_edit' cv.uuid %}"
+                               class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                {% trans "Edit" %}
+                            </a>
+                            <a href="{% url 'accounts:cv_duplicate' cv.uuid %}"
+                               class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                {% trans "Duplicate" %}
+                            </a>
+                            {% if not cv.is_primary %}
+                            <button hx-post="{% url 'accounts:cv_set_primary' cv.uuid %}"
+                                    hx-swap="none"
+                                    hx-on::after-request="location.reload()"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                {% trans "Set as Primary" %}
+                            </button>
+                            {% endif %}
+                            <hr class="my-1 border-gray-200 dark:border-gray-600">
+                            <button hx-delete="{% url 'accounts:cv_delete' cv.uuid %}"
+                                    hx-confirm="{% trans 'Delete this CV?' %}"
+                                    hx-target="closest .bg-white"
+                                    hx-swap="outerHTML"
+                                    class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                {% trans "Delete" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CV Name -->
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ cv.name }}</h3>
+                {% if cv.headline %}
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ cv.headline|truncatewords:10 }}</p>
+                {% endif %}
+
+                <!-- Target Keywords -->
+                {% if cv.target_job_types %}
+                <div class="mt-3 flex flex-wrap gap-1">
+                    {% for job_type in cv.target_job_types|slice:":3" %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                        {{ job_type }}
+                    </span>
+                    {% endfor %}
+                    {% if cv.target_job_types|length > 3 %}
+                    <span class="text-xs text-gray-500">+{{ cv.target_job_types|length|add:"-3" }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Stats -->
+                <div class="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div class="text-center">
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ cv.applications_count }}</p>
+                        <p class="text-xs text-gray-500">{% trans "Uses" %}</p>
+                    </div>
+                    <div class="text-center">
+                        {% if cv.interview_rate %}
+                        <p class="text-lg font-bold text-green-600 dark:text-green-400">{{ cv.interview_rate }}%</p>
+                        {% else %}
+                        <p class="text-lg font-bold text-gray-400">--</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500">{% trans "Interview Rate" %}</p>
+                    </div>
+                    <div class="text-center">
+                        {% if cv.ai_score %}
+                        <p class="text-lg font-bold {% if cv.ai_score >= 80 %}text-green-600{% elif cv.ai_score >= 60 %}text-yellow-600{% else %}text-red-600{% endif %}">{{ cv.ai_score|floatformat:0 }}</p>
+                        {% else %}
+                        <p class="text-lg font-bold text-gray-400">--</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500">{% trans "AI Score" %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV Actions Footer -->
+            <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 flex items-center justify-between">
+                <a href="{% url 'accounts:cv_detail' cv.uuid %}"
+                   class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                    {% trans "View Details" %}
+                </a>
+                <a href="{% url 'accounts:cv_feedback' cv.uuid %}"
+                   class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    {% trans "Get Feedback" %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Add New CV Card -->
+        <a href="{% url 'accounts:cv_create' %}"
+           class="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 flex flex-col items-center justify-center hover:border-primary-400 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-colors min-h-[240px]">
+            <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-3">
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{% trans "Create New CV" %}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{% trans "Tailored for a specific role" %}</p>
+        </a>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center">
+        <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-6">
+            <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% trans "No CVs Yet" %}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+            {% trans "Create your first CV to start applying to jobs. You can create multiple versions for different types of roles." %}
+        </p>
+        <a href="{% url 'accounts:cv_create' %}"
+           class="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            {% trans "Create Your First CV" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

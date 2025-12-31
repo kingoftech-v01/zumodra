@@ -1,0 +1,367 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Apply for" %} {{ job.job.title }} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block meta_description %}{% trans "Apply for the position of" %} {{ job.job.title }}. {% trans "Submit your application now." %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Back Link -->
+    <a href="{% url 'careers:template:job-detail' pk=job.pk %}" class="inline-flex items-center text-gray-600 hover:text-primary mb-8">
+        <span class="mdi mdi-arrow-left mr-2"></span>
+        {% trans "Back to job details" %}
+    </a>
+
+    <!-- Header -->
+    <div class="bg-white rounded-xl border border-gray-200 p-8 mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Apply for this position" %}</h1>
+        <div class="flex items-center text-gray-600">
+            <span class="text-xl font-medium text-primary">{{ job.job.title }}</span>
+            {% if job.job.location_city %}
+            <span class="mx-3">&bull;</span>
+            <span class="inline-flex items-center">
+                <span class="mdi mdi-map-marker-outline mr-1"></span>
+                {{ job.job.location_city }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Application Form -->
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl border border-gray-200 p-8" id="application-form">
+        {% csrf_token %}
+
+        <!-- Error Messages -->
+        {% if form.errors %}
+        <div class="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center text-red-700 mb-2">
+                <span class="mdi mdi-alert-circle mr-2"></span>
+                <strong>{% trans "Please correct the errors below" %}</strong>
+            </div>
+            <ul class="list-disc list-inside text-red-600 text-sm">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Personal Information -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+                <span class="mdi mdi-account-outline mr-2 text-primary"></span>
+                {% trans "Personal Information" %}
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- First Name -->
+                <div>
+                    <label for="id_first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "First Name" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="id_last_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Last Name" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Email Address" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Phone Number" %}
+                    </label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Resume & Documents -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+                <span class="mdi mdi-file-document-outline mr-2 text-primary"></span>
+                {% trans "Resume & Documents" %}
+            </h2>
+
+            <!-- Resume Upload -->
+            <div class="mb-6">
+                <label for="id_resume" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Resume / CV" %} <span class="text-red-500">*</span>
+                </label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary transition-colors" id="resume-dropzone">
+                    <div class="space-y-2 text-center">
+                        <span class="mdi mdi-cloud-upload text-4xl text-gray-400"></span>
+                        <div class="flex flex-col text-sm text-gray-600">
+                            <label for="id_resume" class="relative cursor-pointer rounded-md font-medium text-primary hover:text-secondary">
+                                <span>{% trans "Upload a file" %}</span>
+                                <input type="file" name="resume" id="id_resume" class="sr-only" accept=".pdf,.doc,.docx" required>
+                            </label>
+                            <p class="text-gray-500">{% trans "or drag and drop" %}</p>
+                        </div>
+                        <p class="text-xs text-gray-500">{% trans "PDF, DOC, DOCX up to 10MB" %}</p>
+                    </div>
+                </div>
+                <p id="resume-filename" class="mt-2 text-sm text-green-600 hidden">
+                    <span class="mdi mdi-check-circle mr-1"></span>
+                    <span id="resume-name"></span>
+                </p>
+                {% if form.resume.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.resume.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Cover Letter -->
+            <div>
+                <label for="id_cover_letter" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Cover Letter" %}
+                    {% if job.job.require_cover_letter %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.cover_letter }}
+                <p class="mt-1 text-xs text-gray-500">{% trans "Tell us why you're a great fit for this role" %}</p>
+                {% if form.cover_letter.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.cover_letter.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Links -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+                <span class="mdi mdi-link-variant mr-2 text-primary"></span>
+                {% trans "Online Profiles" %} <span class="text-sm font-normal text-gray-500">({% trans "optional" %})</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- LinkedIn -->
+                <div>
+                    <label for="id_linkedin_url" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="mdi mdi-linkedin mr-1 text-[#0077B5]"></span>
+                        {% trans "LinkedIn Profile" %}
+                    </label>
+                    {{ form.linkedin_url }}
+                    {% if form.linkedin_url.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.linkedin_url.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Portfolio -->
+                <div>
+                    <label for="id_portfolio_url" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="mdi mdi-web mr-1 text-primary"></span>
+                        {% trans "Portfolio / Website" %}
+                    </label>
+                    {{ form.portfolio_url }}
+                    {% if form.portfolio_url.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.portfolio_url.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Custom Questions -->
+        {% if job_serialized.custom_questions %}
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+                <span class="mdi mdi-comment-question-outline mr-2 text-primary"></span>
+                {% trans "Additional Questions" %}
+            </h2>
+
+            <div class="space-y-6">
+                {% for question in job_serialized.custom_questions %}
+                <div>
+                    <label for="custom_{{ question.id|default:forloop.counter }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ question.label|default:question.question }}
+                        {% if question.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+
+                    {% if question.type == 'textarea' or question.type == 'text' %}
+                    <textarea name="custom_answers[{{ question.id|default:forloop.counter }}]"
+                              id="custom_{{ question.id|default:forloop.counter }}"
+                              class="form-textarea"
+                              rows="4"
+                              {% if question.required %}required{% endif %}></textarea>
+                    {% elif question.type == 'select' %}
+                    <select name="custom_answers[{{ question.id|default:forloop.counter }}]"
+                            id="custom_{{ question.id|default:forloop.counter }}"
+                            class="form-select"
+                            {% if question.required %}required{% endif %}>
+                        <option value="">{% trans "Select an option" %}</option>
+                        {% for option in question.options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input type="text"
+                           name="custom_answers[{{ question.id|default:forloop.counter }}]"
+                           id="custom_{{ question.id|default:forloop.counter }}"
+                           class="form-input"
+                           {% if question.required %}required{% endif %}>
+                    {% endif %}
+
+                    {% if question.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ question.help_text }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Consent -->
+        <section class="mb-10 bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+                <span class="mdi mdi-shield-check-outline mr-2 text-primary"></span>
+                {% trans "Privacy & Consent" %}
+            </h2>
+
+            <div class="space-y-4">
+                <!-- Data Storage Consent -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        {{ form.consent_to_store }}
+                    </div>
+                    <label for="id_consent_to_store" class="ml-3 text-sm text-gray-700">
+                        {% if gdpr_consent_text %}
+                        {{ gdpr_consent_text|safe }}
+                        {% else %}
+                        {% trans "I consent to the storage of my personal data for the purpose of this job application." %} <span class="text-red-500">*</span>
+                        {% endif %}
+                    </label>
+                </div>
+                {% if form.consent_to_store.errors %}
+                <p class="text-sm text-red-600 ml-8">{{ form.consent_to_store.errors.0 }}</p>
+                {% endif %}
+
+                <!-- Processing Consent -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        {{ form.consent_to_process }}
+                    </div>
+                    <label for="id_consent_to_process" class="ml-3 text-sm text-gray-700">
+                        {% trans "I consent to the processing of my application by the hiring team." %} <span class="text-red-500">*</span>
+                    </label>
+                </div>
+                {% if form.consent_to_process.errors %}
+                <p class="text-sm text-red-600 ml-8">{{ form.consent_to_process.errors.0 }}</p>
+                {% endif %}
+
+                <!-- Marketing Consent (Optional) -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        {{ form.marketing_consent }}
+                    </div>
+                    <label for="id_marketing_consent" class="ml-3 text-sm text-gray-700">
+                        {% trans "I would like to receive job alerts and career updates (optional)." %}
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Honeypot (hidden) -->
+        <div style="position: absolute; left: -9999px;" aria-hidden="true">
+            {{ form.website }}
+        </div>
+
+        <!-- Submit -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t">
+            <p class="text-sm text-gray-500">
+                <span class="text-red-500">*</span> {% trans "Required fields" %}
+            </p>
+            <button type="submit" id="submit-btn"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors text-lg">
+                <span class="mdi mdi-send mr-2"></span>
+                {% trans "Submit Application" %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // File upload handling
+    const resumeInput = document.getElementById('id_resume');
+    const dropzone = document.getElementById('resume-dropzone');
+    const filenameDisplay = document.getElementById('resume-filename');
+    const filenameName = document.getElementById('resume-name');
+
+    resumeInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            filenameName.textContent = this.files[0].name;
+            filenameDisplay.classList.remove('hidden');
+            dropzone.classList.add('border-green-500', 'bg-green-50');
+            dropzone.classList.remove('border-gray-300');
+        }
+    });
+
+    // Drag and drop
+    dropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-primary', 'bg-primary/5');
+    });
+
+    dropzone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary', 'bg-primary/5');
+    });
+
+    dropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary', 'bg-primary/5');
+
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            resumeInput.files = e.dataTransfer.files;
+            filenameName.textContent = e.dataTransfer.files[0].name;
+            filenameDisplay.classList.remove('hidden');
+            dropzone.classList.add('border-green-500', 'bg-green-50');
+        }
+    });
+
+    // Form validation
+    document.getElementById('application-form').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="mdi mdi-loading mdi-spin mr-2"></span>{% trans "Submitting..." %}';
+    });
+
+    // Client-side file size validation
+    resumeInput.addEventListener('change', function() {
+        if (this.files[0] && this.files[0].size > 10 * 1024 * 1024) {
+            alert('{% trans "File size must be under 10MB" %}');
+            this.value = '';
+            filenameDisplay.classList.add('hidden');
+            dropzone.classList.remove('border-green-500', 'bg-green-50');
+        }
+    });
+</script>
+{% endblock %}

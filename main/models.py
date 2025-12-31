@@ -1,18 +1,28 @@
-from django.db import models
-from django_tenants.models import TenantMixin, DomainMixin
+"""
+Main App Models - Zumodra Multi-tenant Platform
 
-# Create your models here.
-class Tenant(TenantMixin):
-    name = models.CharField(max_length=100)
-    paid_until =  models.DateField()
-    on_trial = models.BooleanField()
-    created_on = models.DateField(auto_now_add=True)
+IMPORTANT: Tenant and Domain models have been consolidated into the `tenants` app.
+This file re-exports them for backwards compatibility with django-tenants settings.
 
-    # default true, schema will be automatically created and synced when it is saved
-    auto_create_schema = True
+The canonical models are in:
+- tenants.models.Tenant
+- tenants.models.Domain
 
-    def __str__(self):
-        return self.name
+All new code should import directly from `tenants.models`.
+"""
 
-class Domain(DomainMixin):
-    pass
+# Re-export from tenants for backwards compatibility with TENANT_MODEL setting
+from tenants.models import Tenant, Domain
+
+# Note: The original basic models have been replaced with the comprehensive
+# versions from tenants app which include:
+# - Tenant: Full enterprise tenant with Plan, status, Stripe integration
+# - Domain: Custom domain mapping with SSL support
+# - TenantSettings: Tenant-specific configuration
+# - TenantInvitation: User invitations
+# - TenantUsage: Resource usage tracking
+# - AuditLog: Tenant-scoped audit logging
+# - Circusale: Business units/divisions
+# - CircusaleUser: User-to-circusale assignments
+
+__all__ = ['Tenant', 'Domain']

@@ -1,0 +1,63 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Unsubscribed" %} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <!-- Icon -->
+    <div class="inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-8">
+        <span class="mdi mdi-bell-off-outline text-6xl text-gray-400"></span>
+    </div>
+
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {% trans "You've Been Unsubscribed" %}
+    </h1>
+
+    <p class="text-xl text-gray-600 mb-8">
+        {% trans "You will no longer receive job alerts from us." %}
+    </p>
+
+    <!-- Feedback -->
+    <div class="bg-gray-50 rounded-xl p-8 mb-8 text-left">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{% trans "We're sorry to see you go!" %}</h2>
+        <p class="text-gray-600 mb-4">{% trans "If you'd like to share why you unsubscribed, we'd love to hear your feedback to improve our service." %}</p>
+
+        <div class="space-y-2">
+            <label class="flex items-center">
+                <input type="radio" name="reason" class="form-checkbox mr-3" disabled>
+                <span class="text-gray-600">{% trans "Too many emails" %}</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="reason" class="form-checkbox mr-3" disabled>
+                <span class="text-gray-600">{% trans "Jobs weren't relevant to me" %}</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="reason" class="form-checkbox mr-3" disabled>
+                <span class="text-gray-600">{% trans "I found a job" %}</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="reason" class="form-checkbox mr-3" disabled>
+                <span class="text-gray-600">{% trans "Other reason" %}</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Re-subscribe Option -->
+    <div class="bg-primary/5 rounded-xl p-8 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">{% trans "Changed your mind?" %}</h3>
+        <p class="text-gray-600 mb-4">{% trans "You can always subscribe again to receive job alerts." %}</p>
+        <a href="{% url 'careers:template:alert-subscribe' %}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors">
+            <span class="mdi mdi-bell-plus-outline mr-2"></span>
+            {% trans "Re-Subscribe" %}
+        </a>
+    </div>
+
+    <!-- Browse Jobs -->
+    <p class="text-gray-500">
+        {% trans "You can still browse our" %}
+        <a href="{% url 'careers:template:home' %}" class="text-primary hover:underline">{% trans "open positions" %}</a>
+        {% trans "anytime." %}
+    </p>
+</div>
+{% endblock %}

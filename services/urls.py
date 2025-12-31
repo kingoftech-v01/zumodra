@@ -33,6 +33,11 @@ urlpatterns = [
     path('contract/<int:contract_id>/', view_contract, name='view_contract'),
     path('contracts/', my_contracts, name='my_contracts'),
     path('contract/<int:contract_id>/update-status/', update_contract_status, name='update_contract_status'),
+    path('contract/<int:contract_id>/fund/', fund_contract, name='fund_contract'),
+
+    # ==================== DISPUTES ====================
+    path('contract/<int:contract_id>/dispute/', create_dispute, name='create_dispute'),
+    path('dispute/<int:dispute_id>/', view_dispute, name='view_dispute'),
 
     # ==================== REVIEWS ====================
     path('service/<uuid:service_uuid>/review/', add_review, name='add_review'),

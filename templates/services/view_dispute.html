@@ -1,0 +1,176 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Dispute" %} #{{ dispute.id }} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'services:my_contracts' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {% trans "My Contracts" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'services:view_contract' contract.id %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {{ contract.title|truncatewords:5 }}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Dispute" %} #{{ dispute.id }}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Dispute" %} #{{ dispute.id }}{% endblock %}
+
+{% block page_description %}
+<div class="flex items-center gap-3 mt-1">
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        {% if dispute.resolved %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+        {% else %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300{% endif %}">
+        {% if dispute.resolved %}{% trans "Resolved" %}{% else %}{% trans "Open" %}{% endif %}
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <!-- Dispute Details -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ dispute.reason }}</h2>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {% trans "Raised by" %}
+                        {% if is_raiser %}{% trans "you" %}{% else %}{{ dispute.raised_by.get_full_name|default:dispute.raised_by.email }}{% endif %}
+                        {% trans "on" %} {{ dispute.created_at|date:"F d, Y" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-5">
+            {% if dispute.details %}
+            <div class="prose dark:prose-invert max-w-none">
+                {{ dispute.details|linebreaks }}
+            </div>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400 italic">{% trans "No additional details provided." %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contract & Escrow Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Contract Info -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Contract" %}</h3>
+            <dl class="space-y-3">
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Title" %}</dt>
+                    <dd class="mt-1 text-gray-900 dark:text-white">{{ contract.title }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Amount" %}</dt>
+                    <dd class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">${{ contract.agreed_rate|floatformat:2 }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Status" %}</dt>
+                    <dd class="mt-1">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                            {{ contract.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'services:view_contract' contract.id %}"
+                   class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                    {% trans "View Contract" %} &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Escrow Status -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Escrow Status" %}</h3>
+            <dl class="space-y-3">
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Escrow Amount" %}</dt>
+                    <dd class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">${{ escrow.amount|floatformat:2 }} {{ escrow.currency }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Status" %}</dt>
+                    <dd class="mt-1">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                            {{ escrow.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Dispute Raised" %}</dt>
+                    <dd class="mt-1 text-gray-900 dark:text-white">{{ escrow.dispute_raised_at|date:"F d, Y H:i" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Resolution (if resolved) -->
+    {% if dispute.resolved %}
+    <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-green-800 dark:text-green-200">{% trans "Dispute Resolved" %}</h3>
+                <p class="mt-1 text-sm text-green-700 dark:text-green-300">
+                    {% trans "Resolved on" %} {{ dispute.resolved_at|date:"F d, Y H:i" }}
+                </p>
+                {% if dispute.resolution_notes %}
+                <div class="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">{% trans "Resolution Notes:" %}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ dispute.resolution_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Pending Resolution Notice -->
+    <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200">{% trans "Pending Review" %}</h3>
+                <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                    {% trans "Our team is reviewing this dispute. You will be notified once a resolution is made. Expected response within 48 hours." %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="flex justify-end">
+        <a href="{% url 'services:view_contract' contract.id %}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+            {% trans "Back to Contract" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

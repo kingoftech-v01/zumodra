@@ -1,0 +1,60 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Subscription Confirmed" %} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <!-- Success Icon -->
+    <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-8">
+        <span class="mdi mdi-bell-check-outline text-6xl text-green-500"></span>
+    </div>
+
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {% trans "You're All Set!" %}
+    </h1>
+
+    <p class="text-xl text-gray-600 mb-8">
+        {% trans "You've been subscribed to job alerts. We'll notify you when new opportunities match your preferences." %}
+    </p>
+
+    <!-- What to Expect -->
+    <div class="bg-blue-50 rounded-xl p-8 mb-8 text-left">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+            <span class="mdi mdi-information-outline mr-2 text-blue-500"></span>
+            {% trans "What to Expect" %}
+        </h2>
+
+        <ul class="space-y-3 text-gray-600">
+            <li class="flex items-start">
+                <span class="mdi mdi-check text-green-500 mr-2 mt-0.5"></span>
+                {% trans "You'll receive an email when new jobs match your criteria" %}
+            </li>
+            <li class="flex items-start">
+                <span class="mdi mdi-check text-green-500 mr-2 mt-0.5"></span>
+                {% trans "Each alert includes a direct link to apply" %}
+            </li>
+            <li class="flex items-start">
+                <span class="mdi mdi-check text-green-500 mr-2 mt-0.5"></span>
+                {% trans "You can update your preferences or unsubscribe anytime" %}
+            </li>
+        </ul>
+    </div>
+
+    <!-- Check Spam -->
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-left">
+        <div class="flex items-start text-amber-700">
+            <span class="mdi mdi-email-alert-outline mr-2 text-xl flex-shrink-0"></span>
+            <span class="text-sm">{% trans "Please add our email to your contacts or safe senders list to ensure you receive our alerts." %}</span>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="{% url 'careers:template:home' %}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors">
+            <span class="mdi mdi-briefcase-outline mr-2"></span>
+            {% trans "Browse Current Jobs" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

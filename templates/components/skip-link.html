@@ -1,0 +1,77 @@
+{% comment %}
+Skip to Content Link Component
+
+A WCAG 2.1 AA compliant skip link that allows keyboard users to bypass
+repetitive navigation and jump directly to main content.
+
+Usage:
+    {% include "components/skip-link.html" %}
+
+    Or with custom options:
+    {% include "components/skip-link.html" with target_id="main-content" label="Skip to main content" %}
+
+Requirements:
+    - The target element must have the matching ID
+    - Include accessibility.css for styling
+    - Include accessibility.js for enhanced functionality
+
+Example target element:
+    <main id="main-content" tabindex="-1">
+        ...
+    </main>
+{% endcomment %}
+
+{% load i18n %}
+
+{# Default values #}
+{% with target_id=target_id|default:"main-content" %}
+{% with label=label|default:_("Skip to main content") %}
+{% with nav_label=nav_label|default:_("Skip to navigation") %}
+{% with footer_label=footer_label|default:_("Skip to footer") %}
+{% with show_nav_link=show_nav_link|default:False %}
+{% with show_footer_link=show_footer_link|default:False %}
+
+{# Single skip link version #}
+{% if not show_nav_link and not show_footer_link %}
+<a href="#{{ target_id }}"
+   class="skip-link"
+   data-skip-link
+   aria-label="{{ label }}">
+    {{ label }}
+</a>
+{% else %}
+{# Multiple skip links version #}
+<nav class="skip-links" aria-label="{% trans 'Skip links' %}">
+    <a href="#{{ target_id }}"
+       class="skip-link"
+       data-skip-link
+       aria-label="{{ label }}">
+        {{ label }}
+    </a>
+
+    {% if show_nav_link %}
+    <a href="#main-nav"
+       class="skip-link"
+       data-skip-link
+       aria-label="{{ nav_label }}">
+        {{ nav_label }}
+    </a>
+    {% endif %}
+
+    {% if show_footer_link %}
+    <a href="#footer"
+       class="skip-link"
+       data-skip-link
+       aria-label="{{ footer_label }}">
+        {{ footer_label }}
+    </a>
+    {% endif %}
+</nav>
+{% endif %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

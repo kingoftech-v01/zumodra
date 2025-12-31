@@ -1,0 +1,112 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Notification Preferences" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="text-gray-400">/</li>
+<li><a href="{% url 'notifications:notification_list' %}" class="text-gray-600 dark:text-gray-400">{% trans "Notifications" %}</a></li>
+<li class="text-gray-400">/</li>
+<li class="text-gray-600 dark:text-gray-400">{% trans "Preferences" %}</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Notification Preferences" %}{% endblock %}
+{% block page_description %}{% trans "Manage how you receive notifications" %}{% endblock %}
+
+{% block content %}
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- General Settings -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "General Settings" %}</h2>
+
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Enable Notifications" %}</label>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Receive notifications for important updates" %}</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="notifications_enabled" class="sr-only peer" {% if preferences.notifications_enabled %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Quiet Hours" %}</label>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Don't send notifications during certain hours" %}</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="quiet_hours_enabled" class="sr-only peer" {% if preferences.quiet_hours_enabled %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                </label>
+            </div>
+
+            {% if preferences.quiet_hours_enabled %}
+            <div class="grid grid-cols-2 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{% trans "Start Time" %}</label>
+                    <input type="time" name="quiet_hours_start" value="{{ preferences.quiet_hours_start|default:'22:00' }}"
+                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{% trans "End Time" %}</label>
+                    <input type="time" name="quiet_hours_end" value="{{ preferences.quiet_hours_end|default:'08:00' }}"
+                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Channel Preferences -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Notification Channels" %}</h2>
+
+        <div class="space-y-4">
+            {% for channel in channels %}
+            <div class="flex items-center justify-between py-2">
+                <div>
+                    <label class="text-sm font-medium text-gray-900 dark:text-white">{{ channel.name }}</label>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ channel.description }}</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="channel_{{ channel.channel_type }}" class="sr-only peer"
+                           {% if preferences.channel_preferences|default:channel.channel_type in preferences.channel_preferences %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                </label>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "No notification channels configured." %}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Email Digest -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Email Digest" %}</h2>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{% trans "Email Digest Frequency" %}</label>
+            <select name="email_digest_frequency"
+                    class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="realtime" {% if preferences.email_digest_frequency == 'realtime' %}selected{% endif %}>{% trans "Real-time (send immediately)" %}</option>
+                <option value="hourly" {% if preferences.email_digest_frequency == 'hourly' %}selected{% endif %}>{% trans "Hourly digest" %}</option>
+                <option value="daily" {% if preferences.email_digest_frequency == 'daily' %}selected{% endif %}>{% trans "Daily digest" %}</option>
+                <option value="weekly" {% if preferences.email_digest_frequency == 'weekly' %}selected{% endif %}>{% trans "Weekly digest" %}</option>
+                <option value="none" {% if preferences.email_digest_frequency == 'none' %}selected{% endif %}>{% trans "Don't send email notifications" %}</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="flex justify-end">
+        <button type="submit"
+                class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
+            {% trans "Save Preferences" %}
+        </button>
+    </div>
+</form>
+{% endblock %}

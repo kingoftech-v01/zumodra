@@ -1,0 +1,134 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Fund Escrow" %} - {{ contract.title }} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'services:my_contracts' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {% trans "My Contracts" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'services:view_contract' contract.id %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {{ contract.title|truncatewords:5 }}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Fund Escrow" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Fund Escrow" %}{% endblock %}
+
+{% block page_description %}
+<p class="text-gray-600 dark:text-gray-400">{% trans "Securely fund the escrow to start work on your contract." %}</p>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <!-- Contract Summary -->
+        <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ contract.title }}</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {% trans "Contract with" %} {{ contract.provider.display_name }}
+            </p>
+        </div>
+
+        <!-- Payment Breakdown -->
+        <div class="px-6 py-5 space-y-4">
+            <div class="flex items-center justify-between py-2">
+                <span class="text-gray-600 dark:text-gray-400">{% trans "Contract Amount" %}</span>
+                <span class="font-medium text-gray-900 dark:text-white">${{ contract.agreed_rate|floatformat:2 }}</span>
+            </div>
+            <div class="flex items-center justify-between py-2 text-sm">
+                <span class="text-gray-500 dark:text-gray-400">{% trans "Platform Fee" %} ({{ contract.platform_fee_percent }}%)</span>
+                <span class="text-gray-600 dark:text-gray-300">-${{ platform_fee|floatformat:2 }}</span>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-600 dark:text-gray-400">{% trans "Provider Receives" %}</span>
+                    <span class="text-lg font-bold text-green-600 dark:text-green-400">${{ provider_payout|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Escrow Protection Info -->
+        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-t border-b border-blue-100 dark:border-blue-800">
+            <div class="flex items-start">
+                <svg class="flex-shrink-0 w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">{% trans "Escrow Protection" %}</h3>
+                    <p class="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                        {% trans "Your payment is held securely until the work is completed and approved. You can request revisions or raise a dispute if needed." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <form method="post" class="px-6 py-5">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                <!-- Total to Pay -->
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Total to Pay" %}</span>
+                        <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">${{ contract.agreed_rate|floatformat:2 }} {{ escrow.currency }}</span>
+                    </div>
+                </div>
+
+                <!-- Payment Method (Stripe placeholder) -->
+                <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Credit or Debit Card" %}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {% trans "Payments are processed securely via Stripe. Your card details are never stored on our servers." %}
+                    </p>
+                </div>
+
+                <!-- For development: Simulate payment -->
+                <input type="hidden" name="simulate_payment" value="1">
+            </div>
+
+            <div class="mt-6 flex items-center gap-4">
+                <button type="submit"
+                        class="flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    {% trans "Pay & Fund Escrow" %}
+                </button>
+                <a href="{% url 'services:view_contract' contract.id %}"
+                   class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                    {% trans "Cancel" %}
+                </a>
+            </div>
+        </form>
+
+        <!-- Terms -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                {% trans "By proceeding, you agree to our Terms of Service and Escrow Agreement." %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

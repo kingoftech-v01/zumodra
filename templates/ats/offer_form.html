@@ -1,0 +1,172 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Create Offer" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'ats:offer-list' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+        {% trans "Offers" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Create Offer" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Create Job Offer" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Create a formal offer for the selected candidate." %}
+</p>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <!-- Candidate Header -->
+        <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <span class="text-lg font-medium text-primary-600 dark:text-primary-400">
+                        {{ application.candidate.full_name|slice:":1"|upper }}
+                    </span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ application.candidate.full_name }}</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {% trans "for" %} <a href="{% url 'ats:job-detail' application.job.pk %}" class="text-primary-600 hover:text-primary-700 dark:text-primary-400">{{ application.job.title }}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="px-6 py-6 space-y-6">
+            {% csrf_token %}
+
+            <!-- Salary -->
+            <div>
+                <label for="salary" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Annual Salary" %} <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400">$</span>
+                    </div>
+                    <input type="number"
+                           id="salary"
+                           name="salary"
+                           required
+                           min="0"
+                           step="1000"
+                           placeholder="75000"
+                           class="block w-full pl-8 pr-12 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">{% trans "/year" %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Date -->
+            <div>
+                <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Start Date" %}
+                </label>
+                <input type="date"
+                       id="start_date"
+                       name="start_date"
+                       class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "When the candidate is expected to start." %}</p>
+            </div>
+
+            <!-- Expiration Date -->
+            <div>
+                <label for="expiration_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Offer Expiration" %}
+                </label>
+                <input type="date"
+                       id="expiration_date"
+                       name="expiration_date"
+                       class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Date by which the candidate must respond." %}</p>
+            </div>
+
+            <!-- Benefits -->
+            <div>
+                <label for="benefits" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Benefits Package" %}
+                </label>
+                <textarea id="benefits"
+                          name="benefits"
+                          rows="4"
+                          placeholder="{% trans 'e.g., Health insurance, 401k matching, PTO...' %}"
+                          class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"></textarea>
+            </div>
+
+            <!-- Internal Notes -->
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Internal Notes" %}
+                </label>
+                <textarea id="notes"
+                          name="notes"
+                          rows="3"
+                          placeholder="{% trans 'Notes visible only to hiring team...' %}"
+                          class="block w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"></textarea>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "These notes will not be visible to the candidate." %}</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'ats:application-detail' application.pk %}"
+                   class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                    {% trans "Cancel" %}
+                </a>
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            name="action"
+                            value="save_draft"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                        {% trans "Save as Draft" %}
+                    </button>
+                    <button type="submit"
+                            name="action"
+                            value="send"
+                            class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-sm transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        {% trans "Create & Send Offer" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tips -->
+    <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+            <svg class="flex-shrink-0 w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">{% trans "Tips for a Great Offer" %}</h3>
+                <ul class="mt-1 text-sm text-blue-700 dark:text-blue-300 list-disc list-inside space-y-1">
+                    <li>{% trans "Research market rates for the position and location" %}</li>
+                    <li>{% trans "Be specific about benefits and perks" %}</li>
+                    <li>{% trans "Give candidates adequate time to consider (typically 1-2 weeks)" %}</li>
+                    <li>{% trans "Consider the candidate's current compensation and expectations" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

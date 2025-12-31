@@ -1,0 +1,137 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Employment Verification" %} - Zumodra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Zumodra</h1>
+            <p class="text-gray-600">{% trans "Employment Verification Request" %}</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Verification Details" %}</h2>
+
+            <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                <p class="text-gray-700 mb-2">
+                    {% blocktrans with name=verification.user.get_full_name|default:verification.user.email %}
+                    <strong>{{ name }}</strong> has listed the following employment and requested verification:
+                    {% endblocktrans %}
+                </p>
+            </div>
+
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Company" %}</dt>
+                    <dd class="mt-1 text-lg text-gray-900">{{ verification.company_name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Position" %}</dt>
+                    <dd class="mt-1 text-lg text-gray-900">{{ verification.job_title }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "Start Date" %}</dt>
+                    <dd class="mt-1 text-gray-900">{{ verification.start_date|date:"M d, Y" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">{% trans "End Date" %}</dt>
+                    <dd class="mt-1 text-gray-900">{% if verification.is_current %}{% trans "Currently Employed" %}{% else %}{{ verification.end_date|date:"M d, Y" }}{% endif %}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{% trans "Verification Response" %}</h2>
+            <p class="text-gray-600 mb-6">
+                {% trans "Please confirm the accuracy of the employment details above." %}
+            </p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        {{ form.dates_confirmed }}
+                        <label for="id_dates_confirmed" class="ml-3 text-gray-700">
+                            {% trans "The employment dates are accurate" %}
+                        </label>
+                    </div>
+
+                    <div class="flex items-center">
+                        {{ form.title_confirmed }}
+                        <label for="id_title_confirmed" class="ml-3 text-gray-700">
+                            {% trans "The job title is accurate" %}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="id_eligible_for_rehire" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.eligible_for_rehire.label }}
+                        </label>
+                        {{ form.eligible_for_rehire }}
+                    </div>
+
+                    <div>
+                        <label for="id_performance_rating" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.performance_rating.label }}
+                        </label>
+                        {{ form.performance_rating }}
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+
+                <h3 class="text-lg font-medium text-gray-900">{% trans "Your Information" %}</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="id_verifier_name" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.verifier_name.label }} *
+                        </label>
+                        {{ form.verifier_name }}
+                        {% if form.verifier_name.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.verifier_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="id_verifier_email" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.verifier_email.label }} *
+                        </label>
+                        {{ form.verifier_email }}
+                        {% if form.verifier_email.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.verifier_email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <label for="id_notes" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.notes.label }}
+                    </label>
+                    {{ form.notes }}
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
+                        {% trans "Submit Verification" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center mt-8 text-sm text-gray-500">
+            <p>{% trans "This verification request was sent via Zumodra." %}</p>
+            <p>{% trans "If you did not expect this request, please ignore it." %}</p>
+        </div>
+    </div>
+</body>
+</html>

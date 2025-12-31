@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Page Not Found" %} - Zumodra{% endblock %}
+{% block meta_description %}{% trans "The page you are looking for could not be found." %}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <!-- Header with Logo -->
+    <header class="p-6">
+        <a href="/" class="inline-flex items-center">
+            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">Zumodra</span>
+        </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl w-full text-center">
+            <!-- Illustration -->
+            <div class="mb-8">
+                <svg class="mx-auto h-48 w-48 text-primary-500 dark:text-primary-400" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="4" stroke-dasharray="8 8" opacity="0.3"/>
+                    <path d="M100 40V100L130 130" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                    <circle cx="100" cy="100" r="10" fill="currentColor"/>
+                    <text x="100" y="170" text-anchor="middle" fill="currentColor" font-size="48" font-weight="bold">404</text>
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+                {% trans "Page Not Found" %}
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                {% trans "Oops! The page you're looking for seems to have wandered off. It might have been moved, deleted, or never existed in the first place." %}
+            </p>
+
+            <!-- Search Bar -->
+            <div class="max-w-md mx-auto mb-8">
+                <form action="{% url 'home' %}" method="get" class="relative">
+                    <input type="text"
+                           name="q"
+                           placeholder="{% trans 'Search for something...' %}"
+                           class="w-full px-4 py-3 pl-12 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <button type="submit" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                        <span class="sr-only">{% trans "Search" %}</span>
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Primary Action -->
+            <div class="mb-8">
+                <a href="/"
+                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    {% trans "Back to Home" %}
+                </a>
+            </div>
+
+            <!-- Popular Links -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-8">
+                <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                    {% trans "Popular Pages" %}
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <a href="{% url 'home' %}"
+                       class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        {% trans "Home" %}
+                    </a>
+                    <a href="{% url 'careers_public:job_list' %}"
+                       class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        {% trans "Careers" %}
+                    </a>
+                    <a href="{% url 'about' %}"
+                       class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        {% trans "About Us" %}
+                    </a>
+                    <a href="{% url 'account_login' %}"
+                       class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        {% trans "Sign In" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-6 text-center">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            {% blocktrans %}Need help? Contact us at{% endblocktrans %}
+            <a href="mailto:support@rhematek-solutions.com" class="text-primary-600 dark:text-primary-400 hover:underline">
+                support@rhematek-solutions.com
+            </a>
+        </p>
+    </footer>
+</div>
+{% endblock %}

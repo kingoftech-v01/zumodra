@@ -1,0 +1,225 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Candidates" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Candidates" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Candidates" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Manage your talent pool and track candidate progress." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<button hx-get="{% url 'ats:candidate_import' %}"
+        hx-target="#modal-container"
+        hx-swap="innerHTML"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+    </svg>
+    {% trans "Import" %}
+</button>
+<a href="{% url 'ats:candidate_create' %}"
+   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    {% trans "Add Candidate" %}
+</a>
+{% endblock %}
+
+{% block content %}
+<div id="main-content" x-data="{ viewMode: 'list' }">
+    <!-- View Toggle & Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- Search -->
+        <div class="relative flex-1 max-w-md">
+            <input type="text"
+                   name="search"
+                   hx-get="{% url 'ats:candidate_list' %}"
+                   hx-trigger="keyup changed delay:300ms"
+                   hx-target="#candidates-container"
+                   hx-swap="innerHTML"
+                   class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                   placeholder="{% trans 'Search candidates...' %}">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- View Toggle -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <button @click="viewMode = 'list'"
+                        :class="viewMode === 'list' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                    </svg>
+                </button>
+                <button @click="viewMode = 'grid'"
+                        :class="viewMode === 'grid' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <select name="source"
+                    hx-get="{% url 'ats:candidate_list' %}"
+                    hx-trigger="change"
+                    hx-target="#candidates-container"
+                    hx-swap="innerHTML"
+                    class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="">{% trans "All Sources" %}</option>
+                <option value="website">{% trans "Website" %}</option>
+                <option value="linkedin">{% trans "LinkedIn" %}</option>
+                <option value="referral">{% trans "Referral" %}</option>
+                <option value="agency">{% trans "Agency" %}</option>
+            </select>
+
+            <select name="tags"
+                    hx-get="{% url 'ats:candidate_list' %}"
+                    hx-trigger="change"
+                    hx-target="#candidates-container"
+                    hx-swap="innerHTML"
+                    class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="">{% trans "All Tags" %}</option>
+                {% for tag in tags %}
+                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Candidates Container -->
+    <div id="candidates-container">
+        <!-- List View -->
+        <div x-show="viewMode === 'list'" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                            <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Candidate" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Current Position" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Skills" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Source" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Added" %}
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">{% trans "Actions" %}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for candidate in candidates %}
+                    {% include "partials/_candidate_row.html" %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No candidates found" %}</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Start building your talent pool." %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if page_obj %}
+            {% include "components/pagination.html" %}
+            {% endif %}
+        </div>
+
+        <!-- Grid View -->
+        <div x-show="viewMode === 'grid'" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for candidate in candidates %}
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        {% if candidate.photo %}
+                        <img class="h-12 w-12 rounded-full object-cover" src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}">
+                        {% else %}
+                        <div class="h-12 w-12 rounded-full bg-primary-600 flex items-center justify-center">
+                            <span class="text-white font-medium">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="ml-4">
+                            <div class="flex items-center gap-1.5">
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.full_name }}</h3>
+                                {% if candidate.user and candidate.user.trust_score %}
+                                {% include "components/trust_badge.html" with trust_score=candidate.user.trust_score size="sm" %}
+                                {% endif %}
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ candidate.current_title|default:"N/A" }}</p>
+                        </div>
+                    </div>
+
+                    {% if candidate.skills.all %}
+                    <div class="mt-4 flex flex-wrap gap-1">
+                        {% for skill in candidate.skills.all|slice:":3" %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
+                            {{ skill.name }}
+                        </span>
+                        {% endfor %}
+                        {% if candidate.skills.count > 3 %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                            +{{ candidate.skills.count|add:"-3" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                        <span>{{ candidate.source|default:"Direct" }}</span>
+                        <span>{{ candidate.created_at|naturaltime }}</span>
+                    </div>
+                </div>
+
+                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between">
+                    <a href="{% url 'ats:candidate_detail' candidate.id %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                        {% trans "View Profile" %}
+                    </a>
+                    <button hx-get="{% url 'ats:candidate_add_to_job' candidate.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML"
+                            class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                        {% trans "Add to Job" %}
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Verification Dashboard" %} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {% trans "Verification Dashboard" %}
+        </h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {% trans "Manage your identity and career verifications to build trust on the platform." %}
+        </p>
+    </div>
+
+    <!-- Trust Score Card -->
+    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 mb-8 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-semibold mb-2">{% trans "Your Trust Score" %}</h2>
+                <div class="flex items-center gap-4">
+                    <span class="text-5xl font-bold">{{ trust_score.overall_score|floatformat:0 }}</span>
+                    <span class="text-2xl">/100</span>
+                </div>
+                <p class="mt-2 text-indigo-100">
+                    {{ trust_score.get_trust_level_display }}
+                </p>
+            </div>
+            <div class="text-right">
+                {% if trust_score.is_id_verified %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-400 text-green-900 text-sm font-medium mb-2">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "ID Verified" %}
+                </span>
+                {% endif %}
+                {% if trust_score.is_career_verified %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-400 text-green-900 text-sm font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "Career Verified" %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <a href="{% url 'frontend:accounts:trust-score' %}" class="inline-block mt-4 text-indigo-100 hover:text-white underline">
+            {% trans "View detailed breakdown" %} &rarr;
+        </a>
+    </div>
+
+    <!-- Verification Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- KYC Verification Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {% trans "Identity (KYC)" %}
+                </h3>
+                {% if kyc_verified %}
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                    {% trans "Verified" %}
+                </span>
+                {% else %}
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                    {% trans "Not Verified" %}
+                </span>
+                {% endif %}
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                {% trans "Verify your identity with a government-issued ID." %}
+            </p>
+            <div class="flex gap-2">
+                <a href="{% url 'frontend:accounts:kyc-list' %}"
+                   class="flex-1 text-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm">
+                    {% trans "View All" %}
+                </a>
+                {% if not kyc_verified %}
+                <a href="{% url 'frontend:accounts:kyc-start' %}"
+                   class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                    {% trans "Start KYC" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Employment Verification Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {% trans "Employment" %}
+                </h3>
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    {{ emp_verified }}/{{ emp_total }} {% trans "Verified" %}
+                </span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                {% trans "Verify your work history with former employers." %}
+            </p>
+            {% if emp_total > 0 %}
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ career_progress|floatformat:0 }}%"></div>
+            </div>
+            {% endif %}
+            <div class="flex gap-2">
+                <a href="{% url 'frontend:accounts:employment-list' %}"
+                   class="flex-1 text-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm">
+                    {% trans "View All" %}
+                </a>
+                <a href="{% url 'frontend:accounts:employment-add' %}"
+                   class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                    {% trans "Add Job" %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Education Verification Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {% trans "Education" %}
+                </h3>
+                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                    {{ edu_verified }}/{{ edu_total }} {% trans "Verified" %}
+                </span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                {% trans "Verify your educational credentials." %}
+            </p>
+            <div class="flex gap-2">
+                <a href="{% url 'frontend:accounts:education-list' %}"
+                   class="flex-1 text-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm">
+                    {% trans "View All" %}
+                </a>
+                <a href="{% url 'frontend:accounts:education-add' %}"
+                   class="flex-1 text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                    {% trans "Add Education" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Employment History -->
+    {% if employment_verifications %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {% trans "Employment History" %}
+        </h3>
+        <div class="space-y-4">
+            {% for emp in employment_verifications %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">{{ emp.job_title }}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ emp.company_name }} &bull; {{ emp.start_date|date:"M Y" }} - {% if emp.is_current %}{% trans "Present" %}{% else %}{{ emp.end_date|date:"M Y" }}{% endif %}
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    {% if emp.status == 'verified' %}
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                        {% trans "Verified" %}
+                    </span>
+                    {% elif emp.status == 'pending' %}
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                        {% trans "Pending" %}
+                    </span>
+                    {% else %}
+                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                        {{ emp.get_status_display }}
+                    </span>
+                    {% endif %}
+                    <a href="{% url 'frontend:accounts:employment-detail' uuid=emp.uuid %}"
+                       class="text-indigo-600 hover:text-indigo-800 text-sm">
+                        {% trans "View" %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Education -->
+    {% if education_verifications %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {% trans "Education History" %}
+        </h3>
+        <div class="space-y-4">
+            {% for edu in education_verifications %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">{{ edu.get_degree_type_display }} in {{ edu.field_of_study }}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ edu.institution_name }} &bull; {{ edu.end_date|date:"Y" }}{% if edu.graduated %} ({% trans "Graduated" %}){% endif %}
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    {% if edu.status == 'verified' %}
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                        {% trans "Verified" %}
+                    </span>
+                    {% elif edu.status == 'pending' %}
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                        {% trans "Pending" %}
+                    </span>
+                    {% else %}
+                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                        {{ edu.get_status_display }}
+                    </span>
+                    {% endif %}
+                    <a href="{% url 'frontend:accounts:education-detail' uuid=edu.uuid %}"
+                       class="text-indigo-600 hover:text-indigo-800 text-sm">
+                        {% trans "View" %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ policy.title|default:"Privacy Policy" }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            {% if policy %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ policy.title }}</h4>
+                        <small class="text-muted">
+                            {% trans "Version" %} {{ policy.version }} |
+                            {% trans "Effective" %} {{ policy.effective_date|date:"F d, Y" }}
+                        </small>
+                    </div>
+                    {% if all_versions.count > 1 %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                            {% trans "Version" %} {{ policy.version }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for ver in all_versions %}
+                            <li>
+                                <a class="dropdown-item {% if ver.version == policy.version %}active{% endif %}"
+                                   href="{% url 'privacy:policy_version' ver.version %}">
+                                    {% trans "Version" %} {{ ver.version }}
+                                    {% if ver.is_current %}
+                                    <span class="badge bg-primary ms-2">{% trans "Current" %}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if policy.summary %}
+                <div class="card-body border-bottom bg-light">
+                    <h6 class="text-muted mb-2">{% trans "Summary of Changes" %}</h6>
+                    <p class="mb-0">{{ policy.summary }}</p>
+                </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <div class="privacy-policy-content">
+                        {{ policy.content|safe }}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <small class="text-muted">
+                                {% trans "Document Hash:" %}
+                                <code>{{ policy.document_hash|slice:":16" }}...</code>
+                            </small>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'privacy:dashboard' %}" class="btn btn-outline-primary">
+                                {% trans "Manage My Privacy" %}
+                            </a>
+                            <button onclick="window.print()" class="btn btn-outline-secondary">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if not policy.is_current %}
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% trans "You are viewing an older version of our privacy policy." %}
+                <a href="{% url 'privacy:policy' %}">
+                    {% trans "View current policy" %}
+                </a>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="alert alert-info">
+                <h5 class="alert-heading">{% trans "Privacy Policy" %}</h5>
+                <p>{% trans "No privacy policy has been published yet. Please check back later." %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.privacy-policy-content h1 { font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1rem; }
+.privacy-policy-content h2 { font-size: 1.5rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+.privacy-policy-content h3 { font-size: 1.25rem; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.privacy-policy-content p { margin-bottom: 1rem; line-height: 1.7; }
+.privacy-policy-content ul, .privacy-policy-content ol { margin-bottom: 1rem; }
+.privacy-policy-content li { margin-bottom: 0.5rem; }
+.privacy-policy-content table { width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+.privacy-policy-content th, .privacy-policy-content td { padding: 0.75rem; border: 1px solid #ddd; }
+.privacy-policy-content th { background-color: #f8f9fa; }
+
+@media print {
+    .card-header .dropdown, .card-footer .btn { display: none !important; }
+    .card { border: none !important; box-shadow: none !important; }
+}
+</style>
+{% endblock %}

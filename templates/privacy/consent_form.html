@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Privacy Consent" %} - {{ consent_type|default:"Manage Consents" }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        {% trans "Privacy Consent" %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if purpose %}
+                    <!-- Specific Purpose Consent -->
+                    <div class="mb-4">
+                        <h5 class="text-primary">{{ purpose.name }}</h5>
+                        <p class="text-muted">{{ purpose.description }}</p>
+
+                        <div class="alert alert-info">
+                            <strong>{% trans "Legal Basis:" %}</strong>
+                            {{ purpose.get_legal_basis_display }}
+                        </div>
+
+                        {% if purpose.data_categories %}
+                        <div class="mb-3">
+                            <strong>{% trans "Data Categories:" %}</strong>
+                            <ul class="mt-2">
+                                {% for category in purpose.data_categories %}
+                                <li>{{ category }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if purpose.retention_days %}
+                        <p>
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            {% blocktrans with days=purpose.retention_days %}
+                            Data will be retained for {{ days }} days.
+                            {% endblocktrans %}
+                        </p>
+                        {% endif %}
+
+                        {% if purpose.third_party_sharing %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-share-alt me-2"></i>
+                            {% trans "This data may be shared with third parties:" %}
+                            <ul class="mb-0 mt-2">
+                                {% for recipient in purpose.third_party_recipients %}
+                                <li>{{ recipient }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Privacy Policy Reference -->
+                    {% if privacy_policy %}
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h6>{% trans "Privacy Policy" %}</h6>
+                        <p class="mb-2">
+                            {% blocktrans with version=privacy_policy.version date=privacy_policy.effective_date %}
+                            Version {{ version }}, effective {{ date }}
+                            {% endblocktrans %}
+                        </p>
+                        <a href="{% url 'privacy:policy' %}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            {% trans "Read Full Policy" %}
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Consent Form -->
+                    <form method="post" id="consent-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="consent_type" value="{{ consent_type }}">
+
+                        {% if existing_consent and existing_consent.is_valid %}
+                        <div class="alert alert-success mb-4">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% blocktrans with date=existing_consent.created_at %}
+                            You have already given consent on {{ date }}.
+                            {% endblocktrans %}
+                        </div>
+                        {% endif %}
+
+                        <div class="consent-text mb-4 p-3 border rounded" style="max-height: 300px; overflow-y: auto;">
+                            {% if purpose %}
+                            <p>{{ purpose.description }}</p>
+                            {% else %}
+                            <p>
+                                {% trans "By giving your consent, you agree to the processing of your personal data for the purposes described in our Privacy Policy." %}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <textarea name="consent_text" class="d-none">
+                            {{ purpose.description|default:"I consent to the processing of my personal data as described." }}
+                        </textarea>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="consent-checkbox" required>
+                            <label class="form-check-label" for="consent-checkbox">
+                                {% trans "I have read and understood the above information and give my consent." %}
+                            </label>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" name="granted" value="true" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>
+                                {% trans "I Consent" %}
+                            </button>
+                            <button type="submit" name="granted" value="false" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                {% trans "I Do Not Consent" %}
+                            </button>
+                            <a href="{% url 'privacy:dashboard' %}" class="btn btn-link">
+                                {% trans "Cancel" %}
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Existing Consent Status -->
+                    {% if existing_consent %}
+                    <hr class="my-4">
+                    <div class="mt-4">
+                        <h6>{% trans "Current Consent Status" %}</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>{% trans "Status" %}</th>
+                                <td>
+                                    {% if existing_consent.is_valid %}
+                                    <span class="badge bg-success">{% trans "Active" %}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "Given On" %}</th>
+                                <td>{{ existing_consent.created_at|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "Version" %}</th>
+                                <td>{{ existing_consent.consent_text_version }}</td>
+                            </tr>
+                            {% if existing_consent.expires_at %}
+                            <tr>
+                                <th>{% trans "Expires" %}</th>
+                                <td>{{ existing_consent.expires_at|date:"F d, Y" }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+
+                        {% if existing_consent.is_valid %}
+                        <form method="post" class="mt-3" onsubmit="return confirm('{% trans "Are you sure you want to withdraw your consent?" %}');">
+                            {% csrf_token %}
+                            <input type="hidden" name="consent_type" value="{{ consent_type }}">
+                            <button type="submit" name="granted" value="false" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-ban me-1"></i>
+                                {% trans "Withdraw Consent" %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-shield fa-2x text-primary mb-3"></i>
+                            <h6>{% trans "Your Data Rights" %}</h6>
+                            <p class="small text-muted mb-0">
+                                {% trans "You can withdraw consent at any time without affecting the lawfulness of prior processing." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-history fa-2x text-primary mb-3"></i>
+                            <h6>{% trans "Audit Trail" %}</h6>
+                            <p class="small text-muted mb-0">
+                                {% trans "All consent actions are logged with timestamp, IP address, and version information." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-question-circle fa-2x text-primary mb-3"></i>
+                            <h6>{% trans "Questions?" %}</h6>
+                            <p class="small text-muted mb-0">
+                                {% trans "Contact our Data Protection Officer for any privacy-related questions." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('consent-form').addEventListener('submit', function(e) {
+    const checkbox = document.getElementById('consent-checkbox');
+    const grantedValue = e.submitter.value;
+
+    if (grantedValue === 'true' && !checkbox.checked) {
+        e.preventDefault();
+        alert('{% trans "Please confirm that you have read and understood the information before consenting." %}');
+    }
+});
+</script>
+{% endblock %}

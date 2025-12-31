@@ -1,0 +1,223 @@
+{% load static i18n %}
+
+{#
+    Chart Container Component for Chart.js
+
+    Usage:
+    {% include "components/chart_container.html" with chart_id="revenue-chart" chart_type="line" title="Revenue Over Time" %}
+
+    Context variables:
+    - chart_id: Unique ID for the chart canvas
+    - chart_type: Type of chart (line, bar, doughnut, pie, area)
+    - title: Chart title
+    - subtitle: Chart subtitle (optional)
+    - height: Chart height in pixels (default: 300)
+    - data_url: HTMX endpoint for chart data (optional)
+    - period_selector: Show period selector (day, week, month, year)
+#}
+
+<div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden"
+     x-data="{
+         period: 'month',
+         chartInstance: null
+     }">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ title }}</h3>
+                {% if subtitle %}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ subtitle }}</p>
+                {% endif %}
+            </div>
+
+            {% if period_selector %}
+            <!-- Period Selector -->
+            <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <button @click="period = 'day'"
+                        :class="period === 'day' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        hx-get="{{ data_url }}?period=day"
+                        hx-target="#{{ chart_id }}-data"
+                        hx-swap="innerHTML"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 transition-colors">
+                    {% trans "Day" %}
+                </button>
+                <button @click="period = 'week'"
+                        :class="period === 'week' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        hx-get="{{ data_url }}?period=week"
+                        hx-target="#{{ chart_id }}-data"
+                        hx-swap="innerHTML"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 transition-colors">
+                    {% trans "Week" %}
+                </button>
+                <button @click="period = 'month'"
+                        :class="period === 'month' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        hx-get="{{ data_url }}?period=month"
+                        hx-target="#{{ chart_id }}-data"
+                        hx-swap="innerHTML"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 transition-colors">
+                    {% trans "Month" %}
+                </button>
+                <button @click="period = 'year'"
+                        :class="period === 'year' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
+                        hx-get="{{ data_url }}?period=year"
+                        hx-target="#{{ chart_id }}-data"
+                        hx-swap="innerHTML"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 transition-colors">
+                    {% trans "Year" %}
+                </button>
+            </div>
+            {% endif %}
+
+            {% if actions %}
+            <!-- Actions Dropdown -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                    </svg>
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition
+                     class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                    <div class="py-1">
+                        <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            {% trans "Download PNG" %}
+                        </button>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            {% trans "Download CSV" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Chart Body -->
+    <div class="p-5">
+        <!-- Loading State -->
+        <div id="{{ chart_id }}-loading" class="htmx-indicator flex items-center justify-center" style="height: {{ height|default:300 }}px;">
+            <svg class="animate-spin h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Chart Canvas -->
+        <div class="relative" style="height: {{ height|default:300 }}px;">
+            <canvas id="{{ chart_id }}"></canvas>
+        </div>
+
+        <!-- Data container for HTMX updates -->
+        <div id="{{ chart_id }}-data" class="hidden"
+             hx-get="{{ data_url|default:'' }}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+
+    {% if legend_items %}
+    <!-- Custom Legend -->
+    <div class="px-5 pb-4">
+        <div class="flex flex-wrap items-center gap-4">
+            {% for item in legend_items %}
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ item.color }};"></span>
+                <span class="text-sm text-gray-600 dark:text-gray-400">{{ item.label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Chart Initialization Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('{{ chart_id }}').getContext('2d');
+
+    // Default chart configuration
+    const chartConfig = {
+        type: '{{ chart_type|default:"line" }}',
+        data: {
+            labels: {{ labels|default:"[]"|safe }},
+            datasets: {{ datasets|default:"[]"|safe }}
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: {% if show_legend %}true{% else %}false{% endif %},
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: document.documentElement.classList.contains('dark') ? '#374151' : '#ffffff',
+                    titleColor: document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827',
+                    bodyColor: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
+                    borderColor: document.documentElement.classList.contains('dark') ? '#4b5563' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    usePointStyle: true
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#f3f4f6'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                    }
+                }
+            }
+        }
+    };
+
+    window['{{ chart_id }}Chart'] = new Chart(ctx, chartConfig);
+
+    // Listen for data updates from HTMX
+    document.getElementById('{{ chart_id }}-data').addEventListener('htmx:afterSwap', function(evt) {
+        const newData = JSON.parse(evt.target.textContent);
+        const chart = window['{{ chart_id }}Chart'];
+
+        chart.data.labels = newData.labels;
+        chart.data.datasets = newData.datasets;
+        chart.update('active');
+    });
+
+    // Update chart on dark mode toggle
+    document.addEventListener('alpine:init', () => {
+        Alpine.effect(() => {
+            const isDark = Alpine.store('darkMode');
+            const chart = window['{{ chart_id }}Chart'];
+            if (chart) {
+                chart.options.plugins.legend.labels.color = isDark ? '#9ca3af' : '#6b7280';
+                chart.options.scales.x.ticks.color = isDark ? '#9ca3af' : '#6b7280';
+                chart.options.scales.y.ticks.color = isDark ? '#9ca3af' : '#6b7280';
+                chart.options.scales.y.grid.color = isDark ? '#374151' : '#f3f4f6';
+                chart.update();
+            }
+        });
+    });
+});
+</script>

@@ -1,0 +1,187 @@
+{% load static i18n humanize %}
+{#
+    Employee List Partial (HTMX-swappable)
+
+    Usage:
+    {% include "hr/partials/_employee_list.html" with employees=employees %}
+
+    Context variables:
+    - employees: QuerySet of Employee instances
+    - view_mode: 'grid' or 'list' (optional, uses Alpine.js if not set)
+    - show_pagination: Boolean (optional, default True)
+    - page_obj: Pagination object (optional)
+#}
+
+<div id="employees-list-partial" x-data="{ viewMode: '{{ view_mode|default:'grid' }}' }">
+    {# Grid View #}
+    <div x-show="viewMode === 'grid'"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for employee in employees %}
+        {% include "hr/partials/_employee_card.html" with employee=employee %}
+        {% empty %}
+        <div class="col-span-full py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No employees found" %}</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {% trans "Try adjusting your search or filter criteria." %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# List View #}
+    <div x-show="viewMode === 'list'"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Employee" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Department" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Job Title" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Status" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Manager" %}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {% trans "Start Date" %}
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">{% trans "Actions" %}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for employee in employees %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                {% if employee.user.profile_picture %}
+                                <img class="h-10 w-10 rounded-full object-cover" src="{{ employee.user.profile_picture.url }}" alt="">
+                                {% else %}
+                                <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-medium text-sm">
+                                        {{ employee.user.first_name|slice:":1"|upper }}{{ employee.user.last_name|slice:":1"|upper }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ employee.full_name }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ employee.user.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900 dark:text-white">
+                                {{ employee.department.name|default:"-" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ employee.job_title|default:"-" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if employee.status == 'active' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                {% trans "Active" %}
+                            </span>
+                            {% elif employee.status == 'probation' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                {% trans "Probation" %}
+                            </span>
+                            {% elif employee.status == 'on_leave' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                {% trans "On Leave" %}
+                            </span>
+                            {% elif employee.status == 'suspended' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                {% trans "Suspended" %}
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                {{ employee.get_status_display }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if employee.manager %}
+                            <div class="flex items-center">
+                                {% if employee.manager.user.profile_picture %}
+                                <img class="h-6 w-6 rounded-full" src="{{ employee.manager.user.profile_picture.url }}" alt="">
+                                {% else %}
+                                <div class="h-6 w-6 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs">
+                                    {{ employee.manager.user.first_name|slice:":1" }}
+                                </div>
+                                {% endif %}
+                                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ employee.manager.full_name }}
+                                </span>
+                            </div>
+                            {% else %}
+                            <span class="text-sm text-gray-400 dark:text-gray-500">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ employee.start_date|date:"M d, Y"|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end space-x-2">
+                                <a href="{% url 'hr:employee-detail' employee.pk %}"
+                                   class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                                    {% trans "View" %}
+                                </a>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <a href="{% url 'hr:employee-edit' employee.pk %}"
+                                   class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
+                                    {% trans "Edit" %}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No employees found" %}</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {% trans "Try adjusting your search or filter criteria." %}
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# Pagination #}
+    {% if show_pagination|default:True and page_obj %}
+    <div class="mt-6">
+        {% include "components/pagination.html" %}
+    </div>
+    {% endif %}
+</div>

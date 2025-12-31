@@ -1,0 +1,140 @@
+{% extends "careers/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Job Alerts" %} - {{ meta_title|default:"Careers" }}{% endblock %}
+
+{% block meta_description %}{% trans "Subscribe to job alerts and be the first to know about new opportunities that match your interests." %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6">
+            <span class="mdi mdi-bell-ring-outline text-4xl text-primary"></span>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            {% trans "Never Miss an Opportunity" %}
+        </h1>
+
+        <p class="text-xl text-gray-600">
+            {% trans "Get notified when new jobs match your preferences." %}
+        </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="mb-8 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
+        <div class="flex items-center">
+            <span class="mdi {% if message.tags == 'success' %}mdi-check-circle{% elif message.tags == 'error' %}mdi-alert-circle{% else %}mdi-information{% endif %} mr-2"></span>
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Subscription Form -->
+    <form method="post" class="bg-white rounded-xl border border-gray-200 p-8">
+        {% csrf_token %}
+
+        <!-- Email -->
+        <div class="mb-8">
+            <label for="id_email" class="block text-sm font-medium text-gray-700 mb-2">
+                {% trans "Email Address" %} <span class="text-red-500">*</span>
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Departments -->
+        <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+                {% trans "Which departments interest you?" %}
+            </label>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {% for value, label in form.fields.departments.choices %}
+                <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+                    <input type="checkbox" name="departments" value="{{ value }}" class="form-checkbox mr-3">
+                    <span class="text-sm text-gray-700">{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <p class="mt-2 text-xs text-gray-500">{% trans "Leave empty to receive alerts for all departments" %}</p>
+        </div>
+
+        <!-- Job Types -->
+        <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+                {% trans "What type of work are you looking for?" %}
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+                {% for value, label in form.fields.job_types.choices %}
+                <label class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+                    <input type="checkbox" name="job_types" value="{{ value }}" class="form-checkbox mr-3">
+                    <span class="text-sm text-gray-700">{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Remote Only -->
+        <div class="mb-8">
+            <label class="flex items-center p-4 bg-primary/5 rounded-lg cursor-pointer">
+                {{ form.remote_only }}
+                <span class="ml-3 text-gray-700">
+                    <span class="mdi mdi-home-outline mr-1"></span>
+                    {% trans "Only show remote-friendly positions" %}
+                </span>
+            </label>
+        </div>
+
+        <!-- Frequency -->
+        <div class="mb-8">
+            <label for="id_frequency" class="block text-sm font-medium text-gray-700 mb-2">
+                {% trans "How often would you like to receive alerts?" %}
+            </label>
+            {{ form.frequency }}
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="w-full inline-flex items-center justify-center px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors text-lg">
+            <span class="mdi mdi-bell-plus-outline mr-2"></span>
+            {% trans "Subscribe to Alerts" %}
+        </button>
+
+        <p class="mt-4 text-center text-sm text-gray-500">
+            {% trans "You can unsubscribe at any time. We respect your privacy." %}
+        </p>
+    </form>
+
+    <!-- Benefits -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                <span class="mdi mdi-clock-fast text-xl text-green-600"></span>
+            </div>
+            <h3 class="font-semibold text-gray-900">{% trans "Be First to Know" %}</h3>
+            <p class="text-sm text-gray-500">{% trans "Get alerts as soon as jobs are posted" %}</p>
+        </div>
+
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
+                <span class="mdi mdi-filter-outline text-xl text-blue-600"></span>
+            </div>
+            <h3 class="font-semibold text-gray-900">{% trans "Customized Matches" %}</h3>
+            <p class="text-sm text-gray-500">{% trans "Only receive jobs that match your preferences" %}</p>
+        </div>
+
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-3">
+                <span class="mdi mdi-cancel text-xl text-purple-600"></span>
+            </div>
+            <h3 class="font-semibold text-gray-900">{% trans "Easy to Unsubscribe" %}</h3>
+            <p class="text-sm text-gray-500">{% trans "One-click unsubscribe anytime" %}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

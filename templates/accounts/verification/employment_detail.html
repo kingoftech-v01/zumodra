@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ verification.job_title }} at {{ verification.company_name }} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="mb-8">
+        <a href="{% url 'frontend:accounts:employment-list' %}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+            &larr; {% trans "Back to Employment History" %}
+        </a>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ verification.job_title }}</h1>
+                    {% if verification.status == 'verified' %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        {% trans "Verified" %}
+                    </span>
+                    {% elif verification.status == 'pending' %}
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                        {% trans "Pending Verification" %}
+                    </span>
+                    {% elif verification.status == 'rejected' %}
+                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                        {% trans "Rejected" %}
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                        {{ verification.get_status_display }}
+                    </span>
+                    {% endif %}
+                </div>
+                <h2 class="text-xl text-gray-700 dark:text-gray-300">{{ verification.company_name }}</h2>
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Period" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">
+                    {{ verification.start_date|date:"M Y" }} - {% if verification.is_current %}{% trans "Present" %}{% else %}{{ verification.end_date|date:"M Y" }}{% endif %}
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Employment Type" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.get_employment_type_display }}</dd>
+            </div>
+
+            {% if verification.description %}
+            <div class="md:col-span-2">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Description" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.description }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+
+    <!-- Verification Status -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Verification Status" %}</h3>
+
+        {% if verification.status == 'verified' %}
+        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-4">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <p class="font-medium text-green-800 dark:text-green-200">{% trans "This employment has been verified" %}</p>
+                    {% if verification.verified_at %}
+                    <p class="text-sm text-green-600 dark:text-green-300">{% trans "Verified on" %} {{ verification.verified_at|date:"M d, Y" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% elif verification.status == 'pending' %}
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-4">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-yellow-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <p class="font-medium text-yellow-800 dark:text-yellow-200">{% trans "Verification request pending" %}</p>
+                    {% if verification.request_sent_at %}
+                    <p class="text-sm text-yellow-600 dark:text-yellow-300">{% trans "Request sent on" %} {{ verification.request_sent_at|date:"M d, Y" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% elif verification.status == 'rejected' %}
+        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-4">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <p class="font-medium text-red-800 dark:text-red-200">{% trans "Verification was not successful" %}</p>
+                    {% if verification.rejection_reason %}
+                    <p class="text-sm text-red-600 dark:text-red-300">{{ verification.rejection_reason }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+            <p class="text-gray-700 dark:text-gray-300">
+                {% trans "This employment has not been verified yet." %}
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Request Verification Button -->
+        {% if verification.status == 'unverified' %}
+        {% if verification.hr_contact_email %}
+        <form method="post" action="{% url 'frontend:accounts:employment-request-verification' uuid=verification.uuid %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                {% trans "Send Verification Request to HR" %}
+            </button>
+            <p class="text-sm text-gray-500 mt-2 text-center">
+                {% trans "An email will be sent to" %} {{ verification.hr_contact_email }}
+            </p>
+        </form>
+        {% else %}
+        <div class="text-center">
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                {% trans "Add HR contact information to enable verification." %}
+            </p>
+            <a href="#" class="text-indigo-600 hover:text-indigo-800">
+                {% trans "Edit Employment Details" %}
+            </a>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- HR Contact Information -->
+    {% if verification.hr_contact_email or verification.hr_contact_name %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "HR Contact" %}</h3>
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if verification.hr_contact_name %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Contact Name" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.hr_contact_name }}</dd>
+            </div>
+            {% endif %}
+            {% if verification.hr_contact_email %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Email" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.hr_contact_email }}</dd>
+            </div>
+            {% endif %}
+            {% if verification.hr_contact_phone %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Phone" %}</dt>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ verification.hr_contact_phone }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,249 +1,220 @@
+"""
+Security Middleware for Authentication Protection.
+
+This middleware provides rate limiting and blocking for failed authentication attempts.
+It uses IP-based blocking only (not MAC or User-Agent) as those are trivially spoofed.
+
+SECURITY NOTES:
+- MAC addresses are NOT accessible via HTTP in web contexts and MUST NOT be trusted
+- User-Agent headers are easily spoofed and MUST NOT be used for security decisions
+- Only IP-based blocking is reliable (with proper X-Forwarded-For handling)
+"""
 import time
 import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponseForbidden
 from django.core.mail import send_mail
-import requests  # For webhooks
-from django.contrib.admin.views.decorators import staff_member_required
-from django.urls import path
-from django.shortcuts import render
+import requests
 
 logger = logging.getLogger('auth_security')
 
-def get_mac_address(request):
-    return request.META.get('HTTP_X_MAC_ADDRESS')
-
-def get_user_agent(request):
-    return request.META.get('HTTP_USER_AGENT')
 
 def get_client_ip(request):
+    """
+    Get client IP address with proper X-Forwarded-For handling.
+
+    SECURITY: Only trust X-Forwarded-For if behind a trusted proxy.
+    Configure SECURITY_TRUSTED_PROXY_COUNT in settings.
+    """
+    trusted_proxy_count = getattr(settings, 'SECURITY_TRUSTED_PROXY_COUNT', 0)
+
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+    if x_forwarded_for and trusted_proxy_count > 0:
+        # X-Forwarded-For is a comma-separated list, rightmost is closest to server
+        # We trust only the entries added by our trusted proxies
+        ips = [ip.strip() for ip in x_forwarded_for.split(',')]
+        if len(ips) >= trusted_proxy_count:
+            # Get the IP added by the first trusted proxy
+            return ips[-trusted_proxy_count]
+        return ips[0]
+
+    # Fall back to REMOTE_ADDR (direct connection)
+    return request.META.get('REMOTE_ADDR', '0.0.0.0')
+
 
 def notify_admin(subject, message):
+    """Send security alert notifications via email and webhook."""
     # Email notification
-    if hasattr(settings, "ADMIN_EMAIL_LIST"):
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, settings.ADMIN_EMAIL_LIST)
-    # Webhook notification
-    if hasattr(settings, "SECURITY_ALERT_WEBHOOK"):
+    if hasattr(settings, "ADMIN_EMAIL_LIST") and settings.ADMIN_EMAIL_LIST:
         try:
-            requests.post(settings.SECURITY_ALERT_WEBHOOK, json={"subject": subject, "message": message})
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                settings.ADMIN_EMAIL_LIST,
+                fail_silently=True
+            )
+        except Exception as e:
+            logger.error(f"Email notification failed: {e}")
+
+    # Webhook notification
+    if hasattr(settings, "SECURITY_ALERT_WEBHOOK") and settings.SECURITY_ALERT_WEBHOOK:
+        try:
+            requests.post(
+                settings.SECURITY_ALERT_WEBHOOK,
+                json={"subject": subject, "message": message},
+                timeout=5
+            )
         except Exception as e:
             logger.error(f"Webhook notification failed: {e}")
 
+
 def integrate_firewall_block(ip):
-    # Place actual integration here (API, script, etc.)
-    logger.warning(f"FW BLOCK: {ip}")
+    """
+    Hook for firewall integration.
+    Override this in production to integrate with your firewall API.
+    """
+    logger.warning(f"Firewall block requested for IP: {ip}")
     # Example: requests.get(f"https://firewall.local/api/block?ip={ip}")
 
+
 class AuthSecurityMiddleware:
+    """
+    Middleware to block IPs after too many failed authentication attempts.
+
+    Features:
+    - Blocks for configurable duration on repeated failures (default: 48 hours)
+    - Logs and tracks attempts by IP only (secure, not spoofable)
+    - Can be extended for alerting via email/webhook
+
+    SECURITY:
+    - Only uses IP for blocking (MAC/User-Agent are NOT used - they are spoofable)
+    - Properly handles X-Forwarded-For with trusted proxy count
+    - Uses server-side session/JWT for actual authentication, not headers
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
         self.fail_limit = getattr(settings, 'AUTH_FAIL_LIMIT', 5)
-        self.block_duration = getattr(settings, 'AUTH_BLOCK_DURATION', 48*3600)
-        self.attack_window = getattr(settings, 'ATTACK_WINDOW', 300)  # 5 minutes for rapid attacks
+        self.block_duration = getattr(settings, 'AUTH_BLOCK_DURATION', 48 * 3600)  # 48 hours
+        self.attack_window = getattr(settings, 'ATTACK_WINDOW', 300)  # 5 minutes
 
     def __call__(self, request):
         ip = get_client_ip(request)
-        mac = get_mac_address(request)
-        ua = get_user_agent(request)
 
-        if request.path == settings.LOGIN_URL and request.method == "POST":
-            if self.is_locked(ip, mac, ua):
-                logger.warning(f"Blocked login attempt: IP={ip} MAC={mac} UA={ua}")
-                return HttpResponseForbidden("Too many failed attempts from your address. Wait 48 hours.")
+        # Only apply to authentication endpoints
+        login_url = getattr(settings, 'LOGIN_URL', '/accounts/login/')
+        if request.path == login_url and request.method == "POST":
+            if self.is_ip_blocked(ip):
+                logger.warning(f"Blocked login attempt from IP: {ip}")
+                return HttpResponseForbidden(
+                    "Too many failed attempts from your IP address. "
+                    "Please try again after 48 hours or contact support."
+                )
 
         response = self.get_response(request)
 
-        if request.path == settings.LOGIN_URL and request.method == "POST":
+        # Track failed/successful logins
+        if request.path == login_url and request.method == "POST":
             if response.status_code != 200:
-                self.on_fail(ip, mac, ua, request)
+                self.on_login_fail(ip, request)
             else:
-                self.clear_failures(ip, mac, ua, request)
+                self.on_login_success(ip)
+
         return response
 
     def get_cache_key(self, prefix, identifier):
-        return f"{prefix}_{identifier}"
+        """Generate cache key with prefix."""
+        return f"auth_security:{prefix}:{identifier}"
 
-    def is_locked(self, ip, mac, ua):
-        return any([
-            cache.get(self.get_cache_key("blocked_ip", ip)),
-            mac and cache.get(self.get_cache_key("blocked_mac", mac)),
-            ua and cache.get(self.get_cache_key("blocked_ua", ua))
-        ])
+    def is_ip_blocked(self, ip):
+        """Check if IP is currently blocked."""
+        return cache.get(self.get_cache_key("blocked_ip", ip), False)
 
-    def on_fail(self, ip, mac, ua, request):
-        for ident, val in {'ip': ip, 'mac': mac, 'ua': ua}.items():
-            if val:
-                k = self.get_cache_key(f'fail_{ident}', val)
-                fails = cache.get(k, 0) + 1
-                cache.set(k, fails, self.block_duration)
-                logger.info(f"Failed login: {ident.upper()}={val} count={fails} User={request.POST.get('username', '')}")
-                
-                # Persistent/rapid attack detection and alert
-                if fails >= self.fail_limit:
-                    blocked_key = self.get_cache_key(f"blocked_{ident}", val)
-                    already_blocked = cache.get(blocked_key)
-                    if not already_blocked:
-                        cache.set(blocked_key, True, self.block_duration)
-                        logger.critical(f"BLOCKED: {ident.upper()}={val} - Triggered at {time.ctime()}")
-                        subject = f"ALERT: {ident.upper()} BLOCKED"
-                        msg = f"{ident.upper()} {val} blocked for 48h after {fails} failed attempts."
-                        notify_admin(subject, msg)
-                        if ident == "ip":
-                            integrate_firewall_block(val)
+    def on_login_fail(self, ip, request):
+        """Handle failed login attempt."""
+        fail_key = self.get_cache_key("fail_count", ip)
+        fails = cache.get(fail_key, 0) + 1
+        cache.set(fail_key, fails, self.block_duration)
 
-    def clear_failures(self, ip, mac, ua, request):
-        for ident, val in {'ip': ip, 'mac': mac, 'ua': ua}.items():
-            if val:
-                cache.delete(self.get_cache_key(f'fail_{ident}', val))
-        username = request.POST.get("username")
-        if username:
-            cache.delete(self.get_cache_key('fail_user', username))
+        username = request.POST.get('username', 'unknown')
+        logger.info(f"Failed login: IP={ip} count={fails} user={username}")
 
-# --- Admin Dashboard Endpoint Example ---
+        # Block if limit exceeded
+        if fails >= self.fail_limit:
+            blocked_key = self.get_cache_key("blocked_ip", ip)
+            if not cache.get(blocked_key):
+                cache.set(blocked_key, True, self.block_duration)
+                logger.critical(f"BLOCKED IP: {ip} after {fails} failed attempts at {time.ctime()}")
+
+                # Send admin notification
+                subject = f"SECURITY ALERT: IP Blocked - {ip}"
+                msg = (
+                    f"IP Address {ip} has been blocked for 48 hours "
+                    f"after {fails} failed login attempts.\n\n"
+                    f"Last attempted username: {username}\n"
+                    f"Time: {time.ctime()}"
+                )
+                notify_admin(subject, msg)
+
+                # Optional firewall integration
+                integrate_firewall_block(ip)
+
+    def on_login_success(self, ip):
+        """Clear failure count on successful login."""
+        cache.delete(self.get_cache_key("fail_count", ip))
+
+
+class RateLimitMiddleware:
+    """
+    General rate limiting middleware for API endpoints.
+
+    Uses IP-based rate limiting with proper X-Forwarded-For handling.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.rate_limit = getattr(settings, 'API_RATE_LIMIT', 100)  # requests per minute
+        self.rate_window = getattr(settings, 'API_RATE_WINDOW', 60)  # 1 minute
+
+    def __call__(self, request):
+        # Only apply to API endpoints
+        if not request.path.startswith('/api/'):
+            return self.get_response(request)
+
+        ip = get_client_ip(request)
+        cache_key = f"rate_limit:{ip}"
+
+        requests_made = cache.get(cache_key, 0)
+
+        if requests_made >= self.rate_limit:
+            logger.warning(f"Rate limit exceeded for IP: {ip}")
+            return HttpResponseForbidden(
+                "Rate limit exceeded. Please slow down your requests."
+            )
+
+        cache.set(cache_key, requests_made + 1, self.rate_window)
+
+        return self.get_response(request)
+
+
+# Admin dashboard for security monitoring (staff only)
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+
 
 @staff_member_required
 def security_dashboard(request):
-    # Review currently blocked and failed IP/MAC/UA (shows sampled keys, assume small data for demo!)
-    blocked = []
-    for prefix in ['blocked_ip', 'blocked_mac', 'blocked_ua']:
-        # In production, use a dedicated model for persistent/large datasets
-        example_keys = cache._cache.keys(f"{prefix}_*")
-        for k in example_keys:
-            if cache.get(k):
-                blocked.append(k.replace(f"{prefix}_", '').upper())
-    context = {'blocked': blocked}
-    return render(request, "security_dashboard.html", context)
-
-# Add this to your urls.py for staff admin visibility
-urlpatterns = [
-    path("admin/security-dashboard/", security_dashboard, name="security_dashboard"),
-]
-
-# Ensure LOGGING and email/webhook settings are set in settings.py, for example:
-# LOGGING = {
-#     'version': 1,
-#     'handlers': {'console': {'class': 'logging.StreamHandler'}},
-#     'loggers': {'auth_security': {'handlers': ['console'], 'level': 'INFO'}}
-# }
-# ADMIN_EMAIL_LIST = ["admin@example.com"]
-# DEFAULT_FROM_EMAIL = "noreply@example.com"
-# SECURITY_ALERT_WEBHOOK = "https://webhook.site/abcde123"
-
-
-
-import time
-from django.conf import settings
-from django.core.cache import cache
-from django.http import HttpResponseForbidden
-
-# Optional: Helper to extract MAC address (this is only realistic for intranet/local setups, in web context this is ineffective)
-def get_mac_address(request):
-    # Realistically, MAC address is not accessible via HTTP requests.
-    # Placeholder for scenarios like trusted internal networks.
-    return request.META.get('HTTP_X_MAC_ADDRESS')
-
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
-class AuthSecurityMiddleware:
     """
-    Middleware to block IPs and optionally MAC addresses after too many failed authentication attempts.
-    Features:
-    - Blocks for 48 hours on repeated failure (configurable)
-    - Logs and tracks attempts by IP, (optionally) by MAC and username
-    - Can be extended for further auditing and alerting
+    Security dashboard for staff to view blocked IPs.
+
+    NOTE: In production, use a proper database model for persistent storage
+    instead of cache keys which may be ephemeral.
     """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-        self.fail_limit = getattr(settings, 'AUTH_FAIL_LIMIT', 5)
-        self.block_duration = getattr(settings, 'AUTH_BLOCK_DURATION', 48*3600)  # 48 hours
-
-    def __call__(self, request):
-        ip = get_client_ip(request)
-        mac = get_mac_address(request)  # Real effect only possible with special setups
-
-        # Only block authentication endpoints (e.g. login)
-        if request.path == settings.LOGIN_URL and request.method == "POST":
-            # Check for locked IP or MAC address
-            if self.is_locked(ip, mac):
-                return HttpResponseForbidden("Too many failed attempts from your IP or MAC. Try again after 48 hours.")
-
-        response = self.get_response(request)
-
-        # Check for failed authentication (status not 200)
-        if request.path == settings.LOGIN_URL and request.method == "POST":
-            if response.status_code != 200:
-                self.on_fail(ip, mac, request)
-            else:
-                self.clear_failures(ip, mac, request)
-        return response
-
-    def get_cache_key(self, prefix, identifier):
-        return f"{prefix}_{identifier}"
-
-    def is_locked(self, ip, mac):
-        ip_locked = cache.get(self.get_cache_key("blocked_ip", ip))
-        if ip_locked:
-            return True
-        if mac:
-            mac_locked = cache.get(self.get_cache_key("blocked_mac", mac))
-            if mac_locked:
-                return True
-        return False
-
-    def on_fail(self, ip, mac, request):
-        # Increment IP failure count
-        key_ip = self.get_cache_key('fail_ip', ip)
-        fails_ip = cache.get(key_ip, 0) + 1
-        cache.set(key_ip, fails_ip, self.block_duration)
-
-        # Optional: Increment MAC failure count
-        if mac:
-            key_mac = self.get_cache_key('fail_mac', mac)
-            fails_mac = cache.get(key_mac, 0) + 1
-            cache.set(key_mac, fails_mac, self.block_duration)
-
-        # Optional: Per-username limits (prefers POST['username'])
-        username = request.POST.get("username")
-        if username:
-            key_user = self.get_cache_key('fail_user', username)
-            fails_user = cache.get(key_user, 0) + 1
-            cache.set(key_user, fails_user, self.block_duration)
-
-        # Block if threshold exceeded
-        if fails_ip >= self.fail_limit:
-            cache.set(self.get_cache_key("blocked_ip", ip), True, timeout=self.block_duration)
-        if mac and fails_mac >= self.fail_limit:
-            cache.set(self.get_cache_key("blocked_mac", mac), True, timeout=self.block_duration)
-        if username and fails_user >= self.fail_limit:
-            cache.set(self.get_cache_key("blocked_user", username), True, timeout=self.block_duration)
-
-    def clear_failures(self, ip, mac, request):
-        # On a successful login, clear failure history
-        cache.delete(self.get_cache_key('fail_ip', ip))
-        if mac:
-            cache.delete(self.get_cache_key('fail_mac', mac))
-        username = request.POST.get("username")
-        if username:
-            cache.delete(self.get_cache_key('fail_user', username))
-
-# In settings.py, add:
-# MIDDLEWARE.append('yourapp.security_middleware.AuthSecurityMiddleware')
-# LOGIN_URL = "/login"  # Or your actual login URL
-# AUTH_FAIL_LIMIT = 5
-# AUTH_BLOCK_DURATION = 48*3600  # 48 hours
-
-# Make sure Django cache is properly configured for production!
+    # This is a simplified example - in production use a proper model
+    context = {
+        'blocked_count': 'Use database model for production',
+        'recent_blocks': [],
+    }
+    return render(request, "security/dashboard.html", context)

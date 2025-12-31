@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Identity Verifications" %} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <a href="{% url 'frontend:accounts:verification-dashboard' %}" class="text-indigo-600 hover:text-indigo-800 mb-2 inline-block">
+                &larr; {% trans "Back to Dashboard" %}
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                {% trans "Identity Verifications" %}
+            </h1>
+        </div>
+        <a href="{% url 'frontend:accounts:kyc-start' %}"
+           class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            {% trans "New Verification" %}
+        </a>
+    </div>
+
+    {% if verifications %}
+    <div class="space-y-4">
+        {% for kyc in verifications %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            {{ kyc.get_verification_type_display }}
+                        </h3>
+                        {% if kyc.status == 'verified' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            {% trans "Verified" %}
+                        </span>
+                        {% elif kyc.status == 'pending' %}
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                            {% trans "Pending" %}
+                        </span>
+                        {% elif kyc.status == 'in_progress' %}
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                            {% trans "In Progress" %}
+                        </span>
+                        {% elif kyc.status == 'rejected' %}
+                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                            {% trans "Rejected" %}
+                        </span>
+                        {% else %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                            {{ kyc.get_status_display }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        {% trans "Level:" %} {{ kyc.get_level_display }}
+                        {% if kyc.document_type %}
+                        &bull; {{ kyc.document_type }}
+                        {% endif %}
+                        {% if kyc.document_country %}
+                        ({{ kyc.document_country }})
+                        {% endif %}
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {% trans "Submitted:" %} {{ kyc.created_at|date:"M d, Y" }}
+                        {% if kyc.verified_at %}
+                        &bull; {% trans "Verified:" %} {{ kyc.verified_at|date:"M d, Y" }}
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'frontend:accounts:kyc-status' uuid=kyc.uuid %}"
+                   class="text-indigo-600 hover:text-indigo-800 font-medium">
+                    {% trans "View Details" %} &rarr;
+                </a>
+            </div>
+            {% if kyc.rejection_reason %}
+            <div class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <p class="text-sm text-red-700 dark:text-red-300">
+                    <strong>{% trans "Rejection reason:" %}</strong> {{ kyc.rejection_reason }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{% trans "No identity verifications yet" %}</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">{% trans "Verify your identity to build trust on the platform." %}</p>
+        <a href="{% url 'frontend:accounts:kyc-start' %}"
+           class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            {% trans "Start Verification" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
