@@ -145,6 +145,7 @@ INSTALLED_APPS = [
 
     # Task Scheduling
     'django_q',
+    'django_celery_beat',
     'django_extensions',
 
     # Wagtail CMS
