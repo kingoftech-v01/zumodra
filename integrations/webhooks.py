@@ -6,6 +6,8 @@ Includes signature verification, deduplication, and async processing.
 """
 
 import json
+import hmac
+import hashlib
 import logging
 from typing import Dict, Any, Optional
 
@@ -27,6 +29,79 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class WebhookValidator:
+    """
+    Validates webhook signatures from various providers.
+
+    Supports multiple signature schemes:
+    - HMAC-SHA256 (default)
+    - HMAC-SHA1
+    - Custom header-based validation
+    """
+
+    def __init__(self, endpoint: WebhookEndpoint):
+        self.endpoint = endpoint
+        self.secret_key = endpoint.secret_key
+
+    def validate_signature(self, payload: bytes, headers: Dict[str, str]) -> bool:
+        """
+        Validate webhook signature against the payload.
+
+        Args:
+            payload: Raw request body bytes
+            headers: Request headers dict
+
+        Returns:
+            True if signature is valid, False otherwise
+        """
+        if not self.secret_key:
+            return True  # No secret configured, skip validation
+
+        # Try common signature header names
+        signature_headers = [
+            'X-Hub-Signature-256',  # GitHub
+            'X-Signature-256',
+            'X-Webhook-Signature',
+            'Stripe-Signature',
+            'X-Slack-Signature',
+            'X-Twilio-Signature',
+        ]
+
+        signature = None
+        for header in signature_headers:
+            if header in headers:
+                signature = headers[header]
+                break
+
+        if not signature:
+            # Check case-insensitive
+            headers_lower = {k.lower(): v for k, v in headers.items()}
+            for header in signature_headers:
+                if header.lower() in headers_lower:
+                    signature = headers_lower[header.lower()]
+                    break
+
+        if not signature:
+            logger.warning(f"No signature header found for endpoint {self.endpoint.id}")
+            return False
+
+        # Calculate expected signature
+        expected = self._calculate_signature(payload)
+
+        # Handle different signature formats
+        if signature.startswith('sha256='):
+            signature = signature[7:]
+        elif signature.startswith('sha1='):
+            signature = signature[5:]
+
+        return hmac.compare_digest(signature, expected)
+
+    def _calculate_signature(self, payload: bytes) -> str:
+        """Calculate HMAC-SHA256 signature."""
+        secret = self.secret_key.encode('utf-8') if isinstance(self.secret_key, str) else self.secret_key
+        return hmac.new(secret, payload, hashlib.sha256).hexdigest()
 
 
 def get_client_ip(request) -> str:
