@@ -808,7 +808,7 @@ class PerformanceReview(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='reviews_given'
+        related_name='hr_performance_reviews_given'
     )
 
     # Review Details

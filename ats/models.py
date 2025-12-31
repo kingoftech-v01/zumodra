@@ -2459,7 +2459,8 @@ class ApplicationNote(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        related_name='ats_applicationnote_set'
     )
     content = models.TextField()
     is_private = models.BooleanField(

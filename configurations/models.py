@@ -836,7 +836,7 @@ class ApplicationNote(TenantAwareModel):
     Internal notes on a job application.
     """
     application = models.ForeignKey(JobApplication, on_delete=models.CASCADE, related_name='notes')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='config_applicationnote_set')
     note = models.TextField()
     is_private = models.BooleanField(default=True, help_text=_("Private notes visible only to hiring team"))
 
