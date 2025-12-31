@@ -237,72 +237,28 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # =============================================================================
 # CONTENT SECURITY POLICY
 # =============================================================================
-# Used by django-csp middleware
+# Used by django-csp middleware 4.0+
+# This provides default secure settings; override in main settings.py as needed
+
+CONTENT_SECURITY_POLICY_DEFAULTS = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': ("'self'",),
+        'style-src': ("'self'",),
+        'img-src': ("'self'", "data:", "https:"),
+        'font-src': ("'self'",),
+        'connect-src': ("'self'", "wss:"),
+        'frame-src': ("'none'",),
+        'object-src': ("'none'",),
+        'base-uri': ("'self'",),
+        'form-action': ("'self'",),
+        'frame-ancestors': ("'none'",),
+        'upgrade-insecure-requests': True,
+    }
+}
 
 # Report-only mode for testing (set to False in production after testing)
-CSP_REPORT_ONLY = False
-
-# Default source
-CSP_DEFAULT_SRC = ("'self'",)
-
-# Script sources (avoid 'unsafe-inline' if possible)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    # Add CDNs you trust
-    # 'https://cdn.jsdelivr.net',
-)
-
-# Style sources
-CSP_STYLE_SRC = (
-    "'self'",
-    # "'unsafe-inline'",  # Only if absolutely necessary
-)
-
-# Image sources
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "https:",  # Allow HTTPS images
-)
-
-# Font sources
-CSP_FONT_SRC = (
-    "'self'",
-    # 'https://fonts.gstatic.com',  # Google Fonts
-)
-
-# Connection sources (for AJAX, WebSocket)
-CSP_CONNECT_SRC = (
-    "'self'",
-    "wss:",  # WebSocket connections
-)
-
-# Frame sources
-CSP_FRAME_SRC = ("'none'",)
-
-# Object sources (Flash, Java, etc.)
-CSP_OBJECT_SRC = ("'none'",)
-
-# Base URI
-CSP_BASE_URI = ("'self'",)
-
-# Form action targets
-CSP_FORM_ACTION = ("'self'",)
-
-# Frame ancestors (prevents embedding)
-CSP_FRAME_ANCESTORS = ("'none'",)
-
-# Plugin types
-CSP_PLUGIN_TYPES = ()
-
-# Block all mixed content
-CSP_BLOCK_ALL_MIXED_CONTENT = True
-
-# Upgrade insecure requests
-CSP_UPGRADE_INSECURE_REQUESTS = True
-
-# Report URI for CSP violations
-# CSP_REPORT_URI = '/csp-report/'
+# CONTENT_SECURITY_POLICY_REPORT_ONLY = True
 
 
 # =============================================================================

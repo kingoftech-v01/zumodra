@@ -1153,35 +1153,41 @@ MULTITENANT_RELATIVE_MEDIA_ROOT = '%s/media'
 
 # ==================== SECURITY HEADERS ====================
 
-# Content Security Policy (configured via django-csp middleware)
+# Content Security Policy (configured via django-csp middleware 4.0+)
 # Note: unsafe-inline/unsafe-eval needed for HTMX and some JS libraries
 # In strict production, use nonces instead and remove these directives
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    "https://cdn.jsdelivr.net",
-    "https://unpkg.com",
-    "https://js.stripe.com",
-) + (("'unsafe-inline'", "'unsafe-eval'") if DEBUG else ())
-CSP_STYLE_SRC = (
-    "'self'",
-    "'unsafe-inline'",  # Required for HTMX dynamic styles
-    "https://fonts.googleapis.com",
-    "https://cdn.jsdelivr.net",
-)
-CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com", "data:")
-CSP_IMG_SRC = ("'self'", "data:", "https:", "blob:")
-CSP_CONNECT_SRC = (
-    "'self'",
-    "wss:",
-    "https:",
-    "https://api.stripe.com",
-)
-CSP_FRAME_SRC = ("'self'", "https://js.stripe.com")
-CSP_FRAME_ANCESTORS = ("'self'",)
-CSP_OBJECT_SRC = ("'none'",)
-CSP_BASE_URI = ("'self'",)
-CSP_FORM_ACTION = ("'self'",)
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': (
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://unpkg.com",
+            "https://js.stripe.com",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+        ),
+        'style-src': (
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net",
+        ),
+        'font-src': ("'self'", "https://fonts.gstatic.com", "data:"),
+        'img-src': ("'self'", "data:", "https:", "blob:"),
+        'connect-src': (
+            "'self'",
+            "wss:",
+            "https:",
+            "https://api.stripe.com",
+        ),
+        'frame-src': ("'self'", "https://js.stripe.com"),
+        'frame-ancestors': ("'self'",),
+        'object-src': ("'none'",),
+        'base-uri': ("'self'",),
+        'form-action': ("'self'",),
+    }
+}
 
 # ==================== FEATURE FLAGS ====================
 
