@@ -33,7 +33,7 @@ from .models import (
 class ProviderSkillInline(admin.TabularInline):
     model = ProviderSkill
     extra = 1
-    autocomplete_fields = ['skill']
+    raw_id_fields = ['skill']
 
 
 class ServiceInline(admin.TabularInline):
@@ -106,7 +106,7 @@ class ServiceProviderAdmin(admin.ModelAdmin):
         'uuid', 'rating_avg', 'total_reviews', 'completed_jobs_count',
         'total_earnings', 'created_at', 'updated_at'
     ]
-    autocomplete_fields = ['user', 'company']
+    raw_id_fields = ['user', 'company']
     inlines = [ProviderSkillInline, ServiceInline]
 
     fieldsets = (
@@ -153,7 +153,8 @@ class ProviderSkillAdmin(admin.ModelAdmin):
     list_display = ['provider', 'skill', 'level', 'years_experience', 'is_verified']
     list_filter = ['level', 'is_verified']
     search_fields = ['provider__display_name', 'skill__name']
-    autocomplete_fields = ['provider', 'skill']
+    autocomplete_fields = ['provider']
+    raw_id_fields = ['skill']
 
 
 # =============================================================================
@@ -221,7 +222,8 @@ class ServiceLikeAdmin(admin.ModelAdmin):
     list_display = ['user', 'service', 'created_at']
     list_filter = ['created_at']
     search_fields = ['user__email', 'service__name']
-    autocomplete_fields = ['user', 'service']
+    autocomplete_fields = ['service']
+    raw_id_fields = ['user']
 
 
 # =============================================================================
@@ -234,7 +236,8 @@ class ClientRequestAdmin(admin.ModelAdmin):
     list_filter = ['status', 'category', 'remote_allowed', 'created_at']
     search_fields = ['title', 'description', 'client__email']
     readonly_fields = ['uuid', 'created_at', 'updated_at']
-    autocomplete_fields = ['client', 'category']
+    autocomplete_fields = ['category']
+    raw_id_fields = ['client']
     filter_horizontal = ['required_skills']
 
     def budget_display(self, obj):
@@ -282,7 +285,8 @@ class ServiceContractAdmin(admin.ModelAdmin):
         'started_at', 'delivered_at', 'completed_at', 'cancelled_at',
         'created_at', 'updated_at'
     ]
-    autocomplete_fields = ['client', 'provider', 'proposal', 'service', 'client_request', 'escrow_transaction']
+    autocomplete_fields = ['provider', 'proposal', 'service', 'client_request', 'escrow_transaction']
+    raw_id_fields = ['client']
     inlines = [ContractMessageInline]
     date_hierarchy = 'created_at'
 
@@ -341,7 +345,8 @@ class ServiceReviewAdmin(admin.ModelAdmin):
     list_filter = ['rating', 'created_at']
     search_fields = ['contract__title', 'reviewer__email', 'provider__display_name', 'content']
     readonly_fields = ['created_at', 'updated_at']
-    autocomplete_fields = ['contract', 'reviewer', 'provider']
+    autocomplete_fields = ['contract', 'provider']
+    raw_id_fields = ['reviewer']
 
     def rating_stars(self, obj):
         return '★' * obj.rating + '☆' * (5 - obj.rating)
@@ -359,7 +364,8 @@ class ContractMessageAdmin(admin.ModelAdmin):
     list_filter = ['is_system_message', 'created_at']
     search_fields = ['contract__title', 'sender__email', 'content']
     readonly_fields = ['created_at']
-    autocomplete_fields = ['contract', 'sender']
+    autocomplete_fields = ['contract']
+    raw_id_fields = ['sender']
 
     def content_preview(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content

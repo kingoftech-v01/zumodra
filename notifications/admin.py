@@ -72,7 +72,8 @@ class NotificationTemplateAdmin(ImportExportModelAdmin):
     list_filter = ['template_type', 'channel', 'language', 'is_active']
     search_fields = ['name', 'subject', 'body', 'description']
     readonly_fields = ['created_at', 'updated_at', 'created_by']
-    autocomplete_fields = ['channel', 'created_by']
+    autocomplete_fields = ['channel']
+    raw_id_fields = ['created_by']
 
     fieldsets = (
         ('Basic Information', {
@@ -114,7 +115,7 @@ class NotificationPreferenceAdmin(admin.ModelAdmin):
     ]
     search_fields = ['user__email', 'user__username', 'phone_number']
     readonly_fields = ['unsubscribe_token', 'created_at', 'updated_at']
-    autocomplete_fields = ['user']
+    raw_id_fields = ['user']
 
     fieldsets = (
         ('User', {
@@ -171,7 +172,8 @@ class NotificationAdmin(ImportExportModelAdmin):
         'uuid', 'created_at', 'updated_at', 'sent_at',
         'delivered_at', 'read_at', 'dismissed_at'
     ]
-    autocomplete_fields = ['recipient', 'sender', 'channel', 'template']
+    autocomplete_fields = ['channel', 'template']
+    raw_id_fields = ['recipient', 'sender']
     date_hierarchy = 'created_at'
     inlines = [NotificationDeliveryLogInline]
 
@@ -319,7 +321,8 @@ class ScheduledNotificationAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'is_processed', 'recurrence', 'scheduled_at']
     search_fields = ['name', 'description', 'template__name', 'recipient__email']
     readonly_fields = ['uuid', 'last_run_at', 'next_run_at', 'created_at', 'updated_at']
-    autocomplete_fields = ['recipient', 'template', 'created_by']
+    autocomplete_fields = ['template']
+    raw_id_fields = ['recipient', 'created_by']
     date_hierarchy = 'scheduled_at'
 
     fieldsets = (
