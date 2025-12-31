@@ -295,7 +295,7 @@ def backup_rotation_task(
     name='core.tasks.maintenance_tasks.ssl_renewal_check_task',
     max_retries=2,
     default_retry_delay=300,
-    rate_limit='4/d',
+    rate_limit='1/h',  # Approximately 4 per day (originally 4/d which is invalid)
     queue='low_priority',
     soft_time_limit=120,
     time_limit=180,
@@ -809,7 +809,7 @@ def cleanup_temp_files_task(
 @shared_task(
     bind=True,
     name='core.tasks.maintenance_tasks.database_vacuum_task',
-    rate_limit='1/d',
+    rate_limit='1/h',  # Run once per hour max (originally 1/d which is invalid)
     queue='low_priority',
     soft_time_limit=1800,
     time_limit=3600,
