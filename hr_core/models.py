@@ -215,7 +215,7 @@ class Employee(models.Model):
     class Meta:
         verbose_name = _('Employee')
         verbose_name_plural = _('Employees')
-        ordering = ['last_name', 'first_name']
+        ordering = ['user__last_name', 'user__first_name']
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.employee_id})"
