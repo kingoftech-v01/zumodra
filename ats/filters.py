@@ -16,7 +16,7 @@ from datetime import timedelta
 from .models import (
     JobCategory, Pipeline, PipelineStage, JobPosting,
     Candidate, Application, ApplicationActivity, ApplicationNote,
-    Interview, InterviewFeedback, Offer, SavedSearch
+    Interview, InterviewFeedback, Offer, SavedSearch, InterviewType
 )
 
 
@@ -611,7 +611,7 @@ class InterviewFilter(django_filters.FilterSet):
 
     application = django_filters.NumberFilter(field_name='application_id')
     interview_type = django_filters.ChoiceFilter(
-        choices=Interview.InterviewType.choices
+        choices=InterviewType.choices
     )
     status = django_filters.ChoiceFilter(choices=Interview.InterviewStatus.choices)
     organizer = django_filters.NumberFilter(field_name='organizer_id')
