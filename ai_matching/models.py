@@ -21,6 +21,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 
 from tenants.mixins import TenantAwareModelMixin, TenantBaseModel, TimestampMixin, UUIDMixin
+from core.db.models import TenantAwareModel
 
 
 # ============================================================================
