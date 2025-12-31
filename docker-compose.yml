@@ -137,6 +137,7 @@ services:
       - .:/app
       - static_volume:/app/static
       - media_volume:/app/media
+      - logs_volume:/app/logs
     ports:
       - "8002:8000"
     deploy:
@@ -177,6 +178,7 @@ services:
     volumes:
       - .:/app
       - media_volume:/app/media
+      - logs_volume:/app/logs
     deploy:
       resources:
         limits:
@@ -215,6 +217,7 @@ services:
       SERVICE_TYPE: celery-beat
     volumes:
       - .:/app
+      - logs_volume:/app/logs
     deploy:
       resources:
         limits:
@@ -252,6 +255,7 @@ services:
       SERVICE_TYPE: channels
     volumes:
       - .:/app
+      - logs_volume:/app/logs
     ports:
       - "8003:8001"
     deploy:
@@ -408,6 +412,8 @@ volumes:
   static_volume:
     driver: local
   media_volume:
+    driver: local
+  logs_volume:
     driver: local
   prometheus_data:
     driver: local
