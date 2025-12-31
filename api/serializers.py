@@ -2,7 +2,7 @@
 API Serializers - Convert Django models to JSON
 """
 from rest_framework import serializers
-from custom_account_u.models import User
+from custom_account_u.models import CustomUser as User
 from services.models import (
     DService, DServiceProviderProfile, DServiceCategory,
     DServiceRequest, DServiceProposal, DServiceContract,
