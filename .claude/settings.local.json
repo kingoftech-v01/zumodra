@@ -45,7 +45,17 @@
       "Bash(grep:*)",
       "Bash(python -m py_compile:*)",
       "Bash(python -m pytest:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: add missing TenantAwareModel import in ai_matching/models.py\n\nThe RankingProfile, RankingRule, and CandidateRanking models\ninherit from TenantAwareModel which needs to be imported from core.db.models.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: remove duplicate Tenant admin registration in main/admin.py\n\nTenant was registered in both main/admin.py and tenants/admin.py\ncausing AlreadyRegistered error. The tenants/admin.py version has\nfull configuration, so removing the duplicate from main.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(ssh -o ConnectTimeout=30 root@147.93.47.35 \"docker ps --format ''table {{.Names}}\\\\t{{.Ports}}'' | head -30\")",
+      "Bash(git commit:*)",
+      "Bash(ssh -o ConnectTimeout=30 root@147.93.47.35 \"docker ps -a --format ''table {{.Names}}\\\\t{{.Status}}'' | grep zumodra\")",
+      "Bash(python manage.py makemigrations:*)",
+      "Bash(timeout 30 ssh:*)",
+      "Bash(timeout 10 sleep:*)"
     ]
   }
 }

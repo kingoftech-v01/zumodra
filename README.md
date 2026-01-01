@@ -206,9 +206,10 @@ python manage.py check --deploy
 
 | Document | Description |
 |----------|-------------|
+| [FEATURES.md](docs/FEATURES.md) | Complete platform features and specifications |
 | [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | Complete API reference |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment guide |
-| [SECURITY.md](SECURITY.md) | Security policy and practices |
+| [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Production deployment guide |
+| [SECURITY.md](docs/SECURITY.md) | Security policy and practices |
 | [QA_SCENARIOS.md](docs/QA_SCENARIOS.md) | End-to-end test scenarios |
 | [TENANT_ONBOARDING.md](docs/TENANT_ONBOARDING.md) | New tenant setup guide |
 | [domain_model.md](docs/domain_model.md) | Domain model documentation |

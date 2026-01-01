@@ -1,137 +1,366 @@
-Zumodra is a multi-tenant SaaS platform combining a freelance services marketplace like Fiverr/Upwork with integrated CRM tools, appointment booking, escrow payments, real-time messaging, email marketing, and a Wagtail CMS for content. It evolved from a Django learning project into a production-ready enterprise solution targeting freelancers, agencies, and businesses needing seamless service matching, financial security, and client management.
+# Zumodra Development Context
 
-## Project Purpose
-Zumodra addresses gaps in existing freelance platforms by creating an all-in-one ecosystem where providers list services, clients book appointments or post jobs, payments flow through escrow, and marketing/CRM tools drive retention—all within a multi-tenant architecture for scalability. Unlike standalone marketplaces, it supports enterprise workflows like multi-language support (9 languages), geospatial service matching via PostGIS, and role-based dashboards for clients, providers, and admins.
+## Project Identity
 
-## Key Advantages
-Zumodra stands out with built-in escrow via Stripe (beyond Fiverr's 20% flat fees or Upwork's milestone system), real-time WebSocket messaging with typing indicators/file sharing, and Celery-powered async tasks for newsletters/cron jobs—reducing reliance on external tools. Multi-tenancy enables white-label SaaS deployment at lower costs than single-tenant CRMs, with 2FA, audit logging, and CSP for superior security. Its Django/Wagtail stack ensures SEO-optimized content marketing integrated directly into the marketplace.
+**Zumodra** is a multi-tenant ATS (Applicant Tracking System) and HRIS (Human Resource Information System) SaaS platform with integrated freelance marketplace, built by **Rhematek Solutions** (CEO: Stephane Arthur Victor).
 
-## Unique Differentiators
-- **Escrow + CRM Fusion**: Combines Upwork-style proposals/contracts with monday CRM-like pipelines, tracking leads from inquiry to review in one system—absent in pure marketplaces.
-- **Geospatial + Multi-Language**: PostGIS for location-based service filtering and i18n for 9 languages, enabling global reach without add-ons.
-- **Real-Time + Analytics**: Channels for chat/typing, integrated with django-analytical for geo-tracked user behavior—more advanced than Fiverr Workspace.
-- **Production-Ready Stack**: Docker/Nginx/Gunicorn/Celery from day one, with Wagtail for dynamic landing pages/blog, unlike template-only competitors.
+**Mission**: "Verify. Recruit. Hire. Risk-Free."
 
-| Feature | Fiverr/Upwork | Standalone CRMs | Zumodra |
-|---------|---------------|-----------------|---------|
-| Escrow Payments | Milestone-based  | Rare | Full Stripe escrow + refunds  |
-| Real-Time Chat | Basic messaging | No | WebSockets w/ indicators  |
-| Multi-Tenant SaaS | No | Partial  | Native django-tenants ready  |
-| CMS/Marketing | Limited | Separate tools | Wagtail + newsletters  |
-| Geospatial Search | Basic filters | No | PostGIS integration  |
+**Core Differentiator**: Bidirectional KYC verification of both candidates AND recruiters/employers, with progressive data revelation and escrow-protected payments.
 
-## Core Features
-Completed apps deliver appointment booking, Stripe finance (subscriptions/escrow), real-time messages, newsletters, and security auditing. Partial features include services marketplace, Wagtail blog, and dashboard analytics. Roadmap adds provider profiles, proposals, geofiltered search, ratings, API endpoints, and multi-role dashboards.
+---
 
-## Path to $100M Valuation
-Implementing Phase 1-2 (bug fixes, services views, dashboard logic) unlocks a functional MVP with marketplace + CRM, targeting 20% better sales efficiency via integrated pipelines. Full rollout (Phases 3-5: i18n, testing, mobile API) positions it as a "super-app" for freelancers/agencies, capturing market share from fragmented tools—multi-tenant scalability supports 100K+ users at low cost, with AI matching/video as P3 upsell drivers. Success metrics like 99.9% uptime and 80% test coverage ensure enterprise adoption, mirroring Salesforce's CRM growth trajectory.
+## Technology Stack
 
+```
+Backend:
+- Python 3.13+ / Django 5.x
+- django-tenants (schema-per-tenant multi-tenancy)
+- Django REST Framework (DRF) for APIs
+- Celery 5.x + Redis (async tasks, caching, WebSocket channels)
+- PostgreSQL 16 with PostGIS (geospatial queries)
 
-Zumodra can evolve into a comprehensive freelance management system (FMS) by adding dedicated HR features that streamline contingent workforce operations, leveraging its existing configurations app (with HR/skills taxonomy) and multi-tenant structure. These additions target enterprise HR teams managing freelancers alongside full-time staff, addressing compliance, onboarding, and performance gaps in platforms like Fiverr or Upwork. 
+Frontend:
+- Django templates + HTMX + Alpine.js
+- Tailwind CSS + Bootstrap 5 (selective)
+- WCAG 2.1 AA accessibility target
 
-## Essential HR Features
-Integrate these into a new `hr` app or extend `configurations` and `services` for seamless freelancer lifecycle management.
+Infrastructure:
+- Docker + Docker Compose
+- Nginx + Gunicorn
+- GitHub Actions (CI/CD)
 
-- **Talent Sourcing & Matching**: AI-powered skill matching using existing taxonomy, private talent pools from marketplace data, and integration with job boards—extending PostGIS for location-based hiring.
-- **Automated Onboarding**: Digital contracts with e-signatures, background checks via API (e.g., Checkr), right-to-work verification, and document storage tied to user profiles.
-- **Compliance Tracking**: Worker classification tools, tax form collection (1099-NEC), multi-country compliance rules, and audit logs from the security app.
-
-## Advanced HR Workflows
-Build role-based dashboards for HR admins with analytics from django-analytical.
-
-- **Performance & Ratings**: Verified ratings system post-project, utilization metrics, and re-engagement tracking for top freelancers.
-- **Budget & Spend Analytics**: Real-time spend tracking by department/project, predictive forecasting via Celery tasks, integrated with finance app's escrow data.
-- **Global Payments & Invoicing**: Multi-currency support in Stripe, automated invoice generation, and payroll integration—building on existing subscriptions/refunds.
-
-| Feature | Current Zumodra | Added HR Value | Competitive Edge |
-|---------|-----------------|---------------|------------------|
-| Onboarding | Basic profiles | Automated compliance docs | Reduces 54% productivity lag  |
-| Payments | Escrow/Stripe | Global tax handling | Instant options vs Upwork delays |
-| Analytics | Basic marketing | Spend/utilization dashboards | Predictive forecasting absent in Fiverr |
-| Matching | Service search | AI skill pools | Private networks > public marketplaces |
-
-## Implementation Priority
-Add in Phase 3 (Week 8+): Start with models in `configurations` for `FreelancerProfile` (skills, compliance status), views in `dashboard` for HR metrics, and Celery for automated checks. This transforms Zumodra into an FMS like Worksuite, boosting $100M potential by capturing enterprise HR budgets (projected $10B+ freelance management market).
-
-Zumodra's marketing department can leverage its existing `marketing`, `newsletter`, and Wagtail CMS apps by adding targeted features that drive user acquisition, engagement, and retention in the freelance marketplace. These enhancements position marketing teams to run data-driven campaigns, publish dynamic events for local/global networking, and integrate with the platform's geospatial PostGIS for hyper-local targeting—creating viral growth loops absent in Fiverr/Upwork. 
-
-## Core Marketing Dashboard
-Extend the `dashboard` app with role-specific views for marketers, pulling analytics from `django-analytical` and `user-tracking`.
-
-- **Campaign Analytics**: Track CAC, MRR/ARR, churn rates, activation metrics, and feature adoption via real-time Redis dashboards with A/B testing for emails/landing pages.
-- **Lead Nurturing Automation**: Celery-powered sequences for onboarding emails, re-engagement for inactive freelancers/clients, and personalized nurture flows based on service views or geo-location.
-- **Content Performance**: Wagtail-integrated metrics for blog posts, landing pages, and SEO (sitemaps, meta tags), with predictive analytics for high-engagement topics.
-
-## Event Management System
-Build a new `events` model in `marketing` app, using PostGIS for location-based discovery—marketers publish, users discover nearby opportunities.
-
-- **Event Publishing**: Create webinars, meetups, workshops (virtual/in-person) with RSVPs, ticket sales via Stripe, and live-stream integration (Jitsi). Auto-generate calendars and reminders. 
-- **Geo-Targeted Discovery**: Public event map where users filter by location/skills ("Python devs events in Montreal"), with push notifications via Channels for nearby matches.
-- **Event Analytics**: Track attendance, conversions (e.g., event → service hire), NPS feedback, and follow-up campaigns—turning events into lead pipelines.
-
-## Advanced Growth Features
-- **Feature Marketing**: In-app notifications and email blasts for new platform updates (e.g., HR tools), with video tutorials and dynamic personalization via user behavior data.
-- **Affiliate/Referral Program**: Automated tracking of referrals with tiered commissions, integrated with finance app escrow for payouts.
-- **AI-Powered Personalization**: Enrich CRM data for hyper-targeted ads/emails (e.g., "Services near you"), using existing geoip2 for visitor insights.
-
-| Feature | Current Zumodra | Marketing Boost | Unique Edge |
-|---------|-----------------|---------------|-------------|
-| Events | None | Geo-discovery + RSVPs | Local networking > Upwork forums  |
-| Automation | Newsletters only | Full sequences/A/B | 15%+ sales lift via personalization  |
-| Analytics | Basic tracking | ARR/churn dashboards | Predictive retention absent in Fiverr |
-| Content | Wagtail blog | Event-integrated SEO | Viral local events drive 20% acquisition |
-
-## Implementation Path
-Prioritize in Phase 3 (Week 8-10): Add `Event` model with Leaflet maps, Celery for event reminders, and dashboard views. This unlocks enterprise marketing scale, fueling $100M growth through events as acquisition flywheels and retention via personalized campaigns. 
-
-Zumodra's multi-tenant architecture (using django-tenants in the `main` app) can be fully activated with hierarchical role-based access control (RBAC), enabling each tenant (enterprise) to manage multiple users across roles like HR, marketers, employees, supervisors, and PDG/CEO. Users are scoped to specific "circusales" (business units/divisions) within the tenant, ensuring data isolation via PostGIS-enabled addresses and row-level security—perfect for enterprise-scale freelance/CRM operations. 
-
-## Tenant Structure
-NB: A Tenant is an Entreprise who can a one or Multiple Curcusales and each sur cusale have theire people( employee or other)
-Each tenant represents an enterprise with multiple addresses/circusales (divisions). Extend `configurations` models for this hierarchy.
-
-- **Tenant (Enterprise)**: Owns circusales, users, services, and finances; white-label branding via Wagtail pages.
-- **Circusale (Division)**: Location-specific unit (e.g., "Montreal Sales") with PostGIS coordinates, budgets, and team assignments—users belong to one primary circusale.
-- **User Roles**: PDG (full tenant access), Supervisor (circusale + subordinates), HR/Marketer/Employee (scoped to circusale + role permissions).
-
-## Role-Based Features
-Implement via custom `TenantUser` model extending django-tenant-users, with permissions per tenant/circusale.
-
-- **PDG/CEO**: Manage all circusales, users, budgets, global analytics; approve cross-division hires/services.
-- **Supervisor**: Oversee circusale team, approve local services/contracts, view division P&L from finance app.
-- **HR Personnel**: Onboard freelancers/employees per circusale, compliance checks, performance reviews—tied to new HR features.
-- **Marketers**: Run circusale-specific campaigns/events (geo-targeted via PostGIS), track local leads.
-- **Employees**: Access personal dashboard, submit time sheets, view assigned services/projects.
-
-## Key Implementation Features
-- **Scoped Dashboards**: Dynamic views filter data by `request.tenant` + `user.circusale` (e.g., HR sees only Montreal circusale freelancers).
-- **Permission Middleware**: Custom middleware checks `user.role.permissions` against tenant/circusale context before views.
-- **Multi-Address Management**: Enterprises add circusales with addresses; PostGIS enables "services near this division" matching.
-
-| Role | Tenant Scope | Circusale Scope | Unique Permissions |
-|------|--------------|-----------------|-------------------|
-| PDG | Full | All | User management, budgets  |
-| Supervisor | Full view | Own division | Team approval, local analytics |
-| HR | Hire/view | Assigned | Onboarding, compliance |
-| Marketer | Campaigns | Assigned | Events, geo-leads  |
-| Employee | Personal | Assigned | Timesheets, projects |
-
-## Model Extensions Exemple
-Add to `configurations` app:
-```python
-class Circusale(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=CASCADE)
-    name = models.CharField(max_length=100)
-    address = models.PointField()  # PostGIS
-    budget = models.DecimalField()
-
-class TenantUser(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    tenant = models.ForeignKey(Tenant)
-    circusale = models.ForeignKey(Circusale)
-    role = models.CharField(choices=[('pdg', 'PDG'), ('supervisor', 'Supervisor'), ...])
+Key Integrations:
+- Stripe Connect (escrow payments, subscriptions)
+- Sumsub/Onfido (KYC/IDV verification)
+- DocuSign (e-signatures)
+- Twilio (SMS)
+- SendGrid (email)
+- Calendly (interview scheduling)
 ```
 
-## Activation Path
-Enable django-tenants middleware (Phase 1), migrate tenant/circusale models, add RBAC signals for auto-role assignment. This creates true enterprise SaaS—each tenant operates independently with internal hierarchy, driving $100M scale through Fortune 500 adoption. 
+---
 
+## Multi-Tenancy Architecture
+
+### Schema Structure
+- **Public schema**: Shared data (Plans, Features, GlobalConfigs)
+- **Tenant schemas**: Isolated per-tenant data (HR, ATS, users)
+
+### Tenant Hierarchy
+```
+Tenant (Enterprise)
+    └── Circusale (Business Unit/Division)
+            └── Users (with roles)
+```
+
+### Key Models
+```python
+# Tenant = Enterprise with subdomain (e.g., acme.zumodra.com)
+# Circusale = Location/division with PostGIS coordinates
+# TenantUser = User with role assignment per tenant/circusale
+```
+
+### Role Hierarchy (Per Tenant)
+```
+SuperAdmin (platform-wide)
+├── TenantAdmin (full tenant control)
+├── RHAdmin (HR operations + analytics)
+├── Recruiter (ATS pipelines + candidates)
+├── HiringManager (own jobs + team candidates)
+├── RHOperational (absences + onboarding only)
+└── Viewer (read-only dashboards)
+```
+
+---
+
+## Core Feature Domains
+
+### 1. Two-Level Verification System
+- **Level 1 (KYC)**: ID + selfie + liveness for candidates; business KYC for employers
+- **Level 2 (Career)**: Employment verification emails + education verification
+- Statuses: `UNVERIFIED`, `PENDING`, `VERIFIED`, `DISPUTED`
+
+### 2. Hybrid Ranking Engine
+```
+MatchScore = w_r * RuleScore + w_a * AIScore + w_v * VerificationScore + w_t * TrustScore
+```
+- RuleScore: Boolean filters, hard constraints, keyword matching
+- AIScore: Semantic similarity, skills graph, pattern detection
+- Weights are tenant-configurable
+
+### 3. Trust System
+- Multi-dimension trust scores for candidates, employers, schools
+- AI-assisted review verification for negative reviews
+- Badges: "ID Verified", "Career Verified", "High Trust"
+
+### 4. Freelance Marketplace with Escrow
+- Stripe Connect delayed payouts (escrow-style)
+- Workflow: Post -> Fund -> Deliver -> Accept/Dispute -> Payout
+- KYC required for both parties before transactions
+
+### 5. Progressive Data Revelation
+```
+Stage 1: Name, photo, experience summary, skills, city
+Stage 2 (after "Interested"): Phone, LinkedIn, availability, salary
+Stage 3 (post-interview): Full address, references, work eligibility
+Stage 4 (offer accepted): NAS/SSN, medical docs, emergency contacts
+```
+
+### 6. Multi-Circuit Talent Management
+1. External Recruitment (public job boards)
+2. Internal Mobility (current employees)
+3. Talent Pool/Alumni (former candidates/employees)
+4. Freelancers/Contractors (mission-based)
+
+### 7. Co-op/Student Ecosystem
+- Streams: University Co-op, College Co-op, Junior Internships, Apprenticeships
+- School-Employer-Student triad with approval workflows
+- Academic verification integration
+
+---
+
+## Django Apps Structure
+
+| App | Purpose |
+|-----|---------|
+| `tenants` / `main` | Tenant lifecycle, plans, billing, domain mapping |
+| `accounts` / `custom_account_u` | Users, roles, permissions, KYC status |
+| `ats` | Jobs, applications, pipelines, matching engine |
+| `hr_core` | Employees, absences, schedules, resignations |
+| `documents` | Contracts, e-signatures, secure storage |
+| `analytics` | Diversity metrics, workforce health, reporting |
+| `integrations` | Stripe, KYC providers, DocuSign, email, SMS |
+| `services` | Freelance marketplace services |
+| `finance` | Escrow, payments, subscriptions |
+| `messages` | Real-time messaging (WebSockets) |
+| `marketing` / `newsletter` | Campaigns, events, newsletters |
+| `configurations` | Platform settings, skills taxonomy |
+
+---
+
+## Critical Development Rules
+
+### Multi-Tenant Safety
+```python
+# ALWAYS scope queries by tenant
+# NEVER use raw queries without tenant context
+# Celery tasks MUST carry tenant_id and switch schema
+
+# Good:
+queryset = Model.objects.filter(tenant=request.tenant)
+
+# Bad:
+queryset = Model.objects.all()  # Cross-tenant data leak!
+```
+
+### Security Requirements
+- All admin/HR roles require TOTP 2FA
+- Sensitive fields (NAS, salary, medical) encrypted at rest (AES-256)
+- CSRF protection on all state-changing endpoints
+- Rate limiting on auth endpoints
+- Audit logging for security-critical actions
+
+### API Design
+- Use DRF serializers with proper validation
+- JWT for external API access (48h expiry)
+- Session auth for internal web flows
+- Always check permissions per request
+
+### Database Migrations
+- Every schema change needs a Django migration
+- Test migrations on both public and tenant schemas
+- Never modify production data directly
+
+---
+
+## Key Business Logic
+
+### Subscription Plans
+| Plan | Price | Features |
+|------|-------|----------|
+| Starter | €15/user | 3 pipelines, basic ATS, email only |
+| Pro | €25/user | Unlimited pipelines, CV parsing, SMS |
+| Business | €35/user | Multi-circuits, e-signature, analytics |
+| Enterprise | Custom | SSO, API, dedicated support |
+
+### Verification Flow
+1. User uploads ID + selfie
+2. System sends to Sumsub/Onfido
+3. Async Celery task processes result
+4. Status updated, badge assigned
+5. For Level 2: automated emails to employers/schools
+
+### Escrow Payment Flow
+1. Client funds milestone -> Stripe captures funds
+2. Funds held in platform (delayed payout)
+3. Freelancer delivers via platform
+4. Client accepts -> payout released
+5. Dispute -> AI analysis + evidence collection -> resolution
+
+---
+
+## File Structure Conventions
+
+```
+zumodra/
+├── apps/                    # Django applications
+│   ├── tenants/
+│   ├── accounts/
+│   ├── ats/
+│   └── ...
+├── config/                  # Project settings
+│   ├── settings/
+│   │   ├── base.py
+│   │   ├── local.py
+│   │   └── production.py
+│   ├── urls.py
+│   └── wsgi.py
+├── templates/               # Django templates
+├── static/                  # Static files
+├── docs/                    # Documentation
+│   └── FEATURES.md          # Complete feature specification
+├── docker/                  # Docker configurations
+├── .env.example             # Environment variables template
+└── CLAUDE.md                # This file
+```
+
+---
+
+## Common Patterns
+
+### Creating a Tenant-Scoped View
+```python
+from django_tenants.utils import get_tenant_model
+
+class MyView(LoginRequiredMixin, View):
+    def get(self, request):
+        tenant = request.tenant
+        # All queries automatically scoped to tenant schema
+        items = MyModel.objects.all()  # Only returns tenant's data
+        return render(request, 'template.html', {'items': items})
+```
+
+### Creating a Celery Task with Tenant Context
+```python
+from celery import shared_task
+from django_tenants.utils import schema_context
+
+@shared_task
+def process_verification(tenant_schema, user_id):
+    with schema_context(tenant_schema):
+        user = User.objects.get(id=user_id)
+        # Process within tenant context
+```
+
+### HTMX Partial Update Pattern
+```html
+<!-- In template -->
+<div id="candidate-list" hx-get="/candidates/" hx-trigger="load">
+    Loading...
+</div>
+
+<!-- View returns partial -->
+def candidate_list(request):
+    candidates = Candidate.objects.filter(...)
+    return render(request, 'partials/candidate_list.html', {'candidates': candidates})
+```
+
+---
+
+## Environment Variables
+
+Key variables required (see `.env.example`):
+```
+DATABASE_URL=postgres://...
+REDIS_URL=redis://...
+SECRET_KEY=...
+STRIPE_SECRET_KEY=...
+STRIPE_PUBLISHABLE_KEY=...
+SUMSUB_API_KEY=...
+DOCUSIGN_API_KEY=...
+SENDGRID_API_KEY=...
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+```
+
+---
+
+## Testing Requirements
+
+- Target: ≥90% coverage on core apps
+- Run: `pytest` or `python manage.py test`
+- Always test:
+  - Tenant isolation (no cross-tenant leaks)
+  - Permission checks (role-based access)
+  - Verification flows
+  - Payment flows
+
+---
+
+## What NOT to Do
+
+1. **Never bypass tenant isolation** - All queries must be tenant-scoped
+2. **Never store secrets in code** - Use environment variables
+3. **Never skip migrations** - Database changes need migrations
+4. **Never expose PII in logs** - Sanitize sensitive data
+5. **Never allow cross-tenant joins** - Schemas are isolated
+6. **Never commit .env files** - Only .env.example
+7. **Never use debug mode in production** - Security risk
+8. **Never skip CSRF protection** - Required for all forms
+9. **Never trust user input** - Always validate and sanitize
+10. **Never use raw SQL without parameterization** - SQL injection risk
+
+---
+
+## Quick Reference: Common Tasks
+
+### Add a new model
+1. Create model in appropriate app
+2. Add to `TENANT_APPS` or `SHARED_APPS` in settings
+3. Run `python manage.py makemigrations`
+4. Run `python manage.py migrate_schemas`
+
+### Add a new API endpoint
+1. Create serializer in `serializers.py`
+2. Create viewset in `views.py`
+3. Register in `urls.py`
+4. Add permission classes
+5. Test tenant isolation
+
+### Add a new Celery task
+1. Create task in `tasks.py`
+2. Include tenant_schema parameter
+3. Use `schema_context` wrapper
+4. Register in Celery beat if scheduled
+
+### Deploy changes
+1. Push to feature branch
+2. Open PR, wait for CI
+3. Merge after approval
+4. CI deploys to staging
+5. Manual approval for production
+
+---
+
+## Documentation Reference
+
+For complete feature specifications, see:
+- [docs/FEATURES.md](docs/FEATURES.md) - Full platform documentation (23 sections)
+
+This includes:
+- All feature details
+- Technical architecture
+- Product roadmap
+- Go-to-market strategy
+- Security and compliance
+- Build execution prompts
+- QA procedures
+
+---
+
+## Contact
+
+**Company**: Rhematek Solutions
+**CEO**: Stephane Arthur Victor
+**Platform**: Zumodra ATS/RH
