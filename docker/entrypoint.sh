@@ -9,24 +9,32 @@
 set -e
 
 # -----------------------------------------------------------------------------
-# Configuration
+# Configuration - Read from environment with sensible defaults
 # -----------------------------------------------------------------------------
-DB_HOST="${DB_HOST:-postgres-primary}"
-DB_DEFAULT_PORT="${DB_DEFAULT_PORT:-5432}"
+# Database configuration - supports both DB_PORT and DB_DEFAULT_PORT
+# Priority: DB_PORT > DB_DEFAULT_PORT > default 5432
+DB_HOST="${DB_HOST:-localhost}"
+DB_PORT="${DB_PORT:-${DB_DEFAULT_PORT:-5432}}"
+DB_NAME="${DB_NAME:-${DB_DEFAULT_NAME:-zumodra}}"
 DB_USER="${DB_USER:-postgres}"
-DB_DEFAULT_NAME="${DB_DEFAULT_NAME:-zumodra}"
-MAX_DB_RETRIES="${MAX_DB_RETRIES:-60}"
-DB_RETRY_INTERVAL="${DB_RETRY_INTERVAL:-2}"
+DB_PASSWORD="${DB_PASSWORD:-}"
 
-REDIS_URL="${REDIS_URL:-redis://redis-master:6379/0}"
-MAX_REDIS_RETRIES="${MAX_REDIS_RETRIES:-30}"
-REDIS_RETRY_INTERVAL="${REDIS_RETRY_INTERVAL:-2}"
+# Redis configuration
+REDIS_URL="${REDIS_URL:-redis://localhost:6379/0}"
 
+# RabbitMQ configuration
 RABBITMQ_HOST="${RABBITMQ_HOST:-rabbitmq}"
 RABBITMQ_PORT="${RABBITMQ_PORT:-5672}"
+
+# Retry configuration
+MAX_DB_RETRIES="${MAX_DB_RETRIES:-60}"
+DB_RETRY_INTERVAL="${DB_RETRY_INTERVAL:-2}"
+MAX_REDIS_RETRIES="${MAX_REDIS_RETRIES:-30}"
+REDIS_RETRY_INTERVAL="${REDIS_RETRY_INTERVAL:-2}"
 MAX_RABBITMQ_RETRIES="${MAX_RABBITMQ_RETRIES:-30}"
 RABBITMQ_RETRY_INTERVAL="${RABBITMQ_RETRY_INTERVAL:-2}"
 
+# Service configuration
 SERVICE_TYPE="${SERVICE_TYPE:-web}"
 SKIP_MIGRATIONS="${SKIP_MIGRATIONS:-false}"
 SKIP_COLLECTSTATIC="${SKIP_COLLECTSTATIC:-false}"
@@ -36,6 +44,7 @@ CREATE_DEMO_TENANT="${CREATE_DEMO_TENANT:-false}"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # -----------------------------------------------------------------------------
@@ -53,85 +62,229 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
+log_debug() {
+    echo -e "${CYAN}[DEBUG]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
+
+# -----------------------------------------------------------------------------
+# Print Configuration (for diagnosis)
+# -----------------------------------------------------------------------------
+print_config() {
+    log_info "=========================================="
+    log_info "Zumodra Entrypoint - Configuration"
+    log_info "=========================================="
+    log_info "Service Type: ${SERVICE_TYPE}"
+    log_info ""
+    log_info "Database Configuration (from env):"
+    log_info "  DB_HOST     = ${DB_HOST}"
+    log_info "  DB_PORT     = ${DB_PORT}"
+    log_info "  DB_NAME     = ${DB_NAME}"
+    log_info "  DB_USER     = ${DB_USER}"
+    log_info "  DB_PASSWORD = ${DB_PASSWORD:+[SET]}${DB_PASSWORD:-[NOT SET]}"
+    log_info ""
+    log_info "Redis Configuration:"
+    log_info "  REDIS_URL   = ${REDIS_URL}"
+    log_info ""
+    if [[ "$SERVICE_TYPE" == "celery"* ]]; then
+        log_info "RabbitMQ Configuration:"
+        log_info "  RABBITMQ_HOST = ${RABBITMQ_HOST}"
+        log_info "  RABBITMQ_PORT = ${RABBITMQ_PORT}"
+        log_info ""
+    fi
+    log_info "=========================================="
+}
+
+# -----------------------------------------------------------------------------
+# Check Database Connection (with verbose error reporting)
+# -----------------------------------------------------------------------------
+check_db() {
+    python3 << 'PYEOF'
+import os
+import sys
+
+# Read from environment (same vars the entrypoint uses)
+host = os.environ.get("DB_HOST", "localhost")
+# Support both DB_PORT and DB_DEFAULT_PORT
+port = os.environ.get("DB_PORT", os.environ.get("DB_DEFAULT_PORT", "5432"))
+name = os.environ.get("DB_NAME", os.environ.get("DB_DEFAULT_NAME", "zumodra"))
+user = os.environ.get("DB_USER", "postgres")
+password = os.environ.get("DB_PASSWORD", "")
+
+try:
+    port = int(port)
+except ValueError:
+    print(f"[DB-CHECK] Invalid port value: {port}")
+    sys.exit(1)
+
+# Try psycopg (v3) first, fall back to psycopg2
+driver = None
+try:
+    import psycopg
+    driver = "psycopg3"
+except ImportError:
+    try:
+        import psycopg2 as psycopg
+        driver = "psycopg2"
+    except ImportError:
+        print("[DB-CHECK] Neither psycopg nor psycopg2 is installed!")
+        sys.exit(1)
+
+try:
+    if driver == "psycopg3":
+        conn = psycopg.connect(
+            host=host,
+            port=port,
+            dbname=name,
+            user=user,
+            password=password,
+            connect_timeout=5,
+        )
+    else:
+        conn = psycopg.connect(
+            host=host,
+            port=port,
+            dbname=name,
+            user=user,
+            password=password,
+            connect_timeout=5,
+        )
+    with conn.cursor() as cur:
+        cur.execute("SELECT 1;")
+    conn.close()
+    sys.exit(0)
+except Exception as e:
+    print(f"[DB-CHECK] Failed to connect to {host}:{port}/{name} as {user}: {e}")
+    sys.exit(1)
+PYEOF
+}
+
 # -----------------------------------------------------------------------------
 # Wait for PostgreSQL
 # -----------------------------------------------------------------------------
 wait_for_postgres() {
-    log_info "Waiting for PostgreSQL at ${DB_HOST}:${DB_DEFAULT_PORT}..."
+    log_info "Waiting for PostgreSQL at ${DB_HOST}:${DB_PORT}/${DB_NAME}..."
 
     local retries=0
     while [ $retries -lt $MAX_DB_RETRIES ]; do
-        # Try to connect using pg_isready if available, otherwise use Python
-        if command -v pg_isready &> /dev/null; then
-            if pg_isready -h "$DB_HOST" -p "$DB_DEFAULT_PORT" -U "$DB_USER" -d "$DB_DEFAULT_NAME" -q; then
-                log_info "PostgreSQL is ready!"
-                return 0
-            fi
+        retries=$((retries + 1))
+
+        # Run the check and capture output
+        if output=$(check_db 2>&1); then
+            log_info "PostgreSQL is ready at ${DB_HOST}:${DB_PORT}/${DB_NAME}"
+            return 0
         else
-            # Use Python to check database connection
-            if python -c "
-import sys
-import psycopg2
-try:
-    conn = psycopg2.connect(
-        host='$DB_HOST',
-        port='$DB_DEFAULT_PORT',
-        user='$DB_USER',
-        dbname='$DB_DEFAULT_NAME',
-        connect_timeout=5
-    )
-    conn.close()
-    sys.exit(0)
-except Exception:
-    sys.exit(1)
-" 2>/dev/null; then
-                log_info "PostgreSQL is ready!"
-                return 0
+            # Show the actual error on every 5th attempt or the first attempt
+            if [ $retries -eq 1 ] || [ $((retries % 5)) -eq 0 ]; then
+                log_warn "PostgreSQL not ready (attempt ${retries}/${MAX_DB_RETRIES})"
+                if [ -n "$output" ]; then
+                    log_debug "$output"
+                fi
+            else
+                log_warn "PostgreSQL not ready (attempt ${retries}/${MAX_DB_RETRIES})..."
             fi
         fi
 
-        retries=$((retries + 1))
-        log_warn "PostgreSQL not ready yet (attempt $retries/$MAX_DB_RETRIES)..."
         sleep $DB_RETRY_INTERVAL
     done
 
-    log_error "Failed to connect to PostgreSQL after $MAX_DB_RETRIES attempts"
+    log_error "Failed to connect to PostgreSQL at ${DB_HOST}:${DB_PORT}/${DB_NAME} after ${MAX_DB_RETRIES} attempts"
+    log_error "Please verify:"
+    log_error "  1. Database host '${DB_HOST}' is reachable from this container"
+    log_error "  2. PostgreSQL is running on port ${DB_PORT}"
+    log_error "  3. Database '${DB_NAME}' exists"
+    log_error "  4. User '${DB_USER}' has access with the provided password"
     return 1
+}
+
+# -----------------------------------------------------------------------------
+# Check Redis Connection (with verbose error reporting)
+# -----------------------------------------------------------------------------
+check_redis() {
+    python3 << 'PYEOF'
+import os
+import sys
+
+redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
+try:
+    import redis
+except ImportError:
+    print("[REDIS-CHECK] redis-py is not installed!")
+    sys.exit(1)
+
+try:
+    r = redis.from_url(redis_url, socket_connect_timeout=5)
+    r.ping()
+    sys.exit(0)
+except Exception as e:
+    print(f"[REDIS-CHECK] Failed to connect to {redis_url}: {e}")
+    sys.exit(1)
+PYEOF
 }
 
 # -----------------------------------------------------------------------------
 # Wait for Redis
 # -----------------------------------------------------------------------------
 wait_for_redis() {
-    log_info "Waiting for Redis..."
-
-    # Extract host and port from REDIS_URL
-    local redis_host=$(echo "$REDIS_URL" | sed -E 's|redis://([^:]+):([0-9]+)/.*|\1|')
-    local redis_port=$(echo "$REDIS_URL" | sed -E 's|redis://([^:]+):([0-9]+)/.*|\2|')
+    log_info "Waiting for Redis at ${REDIS_URL}..."
 
     local retries=0
     while [ $retries -lt $MAX_REDIS_RETRIES ]; do
-        if python -c "
-import sys
-import redis
-try:
-    r = redis.from_url('$REDIS_URL', socket_connect_timeout=5)
-    r.ping()
-    sys.exit(0)
-except Exception:
-    sys.exit(1)
-" 2>/dev/null; then
+        retries=$((retries + 1))
+
+        if output=$(check_redis 2>&1); then
             log_info "Redis is ready!"
             return 0
+        else
+            if [ $retries -eq 1 ] || [ $((retries % 5)) -eq 0 ]; then
+                log_warn "Redis not ready (attempt ${retries}/${MAX_REDIS_RETRIES})"
+                if [ -n "$output" ]; then
+                    log_debug "$output"
+                fi
+            else
+                log_warn "Redis not ready (attempt ${retries}/${MAX_REDIS_RETRIES})..."
+            fi
         fi
 
-        retries=$((retries + 1))
-        log_warn "Redis not ready yet (attempt $retries/$MAX_REDIS_RETRIES)..."
         sleep $REDIS_RETRY_INTERVAL
     done
 
-    log_error "Failed to connect to Redis after $MAX_REDIS_RETRIES attempts"
+    log_error "Failed to connect to Redis at ${REDIS_URL} after ${MAX_REDIS_RETRIES} attempts"
     return 1
+}
+
+# -----------------------------------------------------------------------------
+# Check RabbitMQ Connection (with verbose error reporting)
+# -----------------------------------------------------------------------------
+check_rabbitmq() {
+    python3 << 'PYEOF'
+import os
+import sys
+import socket
+
+host = os.environ.get("RABBITMQ_HOST", "rabbitmq")
+port_str = os.environ.get("RABBITMQ_PORT", "5672")
+
+try:
+    port = int(port_str)
+except ValueError:
+    print(f"[RABBITMQ-CHECK] Invalid port value: {port_str}")
+    sys.exit(1)
+
+try:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(5)
+    result = sock.connect_ex((host, port))
+    sock.close()
+    if result == 0:
+        sys.exit(0)
+    else:
+        print(f"[RABBITMQ-CHECK] Connection refused to {host}:{port} (error code: {result})")
+        sys.exit(1)
+except Exception as e:
+    print(f"[RABBITMQ-CHECK] Failed to connect to {host}:{port}: {e}")
+    sys.exit(1)
+PYEOF
 }
 
 # -----------------------------------------------------------------------------
@@ -142,29 +295,26 @@ wait_for_rabbitmq() {
 
     local retries=0
     while [ $retries -lt $MAX_RABBITMQ_RETRIES ]; do
-        # Simple TCP check using Python
-        if python -c "
-import sys
-import socket
-try:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
-    result = sock.connect_ex(('$RABBITMQ_HOST', $RABBITMQ_PORT))
-    sock.close()
-    sys.exit(0 if result == 0 else 1)
-except Exception:
-    sys.exit(1)
-" 2>/dev/null; then
+        retries=$((retries + 1))
+
+        if output=$(check_rabbitmq 2>&1); then
             log_info "RabbitMQ is ready!"
             return 0
+        else
+            if [ $retries -eq 1 ] || [ $((retries % 5)) -eq 0 ]; then
+                log_warn "RabbitMQ not ready (attempt ${retries}/${MAX_RABBITMQ_RETRIES})"
+                if [ -n "$output" ]; then
+                    log_debug "$output"
+                fi
+            else
+                log_warn "RabbitMQ not ready (attempt ${retries}/${MAX_RABBITMQ_RETRIES})..."
+            fi
         fi
 
-        retries=$((retries + 1))
-        log_warn "RabbitMQ not ready yet (attempt $retries/$MAX_RABBITMQ_RETRIES)..."
         sleep $RABBITMQ_RETRY_INTERVAL
     done
 
-    log_error "Failed to connect to RabbitMQ after $MAX_RABBITMQ_RETRIES attempts"
+    log_error "Failed to connect to RabbitMQ at ${RABBITMQ_HOST}:${RABBITMQ_PORT} after ${MAX_RABBITMQ_RETRIES} attempts"
     return 1
 }
 
@@ -206,7 +356,7 @@ run_collectstatic() {
     log_info "Collecting static files..."
 
     # Check if static directory is writable
-    if [ -w "/app/static" ]; then
+    if [ -w "/app/static" ] || [ -w "/app" ]; then
         if python manage.py collectstatic --noinput --clear 2>/dev/null; then
             log_info "Static files collected successfully!"
         else
@@ -260,9 +410,8 @@ bootstrap_demo_tenant() {
 # Main Entrypoint Logic
 # -----------------------------------------------------------------------------
 main() {
-    log_info "=========================================="
-    log_info "Zumodra Entrypoint - Service: $SERVICE_TYPE"
-    log_info "=========================================="
+    # Print configuration for diagnosis
+    print_config
 
     # Wait for required services
     wait_for_postgres || exit 1

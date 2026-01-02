@@ -9,10 +9,13 @@ x-common-env: &common-env
   DEBUG: ${DEBUG:-True}
   SECRET_KEY: ${SECRET_KEY:-development-secret-key-change-in-production}
   DB_ENGINE: django.contrib.gis.db.backends.postgis
+  # Database env vars - entrypoint supports both DB_NAME/DB_PORT and DB_DEFAULT_NAME/DB_DEFAULT_PORT
+  DB_NAME: ${DB_NAME:-${DB_DEFAULT_NAME:-zumodra}}
   DB_DEFAULT_NAME: ${DB_DEFAULT_NAME:-zumodra}
   DB_USER: ${DB_USER:-postgres}
   DB_PASSWORD: ${DB_PASSWORD:-zumodra_dev_password}
   DB_HOST: db
+  DB_PORT: "5432"
   DB_DEFAULT_PORT: "5432"
   REDIS_URL: redis://redis:6379/0
   CELERY_BROKER_URL: amqp://${RABBITMQ_USER:-zumodra}:${RABBITMQ_PASSWORD:-zumodra_dev_password}@rabbitmq:5672/zumodra
