@@ -30,15 +30,17 @@ Zumodra is a comprehensive multi-tenant platform that combines:
 git clone https://github.com/rhematek/zumodra.git
 cd zumodra
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
+# Configure environment (DEVELOPMENT)
+cp .env.dev.example .env
+# Edit .env with your credentials (see "Database Configuration" below)
 
 # Start all services
 docker compose up -d
 
-# Run migrations
-docker compose exec web python manage.py migrate
+# The entrypoint automatically handles:
+# - Waiting for database/redis/rabbitmq
+# - Running migrations
+# - Collecting static files
 
 # Create superuser
 docker compose exec web python manage.py createsuperuser
@@ -51,6 +53,66 @@ docker compose exec web python manage.py bootstrap_demo_tenant
 # API Docs: http://localhost:8000/api/docs/
 # Admin: http://localhost:8000/admin-panel/
 ```
+
+### Production Deployment (Dokploy/Coolify)
+
+```bash
+# Use production compose file
+cp .env.prod.example .env
+# Edit .env with REAL production secrets
+
+docker compose -f docker-compose.prod.yml up -d
+```
+
+---
+
+## Database Configuration
+
+The entrypoint script and Django both use the same environment variables. Set these correctly and everything works.
+
+### Required Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DB_HOST` | PostgreSQL hostname | `db` (dev) / `postgres-primary` (prod) |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_NAME` | Database name | `zumodra` |
+| `DB_USER` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `your-strong-password` |
+
+### How It Works
+
+1. **Docker Compose** passes these env vars to the `web` container
+2. **Entrypoint script** logs them on startup for diagnosis:
+   ```
+   [INFO] Database Configuration (from env):
+   [INFO]   DB_HOST     = db
+   [INFO]   DB_PORT     = 5432
+   [INFO]   DB_NAME     = zumodra
+   [INFO]   DB_USER     = postgres
+   [INFO]   DB_PASSWORD = [SET]
+   ```
+3. **Django** reads the same vars in `settings.py`
+
+### Troubleshooting "password authentication failed"
+
+If you see this error:
+1. Check that `DB_PASSWORD` in your `.env` matches `POSTGRES_PASSWORD` in the Postgres container
+2. Check that `DB_USER` matches `POSTGRES_USER`
+3. Check the entrypoint logs to see what values are actually being used
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `.env.dev.example` | Development environment template |
+| `.env.prod.example` | Production environment template |
+| `docker/Dockerfile` | Development Dockerfile |
+| `docker/Dockerfile.prod` | Production Dockerfile (with entrypoint) |
+| `docker-compose.yml` | Development compose |
+| `docker-compose.prod.yml` | Production compose |
+
+---
 
 ### Demo Tenant
 

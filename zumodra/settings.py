@@ -298,16 +298,26 @@ ASGI_APPLICATION = 'zumodra.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# =============================================================================
+# DATABASE ENV VARS - Supports both short and legacy names:
+#   DB_NAME / DB_DEFAULT_NAME  - Database name (default: zumodra)
+#   DB_PORT / DB_DEFAULT_PORT  - Database port (default: 5432)
+#   DB_HOST                    - Database host (default: localhost)
+#   DB_USER                    - Database user (default: postgres)
+#   DB_PASSWORD                - Database password (required)
+# =============================================================================
 
 DATABASES = {
     'default': {
         # Use django-tenants database backend wrapper for PostGIS
         'ENGINE': 'django_tenants.postgresql_backend',
-        'NAME': env('DB_DEFAULT_NAME', default='zumodra'),
+        # Support both DB_NAME and DB_DEFAULT_NAME (DB_NAME takes priority)
+        'NAME': env('DB_NAME', default=env('DB_DEFAULT_NAME', default='zumodra')),
         'USER': env('DB_USER', default='postgres'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_DEFAULT_PORT', default='5433'),
+        # Support both DB_PORT and DB_DEFAULT_PORT (DB_PORT takes priority)
+        'PORT': env('DB_PORT', default=env('DB_DEFAULT_PORT', default='5432')),
     }
 }
 
