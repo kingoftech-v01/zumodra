@@ -1,22 +1,89 @@
 {% extends "account/base.html" %}
+{% load i18n static %}
 
-{% load i18n %}
-
-{% block head_title %}{% trans "Confirm Access" %}{% endblock head_title %}
+{% block head_title %}{% trans "Confirm Access" %} - Zumodra{% endblock %}
 
 {% block content %}
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-shield-warning text-3xl text-yellow-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Confirm Your Identity" %}</h1>
+    <p class="text-gray-600">{% trans "Please enter your password to continue" %}</p>
+</div>
 
-<h1>{% trans "Confirm Access" %}</h1>
+{# Security Notice #}
+<div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-shield-check text-yellow-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-yellow-700">
+            {% trans "To safeguard the security of your account, please enter your password to verify it's really you." %}
+        </div>
+    </div>
+</div>
 
-<p>{% blocktranslate %}To safeguard the security of your account, please enter your password:{% endblocktranslate %}</p>
+<form method="POST" action="{% url 'account_reauthenticate' %}" class="space-y-4">
+    {% csrf_token %}
 
-<form class="reauthenticate" method="POST" action="{% url 'account_reauthenticate' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <button type="submit">{% trans "Confirm" %}</button>
+    {# Password Field #}
+    <div>
+        <label for="id_password" class="block text-sm font-medium text-gray-700 mb-1">
+            {% trans "Password" %}
+        </label>
+        <div class="relative" x-data="{ showPassword: false }">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <span class="ph-bold ph-lock text-lg"></span>
+            </span>
+            <input :type="showPassword ? 'text' : 'password'"
+                   name="password"
+                   id="id_password"
+                   class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors {% if form.password.errors %}border-red-500{% endif %}"
+                   placeholder="{% trans 'Enter your password' %}"
+                   autocomplete="current-password"
+                   autofocus
+                   required>
+            <button type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <span class="ph-bold ph-eye text-lg" x-show="!showPassword"></span>
+                <span class="ph-bold ph-eye-slash text-lg" x-show="showPassword" x-cloak></span>
+            </button>
+        </div>
+        {% if form.password.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    {# Submit Button #}
+    <button type="submit"
+            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200">
+        <span class="ph-bold ph-check-circle text-lg"></span>
+        {% trans "Confirm" %}
+    </button>
 </form>
 
+{# Form Errors #}
+{% if form.non_field_errors %}
+<div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Forgot Password Link #}
+<div class="mt-6 text-center">
+    <a href="{% url 'account_reset_password' %}" class="text-blue-600 hover:underline text-sm">
+        {% trans "Forgot your password?" %}
+    </a>
+</div>
 {% endblock content %}

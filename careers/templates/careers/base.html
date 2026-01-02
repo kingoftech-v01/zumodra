@@ -32,34 +32,11 @@
     <link rel="icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
     {% endif %}
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
-
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '{{ site.primary_color|default:"#3B82F6" }}',
-                        secondary: '{{ site.secondary_color|default:"#1E40AF" }}',
-                        accent: '{{ site.accent_color|default:"#10B981" }}',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Local Icon Font -->
+    <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}">
 
     <!-- Dynamic CSS Variables for Branding -->
     <style>

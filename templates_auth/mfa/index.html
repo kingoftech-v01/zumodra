@@ -1,47 +1,182 @@
 {% extends "account/base.html" %}
-{% load i18n %}
-{% block head_title %}
-    {% trans "Two-Factor Authentication" %}
-{% endblock head_title %}
+{% load i18n static %}
+
+{% block head_title %}{% trans "Two-Factor Authentication" %} - Zumodra{% endblock %}
+
 {% block content %}
-    <h1>{% trans "Two-Factor Authentication" %}</h1>
-    <section class="totp">
-        <h2>{% translate "Authenticator App" %}</h2>
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-shield-check text-3xl text-green-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Two-Factor Authentication" %}</h1>
+    <p class="text-gray-600">{% trans "Add an extra layer of security to your account" %}</p>
+</div>
+
+{# Security Status Banner #}
+{% if authenticators.totp %}
+<div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-check-circle text-green-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-green-700">
+            {% trans "Your account is protected with two-factor authentication." %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning text-yellow-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-yellow-700">
+            {% trans "Two-factor authentication is not enabled. We strongly recommend enabling it for better security." %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Authenticator App Section #}
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-4">
+    <div class="p-5 border-b border-gray-100">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span class="ph-bold ph-device-mobile text-2xl text-blue-600"></span>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-lg font-semibold text-gray-900 mb-1">{% trans "Authenticator App" %}</h2>
+                <p class="text-sm text-gray-600">
+                    {% trans "Use an authenticator app like Google Authenticator, Authy, or 1Password to generate verification codes." %}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="px-5 py-4 bg-gray-50">
         {% if authenticators.totp %}
-            <p>{% translate "Authentication using an authenticator app is active." %}</p>
-            <ul class="actions">
-                <li>
-                    <a href="{% url 'mfa_deactivate_totp' %}">{% translate "Deactivate" %}</a>
-                </li>
-            </ul>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    <span class="ph-bold ph-check-circle text-sm"></span>
+                    {% trans "Active" %}
+                </span>
+                <span class="text-sm text-gray-600">{% trans "Authenticator app is enabled" %}</span>
+            </div>
+            <a href="{% url 'mfa_deactivate_totp' %}"
+               class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <span class="ph-bold ph-x-circle text-base"></span>
+                {% trans "Deactivate" %}
+            </a>
+        </div>
         {% else %}
-            <p>{% translate "An authenticator app is not active." %}</p>
-            <ul class="actions">
-                <li>
-                    <a href="{% url 'mfa_activate_totp' %}">{% translate "Activate" %}</a>
-                </li>
-            </ul>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600">
+                    <span class="ph-bold ph-minus-circle text-sm"></span>
+                    {% trans "Not Active" %}
+                </span>
+                <span class="text-sm text-gray-600">{% trans "Authenticator app is not set up" %}</span>
+            </div>
+            <a href="{% url 'mfa_activate_totp' %}"
+               class="inline-flex items-center gap-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                <span class="ph-bold ph-plus-circle text-base"></span>
+                {% trans "Activate" %}
+            </a>
+        </div>
         {% endif %}
-    </section>
-    <section class="recovery_codes">
-        <h2>{% translate "Recovery Codes" %}</h2>
+    </div>
+</div>
+
+{# Recovery Codes Section #}
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6">
+    <div class="p-5 border-b border-gray-100">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span class="ph-bold ph-lifebuoy text-2xl text-purple-600"></span>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-lg font-semibold text-gray-900 mb-1">{% trans "Recovery Codes" %}</h2>
+                <p class="text-sm text-gray-600">
+                    {% trans "Recovery codes can be used to access your account if you lose access to your authenticator app." %}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="px-5 py-4 bg-gray-50">
         {% if authenticators.recovery_codes %}
-            <p>
-                {% blocktranslate with total_count=authenticators.recovery_codes.generate_codes|length count unused_count=authenticators.recovery_codes.get_unused_codes|length %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
-            </p>
-            <ul class="actions">
-                <li>
-                    <a href="{% url 'mfa_view_recovery_codes' %}">{% translate "View codes" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'mfa_download_recovery_codes' %}">{% translate "Download codes" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'mfa_generate_recovery_codes' %}">{% translate "Generate new codes" %}</a>
-                </li>
-            </ul>
+        <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-2">
+                {% with unused=authenticators.recovery_codes.get_unused_codes|length total=authenticators.recovery_codes.generate_codes|length %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {% if unused > 3 %}bg-green-100 text-green-700{% elif unused > 0 %}bg-yellow-100 text-yellow-700{% else %}bg-red-100 text-red-700{% endif %}">
+                    <span class="ph-bold ph-hash text-sm"></span>
+                    {{ unused }} / {{ total }}
+                </span>
+                <span class="text-sm text-gray-600">
+                    {% blocktrans count unused_count=unused %}{{ unused_count }} code remaining{% plural %}{{ unused_count }} codes remaining{% endblocktrans %}
+                </span>
+                {% endwith %}
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'mfa_view_recovery_codes' %}"
+                   class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-gray-100 rounded-lg transition-colors">
+                    <span class="ph-bold ph-eye text-base"></span>
+                    {% trans "View" %}
+                </a>
+                <a href="{% url 'mfa_download_recovery_codes' %}"
+                   class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-gray-100 rounded-lg transition-colors">
+                    <span class="ph-bold ph-download-simple text-base"></span>
+                    {% trans "Download" %}
+                </a>
+                <a href="{% url 'mfa_generate_recovery_codes' %}"
+                   class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <span class="ph-bold ph-arrows-clockwise text-base"></span>
+                    {% trans "Regenerate" %}
+                </a>
+            </div>
+        </div>
         {% else %}
-            <p>{% translate "No recovery codes set up." %}</p>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600">
+                    <span class="ph-bold ph-minus-circle text-sm"></span>
+                    {% trans "Not Set Up" %}
+                </span>
+                <span class="text-sm text-gray-600">{% trans "No recovery codes generated" %}</span>
+            </div>
+            {% if authenticators.totp %}
+            <a href="{% url 'mfa_generate_recovery_codes' %}"
+               class="inline-flex items-center gap-1 px-4 py-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors">
+                <span class="ph-bold ph-plus-circle text-base"></span>
+                {% trans "Generate Codes" %}
+            </a>
+            {% endif %}
+        </div>
         {% endif %}
-    </section>
+    </div>
+</div>
+
+{# Security Tips #}
+<div class="bg-gray-50 rounded-xl p-5">
+    <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <span class="ph-bold ph-lightbulb text-yellow-500"></span>
+        {% trans "Security Tips" %}
+    </h3>
+    <ul class="space-y-2 text-sm text-gray-600">
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-check text-green-500 mt-0.5"></span>
+            {% trans "Store recovery codes in a secure location, separate from your phone." %}
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-check text-green-500 mt-0.5"></span>
+            {% trans "Use a password manager that supports 2FA codes for convenience." %}
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-check text-green-500 mt-0.5"></span>
+            {% trans "Regenerate recovery codes if you suspect they've been compromised." %}
+        </li>
+    </ul>
+</div>
+
+{# Back to Account #}
+<div class="mt-6 text-center">
+    <a href="{% url 'account_change_password' %}" class="text-blue-600 hover:underline text-sm">
+        {% trans "Back to Account Settings" %}
+    </a>
+</div>
 {% endblock content %}

@@ -1,46 +1,156 @@
 {% extends "account/base.html" %}
-
-{% load i18n %}
+{% load i18n static %}
 {% load account socialaccount %}
 
-{% block head_title %}{% trans "Sign In" %}{% endblock head_title %}
+{% block head_title %}{% trans "Sign In" %} - Zumodra{% endblock %}
 
 {% block content %}
-
-<h1>{% trans "Sign In" %}</h1>
+<div class="text-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Welcome Back!" %}</h1>
+    <p class="text-gray-600">{% trans "Sign in to access your dashboard" %}</p>
+</div>
 
 {% get_providers as socialaccount_providers %}
 
+{# Social Login Buttons #}
 {% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one
-of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
-
-<div class="socialaccount_ballot">
-
-  <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  </ul>
-
-  <div class="login-or">{% trans 'or' %}</div>
-
+<div class="space-y-3 mb-6">
+    {% for provider in socialaccount_providers %}
+    <a href="{% provider_login_url provider.id process='login' %}"
+       class="flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+        {% if provider.id == 'google' %}
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span class="text-gray-700 font-medium">{% trans "Continue with Google" %}</span>
+        {% elif provider.id == 'linkedin' or provider.id == 'linkedin_oauth2' %}
+        <svg class="w-5 h-5 text-[#0A66C2]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+        <span class="text-gray-700 font-medium">{% trans "Continue with LinkedIn" %}</span>
+        {% else %}
+        <span class="ph-bold ph-user text-gray-500"></span>
+        <span class="text-gray-700 font-medium">{% blocktrans with name=provider.name %}Continue with {{ name }}{% endblocktrans %}</span>
+        {% endif %}
+    </a>
+    {% endfor %}
 </div>
 
-{% include "socialaccount/snippets/login_extra.html" %}
-
-{% else %}
-<p>{% blocktrans %}If you have not created an account yet, then please
-<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+{# Divider #}
+<div class="relative my-6">
+    <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-200"></div>
+    </div>
+    <div class="relative flex justify-center text-sm">
+        <span class="px-4 bg-white text-gray-500">{% trans "or continue with email" %}</span>
+    </div>
+</div>
 {% endif %}
 
-<form class="login" method="POST" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+{# Login Form #}
+<form method="POST" action="{% url 'account_login' %}" class="space-y-4">
+    {% csrf_token %}
+
+    {# Email Field #}
+    <div>
+        <label for="id_login" class="block text-sm font-medium text-gray-700 mb-1">
+            {% trans "Email address" %}
+        </label>
+        <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <span class="ph-bold ph-envelope text-lg"></span>
+            </span>
+            <input type="email"
+                   name="login"
+                   id="id_login"
+                   class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                   placeholder="{% trans 'you@example.com' %}"
+                   autocomplete="email"
+                   required>
+        </div>
+        {% if form.login.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.login.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    {# Password Field #}
+    <div>
+        <div class="flex items-center justify-between mb-1">
+            <label for="id_password" class="block text-sm font-medium text-gray-700">
+                {% trans "Password" %}
+            </label>
+            <a href="{% url 'account_reset_password' %}" class="text-sm text-blue-600 hover:text-blue-700 hover:underline">
+                {% trans "Forgot password?" %}
+            </a>
+        </div>
+        <div class="relative" x-data="{ showPassword: false }">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <span class="ph-bold ph-lock text-lg"></span>
+            </span>
+            <input :type="showPassword ? 'text' : 'password'"
+                   name="password"
+                   id="id_password"
+                   class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                   placeholder="{% trans 'Enter your password' %}"
+                   autocomplete="current-password"
+                   required>
+            <button type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <span class="ph-bold ph-eye text-lg" x-show="!showPassword"></span>
+                <span class="ph-bold ph-eye-slash text-lg" x-show="showPassword" x-cloak></span>
+            </button>
+        </div>
+        {% if form.password.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    {# Remember Me #}
+    <div class="flex items-center">
+        <input type="checkbox"
+               name="remember"
+               id="id_remember"
+               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+        <label for="id_remember" class="ml-2 text-sm text-gray-600">
+            {% trans "Remember me" %}
+        </label>
+    </div>
+
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    {# Submit Button #}
+    <button type="submit"
+            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200">
+        <span class="ph-bold ph-sign-in text-lg"></span>
+        {% trans "Sign In" %}
+    </button>
 </form>
 
-{% endblock content %}
+{# Form Errors #}
+{% if form.non_field_errors %}
+<div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Sign Up Link #}
+<p class="mt-6 text-center text-gray-600">
+    {% trans "Don't have an account?" %}
+    <a href="{% url 'account_signup' %}" class="text-blue-600 font-semibold hover:underline">
+        {% trans "Sign up" %}
+    </a>
+</p>
+{% endblock %}

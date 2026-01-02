@@ -1,0 +1,231 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dispute Opened" %}{% endblock %}
+
+{% block preheader_text %}{% trans "A dispute has been opened regarding your project." %}{% endblock %}
+
+{% block email_content %}
+{# Alert header #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <span style="display: inline-block; width: 64px; height: 64px; background-color: #fef2f2; border-radius: 50%; text-align: center; line-height: 64px; font-size: 32px;">&#9888;</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 600; color: #1e293b; line-height: 1.3; text-align: center;">
+                {% trans "Dispute Opened" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6;">
+                {% blocktrans %}Hi {{ recipient_name }}, a dispute has been opened regarding <strong>{{ project_title }}</strong>. Please review the details and respond as soon as possible.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Dispute details card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #991b1b; text-transform: uppercase; letter-spacing: 0.5px;">
+                            {% trans "Dispute Details" %}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            {# Dispute ID #}
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #7f1d1d;">{% trans "Dispute ID" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Courier New', monospace; font-size: 14px; font-weight: 600; color: #7f1d1d;">#{{ dispute_id }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Opened By #}
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #7f1d1d;">{% trans "Opened By" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #7f1d1d;">{{ opened_by_name }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Amount in Dispute #}
+                            <tr>
+                                <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #7f1d1d;">{% trans "Amount in Dispute" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; color: #7f1d1d;">{{ dispute_amount }} {{ currency }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Reason #}
+                            <tr>
+                                <td style="padding: 12px 0;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #7f1d1d;">{% trans "Reason" %}</span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #7f1d1d;">{{ dispute_reason }}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Dispute description #}
+{% if dispute_description %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">
+                {% trans "Description" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="background-color: #f8fafc; border-radius: 8px; padding: 16px;">
+                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569; line-height: 1.6; font-style: italic;">
+                            "{{ dispute_description }}"
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+{# What to do next #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 20px 0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "What You Need to Do" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #dc2626; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">1</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Review the dispute details carefully" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #dc2626; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">2</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Gather any evidence or documentation to support your case" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #dc2626; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">3</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% blocktrans %}Respond within {{ response_deadline_days }} days to avoid automatic resolution{% endblocktrans %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Response deadline warning #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="vertical-align: top; width: 24px;">
+                        <span style="font-size: 18px;">&#9203;</span>
+                    </td>
+                    <td style="padding-left: 12px;">
+                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #92400e; line-height: 1.5;">
+                            <strong>{% trans "Response Deadline" %}</strong><br>
+                            {% blocktrans %}You must respond by <strong>{{ response_deadline|date:"F j, Y" }}</strong> or the dispute may be resolved without your input.{% endblocktrans %}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 24px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #dc2626; border-radius: 6px;">
+                        <a href="{{ dispute_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "Respond to Dispute" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because a dispute was opened regarding your project on Zumodra Marketplace." %}
+{% endblock %}

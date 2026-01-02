@@ -1,0 +1,164 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Application Received" %}{% endblock %}
+
+{% block preheader_text %}{% trans "We've received your application and will review it shortly." %}{% endblock %}
+
+{% block email_content %}
+{# Greeting #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 600; color: #1e293b; line-height: 1.3;">
+                {% trans "Application Received!" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6;">
+                {% blocktrans %}Hi {{ candidate_name }}, thank you for applying to <strong>{{ job_title }}</strong> at <strong>{{ company_name }}</strong>. We've received your application and will review it shortly.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Application details card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f8fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                            {% trans "Position Applied For" %}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                            {{ job_title }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding-right: 24px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">
+                                        {% trans "Company" %}
+                                    </span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; font-weight: 500;">
+                                        {{ company_name }}
+                                    </span>
+                                </td>
+                                <td style="padding-right: 24px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">
+                                        {% trans "Location" %}
+                                    </span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; font-weight: 500;">
+                                        {{ job_location|default:"Remote" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">
+                                        {% trans "Applied" %}
+                                    </span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; font-weight: 500;">
+                                        {{ application_date|date:"M d, Y" }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# What's next #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "What Happens Next?" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">1</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Our team will review your application within 3-5 business days" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">2</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "If your profile matches our requirements, we'll reach out to schedule an interview" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 28px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 24px; height: 24px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 24px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">3</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "You can track your application status in your dashboard" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 10px 0 20px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #2563eb; border-radius: 6px;">
+                        <a href="{{ dashboard_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "View Application Status" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because you applied for a position through Zumodra." %}
+{% endblock %}

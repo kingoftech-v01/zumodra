@@ -1,0 +1,75 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n account %}
+
+{% block title %}{% trans "Confirm Your Email Address" %}{% endblock %}
+
+{% block preheader_text %}{% trans "Please confirm your email to complete your Zumodra registration." %}{% endblock %}
+
+{% block email_content %}
+{% user_display user as user_display %}
+
+{# Greeting #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 600; color: #1e293b; line-height: 1.3;">
+                {% trans "Welcome to Zumodra!" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6;">
+                {% blocktrans %}Hi {{ user_display }}, thank you for signing up! Please confirm your email address by clicking the button below.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 20px 0 30px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #2563eb; border-radius: 6px;">
+                        <a href="{{ activate_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "Confirm Email Address" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Alternative link #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b; line-height: 1.6;">
+                {% trans "Or copy and paste this link into your browser:" %}
+            </p>
+            <p style="margin: 10px 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #2563eb; word-break: break-all;">
+                {{ activate_url }}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Security note #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f8fafc; border-radius: 6px; padding: 16px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b; line-height: 1.5;">
+                <strong style="color: #475569;">{% trans "Didn't create an account?" %}</strong><br>
+                {% trans "If you didn't sign up for Zumodra, you can safely ignore this email." %}
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because you signed up for a Zumodra account." %}
+{% endblock %}

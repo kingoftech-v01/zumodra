@@ -93,11 +93,14 @@ celery -A zumodra beat --loglevel=info
 - Two-Factor Authentication (mandatory)
 - JWT API authentication with token rotation
 - Brute force protection (django-axes)
-- Content Security Policy headers
+- **Strict Content Security Policy** - No external CDN dependencies
+- **Local-only assets** - All CSS/JS/fonts/icons served from staticfiles
 - Admin honeypot protection
 - Comprehensive audit logging
 - Rate limiting per user tier
 - Input sanitization and XSS prevention
+
+> See [SECURITY.md](SECURITY.md) for the complete security policy including CSP configuration.
 
 ---
 
@@ -115,8 +118,9 @@ celery -A zumodra beat --loglevel=info
 
 ### Frontend
 - Django Templates with HTMX
-- Alpine.js for interactivity
-- Tailwind CSS
+- Alpine.js for interactivity (local, no CDN)
+- Tailwind CSS (pre-compiled, local)
+- Phosphor Icons / Icomoon (local icon fonts)
 - Wagtail CMS
 
 ### Infrastructure
@@ -143,13 +147,49 @@ zumodra/
 ├── integrations/       # Third-party integrations
 ├── tenants/            # Multi-tenant management
 ├── api/                # REST API infrastructure
-├── core/               # Shared utilities
-├── security/           # Security middleware
+├── core/               # Shared utilities & security middleware
 ├── templates/          # Django templates
+├── templates_auth/     # Allauth & MFA templates
+├── staticfiles/        # Static assets (CSS, JS, fonts, icons)
 ├── tests/              # Test suite
 ├── docker/             # Docker configurations
 ├── docs/               # Documentation
 └── zumodra/            # Django project settings
+```
+
+### Template Structure
+
+```
+templates/
+├── base/
+│   ├── unified_base.html    # Root base template (no CDN)
+│   ├── base_auth.html       # Auth pages base
+│   ├── dashboard_base.html  # Dashboard base
+│   └── public_base.html     # Public pages base
+├── components/              # Reusable UI components
+├── emails/                  # HTML email templates
+│   ├── base/base_email.html # Email base template
+│   ├── auth/                # Auth emails
+│   ├── ats/                 # ATS notifications
+│   └── marketplace/         # Marketplace emails
+└── errors/                  # Error pages (500, 503)
+
+templates_auth/
+├── account/                 # Allauth templates
+├── mfa/                     # MFA/2FA templates
+└── socialaccount/           # Social auth templates
+```
+
+### Static Assets (Local Only)
+
+```
+staticfiles/
+├── assets/
+│   ├── js/vendor/           # Alpine.js, HTMX, Chart.js, SortableJS
+│   ├── css/                 # Icomoon icons, Leaflet styles
+│   └── fonts/               # Local web fonts
+└── dist/
+    └── output-tailwind.css  # Pre-compiled Tailwind CSS
 ```
 
 ---

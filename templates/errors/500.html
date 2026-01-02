@@ -7,31 +7,8 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{% trans "Server Error" %} - Zumodra</title>
 
-    <!-- Tailwind CSS (inline for reliability during errors) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
     <style>
         [x-cloak] { display: none !important; }
         @keyframes pulse-slow {
@@ -39,6 +16,16 @@
             50% { opacity: 0.5; }
         }
         .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+        /* Primary color utilities for error page */
+        .text-primary-400 { color: #60a5fa; }
+        .text-primary-500 { color: #3b82f6; }
+        .text-primary-600 { color: #2563eb; }
+        .text-primary-700 { color: #1d4ed8; }
+        .bg-primary-600 { background-color: #2563eb; }
+        .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .focus\:ring-primary-500:focus { --tw-ring-color: #3b82f6; }
+        .hover\:text-primary-300:hover { color: #93c5fd; }
+        .hover\:text-primary-700:hover { color: #1d4ed8; }
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
@@ -148,7 +135,7 @@
         </footer>
     </div>
 
-    <!-- Alpine.js for dark mode -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Local Alpine.js -->
+    <script defer src="{% static 'assets/js/vendor/alpine.min.js' %}"></script>
 </body>
 </html>

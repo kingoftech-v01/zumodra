@@ -1,13 +1,89 @@
-{% extends "mfa/recovery_codes/base.html" %}
-{% load i18n %}
+{% extends "account/base.html" %}
+{% load i18n static %}
+
+{% block head_title %}{% trans "Generate Recovery Codes" %} - Zumodra{% endblock %}
+
 {% block content %}
-    <h1>{% translate "Recovery Codes" %}</h1>
-    <p>
-        {% blocktranslate %}You are about to generate a new set of recovery codes for your account. This action will invalidate your existing codes. Are you sure?{% endblocktranslate %}
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-arrows-clockwise text-3xl text-yellow-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Generate New Recovery Codes" %}</h1>
+    <p class="text-gray-600">{% trans "Create a new set of recovery codes for your account" %}</p>
+</div>
+
+{# Warning Notice #}
+<div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning text-yellow-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-yellow-700">
+            <p class="font-semibold mb-1">{% trans "This will invalidate existing codes" %}</p>
+            <p>{% trans "Your current recovery codes will no longer work after generating new ones." %}</p>
+        </div>
+    </div>
+</div>
+
+{# What Happens #}
+<div class="bg-gray-50 rounded-xl p-5 mb-6">
+    <h3 class="font-semibold text-gray-900 mb-3">{% trans "What happens when you generate new codes:" %}</h3>
+    <ul class="space-y-2 text-sm text-gray-600">
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-x-circle text-red-500 mt-0.5"></span>
+            {% trans "All existing recovery codes will be invalidated" %}
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-check-circle text-green-500 mt-0.5"></span>
+            {% trans "A new set of 10 recovery codes will be created" %}
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-check-circle text-green-500 mt-0.5"></span>
+            {% trans "You'll be able to download or copy the new codes" %}
+        </li>
+    </ul>
+</div>
+
+<form method="POST" action="{% url 'mfa_generate_recovery_codes' %}" class="space-y-4">
+    {% csrf_token %}
+
+    {# Form fields #}
+    {% for field in form %}
+        {% if field.is_hidden %}
+            {{ field }}
+        {% endif %}
+    {% endfor %}
+
+    <div class="flex flex-col gap-3">
+        <button type="submit"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 transition-all duration-200">
+            <span class="ph-bold ph-arrows-clockwise text-lg"></span>
+            {% trans "Generate New Codes" %}
+        </button>
+        <a href="{% url 'mfa_index' %}"
+           class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-200">
+            <span class="ph-bold ph-arrow-left text-lg"></span>
+            {% trans "Cancel" %}
+        </a>
+    </div>
+</form>
+
+{# Form Errors #}
+{% if form.non_field_errors %}
+<div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Tip #}
+<div class="mt-8 text-center">
+    <p class="text-sm text-gray-500">
+        {% trans "After generating, make sure to save your new codes in a secure location." %}
     </p>
-    <form method="POST" action="{% url 'mfa_generate_recovery_codes' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">{% trans "Generate" %}</button>
-    </form>
+</div>
 {% endblock content %}

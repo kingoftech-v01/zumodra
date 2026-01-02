@@ -1,23 +1,118 @@
-{% extends "mfa/recovery_codes/base.html" %}
-{% load i18n %}
+{% extends "account/base.html" %}
+{% load i18n static %}
+
+{% block head_title %}{% trans "Recovery Codes" %} - Zumodra{% endblock %}
+
 {% block content %}
-    <h1>{% translate "Recovery Codes" %}</h1>
-    <p>
-        {% blocktranslate count unused_count=unused_codes|length %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
-    </p>
-    {% if unused_codes %}
-        <textarea class="recovery-codes" rows="{{ unused_codes|length }}" readonly>{% for code in unused_codes %}{{ code }}
-{% endfor %}
-</textarea>
-    {% endif %}
-    <ul class="actions">
-        {% if unused_codes %}
-            <li>
-                <a href="{% url 'mfa_download_recovery_codes' %}">{% translate "Download codes" %}</a>
-            </li>
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-lifebuoy text-3xl text-purple-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Recovery Codes" %}</h1>
+    <p class="text-gray-600">{% trans "Use these codes to access your account if you lose your phone" %}</p>
+</div>
+
+{# Status Banner #}
+<div class="mb-6 p-4 {% if unused_codes|length > 3 %}bg-green-50 border-l-4 border-green-500{% elif unused_codes|length > 0 %}bg-yellow-50 border-l-4 border-yellow-500{% else %}bg-red-50 border-l-4 border-red-500{% endif %} rounded-r-lg">
+    <div class="flex items-start">
+        {% if unused_codes|length > 3 %}
+        <span class="ph-bold ph-check-circle text-green-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-green-700">
+        {% elif unused_codes|length > 0 %}
+        <span class="ph-bold ph-warning text-yellow-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-yellow-700">
+        {% else %}
+        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
         {% endif %}
-        <li>
-            <a href="{% url 'mfa_generate_recovery_codes' %}">{% translate "Generate new codes" %}</a>
-        </li>
-    </ul>
+            {% blocktrans count unused_count=unused_codes|length %}There is {{ unused_count }} out of {{ total_count }} recovery codes remaining.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes remaining.{% endblocktrans %}
+        </div>
+    </div>
+</div>
+
+{# Recovery Codes Display #}
+{% if unused_codes %}
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6">
+    <div class="px-5 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+        <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+            <span class="ph-bold ph-key text-gray-600"></span>
+            {% trans "Your Recovery Codes" %}
+        </h2>
+        <button type="button"
+                onclick="copyRecoveryCodes()"
+                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-white border border-gray-300 rounded-lg transition-colors"
+                id="copy-btn">
+            <span class="ph-bold ph-copy text-base"></span>
+            {% trans "Copy" %}
+        </button>
+    </div>
+    <div class="p-5">
+        <div class="grid grid-cols-2 gap-3 font-mono text-center" id="recovery-codes">
+            {% for code in unused_codes %}
+            <div class="px-4 py-3 bg-gray-100 rounded-lg text-gray-800 text-sm tracking-wider">
+                {{ code }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{# Warning #}
+<div class="mb-6 p-4 bg-yellow-50 rounded-xl">
+    <div class="flex items-start gap-3">
+        <span class="ph-bold ph-warning text-yellow-600 text-xl flex-shrink-0"></span>
+        <div>
+            <h3 class="font-semibold text-yellow-800 mb-1">{% trans "Keep these codes safe" %}</h3>
+            <ul class="text-sm text-yellow-700 space-y-1">
+                <li>{% trans "Each code can only be used once" %}</li>
+                <li>{% trans "Store them in a secure location like a password manager" %}</li>
+                <li>{% trans "Don't share these codes with anyone" %}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-8 bg-gray-50 rounded-xl mb-6">
+    <span class="ph-bold ph-x-circle text-4xl text-gray-400 mb-3"></span>
+    <p class="text-gray-600">{% trans "No recovery codes available." %}</p>
+</div>
+{% endif %}
+
+{# Actions #}
+<div class="flex flex-col gap-3">
+    {% if unused_codes %}
+    <a href="{% url 'mfa_download_recovery_codes' %}"
+       class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200">
+        <span class="ph-bold ph-download-simple text-lg"></span>
+        {% trans "Download Codes" %}
+    </a>
+    {% endif %}
+    <a href="{% url 'mfa_generate_recovery_codes' %}"
+       class="w-full flex items-center justify-center gap-2 px-4 py-3 {% if unused_codes %}bg-gray-100 text-gray-700 hover:bg-gray-200{% else %}bg-purple-600 text-white hover:bg-purple-700{% endif %} font-semibold rounded-lg transition-all duration-200">
+        <span class="ph-bold ph-arrows-clockwise text-lg"></span>
+        {% trans "Generate New Codes" %}
+    </a>
+    <a href="{% url 'mfa_index' %}"
+       class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-200">
+        <span class="ph-bold ph-arrow-left text-lg"></span>
+        {% trans "Back to Security Settings" %}
+    </a>
+</div>
+
+<script>
+function copyRecoveryCodes() {
+    const codes = [];
+    document.querySelectorAll('#recovery-codes > div').forEach(el => {
+        codes.push(el.textContent.trim());
+    });
+    navigator.clipboard.writeText(codes.join('\n')).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="ph-bold ph-check text-base"></span> {% trans "Copied!" %}';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+        }, 2000);
+    });
+}
+</script>
 {% endblock content %}

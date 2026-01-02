@@ -1,0 +1,25 @@
+{% extends "emails/base/base_email.txt" %}
+{% load i18n %}
+
+{% block email_content %}
+{% trans "Email Change Request" %}
+{{ "=" | ljust:50 }}
+
+{% blocktrans %}Hi {{ user_name }},{% endblocktrans %}
+
+{% blocktrans %}You requested to change your email address to: {{ new_email }}{% endblocktrans %}
+
+{% trans "Please confirm this change by visiting the link below:" %}
+
+{{ confirmation_url }}
+
+{% trans "SECURITY NOTICE" %}
+{{ "-" | ljust:30 }}
+{% trans "If you did not request this change, please ignore this email and your email address will remain unchanged. Your account is still secure." %}
+
+{% trans "This confirmation link will expire in 24 hours." %}
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because an email change was requested for your Zumodra account." %}
+{% endblock %}

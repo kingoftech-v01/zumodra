@@ -1,0 +1,213 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Job Offer" %}{% endblock %}
+
+{% block preheader_text %}{% trans "Congratulations! You've received a job offer." %}{% endblock %}
+
+{% block email_content %}
+{# Celebration header #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding-bottom: 24px;">
+            <span style="font-size: 48px;">&#127881;</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; color: #1e293b; line-height: 1.3; text-align: center;">
+                {% trans "Congratulations!" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6; text-align: center;">
+                {% blocktrans %}{{ candidate_name }}, we are thrilled to extend an offer for the position of <strong>{{ job_title }}</strong> at <strong>{{ company_name }}</strong>.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Offer details card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">
+                            {% trans "Offer Details" %}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 20px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; color: #1e293b;">
+                            {{ job_title }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            {# Salary #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Compensation" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ salary }} {{ salary_currency }}/{{ salary_period }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Employment Type #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Employment Type" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ employment_type }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Start Date #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Start Date" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ start_date|date:"F j, Y" }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Location #}
+                            <tr>
+                                <td style="padding: 12px 0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Location" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ job_location|default:"Remote" }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Benefits summary #}
+{% if benefits %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "Benefits Package" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                {% for benefit in benefits %}
+                <tr>
+                    <td style="padding: 6px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 14px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 8px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">{{ benefit }}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+{# Response deadline #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #fef3c7; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="vertical-align: top; width: 24px;">
+                        <span style="font-size: 18px;">&#9203;</span>
+                    </td>
+                    <td style="padding-left: 12px;">
+                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #92400e; line-height: 1.5;">
+                            <strong>{% trans "Response Required" %}</strong><br>
+                            {% blocktrans %}Please respond to this offer by <strong>{{ response_deadline|date:"F j, Y" }}</strong>.{% endblocktrans %}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Buttons #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 24px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #22c55e; border-radius: 6px;">
+                        <a href="{{ accept_offer_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "View & Accept Offer" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <a href="{{ dashboard_url }}" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b; text-decoration: underline;">
+                {% trans "View full offer details in your dashboard" %}
+            </a>
+        </td>
+    </tr>
+</table>
+
+{# Contact info #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="border-top: 1px solid #e2e8f0; padding-top: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b; line-height: 1.6;">
+                {% trans "If you have any questions about this offer, please contact:" %}<br>
+                <a href="mailto:{{ recruiter_email }}" style="color: #2563eb; text-decoration: none;">{{ recruiter_name }}</a> ({{ recruiter_title }})
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because you've been extended a job offer through Zumodra." %}
+{% endblock %}

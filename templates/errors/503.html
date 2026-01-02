@@ -8,31 +8,8 @@
     <meta http-equiv="refresh" content="{{ refresh_interval|default:60 }}">
     <title>{% trans "Under Maintenance" %} - Zumodra</title>
 
-    <!-- Tailwind CSS (inline for reliability during maintenance) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
     <style>
         [x-cloak] { display: none !important; }
         @keyframes spin-slow {
@@ -45,6 +22,17 @@
             50% { transform: translateY(-10px); }
         }
         .animate-bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
+        /* Primary color utilities for maintenance page */
+        .text-primary-400 { color: #60a5fa; }
+        .text-primary-500 { color: #3b82f6; }
+        .text-primary-600 { color: #2563eb; }
+        .text-primary-700 { color: #1d4ed8; }
+        .bg-primary-600 { background-color: #2563eb; }
+        .hover\:bg-primary-700:hover { background-color: #1d4ed8; }
+        .hover\:text-primary-500:hover { color: #3b82f6; }
+        .focus\:ring-primary-500:focus { --tw-ring-color: #3b82f6; }
+        .from-primary-500 { --tw-gradient-from: #3b82f6; }
+        .to-primary-600 { --tw-gradient-to: #2563eb; }
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800"
@@ -225,7 +213,7 @@
         </footer>
     </div>
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Local Alpine.js -->
+    <script defer src="{% static 'assets/js/vendor/alpine.min.js' %}"></script>
 </body>
 </html>

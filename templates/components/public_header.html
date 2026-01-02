@@ -1,0 +1,239 @@
+{# =============================================================================
+   ZUMODRA PUBLIC HEADER COMPONENT
+   =============================================================================
+
+   File: templates/components/public_header.html
+   Purpose: Consolidated public header for non-dashboard pages
+
+   Usage:
+   {% include "components/public_header.html" %}
+   {% include "components/public_header.html" with transparent=True %}
+
+   Parameters:
+   - transparent: If True, header has transparent background (for hero sections)
+
+   NO CDN DEPENDENCIES - Uses local Phosphor icons
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-01
+   ============================================================================= #}
+
+{% load i18n static %}
+
+<header id="header" class="header sticky top-0 z-50 {% if transparent %}bg-transparent{% else %}bg-white shadow-md{% endif %} transition-all duration-300"
+        x-data="{ mobileMenuOpen: false, scrolled: false }"
+        x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 50 })"
+        :class="{ 'bg-white shadow-md': scrolled || !{{ transparent|default:'false' }} }">
+
+    <div class="header_inner flex items-center justify-between w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 border-b border-light">
+        {# Logo #}
+        <div class="left flex items-center gap-6 h-full">
+            <a href="{% url 'home' %}" class="flex items-center">
+                <img src="{% static 'assets/images/rhematekCS.png' %}"
+                     alt="Zumodra"
+                     class="logo-white md:h-[42px] h-8 w-auto"
+                     :class="{ 'hidden': scrolled && {{ transparent|default:'false' }} }" />
+                <img src="{% static 'assets/images/rhematekC.png' %}"
+                     alt="Zumodra"
+                     class="logo-black md:h-[42px] h-8 w-auto {% if transparent %}hidden{% endif %}"
+                     :class="{ 'block': scrolled || !{{ transparent|default:'false' }}, 'hidden': !scrolled && {{ transparent|default:'false' }} }" />
+            </a>
+        </div>
+
+        {# Desktop Navigation #}
+        <div class="right flex items-center gap-6 h-full">
+            <nav class="navigator h-full max-lg:hidden">
+                <ul class="list flex items-center gap-1 h-full">
+                    <li class="h-full relative">
+                        <a href="{% url 'home' %}"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'Home' %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'about' %}"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'About' %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <a href="#"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'For Candidates' %}</span>
+                            <span class="ph-bold ph-caret-down text-sm"></span>
+                        </a>
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-1"
+                             class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-line p-2 z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Jobs' %}</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Projects' %}</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Employers' %}</a>
+                            <hr class="my-2 border-line">
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Become a Seller' %}</a>
+                        </div>
+                    </li>
+                    <li class="h-full relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <a href="#"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'For Employers' %}</span>
+                            <span class="ph-bold ph-caret-down text-sm"></span>
+                        </a>
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-1"
+                             class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-line p-2 z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Candidates' %}</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Services' %}</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Post a Job' %}</a>
+                            <hr class="my-2 border-line">
+                            <a href="#" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Become a Buyer' %}</a>
+                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'wagtail_serve' '' %}"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'Blog' %}</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            {# Language Selector #}
+            <form action="{% url 'set_language' %}" method="post" class="max-sm:hidden">
+                {% csrf_token %}
+                <select name="language"
+                        onchange="this.form.submit()"
+                        class="text-sm border border-line rounded-lg px-3 py-2 bg-transparent {% if transparent %}text-white border-white/30{% else %}text-secondary{% endif %} cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+                        :class="{ 'text-secondary border-line': scrolled }">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% for lang_code, lang_name in LANGUAGES %}
+                    <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %} class="text-secondary bg-white">
+                        {{ lang_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="next" value="{{ request.path }}">
+            </form>
+
+            {# Auth Buttons #}
+            <div class="button-block flex items-center gap-3">
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}"
+                   class="flex items-center gap-2 px-4 py-2 rounded-lg {% if transparent %}text-white border border-white/30{% else %}text-primary border border-primary{% endif %} hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                   :class="{ 'text-primary border-primary': scrolled }">
+                    <span class="ph-bold ph-squares-four text-lg"></span>
+                    <span class="max-sm:hidden">{% trans 'Dashboard' %}</span>
+                </a>
+                <a href="{% url 'account_logout' %}"
+                   class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-300">
+                    <span class="ph-bold ph-sign-out text-lg"></span>
+                    <span class="max-sm:hidden">{% trans 'Sign Out' %}</span>
+                </a>
+                {% else %}
+                <a href="{% url 'account_login' %}"
+                   class="flex items-center gap-2 px-4 py-2 rounded-lg {% if transparent %}text-white border border-white/30{% else %}text-primary border border-primary{% endif %} hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 max-sm:hidden"
+                   :class="{ 'text-primary border-primary': scrolled }">
+                    <span class="ph-bold ph-sign-in text-lg"></span>
+                    <span>{% trans 'Sign In' %}</span>
+                </a>
+                <a href="{% url 'account_signup' %}"
+                   class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-300">
+                    <span class="ph-bold ph-user-plus text-lg max-sm:hidden"></span>
+                    <span>{% trans 'Get Started' %}</span>
+                </a>
+                {% endif %}
+            </div>
+
+            {# Mobile Menu Toggle #}
+            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface transition-all duration-300">
+                <span class="ph-bold ph-list text-2xl {% if transparent %}text-white{% else %}text-secondary{% endif %}"
+                      :class="{ 'text-secondary': scrolled }"
+                      x-show="!mobileMenuOpen"></span>
+                <span class="ph-bold ph-x text-2xl text-secondary" x-show="mobileMenuOpen" x-cloak></span>
+                <span class="sr-only">{% trans 'Toggle menu' %}</span>
+            </button>
+        </div>
+    </div>
+
+    {# Mobile Menu #}
+    <div x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-4"
+         @click.outside="mobileMenuOpen = false"
+         class="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-line z-50"
+         x-cloak>
+        <nav class="container py-4">
+            <ul class="space-y-1">
+                <li>
+                    <a href="{% url 'home' %}" class="block px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span class="ph-bold ph-house mr-3"></span>{% trans 'Home' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'about' %}" class="block px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span class="ph-bold ph-info mr-3"></span>{% trans 'About' %}
+                    </a>
+                </li>
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded" class="flex items-center justify-between w-full px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span><span class="ph-bold ph-user mr-3"></span>{% trans 'For Candidates' %}</span>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded" x-collapse class="pl-8 space-y-1 mt-1">
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Jobs' %}</a></li>
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Projects' %}</a></li>
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Employers' %}</a></li>
+                    </ul>
+                </li>
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded" class="flex items-center justify-between w-full px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span><span class="ph-bold ph-buildings mr-3"></span>{% trans 'For Employers' %}</span>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded" x-collapse class="pl-8 space-y-1 mt-1">
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Candidates' %}</a></li>
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Services' %}</a></li>
+                        <li><a href="#" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Post a Job' %}</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{% url 'wagtail_serve' '' %}" class="block px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span class="ph-bold ph-article mr-3"></span>{% trans 'Blog' %}
+                    </a>
+                </li>
+            </ul>
+
+            {# Mobile Auth #}
+            {% if not user.is_authenticated %}
+            <div class="mt-4 pt-4 border-t border-line space-y-2">
+                <a href="{% url 'account_login' %}" class="block w-full px-4 py-3 text-center text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-all">
+                    {% trans 'Sign In' %}
+                </a>
+                <a href="{% url 'account_signup' %}" class="block w-full px-4 py-3 text-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-all">
+                    {% trans 'Get Started' %}
+                </a>
+            </div>
+            {% endif %}
+        </nav>
+    </div>
+</header>

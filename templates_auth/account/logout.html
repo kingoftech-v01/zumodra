@@ -1,21 +1,41 @@
 {% extends "account/base.html" %}
+{% load i18n static %}
 
-{% load i18n %}
-
-{% block head_title %}{% trans "Sign Out" %}{% endblock head_title %}
+{% block head_title %}{% trans "Sign Out" %} - Zumodra{% endblock %}
 
 {% block content %}
-<h1>{% trans "Sign Out" %}</h1>
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-sign-out text-3xl text-blue-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Sign Out" %}</h1>
+    <p class="text-gray-600">{% trans "Are you sure you want to sign out?" %}</p>
+</div>
 
-<p>{% trans 'Are you sure you want to sign out?' %}</p>
+<form method="POST" action="{% url 'account_logout' %}" class="space-y-4">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
 
-<form method="post" action="{% url 'account_logout' %}">
-  {% csrf_token %}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-  {% endif %}
-  <button type="submit">{% trans 'Sign Out' %}</button>
+    <div class="flex flex-col gap-3">
+        <button type="submit"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-200">
+            <span class="ph-bold ph-sign-out text-lg"></span>
+            {% trans "Yes, Sign Out" %}
+        </button>
+
+        <a href="/"
+           class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-200">
+            <span class="ph-bold ph-arrow-left text-lg"></span>
+            {% trans "No, Go Back" %}
+        </a>
+    </div>
 </form>
 
-
-{% endblock content %}
+<div class="mt-8 text-center">
+    <p class="text-sm text-gray-500">
+        {% trans "Thanks for using Zumodra. See you next time!" %}
+    </p>
+</div>
+{% endblock %}

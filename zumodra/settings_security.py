@@ -238,21 +238,24 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # CONTENT SECURITY POLICY
 # =============================================================================
 # Used by django-csp middleware 4.0+
-# This provides default secure settings; override in main settings.py as needed
+# STRICT CSP: No external CDN, fonts, or third-party assets allowed
+# All assets must be served from 'self' (local staticfiles)
 
 CONTENT_SECURITY_POLICY_DEFAULTS = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
         'script-src': ("'self'",),
-        'style-src': ("'self'",),
-        'img-src': ("'self'", "data:", "https:"),
+        'style-src': ("'self'", "'unsafe-inline'",),  # unsafe-inline for Alpine.js
+        'img-src': ("'self'", "data:", "blob:",),
         'font-src': ("'self'",),
-        'connect-src': ("'self'", "wss:"),
+        'connect-src': ("'self'", "wss:",),  # wss: for WebSocket
         'frame-src': ("'none'",),
         'object-src': ("'none'",),
         'base-uri': ("'self'",),
         'form-action': ("'self'",),
         'frame-ancestors': ("'none'",),
+        'media-src': ("'self'",),
+        'worker-src': ("'self'", "blob:",),
         'upgrade-insecure-requests': True,
     }
 }
@@ -293,15 +296,15 @@ BRUTE_FORCE_LOCKOUT_THRESHOLDS = [
 # =============================================================================
 
 SECURITY_HEADERS = {
-    # Content Security Policy
+    # Content Security Policy - STRICT: No external CDN/assets
     'CSP_ENABLED': True,
     'CSP_REPORT_ONLY': False,
     'CSP_REPORT_URI': None,
     'CSP_DIRECTIVES': {
         'default-src': ["'self'"],
         'script-src': ["'self'"],
-        'style-src': ["'self'"],
-        'img-src': ["'self'", "data:", "https:"],
+        'style-src': ["'self'", "'unsafe-inline'"],  # unsafe-inline for Alpine.js
+        'img-src': ["'self'", "data:", "blob:"],
         'font-src': ["'self'"],
         'connect-src': ["'self'", "wss:"],
         'frame-src': ["'none'"],
@@ -309,6 +312,8 @@ SECURITY_HEADERS = {
         'base-uri': ["'self'"],
         'form-action': ["'self'"],
         'frame-ancestors': ["'none'"],
+        'media-src': ["'self'"],
+        'worker-src': ["'self'", "blob:"],
         'upgrade-insecure-requests': [],
     },
 

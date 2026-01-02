@@ -1,11 +1,53 @@
 {% extends "account/base.html" %}
+{% load i18n static %}
 
-{% load i18n %}
-
-{% block head_title %}{% trans "Account Inactive" %}{% endblock head_title %}
+{% block head_title %}{% trans "Account Inactive" %} - Zumodra{% endblock %}
 
 {% block content %}
-<h1>{% trans "Account Inactive" %}</h1>
+<div class="text-center mb-6">
+    <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+        <span class="ph-bold ph-user-minus text-3xl text-red-600"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Account Inactive" %}</h1>
+    <p class="text-gray-600">{% trans "This account is currently inactive." %}</p>
+</div>
 
-<p>{% trans "This account is inactive." %}</p>
+{# Info Message #}
+<div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
+            {% trans "Your account has been deactivated. This may be due to inactivity, policy violation, or at your request." %}
+        </div>
+    </div>
+</div>
+
+{# What to do #}
+<div class="bg-gray-50 rounded-xl p-5 mb-6">
+    <h3 class="font-semibold text-gray-900 mb-3">{% trans "What can you do?" %}</h3>
+    <ul class="space-y-2 text-sm text-gray-600">
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-envelope text-blue-500 mt-0.5"></span>
+            {% trans "Contact our support team to reactivate your account" %}
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="ph-bold ph-user-plus text-blue-500 mt-0.5"></span>
+            {% trans "Create a new account if you're eligible" %}
+        </li>
+    </ul>
+</div>
+
+{# Actions #}
+<div class="flex flex-col gap-3">
+    <a href="mailto:support@zumodra.com"
+       class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200">
+        <span class="ph-bold ph-envelope text-lg"></span>
+        {% trans "Contact Support" %}
+    </a>
+    <a href="{% url 'account_login' %}"
+       class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-200">
+        <span class="ph-bold ph-arrow-left text-lg"></span>
+        {% trans "Back to Sign In" %}
+    </a>
+</div>
 {% endblock content %}

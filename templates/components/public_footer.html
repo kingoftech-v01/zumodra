@@ -1,0 +1,182 @@
+{# =============================================================================
+   ZUMODRA PUBLIC FOOTER COMPONENT
+   =============================================================================
+
+   File: templates/components/public_footer.html
+   Purpose: Consolidated public footer for all pages
+
+   Usage:
+   {% include "components/public_footer.html" %}
+
+   NO CDN DEPENDENCIES - Uses local Phosphor icons
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-01
+   ============================================================================= #}
+
+{% load i18n static %}
+
+<footer class="footer mt-auto bg-feature">
+    <div class="container">
+        {# Footer Top - Logo & Social #}
+        <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light/20">
+            <a href="{% url 'home' %}" class="footer_logo">
+                <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="h-[42px] w-auto" />
+            </a>
+            <div class="list_social flex flex-wrap items-center gap-4">
+                <span class="text-subtitle text-white">{% trans 'Follow Us:' %}</span>
+                <div class="list flex flex-wrap items-center gap-3">
+                    <a href="https://www.facebook.com/zumodra" target="_blank" rel="noopener noreferrer"
+                       class="w-10 h-10 flex items-center justify-center border border-light/30 text-white rounded-full duration-300 hover:bg-white hover:text-black"
+                       aria-label="Facebook">
+                        <span class="ph-fill ph-facebook-logo text-lg"></span>
+                    </a>
+                    <a href="https://www.linkedin.com/company/zumodra" target="_blank" rel="noopener noreferrer"
+                       class="w-10 h-10 flex items-center justify-center border border-light/30 text-white rounded-full duration-300 hover:bg-white hover:text-black"
+                       aria-label="LinkedIn">
+                        <span class="ph-fill ph-linkedin-logo text-lg"></span>
+                    </a>
+                    <a href="https://www.twitter.com/zumodra" target="_blank" rel="noopener noreferrer"
+                       class="w-10 h-10 flex items-center justify-center border border-light/30 text-white rounded-full duration-300 hover:bg-white hover:text-black"
+                       aria-label="Twitter">
+                        <span class="ph-fill ph-twitter-logo text-lg"></span>
+                    </a>
+                    <a href="https://www.instagram.com/zumodra" target="_blank" rel="noopener noreferrer"
+                       class="w-10 h-10 flex items-center justify-center border border-light/30 text-white rounded-full duration-300 hover:bg-white hover:text-black"
+                       aria-label="Instagram">
+                        <span class="ph-fill ph-instagram-logo text-lg"></span>
+                    </a>
+                    <a href="https://www.youtube.com/@zumodra" target="_blank" rel="noopener noreferrer"
+                       class="w-10 h-10 flex items-center justify-center border border-light/30 text-white rounded-full duration-300 hover:bg-white hover:text-black"
+                       aria-label="YouTube">
+                        <span class="ph-fill ph-youtube-logo text-lg"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {# Footer Content - Navigation Columns #}
+        <div class="footer_content flex max-xl:flex-wrap items-start justify-between gap-y-8 md:py-10 py-7">
+            {# Categories #}
+            <div class="footer_nav max-md:w-1/2">
+                <strong class="nav_heading text-button-sm text-white">{% trans 'Categories' %}</strong>
+                <ul class="list_nav flex flex-col gap-3 mt-4">
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Graphics & Design' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Digital Marketing' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Writing & Translation' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Video & Animation' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Music & Audio' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Programming & Tech' %}</a></li>
+                </ul>
+            </div>
+
+            {# For Candidates #}
+            <div class="footer_nav max-md:w-1/2">
+                <strong class="nav_heading text-button-sm text-white">{% trans 'For Candidates' %}</strong>
+                <ul class="list_nav flex flex-col gap-3 mt-4">
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Candidate Dashboard' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Browse Jobs' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Browse Employers' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'My Proposals' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'My Services' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Job Alerts' %}</a></li>
+                </ul>
+            </div>
+
+            {# For Employers #}
+            <div class="footer_nav max-md:w-1/2">
+                <strong class="nav_heading text-button-sm text-white">{% trans 'For Employers' %}</strong>
+                <ul class="list_nav flex flex-col gap-3 mt-4">
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Employer Dashboard' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Browse Candidates' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Browse Services' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Submit Jobs' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'My Jobs' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Job Applicants' %}</a></li>
+                </ul>
+            </div>
+
+            {# Support #}
+            <div class="footer_nav max-md:w-1/2">
+                <strong class="nav_heading text-button-sm text-white">{% trans 'Support' %}</strong>
+                <ul class="list_nav flex flex-col gap-3 mt-4">
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Help & Support' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Selling on Zumodra' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Buying on Zumodra' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'about' %}">{% trans 'About Us' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'FAQs' %}</a></li>
+                    <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans 'Contact Us' %}</a></li>
+                </ul>
+            </div>
+
+            {# Newsletter & App Download #}
+            <div class="flex-shrink-0 max-xl:w-full">
+                <div class="company-contact sm:w-[340px]">
+                    {# Newsletter Signup #}
+                    <strong class="heading block text-button-sm text-white">{% trans 'Subscribe to Newsletter' %}</strong>
+                    <form class="send-block mt-4 flex items-center h-[46px] rounded-lg overflow-hidden"
+                          hx-post="{% url 'newsletter_subscribe' %}"
+                          hx-swap="outerHTML"
+                          hx-target="this">
+                        {% csrf_token %}
+                        <input class="caption1 text-secondary h-full w-full pr-4 pl-3 bg-white"
+                               type="email"
+                               name="email"
+                               placeholder="{% trans 'Your email address' %}"
+                               required
+                               aria-label="{% trans 'Email address' %}" />
+                        <button type="submit"
+                                class="flex items-center justify-center w-[46px] h-[46px] bg-primary flex-shrink-0 hover:bg-primary/90 transition-colors"
+                                aria-label="{% trans 'Subscribe' %}">
+                            <span class="ph-bold ph-paper-plane-tilt text-white text-lg"></span>
+                        </button>
+                    </form>
+
+                    {# App Download #}
+                    <strong class="heading block text-button-sm text-white mt-6">{% trans 'Download App' %}</strong>
+                    <div class="list-download flex items-start gap-3 mt-4">
+                        <a href="https://play.google.com/store/apps/details?id=com.zumodra"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="hover:opacity-80 transition-opacity">
+                            <img src="{% static 'assets/images/download/gg_play.png' %}"
+                                 alt="{% trans 'Get it on Google Play' %}"
+                                 class="h-10" />
+                        </a>
+                        <a href="https://apps.apple.com/app/zumodra"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="hover:opacity-80 transition-opacity">
+                            <img src="{% static 'assets/images/download/app_store.png' %}"
+                                 alt="{% trans 'Download on App Store' %}"
+                                 class="h-10" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Footer Bottom - Copyright & Legal #}
+        <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-4 border-t border-light/20">
+            <div class="left-block flex items-center gap-2">
+                <span class="ph-bold ph-shield-check text-placehover"></span>
+                <div class="copyright text-placehover caption1">
+                    &copy; {% now "Y" %} Zumodra by Rhematek Solutions. {% trans 'All Rights Reserved.' %}
+                </div>
+            </div>
+            <div class="nav-link flex items-center gap-4">
+                <a class="text-placehover caption1 hover:text-white hover:underline transition-colors" href="{% url 'term_of_use' %}">
+                    {% trans 'Terms of Service' %}
+                </a>
+                <span class="text-placehover caption1">|</span>
+                <a class="text-placehover caption1 hover:text-white hover:underline transition-colors" href="{% url 'privacy_policy' %}">
+                    {% trans 'Privacy Policy' %}
+                </a>
+                <span class="text-placehover caption1">|</span>
+                <a class="text-placehover caption1 hover:text-white hover:underline transition-colors" href="#">
+                    {% trans 'Cookie Policy' %}
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>

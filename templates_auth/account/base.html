@@ -1,106 +1,155 @@
+{# =============================================================================
+   ZUMODRA AUTH BASE TEMPLATE
+   =============================================================================
+
+   File: templates_auth/account/base.html
+   Purpose: Base template for all Allauth authentication pages
+
+   NO CDN DEPENDENCIES - All assets served locally
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-01
+   ============================================================================= #}
+
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
   <head>
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block head_title %}{% endblock head_title %}</title>
-    <!-- Stylesheets -->
+    <meta name="description" content="Zumodra - Verify. Recruit. Hire. Risk-Free.">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block head_title %}Zumodra{% endblock head_title %}</title>
+
+    {# ===== FAVICON ===== #}
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
+
+    {# ===== LOCAL CSS - NO CDN ===== #}
+    {# Auth-specific styles #}
     <link rel="stylesheet" href="{% static 'auth/assets/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'auth/assets/css/style.css' %}">
-    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
-    <link rel="stylesheet" href="{% static '/assets/css/swiper-bundle.min.css' %}" />
-    <link rel="stylesheet" href="{% static '/assets/css/leaflet.css' %}" />
-    <link rel="stylesheet" href="{% static '/assets/css/slick.css' %}" />
-    <link rel="stylesheet" href="{% static '/assets/css/style.css' %}" />
-    <link rel="stylesheet" href="{% static '/dist/output-tailwind.css' %}" />
-    <link rel="stylesheet" href="{% static '/dist/output-scss.css' %}" />
-    <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-      
-    <!-- Google Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap">
+
+    {# Core Tailwind CSS (pre-compiled) #}
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}">
+
+    {# Component CSS #}
+    <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+
+    {# Icon Fonts (Local) #}
+    <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}">
 
     <style>
       body {
         background-color: #000000;
         background: url({% static 'auth/assets/img/5.jpg' %}) no-repeat center center / cover;
-        font-family: "Nunito", sans-serif;
+        font-family: "Nunito Sans", sans-serif;
       }
       ul {
-        list-style-type: none !important; 
+        list-style-type: none !important;
+      }
+      /* Form styling enhancements */
+      .form-control {
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+      }
+      .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+      }
+      .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: background-color 0.2s;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+      }
+      .auth-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 450px;
+        width: 100%;
+      }
+      .auth-link {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .auth-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
       }
     </style>
     {% block extra_head %}
     {% endblock extra_head %}
   </head>
-  <body>
-{% include 'header_auth.html' %}
-<div class="breadcrowmb">
+  <body class="min-h-screen">
+    {# Header #}
+    {% include 'header_auth.html' %}
 
-</div>
-<!-- min-vh-100  minimum viewport height -->
-<div class="main-container">
-  <div class="bg-overlay"></div>
-  <div class="container d-flex align-items-center z-1 relative">
-    <div class="shadow d-flex flex-column form-layout auth-container">
+    {# ===== MAIN CONTENT ===== #}
+    <div class="main-container min-vh-100 d-flex align-items-center justify-content-center py-5">
+      <div class="bg-overlay"></div>
+      <div class="container d-flex align-items-center justify-content-center z-1 relative">
+        <div class="shadow d-flex flex-column form-layout auth-container">
 
-      <!-- <div class="d-flex justify-content-center mb-4">
-        <a href="./index.html" class="d-flex align-items-center gap-x-1">
-          <img src="{% static 'auth/assets/img/logo.svg' %}" alt="" class="w-8">
-          <h1 class="text-uppercase text-white font-bold text-2xl mb-0">Authlab</h1>
-        </a>
-      </div> -->
+          {# Logo #}
+          <div class="text-center mb-4">
+            <a href="/" class="text-decoration-none">
+              <h1 class="text-2xl font-bold text-primary">Zumodra</h1>
+            </a>
+          </div>
 
-    {% block body %}
+          {% block body %}
 
-    {% if messages %}
-    <div>
-      <strong>{% trans "Messages:" %}</strong>
-      <ul class="messages list-unstyled">
-        {% for message in messages %}
-        <li class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}">{{message}}</li>
-        {% endfor %}
-      </ul>
+          {# Flash Messages #}
+          {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-dismissible fade show {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% block content %}
+          {% endblock content %}
+          {% endblock body %}
+
+          {% block extra_body %}
+          {% endblock extra_body %}
+
+        </div>
+      </div>
     </div>
-    {% endif %}
 
-    {% comment "Menu" %}
-    <div class="menu">
-      <strong>{% trans "Menu:" %}</strong>
-      <ul class="list-unstyled">
-        {% if user.is_authenticated %}
-        <li><a href="{% url 'account_email' %}">{% trans "Change Email" %}</a></li>
-        <li><a href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a></li>
-        {% else %}
-        <li><a href="{% url 'account_login' %}">{% trans "Sign In" %}</a></li>
-        <li><a href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a></li>
-        {% endif %}
-      </ul>
-    </div>
-    {% endcomment %}
+    {# Footer #}
+    {% include 'footer.html' %}
 
-    {% block content %}
-    {% endblock content %}
-    {% endblock body %}
-    {% block extra_body %}
-    {% endblock extra_body %}
-
-    </div>
-  </div>
-</div>
-{% include 'footer.html' %}
-    <!-- JavaScripts -->
+    {# ===== LOCAL JAVASCRIPT - NO CDN ===== #}
     <script src="{% static 'auth/assets/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static '/assets/js/jquery.min.js' %}"></script>
-    <script src="{% static '/assets/js/phosphor-icons.js' %}"></script>
-    <script src="{% static '/assets/js/slick.min.js' %}"></script>
-    <script src="{% static '/assets/js/leaflet.js' %}"></script>
-    <script src="{% static '/assets/js/swiper-bundle.min.js' %}"></script>
-    <script src="{% static '/assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    {% block extra_js %}
+    {% endblock extra_js %}
   </body>
 </html>

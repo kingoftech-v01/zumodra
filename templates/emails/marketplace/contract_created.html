@@ -1,0 +1,205 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Contract Created" %}{% endblock %}
+
+{% block preheader_text %}{% trans "A new contract has been created. Please review the details." %}{% endblock %}
+
+{% block email_content %}
+{# Greeting #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 600; color: #1e293b; line-height: 1.3;">
+                {% trans "Contract Created" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6;">
+                {% blocktrans %}Hi {{ recipient_name }}, a new contract has been created for <strong>{{ project_title }}</strong>. Please review the contract details below.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Contract details card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                            {% trans "Contract Details" %}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 20px;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; color: #1e293b;">
+                            {{ project_title }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            {# Contract ID #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Contract ID" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Courier New', monospace; font-size: 14px; font-weight: 600; color: #1e293b;">#{{ contract_id }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Client #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Client" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #1e293b;">{{ client_name }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Freelancer #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Freelancer" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #1e293b;">{{ freelancer_name }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Contract Type #}
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Contract Type" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #1e293b;">{{ contract_type }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            {# Amount #}
+                            <tr>
+                                <td style="padding: 12px 0;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Total Amount" %}</span>
+                                            </td>
+                                            <td align="right">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #1e293b;">{{ total_amount }} {{ currency }}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Milestones #}
+{% if milestones %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "Milestones" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e2e8f0; border-radius: 8px;">
+                {% for milestone in milestones %}
+                <tr>
+                    <td style="padding: 16px; {% if not forloop.last %}border-bottom: 1px solid #e2e8f0;{% endif %}">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; color: #1e293b;">{{ milestone.name }}</span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b;">{% trans "Due:" %} {{ milestone.due_date|date:"M d, Y" }}</span>
+                                </td>
+                                <td align="right">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ milestone.amount }} {{ currency }}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+{# Escrow notice #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px; padding: 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="vertical-align: top; width: 24px;">
+                        <span style="font-size: 18px;">&#128274;</span>
+                    </td>
+                    <td style="padding-left: 12px;">
+                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #166534; line-height: 1.5;">
+                            <strong>{% trans "Escrow Protected" %}</strong><br>
+                            {% trans "All payments are held securely in escrow until work is completed and approved. This protects both parties in the transaction." %}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 24px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #2563eb; border-radius: 6px;">
+                        <a href="{{ contract_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "View Contract" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because a contract was created on Zumodra Marketplace." %}
+{% endblock %}

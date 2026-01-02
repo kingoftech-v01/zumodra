@@ -1,0 +1,202 @@
+{# =============================================================================
+   ZUMODRA EMAIL BASE TEMPLATE
+   =============================================================================
+
+   File: templates/emails/base/base_email.html
+   Purpose: Base template for all HTML emails - Table-based, email-safe layout
+
+   USAGE:
+   {% extends "emails/base/base_email.html" %}
+   {% block title %}Your Subject{% endblock %}
+   {% block email_content %}Your content here{% endblock %}
+
+   BLOCKS:
+   - title: Email subject/title
+   - preheader: Preview text shown in email clients
+   - email_header: Logo section (override for custom header)
+   - email_content: Main email content
+   - email_footer: Footer section (override for custom footer)
+   - email_cta: Call-to-action button
+
+   COLOR VARIABLES:
+   - Primary: #2563eb (Blue)
+   - Primary Dark: #1d4ed8
+   - Text Dark: #1e293b
+   - Text Light: #64748b
+   - Background: #f4f4f4
+   - Card: #ffffff
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-01
+   ============================================================================= #}
+
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}Zumodra{% endblock %}</title>
+
+    {# Preheader text - shows as preview in email clients #}
+    {% block preheader %}
+    <span style="display: none !important; visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+        {% block preheader_text %}{% endblock %}
+    </span>
+    {% endblock %}
+
+    <style type="text/css">
+        /* Email client resets */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+
+        /* iOS link colors */
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        /* Gmail blue link fix */
+        u + #body a { color: inherit; text-decoration: none; font-size: inherit; font-family: inherit; font-weight: inherit; line-height: inherit; }
+
+        /* Samsung Mail fix */
+        #MessageViewBody a { color: inherit; text-decoration: none; font-size: inherit; font-family: inherit; font-weight: inherit; line-height: inherit; }
+
+        /* Button hover */
+        .btn-primary:hover { background-color: #1d4ed8 !important; }
+
+        /* Responsive styles */
+        @media screen and (max-width: 600px) {
+            .container { width: 100% !important; max-width: 100% !important; }
+            .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+            .mobile-full { width: 100% !important; display: block !important; }
+            .mobile-center { text-align: center !important; }
+            .mobile-hide { display: none !important; }
+            .mobile-stack { display: block !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body id="body" style="margin: 0; padding: 0; background-color: #f4f4f4;">
+
+    {# Wrapper table #}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+
+                {# Container #}
+                <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+
+                    {# ===== HEADER ===== #}
+                    {% block email_header %}
+                    <tr>
+                        <td align="center" style="background-color: #2563eb; padding: 30px 40px;">
+                            {# Logo - using text as fallback #}
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ site_url|default:'https://zumodra.com' }}" style="text-decoration: none;">
+                                            <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+                                                Zumodra
+                                            </span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 8px;">
+                                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.8); letter-spacing: 1px; text-transform: uppercase;">
+                                            Verify. Recruit. Hire. Risk-Free.
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endblock %}
+
+                    {# ===== MAIN CONTENT ===== #}
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px;">
+                            {% block email_content %}
+                            {# Child templates insert content here #}
+                            {% endblock %}
+                        </td>
+                    </tr>
+
+                    {# ===== CALL TO ACTION (Optional) ===== #}
+                    {% block email_cta %}{% endblock %}
+
+                    {# ===== FOOTER ===== #}
+                    {% block email_footer %}
+                    <tr>
+                        <td style="background-color: #f8fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                {# Company info #}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">
+                                            &copy; {% now "Y" %} Zumodra by Rhematek Solutions. All rights reserved.
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                {# Links #}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="{{ site_url|default:'https://zumodra.com' }}/privacy/" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b; text-decoration: none;">
+                                                        Privacy Policy
+                                                    </a>
+                                                </td>
+                                                <td style="color: #cbd5e1;">|</td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="{{ site_url|default:'https://zumodra.com' }}/terms/" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b; text-decoration: none;">
+                                                        Terms of Service
+                                                    </a>
+                                                </td>
+                                                <td style="color: #cbd5e1;">|</td>
+                                                <td style="padding: 0 10px;">
+                                                    <a href="{{ site_url|default:'https://zumodra.com' }}/contact/" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b; text-decoration: none;">
+                                                        Contact Us
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {# Unsubscribe (if applicable) #}
+                                {% block unsubscribe %}{% endblock %}
+
+                                {# Address #}
+                                <tr>
+                                    <td align="center">
+                                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #94a3b8;">
+                                            This email was sent by Zumodra.
+                                            {% block email_reason %}{% endblock %}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endblock %}
+
+                </table>
+                {# End Container #}
+
+            </td>
+        </tr>
+    </table>
+    {# End Wrapper #}
+
+</body>
+</html>

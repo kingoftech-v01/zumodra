@@ -142,18 +142,20 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         SECURITY_HSTS_SECONDS: int = 31536000
     """
 
-    # Default CSP directives
+    # Default CSP directives - STRICT: No external CDN/fonts allowed
     DEFAULT_CSP_POLICY = {
         'default-src': ["'self'"],
-        'script-src': ["'self'", "'unsafe-inline'"],  # Adjust as needed
-        'style-src': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", "data:", "https:"],
-        'font-src': ["'self'", "https://fonts.gstatic.com"],
-        'connect-src': ["'self'"],
+        'script-src': ["'self'"],
+        'style-src': ["'self'", "'unsafe-inline'"],  # unsafe-inline needed for Alpine.js dynamic styles
+        'img-src': ["'self'", "data:", "blob:"],
+        'font-src': ["'self'"],
+        'connect-src': ["'self'", "wss:"],  # wss: for WebSocket connections
         'frame-ancestors': ["'none'"],
         'form-action': ["'self'"],
         'base-uri': ["'self'"],
         'object-src': ["'none'"],
+        'media-src': ["'self'"],
+        'worker-src': ["'self'", "blob:"],
     }
 
     # Default Permissions-Policy

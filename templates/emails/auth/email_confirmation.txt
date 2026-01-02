@@ -1,0 +1,12 @@
+{% load i18n account %}{% user_display user as user_display %}{% autoescape off %}{% blocktrans %}Welcome to Zumodra!
+
+Hi {{ user_display }},
+
+Thank you for signing up! Please confirm your email address by clicking the link below:
+
+{{ activate_url }}
+
+If you didn't create an account with Zumodra, you can safely ignore this email.
+
+Best regards,
+The Zumodra Team{% endblocktrans %}{% endautoescape %}

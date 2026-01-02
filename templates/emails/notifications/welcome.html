@@ -1,0 +1,221 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Welcome to Zumodra" %}{% endblock %}
+
+{% block preheader_text %}{% trans "Welcome aboard! Let's get you started on your journey." %}{% endblock %}
+
+{% block email_content %}
+{# Welcome header #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding-bottom: 24px;">
+            <span style="font-size: 48px;">&#128075;</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; color: #1e293b; line-height: 1.3; text-align: center;">
+                {% trans "Welcome to Zumodra!" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6; text-align: center;">
+                {% blocktrans %}Hi {{ user_name }}, we're thrilled to have you join the Zumodra community. Let's get you set up for success!{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Tagline #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 20px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 8px; padding: 20px 40px; text-align: center;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #ffffff;">
+                            {% trans "Verify. Recruit. Hire. Risk-Free." %}
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Getting started steps #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 600; color: #1e293b; text-align: center;">
+                {% trans "Get Started in 3 Easy Steps" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                {# Step 1 #}
+                <tr>
+                    <td style="padding: 16px 0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border-radius: 8px; padding: 20px;">
+                            <tr>
+                                <td style="padding: 20px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width: 48px; vertical-align: top;">
+                                                <span style="display: inline-block; width: 40px; height: 40px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #ffffff;">1</span>
+                                            </td>
+                                            <td style="padding-left: 16px;">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{% trans "Complete Your Profile" %}</span><br>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Add your experience, skills, and a professional photo to stand out." %}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {# Step 2 #}
+                <tr>
+                    <td style="padding: 16px 0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border-radius: 8px; padding: 20px;">
+                            <tr>
+                                <td style="padding: 20px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width: 48px; vertical-align: top;">
+                                                <span style="display: inline-block; width: 40px; height: 40px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #ffffff;">2</span>
+                                            </td>
+                                            <td style="padding-left: 16px;">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{% trans "Verify Your Identity" %}</span><br>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Complete KYC verification to unlock all platform features and build trust." %}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {# Step 3 #}
+                <tr>
+                    <td style="padding: 16px 0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border-radius: 8px; padding: 20px;">
+                            <tr>
+                                <td style="padding: 20px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width: 48px; vertical-align: top;">
+                                                <span style="display: inline-block; width: 40px; height: 40px; background-color: #2563eb; border-radius: 50%; text-align: center; line-height: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #ffffff;">3</span>
+                                            </td>
+                                            <td style="padding-left: 16px;">
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{% trans "Start Exploring" %}</span><br>
+                                                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{% trans "Browse opportunities, apply to jobs, or post projects to find talent." %}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Why Zumodra #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0; border-top: 1px solid #e2e8f0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "Why Zumodra?" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        <strong>{% trans "Verified Profiles" %}</strong> - {% trans "Trust built on bidirectional KYC verification" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        <strong>{% trans "Escrow Protection" %}</strong> - {% trans "Secure payments with funds held until work is approved" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        <strong>{% trans "Smart Matching" %}</strong> - {% trans "AI-powered matching to find the perfect fit" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 24px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #2563eb; border-radius: 6px;">
+                        <a href="{{ dashboard_url }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "Go to Dashboard" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Help section #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="border-top: 1px solid #e2e8f0; padding-top: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b; line-height: 1.6; text-align: center;">
+                {% trans "Need help getting started?" %}<br>
+                <a href="{{ help_url }}" style="color: #2563eb; text-decoration: none;">{% trans "Visit our Help Center" %}</a> {% trans "or" %} <a href="mailto:{{ support_email }}" style="color: #2563eb; text-decoration: none;">{% trans "contact support" %}</a>
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this email because you created a new account on Zumodra." %}
+{% endblock %}

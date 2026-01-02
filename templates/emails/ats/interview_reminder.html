@@ -1,0 +1,187 @@
+{% extends "emails/base/base_email.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Interview Reminder" %}{% endblock %}
+
+{% block preheader_text %}{% trans "Reminder: Your interview is coming up soon." %}{% endblock %}
+
+{% block email_content %}
+{# Greeting #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding-bottom: 20px;">
+            <h1 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 600; color: #1e293b; line-height: 1.3;">
+                {% trans "Interview Reminder" %}
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #475569; line-height: 1.6;">
+                {% blocktrans %}Hi {{ candidate_name }}, this is a friendly reminder that your interview for <strong>{{ job_title }}</strong> at <strong>{{ company_name }}</strong> is {{ time_until_interview }}.{% endblocktrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{# Countdown card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 20px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="background-color: #fef3c7; border-radius: 12px; padding: 20px 40px; text-align: center;">
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #92400e; text-transform: uppercase; letter-spacing: 1px;">{% trans "Starts In" %}</span><br>
+                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 700; color: #78350f;">{{ time_until_interview }}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Interview details card #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="background-color: #f8fafc; border-radius: 8px; padding: 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                {# Date & Time #}
+                <tr>
+                    <td style="padding-bottom: 16px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="font-size: 16px;">&#128197;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ interview_date|date:"l, F j, Y" }}</span><br>
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">{{ interview_time }} ({{ timezone }})</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {# Location/Link #}
+                <tr>
+                    <td>
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="font-size: 16px;">{% if is_virtual %}&#128187;{% else %}&#128205;{% endif %}</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    {% if is_virtual %}
+                                    <a href="{{ meeting_link }}" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #2563eb; text-decoration: none;">{% trans "Join Video Call" %} &rarr;</a>
+                                    {% else %}
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #1e293b;">{{ interview_location }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# Tips section #}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td style="padding: 24px 0;">
+            <h2 style="margin: 0 0 16px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; color: #1e293b;">
+                {% trans "Quick Tips" %}
+            </h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Test your camera and microphone before the call" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Find a quiet, well-lit space" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Have your resume and the job description handy" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="width: 24px; vertical-align: top;">
+                                    <span style="color: #22c55e; font-size: 16px;">&#10003;</span>
+                                </td>
+                                <td style="padding-left: 12px;">
+                                    <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #475569;">
+                                        {% trans "Prepare questions to ask the interviewer" %}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{# CTA Button #}
+{% if is_virtual %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td align="center" style="padding: 10px 0 20px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="center" style="background-color: #2563eb; border-radius: 6px;">
+                        <a href="{{ meeting_link }}" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                            {% trans "Join Meeting" %}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endif %}
+{% endblock %}
+
+{% block email_reason %}
+{% trans "You received this reminder because you have an upcoming interview scheduled through Zumodra." %}
+{% endblock %}
