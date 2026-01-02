@@ -1,8 +1,8 @@
 # =============================================================================
 # Zumodra Production Dockerfile
 # =============================================================================
+# Usage: docker-compose -f docker-compose.prod.yml up -d
 # Multi-stage, security-hardened build for production deployment
-# Supports 500K+ concurrent connections with Gunicorn + Uvicorn workers
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -168,7 +168,11 @@ RUN rm -rf \
 # Copy requirements back for reference
 COPY --chown=${APP_USER}:${APP_GROUP} requirements.txt ${APP_HOME}/
 
-# Collect static files (will be overwritten at runtime if needed)
+# Copy entrypoint script
+COPY --chown=root:root docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Collect static files at build time (will be refreshed at runtime if needed)
 RUN python manage.py collectstatic --noinput --clear 2>/dev/null || true
 
 # Switch to non-root user
@@ -178,11 +182,12 @@ USER ${APP_USER}
 EXPOSE 8000
 
 # Health check configuration
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || wget -q --spider http://localhost:8000/health/ || exit 1
 
 # Use tini as init system for proper signal handling
-ENTRYPOINT ["/usr/bin/tini", "--"]
+# Entrypoint handles DB wait, migrations, and collectstatic before starting
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
 
 # Default command: Gunicorn with Uvicorn workers for ASGI
 CMD ["gunicorn", "zumodra.asgi:application", \

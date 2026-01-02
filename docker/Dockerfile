@@ -1,5 +1,9 @@
-# Zumodra Multi-Tenant ATS/HR SaaS Platform
-# Production-ready Dockerfile
+# =============================================================================
+# Zumodra Development Dockerfile
+# =============================================================================
+# Usage: docker-compose up -d
+# This is the DEVELOPMENT Dockerfile. For production, use Dockerfile.prod
+# =============================================================================
 
 # Build stage
 FROM python:3.11-slim-bookworm AS builder
@@ -53,6 +57,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdal-bin \
     curl \
     libmagic1 \
+    tini \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -74,6 +79,10 @@ RUN mkdir -p ${APP_HOME}/static ${APP_HOME}/media ${APP_HOME}/logs && \
 # Copy application code
 COPY --chown=${APP_USER}:${APP_USER} . ${APP_HOME}
 
+# Copy entrypoint script
+COPY --chown=root:root docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Switch to non-root user
 USER ${APP_USER}
 
@@ -81,8 +90,11 @@ USER ${APP_USER}
 EXPOSE 8000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Use tini as init system
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
 
 # Default command
 CMD ["gunicorn", "zumodra.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--timeout", "120"]

@@ -43,11 +43,35 @@ docker compose exec web python manage.py migrate
 # Create superuser
 docker compose exec web python manage.py createsuperuser
 
+# (Optional) Create demo tenant with sample data
+docker compose exec web python manage.py bootstrap_demo_tenant
+
 # Access application
 # Web: http://localhost:8000
 # API Docs: http://localhost:8000/api/docs/
 # Admin: http://localhost:8000/admin-panel/
 ```
+
+### Demo Tenant
+
+For testing and exploration, create a demo tenant with rich sample data:
+
+```bash
+# Manual creation
+python manage.py bootstrap_demo_tenant
+
+# Or enable auto-creation on Docker startup
+CREATE_DEMO_TENANT=1 docker compose up -d
+```
+
+**Demo Login Credentials:**
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@demo.zumodra.local | Demo@2024! |
+| HR Manager | hr@demo.zumodra.local | Demo@2024! |
+| Recruiter | recruiter@demo.zumodra.local | Demo@2024! |
+
+See [TENANT_ONBOARDING.md](docs/TENANT_ONBOARDING.md) for full demo tenant details.
 
 ### Local Development
 

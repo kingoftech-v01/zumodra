@@ -1,7 +1,7 @@
 # Zumodra Tenant Onboarding Guide
 
-**Version:** 1.0.0
-**Last Updated:** December 2025
+**Version:** 1.1.0
+**Last Updated:** January 2026
 
 Welcome to Zumodra! This guide will help you set up your organization and start using the platform.
 
@@ -9,15 +9,96 @@ Welcome to Zumodra! This guide will help you set up your organization and start 
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Initial Setup](#initial-setup)
-3. [Team Management](#team-management)
-4. [ATS Configuration](#ats-configuration)
-5. [HR Core Setup](#hr-core-setup)
-6. [Marketplace Setup](#marketplace-setup)
-7. [Integrations](#integrations)
-8. [Best Practices](#best-practices)
-9. [Getting Help](#getting-help)
+1. [Demo Tenant](#demo-tenant)
+2. [Getting Started](#getting-started)
+3. [Initial Setup](#initial-setup)
+4. [Team Management](#team-management)
+5. [ATS Configuration](#ats-configuration)
+6. [HR Core Setup](#hr-core-setup)
+7. [Marketplace Setup](#marketplace-setup)
+8. [Integrations](#integrations)
+9. [Best Practices](#best-practices)
+10. [Getting Help](#getting-help)
+
+---
+
+## Demo Tenant
+
+A pre-configured demo tenant is available for testing and exploration. It contains realistic sample data across all platform features.
+
+### Demo Tenant URL
+
+```
+http://demo.localhost:8000
+```
+
+### Demo Login Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | admin@demo.zumodra.local | Demo@2024! |
+| **HR Manager** | hr@demo.zumodra.local | Demo@2024! |
+| **Recruiter** | recruiter@demo.zumodra.local | Demo@2024! |
+| **Hiring Manager** | hiring@demo.zumodra.local | Demo@2024! |
+| **Employee** | employee@demo.zumodra.local | Demo@2024! |
+| **Candidate** | candidate@demo.zumodra.local | Demo@2024! |
+
+### Demo Data Included
+
+The demo tenant contains:
+
+**ATS (Applicant Tracking)**
+- 8 job categories (Engineering, Design, Marketing, Sales, etc.)
+- 15 job postings with various statuses
+- 50 candidates with skills and experience
+- Applications spread across pipeline stages
+- Scheduled interviews (past and future)
+- Draft and sent offers
+
+**HR Core**
+- 25 employees with profiles
+- Time-off types (PTO, Sick Leave, Personal)
+- Pending and approved time-off requests
+
+**Marketplace**
+- 6 service categories
+- 10 service providers with profiles
+- Sample services and proposals
+
+**Verification & Trust**
+- KYC verifications (pending, approved)
+- Trust scores for demo users
+
+**Messaging**
+- Conversations between users
+- Sample messages
+
+### Creating the Demo Tenant
+
+The demo tenant is automatically created when running with Docker:
+
+```bash
+# Enable demo tenant creation
+CREATE_DEMO_TENANT=1 docker-compose up -d
+
+# Or manually:
+python manage.py bootstrap_demo_tenant
+
+# Reset and recreate:
+python manage.py bootstrap_demo_tenant --reset
+```
+
+### Demo Tenant Command Options
+
+```bash
+python manage.py bootstrap_demo_tenant [options]
+
+Options:
+  --reset            Delete existing demo tenant and recreate
+  --dry-run          Preview what would be created
+  --skip-marketplace Skip marketplace/services data
+  --skip-messaging   Skip messaging/conversations data
+```
 
 ---
 

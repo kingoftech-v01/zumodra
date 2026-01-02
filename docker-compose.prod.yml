@@ -1,8 +1,8 @@
 # =============================================================================
-# Zumodra Production Docker Compose Configuration
+# Zumodra PRODUCTION Docker Compose
 # =============================================================================
-# Designed for high availability with 500K+ concurrent connections
 # Usage: docker-compose -f docker-compose.prod.yml up -d
+# For development: docker-compose up -d
 # =============================================================================
 
 version: '3.9'
@@ -252,7 +252,7 @@ services:
       GUNICORN_WORKERS: "4"
       SERVICE_TYPE: web
     volumes:
-      - static_volume:/app/static:ro
+      - static_volume:/app/static
       - media_volume:/app/media
       - logs_volume:/app/logs
     deploy:
@@ -429,13 +429,16 @@ services:
     image: nginx:1.25-alpine
     container_name: zumodra_nginx
     restart: always
+    entrypoint: ["/docker-entrypoint.d/nginx-entrypoint.sh"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
     volumes:
       - ./docker/nginx.prod.conf:/etc/nginx/nginx.conf:ro
       - ./docker/nginx-sites/zumodra.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx-entrypoint.sh:/docker-entrypoint.d/nginx-entrypoint.sh:ro
       - static_volume:/app/static:ro
       - media_volume:/app/media:ro
-      - ./docker/ssl/certs:/etc/nginx/ssl:ro
-      - ./docker/ssl/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+      - nginx_ssl:/etc/nginx/ssl
       - nginx_cache:/var/cache/nginx
     ports:
       - "80:80"
@@ -462,7 +465,7 @@ services:
     networks:
       - zumodra_frontend
       - zumodra_backend
-    read_only: true
+    read_only: false
     tmpfs:
       - /var/run:size=10M
       - /tmp:size=100M
@@ -697,6 +700,8 @@ volumes:
   logs_volume:
     driver: local
   nginx_cache:
+    driver: local
+  nginx_ssl:
     driver: local
   prometheus_data:
     driver: local
