@@ -62,6 +62,7 @@ SHARED_APPS = [
 ]
 
 TENANT_APPS = [
+    # Django Core Apps (tenant-specific instances)
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -73,12 +74,14 @@ TENANT_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.gis',
 
+    # Two-Factor Authentication
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_hotp',
     'django_otp.plugins.otp_email',
     'django_otp.plugins.otp_static',
 
+    # Allauth Authentication
     'allauth_2fa',
     'allauth',
     'allauth.mfa',
@@ -88,6 +91,51 @@ TENANT_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.linkedin',
+
+    # Third-party apps with tenant-specific data
+    'auditlog',
+    'newsletter',
+    'taggit',
+    'sorl.thumbnail',
+
+    # Wagtail CMS (tenant-specific content)
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail_localize',
+    'wagtail_localize.locales',
+    'wagtail',
+    'modelcluster',
+
+    # Zumodra Core Apps (tenant-specific data)
+    'custom_account_u',
+    'accounts',
+    'ats',
+    'hr_core',
+    'services',
+    'finance',
+    'messages_sys',
+    'notifications',
+    'careers',
+    'ai_matching',
+    'integrations',
+    'dashboard',
+    'dashboard_service',
+    'analytics',
+    'blog',
+    'configurations',
+    'core',
+    'security',
+    'marketing',
+    'api',
+    'appointment.apps.AppointmentConfig',
 ]
 
 # Combined list of all installed apps

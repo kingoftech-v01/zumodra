@@ -305,6 +305,68 @@ See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for complete API refe
 
 ---
 
+## Management Commands
+
+Zumodra includes several custom management commands for common operations:
+
+### Tenant Management
+
+```bash
+# Bootstrap a demo tenant with comprehensive sample data
+python manage.py bootstrap_demo_tenant
+python manage.py bootstrap_demo_tenant --reset      # Delete and recreate
+python manage.py bootstrap_demo_tenant --dry-run    # Preview changes
+
+# Create a beta tenant for early adopters
+python manage.py setup_beta_tenant "Company Name" "owner@email.com"
+python manage.py setup_beta_tenant "Acme Corp" "admin@acme.com" --plan beta_enterprise --trial-days 90
+
+# Create a basic demo tenant with sample data
+python manage.py setup_demo_data
+python manage.py setup_demo_data --num-jobs 20 --num-candidates 100 --reset
+
+# Create a standard tenant
+python manage.py create_tenant
+
+# Set up subscription plans
+python manage.py setup_plans
+
+# Clean up inactive tenants
+python manage.py cleanup_inactive_tenants --days 90 --dry-run
+
+# Migrate data between tenant schemas
+python manage.py migrate_tenant_data
+```
+
+### Infrastructure & Utilities
+
+```bash
+# Check health of all services (database, cache, email, etc.)
+python manage.py health_check
+python manage.py health_check --full    # Include external services
+python manage.py health_check --json    # Output as JSON
+
+# Generate API documentation
+python manage.py generate_api_docs
+python manage.py generate_api_docs --format markdown
+python manage.py generate_api_docs --format html --output docs/api
+```
+
+### Django-Tenants Migrations
+
+```bash
+# Run migrations on all schemas
+python manage.py migrate_schemas
+
+# Run migrations only on shared (public) schema
+python manage.py migrate_schemas --shared
+
+# Run migrations only on tenant schemas
+python manage.py migrate_schemas --tenant
+```
+
+---
+
 ## Testing
 
 ```bash
