@@ -56,6 +56,9 @@ SHARED_APPS = [
     # Tenant management apps (shared across all tenants)
     'tenants',
     'main',
+
+    # Celery Beat (must be in SHARED_APPS for multi-tenant - runs on public schema)
+    'django_celery_beat',
 ]
 
 TENANT_APPS = [
