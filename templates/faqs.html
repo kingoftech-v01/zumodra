@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA FAQ PAGE
@@ -18,8 +19,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "FAQs" %} - Zumodra{% endblock %}
@@ -223,12 +222,12 @@
                 <div class="bg-surface p-6 rounded-xl">
                     <h5 class="heading5">{% trans "Still have questions?" %}</h5>
                     <p class="body2 text-secondary mt-2">{% trans "Can't find the answer you're looking for? Our support team is here to help." %}</p>
-                    <a href="{% url 'contact' %}" class="button-main w-full text-center mt-4">{% trans "Contact Support" %}</a>
+                    <a href="{% url 'contact_us' %}" class="button-main w-full text-center mt-4">{% trans "Contact Support" %}</a>
                 </div>
                 <div class="bg-surface p-6 rounded-xl mt-6">
                     <h5 class="heading5">{% trans "Ready to get started?" %}</h5>
                     <p class="body2 text-secondary mt-2">{% trans "Join thousands of businesses and freelancers already using Zumodra." %}</p>
-                    <a href="{% url 'register' %}" class="button-main -border w-full text-center mt-4">{% trans "Create Free Account" %}</a>
+                    <a href="{% url 'account_signup' %}" class="button-main -border w-full text-center mt-4">{% trans "Create Free Account" %}</a>
                 </div>
             </div>
         </div>

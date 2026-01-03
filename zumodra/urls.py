@@ -261,7 +261,7 @@ urlpatterns += i18n_patterns(
     # Keep these only if you need backward-compatible URLs
     path('app/messages/', include('messages_sys.urls')),        # Messages (standalone)
 
-    # Services Marketplace
+    # Services Marketplace (tenant-specific)
     path('services/', include('services.urls')),                # Services marketplace
 
     # Notifications (web views)

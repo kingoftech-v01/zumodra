@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA BECOME A SELLER PAGE
@@ -20,8 +21,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Become a Seller" %} - Zumodra{% endblock %}
@@ -42,7 +41,7 @@
                 <h2 class="heading2 text-white animate animate_top" style="--i: 1">{% trans "Turn Your Skills Into Income" %}</h2>
                 <p class="body2 text-white mt-3 animate animate_top" style="--i: 2">{% trans "Join thousands of verified freelancers earning on Zumodra. Get matched with quality clients, receive secure payments, and build your reputation." %}</p>
                 <div class="mt-7.5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'register' %}?type=freelancer" class="button-main bg-white">{% trans "Start Selling Today" %}</a>
+                    <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-white">{% trans "Start Selling Today" %}</a>
                 </div>
             </div>
         </div>
@@ -230,8 +229,8 @@
             <h4 class="heading4">{% trans "Ready to Start Earning?" %}</h4>
             <p class="desc mt-2 text-secondary max-w-2xl mx-auto">{% trans "Join Zumodra today and connect with clients looking for your skills. It's free to create your profile." %}</p>
             <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'register' %}?type=freelancer" class="button-main">{% trans "Create Free Account" %}</a>
-                <a href="{% url 'how_it_works' %}" class="button-main -border">{% trans "Learn More" %}</a>
+                <a href="{% url 'account_signup' %}?type=freelancer" class="button-main">{% trans "Create Free Account" %}</a>
+                <a href="{% url 'about' %}" class="button-main -border">{% trans "Learn More" %}</a>
             </div>
         </div>
     </div>

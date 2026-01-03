@@ -1,13 +1,14 @@
-{# =============================================================================
+{% comment %}
+=============================================================================
    ZUMODRA PUBLIC HEADER COMPONENT
-   =============================================================================
+=============================================================================
 
    File: templates/components/public_header.html
    Purpose: Consolidated public header for non-dashboard pages
 
    Usage:
-   {% include "components/public_header.html" %}
-   {% include "components/public_header.html" with transparent=True %}
+   include "components/public_header.html"
+   include "components/public_header.html" with transparent=True
 
    Parameters:
    - transparent: If True, header has transparent background (for hero sections)
@@ -16,7 +17,8 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+=============================================================================
+{% endcomment %}
 
 {% load i18n static %}
 
@@ -89,12 +91,18 @@
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
                              class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-line p-2 z-50">
-                            <a href="{% url 'careers:job_list' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Jobs' %}</a>
-                            <a href="{% url 'services:browse_services' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Projects' %}</a>
+                            {% url 'services:service_list' as browse_jobs_url %}
+                            {% if browse_jobs_url %}<a href="{{ browse_jobs_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Jobs' %}</a>{% endif %}
+                            {% url 'services:browse_services' as services_browse_url %}
+                            {% if services_browse_url %}
+                            <a href="{{ services_browse_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Projects' %}</a>
+                            {% endif %}
                             <hr class="my-2 border-line">
                             <a href="{% url 'become_seller' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Become a Freelancer' %}</a>
                         </div>
                     </li>
+                    {% url 'services:browse_services' as services_url %}
+                    {% if services_url %}
                     <li class="h-full relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <a href="#"
                            class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
@@ -110,12 +118,24 @@
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
                              class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-line p-2 z-50">
-                            <a href="{% url 'services:browse_services' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Services' %}</a>
-                            <a href="{% url 'services:create_service_request' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Post a Project' %}</a>
+                            <a href="{{ services_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Services' %}</a>
+                            {% url 'services:create_service_request' as create_request_url %}
+                            {% if create_request_url %}
+                            <a href="{{ create_request_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Post a Project' %}</a>
+                            {% endif %}
                             <hr class="my-2 border-line">
                             <a href="{% url 'become_buyer' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Hire Talent' %}</a>
                         </div>
                     </li>
+                    {% else %}
+                    <li class="h-full relative">
+                        <a href="{% url 'become_buyer' %}"
+                           class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
+                           :class="{ 'text-secondary': scrolled }">
+                            <span class="text-button">{% trans 'For Employers' %}</span>
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="h-full relative">
                         <a href="{% url 'wagtail_serve' '' %}"
                            class="flex items-center gap-1 h-full px-4 py-2 rounded-lg {% if transparent %}text-white{% else %}text-secondary{% endif %} hover:bg-surface hover:text-primary duration-300"
@@ -147,12 +167,15 @@
             {# Auth Buttons #}
             <div class="button-block flex items-center gap-3">
                 {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}"
+                {% url 'dashboard:index' as dashboard_url %}
+                {% if dashboard_url %}
+                <a href="{{ dashboard_url }}"
                    class="flex items-center gap-2 px-4 py-2 rounded-lg {% if transparent %}text-white border border-white/30{% else %}text-primary border border-primary{% endif %} hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
                    :class="{ 'text-primary border-primary': scrolled }">
                     <span class="ph-bold ph-squares-four text-lg"></span>
                     <span class="max-sm:hidden">{% trans 'Dashboard' %}</span>
                 </a>
+                {% endif %}
                 <a href="{% url 'account_logout' %}"
                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-300">
                     <span class="ph-bold ph-sign-out text-lg"></span>
@@ -222,22 +245,38 @@
                         <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
                     </button>
                     <ul x-show="expanded" x-collapse class="pl-8 space-y-1 mt-1">
-                        <li><a href="{% url 'careers:job_list' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Jobs' %}</a></li>
-                        <li><a href="{% url 'services:browse_services' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Projects' %}</a></li>
+                        {% url 'services:service_list' as mobile_browse_jobs_url %}
+                        {% if mobile_browse_jobs_url %}<li><a href="{{ mobile_browse_jobs_url }}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Jobs' %}</a></li>{% endif %}
+                        {% url 'services:browse_services' as mobile_services_browse_url %}
+                        {% if mobile_services_browse_url %}
+                        <li><a href="{{ mobile_services_browse_url }}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Projects' %}</a></li>
+                        {% endif %}
                         <li><a href="{% url 'become_seller' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Become a Freelancer' %}</a></li>
                     </ul>
                 </li>
+                {% url 'services:browse_services' as mobile_services_url %}
+                {% if mobile_services_url %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded" class="flex items-center justify-between w-full px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
                         <span><span class="ph-bold ph-briefcase mr-3"></span>{% trans 'For Employers' %}</span>
                         <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
                     </button>
                     <ul x-show="expanded" x-collapse class="pl-8 space-y-1 mt-1">
-                        <li><a href="{% url 'services:browse_services' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Services' %}</a></li>
-                        <li><a href="{% url 'services:create_service_request' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Post a Project' %}</a></li>
+                        <li><a href="{{ mobile_services_url }}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Browse Services' %}</a></li>
+                        {% url 'services:create_service_request' as mobile_create_request_url %}
+                        {% if mobile_create_request_url %}
+                        <li><a href="{{ mobile_create_request_url }}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Post a Project' %}</a></li>
+                        {% endif %}
                         <li><a href="{% url 'become_buyer' %}" class="block px-4 py-2 text-sm text-secondary hover:text-primary">{% trans 'Hire Talent' %}</a></li>
                     </ul>
                 </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'become_buyer' %}" class="block px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
+                        <span class="ph-bold ph-briefcase mr-3"></span>{% trans 'For Employers' %}
+                    </a>
+                </li>
+                {% endif %}
                 <li>
                     <a href="{% url 'wagtail_serve' '' %}" class="block px-4 py-3 text-secondary hover:bg-surface hover:text-primary rounded-lg transition-all">
                         <span class="ph-bold ph-article mr-3"></span>{% trans 'Blog' %}

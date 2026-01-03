@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA CONTACT PAGE
@@ -18,8 +19,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Contact Us" %} - Zumodra{% endblock %}
@@ -130,7 +129,7 @@
         <div class="form_area flex-shrink-0 xl:w-[520px] lg:w-1/2 p-9 rounded-xl bg-white shadow-lg duration-300">
             <form class="form flex flex-col gap-5"
                   method="post"
-                  action="{% url 'contact_submit' %}"
+                  action="{% url 'contact_us' %}"
                   x-data="{ submitting: false, success: false }"
                   @submit.prevent="submitting = true; $el.submit()">
                 {% csrf_token %}
@@ -199,7 +198,7 @@
                     {% trans "By submitting this form, you agree to our" %}
                     <a href="{% url 'privacy_policy' %}" class="text-primary hover:underline">{% trans "Privacy Policy" %}</a>
                     {% trans "and" %}
-                    <a href="{% url 'terms_of_use' %}" class="text-primary hover:underline">{% trans "Terms of Service" %}</a>.
+                    <a href="{% url 'term_of_use' %}" class="text-primary hover:underline">{% trans "Terms of Service" %}</a>.
                 </p>
             </form>
         </div>
@@ -213,7 +212,7 @@
         <p class="body2 text-secondary mt-3 max-w-2xl mx-auto">
             {% trans "Check out our frequently asked questions for quick answers to common inquiries about our platform, pricing, and services." %}
         </p>
-        <a href="{% url 'faqs' %}" class="button-main mt-6 inline-block">
+        <a href="{% url 'faq' %}" class="button-main mt-6 inline-block">
             {% trans "View FAQs" %}
         </a>
     </div>

@@ -25,6 +25,8 @@ from .views import (
     term_of_use_view,
     privacy_policy_view,
     auth_test_view,
+    become_seller_view,
+    become_buyer_view,
 )
 
 
@@ -102,8 +104,10 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api/v1/', include('api.urls_v1')),
 
-    # Public Career Pages
-    path('careers/', include('careers.urls', namespace='careers_public')),
+    # Public Career Pages (Disabled - careers is tenant-specific)
+    # Note: careers app depends on ats tables which are tenant-specific
+    # Jobs are only available within tenant contexts (subdomain access)
+    # path('careers/', include('careers.urls', namespace='careers_public')),
 ]
 
 # Add API documentation URLs if drf-spectacular is installed
@@ -139,6 +143,8 @@ urlpatterns += i18n_patterns(
     path('pricing/', pricing_view, name='pricing'),
     path('terms/', term_of_use_view, name='term_of_use'),
     path('privacy/', privacy_policy_view, name='privacy_policy'),
+    path('become-seller/', become_seller_view, name='become_seller'),
+    path('become-buyer/', become_buyer_view, name='become_buyer'),
     path('auth-test/', auth_test_view, name='auth_test'),
 
     # NOTE: Services Marketplace is only available on tenant subdomains

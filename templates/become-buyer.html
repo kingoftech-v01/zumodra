@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA BECOME A BUYER/EMPLOYER PAGE
@@ -20,8 +21,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Hire Talent" %} - Zumodra{% endblock %}
@@ -29,6 +28,7 @@
 {% block meta_description %}{% trans "Find verified freelancers and top talent on Zumodra. Hire with confidence using our KYC verification, secure escrow payments, and AI-powered matching." %}{% endblock %}
 
 {% block content %}
+{% url 'services:service_list' as browse_services_url %}
 
 {% comment %} HERO SECTION {% endcomment %}
 <section class="slider">
@@ -42,7 +42,7 @@
                 <h2 class="heading2 text-white animate animate_top" style="--i: 1">{% trans "Hire Verified Talent, Risk-Free" %}</h2>
                 <p class="body2 text-white mt-3 animate animate_top" style="--i: 2">{% trans "Access a global pool of KYC-verified freelancers. Our bidirectional verification ensures you're hiring real professionals with confirmed credentials." %}</p>
                 <div class="mt-7.5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'register' %}?type=employer" class="button-main bg-white">{% trans "Start Hiring Today" %}</a>
+                    <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white">{% trans "Start Hiring Today" %}</a>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Browse verified professionals across all major categories" %}</p>
         <ul class="list_jobs grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 sm:gap-7.5 gap-4 md:mt-10 mt-7">
             <li class="item animate animate_top" style="--i: 1">
-                <a href="{% url 'services_category' 'design' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=design" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/1.webp' %}" alt="{% trans 'Graphic & Design' %}" class="w-full h-full object-cover" />
                     </div>
@@ -65,7 +65,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 2">
-                <a href="{% url 'services_category' 'development' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=development" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/2.webp' %}" alt="{% trans 'Programming & Tech' %}" class="w-full h-full object-cover" />
                     </div>
@@ -74,7 +74,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 3">
-                <a href="{% url 'services_category' 'marketing' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=marketing" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/3.webp' %}" alt="{% trans 'Digital Marketing' %}" class="w-full h-full object-cover" />
                     </div>
@@ -83,7 +83,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 4">
-                <a href="{% url 'services_category' 'writing' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=writing" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/4.webp' %}" alt="{% trans 'Writing & Translation' %}" class="w-full h-full object-cover" />
                     </div>
@@ -92,7 +92,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 5">
-                <a href="{% url 'services_category' 'video' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=video" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/5.webp' %}" alt="{% trans 'Video & Animation' %}" class="w-full h-full object-cover" />
                     </div>
@@ -101,7 +101,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 6">
-                <a href="{% url 'services_category' 'audio' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=audio" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/6.webp' %}" alt="{% trans 'Music & Audio' %}" class="w-full h-full object-cover" />
                     </div>
@@ -110,7 +110,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 7">
-                <a href="{% url 'services_category' 'business' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=business" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/7.webp' %}" alt="{% trans 'Business Consulting' %}" class="w-full h-full object-cover" />
                     </div>
@@ -119,7 +119,7 @@
                 </a>
             </li>
             <li class="item animate animate_top" style="--i: 8">
-                <a href="{% url 'services_category' 'ai' %}" class="block">
+                <a href="{{ browse_services_url|default:'#' }}?category=ai" class="block">
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
                         <img src="{% static 'assets/images/blog/8.webp' %}" alt="{% trans 'AI & Data' %}" class="w-full h-full object-cover" />
                     </div>
@@ -238,7 +238,7 @@
         <p class="body2 text-secondary mt-3 max-w-2xl mx-auto animate animate_top" style="--i: 2">{% trans "From startups to enterprises, we have a plan that fits your hiring needs. All plans include KYC verification, escrow payments, and core ATS features." %}</p>
         <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5 animate animate_top" style="--i: 3">
             <a href="{% url 'pricing' %}" class="button-main">{% trans "View Pricing Plans" %}</a>
-            <a href="{% url 'contact' %}" class="button-main -border">{% trans "Contact Sales" %}</a>
+            <a href="{% url 'contact_us' %}" class="button-main -border">{% trans "Contact Sales" %}</a>
         </div>
     </div>
 </section>
@@ -254,8 +254,8 @@
             <h4 class="heading4 text-white">{% trans "Ready to Find Your Next Great Hire?" %}</h4>
             <p class="desc mt-2 text-white max-w-2xl mx-auto">{% trans "Post your first job for free and connect with verified talent today." %}</p>
             <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'register' %}?type=employer" class="button-main bg-white">{% trans "Post a Job Free" %}</a>
-                <a href="{% url 'demo' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
+                <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white">{% trans "Post a Job Free" %}</a>
+                <a href="{% url 'contact_us' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
             </div>
         </div>
     </div>

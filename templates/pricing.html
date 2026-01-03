@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA PRICING PAGE
@@ -25,8 +26,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Pricing" %} - Zumodra{% endblock %}
@@ -104,7 +103,7 @@
                         <strong class="pricing_feature text-title text-placehover">{% trans "Analytics dashboard" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main -border w-full text-center mt-5" href="{% url 'register' %}?plan=starter">{% trans "Get Started" %}</a>
+                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}?plan=starter">{% trans "Get Started" %}</a>
             </li>
 
             {% comment %} Pro Plan {% endcomment %}
@@ -146,7 +145,7 @@
                         <strong class="pricing_feature text-title text-placehover">{% trans "Multi-circuit talent" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main -border w-full text-center mt-5" href="{% url 'register' %}?plan=pro">{% trans "Get Started" %}</a>
+                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}?plan=pro">{% trans "Get Started" %}</a>
             </li>
 
             {% comment %} Business Plan - Most Popular {% endcomment %}
@@ -189,7 +188,7 @@
                         <strong class="pricing_feature text-title">{% trans "Priority support" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main w-full text-center mt-5" href="{% url 'register' %}?plan=business">{% trans "Get Started" %}</a>
+                <a class="button-main w-full text-center mt-5" href="{% url 'account_signup' %}?plan=business">{% trans "Get Started" %}</a>
             </li>
 
             {% comment %} Enterprise Plan {% endcomment %}
@@ -231,7 +230,7 @@
                         <strong class="pricing_feature text-title">{% trans "24/7 premium support" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main -border w-full text-center mt-5" href="{% url 'contact' %}">{% trans "Contact Sales" %}</a>
+                <a class="button-main -border w-full text-center mt-5" href="{% url 'contact_us' %}">{% trans "Contact Sales" %}</a>
             </li>
         </ul>
     </div>
@@ -286,8 +285,8 @@
             <h4 class="heading4 text-white">{% trans "Not Sure Which Plan Is Right for You?" %}</h4>
             <p class="desc mt-2 text-white max-w-2xl mx-auto">{% trans "Our team is here to help you find the perfect solution. Schedule a demo or chat with our sales team." %}</p>
             <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'contact' %}" class="button-main bg-white">{% trans "Talk to Sales" %}</a>
-                <a href="{% url 'demo' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
+                <a href="{% url 'contact_us' %}" class="button-main bg-white">{% trans "Talk to Sales" %}</a>
+                <a href="{% url 'contact_us' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
             </div>
         </div>
     </div>
@@ -337,7 +336,7 @@
             </div>
         </div>
         <div class="text-center mt-8">
-            <a href="{% url 'faqs' %}" class="text-button text-primary hover:underline">{% trans "View All FAQs" %} →</a>
+            <a href="{% url 'faq' %}" class="text-button text-primary hover:underline">{% trans "View All FAQs" %} →</a>
         </div>
     </div>
 </section>

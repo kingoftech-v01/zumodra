@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load static i18n %}
+{% url 'services:service_list' as careers_url %}
 
 {% block title %}{% trans "Page Not Found" %} - Zumodra{% endblock %}
 {% block meta_description %}{% trans "The page you are looking for could not be found." %}{% endblock %}
@@ -76,10 +77,10 @@
                        class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         {% trans "Home" %}
                     </a>
-                    <a href="{% url 'careers:job_list' %}"
+                    {% if careers_url %}<a href="{{ careers_url }}"
                        class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         {% trans "Careers" %}
-                    </a>
+                    </a>{% endif %}
                     <a href="{% url 'about' %}"
                        class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                         {% trans "About Us" %}

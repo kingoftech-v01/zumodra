@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA ABOUT US PAGE
@@ -20,8 +21,6 @@
    Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "About Us" %} - Zumodra{% endblock %}
@@ -37,7 +36,7 @@
             <div class="slider_content lg:w-[430px] w-full">
                 <h2 class="heading2 animate animate_top" style="--i: 1">{% trans "Welcome to Zumodra" %}</h2>
                 <p class="body2 mt-3 animate animate_top" style="--i: 2">{% trans "Unlock the power of verified talent to meet your business needs and propel your company forward with confidence." %}</p>
-                <a href="{% url 'contact' %}" class="button-main mt-7 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
+                <a href="{% url 'contact_us' %}" class="button-main mt-7 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
             </div>
                     <ul class="slider_bg grid grid-cols-3 w-7/12 h-full max-lg:hidden">
                         <li class="h-full overflow-hidden">
@@ -64,7 +63,7 @@
         <p class="body2 text-center mt-3 animate animate_top" style="--i: 2">
             {% trans "With a vision to revolutionize the way freelancers and employers connect, Zumodra serves as a dynamic hub for talent discovery and collaboration. We believe in empowering individuals and businesses to thrive in the digital economy through bidirectional KYC verification, secure escrow payments, and meaningful connections that facilitate seamless workflows." %}
         </p>
-        <a href="{% url 'contact' %}" class="button-main mt-4 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
+        <a href="{% url 'contact_us' %}" class="button-main mt-4 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
                 <ul class="list_img grid sm:grid-cols-3 xl:gap-15 lg:gap-8 gap-5 w-full md:mt-10 mt-7">
                     <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 4">
                         <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="avatar/about1" class="w-full h-full object-cover" />

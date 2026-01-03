@@ -1,18 +1,20 @@
-{# =============================================================================
+{% comment %}
+=============================================================================
    ZUMODRA PUBLIC FOOTER COMPONENT
-   =============================================================================
+=============================================================================
 
    File: templates/components/public_footer.html
    Purpose: Consolidated public footer for all pages
 
    Usage:
-   {% include "components/public_footer.html" %}
+   include "components/public_footer.html"
 
    NO CDN DEPENDENCIES - Uses local Phosphor icons
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-01
-   ============================================================================= #}
+=============================================================================
+{% endcomment %}
 
 {% load i18n static %}
 
@@ -112,10 +114,12 @@
             {# Newsletter & App Download #}
             <div class="flex-shrink-0 max-xl:w-full">
                 <div class="company-contact sm:w-[340px]">
-                    {# Newsletter Signup #}
+                    {# Newsletter Signup - Uses default newsletter if available #}
+                    {% url 'newsletter_subscribe_request' newsletter_slug='default' as newsletter_sub_url %}
+                    {% if newsletter_sub_url %}
                     <strong class="heading block text-button-sm text-white">{% trans 'Subscribe to Newsletter' %}</strong>
                     <form class="send-block mt-4 flex items-center h-[46px] rounded-lg overflow-hidden"
-                          hx-post="{% url 'newsletter_subscribe' %}"
+                          hx-post="{{ newsletter_sub_url }}"
                           hx-swap="outerHTML"
                           hx-target="this">
                         {% csrf_token %}
@@ -131,6 +135,10 @@
                             <span class="ph-bold ph-paper-plane-tilt text-white text-lg"></span>
                         </button>
                     </form>
+                    {% else %}
+                    <strong class="heading block text-button-sm text-white">{% trans 'Subscribe to Newsletter' %}</strong>
+                    <p class="mt-4 text-sm text-white/80">{% trans 'Newsletter subscription coming soon!' %}</p>
+                    {% endif %}
 
                     {# App Download #}
                     <strong class="heading block text-button-sm text-white mt-6">{% trans 'Download App' %}</strong>

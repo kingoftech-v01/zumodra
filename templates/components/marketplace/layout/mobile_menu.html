@@ -1,12 +1,13 @@
-{# =============================================================================
+{% comment %}
+=============================================================================
    ZUMODRA MOBILE MENU COMPONENT
-   =============================================================================
+=============================================================================
 
    File: templates/components/marketplace/layout/mobile_menu.html
    Purpose: Slide-in mobile navigation for public/marketplace pages
 
    Usage:
-   {% include "components/marketplace/layout/mobile_menu.html" %}
+   include "components/marketplace/layout/mobile_menu.html"
 
    Features:
    - Slide-in mobile navigation
@@ -17,7 +18,8 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+=============================================================================
+{% endcomment %}
 
 {% load i18n static %}
 
@@ -50,8 +52,10 @@
         </div>
 
         {# Mobile Search #}
+        {% url 'dashboard:global-search' as mobile_search_url %}
+        {% if mobile_search_url %}
         <form class="relative mx-5 mt-4"
-              hx-get="{% url 'dashboard:search' %}"
+              hx-get="{{ mobile_search_url }}"
               hx-trigger="keyup changed delay:300ms"
               hx-target="#mobile-search-results">
             {% csrf_token %}
@@ -64,6 +68,7 @@
                    class="h-12 w-full rounded-lg border border-line text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </form>
         <div id="mobile-search-results" class="mx-5"></div>
+        {% endif %}
 
         {# Navigation #}
         <nav class="mt-4 px-5 overflow-y-auto" style="max-height: calc(100vh - 200px);">
@@ -93,9 +98,12 @@
                         <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Jobs' %}</a></li>
                         <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Projects' %}</a></li>
                         <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Employers' %}</a></li>
-                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Seller' %}</a></li>
+                        <li><a href="{% url 'become_seller' %}" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Seller' %}</a></li>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'dashboard' %}" class="block py-2 text-primary font-medium">{% trans 'Candidate Dashboard' %}</a></li>
+                        {% url 'dashboard:index' as candidate_dashboard_url %}
+                        {% if candidate_dashboard_url %}
+                        <li><a href="{{ candidate_dashboard_url }}" class="block py-2 text-primary font-medium">{% trans 'Candidate Dashboard' %}</a></li>
+                        {% endif %}
                         {% endif %}
                     </ul>
                 </li>
@@ -115,9 +123,12 @@
                         class="pl-12 mt-1 space-y-1">
                         <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Services' %}</a></li>
                         <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Candidates' %}</a></li>
-                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Buyer' %}</a></li>
+                        <li><a href="{% url 'become_buyer' %}" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Buyer' %}</a></li>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'dashboard' %}" class="block py-2 text-primary font-medium">{% trans 'Employer Dashboard' %}</a></li>
+                        {% url 'dashboard:index' as employer_dashboard_url %}
+                        {% if employer_dashboard_url %}
+                        <li><a href="{{ employer_dashboard_url }}" class="block py-2 text-primary font-medium">{% trans 'Employer Dashboard' %}</a></li>
+                        {% endif %}
                         {% endif %}
                     </ul>
                 </li>

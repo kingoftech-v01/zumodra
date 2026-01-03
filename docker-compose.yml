@@ -180,9 +180,12 @@ services:
           cpus: '0.25'
           memory: 256M
     healthcheck:
-      <<: *healthcheck-defaults
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 15s
+      timeout: 10s
+      retries: 5
+      # Migrations can take 5+ minutes on first startup, so allow 6 minutes
+      start_period: 360s
     depends_on:
       db:
         condition: service_healthy
@@ -298,9 +301,11 @@ services:
           cpus: '0.1'
           memory: 128M
     healthcheck:
-      <<: *healthcheck-defaults
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('localhost',8001)); s.close()"]
       interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
       db:
         condition: service_healthy

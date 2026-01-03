@@ -55,7 +55,29 @@
       "Bash(ssh -o ConnectTimeout=30 root@147.93.47.35 \"docker ps -a --format ''table {{.Names}}\\\\t{{.Status}}'' | grep zumodra\")",
       "Bash(python manage.py makemigrations:*)",
       "Bash(timeout 30 ssh:*)",
-      "Bash(timeout 10 sleep:*)"
+      "Bash(timeout 10 sleep:*)",
+      "Bash(git -C /home/kingoftech/zumodra add -A)",
+      "Bash(git -C /home/kingoftech/zumodra reset HEAD)",
+      "Bash(git -C /home/kingoftech/zumodra add .gitignore docker-compose.yml docker-compose.prod.yml docker/nginx-sites/zumodra.dev.conf docker/nginx.prod.conf .env.example)",
+      "Bash(git -C /home/kingoftech/zumodra commit -m \"$\\(cat <<''EOF''\nchore: update Docker config and add .env.example\n\n- Update .gitignore with collected static files and IDE settings\n- Update docker-compose.yml and docker-compose.prod.yml configs\n- Update nginx configuration files\n- Add .env.example template for developers\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /home/kingoftech/zumodra add:*)",
+      "Bash(git -C /home/kingoftech/zumodra commit -m \"$\\(cat <<''EOF''\nrefactor: update templates and consolidate migrations\n\n- Fix URL patterns in templates \\(services, header links\\)\n- Update careers models and add migrations\n- Consolidate tenant migrations\n- Update bootstrap_demo_tenant command\n- Various template improvements and fixes\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /home/kingoftech/zumodra commit -m \"$\\(cat <<''EOF''\nchore: add remaining migrations and static assets\n\n- Add migrations for accounts, analytics, ats, hr_core, integrations,\n  marketing, notifications, security apps\n- Update existing migrations for blog, configurations, finance,\n  messages_sys, services\n- Add management commands for tenant creation and migration fixes\n- Update static CSS and JS files \\(accessibility, dark-mode, etc.\\)\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /home/kingoftech/zumodra commit -m \"$\\(cat <<''EOF''\nchore: remove obsolete migrations and unused CSS\n\n- Remove old blog migrations \\(consolidated into 0001_initial\\)\n- Remove old core, dashboard_service, services migrations\n- Remove unused components.css and theme.css\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /home/kingoftech/zumodra commit -m \"$\\(cat <<''EOF''\nchore: add vendor static folders to gitignore\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /home/kingoftech/zumodra log --oneline -6)",
+      "Bash(git -C:*)",
+      "Bash(docker volume:*)",
+      "Bash(docker network:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker ps:*)",
+      "Bash(curl:*)",
+      "Bash(git -C /home/kingoftech/zumodra checkout --theirs main/templates/main/index.html)",
+      "Bash(docker restart:*)",
+      "Bash(docker exec:*)",
+      "Bash(for:*)",
+      "Bash(do head -1 \"$f\")"
     ]
   }
 }

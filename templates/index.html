@@ -1,7 +1,8 @@
+{% extends "base.html" %}
 {% comment %}
 =============================================================================
    ZUMODRA HOME PAGE
-   =============================================================================
+=============================================================================
 
    File: templates/index.html
    Purpose: Main homepage for the Zumodra platform
@@ -18,10 +19,8 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   =============================================================================
+=============================================================================
 {% endcomment %}
-
-{% extends "base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Home" %} - Zumodra{% endblock %}
@@ -41,8 +40,9 @@
             <div class="slider_content flex flex-col items-start justify-center sm:pt-20 pt-16 md:w-[720px] w-full h-full">
                 <h2 class="heading1 text-white animate animate_top" style="--i: 1">{% trans "Verify. Recruit. Hire. Risk-Free." %}</h2>
                 <p class="body2 text-white mt-5 animate animate_top" style="--i: 2">{% trans "Find verified freelancers and top talent for any project. Build trust with bidirectional KYC verification." %}</p>
+                {% url 'services:service_list' as job_search_url %}
                 <div class="form_search z-[1] w-full md:mt-10 mt-7 animate animate_top" style="--i: 3">
-                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white" action="{% url 'search' %}" method="get">
+                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white" action="{{ job_search_url|default:'#' }}" method="get">
                         <div class="form_input relative w-full">
                             <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
                             <input type="text" name="q" class="input_search w-full h-full pl-10" placeholder="{% trans 'Job title, keywords, or company' %}" />
@@ -65,10 +65,10 @@
                 </div>
                 <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
                     <strong class="text-button-sm text-white">{% trans "Popular:" %}</strong>
-                    <a href="{% url 'services_category' 'graphics' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Graphics" %}</a>
-                    <a href="{% url 'services_category' 'web' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Website" %}</a>
-                    <a href="{% url 'services_category' 'logo' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Logo" %}</a>
-                    <a href="{% url 'services_category' 'dev' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Development" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=graphics" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Graphics" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=web" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Website" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=logo" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Logo" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=dev" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Development" %}</a>
                 </div>
             </div>
         </div>
@@ -129,7 +129,7 @@
                 <h3 class="heading3">{% trans "Top Categories" %}</h3>
                 <p class="body2 text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
             </div>
-            <a href="{% url 'categories' %}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
+            <a href="{{ job_search_url|default:'#' }}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
         </div>
                 <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
                     <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 1">

@@ -277,10 +277,12 @@ services:
         max_attempts: 5
         window: 120s
     healthcheck:
-      <<: *healthcheck-defaults
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 15s
       timeout: 5s
+      retries: 5
+      # Allow time for migrations on first deployment
+      start_period: 360s
     depends_on:
       postgres-primary:
         condition: service_healthy
