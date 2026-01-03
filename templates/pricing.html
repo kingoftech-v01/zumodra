@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block head_title %}{% trans "Pricing" %} - Zumodra{% endblock head_title %}
+
+{% block header %}
+    {% include 'header.html' %}
+{% endblock header %}
+
+{% block content %}
+
+    <!-- Hero Section -->
+    <section class="slider">
+        <div class="slider_inner relative lg:h-[400px] sm:pt-20 pt-16 overflow-hidden bg-gradient-to-r from-primary-600 to-primary-800">
+            <div class="container flex items-center justify-center h-full max-lg:py-16">
+                <div class="slider_content text-center text-white">
+                    <h1 class="heading1 animate animate_top" style="--i: 1">{% trans "Simple, Transparent Pricing" %}</h1>
+                    <p class="body1 mt-4 opacity-90 animate animate_top" style="--i: 2">
+                        {% trans "Choose the plan that fits your business needs" %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pricing lg:py-20 sm:py-14 py-10">
+        <div class="container">
+            <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+
+                <!-- Starter Plan -->
+                <div class="pricing-card bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-primary-200 transition-all duration-300 animate animate_top" style="--i: 1">
+                    <div class="text-center mb-6">
+                        <h3 class="heading4 text-secondary">{% trans "Starter" %}</h3>
+                        <div class="mt-4">
+                            <span class="heading2 text-primary-600">€15</span>
+                            <span class="body2 text-secondary">/{% trans "user/month" %}</span>
+                        </div>
+                        <p class="body3 text-secondary mt-2">{% trans "For small teams getting started" %}</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Up to 3 job pipelines" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Basic ATS features" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Email notifications" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Standard support" %}</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'account_signup' %}" class="button-outline w-full text-center block">{% trans "Start Free Trial" %}</a>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="pricing-card bg-white rounded-xl shadow-lg p-8 border-2 border-primary-500 relative animate animate_top" style="--i: 2">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-primary-500 text-white px-4 py-1 rounded-full text-sm font-medium">{% trans "Popular" %}</span>
+                    </div>
+                    <div class="text-center mb-6">
+                        <h3 class="heading4 text-secondary">{% trans "Pro" %}</h3>
+                        <div class="mt-4">
+                            <span class="heading2 text-primary-600">€25</span>
+                            <span class="body2 text-secondary">/{% trans "user/month" %}</span>
+                        </div>
+                        <p class="body3 text-secondary mt-2">{% trans "For growing businesses" %}</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Unlimited pipelines" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "AI-powered CV parsing" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "SMS notifications" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Priority support" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "KYC verification" %}</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'account_signup' %}" class="button-main w-full text-center block">{% trans "Start Free Trial" %}</a>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-primary-200 transition-all duration-300 animate animate_top" style="--i: 3">
+                    <div class="text-center mb-6">
+                        <h3 class="heading4 text-secondary">{% trans "Business" %}</h3>
+                        <div class="mt-4">
+                            <span class="heading2 text-primary-600">€35</span>
+                            <span class="body2 text-secondary">/{% trans "user/month" %}</span>
+                        </div>
+                        <p class="body3 text-secondary mt-2">{% trans "For enterprises" %}</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Everything in Pro" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Multi-circuit talent" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "E-signatures (DocuSign)" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Advanced analytics" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3">{% trans "Custom workflows" %}</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'account_signup' %}" class="button-outline w-full text-center block">{% trans "Start Free Trial" %}</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg p-8 text-white animate animate_top" style="--i: 4">
+                    <div class="text-center mb-6">
+                        <h3 class="heading4 text-gray-300">{% trans "Enterprise" %}</h3>
+                        <div class="mt-4">
+                            <span class="heading3">{% trans "Custom" %}</span>
+                        </div>
+                        <p class="body3 text-gray-400 mt-2">{% trans "Tailored for your needs" %}</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3 text-gray-300">{% trans "Everything in Business" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3 text-gray-300">{% trans "SSO integration" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3 text-gray-300">{% trans "Full API access" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3 text-gray-300">{% trans "Dedicated support" %}</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="body3 text-gray-300">{% trans "Custom SLA" %}</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'contact_us' %}" class="bg-white text-gray-900 hover:bg-gray-100 font-medium py-3 px-6 rounded-lg w-full text-center block transition-colors">{% trans "Contact Sales" %}</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq lg:py-20 sm:py-14 py-10 bg-[#FAF7F1]">
+        <div class="container">
+            <h2 class="heading2 text-center mb-10 animate animate_top" style="--i: 1">{% trans "Frequently Asked Questions" %}</h2>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="bg-white rounded-lg p-6 shadow-sm animate animate_top" style="--i: 2">
+                    <h4 class="heading5 mb-2">{% trans "Can I change plans later?" %}</h4>
+                    <p class="body2 text-secondary">{% trans "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle." %}</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 shadow-sm animate animate_top" style="--i: 3">
+                    <h4 class="heading5 mb-2">{% trans "Is there a free trial?" %}</h4>
+                    <p class="body2 text-secondary">{% trans "Yes, all plans come with a 14-day free trial. No credit card required to start." %}</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 shadow-sm animate animate_top" style="--i: 4">
+                    <h4 class="heading5 mb-2">{% trans "What payment methods do you accept?" %}</h4>
+                    <p class="body2 text-secondary">{% trans "We accept all major credit cards, PayPal, and bank transfers for annual plans." %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
+
+{% block footer %}
+    {% include 'footer.html' %}
+{% endblock footer %}

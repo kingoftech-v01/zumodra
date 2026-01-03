@@ -11,11 +11,9 @@ set -e
 # -----------------------------------------------------------------------------
 # Configuration - Read from environment with sensible defaults
 # -----------------------------------------------------------------------------
-# Database configuration - supports both DB_PORT and DB_DEFAULT_PORT
-# Priority: DB_PORT > DB_DEFAULT_PORT > default 5432
 DB_HOST="${DB_HOST:-localhost}"
-DB_PORT="${DB_PORT:-${DB_DEFAULT_PORT:-5432}}"
-DB_NAME="${DB_NAME:-${DB_DEFAULT_NAME:-zumodra}}"
+DB_PORT="${DB_PORT:-5432}"
+DB_NAME="${DB_NAME:-zumodra}"
 DB_USER="${DB_USER:-postgres}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 
@@ -104,9 +102,8 @@ import sys
 
 # Read from environment (same vars the entrypoint uses)
 host = os.environ.get("DB_HOST", "localhost")
-# Support both DB_PORT and DB_DEFAULT_PORT
-port = os.environ.get("DB_PORT", os.environ.get("DB_DEFAULT_PORT", "5432"))
-name = os.environ.get("DB_NAME", os.environ.get("DB_DEFAULT_NAME", "zumodra"))
+port = os.environ.get("DB_PORT", "5432")
+name = os.environ.get("DB_NAME", "zumodra")
 user = os.environ.get("DB_USER", "postgres")
 password = os.environ.get("DB_PASSWORD", "")
 
@@ -319,7 +316,7 @@ wait_for_rabbitmq() {
 }
 
 # -----------------------------------------------------------------------------
-# Run Django Migrations
+# Run Django Migrations (django-tenants compatible)
 # -----------------------------------------------------------------------------
 run_migrations() {
     if [ "$SKIP_MIGRATIONS" = "true" ]; then
@@ -327,14 +324,24 @@ run_migrations() {
         return 0
     fi
 
-    log_info "Running Django migrations..."
+    log_info "Running Django migrations (django-tenants)..."
 
-    # Run migrations for all apps
-    if python manage.py migrate --noinput; then
-        log_info "Migrations completed successfully!"
+    # Step 1: Run migrations for SHARED_APPS on the public schema
+    log_info "Step 1/2: Migrating shared schema (public)..."
+    if python manage.py migrate_schemas --shared --noinput; then
+        log_info "Shared schema migrations completed successfully!"
     else
-        log_error "Migration failed!"
+        log_error "Shared schema migration failed!"
         return 1
+    fi
+
+    # Step 2: Run migrations for TENANT_APPS on all tenant schemas
+    log_info "Step 2/2: Migrating tenant schemas..."
+    if python manage.py migrate_schemas --tenant --noinput; then
+        log_info "Tenant schema migrations completed successfully!"
+    else
+        log_warn "Tenant schema migration had issues (may be no tenants yet)"
+        # Don't fail if there are no tenants - this is expected on first run
     fi
 }
 
@@ -407,6 +414,50 @@ bootstrap_demo_tenant() {
 }
 
 # -----------------------------------------------------------------------------
+# Migration Lock (for production with multiple replicas)
+# Uses Redis to ensure only one instance runs migrations at a time
+# -----------------------------------------------------------------------------
+acquire_migration_lock() {
+    python3 << 'PYEOF'
+import os
+import sys
+
+redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+lock_key = "zumodra:migration:lock"
+lock_timeout = 600  # 10 minutes
+
+try:
+    import redis
+    r = redis.from_url(redis_url, socket_connect_timeout=5)
+    acquired = r.set(lock_key, "locked", nx=True, ex=lock_timeout)
+    if acquired:
+        print("ACQUIRED")
+    else:
+        print("WAITING")
+except Exception as e:
+    # If Redis fails, proceed without lock (fail open for dev environments)
+    print(f"ERROR: {e}")
+    sys.exit(0)
+PYEOF
+}
+
+release_migration_lock() {
+    python3 << 'PYEOF'
+import os
+
+redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+lock_key = "zumodra:migration:lock"
+
+try:
+    import redis
+    r = redis.from_url(redis_url, socket_connect_timeout=5)
+    r.delete(lock_key)
+except:
+    pass  # Best effort - ignore errors
+PYEOF
+}
+
+# -----------------------------------------------------------------------------
 # Main Entrypoint Logic
 # -----------------------------------------------------------------------------
 main() {
@@ -422,18 +473,36 @@ main() {
         wait_for_rabbitmq || exit 1
     fi
 
-    # Only run migrations and collectstatic for the primary web instance
-    # or when explicitly enabled
+    # Only run migrations and collectstatic for the web service
+    # Uses Redis-based locking to prevent race conditions with multiple replicas
     if [ "$SERVICE_TYPE" = "web" ]; then
-        run_migrations || exit 1
-        create_cache_table
-        run_collectstatic
-        bootstrap_demo_tenant
-        verify_django_setup
-    elif [ "$SERVICE_TYPE" = "celery-beat" ]; then
-        # Celery beat needs migrations for django_celery_beat tables
-        run_migrations || exit 1
+        local lock_status
+        lock_status=$(acquire_migration_lock)
+
+        if [ "$lock_status" = "ACQUIRED" ]; then
+            log_info "Migration lock acquired, running database setup..."
+            run_migrations || { release_migration_lock; exit 1; }
+            create_cache_table
+            run_collectstatic
+            bootstrap_demo_tenant
+            verify_django_setup
+            release_migration_lock
+            log_info "Migration lock released"
+        elif [ "$lock_status" = "WAITING" ]; then
+            log_info "Another instance is running migrations, waiting 30s..."
+            sleep 30
+        else
+            # Lock acquisition failed (Redis error) - proceed anyway for dev
+            log_warn "Could not acquire migration lock, proceeding without lock..."
+            run_migrations || exit 1
+            create_cache_table
+            run_collectstatic
+            bootstrap_demo_tenant
+            verify_django_setup
+        fi
     fi
+    # Note: celery services do NOT run migrations - web container handles all migrations
+    # django_celery_beat tables are in SHARED_APPS and migrated with --shared flag
 
     log_info "=========================================="
     log_info "Starting application: $@"

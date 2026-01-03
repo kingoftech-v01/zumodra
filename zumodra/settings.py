@@ -42,63 +42,63 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.l
 # =============================================================================
 # django-tenants: Shared apps run on public schema, tenant apps on tenant schemas
 
+# =============================================================================
+# DJANGO-TENANTS APP CONFIGURATION
+# =============================================================================
+# IMPORTANT: django-tenants uses SHARED_APPS and TENANT_APPS to determine
+# which apps get migrated to which schemas:
+# - SHARED_APPS: Only migrated to PUBLIC schema (shared across all tenants)
+# - TENANT_APPS: Only migrated to TENANT schemas (isolated per tenant)
+# - INSTALLED_APPS: Computed from both lists (DO NOT define manually!)
+# =============================================================================
+
 SHARED_APPS = [
-    'django_tenants',            # Must be first for multi-tenancy
+    # Django Tenants (MUST be first)
+    'django_tenants',
+
+    # Django Core - SHARED (public schema only)
     'django.contrib.contenttypes',
-    'django.contrib.sites',
     'django.contrib.auth',
-    'custom_account_u',          # Custom user model - must be before admin
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Tenant management apps (shared across all tenants)
+    # Custom User Model - SHARED (users can belong to multiple tenants)
+    'custom_account_u',
+
+    # Tenant Management - SHARED
     'tenants',
     'main',
 
-    # Celery Beat (must be in SHARED_APPS for multi-tenant - runs on public schema)
-    'django_celery_beat',
-]
+    # Allauth Authentication - SHARED (users can belong to multiple tenants)
+    # Must be in SHARED to allow login/signup on public site
+    'allauth',
+    'allauth.account',
+    'allauth.mfa',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.linkedin',
+    'allauth_2fa',
 
-TENANT_APPS = [
-    # Django Core Apps (tenant-specific instances)
-    'django.contrib.sites',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'django.contrib.sitemaps',
-    'django.contrib.gis',
-
-    # Two-Factor Authentication
+    # Two-Factor Authentication - SHARED (tied to user accounts)
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_hotp',
     'django_otp.plugins.otp_email',
     'django_otp.plugins.otp_static',
 
-    # Allauth Authentication
-    'allauth_2fa',
-    'allauth',
-    'allauth.mfa',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.linkedin',
+    # Celery Beat - SHARED (single scheduler for entire platform)
+    'django_celery_beat',
 
-    # Third-party apps with tenant-specific data
-    'auditlog',
-    'newsletter',
-    'taggit',
-    'sorl.thumbnail',
+    # Security - SHARED (platform-wide)
+    'axes',
+    'admin_honeypot',
 
-    # Wagtail CMS (tenant-specific content)
+    # Wagtail CMS - SHARED (needed for public site, shared content across tenants)
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -113,65 +113,15 @@ TENANT_APPS = [
     'wagtail_localize.locales',
     'wagtail',
     'modelcluster',
-
-    # Zumodra Core Apps (tenant-specific data)
-    'custom_account_u',
-    'accounts',
-    'ats',
-    'hr_core',
-    'services',
-    'finance',
-    'messages_sys',
-    'notifications',
-    'careers',
-    'ai_matching',
-    'integrations',
-    'dashboard',
-    'dashboard_service',
-    'analytics',
-    'blog',
-    'configurations',
-    'core',
-    'security',
-    'marketing',
-    'api',
-    'appointment.apps.AppointmentConfig',
+    'taggit',
 ]
 
-# Combined list of all installed apps
-INSTALLED_APPS = [
-    # Django Tenants (must be first)
-    'django_tenants',
-
-    # Django Core Apps
-    'django.contrib.sites',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+TENANT_APPS = [
+    # Django Core - TENANT-SPECIFIC
+    'django.contrib.contenttypes',  # Needed for auditlog, generic FKs in tenant schemas
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'django.contrib.gis',
-
-    # Two-Factor Authentication
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_hotp',
-    'django_otp.plugins.otp_email',
-    'django_otp.plugins.otp_static',
-
-    # Allauth Authentication
-    'allauth_2fa',
-    'allauth',
-    'allauth.mfa',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.linkedin',
 
     # Third-Party UI/Forms
     'widget_tweaks',
@@ -179,7 +129,7 @@ INSTALLED_APPS = [
     'leaflet',
     'crispy_forms',
 
-    # Analytics & Tracking
+    # Analytics & Tracking - TENANT-SPECIFIC
     'analytical',
     'newsletter',
     'auditlog',
@@ -188,34 +138,13 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     'phonenumber_field',
 
-    # Security
-    'admin_honeypot',
+    # Security - TENANT-SPECIFIC
     'csp',
-    'axes',
     'sslserver',
 
     # Task Scheduling
     'django_q',
-    'django_celery_beat',
     'django_extensions',
-
-    # Wagtail CMS
-    'wagtail.contrib.forms',
-    'wagtail.contrib.redirects',
-    'wagtail.embeds',
-    'wagtail.sites',
-    'wagtail.users',
-    'wagtail.snippets',
-    'wagtail.documents',
-    'wagtail.images',
-    'wagtail.search',
-    'wagtail.admin',
-    'wagtail_localize',
-    'wagtail_localize.locales',
-    'wagtail',
-
-    'modelcluster',
-    'taggit',
 
     # REST API & Documentation
     'rest_framework',
@@ -227,39 +156,32 @@ INSTALLED_APPS = [
     # WebSockets
     'channels',
 
-    # Zumodra Core Apps
-    'custom_account_u',
-    'main',
-    'blog',
+    # Zumodra Core Apps - TENANT-SPECIFIC
+    'accounts',
+    'ats',
+    'hr_core',
+    'services',
     'finance',
     'messages_sys',
-    'configurations',
-    'dashboard_service',
-    'dashboard',
-    'services',
-    'appointment.apps.AppointmentConfig',
-
-    # API & Features
-    'api',
     'notifications',
-    'analytics',
-
-    # HR & ATS apps
-    'ats',
     'careers',
-    'hr_core',
-    'tenants',
-    'accounts',
     'ai_matching',
     'integrations',
-
-    # Infrastructure & Utilities
+    'dashboard',
+    'dashboard_service',
+    'analytics',
+    'blog',
+    'configurations',
     'core',
     'security',
     'marketing',
+    'api',
+    'appointment.apps.AppointmentConfig',
 ]
 
-# INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+# INSTALLED_APPS: Computed from SHARED_APPS + TENANT_APPS (django-tenants standard)
+# This ensures proper migration behavior for multi-tenant schemas
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 # Multi-tenant model configuration
 # NOTE: Models are defined in tenants.models but re-exported from main.models
@@ -429,11 +351,10 @@ LANGUAGES = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/files/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "staticfiles",
-    BASE_DIR / "staticfiles_auth",
 ]
 
 STATIC_ROOT = BASE_DIR / 'static'
@@ -452,13 +373,13 @@ AUTH_USER_MODEL = 'custom_account_u.CustomUser'
 
 # Email Settings
 EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = env('EMAIL_HOST', default='business43.web-hosting.com')
+EMAIL_HOST = env('EMAIL_HOST', default='localhost')
 EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='support@rhematek-solutions.com')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='support@rhematek-solutions.com')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@localhost')
 
 # Stripe Settings
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default='')
@@ -526,9 +447,9 @@ LOGIN_ATTEMPT_TIMEOUT = 86400  # in seconds (72 hours)
 ACCOUNT_FORMS = {'signup': 'custom_account_u.forms.CustomSignupForm'}
 
 # django-analytical settings
-GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-XXXXXXX-1'
-CLICKY_SITE_ID = '1234567'
-CRAZY_EGG_ACCOUNT_NUMBER = '7654321'
+GOOGLE_ANALYTICS_PROPERTY_ID = env('GOOGLE_ANALYTICS_PROPERTY_ID', default='')
+CLICKY_SITE_ID = env('CLICKY_SITE_ID', default='')
+CRAZY_EGG_ACCOUNT_NUMBER = env('CRAZY_EGG_ACCOUNT_NUMBER', default='')
 
 # django-user-tracking settings
 USER_TRACKING_AUTO_IDENTIFY = True            # Track authenticated users
@@ -1082,35 +1003,6 @@ SPECTACULAR_SETTINGS = {
     'EXTENSIONS_INFO': {},
 }
 
-# ==================== CELERY CONFIGURATION ====================
-
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERY_WORKER_CONCURRENCY = 4
-
-# Celery Beat schedule for periodic tasks
-CELERY_BEAT_SCHEDULE = {
-    'cleanup-expired-sessions': {
-        'task': 'main.tasks.cleanup_expired_sessions',
-        'schedule': 3600.0,  # Every hour
-    },
-    'send-scheduled-newsletters': {
-        'task': 'newsletter.tasks.send_scheduled_newsletters',
-        'schedule': 300.0,  # Every 5 minutes
-    },
-    'update-analytics': {
-        'task': 'analytics.tasks.update_daily_analytics',
-        'schedule': 86400.0,  # Every day
-    },
-}
-
 # ==================== CHANNELS / WEBSOCKET CONFIGURATION ====================
 # Optimized for 500K concurrent users
 
@@ -1204,6 +1096,9 @@ OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4')
 
 # Public schema URL routing
 PUBLIC_SCHEMA_URLCONF = 'zumodra.urls_public'
+
+# Show public schema if no tenant found (required for health checks and public pages)
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
 
 # Default tenant schema
 DEFAULT_SCHEMA_NAME = 'public'

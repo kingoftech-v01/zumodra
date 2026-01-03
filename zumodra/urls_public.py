@@ -11,11 +11,20 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.http import JsonResponse
 
+# Wagtail CMS imports
+from wagtail import urls as wagtail_urls
+from wagtail.documents import urls as wagtaildocs_urls
+
 from .views import (
     home_view,
     about_us_view,
+    contact_us_view,
+    faq_view,
+    services_view,
+    pricing_view,
     term_of_use_view,
     privacy_policy_view,
+    auth_test_view,
 )
 
 
@@ -124,8 +133,23 @@ urlpatterns += i18n_patterns(
     # Public pages
     path('', home_view, name='home'),
     path('about/', about_us_view, name='about'),
+    path('contact/', contact_us_view, name='contact_us'),
+    path('faq/', faq_view, name='faq'),
+    path('services/', services_view, name='services'),
+    path('pricing/', pricing_view, name='pricing'),
     path('terms/', term_of_use_view, name='term_of_use'),
     path('privacy/', privacy_policy_view, name='privacy_policy'),
+    path('auth-test/', auth_test_view, name='auth_test'),
+
+    # NOTE: Services Marketplace is only available on tenant subdomains
+    # The public site uses the static /services/ page instead
+    # Marketplace (services app) is included in urls.py (tenant URLs)
+
+    # Blog (Wagtail CMS)
+    path('blog/', include('blog.urls')),
+
+    # Wagtail documents
+    path('documents/', include(wagtaildocs_urls)),
 
     # Authentication
     path('accounts/', include('allauth.urls')),
@@ -134,6 +158,9 @@ urlpatterns += i18n_patterns(
 
     # Newsletter
     path('newsletter/', include('newsletter.urls')),
+
+    # Wagtail page routing (catch-all, must be last)
+    path('', include(wagtail_urls)),
 )
 
 # Custom error handlers
