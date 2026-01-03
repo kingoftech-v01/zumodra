@@ -1,0 +1,243 @@
+{% comment %}
+=============================================================================
+   ZUMODRA CONTACT PAGE
+   =============================================================================
+
+   File: templates/contact.html
+   Purpose: Contact page with map, contact information, and inquiry form
+
+   Extends: base.html (canonical public base template)
+
+   Features:
+   - Google Maps integration
+   - Contact information (address, hours, email, social)
+   - Contact form for inquiries
+   - Fully i18n ready
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   =============================================================================
+{% endcomment %}
+
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Contact Us" %} - Zumodra{% endblock %}
+
+{% block meta_description %}{% trans "Get in touch with Zumodra. We're here to help you with your recruitment and freelance marketplace needs. Contact our team today." %}{% endblock %}
+
+{% block content %}
+{% comment %} MAP SECTION {% endcomment %}
+<section class="map">
+    <div class="map_inner lg:h-[580px] h-[480px] sm:pt-20 pt-16">
+        {% comment %}
+        TODO: Replace with dynamic map based on company settings
+        Currently showing Zumodra headquarters location
+        {% endcomment %}
+        <iframe
+            class="w-full h-full"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.85837007928746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sEiffel%20Tower!5e0!3m2!1sen!2sfr!4v1704288000000!5m2!1sen!2sfr"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="{% trans 'Zumodra Office Location' %}">
+        </iframe>
+    </div>
+</section>
+
+{% comment %} CONTACT US SECTION {% endcomment %}
+<section class="contact lg:py-20 sm:py-14 py-10">
+    <div class="container flex max-lg:flex-col lg:items-center justify-between gap-y-10">
+        {% comment %} Contact Information {% endcomment %}
+        <div class="content lg:w-5/12">
+            <div class="heading">
+                <h3 class="heading3">{% trans "We'd Love to Help" %}</h3>
+                <p class="body2 text-secondary mt-3">
+                    {% trans "We're here to assist you every step of the way. Whether you're looking to hire verified talent or find your next opportunity, let's make your goals a reality." %}
+                </p>
+            </div>
+            <ul class="list grid xl:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6 sm:mt-8 mt-6">
+                <li class="flex flex-col gap-2">
+                    <strong class="text-title">{% trans "Address:" %}</strong>
+                    <p class="desc body2 text-secondary">
+                        {% blocktrans %}
+                        123 Innovation Street<br>
+                        Tech District, Paris 75001<br>
+                        France
+                        {% endblocktrans %}
+                    </p>
+                </li>
+                <li class="flex flex-col gap-2">
+                    <strong class="text-title">{% trans "Business Hours:" %}</strong>
+                    <p class="desc body2 text-secondary">
+                        {% blocktrans %}
+                        Monday - Friday: 09:00 - 18:00<br>
+                        Saturday - Sunday: Closed
+                        {% endblocktrans %}
+                    </p>
+                </li>
+                <li class="flex flex-col gap-2">
+                    <strong class="text-title">{% trans "Contact Information:" %}</strong>
+                    <p class="desc body2 text-secondary">
+                        <a href="mailto:contact@zumodra.com" class="hover:text-primary duration-300">contact@zumodra.com</a><br>
+                        <a href="tel:+33123456789" class="hover:text-primary duration-300">+33 1 23 45 67 89</a>
+                    </p>
+                </li>
+                <li class="flex flex-col gap-2">
+                    <strong class="text-title">{% trans "Follow Us:" %}</strong>
+                    <ul class="list flex flex-wrap items-center gap-2.5">
+                        <li>
+                            <a href="https://www.facebook.com/zumodra" target="_blank" rel="noopener noreferrer"
+                               class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary"
+                               aria-label="{% trans 'Follow us on Facebook' %}">
+                                <span class="icon-facebook text-black duration-300"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.instagram.com/zumodra" target="_blank" rel="noopener noreferrer"
+                               class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary"
+                               aria-label="{% trans 'Follow us on Instagram' %}">
+                                <span class="icon-instagram text-black duration-300"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.twitter.com/zumodra" target="_blank" rel="noopener noreferrer"
+                               class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary"
+                               aria-label="{% trans 'Follow us on Twitter' %}">
+                                <span class="icon-twitter text-black duration-300"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/company/zumodra" target="_blank" rel="noopener noreferrer"
+                               class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary"
+                               aria-label="{% trans 'Connect with us on LinkedIn' %}">
+                                <span class="icon-linkedin text-black duration-300"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.youtube.com/zumodra" target="_blank" rel="noopener noreferrer"
+                               class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary"
+                               aria-label="{% trans 'Subscribe to our YouTube channel' %}">
+                                <span class="icon-youtube text-black duration-300"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        {% comment %} Contact Form {% endcomment %}
+        <div class="form_area flex-shrink-0 xl:w-[520px] lg:w-1/2 p-9 rounded-xl bg-white shadow-lg duration-300">
+            <form class="form flex flex-col gap-5"
+                  method="post"
+                  action="{% url 'contact_submit' %}"
+                  x-data="{ submitting: false, success: false }"
+                  @submit.prevent="submitting = true; $el.submit()">
+                {% csrf_token %}
+
+                <div class="name">
+                    <label for="contact-name" class="text-title">{% trans "Your Name" %}</label>
+                    <input
+                        class="w-full mt-2 px-4 py-3 border border-line rounded-lg focus:border-primary focus:outline-none duration-300"
+                        id="contact-name"
+                        name="name"
+                        type="text"
+                        placeholder="{% trans 'Enter your full name' %}"
+                        required
+                        autocomplete="name" />
+                </div>
+
+                <div class="mail">
+                    <label for="contact-email" class="text-title">{% trans "Email Address" %}</label>
+                    <input
+                        class="w-full mt-2 px-4 py-3 border border-line rounded-lg focus:border-primary focus:outline-none duration-300"
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        placeholder="{% trans 'Enter your email address' %}"
+                        required
+                        autocomplete="email" />
+                </div>
+
+                <div class="subject">
+                    <label for="contact-subject" class="text-title">{% trans "Subject" %}</label>
+                    <select
+                        class="w-full mt-2 px-4 py-3 border border-line rounded-lg focus:border-primary focus:outline-none duration-300"
+                        id="contact-subject"
+                        name="subject"
+                        required>
+                        <option value="">{% trans "Select a subject" %}</option>
+                        <option value="general">{% trans "General Inquiry" %}</option>
+                        <option value="support">{% trans "Technical Support" %}</option>
+                        <option value="sales">{% trans "Sales & Pricing" %}</option>
+                        <option value="partnership">{% trans "Partnership Opportunities" %}</option>
+                        <option value="feedback">{% trans "Feedback & Suggestions" %}</option>
+                    </select>
+                </div>
+
+                <div class="message">
+                    <label for="contact-message" class="text-title">{% trans "Your Message" %}</label>
+                    <textarea
+                        class="border w-full mt-2 px-4 py-3 border-line rounded-lg focus:border-primary focus:outline-none duration-300"
+                        id="contact-message"
+                        name="message"
+                        rows="4"
+                        placeholder="{% trans 'How can we help you? Please describe your inquiry in detail...' %}"
+                        required></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    class="button-main w-full text-center mt-1"
+                    :disabled="submitting"
+                    :class="{ 'opacity-50 cursor-not-allowed': submitting }">
+                    <span x-show="!submitting">{% trans "Send Message" %}</span>
+                    <span x-show="submitting" x-cloak>{% trans "Sending..." %}</span>
+                </button>
+
+                <p class="caption1 text-secondary text-center">
+                    {% trans "By submitting this form, you agree to our" %}
+                    <a href="{% url 'privacy_policy' %}" class="text-primary hover:underline">{% trans "Privacy Policy" %}</a>
+                    {% trans "and" %}
+                    <a href="{% url 'terms_of_use' %}" class="text-primary hover:underline">{% trans "Terms of Service" %}</a>.
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% comment %} FAQ TEASER SECTION {% endcomment %}
+<section class="faq-teaser bg-surface lg:py-20 sm:py-14 py-10">
+    <div class="container text-center">
+        <h3 class="heading4">{% trans "Have Questions?" %}</h3>
+        <p class="body2 text-secondary mt-3 max-w-2xl mx-auto">
+            {% trans "Check out our frequently asked questions for quick answers to common inquiries about our platform, pricing, and services." %}
+        </p>
+        <a href="{% url 'faqs' %}" class="button-main mt-6 inline-block">
+            {% trans "View FAQs" %}
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% comment %} Form validation and submission handling {% endcomment %}
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.contact form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const email = form.querySelector('#contact-email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email.value)) {
+                e.preventDefault();
+                email.classList.add('border-red-500');
+                email.focus();
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,10 +1,10 @@
 {% comment %}
 =============================================================================
-   ZUMODRA TERMS OF USE PAGE
+   ZUMODRA PRIVACY POLICY PAGE
    =============================================================================
 
-   File: templates/term-of-use.html
-   Purpose: Terms of Use legal page
+   File: templates/privacy-policy.html
+   Purpose: Privacy Policy legal page
 
    Extends: base.html (canonical public base template)
 
@@ -16,9 +16,9 @@
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Terms of Use" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Privacy Policy" %} - Zumodra{% endblock %}
 
-{% block meta_description %}{% trans "Read Zumodra's Terms of Use to understand the rules and guidelines for using our platform." %}{% endblock %}
+{% block meta_description %}{% trans "Read Zumodra's Privacy Policy to understand how we collect, use, and protect your personal data." %}{% endblock %}
 
 {% block content %}
 {% comment %} BREADCRUMB SECTION {% endcomment %}
@@ -26,7 +26,7 @@
     <div class="breadcrumb_inner sm:pt-20 pt-16">
         <div class="content relative w-full h-full">
             <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
-                <img src="{% static 'assets/images/components/breadcrumb_terms.jpg' %}" alt="{% trans 'Terms of Use' %}" class="w-full h-full object-cover" />
+                <img src="{% static 'assets/images/components/breadcrumb_terms.jpg' %}" alt="{% trans 'Privacy Policy' %}" class="w-full h-full object-cover" />
             </div>
             <div class="container relative h-full lg:py-20 sm:py-14 py-10">
                 <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
@@ -35,16 +35,16 @@
                         <span class="caption1 text-white opacity-40">/</span>
                         <span class="caption1 text-white">{% trans "Legal" %}</span>
                         <span class="caption1 text-white opacity-40">/</span>
-                        <span class="caption1 text-white opacity-60">{% trans "Terms of Use" %}</span>
+                        <span class="caption1 text-white opacity-60">{% trans "Privacy Policy" %}</span>
                     </div>
-                    <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "Terms of Use" %}</h3>
+                    <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "Privacy Policy" %}</h3>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% comment %} TERMS OF USE CONTENT {% endcomment %}
+{% comment %} PRIVACY POLICY CONTENT {% endcomment %}
         <section class="terms_of_use lg:py-20 sm:py-14 py-10">
             <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
                 <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">

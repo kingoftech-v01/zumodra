@@ -1,23 +1,44 @@
+{% comment %}
+=============================================================================
+   ZUMODRA ABOUT US PAGE
+   =============================================================================
+
+   File: templates/about-us.html
+   Purpose: About page introducing Zumodra's mission and values
+
+   Extends: base.html (canonical public base template)
+
+   Features:
+   - Hero section with mission statement
+   - About section with company overview
+   - Statistics counter
+   - Testimonials carousel
+   - Team section
+   - How it works process
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   =============================================================================
+{% endcomment %}
+
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block head_title %}About Us - Zumodra{% endblock head_title %}
+{% block title %}{% trans "About Us" %} - Zumodra{% endblock %}
 
-{% block header %}
-    {% include 'header.html' %}
-{% endblock header %}
+{% block meta_description %}{% trans "Learn about Zumodra's mission to revolutionize recruitment through verified talent and secure hiring. Discover how we're building trust in the freelance marketplace." %}{% endblock %}
 
 {% block content %}
 
-        <!-- Slider -->
-        <section class="slider">
-            <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden bg-[#F1F6F2]">
-                <div class="container flex items-center justify-between h-full max-lg:py-16">
-                    <div class="slider_content lg:w-[430px] w-full">
-                        <h2 class="heading2 animate animate_top" style="--i: 1">Welcome to the FreelanHub</h2>
-                        <p class="body2 mt-3 animate animate_top" style="--i: 2">Unlock the Power of Freelancers to Meet Your Business Needs and Propel Your Company Forward</p>
-                        <a href="contact1.html" class="button-main mt-7 animate animate_top" style="--i: 3">Contact Us</a>
-                    </div>
+{% comment %} HERO SECTION {% endcomment %}
+<section class="slider">
+    <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden bg-[#F1F6F2]">
+        <div class="container flex items-center justify-between h-full max-lg:py-16">
+            <div class="slider_content lg:w-[430px] w-full">
+                <h2 class="heading2 animate animate_top" style="--i: 1">{% trans "Welcome to Zumodra" %}</h2>
+                <p class="body2 mt-3 animate animate_top" style="--i: 2">{% trans "Unlock the power of verified talent to meet your business needs and propel your company forward with confidence." %}</p>
+                <a href="{% url 'contact' %}" class="button-main mt-7 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
+            </div>
                     <ul class="slider_bg grid grid-cols-3 w-7/12 h-full max-lg:hidden">
                         <li class="h-full overflow-hidden">
                             <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="avatar/about1" class="w-full h-full object-cover" />
@@ -33,19 +54,17 @@
             </div>
         </section>
 
-        <!-- About -->
-        <div class="about lg:py-20 sm:py-14 py-10">
-            <div class="container flex flex-col items-center">
-                <h3 class="heading3 text-center animate animate_top" style="--i: 1">
-                    We are revolutionizing how businesses<br class="max-lg:hidden" />
-                    connect with top freelancers
-                </h3>
-                <p class="body2 text-center mt-3 animate animate_top" style="--i: 2">
-                    With a vision to revolutionize the way freelancers and employers connect, our platform serves as a dynamic hub<br class="max-lg:hidden" />
-                    for talent discovery and collaboration. At Fivak, we believe in empowering individuals and businesses to thrive in<br class="max-lg:hidden" />
-                    the digital economy by fostering meaningful connections and facilitating seamless workflows.
-                </p>
-                <a href="contact1.html" class="button-main mt-4 animate animate_top" style="--i: 3">Contact Us</a>
+{% comment %} ABOUT SECTION {% endcomment %}
+<div class="about lg:py-20 sm:py-14 py-10">
+    <div class="container flex flex-col items-center">
+        <h3 class="heading3 text-center animate animate_top" style="--i: 1">
+            {% trans "We are revolutionizing how businesses" %}<br class="max-lg:hidden" />
+            {% trans "connect with verified talent" %}
+        </h3>
+        <p class="body2 text-center mt-3 animate animate_top" style="--i: 2">
+            {% trans "With a vision to revolutionize the way freelancers and employers connect, Zumodra serves as a dynamic hub for talent discovery and collaboration. We believe in empowering individuals and businesses to thrive in the digital economy through bidirectional KYC verification, secure escrow payments, and meaningful connections that facilitate seamless workflows." %}
+        </p>
+        <a href="{% url 'contact' %}" class="button-main mt-4 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
                 <ul class="list_img grid sm:grid-cols-3 xl:gap-15 lg:gap-8 gap-5 w-full md:mt-10 mt-7">
                     <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 4">
                         <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="avatar/about1" class="w-full h-full object-cover" />
@@ -60,36 +79,36 @@
             </div>
         </div>
 
-        <!-- Counter -->
-        <section class="counter lg:py-15 sm:py-12 py-8 bg-[#FAF7F1]">
-            <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
-                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-                    <h2 class="heading2 pb-1 text-center">2,5M+</h2>
-                    <span class="body1 text-center">Jobs Available</span>
-                </div>
-                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
-                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-                    <h2 class="heading2 pb-1 text-center">177k+</h2>
-                    <span class="body1 text-center">New Jobs This Week!</span>
-                </div>
-                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
-                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-                    <h2 class="heading2 pb-1 text-center">298k+</h2>
-                    <span class="body1 text-center">Companies Hiring</span>
-                </div>
-                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
-                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-                    <h2 class="heading2 pb-1 text-center">5M+</h2>
-                    <span class="body1 text-center">Total Freelancers</span>
-                </div>
-            </div>
-        </section>
+{% comment %} STATISTICS COUNTER SECTION {% endcomment %}
+<section class="counter lg:py-15 sm:py-12 py-8 bg-[#FAF7F1]">
+    <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
+            <h2 class="heading2 pb-1 text-center">2.5M+</h2>
+            <span class="body1 text-center">{% trans "Jobs Available" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
+            <h2 class="heading2 pb-1 text-center">177k+</h2>
+            <span class="body1 text-center">{% trans "New Jobs This Week" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
+            <h2 class="heading2 pb-1 text-center">298k+</h2>
+            <span class="body1 text-center">{% trans "Companies Hiring" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
+            <h2 class="heading2 pb-1 text-center">5M+</h2>
+            <span class="body1 text-center">{% trans "Verified Freelancers" %}</span>
+        </div>
+    </div>
+</section>
 
-        <!-- Testimonials -->
-        <section class="testimonials lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Testimonials</h3>
-                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Discover exceptional experiences through testimonials from our satisfied customers.</p>
+{% comment %} TESTIMONIALS SECTION {% endcomment %}
+<section class="testimonials lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Testimonials" %}</h3>
+        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover exceptional experiences through testimonials from our satisfied customers." %}</p>
                 <div class="swiper -section swiper-list-testimonials style-3 md:pt-10 pt-7">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
@@ -549,33 +568,32 @@
             </div>
         </section>
 
-        <!-- Benefit Second -->
-        <section class="benefit lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5">
-                    <li class="item animate animate_top" style="--i: 1">
-                        <span class="ph-duotone ph-wallet text-4xl text-primary"></span>
-                        <h6 class="heading6 mt-3">Post Your Job</h6>
-                        <p class="mt-1">Create a job listing with details like requirements and budget.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 2">
-                        <span class="ph-duotone ph-shield-check text-4xl text-primary"></span>
-                        <h6 class="heading6 mt-3">Review Applicants</h6>
-                        <p class="mt-1">Receive and evaluate applications from freelancers.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 3">
-                        <span class="ph-duotone ph-certificate text-4xl text-primary"></span>
-                        <h6 class="heading6 mt-3">Choose a Freelancer</h6>
-                        <p class="mt-1">Conduct interviews or discussions to choose the best candidate.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 4">
-                        <span class="ph-duotone ph-phone-call text-4xl text-primary"></span>
-                        <h6 class="heading6 mt-3">Manage the Project</h6>
-                        <p class="mt-1">Collaborate with the selected freelancer to complete the project.</p>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
+{% comment %} HOW IT WORKS SECTION {% endcomment %}
+<section class="benefit lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5">
+            <li class="item animate animate_top" style="--i: 1">
+                <span class="ph-duotone ph-wallet text-4xl text-primary"></span>
+                <h6 class="heading6 mt-3">{% trans "Post Your Job" %}</h6>
+                <p class="mt-1">{% trans "Create a job listing with details like requirements and budget." %}</p>
+            </li>
+            <li class="item animate animate_top" style="--i: 2">
+                <span class="ph-duotone ph-shield-check text-4xl text-primary"></span>
+                <h6 class="heading6 mt-3">{% trans "Review Verified Applicants" %}</h6>
+                <p class="mt-1">{% trans "Receive and evaluate applications from KYC-verified freelancers." %}</p>
+            </li>
+            <li class="item animate animate_top" style="--i: 3">
+                <span class="ph-duotone ph-certificate text-4xl text-primary"></span>
+                <h6 class="heading6 mt-3">{% trans "Choose a Freelancer" %}</h6>
+                <p class="mt-1">{% trans "Conduct interviews or discussions to choose the best candidate." %}</p>
+            </li>
+            <li class="item animate animate_top" style="--i: 4">
+                <span class="ph-duotone ph-phone-call text-4xl text-primary"></span>
+                <h6 class="heading6 mt-3">{% trans "Secure Payment & Delivery" %}</h6>
+                <p class="mt-1">{% trans "Collaborate with escrow-protected payments until project completion." %}</p>
+            </li>
+        </ul>
+    </div>
+</section>
 
 {% endblock content %}

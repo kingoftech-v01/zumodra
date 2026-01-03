@@ -1,32 +1,86 @@
 {% extends "account/base.html" %}
 {% load i18n %}
 
+{% block head_title %}{% trans "Backup Codes" %} - Zumodra{% endblock %}
+
 {% block content %}
-<h1>
-  {% trans "Two-Factor Authentication Backup Tokens" %}
-</h1>
+<div class="text-center mb-6">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
+        <span class="ph-bold ph-key text-purple-600 text-3xl"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Backup Codes" %}</h1>
+    <p class="text-gray-600">{% trans "Use these codes if you lose access to your authenticator" %}</p>
+</div>
 
 {% if backup_tokens %}
-  {% if reveal_tokens %}
-    <ul>
-      {% for token in backup_tokens %}
-        <li>{{ token.token }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    {% trans 'Backup tokens have been generated, but are not revealed here for security reasons. Press the button below to generate new ones.' %}
-  {% endif %}
+    {% if reveal_tokens %}
+    {# Display newly generated tokens #}
+    <div class="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
+        <div class="flex items-start gap-2 mb-3">
+            <span class="ph-bold ph-check-circle text-green-600 text-lg"></span>
+            <p class="text-sm text-green-800 font-medium">{% trans "New backup codes generated! Save these in a safe place." %}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            {% for token in backup_tokens %}
+            <div class="bg-white px-4 py-2 rounded border border-green-300 text-center font-mono text-sm">
+                {{ token.token }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg mb-6">
+        <div class="flex items-start">
+            <span class="ph-bold ph-warning text-yellow-600 text-lg mr-2 flex-shrink-0"></span>
+            <div class="text-sm text-yellow-800">
+                <p class="font-medium mb-1">{% trans "Save these codes now!" %}</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>{% trans "Each code can only be used once" %}</li>
+                    <li>{% trans "Store them in a secure location (password manager, safe, etc.)" %}</li>
+                    <li>{% trans "These codes won't be shown again" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {# Tokens exist but not revealed #}
+    <div class="p-4 bg-gray-50 rounded-lg mb-6">
+        <div class="flex items-start gap-2">
+            <span class="ph-bold ph-lock text-gray-500 text-lg"></span>
+            <div class="text-sm text-gray-600">
+                <p>{% trans "You have backup codes, but they are hidden for security. Generate new codes if you need to see them." %}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% else %}
-  {% trans 'No tokens. Press the button below to generate some.' %}
+{# No tokens exist #}
+<div class="p-4 bg-gray-50 rounded-lg mb-6">
+    <div class="flex items-start gap-2">
+        <span class="ph-bold ph-info text-gray-500 text-lg"></span>
+        <div class="text-sm text-gray-600">
+            <p>{% trans "You don't have any backup codes yet. Generate some to ensure you can access your account if you lose your phone." %}</p>
+        </div>
+    </div>
+</div>
 {% endif %}
 
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">
-    {% trans 'Generate backup tokens' %}
-  </button>
+{# Generate New Tokens Form #}
+<form method="post" class="mb-6">
+    {% csrf_token %}
+    <button type="submit"
+            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200">
+        <span class="ph-bold ph-arrows-clockwise text-lg"></span>
+        {% trans "Generate New Backup Codes" %}
+    </button>
 </form>
 
-<a href="{% url 'two-factor-remove' %}">Disable Two Factor</a>
-
+{# Actions #}
+<div class="pt-4 border-t border-gray-200">
+    <a href="{% url 'two-factor-remove' %}"
+       class="flex items-center justify-center gap-2 w-full px-4 py-3 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+        <span class="ph-bold ph-shield-slash text-lg"></span>
+        {% trans "Disable Two-Factor Authentication" %}
+    </a>
+</div>
 {% endblock %}

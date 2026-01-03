@@ -1,11 +1,28 @@
+{% comment %}
+=============================================================================
+   ZUMODRA SERVICES PAGE
+   =============================================================================
+
+   File: templates/services.html
+   Purpose: Overview of Zumodra's platform services
+
+   Extends: base.html (canonical public base template)
+
+   Features:
+   - Hero section
+   - Services grid (ATS, HRIS, KYC, Marketplace, Analytics, E-signatures)
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   =============================================================================
+{% endcomment %}
+
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block head_title %}{% trans "Our Services" %} - Zumodra{% endblock head_title %}
+{% block title %}{% trans "Our Services" %} - Zumodra{% endblock %}
 
-{% block header %}
-    {% include 'header.html' %}
-{% endblock header %}
+{% block meta_description %}{% trans "Explore Zumodra's comprehensive HR and recruitment solutions: ATS, HRIS, KYC verification, freelance marketplace, analytics, and e-signatures." %}{% endblock %}
 
 {% block content %}
 
@@ -125,7 +142,3 @@
     </section>
 
 {% endblock content %}
-
-{% block footer %}
-    {% include 'footer.html' %}
-{% endblock footer %}

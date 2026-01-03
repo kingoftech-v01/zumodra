@@ -1,0 +1,98 @@
+{# =============================================================================
+   ZUMODRA RATING COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/common/rating.html
+   Purpose: Display star ratings in various formats
+
+   Usage:
+   {% include "components/marketplace/common/rating.html" with value=4.5 %}
+   {% include "components/marketplace/common/rating.html" with value=4.5 count=482 layout="compact" %}
+
+   Parameters:
+   - value: Rating value (0-5)
+   - count: Number of reviews (optional)
+   - max: Maximum rating value (default: 5)
+   - layout: "default", "compact", "stars_only", "interactive", "large"
+   - show_count: Boolean to show review count
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n %}
+
+{% if layout == "interactive" %}
+{# Interactive Rating (for review forms) #}
+<div class="rating_interactive flex items-center gap-3"
+     x-data="{ rating: {{ value|default:0 }}, hoverRating: 0 }">
+    <span class="text-secondary text-sm">{% trans 'Your Rating:' %}</span>
+    <div class="flex gap-1">
+        {% for i in "12345" %}
+        <button type="button"
+                @click="rating = {{ i }}"
+                @mouseenter="hoverRating = {{ i }}"
+                @mouseleave="hoverRating = 0"
+                class="text-2xl cursor-pointer transition-colors"
+                :class="(hoverRating || rating) >= {{ i }} ? 'text-yellow' : 'text-gray-300'">
+            <span class="ph-fill ph-star"></span>
+        </button>
+        {% endfor %}
+    </div>
+    <input type="hidden" name="rating" :value="rating">
+</div>
+
+{% elif layout == "large" %}
+{# Large Display (for profile/detail pages) #}
+<div class="rating_large flex flex-col items-center justify-center gap-2">
+    <h2 class="heading1">{{ value|floatformat:1 }}</h2>
+    <div class="flex gap-1">
+        {% for i in "12345" %}
+        {% if i|add:0 <= value|floatformat:0|add:0 %}
+        <span class="ph-fill ph-star text-2xl text-yellow"></span>
+        {% elif i|add:0 == value|floatformat:0|add:1 and value|floatformat:1 != value|floatformat:0 %}
+        <span class="ph-fill ph-star-half text-2xl text-yellow"></span>
+        {% else %}
+        <span class="ph ph-star text-2xl text-gray-300"></span>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% if count %}
+    <span class="caption1 text-secondary">({{ count|default:0 }} {% trans 'Ratings' %})</span>
+    {% endif %}
+</div>
+
+{% elif layout == "stars_only" %}
+{# Stars Only #}
+<div class="rating_stars flex items-center gap-0.5">
+    {% for i in "12345" %}
+    {% if i|add:0 <= value|floatformat:0|add:0 %}
+    <span class="ph-fill ph-star text-yellow"></span>
+    {% elif i|add:0 == value|floatformat:0|add:1 and value|floatformat:1 != value|floatformat:0 %}
+    <span class="ph-fill ph-star-half text-yellow"></span>
+    {% else %}
+    <span class="ph ph-star text-gray-300"></span>
+    {% endif %}
+    {% endfor %}
+</div>
+
+{% elif layout == "compact" %}
+{# Compact (for cards) #}
+<div class="rating_compact flex items-center gap-1">
+    <span class="ph-fill ph-star text-yellow text-xs"></span>
+    <strong class="text-button-sm">{{ value|floatformat:1 }}</strong>
+    {% if count %}
+    <span class="caption1 text-secondary">({{ count }})</span>
+    {% endif %}
+</div>
+
+{% else %}
+{# Default Layout #}
+<div class="rating flex items-center gap-1">
+    <span class="ph-fill ph-star text-yellow"></span>
+    <strong class="text-sm font-semibold">{{ value|floatformat:1 }}</strong>
+    {% if count %}
+    <span class="caption1 text-secondary">({{ count }} {% trans 'reviews' %})</span>
+    {% endif %}
+</div>
+{% endif %}

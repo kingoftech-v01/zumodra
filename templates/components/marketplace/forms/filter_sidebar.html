@@ -1,0 +1,278 @@
+{# =============================================================================
+   ZUMODRA FILTER SIDEBAR COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/forms/filter_sidebar.html
+   Purpose: Filter sidebar for listing pages (jobs, candidates, services, etc.)
+
+   Usage:
+   {% include "components/marketplace/forms/filter_sidebar.html" %}
+   {% include "components/marketplace/forms/filter_sidebar.html" with filter_type="jobs" %}
+
+   Parameters:
+   - filter_type: "jobs" (default), "candidates", "services", "employers", "projects"
+   - filter_action: URL for form submission (defaults to current page)
+   - locations: List of location options
+   - categories: List of category options
+   - skills: List of skill options
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n static %}
+
+<div id="filter_sidebar"
+     class="filter_sidebar lg:sticky lg:top-24 lg:w-[300px] w-full flex-shrink-0 overflow-hidden rounded-lg bg-white shadow-md"
+     x-data="{ mobileOpen: false }">
+
+    {# Mobile Filter Toggle (visible on mobile) #}
+    <button @click="mobileOpen = !mobileOpen"
+            class="lg:hidden flex items-center justify-between w-full p-4 border-b border-line">
+        <span class="text-button flex items-center gap-2">
+            <span class="ph-bold ph-funnel"></span>
+            {% trans 'Filters' %}
+        </span>
+        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': mobileOpen }"></span>
+    </button>
+
+    <form action="{{ filter_action|default:request.path }}"
+          method="get"
+          class="lg:block"
+          :class="{ 'hidden': !mobileOpen }"
+          hx-get="{{ filter_action|default:request.path }}"
+          hx-trigger="change delay:300ms"
+          hx-target="#listing-results"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+
+        {# Filter Header #}
+        <div class="filter_header flex items-center justify-between p-5 border-b border-line max-lg:hidden">
+            <h6 class="heading6">{% trans 'Filters' %}</h6>
+            <a href="{{ request.path }}" class="text-primary caption1 hover:underline">
+                {% trans 'Clear All' %}
+            </a>
+        </div>
+
+        {# Filter Content #}
+        <div class="filter_content p-5 space-y-5">
+
+            {# Location Filter #}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">{% trans 'Location' %}</strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3">
+                    <select name="location" class="w-full border border-line rounded-lg px-3 py-2 caption1 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">{% trans 'All Locations' %}</option>
+                        {% for location in locations %}
+                        <option value="{{ location.slug }}" {% if request.GET.location == location.slug %}selected{% endif %}>
+                            {{ location.name }}
+                        </option>
+                        {% empty %}
+                        <option value="new-york">New York</option>
+                        <option value="los-angeles">Los Angeles</option>
+                        <option value="chicago">Chicago</option>
+                        <option value="san-francisco">San Francisco</option>
+                        <option value="remote">{% trans 'Remote' %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            {# Job Type Filter (for jobs/candidates) #}
+            {% if filter_type == "jobs" or filter_type == "candidates" or not filter_type %}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">{% trans 'Job Type' %}</strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3 flex flex-col gap-2">
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="job_type" value="full-time" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if 'full-time' in request.GET.job_type %}checked{% endif %} />
+                        <span class="caption1">{% trans 'Full-Time' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="job_type" value="part-time" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if 'part-time' in request.GET.job_type %}checked{% endif %} />
+                        <span class="caption1">{% trans 'Part-Time' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="job_type" value="contract" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if 'contract' in request.GET.job_type %}checked{% endif %} />
+                        <span class="caption1">{% trans 'Contract' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="job_type" value="freelance" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if 'freelance' in request.GET.job_type %}checked{% endif %} />
+                        <span class="caption1">{% trans 'Freelance' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="job_type" value="remote" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if 'remote' in request.GET.job_type %}checked{% endif %} />
+                        <span class="caption1">{% trans 'Remote' %}</span>
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Category Filter (for services) #}
+            {% if filter_type == "services" %}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">{% trans 'Category' %}</strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3 flex flex-col gap-2">
+                    {% for category in categories %}
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="category" value="{{ category.slug }}" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if category.slug in request.GET.category %}checked{% endif %} />
+                        <span class="caption1">{{ category.name }}</span>
+                    </label>
+                    {% empty %}
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="category" value="design" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Graphic & Design' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="category" value="development" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Programming & Tech' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="category" value="marketing" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Digital Marketing' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="category" value="writing" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Writing & Translation' %}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Experience Level Filter #}
+            {% if filter_type != "services" %}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">{% trans 'Experience Level' %}</strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3 flex flex-col gap-2">
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="experience" value="entry" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Entry Level' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="experience" value="mid" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Mid Level' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="experience" value="senior" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Senior Level' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="experience" value="expert" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Expert' %}</span>
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Salary/Price Range Filter #}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">
+                        {% if filter_type == "services" %}{% trans 'Price Range' %}{% else %}{% trans 'Salary Range' %}{% endif %}
+                    </strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3">
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="number" name="min_salary" placeholder="{% trans 'Min' %}"
+                               value="{{ request.GET.min_salary }}"
+                               class="w-full border border-line rounded px-3 py-2 caption1 focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <span class="text-secondary">-</span>
+                        <input type="number" name="max_salary" placeholder="{% trans 'Max' %}"
+                               value="{{ request.GET.max_salary }}"
+                               class="w-full border border-line rounded px-3 py-2 caption1 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    {% if filter_type != "services" %}
+                    <div class="flex flex-col gap-2">
+                        <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                            <input type="radio" name="salary_period" value="hourly" class="w-4 h-4 border-line text-primary focus:ring-primary" />
+                            <span class="caption1">{% trans 'Hourly' %}</span>
+                        </label>
+                        <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                            <input type="radio" name="salary_period" value="monthly" class="w-4 h-4 border-line text-primary focus:ring-primary" />
+                            <span class="caption1">{% trans 'Monthly' %}</span>
+                        </label>
+                        <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                            <input type="radio" name="salary_period" value="yearly" class="w-4 h-4 border-line text-primary focus:ring-primary" checked />
+                            <span class="caption1">{% trans 'Yearly' %}</span>
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Skills Filter #}
+            <div class="filter_group" x-data="{ open: true }">
+                <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
+                    <strong class="text-button">{% trans 'Skills' %}</strong>
+                    <span class="ph ph-caret-down text-lg transition-transform" :class="{ 'rotate-180': open }"></span>
+                </button>
+                <div x-show="open" x-collapse class="filter_options mt-3 flex flex-col gap-2">
+                    {% for skill in skills %}
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="{{ skill.slug }}" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                               {% if skill.slug in request.GET.skills %}checked{% endif %} />
+                        <span class="caption1">{{ skill.name }}</span>
+                    </label>
+                    {% empty %}
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="javascript" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">JavaScript</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="python" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">Python</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="react" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">React</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="design" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'UI/UX Design' %}</span>
+                    </label>
+                    <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <input type="checkbox" name="skills" value="marketing" class="w-4 h-4 rounded border-line text-primary focus:ring-primary" />
+                        <span class="caption1">{% trans 'Digital Marketing' %}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Verified Only Filter #}
+            <div class="filter_group pt-3 border-t border-line">
+                <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
+                    <input type="checkbox" name="verified_only" value="true" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
+                           {% if request.GET.verified_only %}checked{% endif %} />
+                    <span class="caption1 font-medium">{% trans 'Verified Only' %}</span>
+                    <span class="ph-fill ph-shield-check text-green-600 ml-1"></span>
+                </label>
+            </div>
+
+            {# Apply Filters Button (for non-HTMX fallback) #}
+            <noscript>
+                <button type="submit" class="button-main w-full mt-3">
+                    {% trans 'Apply Filters' %}
+                </button>
+            </noscript>
+        </div>
+    </form>
+</div>

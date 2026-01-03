@@ -1,147 +1,112 @@
 {% comment %}
 =============================================================================
-   ZUMODRA BASE TEMPLATE (Legacy/Public Version)
+   ZUMODRA PUBLIC BASE TEMPLATE
    =============================================================================
 
    File: templates/base.html
-   Purpose: Root template for public-facing pages with FreelanHub styling
+   Purpose: Canonical base template for all public-facing pages
 
    NO CDN DEPENDENCIES - All assets served locally
 
-   TEMPLATE HIERARCHY:
-   - This is the LEGACY base template for public marketplace pages
-   - For modern dashboard pages, use: templates/base/dashboard_base.html
-   - For modern public pages, use: templates/base/public_base.html
-
    BLOCKS AVAILABLE:
-   - head_title: Page title (appears in browser tab)
+   - title: Page title (appears in browser tab)
+   - meta_description: Page meta description
    - extra_head: Additional <head> content (CSS, meta tags)
-   - header: Navigation header area
+   - header_class: Additional classes for header element
    - content: Main page content
-   - js: Additional JavaScript before closing </body>
+   - extra_js: Additional JavaScript before closing </body>
+
+   USAGE:
+   {% extends "base.html" %}
+   {% load i18n static %}
+
+   {% block title %}{% trans "Page Title" %} - Zumodra{% endblock %}
+   {% block content %}
+       ...page content...
+   {% endblock %}
 
    Author: Rhematek Solutions
-   Last Updated: 2026-01-01
+   Last Updated: 2026-01-03
    =============================================================================
 {% endcomment %}
 
 {% load static i18n %}
 
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        {# ===== META TAGS ===== #}
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Zumodra - Verify. Recruit. Hire. Risk-Free." />
-        <meta name="csrf-token" content="{{ csrf_token }}">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    {% comment %} META TAGS {% endcomment %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{% block meta_description %}{% trans 'Zumodra - Verify. Recruit. Hire. Risk-Free. The trusted platform for verified freelancers and employers.' %}{% endblock %}" />
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
-        {# ===== PAGE TITLE ===== #}
-        <title>{% block head_title %}Zumodra{% endblock head_title %}</title>
+    {% comment %} PAGE TITLE {% endcomment %}
+    <title>{% block title %}Zumodra{% endblock %}</title>
 
-        {# ===== FAVICON ===== #}
-        <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
+    {% comment %} FAVICON {% endcomment %}
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
 
-        {# ===== LOCAL CSS - NO CDN ===== #}
-        {# Core Tailwind CSS (pre-compiled) #}
-        <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}" />
-        <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}" />
+    {% comment %} LOCAL CSS - NO CDN {% endcomment %}
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}" />
+    <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}" />
 
-        {# Component CSS #}
-        <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/language.css' %}">
+    {% comment %} Component CSS {% endcomment %}
+    <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
 
-        {# Icon Fonts (Local) #}
-        <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}" />
+    {% comment %} Icon Fonts (Local) {% endcomment %}
+    <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}" />
 
-        {# Additional CSS #}
-        <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}" />
-        <link rel="stylesheet" href="{% static 'assets/css/quill.snow.css' %}" />
+    {% comment %} Additional CSS {% endcomment %}
+    <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
 
-        {# ===== ANIMATION & LAYOUT FIXES ===== #}
-        <style>
-            /* Fix: Ensure animated content is visible immediately */
-            .animate {
-                opacity: 1 !important;
-                transform: none !important;
-            }
-            /* Fix: Prevent double scrollbars */
-            html, body {
-                overflow-x: hidden;
-            }
-            html {
-                overflow-y: auto;
-            }
-            body {
-                overflow-y: visible;
-            }
-        </style>
-        <noscript>
-            <style>
-                .animate { opacity: 1 !important; transform: none !important; }
-            </style>
-        </noscript>
+    {% comment %} Animation Fixes {% endcomment %}
+    <style>
+        .animate { opacity: 1 !important; transform: none !important; }
+        html, body { overflow-x: hidden; }
+        html { overflow-y: auto; }
+        body { overflow-y: visible; }
+    </style>
+    <noscript>
+        <style>.animate { opacity: 1 !important; transform: none !important; }</style>
+    </noscript>
 
-        {# ===== ADDITIONAL HEAD CONTENT ===== #}
-        {% block extra_head %} {% endblock extra_head %}
-    </head>
+    {% comment %} Additional Head Content {% endcomment %}
+    {% block extra_head %}{% endblock %}
+</head>
 
-    <body class="flex flex-col min-h-screen">
-        
-        {# ===== HEADER SECTION ===== #}
-        {% block header %}
-        {% endblock header %}
+<body class="flex flex-col min-h-screen">
 
-        <main class="flex-grow">
-            {# ===== MAIN CONTENT AREA ===== #}
-            {% block content %} {% endblock content %}
+    {% comment %} HEADER {% endcomment %}
+    {% include "components/public_header.html" %}
 
-            {# ===== SCROLL TO TOP BUTTON ===== #}
-            <button class="scroll-to-top-btn fixed bottom-6 right-6 z-40 p-3 rounded-full bg-primary text-white shadow-lg opacity-0 invisible transition-all duration-300"
-                    aria-label="Scroll to top"
-                    onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <span class="ph-bold ph-caret-up text-xl"></span>
-            </button>
-        </main>
+    {% comment %} MOBILE MENU {% endcomment %}
+    {% include "components/marketplace/layout/mobile_menu.html" %}
 
-        {# ===== FOOTER ===== #}
-        {% include 'footer.html' %}
+    {% comment %} MAIN CONTENT {% endcomment %}
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
 
-        {# ===== ADDITIONAL PAGE SCRIPTS ===== #}
-        {% block js %} {% endblock js %}
+    {% comment %} FOOTER {% endcomment %}
+    {% include "components/public_footer.html" %}
 
-        {# ===== LOCAL JAVASCRIPT - NO CDN ===== #}
-        {# jQuery - Required for legacy components #}
-        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
-        {# Slick Carousel #}
-        <script src="{% static 'assets/js/slick.min.js' %}"></script>
-        {# Swiper - Touch slider #}
-        <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
-        {# ApexCharts - Charts and graphs #}
-        <script src="{% static 'assets/js/apexcharts.js' %}"></script>
-        {# Main custom JavaScript #}
-        <script src="{% static 'assets/js/main.js' %}"></script>
-        {# Quill Editor #}
-        <script src="{% static 'assets/js/quill.js' %}"></script>
+    {% comment %} SCROLL TO TOP {% endcomment %}
+    {% include "components/marketplace/common/scroll_to_top.html" %}
 
-        {# Scroll to top visibility #}
-        <script>
-            window.addEventListener('scroll', function() {
-                var btn = document.querySelector('.scroll-to-top-btn');
-                if (btn) {
-                    if (window.scrollY > 300) {
-                        btn.classList.remove('opacity-0', 'invisible');
-                        btn.classList.add('opacity-100', 'visible');
-                    } else {
-                        btn.classList.add('opacity-0', 'invisible');
-                        btn.classList.remove('opacity-100', 'visible');
-                    }
-                }
-            });
-        </script>
-    </body>
+    {% comment %} LOCAL JAVASCRIPT - NO CDN {% endcomment %}
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    {% comment %} Alpine.js for interactive components {% endcomment %}
+    <script defer src="{% static 'assets/js/vendor/alpine.min.js' %}"></script>
+
+    {% comment %} Additional Page Scripts {% endcomment %}
+    {% block extra_js %}{% endblock %}
+</body>
 </html>

@@ -4,31 +4,60 @@ from django.conf import settings
 import os
 
 
-def term_of_use_view(request):
-    return render(request, 'term-of-use.html')
-
-def privacy_policy_view(request):
-    return render(request, 'privacy/privacy_policy.html')
-
-
+# =============================================================================
+# PUBLIC PAGE VIEWS
+# =============================================================================
+# All public pages extend base.html and use i18n for translation support.
+# =============================================================================
 
 def home_view(request):
+    """Homepage with hero, features, and testimonials."""
     return render(request, 'index.html')
 
+
 def about_us_view(request):
+    """About us page with company story and team."""
     return render(request, 'about-us.html')
 
-def contact_us_view(request):
-    return render(request, 'contact1.html')
-
-def faq_view(request):
-    return render(request, 'faqs.html')
 
 def services_view(request):
+    """Services overview page."""
     return render(request, 'services.html')
 
+
 def pricing_view(request):
+    """Pricing plans page (Starter, Pro, Business, Enterprise)."""
     return render(request, 'pricing.html')
+
+
+def faq_view(request):
+    """Frequently asked questions page with accordion."""
+    return render(request, 'faqs.html')
+
+
+def contact_us_view(request):
+    """Contact page with form and information."""
+    return render(request, 'contact.html')
+
+
+def become_seller_view(request):
+    """Freelancer onboarding page."""
+    return render(request, 'become-seller.html')
+
+
+def become_buyer_view(request):
+    """Employer/client onboarding page."""
+    return render(request, 'become-buyer.html')
+
+
+def term_of_use_view(request):
+    """Terms of use legal page."""
+    return render(request, 'term-of-use.html')
+
+
+def privacy_policy_view(request):
+    """Privacy policy legal page."""
+    return render(request, 'privacy-policy.html')
 
 
 def auth_test_view(request):

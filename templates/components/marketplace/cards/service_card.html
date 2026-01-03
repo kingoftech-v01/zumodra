@@ -1,0 +1,151 @@
+{# =============================================================================
+   ZUMODRA SERVICE CARD COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/cards/service_card.html
+   Purpose: Display freelance services in grid or list layouts
+
+   Usage:
+   {% include "components/marketplace/cards/service_card.html" with service=service %}
+   {% include "components/marketplace/cards/service_card.html" with service=service layout="list" %}
+
+   Parameters:
+   - service: Service object
+   - layout: "grid" (default) or "list"
+   - show_wishlist: Boolean to show/hide bookmark button (default: True)
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n static %}
+
+{% if layout == "list" %}
+{# List Layout #}
+<li class="item">
+    <div class="service_item service_item_list overflow-hidden relative flex gap-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+        <a href="{{ service.get_absolute_url }}" class="service_thumb flex-shrink-0 w-[280px]">
+            {% if service.thumbnail %}
+            <img src="{{ service.thumbnail.url }}" alt="{{ service.title }}" class="w-full h-full object-cover" />
+            {% else %}
+            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                <span class="ph-fill ph-image text-4xl text-gray-400"></span>
+            </div>
+            {% endif %}
+        </a>
+        <div class="service_info flex-grow py-5 pr-5">
+            <div class="flex items-center justify-between">
+                <a href="#" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category.name }}</a>
+                {% if show_wishlist|default:True %}
+                <button class="add_wishlist_btn -relative -border"
+                        hx-post="{% url 'services:service_bookmark' service.id %}"
+                        hx-swap="outerHTML"
+                        aria-label="{% trans 'Save service' %}">
+                    <span class="ph ph-heart text-xl"></span>
+                    <span class="ph-fill ph-heart text-xl hidden"></span>
+                </button>
+                {% endif %}
+            </div>
+            <a href="{{ service.get_absolute_url }}" class="service_title text-title pt-2 duration-300 hover:text-primary line-clamp-2">
+                {{ service.title }}
+            </a>
+            {% if service.description %}
+            <p class="service_desc text-secondary mt-2 line-clamp-2">
+                {{ service.description|truncatewords:25 }}
+            </p>
+            {% endif %}
+            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                <div class="flex items-center gap-4">
+                    <a href="{{ service.provider.get_absolute_url }}" class="service_author flex items-center gap-2">
+                        {% if service.provider.profile_picture %}
+                        <img src="{{ service.provider.profile_picture.url }}" alt="{{ service.provider.get_full_name }}" class="service_author_avatar w-8 h-8 rounded-full object-cover" />
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                            <span class="text-white text-xs font-semibold">{{ service.provider.first_name|slice:":1" }}</span>
+                        </div>
+                        {% endif %}
+                        <span class="service_author_name -style-1">{{ service.provider.get_full_name }}</span>
+                    </a>
+                    {% if service.rating %}
+                    <div class="rate flex items-center gap-1">
+                        <span class="ph-fill ph-star text-yellow text-xs"></span>
+                        <strong class="service_rate text-button-sm">{{ service.rating|floatformat:1 }}</strong>
+                        <span class="service_rate_quantity caption1 text-secondary">({{ service.review_count }})</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="service_price whitespace-nowrap">
+                    <span class="text-secondary">{% trans 'From' %} </span>
+                    <span class="price text-title">${{ service.starting_price|floatformat:0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>
+
+{% else %}
+{# Grid Layout (Default) #}
+<li class="item h-full">
+    <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+        {# Wishlist Button #}
+        {% if show_wishlist|default:True %}
+        <button class="add_wishlist_btn absolute top-4 right-4 z-10"
+                hx-post="{% url 'services:service_bookmark' service.id %}"
+                hx-swap="outerHTML"
+                aria-label="{% trans 'Save service' %}">
+            <span class="ph ph-heart text-xl"></span>
+            <span class="ph-fill ph-heart text-xl hidden"></span>
+        </button>
+        {% endif %}
+
+        {# Service Thumbnail #}
+        <a href="{{ service.get_absolute_url }}" class="service_thumb block aspect-[4/3] overflow-hidden">
+            {% if service.thumbnail %}
+            <img src="{{ service.thumbnail.url }}" alt="{{ service.title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            {% else %}
+            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                <span class="ph-fill ph-image text-4xl text-gray-400"></span>
+            </div>
+            {% endif %}
+        </a>
+
+        {# Service Info #}
+        <div class="service_info py-5 px-4">
+            {# Category and Rating #}
+            <div class="flex items-center justify-between">
+                <a href="#" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category.name }}</a>
+                {% if service.rating %}
+                <div class="rate flex items-center gap-1">
+                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                    <strong class="service_rate text-button-sm">{{ service.rating|floatformat:1 }}</strong>
+                    <span class="service_rate_quantity caption1 text-secondary">({{ service.review_count }})</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {# Service Title #}
+            <a href="{{ service.get_absolute_url }}" class="service_title text-title pt-2 duration-300 hover:text-primary line-clamp-2">
+                {{ service.title }}
+            </a>
+
+            {# Author and Price #}
+            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                <a href="{{ service.provider.get_absolute_url }}" class="service_author flex items-center gap-2">
+                    {% if service.provider.profile_picture %}
+                    <img src="{{ service.provider.profile_picture.url }}" alt="{{ service.provider.get_full_name }}" class="service_author_avatar w-8 h-8 rounded-full object-cover" />
+                    {% else %}
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                        <span class="text-white text-xs font-semibold">{{ service.provider.first_name|slice:":1" }}</span>
+                    </div>
+                    {% endif %}
+                    <span class="service_author_name -style-1">{{ service.provider.get_full_name }}</span>
+                </a>
+                <div class="service_price whitespace-nowrap">
+                    <span class="text-secondary">{% trans 'From' %} </span>
+                    <span class="price text-title">${{ service.starting_price|floatformat:0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>
+{% endif %}

@@ -1,0 +1,171 @@
+{# =============================================================================
+   ZUMODRA MOBILE MENU COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/layout/mobile_menu.html
+   Purpose: Slide-in mobile navigation for public/marketplace pages
+
+   Usage:
+   {% include "components/marketplace/layout/mobile_menu.html" %}
+
+   Features:
+   - Slide-in mobile navigation
+   - Nested sub-menus with back buttons
+   - Search form with HTMX
+   - Full navigation hierarchy
+   - Alpine.js for animations
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n static %}
+
+<div class="menu_mobile fixed inset-0 z-[100] pointer-events-none"
+     x-data="{ open: false, activeSubmenu: null }"
+     @open-mobile-menu.window="open = true"
+     @keydown.escape.window="open = false">
+
+    {# Backdrop #}
+    <div class="absolute inset-0 bg-black/50 transition-opacity duration-300"
+         :class="open ? 'opacity-100 pointer-events-auto' : 'opacity-0'"
+         @click="open = false"></div>
+
+    {# Menu Panel #}
+    <div class="absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300 pointer-events-auto overflow-hidden"
+         :class="open ? 'translate-x-0' : '-translate-x-full'">
+
+        {# Close Button #}
+        <button @click="open = false"
+                class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-surface hover:bg-gray-200 transition-colors z-10">
+            <span class="ph-bold ph-x text-lg"></span>
+            <span class="sr-only">{% trans 'Close menu' %}</span>
+        </button>
+
+        {# Logo #}
+        <div class="flex items-center justify-center pt-5 pb-4 border-b border-line">
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="h-8" />
+            </a>
+        </div>
+
+        {# Mobile Search #}
+        <form class="relative mx-5 mt-4"
+              hx-get="{% url 'dashboard:search' %}"
+              hx-trigger="keyup changed delay:300ms"
+              hx-target="#mobile-search-results">
+            {% csrf_token %}
+            <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2">
+                <span class="ph ph-magnifying-glass text-xl text-secondary"></span>
+            </button>
+            <input type="text"
+                   name="q"
+                   placeholder="{% trans 'What are you looking for?' %}"
+                   class="h-12 w-full rounded-lg border border-line text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+        </form>
+        <div id="mobile-search-results" class="mx-5"></div>
+
+        {# Navigation #}
+        <nav class="mt-4 px-5 overflow-y-auto" style="max-height: calc(100vh - 200px);">
+            <ul class="space-y-1">
+                {# Home #}
+                <li>
+                    <a href="{% url 'home' %}"
+                       class="flex items-center gap-3 px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
+                        <span class="ph-bold ph-house text-xl"></span>
+                        {% trans 'Home' %}
+                    </a>
+                </li>
+
+                {# For Candidates - Expandable #}
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded"
+                            class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
+                        <span class="flex items-center gap-3">
+                            <span class="ph-bold ph-user text-xl"></span>
+                            {% trans 'For Candidates' %}
+                        </span>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded"
+                        x-collapse
+                        class="pl-12 mt-1 space-y-1">
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Jobs' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Projects' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Employers' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Seller' %}</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'dashboard' %}" class="block py-2 text-primary font-medium">{% trans 'Candidate Dashboard' %}</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+
+                {# For Employers - Expandable #}
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded"
+                            class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
+                        <span class="flex items-center gap-3">
+                            <span class="ph-bold ph-buildings text-xl"></span>
+                            {% trans 'For Employers' %}
+                        </span>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded"
+                        x-collapse
+                        class="pl-12 mt-1 space-y-1">
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Services' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Browse Candidates' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Become a Buyer' %}</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'dashboard' %}" class="block py-2 text-primary font-medium">{% trans 'Employer Dashboard' %}</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+
+                {# Pages - Expandable #}
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded"
+                            class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
+                        <span class="flex items-center gap-3">
+                            <span class="ph-bold ph-files text-xl"></span>
+                            {% trans 'Pages' %}
+                        </span>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded"
+                        x-collapse
+                        class="pl-12 mt-1 space-y-1">
+                        <li><a href="{% url 'about' %}" class="block py-2 text-secondary hover:text-primary">{% trans 'About Us' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Contact' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'FAQs' %}</a></li>
+                        <li><a href="#" class="block py-2 text-secondary hover:text-primary">{% trans 'Pricing' %}</a></li>
+                        <li><a href="{% url 'wagtail_serve' '' %}" class="block py-2 text-secondary hover:text-primary">{% trans 'Blog' %}</a></li>
+                        <li><a href="{% url 'term_of_use' %}" class="block py-2 text-secondary hover:text-primary">{% trans 'Terms of Use' %}</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            {# Auth Buttons for Mobile #}
+            {% if not user.is_authenticated %}
+            <div class="mt-6 pt-6 border-t border-line space-y-3">
+                <a href="{% url 'account_login' %}"
+                   class="block w-full px-4 py-3 text-center text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-all">
+                    {% trans 'Sign In' %}
+                </a>
+                <a href="{% url 'account_signup' %}"
+                   class="block w-full px-4 py-3 text-center bg-primary text-white rounded-lg hover:bg-primary/90 transition-all">
+                    {% trans 'Get Started' %}
+                </a>
+            </div>
+            {% else %}
+            <div class="mt-6 pt-6 border-t border-line">
+                <a href="{% url 'account_logout' %}"
+                   class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <span class="ph-bold ph-sign-out text-xl"></span>
+                    {% trans 'Sign Out' %}
+                </a>
+            </div>
+            {% endif %}
+        </nav>
+    </div>
+</div>

@@ -1,21 +1,82 @@
 {% extends "account/base.html" %}
 {% load i18n %}
 
+{% block head_title %}{% trans "Disable Two-Factor Authentication" %} - Zumodra{% endblock %}
+
 {% block content %}
-<h1>
-  {% trans "Disable Two-Factor Authentication" %}
-</h1>
+<div class="text-center mb-6">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+        <span class="ph-bold ph-shield-slash text-red-600 text-3xl"></span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Disable Two-Factor Authentication" %}</h1>
+    <p class="text-gray-600">{% trans "This will remove the extra security from your account" %}</p>
+</div>
 
-{% if form.otp_token %}
-    <p>{% trans "Please enter a valid authentication token to disable two-factor authentication:" %}</p>
-{% endif %}
+{# Warning #}
+<div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg mb-6">
+    <div class="flex items-start">
+        <span class="ph-bold ph-warning text-red-500 text-lg mr-2 flex-shrink-0"></span>
+        <div class="text-sm text-red-700">
+            <p class="font-medium mb-1">{% trans "Are you sure?" %}</p>
+            <p>{% trans "Disabling two-factor authentication will make your account less secure. Anyone with your password will be able to access your account." %}</p>
+        </div>
+    </div>
+</div>
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">
-    {% trans 'Disable Two-Factor' %}
-  </button>
+<form method="post" class="space-y-4">
+    {% csrf_token %}
+
+    {% if form.otp_token %}
+    {# If 2FA is enabled, require OTP to disable #}
+    <div>
+        <label for="id_otp_token" class="block text-sm font-medium text-gray-700 mb-1">
+            {% trans "Enter your authentication code to confirm" %}
+        </label>
+        <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <span class="ph-bold ph-key text-lg"></span>
+            </span>
+            <input type="text"
+                   name="otp_token"
+                   id="id_otp_token"
+                   class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors text-center text-2xl tracking-widest font-mono"
+                   placeholder="000000"
+                   autocomplete="one-time-code"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   maxlength="6"
+                   required>
+        </div>
+        {% if form.otp_token.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.otp_token.errors.0 }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Form Errors #}
+    {% if form.non_field_errors %}
+    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+        <div class="flex items-start">
+            <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
+            <div class="text-sm text-red-700">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="flex gap-3">
+        <a href="{% url 'two-factor-backup-tokens' %}"
+           class="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            {% trans "Cancel" %}
+        </a>
+        <button type="submit"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-200">
+            <span class="ph-bold ph-shield-slash text-lg"></span>
+            {% trans "Disable 2FA" %}
+        </button>
+    </div>
 </form>
-
 {% endblock %}

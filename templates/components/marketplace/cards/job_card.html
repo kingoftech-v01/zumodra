@@ -1,0 +1,155 @@
+{# =============================================================================
+   ZUMODRA JOB CARD COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/cards/job_card.html
+   Purpose: Display job listings in grid or list layouts
+
+   Usage:
+   {% include "components/marketplace/cards/job_card.html" with job=job %}
+   {% include "components/marketplace/cards/job_card.html" with job=job layout="list" %}
+
+   Parameters:
+   - job: Job object with fields (title, company, location, salary_min, salary_max, etc.)
+   - layout: "grid" (default) or "list"
+   - show_wishlist: Boolean to show/hide wishlist button (default: True)
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n static %}
+
+{% if layout == "list" %}
+{# List Layout #}
+<li class="jobs_item jobs_item_list flex flex-wrap items-center gap-5 px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+    <a href="{{ job.get_absolute_url }}" class="overflow-hidden flex-shrink-0 w-15 h-15">
+        {% if job.company.logo %}
+        <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" class="jobs_avatar w-full h-full object-cover rounded-lg" />
+        {% else %}
+        <div class="w-full h-full bg-primary/10 rounded-lg flex items-center justify-center">
+            <span class="ph-fill ph-buildings text-2xl text-primary"></span>
+        </div>
+        {% endif %}
+    </a>
+    <div class="jobs_content flex-grow">
+        <a href="{{ job.get_absolute_url }}" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+            <span class="jobs_company text-sm font-semibold text-primary">{{ job.company.name }}</span>
+            <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
+        </a>
+        <div class="flex flex-wrap items-center gap-5 gap-y-1 mt-2">
+            <div class="jobs_address -style-1 text-secondary">
+                <span class="ph ph-map-pin text-lg"></span>
+                <span class="address caption1 align-top">{{ job.location }}</span>
+            </div>
+            <div class="jobs_date text-secondary">
+                <span class="ph ph-calendar-blank text-lg"></span>
+                <span class="date caption1 align-top">{{ job.created_at|timesince }} {% trans 'ago' %}</span>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5 mt-3">
+            {% for tag in job.tags.all|slice:":3" %}
+            <span class="jobs_tag caption1 tag bg-surface">{{ tag.name }}</span>
+            {% endfor %}
+            {% if job.is_remote %}
+            <span class="jobs_tag caption1 tag bg-green-100 text-green-700">{% trans 'Remote' %}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="jobs_actions flex flex-col items-end gap-3 flex-shrink-0">
+        {% if show_wishlist|default:True %}
+        <button class="add_wishlist_btn -relative -border"
+                hx-post="{% url 'ats:job_bookmark' job.id %}"
+                hx-swap="outerHTML"
+                aria-label="{% trans 'Save job' %}">
+            <span class="ph ph-heart text-xl"></span>
+            <span class="ph-fill ph-heart text-xl hidden"></span>
+        </button>
+        {% endif %}
+        <div class="jobs_price">
+            {% if job.salary_min and job.salary_max %}
+            <span class="price text-title">${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}</span>
+            <span class="text-secondary">/{{ job.salary_period|default:"year" }}</span>
+            {% elif job.salary_min %}
+            <span class="price text-title">{% trans 'From' %} ${{ job.salary_min|floatformat:0 }}</span>
+            {% else %}
+            <span class="text-secondary">{% trans 'Negotiable' %}</span>
+            {% endif %}
+        </div>
+    </div>
+</li>
+
+{% else %}
+{# Grid Layout (Default) #}
+<li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+    {# Job Info Header #}
+    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+        {# Company Logo #}
+        <a href="{{ job.get_absolute_url }}" class="overflow-hidden flex-shrink-0 w-15 h-15">
+            {% if job.company.logo %}
+            <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" class="jobs_avatar w-full h-full object-cover rounded-lg" />
+            {% else %}
+            <div class="w-full h-full bg-primary/10 rounded-lg flex items-center justify-center">
+                <span class="ph-fill ph-buildings text-2xl text-primary"></span>
+            </div>
+            {% endif %}
+        </a>
+
+        {# Job Content #}
+        <div class="jobs_content flex items-center justify-between gap-2 w-full">
+            <a href="{{ job.get_absolute_url }}" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                <span class="jobs_company text-sm font-semibold text-primary">{{ job.company.name }}</span>
+                <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
+                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                    {# Location #}
+                    <div class="jobs_address -style-1 text-secondary">
+                        <span class="ph ph-map-pin text-lg"></span>
+                        <span class="address caption1 align-top">{{ job.location }}</span>
+                    </div>
+                    {# Posted Date #}
+                    <div class="jobs_date text-secondary">
+                        <span class="ph ph-calendar-blank text-lg"></span>
+                        <span class="date caption1 align-top">{{ job.created_at|timesince }} {% trans 'ago' %}</span>
+                    </div>
+                </div>
+            </a>
+
+            {# Wishlist Button #}
+            {% if show_wishlist|default:True %}
+            <button class="add_wishlist_btn -relative -border"
+                    hx-post="{% url 'ats:job_bookmark' job.id %}"
+                    hx-swap="outerHTML"
+                    aria-label="{% trans 'Save job' %}">
+                <span class="ph ph-heart text-xl"></span>
+                <span class="ph-fill ph-heart text-xl"></span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Job Footer: Tags and Price #}
+    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+        {# Tags #}
+        <div class="flex flex-wrap items-center gap-2.5">
+            {% for tag in job.tags.all|slice:":2" %}
+            <span class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ tag.name }}</span>
+            {% endfor %}
+            {% if job.is_remote %}
+            <span class="jobs_tag caption1 tag bg-green-100 text-green-700">{% trans 'Remote' %}</span>
+            {% endif %}
+        </div>
+
+        {# Price/Salary #}
+        <div class="jobs_price">
+            {% if job.salary_min and job.salary_max %}
+            <span class="price text-title">${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}</span>
+            <span class="text-secondary">/{{ job.salary_period|default:"year" }}</span>
+            {% elif job.salary_min %}
+            <span class="price text-title">{% trans 'From' %} ${{ job.salary_min|floatformat:0 }}</span>
+            {% else %}
+            <span class="text-secondary">{% trans 'Negotiable' %}</span>
+            {% endif %}
+        </div>
+    </div>
+</li>
+{% endif %}

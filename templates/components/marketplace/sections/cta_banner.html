@@ -1,0 +1,118 @@
+{# =============================================================================
+   ZUMODRA CTA BANNER SECTION COMPONENT
+   =============================================================================
+
+   File: templates/components/marketplace/sections/cta_banner.html
+   Purpose: Call-to-action banners for conversion
+
+   Usage:
+   {% include "components/marketplace/sections/cta_banner.html" with title="Start Your Journey" %}
+   {% include "components/marketplace/sections/cta_banner.html" with title="Join Us" layout="gradient" %}
+
+   Parameters:
+   - title: Main heading (supports HTML/line breaks)
+   - subtitle: Subheading text
+   - button_text: CTA button text
+   - button_url: CTA button link
+   - secondary_button_text: Optional second button text
+   - secondary_button_url: Optional second button link
+   - background_image: Optional background image URL
+   - layout: "image" (default) or "gradient" or "centered"
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   ============================================================================= #}
+
+{% load i18n static %}
+
+{% if layout == "gradient" %}
+{# Gradient Background Layout #}
+<section class="banner lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70">
+            <div class="banner_content text-center max-w-2xl mx-auto">
+                <h4 class="heading4 text-white">
+                    {{ title|default:_("Ready to Get Started?") }}
+                </h4>
+                <p class="body1 mt-3 text-white/90">
+                    {{ subtitle|default:_("Join thousands of freelancers and employers on Zumodra") }}
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4 md:mt-8 mt-5">
+                    <a href="{{ button_url|default:'#' }}" class="button-main bg-white text-primary hover:bg-white/90">
+                        {{ button_text|default:_("Sign Up Free") }}
+                    </a>
+                    {% if secondary_button_text %}
+                    <a href="{{ secondary_button_url|default:'#' }}" class="button-main -white -border hover:bg-white hover:text-primary">
+                        {{ secondary_button_text }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% elif layout == "centered" %}
+{# Centered Text Layout #}
+<section class="banner lg:py-20 sm:py-14 py-10 {{ bg_class|default:'bg-surface' }}">
+    <div class="container">
+        <div class="banner_content text-center max-w-3xl mx-auto">
+            <h3 class="heading3">
+                {{ title|default:_("Start Your Freelance Journey Today") }}
+            </h3>
+            <p class="body1 text-secondary mt-4">
+                {{ subtitle|default:_("Connect with top clients and grow your career on the most trusted freelance platform.") }}
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4 md:mt-8 mt-5">
+                <a href="{{ button_url|default:'#' }}" class="button-main">
+                    {{ button_text|default:_("Get Started") }}
+                </a>
+                {% if secondary_button_text %}
+                <a href="{{ secondary_button_url|default:'#' }}" class="button-main -border">
+                    {{ secondary_button_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% else %}
+{# Image Background Layout (Default) #}
+<section class="banner lg:pb-20 sm:pb-14 pb-10">
+    <div class="container">
+        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl">
+            {# Background Image #}
+            <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
+                {% if background_image %}
+                <img src="{{ background_image }}" alt="" class="w-full h-full object-cover" />
+                {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-primary via-primary/90 to-primary/70"></div>
+                {% endif %}
+                {# Overlay #}
+                <div class="absolute inset-0 bg-black/20"></div>
+            </div>
+
+            {# Banner Content #}
+            <div class="banner_content relative z-10 max-w-xl">
+                <h4 class="heading4 text-white">
+                    {{ title|default:_("Embrace Independence<br>Start Your Freelance Journey Now")|safe }}
+                </h4>
+                <p class="body1 mt-3 text-white/90">
+                    {{ subtitle|default:_("Connect with your perfect match in minutes") }}
+                </p>
+                <div class="flex flex-wrap items-center gap-4 md:mt-8 mt-5">
+                    <a href="{{ button_url|default:'#' }}" class="button-main bg-white text-primary hover:bg-white/90">
+                        {{ button_text|default:_("Become A Seller") }}
+                    </a>
+                    {% if secondary_button_text %}
+                    <a href="{{ secondary_button_url|default:'#' }}" class="button-main -white -border hover:bg-white hover:text-primary">
+                        {{ secondary_button_text }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

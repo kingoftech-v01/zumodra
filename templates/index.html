@@ -1,62 +1,84 @@
+{% comment %}
+=============================================================================
+   ZUMODRA HOME PAGE
+   =============================================================================
+
+   File: templates/index.html
+   Purpose: Main homepage for the Zumodra platform
+
+   Extends: base.html (canonical public base template)
+
+   Features:
+   - Hero slider with search functionality
+   - Trusted brands carousel
+   - Category listings
+   - Featured services
+   - Top freelancers showcase
+   - CTA banner
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-03
+   =============================================================================
+{% endcomment %}
+
 {% extends "base.html" %}
+{% load static i18n %}
 
-{% block head_title %}Home - Zumodra{% endblock head_title %}
+{% block title %}{% trans "Home" %} - Zumodra{% endblock %}
 
-{% block header %}
-    {% include 'header_public.html' %}
-{% endblock header %}
+{% block meta_description %}{% trans "Zumodra - Verify. Recruit. Hire. Risk-Free. The trusted platform for verified freelancers and employers. Find top talent or your next opportunity today." %}{% endblock %}
 
 {% block content %}
-{% load static %}
 
-        <!-- Slider -->
-        <section class="slider">
-            <div class="slider_inner relative md:h-[700px] max-md:py-28 overflow-hidden">
-                <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]" aria-hidden="true">
-                    <img src="{% static 'assets/images/slider/index.jpg' %}" alt="slider1" class="w-full h-full object-cover" />
-                    <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+{% comment %} HERO SLIDER SECTION {% endcomment %}
+<section class="slider">
+    <div class="slider_inner relative md:h-[700px] max-md:py-28 overflow-hidden">
+        <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]" aria-hidden="true">
+            <img src="{% static 'assets/images/slider/index.jpg' %}" alt="{% trans 'Hero background' %}" class="w-full h-full object-cover" />
+            <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+        </div>
+        <div class="container h-full">
+            <div class="slider_content flex flex-col items-start justify-center sm:pt-20 pt-16 md:w-[720px] w-full h-full">
+                <h2 class="heading1 text-white animate animate_top" style="--i: 1">{% trans "Verify. Recruit. Hire. Risk-Free." %}</h2>
+                <p class="body2 text-white mt-5 animate animate_top" style="--i: 2">{% trans "Find verified freelancers and top talent for any project. Build trust with bidirectional KYC verification." %}</p>
+                <div class="form_search z-[1] w-full md:mt-10 mt-7 animate animate_top" style="--i: 3">
+                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white" action="{% url 'search' %}" method="get">
+                        <div class="form_input relative w-full">
+                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
+                            <input type="text" name="q" class="input_search w-full h-full pl-10" placeholder="{% trans 'Job title, keywords, or company' %}" />
+                        </div>
+                        <div class="select_block flex-shrink-0 sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                            <div class="select">
+                                <span class="selected" data-title="{% trans 'All Categories' %}">{% trans "All Categories" %}</span>
+                                <ul class="list_option bg-white">
+                                    <li data-item="{% trans 'Graphic & Design' %}">{% trans "Graphic & Design" %}</li>
+                                    <li data-item="{% trans 'Writing & Translation' %}">{% trans "Writing & Translation" %}</li>
+                                    <li data-item="{% trans 'Video & Animation' %}">{% trans "Video & Animation" %}</li>
+                                    <li data-item="{% trans 'Digital Marketing' %}">{% trans "Digital Marketing" %}</li>
+                                    <li data-item="{% trans 'Programming & Tech' %}">{% trans "Programming & Tech" %}</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl right-0"></span>
+                        </div>
+                        <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">{% trans "Search" %}</button>
+                    </form>
                 </div>
-                <div class="container h-full">
-                    <div class="slider_content flex flex-col items-start justify-center sm:pt-20 pt-16 md:w-[720px] w-full h-full">
-                        <h2 class="heading1 text-white animate animate_top" style="--i: 1">Find the right freelance service, right away</h2>
-                        <p class="body2 text-white mt-5 animate animate_top" style="--i: 2">Find skilled freelancers for any project. Discover top services and hire the best talent.</p>
-                        <div class="form_search z-[1] w-full md:mt-10 mt-7 animate animate_top" style="--i: 3">
-                            <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white">
-                                <div class="form_input relative w-full">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10" placeholder="Job title, key words or company" required />
-                                </div>
-                                <div class="select_block flex-shrink-0 sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
-                                    <div class="select">
-                                        <span class="selected" data-title="All Categories">All Categories</span>
-                                        <ul class="list_option bg-white">
-                                            <li data-item="Graphic & Design">Graphic & Design</li>
-                                            <li data-item="Wrting">Wrting</li>
-                                            <li data-item="Videos">Videos</li>
-                                            <li data-item="Digital Marketing">Digital Marketing</li>
-                                        </ul>
-                                    </div>
-                                    <span class="icon_down ph ph-caret-down sm:text-2xl text-xl right-0"></span>
-                                </div>
-                                <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">Search</button>
-                            </form>
-                        </div>
-                        <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
-                            <strong class="text-button-sm text-white">Top Services:</strong>
-                            <a href="jobs-default.html" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">Graphics</a>
-                            <a href="jobs-default.html" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">Website</a>
-                            <a href="jobs-default.html" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">Logo</a>
-                            <a href="jobs-default.html" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">Developement</a>
-                        </div>
-                    </div>
+                <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
+                    <strong class="text-button-sm text-white">{% trans "Popular:" %}</strong>
+                    <a href="{% url 'services_category' 'graphics' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Graphics" %}</a>
+                    <a href="{% url 'services_category' 'web' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Website" %}</a>
+                    <a href="{% url 'services_category' 'logo' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Logo" %}</a>
+                    <a href="{% url 'services_category' 'dev' %}" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Development" %}</a>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
-        <!-- Brand -->
-        <section class="brand bg-surface py-7">
-            <div class="container">
-                <h6 class="heading6 text-center">Trusted by leading enterprise organizations and freelancers globally</h6>
+{% comment %} TRUSTED BRANDS SECTION {% endcomment %}
+<section class="brand bg-surface py-7">
+    <div class="container">
+        <h6 class="heading6 text-center">{% trans "Trusted by leading enterprise organizations and freelancers globally" %}</h6>
                 <div class="swiper swiper-list-brand mt-6">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide flex items-center justify-center">
@@ -99,16 +121,16 @@
             </div>
         </section>
 
-        <!-- Top Categories -->
-        <section class="top_categories lg:pt-20 sm:pt-14 pt-10">
-            <div class="container">
-                <div class="heading flex items-end justify-between flex-wrap gap-4">
-                    <div class="left animate animate_top" style="--i: 1">
-                        <h3 class="heading3">Top Categories</h3>
-                        <p class="body2 text-secondary mt-3">Explore a wide range of services organized by category</p>
-                    </div>
-                    <a href="jobs-default.html" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">All Categories</a>
-                </div>
+{% comment %} TOP CATEGORIES SECTION {% endcomment %}
+<section class="top_categories lg:pt-20 sm:pt-14 pt-10">
+    <div class="container">
+        <div class="heading flex items-end justify-between flex-wrap gap-4">
+            <div class="left animate animate_top" style="--i: 1">
+                <h3 class="heading3">{% trans "Top Categories" %}</h3>
+                <p class="body2 text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
+            </div>
+            <a href="{% url 'categories' %}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
+        </div>
                 <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
                     <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 1">
                         <div class="icon pb-4 w-fit line-before line-2px">
@@ -166,33 +188,33 @@
             </div>
         </section>
 
-        <!-- Feature services -->
-        <section class="feature_services lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <div class="heading flex flex-col items-center">
-                    <h3 class="heading3 text-center animate animate_top" style="--i: 1">Feature services</h3>
-                    <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Discover our featured services designed to elevate your experience</p>
-                    <div class="heading_menu border-b border-line md:mt-7 mt-5 animate animate_top" style="--i: 3">
-                        <div class="menu_tab">
-                            <ul class="menu flex gap-7" role="tablist">
-                                <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300" role="presentation"></li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300 active" id="services_tab01" role="tab" aria-controls="services_01" aria-selected="true">Graphic & Design</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab02" role="tab" aria-controls="services_02" aria-selected="false">Digital Marketing</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab03" role="tab" aria-controls="services_03" aria-selected="false">Development</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab04" role="tab" aria-controls="services_04" aria-selected="false">UI/UX Design</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab05" role="tab" aria-controls="services_05" aria-selected="false">Writing</button>
-                                </li>
-                            </ul>
-                        </div>
+{% comment %} FEATURED SERVICES SECTION {% endcomment %}
+<section class="feature_services lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="heading flex flex-col items-center">
+            <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Featured Services" %}</h3>
+            <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover our featured services designed to elevate your experience" %}</p>
+            <div class="heading_menu border-b border-line md:mt-7 mt-5 animate animate_top" style="--i: 3">
+                <div class="menu_tab">
+                    <ul class="menu flex gap-7" role="tablist">
+                        <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300" role="presentation"></li>
+                        <li class="tab_item" role="presentation">
+                            <button class="tab_btn -before py-1 text-button hover:text-primary duration-300 active" id="services_tab01" role="tab" aria-controls="services_01" aria-selected="true">{% trans "Graphic & Design" %}</button>
+                        </li>
+                        <li class="tab_item" role="presentation">
+                            <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab02" role="tab" aria-controls="services_02" aria-selected="false">{% trans "Digital Marketing" %}</button>
+                        </li>
+                        <li class="tab_item" role="presentation">
+                            <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab03" role="tab" aria-controls="services_03" aria-selected="false">{% trans "Development" %}</button>
+                        </li>
+                        <li class="tab_item" role="presentation">
+                            <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab04" role="tab" aria-controls="services_04" aria-selected="false">{% trans "UI/UX Design" %}</button>
+                        </li>
+                        <li class="tab_item" role="presentation">
+                            <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="services_tab05" role="tab" aria-controls="services_05" aria-selected="false">{% trans "Writing" %}</button>
+                        </li>
+                    </ul>
+                </div>
                     </div>
                 </div>
                 <div id="services_01" class="tab_list active" role="tabpanel" aria-labelledby="services_tab01" aria-hidden="false">
@@ -1237,22 +1259,22 @@
             </div>
         </section>
 
-        <!-- Banner -->
-        <section class="banner lg:pb-20 sm:pb-14 pb-10">
-            <div class="container">
-                <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl animate animateZoomOutUp" style="--i: 5">
-                    <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                        <div style="background-color: #000000; opacity: 0.3; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
-                        <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="banner1" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="banner_content">
-                        <h4 class="heading4 text-white animate animate_top" style="--i: 1">Embrace Independence <br class="max-sm:hidden" />Start Your Freelance Journey Now</h4>
-                        <p class="desc mt-2 text-white animate animate_top" style="--i: 2">Connect with your Desginer in minutes</p>
-                        <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
-                            <a href="become-seller.html" class="button-main bg-white">Become A Seller</a>
-                        </div>
-                    </div>
+{% comment %} CTA BANNER SECTION {% endcomment %}
+<section class="banner lg:pb-20 sm:pb-14 pb-10">
+    <div class="container">
+        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl animate animateZoomOutUp" style="--i: 5">
+            <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
+                <div style="background-color: #000000; opacity: 0.3; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+                <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Join our community' %}" class="w-full h-full object-cover" />
+            </div>
+            <div class="banner_content">
+                <h4 class="heading4 text-white animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
+                <p class="desc mt-2 text-white animate animate_top" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
+                <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
+                    <a href="{% url 'become_seller' %}" class="button-main bg-white">{% trans "Become A Seller" %}</a>
                 </div>
             </div>
-        </section>
-        {% endblock content %}
+        </div>
+    </div>
+</section>
+{% endblock content %}

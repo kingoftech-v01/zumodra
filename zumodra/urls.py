@@ -20,6 +20,12 @@ from django.views.defaults import (
 from .views import (
     home_view,
     about_us_view,
+    services_view,
+    pricing_view,
+    faq_view,
+    contact_us_view,
+    become_seller_view,
+    become_buyer_view,
     term_of_use_view,
     privacy_policy_view,
     auth_test_view,
@@ -232,7 +238,13 @@ urlpatterns += i18n_patterns(
     # Public pages
     path('', home_view, name='home'),
     path('about/', about_us_view, name='about'),
-    path('terms/', term_of_use_view, name='term_of_use'),
+    path('our-services/', services_view, name='services'),
+    path('pricing/', pricing_view, name='pricing'),
+    path('faq/', faq_view, name='faq'),
+    path('contact/', contact_us_view, name='contact_us'),
+    path('become-seller/', become_seller_view, name='become_seller'),
+    path('become-buyer/', become_buyer_view, name='become_buyer'),
+    path('terms/', term_of_use_view, name='terms_of_use'),
     path('privacy/', privacy_policy_view, name='privacy_policy'),
 
     # Authentication (hidden from public but functional)
@@ -321,6 +333,12 @@ Public Pages (with language prefix):
     /careers/               - Public career portal (no i18n prefix)
     /<lang>/                - Home page
     /<lang>/about/          - About us
+    /<lang>/our-services/   - Services overview
+    /<lang>/pricing/        - Pricing plans
+    /<lang>/faq/            - Frequently asked questions
+    /<lang>/contact/        - Contact page
+    /<lang>/become-seller/  - Freelancer onboarding
+    /<lang>/become-buyer/   - Employer onboarding
     /<lang>/terms/          - Terms of use
     /<lang>/privacy/        - Privacy policy
 
