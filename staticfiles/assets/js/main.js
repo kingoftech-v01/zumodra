@@ -1808,5 +1808,7 @@
         handleRate()
         handleToastify()
         handleScrollTop()
+        // Trigger reveal animation on page load for visible elements
+        handleReveal()
     });
 })(window, window.jQuery);
