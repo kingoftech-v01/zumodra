@@ -5,24 +5,19 @@
 # For development: docker-compose up -d
 # =============================================================================
 
-version: '3.9'
-
 x-common-env: &common-env
   DEBUG: "False"
   SECRET_KEY: ${SECRET_KEY}
   DB_ENGINE: django.contrib.gis.db.backends.postgis
-  # Database env vars - entrypoint supports both DB_NAME/DB_PORT and DB_DEFAULT_NAME/DB_DEFAULT_PORT
-  DB_NAME: ${DB_NAME:-${DB_DEFAULT_NAME:-zumodra}}
-  DB_DEFAULT_NAME: ${DB_DEFAULT_NAME:-zumodra}
+  DB_NAME: ${DB_NAME:-zumodra}
   DB_USER: ${DB_USER:-postgres}
   DB_PASSWORD: ${DB_PASSWORD}
   DB_HOST: ${DB_HOST:-postgres-primary}
   DB_PORT: ${DB_PORT:-5432}
-  DB_DEFAULT_PORT: ${DB_DEFAULT_PORT:-5432}
   DB_READ_HOST: postgres-replica
   REDIS_URL: ${REDIS_URL:-redis://redis-master:6379/0}
   REDIS_CACHE_URL: redis://redis-cache:6379/0
-  CELERY_BROKER_URL: amqp://${RABBITMQ_USER:-zumodra}:${RABBITMQ_PASSWORD}@rabbitmq:5672/zumodra
+  CELERY_BROKER_URL: amqp://${RABBITMQ_USER:-zumodra}:${RABBITMQ_PASSWORD}@rabbitmq:5672/${RABBITMQ_VHOST:-zumodra}
   CELERY_RESULT_BACKEND: redis://redis-master:6379/1
   ALLOWED_HOSTS: ${ALLOWED_HOSTS}
   SECURE_SSL_REDIRECT: "True"
@@ -50,7 +45,7 @@ services:
     container_name: zumodra_postgres_primary
     restart: always
     environment:
-      POSTGRES_DB: ${DB_DEFAULT_NAME:-zumodra}
+      POSTGRES_DB: ${DB_NAME:-zumodra}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: "--data-checksums"
@@ -70,7 +65,7 @@ services:
           memory: 4G
     healthcheck:
       <<: *healthcheck-defaults
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_DEFAULT_NAME:-zumodra} && psql -U ${DB_USER:-postgres} -d ${DB_DEFAULT_NAME:-zumodra} -c 'SELECT 1'"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-zumodra} && psql -U ${DB_USER:-postgres} -d ${DB_NAME:-zumodra} -c 'SELECT 1'"]
     networks:
       - zumodra_backend
     read_only: false
@@ -85,7 +80,7 @@ services:
     container_name: zumodra_postgres_replica
     restart: always
     environment:
-      POSTGRES_DB: ${DB_DEFAULT_NAME:-zumodra}
+      POSTGRES_DB: ${DB_NAME:-zumodra}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -106,7 +101,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *healthcheck-defaults
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_DEFAULT_NAME:-zumodra}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-zumodra}"]
     networks:
       - zumodra_backend
     read_only: false
@@ -202,7 +197,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-zumodra}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-      RABBITMQ_DEFAULT_VHOST: zumodra
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-zumodra}
       RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.8
       RABBITMQ_DISK_FREE_LIMIT: 2GB
     volumes:
@@ -300,6 +295,60 @@ services:
     tmpfs:
       - /tmp:size=500M
       - /app/.cache:size=100M
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Django Channels (WebSocket) Server
+  # ===========================================================================
+  channels:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      args:
+        PYTHON_VERSION: "3.12"
+    image: zumodra/web:${VERSION:-latest}
+    restart: always
+    command: daphne -b 0.0.0.0 -p 8001 zumodra.asgi:application
+    environment:
+      <<: *common-env
+      SERVICE_TYPE: channels
+    volumes:
+      - logs_volume:/app/logs
+    deploy:
+      mode: replicated
+      replicas: 4
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('localhost',8001)); s.close()"]
+      interval: 30s
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_healthy
+    networks:
+      - zumodra_backend
+      - zumodra_frontend
+    read_only: true
+    tmpfs:
+      - /tmp:size=200M
     security_opt:
       - no-new-privileges:true
 
