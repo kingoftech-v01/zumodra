@@ -1,4 +1,5 @@
-{# =============================================================================
+{% comment %}
+=============================================================================
    ZUMODRA BASE TEMPLATE (Legacy/Public Version)
    =============================================================================
 
@@ -21,7 +22,8 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-01
-   ============================================================================= #}
+   =============================================================================
+{% endcomment %}
 
 {% load static i18n %}
 
@@ -60,11 +62,36 @@
         <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}" />
         <link rel="stylesheet" href="{% static 'assets/css/quill.snow.css' %}" />
 
+        {# ===== ANIMATION & LAYOUT FIXES ===== #}
+        <style>
+            /* Fix: Ensure animated content is visible immediately */
+            .animate {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            /* Fix: Prevent double scrollbars */
+            html, body {
+                overflow-x: hidden;
+            }
+            html {
+                overflow-y: auto;
+            }
+            body {
+                overflow-y: visible;
+            }
+        </style>
+        <noscript>
+            <style>
+                .animate { opacity: 1 !important; transform: none !important; }
+            </style>
+        </noscript>
+
         {# ===== ADDITIONAL HEAD CONTENT ===== #}
         {% block extra_head %} {% endblock extra_head %}
     </head>
 
     <body class="flex flex-col min-h-screen">
+        
         {# ===== HEADER SECTION ===== #}
         {% block header %}
         {% endblock header %}

@@ -52,15 +52,40 @@ def validate_subdomain(value):
         )
 
 
-def validate_file_size(max_size_mb):
-    """Return a validator for max file size."""
-    def validator(value):
-        if value.size > max_size_mb * 1024 * 1024:
+class FileSizeValidator:
+    """
+    Validator for maximum file size.
+
+    This is a class-based validator that Django can serialize for migrations.
+    It implements the `deconstruct()` method required for migration serialization.
+    """
+
+    def __init__(self, max_size_mb: int):
+        self.max_size_mb = max_size_mb
+
+    def __call__(self, value):
+        if value.size > self.max_size_mb * 1024 * 1024:
             raise ValidationError(
                 _('File size must be under %(max)s MB.'),
-                params={'max': max_size_mb},
+                params={'max': self.max_size_mb},
             )
-    return validator
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, FileSizeValidator) and
+            self.max_size_mb == other.max_size_mb
+        )
+
+    def deconstruct(self):
+        """
+        Return a 3-tuple (path, args, kwargs) for migration serialization.
+        Django uses this to reconstruct the validator in migration files.
+        """
+        return (
+            'careers.models.FileSizeValidator',
+            (self.max_size_mb,),
+            {},
+        )
 
 
 # =============================================================================
@@ -108,19 +133,19 @@ class CareerSite(TenantAwareModelMixin, models.Model):
         upload_to='career_sites/logos/',
         blank=True,
         null=True,
-        validators=[validate_file_size(5)]
+        validators=[FileSizeValidator(5)]
     )
     favicon = models.ImageField(
         upload_to='career_sites/favicons/',
         blank=True,
         null=True,
-        validators=[validate_file_size(1)]
+        validators=[FileSizeValidator(1)]
     )
     cover_image = models.ImageField(
         upload_to='career_sites/covers/',
         blank=True,
         null=True,
-        validators=[validate_file_size(10)]
+        validators=[FileSizeValidator(10)]
     )
 
     # Colors (with validation)
@@ -237,7 +262,7 @@ class CareerSite(TenantAwareModelMixin, models.Model):
         upload_to='career_sites/og/',
         blank=True,
         null=True,
-        validators=[validate_file_size(5)],
+        validators=[FileSizeValidator(5)],
         help_text=_('Open Graph image for social sharing (1200x630 recommended)')
     )
     canonical_url = models.URLField(

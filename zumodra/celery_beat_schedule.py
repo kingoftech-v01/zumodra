@@ -570,7 +570,7 @@ CELERY_BEAT_SCHEDULE = {
     # ==========================================================================
 
     'celery-health-check': {
-        'task': 'zumodra.celery_scale.health_check',
+        'task': 'zumodra.celery.health_check',
         'schedule': timedelta(minutes=5),  # Every 5 minutes
         'options': {'queue': 'default', 'priority': 5},
         'description': 'Celery worker health check',

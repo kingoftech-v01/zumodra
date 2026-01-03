@@ -14,6 +14,7 @@ Environment variable:
     CREATE_DEMO_TENANT=1  # Enable demo tenant creation in entrypoint
 """
 
+import os
 import random
 import uuid
 from datetime import timedelta
@@ -33,11 +34,14 @@ User = get_user_model()
 # DEMO DATA CONFIGURATION
 # =============================================================================
 
+# Get base domain from environment (e.g., localhost, zumodra.com)
+BASE_DOMAIN = os.environ.get('BASE_DOMAIN', 'localhost')
+
 DEMO_TENANT_CONFIG = {
     'name': 'Demo Company',
     'slug': 'demo',
     'schema': 'demo',
-    'domain': 'demo.localhost',
+    'domain': f'demo.{BASE_DOMAIN}',  # Will be demo.localhost or demo.zumodra.com
     'owner_email': 'admin@demo.zumodra.local',
 }
 
@@ -187,6 +191,12 @@ class Command(BaseCommand):
             action='store_true',
             help='Skip creating messaging/conversations data'
         )
+        parser.add_argument(
+            '--domain',
+            type=str,
+            default=None,
+            help=f'Base domain for demo tenant (default: {BASE_DOMAIN} from BASE_DOMAIN env var). Demo will be at demo.<domain>'
+        )
 
     def handle(self, *args, **options):
         self.reset = options.get('reset', False)
@@ -194,6 +204,14 @@ class Command(BaseCommand):
         self.skip_marketplace = options.get('skip_marketplace', False)
         self.skip_messaging = options.get('skip_messaging', False)
         self.verbosity = options.get('verbosity', 1)
+
+        # Handle custom domain
+        custom_domain = options.get('domain')
+        if custom_domain:
+            global DEMO_TENANT_CONFIG
+            DEMO_TENANT_CONFIG = dict(DEMO_TENANT_CONFIG)  # Make a copy
+            DEMO_TENANT_CONFIG['domain'] = f'demo.{custom_domain}'
+            self.stdout.write(f"Using custom domain: {DEMO_TENANT_CONFIG['domain']}")
 
         if self.dry_run:
             self.stdout.write(self.style.WARNING('=== DRY RUN MODE ===\n'))
@@ -279,18 +297,26 @@ class Command(BaseCommand):
     def _create_tenant(self):
         """Create the demo tenant."""
         from tenants.models import Tenant, Plan, Domain
-        from tenants.services import TenantService
+        from django.utils import timezone
+        from datetime import timedelta
 
         plan = Plan.objects.filter(plan_type=Plan.PlanType.PROFESSIONAL).first()
         if not plan:
             plan = Plan.objects.first()
 
-        tenant = TenantService.create_tenant(
+        # Create tenant directly without using TenantService to avoid atomic transaction
+        # which causes issues with Wagtail migrations and PostgreSQL triggers
+        tenant = Tenant(
             name=DEMO_TENANT_CONFIG['name'],
+            slug=DEMO_TENANT_CONFIG['slug'],
+            schema_name=DEMO_TENANT_CONFIG['schema'],
             owner_email=DEMO_TENANT_CONFIG['owner_email'],
             plan=plan,
+            status=Tenant.TenantStatus.TRIAL,
+            on_trial=True,
+            trial_ends_at=timezone.now() + timedelta(days=14),
         )
-        tenant.slug = DEMO_TENANT_CONFIG['slug']
+        # auto_create_schema=True will trigger schema creation and migrations on save
         tenant.save()
         tenant.activate()
 

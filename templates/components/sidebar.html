@@ -52,40 +52,40 @@
                 </svg>
             </button>
             <div x-show="open && sidebarOpen" x-collapse class="mt-1 space-y-1 pl-10">
-                <a href="{% url 'frontend:ats:job-list' %}"
-                   hx-get="{% url 'frontend:ats:job-list' %}"
+                <a href="{% url 'frontend:ats:job_list' %}"
+                   hx-get="{% url 'frontend:ats:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                    :class="activeSection === 'ats-jobs' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
                     {% trans "Jobs" %}
                 </a>
-                <a href="{% url 'frontend:ats:candidate-list' %}"
-                   hx-get="{% url 'frontend:ats:candidate-list' %}"
+                <a href="{% url 'frontend:ats:candidate_list' %}"
+                   hx-get="{% url 'frontend:ats:candidate_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                    :class="activeSection === 'ats-candidates' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
                     {% trans "Candidates" %}
                 </a>
-                <a href="{% url 'frontend:ats:pipeline-board' %}"
-                   hx-get="{% url 'frontend:ats:pipeline-board' %}"
+                <a href="{% url 'frontend:ats:pipeline_board' %}"
+                   hx-get="{% url 'frontend:ats:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                    :class="activeSection === 'ats-applications' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
                     {% trans "Applications" %}
                 </a>
-                <a href="{% url 'frontend:ats:pipeline-board' %}"
-                   hx-get="{% url 'frontend:ats:pipeline-board' %}"
+                <a href="{% url 'frontend:ats:pipeline_board' %}"
+                   hx-get="{% url 'frontend:ats:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                    :class="activeSection === 'ats-pipeline' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
                     {% trans "Pipeline" %}
                 </a>
-                <a href="{% url 'frontend:ats:job-list' %}"
-                   hx-get="{% url 'frontend:ats:job-list' %}"
+                <a href="{% url 'frontend:ats:job_list' %}"
+                   hx-get="{% url 'frontend:ats:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -155,7 +155,7 @@
         </a>
 
         <!-- Services Marketplace -->
-        <a href="{% url 'services:browse_services' %}"
+        <a href="/services/"
            class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
            :class="activeSection === 'services' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

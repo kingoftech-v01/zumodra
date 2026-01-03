@@ -106,7 +106,21 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .dark ::-webkit-scrollbar-track { background: #1e293b; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+        /* Fix: Ensure animated content is visible immediately */
+        .animate {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+        /* Fix: Prevent double scrollbars */
+        html { overflow-y: auto; overflow-x: hidden; }
+        body { overflow-y: visible; overflow-x: hidden; }
     </style>
+    <noscript>
+        <style>
+            .animate { opacity: 1 !important; transform: none !important; }
+        </style>
+    </noscript>
 
     {# ===== ADDITIONAL CSS ===== #}
     {% block extra_css %}{% endblock %}

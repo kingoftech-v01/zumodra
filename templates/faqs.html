@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -5,13 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="FreelanHub - Job Board & Freelance Marketplace" />
         <title>FreelanHub - Job Board & Freelance Marketplace</title>
-        <link rel="shortcut icon" href="./assets/images/fav.png" type="image/x-icon" />
-        <link rel="stylesheet" href="./assets/css/swiper-bundle.min.css" />
-        <link rel="stylesheet" href="./assets/css/leaflet.css" />
-        <link rel="stylesheet" href="./assets/css/slick.css" />
-        <link rel="stylesheet" href="./assets/css/style.css" />
-        <link rel="stylesheet" href="./dist/output-tailwind.css" />
-        <link rel="stylesheet" href="./dist/output-scss.css" />
+        <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
+        <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
+        <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}" />
+        <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}" />
+        <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}" />
     </head>
 
     <body class="lg:overflow-unset">
@@ -21,8 +22,8 @@
                 <div class="left flex items-center gap-15 h-full max-[1600px]:gap-6">
                     <h1>
                         <a href="index.html">
-                            <img src="./assets/images/logo-white.png" alt="logo-white" class="logo-white md:h-[42px] h-8 w-auto" />
-                            <img src="./assets/images/logo.png" alt="logo" class="logo-black md:h-[42px] h-8 w-auto hidden" />
+                            <img src="{% static 'assets/images/logo-white.png' %}" alt="logo-white" class="logo-white md:h-[42px] h-8 w-auto" />
+                            <img src="{% static 'assets/images/logo.png' %}" alt="logo" class="logo-black md:h-[42px] h-8 w-auto hidden" />
                         </a>
                     </h1>
                     <div class="category_block flex items-center relative h-full">
@@ -454,79 +455,79 @@
                                 <ul class="container grid grid-cols-5 gap-5">
                                     <li>
                                         <a href="index.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home1.webp" alt="home1" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home1.webp' %}" alt="home1" class="w-full rounded" />
                                             <span>Home Freelancer 01</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer2.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home2.webp" alt="home2" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home2.webp' %}" alt="home2" class="w-full rounded" />
                                             <span>Home Freelancer 02</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer3.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home3.webp" alt="home3" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home3.webp' %}" alt="home3" class="w-full rounded" />
                                             <span>Home Freelancer 03</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer4.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home4.webp" alt="home4" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home4.webp' %}" alt="home4" class="w-full rounded" />
                                             <span>Home Freelancer 04</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer5.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home5.webp" alt="home5" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home5.webp' %}" alt="home5" class="w-full rounded" />
                                             <span>Home Freelancer 05</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer6.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home6.webp" alt="home6" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home6.webp' %}" alt="home6" class="w-full rounded" />
                                             <span>Home Freelancer 06</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer7.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home7.webp" alt="home7" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home7.webp' %}" alt="home7" class="w-full rounded" />
                                             <span>Home Freelancer 07</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="freelancer8.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home8.webp" alt="home8" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home8.webp' %}" alt="home8" class="w-full rounded" />
                                             <span>Home Freelancer 08</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="jobs9.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home9.webp" alt="home9" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home9.webp' %}" alt="home9" class="w-full rounded" />
                                             <span>Home Jobs 09</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="jobs10.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home10.webp" alt="home10" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home10.webp' %}" alt="home10" class="w-full rounded" />
                                             <span>Home Jobs 10</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="jobs11.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home11.webp" alt="home11" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home11.webp' %}" alt="home11" class="w-full rounded" />
                                             <span>Home Jobs 11</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="jobs12.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home12.webp" alt="home12" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home12.webp' %}" alt="home12" class="w-full rounded" />
                                             <span>Home Jobs 12</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="rtl13.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
-                                            <img src="./assets/images/components/home13.webp" alt="home13" class="w-full rounded" />
+                                            <img src="{% static 'assets/images/components/home13.webp' %}" alt="home13" class="w-full rounded" />
                                             <span>Home RTL 13</span>
                                         </a>
                                     </li>
@@ -917,7 +918,7 @@
                     <a href="become-seller.html" class="button-main bg-white text-black max-sm:hidden">Become A Seller</a>
                     <div class="user_block relative max-sm:hidden">
                         <button class="user_infor flex items-center gap-2 text-white">
-                            <img src="./assets/images/avatar/IMG-7.webp" alt="IMG-7" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full" />
+                            <img src="{% static 'assets/images/avatar/IMG-7.webp' %}" alt="IMG-7" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full" />
                             <strong class="user_name text-title">Employer</strong>
                             <span class="ph ph-caret-down"></span>
                         </button>
@@ -954,7 +955,7 @@
             <div class="breadcrumb_inner sm:pt-20 pt-16">
                 <div class="content relative w-full h-full">
                     <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
-                        <img src="./assets/images/components/breadcrumb_candidate.webp" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
                     </div>
                     <div class="container relative h-full lg:py-20 sm:py-14 py-10">
                         <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
@@ -1158,7 +1159,7 @@
                 <div class="container">
                     <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light">
                         <a href="index.html" class="footer_logo">
-                            <img src="./assets/images/logo-white.png" alt="logo-white" class="h-[42px] w-auto" />
+                            <img src="{% static 'assets/images/logo-white.png' %}" alt="logo-white" class="h-[42px] w-auto" />
                         </a>
                         <div class="list_social flex flex-wrap items-center gap-4">
                             <span class="text-subtitle text-white">Follow Us:</span>
@@ -1241,10 +1242,10 @@
                                 <strong class="heading block text-button-sm text-white mt-5">Download App</strong>
                                 <div class="list-download flex items-start gap-3 mt-4">
                                     <a href="https://play.google.com/" target="_blank">
-                                        <img src="./assets/images/download/gg_play.png" alt="gg_play" />
+                                        <img src="{% static 'assets/images/download/gg_play.png' %}" alt="gg_play" />
                                     </a>
                                     <a href="https://www.apple.com/app-store/" target="_blank">
-                                        <img src="./assets/images/download/app_store.png" alt="app_store" />
+                                        <img src="{% static 'assets/images/download/app_store.png' %}" alt="app_store" />
                                     </a>
                                 </div>
                             </div>
@@ -1271,7 +1272,7 @@
             </button>
             <div class="heading flex items-center justify-center mt-5">
                 <a href="index.html" class="logo">
-                    <img src="./assets/images/logo.png" alt="logo" class="h-8" />
+                    <img src="{% static 'assets/images/logo.png' %}" alt="logo" class="h-8" />
                 </a>
             </div>
             <form class="form-search relative mt-4 mx-5">
@@ -1733,11 +1734,11 @@
             </div>
         </div>
 
-        <script src="./assets/js/jquery.min.js"></script>
-        <script src="./assets/js/phosphor-icons.js"></script>
-        <script src="./assets/js/slick.min.js"></script>
-        <script src="./assets/js/leaflet.js"></script>
-        <script src="./assets/js/swiper-bundle.min.js"></script>
-        <script src="./assets/js/main.js"></script>
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/phosphor-icons.js' %}"></script>
+        <script src="{% static 'assets/js/slick.min.js' %}"></script>
+        <script src="{% static 'assets/js/leaflet.js' %}"></script>
+        <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/main.js' %}"></script>
     </body>
 </html>

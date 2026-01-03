@@ -36,7 +36,7 @@
         <div class="border-b border-gray-200 dark:border-gray-700">
             <nav class="flex -mb-px" aria-label="Tabs">
                 <a href="?status=all"
-                   hx-get="{% url 'ats:offer-list' %}?status=all"
+                   hx-get="{% url 'ats:offer_list' %}?status=all"
                    hx-target="#offers-table-body"
                    hx-swap="innerHTML"
                    class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
@@ -99,7 +99,7 @@
                                     </div>
                                 </div>
                                 <div class="ml-4">
-                                    <a href="{% url 'ats:application-detail' offer.application.pk %}"
+                                    <a href="{% url 'ats:application_detail' offer.application.pk %}"
                                        class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                         {{ offer.application.candidate.full_name }}
                                     </a>
@@ -108,7 +108,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'ats:job-detail' offer.application.job.pk %}"
+                            <a href="{% url 'ats:job_detail' offer.application.job.pk %}"
                                class="text-sm text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                 {{ offer.application.job.title }}
                             </a>
@@ -137,7 +137,7 @@
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'ats:offer-detail' offer.pk %}"
+                            <a href="{% url 'ats:offer_detail' offer.pk %}"
                                class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                 {% trans "View" %}
                             </a>

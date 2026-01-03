@@ -163,6 +163,10 @@ urlpatterns = [
     # Template views (server-rendered) - for /careers/
     # Note: These should be mounted at /careers/ in the main urls.py
     path('pages/', include((template_patterns, 'template'))),
+
+    # Direct job_list URL for navigation (alias to career home)
+    # This allows templates to use {% url 'careers:job_list' %}
+    path('jobs/', CareerSiteHomeView.as_view(), name='job_list'),
 ]
 
 
