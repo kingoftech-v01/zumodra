@@ -1,232 +1,488 @@
 /**
- * Zumodra Accessibility Module
+ * Accessibility Helpers for Zumodra
  *
- * WCAG 2.1 AA compliant accessibility features:
- * - Focus trap for modals
- * - Skip link handling
- * - Keyboard navigation
- * - ARIA live region announcements
- * - Reduced motion support
+ * Features:
+ * - Focus trap for modals and dialogs
+ * - Skip to content link handler
+ * - Keyboard navigation helpers
+ * - ARIA live region announcer
+ * - Reduced motion detection
+ * - Roving tabindex for complex widgets
+ *
+ * WCAG 2.1 AA Compliant
  */
 
 (function() {
     'use strict';
 
+    // Constants
+    const FOCUSABLE_SELECTORS = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled]):not([type="hidden"])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])',
+        '[contenteditable="true"]',
+        'audio[controls]',
+        'video[controls]',
+        'details > summary:first-of-type',
+        'iframe'
+    ].join(', ');
+
+    const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
     /**
-     * Focus Trap - Keeps keyboard focus within a container
+     * Focus Trap Manager
+     * Traps focus within a container (e.g., modals, dialogs)
      */
     class FocusTrap {
-        constructor(element) {
-            this.element = element;
+        constructor(container, options = {}) {
+            this.container = typeof container === 'string'
+                ? document.querySelector(container)
+                : container;
+
+            this.options = {
+                initialFocus: options.initialFocus || null,
+                returnFocus: options.returnFocus !== false,
+                escapeDeactivates: options.escapeDeactivates !== false,
+                clickOutsideDeactivates: options.clickOutsideDeactivates || false,
+                onActivate: options.onActivate || null,
+                onDeactivate: options.onDeactivate || null
+            };
+
+            this.active = false;
+            this.previousActiveElement = null;
             this.firstFocusable = null;
             this.lastFocusable = null;
-            this.active = false;
+
             this.handleKeyDown = this.handleKeyDown.bind(this);
+            this.handleClickOutside = this.handleClickOutside.bind(this);
         }
 
+        /**
+         * Get all focusable elements within the container
+         * @returns {NodeList} Focusable elements
+         */
         getFocusableElements() {
-            const selector = [
-                'a[href]',
-                'button:not([disabled])',
-                'input:not([disabled])',
-                'select:not([disabled])',
-                'textarea:not([disabled])',
-                '[tabindex]:not([tabindex="-1"])',
-                '[contenteditable]'
-            ].join(',');
-
-            return Array.from(this.element.querySelectorAll(selector))
-                .filter(el => !el.closest('[hidden]') && el.offsetParent !== null);
+            return this.container.querySelectorAll(FOCUSABLE_SELECTORS);
         }
 
+        /**
+         * Update references to first and last focusable elements
+         */
+        updateFocusableElements() {
+            const focusables = Array.from(this.getFocusableElements()).filter(el => {
+                return el.offsetParent !== null && !el.hasAttribute('inert');
+            });
+
+            this.firstFocusable = focusables[0] || null;
+            this.lastFocusable = focusables[focusables.length - 1] || null;
+        }
+
+        /**
+         * Activate the focus trap
+         */
         activate() {
-            if (this.active) return;
+            if (this.active || !this.container) return;
 
-            const focusable = this.getFocusableElements();
-            this.firstFocusable = focusable[0];
-            this.lastFocusable = focusable[focusable.length - 1];
-
-            document.addEventListener('keydown', this.handleKeyDown);
             this.active = true;
+            this.previousActiveElement = document.activeElement;
+            this.updateFocusableElements();
 
-            // Focus first focusable element
-            if (this.firstFocusable) {
-                this.firstFocusable.focus();
+            // Set initial focus
+            requestAnimationFrame(() => {
+                let focusTarget = null;
+
+                if (this.options.initialFocus) {
+                    focusTarget = typeof this.options.initialFocus === 'string'
+                        ? this.container.querySelector(this.options.initialFocus)
+                        : this.options.initialFocus;
+                }
+
+                if (!focusTarget) {
+                    focusTarget = this.firstFocusable || this.container;
+                }
+
+                if (focusTarget && typeof focusTarget.focus === 'function') {
+                    focusTarget.focus();
+                }
+            });
+
+            // Add event listeners
+            document.addEventListener('keydown', this.handleKeyDown);
+
+            if (this.options.clickOutsideDeactivates) {
+                document.addEventListener('click', this.handleClickOutside, true);
+            }
+
+            // Mark container as modal
+            this.container.setAttribute('aria-modal', 'true');
+
+            // Callback
+            if (this.options.onActivate) {
+                this.options.onActivate(this);
             }
         }
 
+        /**
+         * Deactivate the focus trap
+         */
         deactivate() {
             if (!this.active) return;
 
-            document.removeEventListener('keydown', this.handleKeyDown);
             this.active = false;
+
+            // Remove event listeners
+            document.removeEventListener('keydown', this.handleKeyDown);
+            document.removeEventListener('click', this.handleClickOutside, true);
+
+            // Remove modal attribute
+            this.container.removeAttribute('aria-modal');
+
+            // Return focus to previous element
+            if (this.options.returnFocus && this.previousActiveElement) {
+                requestAnimationFrame(() => {
+                    if (typeof this.previousActiveElement.focus === 'function') {
+                        this.previousActiveElement.focus();
+                    }
+                });
+            }
+
+            // Callback
+            if (this.options.onDeactivate) {
+                this.options.onDeactivate(this);
+            }
         }
 
-        handleKeyDown(e) {
-            if (e.key !== 'Tab') return;
+        /**
+         * Handle keydown events
+         * @param {KeyboardEvent} event
+         */
+        handleKeyDown(event) {
+            if (!this.active) return;
 
-            const focusable = this.getFocusableElements();
-            this.firstFocusable = focusable[0];
-            this.lastFocusable = focusable[focusable.length - 1];
+            // Escape key
+            if (event.key === 'Escape' && this.options.escapeDeactivates) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.deactivate();
+                return;
+            }
 
-            if (e.shiftKey) {
-                if (document.activeElement === this.firstFocusable) {
-                    e.preventDefault();
-                    this.lastFocusable?.focus();
+            // Tab key - trap focus
+            if (event.key === 'Tab') {
+                this.updateFocusableElements();
+
+                if (!this.firstFocusable) {
+                    event.preventDefault();
+                    return;
                 }
+
+                if (event.shiftKey) {
+                    // Shift + Tab
+                    if (document.activeElement === this.firstFocusable) {
+                        event.preventDefault();
+                        this.lastFocusable.focus();
+                    }
+                } else {
+                    // Tab
+                    if (document.activeElement === this.lastFocusable) {
+                        event.preventDefault();
+                        this.firstFocusable.focus();
+                    }
+                }
+            }
+        }
+
+        /**
+         * Handle clicks outside the container
+         * @param {MouseEvent} event
+         */
+        handleClickOutside(event) {
+            if (this.active && !this.container.contains(event.target)) {
+                this.deactivate();
+            }
+        }
+
+        /**
+         * Toggle the focus trap
+         */
+        toggle() {
+            if (this.active) {
+                this.deactivate();
             } else {
-                if (document.activeElement === this.lastFocusable) {
-                    e.preventDefault();
-                    this.firstFocusable?.focus();
+                this.activate();
+            }
+        }
+
+        /**
+         * Check if trap is active
+         * @returns {boolean}
+         */
+        isActive() {
+            return this.active;
+        }
+    }
+
+    /**
+     * Skip Link Handler
+     * Manages skip to content functionality
+     */
+    class SkipLinkHandler {
+        constructor() {
+            this.init();
+        }
+
+        /**
+         * Initialize skip link functionality
+         */
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        /**
+         * Set up skip link event listeners
+         */
+        setup() {
+            const skipLinks = document.querySelectorAll('.skip-link, [data-skip-link]');
+
+            skipLinks.forEach(link => {
+                link.addEventListener('click', this.handleClick.bind(this));
+                link.addEventListener('keydown', this.handleKeyDown.bind(this));
+            });
+        }
+
+        /**
+         * Handle skip link click
+         * @param {Event} event
+         */
+        handleClick(event) {
+            const targetId = event.target.getAttribute('href');
+
+            if (!targetId || !targetId.startsWith('#')) return;
+
+            const target = document.querySelector(targetId);
+
+            if (target) {
+                event.preventDefault();
+
+                // Make target focusable if it isn't already
+                if (!target.hasAttribute('tabindex')) {
+                    target.setAttribute('tabindex', '-1');
                 }
+
+                // Scroll to target
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Focus target
+                requestAnimationFrame(() => {
+                    target.focus();
+
+                    // Announce for screen readers
+                    Announcer.announce('Skipped to main content');
+                });
+            }
+        }
+
+        /**
+         * Handle keydown on skip link
+         * @param {KeyboardEvent} event
+         */
+        handleKeyDown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.handleClick(event);
             }
         }
     }
 
     /**
-     * Skip Link Handler - Smooth scrolling to main content
+     * Keyboard Navigation Helpers
+     * Provides utilities for keyboard navigation patterns
      */
-    const SkipLinkHandler = {
-        init() {
-            document.addEventListener('click', (e) => {
-                const skipLink = e.target.closest('.skip-link');
-                if (!skipLink) return;
+    class KeyboardNavigation {
+        /**
+         * Handle arrow key navigation within a container
+         * @param {HTMLElement} container - Container element
+         * @param {Object} options - Navigation options
+         */
+        static setupArrowNavigation(container, options = {}) {
+            const {
+                selector = '[role="menuitem"], [role="option"], [role="tab"]',
+                orientation = 'vertical', // 'vertical', 'horizontal', or 'both'
+                wrap = true,
+                onSelect = null
+            } = options;
 
-                const targetId = skipLink.getAttribute('href').slice(1);
-                const target = document.getElementById(targetId);
-
-                if (target) {
-                    e.preventDefault();
-                    target.setAttribute('tabindex', '-1');
-                    target.focus();
-                    target.scrollIntoView({ behavior: this.prefersReducedMotion() ? 'auto' : 'smooth' });
-                }
-            });
-        },
-
-        prefersReducedMotion() {
-            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        }
-    };
-
-    /**
-     * Keyboard Navigation - Enhanced keyboard support
-     */
-    const KeyboardNavigation = {
-        init() {
-            // Show focus styles only for keyboard users
-            this.setupFocusVisibility();
-
-            // Arrow key navigation for lists and menus
-            this.setupArrowNavigation();
-
-            // Escape key handling
-            this.setupEscapeHandler();
-        },
-
-        setupFocusVisibility() {
-            let hadKeyboardEvent = false;
-
-            document.addEventListener('keydown', () => {
-                hadKeyboardEvent = true;
-            });
-
-            document.addEventListener('mousedown', () => {
-                hadKeyboardEvent = false;
-            });
-
-            document.addEventListener('focusin', (e) => {
-                if (hadKeyboardEvent) {
-                    e.target.classList.add('focus-visible');
-                }
-            });
-
-            document.addEventListener('focusout', (e) => {
-                e.target.classList.remove('focus-visible');
-            });
-        },
-
-        setupArrowNavigation() {
-            document.addEventListener('keydown', (e) => {
-                const menu = e.target.closest('[role="menu"], [role="listbox"]');
-                if (!menu) return;
-
-                const items = Array.from(menu.querySelectorAll('[role="menuitem"], [role="option"]'));
+            container.addEventListener('keydown', (event) => {
+                const items = Array.from(container.querySelectorAll(selector));
                 const currentIndex = items.indexOf(document.activeElement);
 
                 if (currentIndex === -1) return;
 
-                let nextIndex;
+                let nextIndex = currentIndex;
+                let handled = false;
 
-                switch (e.key) {
-                    case 'ArrowDown':
-                    case 'ArrowRight':
-                        e.preventDefault();
-                        nextIndex = (currentIndex + 1) % items.length;
-                        items[nextIndex].focus();
-                        break;
-
+                switch (event.key) {
                     case 'ArrowUp':
+                        if (orientation === 'vertical' || orientation === 'both') {
+                            nextIndex = currentIndex - 1;
+                            handled = true;
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (orientation === 'vertical' || orientation === 'both') {
+                            nextIndex = currentIndex + 1;
+                            handled = true;
+                        }
+                        break;
                     case 'ArrowLeft':
-                        e.preventDefault();
-                        nextIndex = (currentIndex - 1 + items.length) % items.length;
-                        items[nextIndex].focus();
+                        if (orientation === 'horizontal' || orientation === 'both') {
+                            nextIndex = currentIndex - 1;
+                            handled = true;
+                        }
                         break;
-
+                    case 'ArrowRight':
+                        if (orientation === 'horizontal' || orientation === 'both') {
+                            nextIndex = currentIndex + 1;
+                            handled = true;
+                        }
+                        break;
                     case 'Home':
-                        e.preventDefault();
-                        items[0].focus();
+                        nextIndex = 0;
+                        handled = true;
                         break;
-
                     case 'End':
-                        e.preventDefault();
-                        items[items.length - 1].focus();
+                        nextIndex = items.length - 1;
+                        handled = true;
                         break;
-                }
-            });
-        },
-
-        setupEscapeHandler() {
-            document.addEventListener('keydown', (e) => {
-                if (e.key !== 'Escape') return;
-
-                // Close open modals
-                const modal = document.querySelector('.modal.show, [role="dialog"][aria-hidden="false"]');
-                if (modal) {
-                    const closeBtn = modal.querySelector('[data-dismiss="modal"], .modal-close');
-                    if (closeBtn) closeBtn.click();
-                    return;
+                    case 'Enter':
+                    case ' ':
+                        if (onSelect) {
+                            event.preventDefault();
+                            onSelect(items[currentIndex], currentIndex);
+                        }
+                        return;
                 }
 
-                // Close open dropdowns
-                const dropdown = document.querySelector('.dropdown.show, [aria-expanded="true"]');
-                if (dropdown) {
-                    dropdown.click();
+                if (handled) {
+                    event.preventDefault();
+
+                    // Handle wrapping
+                    if (wrap) {
+                        if (nextIndex < 0) nextIndex = items.length - 1;
+                        if (nextIndex >= items.length) nextIndex = 0;
+                    } else {
+                        nextIndex = Math.max(0, Math.min(items.length - 1, nextIndex));
+                    }
+
+                    if (items[nextIndex]) {
+                        items[nextIndex].focus();
+                    }
                 }
             });
         }
-    };
+
+        /**
+         * Set up roving tabindex pattern
+         * @param {HTMLElement} container - Container element
+         * @param {string} itemSelector - Selector for items
+         */
+        static setupRovingTabindex(container, itemSelector) {
+            const items = container.querySelectorAll(itemSelector);
+
+            // Initialize tabindex
+            items.forEach((item, index) => {
+                item.setAttribute('tabindex', index === 0 ? '0' : '-1');
+            });
+
+            container.addEventListener('keydown', (event) => {
+                const currentItem = document.activeElement;
+                const itemsArray = Array.from(items);
+                const currentIndex = itemsArray.indexOf(currentItem);
+
+                if (currentIndex === -1) return;
+
+                let nextIndex = -1;
+
+                if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                    nextIndex = (currentIndex + 1) % itemsArray.length;
+                } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                    nextIndex = (currentIndex - 1 + itemsArray.length) % itemsArray.length;
+                } else if (event.key === 'Home') {
+                    nextIndex = 0;
+                } else if (event.key === 'End') {
+                    nextIndex = itemsArray.length - 1;
+                }
+
+                if (nextIndex !== -1) {
+                    event.preventDefault();
+
+                    // Update tabindex
+                    itemsArray.forEach((item, index) => {
+                        item.setAttribute('tabindex', index === nextIndex ? '0' : '-1');
+                    });
+
+                    itemsArray[nextIndex].focus();
+                }
+            });
+        }
+    }
 
     /**
-     * ARIA Announcer - Screen reader announcements
+     * ARIA Live Region Announcer
+     * Provides screen reader announcements
      */
-    const AriaAnnouncer = {
-        liveRegion: null,
+    const Announcer = {
+        /** @type {HTMLElement|null} */
+        politeRegion: null,
+        /** @type {HTMLElement|null} */
+        assertiveRegion: null,
 
+        /**
+         * Initialize the announcer regions
+         */
         init() {
-            this.createLiveRegion();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.createRegions());
+            } else {
+                this.createRegions();
+            }
         },
 
-        createLiveRegion() {
-            this.liveRegion = document.getElementById('aria-live-announcer');
+        /**
+         * Create ARIA live regions
+         */
+        createRegions() {
+            // Polite region (for non-urgent announcements)
+            if (!document.getElementById('aria-live-polite')) {
+                this.politeRegion = document.createElement('div');
+                this.politeRegion.id = 'aria-live-polite';
+                this.politeRegion.setAttribute('role', 'status');
+                this.politeRegion.setAttribute('aria-live', 'polite');
+                this.politeRegion.setAttribute('aria-atomic', 'true');
+                this.politeRegion.className = 'sr-only';
+                document.body.appendChild(this.politeRegion);
+            } else {
+                this.politeRegion = document.getElementById('aria-live-polite');
+            }
 
-            if (!this.liveRegion) {
-                this.liveRegion = document.createElement('div');
-                this.liveRegion.id = 'aria-live-announcer';
-                this.liveRegion.setAttribute('aria-live', 'polite');
-                this.liveRegion.setAttribute('aria-atomic', 'true');
-                this.liveRegion.classList.add('sr-only');
-                document.body.appendChild(this.liveRegion);
+            // Assertive region (for urgent announcements)
+            if (!document.getElementById('aria-live-assertive')) {
+                this.assertiveRegion = document.createElement('div');
+                this.assertiveRegion.id = 'aria-live-assertive';
+                this.assertiveRegion.setAttribute('role', 'alert');
+                this.assertiveRegion.setAttribute('aria-live', 'assertive');
+                this.assertiveRegion.setAttribute('aria-atomic', 'true');
+                this.assertiveRegion.className = 'sr-only';
+                document.body.appendChild(this.assertiveRegion);
+            } else {
+                this.assertiveRegion = document.getElementById('aria-live-assertive');
             }
         },
 
@@ -234,96 +490,216 @@
          * Announce a message to screen readers
          * @param {string} message - Message to announce
          * @param {string} priority - 'polite' or 'assertive'
+         * @param {number} clearDelay - Delay before clearing (ms)
          */
-        announce(message, priority = 'polite') {
-            if (!this.liveRegion) this.createLiveRegion();
+        announce(message, priority = 'polite', clearDelay = 5000) {
+            if (!this.politeRegion || !this.assertiveRegion) {
+                this.createRegions();
+            }
 
-            this.liveRegion.setAttribute('aria-live', priority);
+            const region = priority === 'assertive' ? this.assertiveRegion : this.politeRegion;
 
-            // Clear and set message (needed for repeated announcements)
-            this.liveRegion.textContent = '';
+            if (!region) return;
 
-            // Use setTimeout to ensure the DOM change triggers the announcement
-            setTimeout(() => {
-                this.liveRegion.textContent = message;
-            }, 100);
+            // Clear and re-set for consistent announcement
+            region.textContent = '';
+
+            // Use setTimeout to ensure the empty state is registered
+            requestAnimationFrame(() => {
+                region.textContent = message;
+
+                // Clear after delay
+                if (clearDelay > 0) {
+                    setTimeout(() => {
+                        region.textContent = '';
+                    }, clearDelay);
+                }
+            });
+        },
+
+        /**
+         * Announce polite message (non-interruptive)
+         * @param {string} message - Message to announce
+         */
+        polite(message) {
+            this.announce(message, 'polite');
+        },
+
+        /**
+         * Announce assertive message (interruptive)
+         * @param {string} message - Message to announce
+         */
+        assertive(message) {
+            this.announce(message, 'assertive');
         }
     };
 
     /**
-     * Reduced Motion Handler - Respects user preferences
+     * Reduced Motion Detection
+     * Detects and responds to user preference for reduced motion
      */
     const ReducedMotion = {
+        /** @type {MediaQueryList|null} */
         mediaQuery: null,
+        /** @type {Set<Function>} */
+        listeners: new Set(),
 
+        /**
+         * Initialize reduced motion detection
+         */
         init() {
-            this.mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-            this.applyPreference();
+            if (!window.matchMedia) return;
 
-            this.mediaQuery.addEventListener('change', () => this.applyPreference());
+            this.mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
+
+            // Set up listener for changes
+            const handleChange = (event) => {
+                this.notifyListeners(event.matches);
+
+                // Update CSS custom property
+                document.documentElement.style.setProperty(
+                    '--reduce-motion',
+                    event.matches ? '1' : '0'
+                );
+            };
+
+            if (this.mediaQuery.addEventListener) {
+                this.mediaQuery.addEventListener('change', handleChange);
+            } else {
+                this.mediaQuery.addListener(handleChange);
+            }
+
+            // Initial state
+            handleChange({ matches: this.mediaQuery.matches });
         },
 
-        applyPreference() {
-            if (this.mediaQuery.matches) {
-                document.documentElement.classList.add('reduced-motion');
-            } else {
-                document.documentElement.classList.remove('reduced-motion');
+        /**
+         * Check if reduced motion is preferred
+         * @returns {boolean} True if reduced motion is preferred
+         */
+        isReduced() {
+            return this.mediaQuery ? this.mediaQuery.matches : false;
+        },
+
+        /**
+         * Get appropriate duration based on user preference
+         * @param {number} normalDuration - Normal animation duration (ms)
+         * @param {number} reducedDuration - Reduced motion duration (ms)
+         * @returns {number} Appropriate duration
+         */
+        getDuration(normalDuration, reducedDuration = 0) {
+            return this.isReduced() ? reducedDuration : normalDuration;
+        },
+
+        /**
+         * Add listener for reduced motion changes
+         * @param {Function} callback - Callback function
+         */
+        onChange(callback) {
+            if (typeof callback === 'function') {
+                this.listeners.add(callback);
             }
         },
 
-        prefersReducedMotion() {
-            return this.mediaQuery?.matches ?? false;
-        }
-    };
-
-    /**
-     * Form Accessibility - Enhanced form interactions
-     */
-    const FormAccessibility = {
-        init() {
-            this.setupErrorAnnouncements();
-            this.setupRequiredFieldIndicators();
+        /**
+         * Remove listener
+         * @param {Function} callback - Callback to remove
+         */
+        offChange(callback) {
+            this.listeners.delete(callback);
         },
 
-        setupErrorAnnouncements() {
-            // Announce form errors to screen readers
-            document.addEventListener('invalid', (e) => {
-                const field = e.target;
-                const errorMessage = field.validationMessage || 'This field has an error';
-                AriaAnnouncer.announce(`Error: ${errorMessage}`, 'assertive');
-            }, true);
-        },
-
-        setupRequiredFieldIndicators() {
-            // Ensure required fields have proper ARIA attributes
-            document.querySelectorAll('[required]').forEach(field => {
-                if (!field.getAttribute('aria-required')) {
-                    field.setAttribute('aria-required', 'true');
+        /**
+         * Notify listeners of changes
+         * @param {boolean} isReduced - Current state
+         */
+        notifyListeners(isReduced) {
+            this.listeners.forEach(callback => {
+                try {
+                    callback(isReduced);
+                } catch (e) {
+                    console.error('Reduced motion listener error:', e);
                 }
             });
         }
     };
 
-    // Initialize all modules when DOM is ready
-    function init() {
-        SkipLinkHandler.init();
-        KeyboardNavigation.init();
-        AriaAnnouncer.init();
-        ReducedMotion.init();
-        FormAccessibility.init();
-    }
+    /**
+     * Focus Management Utilities
+     */
+    const FocusManager = {
+        /**
+         * Store current focus for later restoration
+         * @returns {HTMLElement|null} Currently focused element
+         */
+        saveFocus() {
+            return document.activeElement;
+        },
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+        /**
+         * Restore focus to an element
+         * @param {HTMLElement} element - Element to focus
+         */
+        restoreFocus(element) {
+            if (element && typeof element.focus === 'function') {
+                requestAnimationFrame(() => {
+                    element.focus();
+                });
+            }
+        },
 
-    // Expose utilities globally
+        /**
+         * Focus first focusable element in container
+         * @param {HTMLElement} container - Container element
+         * @returns {boolean} True if focus was set
+         */
+        focusFirst(container) {
+            const first = container.querySelector(FOCUSABLE_SELECTORS);
+            if (first) {
+                first.focus();
+                return true;
+            }
+            return false;
+        },
+
+        /**
+         * Check if element is focusable
+         * @param {HTMLElement} element - Element to check
+         * @returns {boolean} True if focusable
+         */
+        isFocusable(element) {
+            if (!element) return false;
+            return element.matches(FOCUSABLE_SELECTORS) && element.offsetParent !== null;
+        },
+
+        /**
+         * Make element programmatically focusable
+         * @param {HTMLElement} element - Element to make focusable
+         */
+        makeFocusable(element) {
+            if (!element.hasAttribute('tabindex')) {
+                element.setAttribute('tabindex', '-1');
+            }
+        }
+    };
+
+    // Initialize on load
+    const skipLinkHandler = new SkipLinkHandler();
+    Announcer.init();
+    ReducedMotion.init();
+
+    // Expose to global scope
     window.ZumodraA11y = {
         FocusTrap,
-        announce: AriaAnnouncer.announce.bind(AriaAnnouncer),
-        prefersReducedMotion: () => ReducedMotion.prefersReducedMotion()
+        SkipLinkHandler,
+        KeyboardNavigation,
+        Announcer,
+        ReducedMotion,
+        FocusManager,
+        FOCUSABLE_SELECTORS
     };
+
+    // Dispatch ready event
+    window.dispatchEvent(new CustomEvent('zumodra:a11y-ready'));
 
 })();
