@@ -2,11 +2,14 @@
 Tenants Signals - Automatic tenant setup and cleanup.
 """
 
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, post_migrate
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
 import secrets
+
+from django_tenants.signals import post_schema_sync
+from django_tenants.utils import schema_context, get_tenant_model
 
 from .models import Tenant, TenantSettings, TenantUsage, TenantInvitation
 
@@ -77,3 +80,29 @@ def set_invitation_token(sender, instance, created, **kwargs):
         if not instance.expires_at:
             instance.expires_at = timezone.now() + timedelta(days=7)
         instance.save(update_fields=['token', 'expires_at'])
+
+
+@receiver(post_schema_sync, sender=get_tenant_model())
+def create_tenant_site(sender, tenant, **kwargs):
+    """
+    Create a Site object for the tenant after its schema is created/synced.
+    This is required for django-allauth to function properly in tenant schemas.
+    """
+    from django.contrib.sites.models import Site
+
+    # Use tenant's schema context to create the Site in the correct schema
+    with schema_context(tenant.schema_name):
+        # Get the tenant's primary domain
+        primary_domain = tenant.get_primary_domain()
+        domain_name = primary_domain.domain if primary_domain else f"{tenant.schema_name}.zumodra.rhematek-solutions.com"
+
+        # Create or update the Site for this tenant
+        site, created = Site.objects.update_or_create(
+            pk=1,  # Use pk=1 to match SITE_ID setting
+            defaults={
+                'domain': domain_name,
+                'name': tenant.name or tenant.schema_name.title()
+            }
+        )
+        if created:
+            print(f"Created Site for tenant {tenant.schema_name}: {domain_name}")

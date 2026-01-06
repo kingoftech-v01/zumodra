@@ -119,6 +119,7 @@ SHARED_APPS = [
 TENANT_APPS = [
     # Django Core - TENANT-SPECIFIC
     'django.contrib.contenttypes',  # Needed for auditlog, generic FKs in tenant schemas
+    'django.contrib.sites',  # Each tenant needs its own Site for allauth
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'django.contrib.gis',
