@@ -244,7 +244,7 @@ urlpatterns += i18n_patterns(
     path('contact/', contact_us_view, name='contact_us'),
     path('become-seller/', become_seller_view, name='become_seller'),
     path('become-buyer/', become_buyer_view, name='become_buyer'),
-    path('terms/', term_of_use_view, name='terms_of_use'),
+    path('terms/', term_of_use_view, name='term_of_use'),
     path('privacy/', privacy_policy_view, name='privacy_policy'),
 
     # Authentication (hidden from public but functional)
