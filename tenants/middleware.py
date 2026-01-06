@@ -19,7 +19,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, set_urlconf
 from django.utils import timezone
 from django_tenants.middleware.main import TenantMainMiddleware
 from django_tenants.utils import get_public_schema_name, get_tenant_model
@@ -40,6 +40,28 @@ TENANT_CACHE_PREFIX = 'tenant:'
 TENANT_CACHE_TIMEOUT = getattr(settings, 'TENANT_CACHE_TIMEOUT', 300)  # 5 minutes default
 TENANT_HEADER_NAME = getattr(settings, 'TENANT_HEADER_NAME', 'X-Tenant-ID')
 TENANT_BASE_DOMAIN = getattr(settings, 'TENANT_BASE_DOMAIN', 'zumodra.com')
+
+
+class TenantURLConfMiddleware:
+    """
+    Middleware to ensure the correct URL configuration is applied after
+    TenantMainMiddleware sets request.urlconf.
+
+    This fixes an issue where django-tenants sets request.urlconf but doesn't
+    call set_urlconf(), which is required for Django's URL resolver to use
+    the correct URL configuration.
+
+    Must be placed immediately after TenantMainMiddleware in MIDDLEWARE.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # If TenantMainMiddleware set a custom urlconf, apply it
+        if hasattr(request, 'urlconf') and request.urlconf:
+            set_urlconf(request.urlconf)
+        return self.get_response(request)
 
 
 class TenantResolutionError(Exception):

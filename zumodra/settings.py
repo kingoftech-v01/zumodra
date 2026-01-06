@@ -200,6 +200,7 @@ AUTHENTICATION_BACKENDS = [
 MIDDLEWARE = [
     # Multi-Tenancy (must be first)
     'django_tenants.middleware.main.TenantMainMiddleware',
+    'tenants.middleware.TenantURLConfMiddleware',  # Fix URL conf for public schema
 
     # Security
     'django.middleware.security.SecurityMiddleware',
