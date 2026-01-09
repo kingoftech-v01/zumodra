@@ -1,0 +1,217 @@
+{% extends 'base/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Appointments{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Appointments</h2>
+        <div>
+            <a href="{% url 'appointment:calendar' %}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-calendar3 me-1"></i> Calendar View
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
+                <i class="bi bi-plus-lg me-1"></i> New Appointment
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">Date From</label>
+                    <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Date To</label>
+                    <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Service</label>
+                    <select name="service" class="form-select">
+                        <option value="">All Services</option>
+                        {% for service in services %}
+                        <option value="{{ service.id }}" {% if request.GET.service == service.id|stringformat:"d" %}selected{% endif %}>{{ service.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Client name/email">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Staff</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>
+                            <strong>{{ appointment.start_time|date:"M d, Y" }}</strong><br>
+                            <small class="text-muted">{{ appointment.start_time|time:"H:i" }} - {{ appointment.end_time|time:"H:i" }}</small>
+                        </td>
+                        <td>
+                            {{ appointment.client_name }}<br>
+                            <small class="text-muted">{{ appointment.client_email }}</small>
+                        </td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.staff_member.user.get_full_name|default:"-" }}</td>
+                        <td>
+                            {% if appointment.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif appointment.status == 'confirmed' %}
+                            <span class="badge bg-success">Confirmed</span>
+                            {% elif appointment.status == 'completed' %}
+                            <span class="badge bg-secondary">Completed</span>
+                            {% elif appointment.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                            {% elif appointment.status == 'no_show' %}
+                            <span class="badge bg-dark">No Show</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'appointment:detail' appointment.id %}">View</a></li>
+                                    {% if appointment.status == 'pending' %}
+                                    <li><a class="dropdown-item text-success" href="{% url 'appointment:confirm' appointment.id %}">Confirm</a></li>
+                                    {% endif %}
+                                    {% if appointment.status in 'pending,confirmed' %}
+                                    <li><a class="dropdown-item" href="{% url 'appointment:reschedule' appointment.id %}">Reschedule</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="{% url 'appointment:cancel' appointment.id %}">Cancel</a></li>
+                                    {% endif %}
+                                    {% if appointment.status == 'confirmed' %}
+                                    <li><a class="dropdown-item" href="{% url 'appointment:complete' appointment.id %}">Mark Complete</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-calendar-x fs-1 text-muted d-block mb-3"></i>
+                            <p class="text-muted mb-3">No appointments found</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
+                                Create First Appointment
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if appointments.has_other_pages %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if appointments.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ appointments.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ appointments.number }} of {{ appointments.paginator.num_pages }}</span>
+                    </li>
+                    {% if appointments.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ appointments.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Appointment Modal (same as calendar view) -->
+<div class="modal fade" id="newAppointmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'appointment:create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Service</label>
+                        <select name="service" class="form-select" required>
+                            {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Staff Member</label>
+                        <select name="staff_member" class="form-select">
+                            <option value="">Any Available</option>
+                            {% for staff in staff_members %}
+                            <option value="{{ staff.id }}">{{ staff.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Time</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client Email</label>
+                        <input type="email" name="client_email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" name="client_name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

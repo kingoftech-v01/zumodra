@@ -14,4 +14,6 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         """Import signals and perform startup tasks."""
-        pass
+        # Connect all cache invalidation signals
+        from core.cache import connect_all_cache_signals
+        connect_all_cache_signals()

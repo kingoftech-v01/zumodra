@@ -30,8 +30,8 @@ Zumodra is a comprehensive multi-tenant platform that combines:
 git clone https://github.com/rhematek/zumodra.git
 cd zumodra
 
-# Configure environment (DEVELOPMENT)
-cp .env.dev.example .env
+# Configure environment
+cp .env.example .env
 # Edit .env with your credentials (see "Database Configuration" below)
 
 # Start all services
@@ -49,19 +49,22 @@ docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py bootstrap_demo_tenant
 
 # Access application
-# Web: http://localhost:8000
-# API Docs: http://localhost:8000/api/docs/
-# Admin: http://localhost:8000/admin-panel/
+# Web: http://localhost:8002 (or http://localhost:8084 via nginx)
+# API Docs: http://localhost:8002/api/docs/
+# Admin: http://localhost:8002/admin-panel/
 ```
 
-### Production Deployment (Dokploy/Coolify)
+### Production Deployment
 
 ```bash
-# Use production compose file
-cp .env.prod.example .env
-# Edit .env with REAL production secrets
+# Configure for production
+cp .env.example .env
+# Edit .env with REAL production secrets (DEBUG=False, secure passwords, etc.)
 
+# For production, use the production compose file if available
 docker compose -f docker-compose.prod.yml up -d
+# Or use the standard compose with production env vars
+docker compose up -d
 ```
 
 ---
@@ -105,12 +108,11 @@ If you see this error:
 
 | File | Purpose |
 |------|---------|
-| `.env.dev.example` | Development environment template |
-| `.env.prod.example` | Production environment template |
-| `docker/Dockerfile` | Development Dockerfile |
-| `docker/Dockerfile.prod` | Production Dockerfile (with entrypoint) |
-| `docker-compose.yml` | Development compose |
-| `docker-compose.prod.yml` | Production compose |
+| `.env.example` | Environment template (copy to .env) |
+| `docker/Dockerfile` | Docker build file |
+| `docker/entrypoint.sh` | Container entrypoint script |
+| `docker-compose.yml` | Main compose file |
+| `docker-compose.prod.yml` | Production compose (optional) |
 
 ---
 
@@ -186,7 +188,7 @@ celery -A zumodra beat --loglevel=info
 - Rate limiting per user tier
 - Input sanitization and XSS prevention
 
-> See [SECURITY.md](SECURITY.md) for the complete security policy including CSP configuration.
+> See [docs/SECURITY.md](docs/SECURITY.md) for the complete security policy including CSP configuration.
 
 ---
 
@@ -284,20 +286,20 @@ staticfiles/
 
 ### Interactive Docs
 
-- **Swagger UI:** http://localhost:8000/api/docs/
-- **ReDoc:** http://localhost:8000/api/redoc/
-- **OpenAPI Schema:** http://localhost:8000/api/schema/
+- **Swagger UI:** http://localhost:8002/api/docs/
+- **ReDoc:** http://localhost:8002/api/redoc/
+- **OpenAPI Schema:** http://localhost:8002/api/schema/
 
 ### Authentication
 
 ```bash
 # Get JWT token
-curl -X POST http://localhost:8000/api/v1/auth/token/ \
+curl -X POST http://localhost:8002/api/token/ \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password"}'
 
 # Use token
-curl http://localhost:8000/api/v1/ats/jobs/ \
+curl http://localhost:8002/api/v1/ats/jobs/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
@@ -394,6 +396,7 @@ python manage.py check --deploy
 
 | Document | Description |
 |----------|-------------|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [FEATURES.md](docs/FEATURES.md) | Complete platform features and specifications |
 | [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | Complete API reference |
 | [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Production deployment guide |
@@ -406,19 +409,19 @@ python manage.py check --deploy
 
 ## Docker Services
 
-| Service | Port | Description |
-|---------|------|-------------|
-| web | 8000 | Django application |
-| channels | 8001 | WebSocket server |
-| nginx | 80/443 | Reverse proxy |
-| db | 5433 | PostgreSQL + PostGIS |
-| redis | 6379 | Cache and sessions |
-| rabbitmq | 5672 | Message broker |
-| celery_worker | - | Background tasks |
-| celery_beat | - | Scheduled tasks |
-| mailhog | 8025 | Email testing (dev) |
-| prometheus | 9090 | Metrics (optional) |
-| grafana | 3000 | Dashboards (optional) |
+| Service | Internal Port | External Port | Description |
+|---------|---------------|---------------|-------------|
+| web | 8000 | 8002 | Django application |
+| channels | 8001 | 8003 | WebSocket server (Daphne) |
+| nginx | 80 | 8084 | Reverse proxy |
+| db | 5432 | 5434 | PostgreSQL + PostGIS |
+| redis | 6379 | 6380 | Cache and sessions |
+| rabbitmq | 5672 | 5673 | Message broker |
+| celery-worker | - | - | Background tasks |
+| celery-beat | - | - | Scheduled tasks |
+| mailhog | 8025 | 8026 | Email testing (dev) |
+| prometheus | 9090 | 9090 | Metrics (optional, --profile monitoring) |
+| grafana | 3000 | 3001 | Dashboards (optional, --profile monitoring) |
 
 ---
 
@@ -517,4 +520,4 @@ Proprietary - All Rights Reserved
 ---
 
 **Version:** 1.0.0
-**Last Updated:** December 2025
+**Last Updated:** January 2026

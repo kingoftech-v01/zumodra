@@ -1,0 +1,134 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block breadcrumb %}
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><span class="text-gray-900 dark:text-gray-100 font-medium">Subscription</span></li>
+{% endblock %}
+
+{% block page_title %}Subscription{% endblock %}
+{% block page_description %}Manage your subscription plan{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Current Subscription -->
+    {% if subscription %}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Plan</h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                {% if subscription.status == 'active' %}
+                bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                {% elif subscription.status == 'past_due' %}
+                bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                {% elif subscription.status == 'canceling' %}
+                bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
+                {% else %}
+                bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                {% endif %}">
+                {{ subscription.status|title }}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-2 border-primary-200 dark:border-primary-700">
+                <p class="text-sm font-medium text-primary-600 dark:text-primary-400">Plan</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ subscription.plan.name }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">${{ subscription.plan.price|floatformat:2 }}/{{ subscription.plan.interval }}</p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Period</p>
+                <p class="text-sm text-gray-900 dark:text-white">
+                    {{ subscription.current_period_start|date:"M d" }} - {{ subscription.current_period_end|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {% if subscription.status == 'canceling' %}Ends On{% else %}Renews On{% endif %}
+                </p>
+                <p class="text-sm text-gray-900 dark:text-white">{{ subscription.current_period_end|date:"M d, Y" }}</p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-3">
+            {% if subscription.status == 'active' %}
+            <a href="{% url 'finance-frontend:subscription-cancel' %}"
+               class="px-4 py-2 border border-red-300 text-red-700 dark:border-red-600 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 font-medium text-sm">
+                Cancel Subscription
+            </a>
+            {% elif subscription.status == 'canceling' %}
+            <button hx-post="{% url 'finance-frontend:subscription-reactivate' %}"
+                    class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
+                Reactivate Subscription
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Available Plans -->
+    <div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">
+            {% if subscription %}Change Plan{% else %}Choose a Plan{% endif %}
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for plan in plans %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow {% if subscription and subscription.plan.id == plan.id %}ring-2 ring-primary-500{% endif %}">
+                <div class="p-6">
+                    {% if subscription and subscription.plan.id == plan.id %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200 mb-2">
+                        Current Plan
+                    </span>
+                    {% endif %}
+                    <h4 class="text-xl font-bold text-gray-900 dark:text-white">{{ plan.name }}</h4>
+                    <p class="mt-2">
+                        <span class="text-4xl font-bold text-gray-900 dark:text-white">${{ plan.price|floatformat:0 }}</span>
+                        <span class="text-gray-500 dark:text-gray-400">/{{ plan.interval }}</span>
+                    </p>
+                    {% if plan.description %}
+                    <ul class="mt-6 space-y-3">
+                        {% for feature in plan.description.splitlines %}
+                        {% if feature.strip %}
+                        <li class="flex items-start">
+                            <svg class="flex-shrink-0 h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ feature.strip }}</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="px-6 pb-6">
+                    {% if subscription and subscription.plan.id == plan.id %}
+                    <button disabled class="w-full px-4 py-2 bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 rounded-md cursor-not-allowed font-medium text-sm">
+                        Current Plan
+                    </button>
+                    {% elif subscription %}
+                    <button hx-post="{% url 'finance-frontend:subscription-upgrade' %}"
+                            hx-vals='{"new_plan_id": "{{ plan.id }}"}'
+                            hx-confirm="Change to {{ plan.name }} plan?"
+                            class="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
+                        {% if plan.price > subscription.plan.price %}Upgrade{% else %}Switch{% endif %} to {{ plan.name }}
+                    </button>
+                    {% else %}
+                    <a href="{% url 'finance-frontend:subscription-checkout' plan_id=plan.id %}"
+                       class="w-full inline-flex justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
+                        Get Started
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center py-12">
+                <p class="text-gray-500 dark:text-gray-400">No subscription plans available</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

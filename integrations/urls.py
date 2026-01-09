@@ -17,6 +17,7 @@ from .views import (
     OAuthCallbackView,
     WebhookReceiverView,
 )
+from .outbound_webhooks import OutboundWebhookViewSet
 
 app_name = 'integrations'
 
@@ -24,6 +25,7 @@ app_name = 'integrations'
 router = DefaultRouter()
 router.register(r'integrations', IntegrationViewSet, basename='integration')
 router.register(r'webhooks', WebhookEndpointViewSet, basename='webhook-endpoint')
+router.register(r'outbound-webhooks', OutboundWebhookViewSet, basename='outbound-webhook')
 router.register(r'webhook-deliveries', WebhookDeliveryViewSet, basename='webhook-delivery')
 router.register(r'sync-logs', IntegrationSyncLogViewSet, basename='sync-log')
 router.register(r'integration-events', IntegrationEventViewSet, basename='integration-event')

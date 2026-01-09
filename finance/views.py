@@ -9,6 +9,13 @@ This module implements API views for:
 - Stripe webhook handling
 - Escrow transaction management
 - Connected account management
+
+Security Features:
+- Tenant isolation via TenantViewMixin
+- Role-based access control for financial operations
+- Participant validation for escrow transactions
+- Audit logging for all financial actions
+- Stripe webhook signature verification
 """
 
 import json
@@ -18,6 +25,9 @@ from datetime import timedelta
 
 import stripe
 from django.conf import settings
+
+# Security logger for financial operations
+security_logger = logging.getLogger('security.finance')
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Sum, Q

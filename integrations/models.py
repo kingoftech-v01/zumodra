@@ -943,3 +943,10 @@ from auditlog.registry import auditlog
 auditlog.register(Integration)
 auditlog.register(IntegrationCredential, exclude_fields=['access_token', 'refresh_token', 'api_key', 'api_secret', 'password'])
 auditlog.register(WebhookEndpoint, exclude_fields=['secret_key'])
+
+# Import outbound webhook models for Django discovery
+try:
+    from integrations.outbound_webhooks import OutboundWebhook, OutboundWebhookDelivery
+    auditlog.register(OutboundWebhook, exclude_fields=['secret'])
+except ImportError:
+    pass

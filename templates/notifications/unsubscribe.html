@@ -1,0 +1,68 @@
+{% extends "base/base.html" %}
+{% load static i18n %}
+
+{% block title %}Unsubscribe{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <img src="{% static 'assets/images/logo.svg' %}" alt="Logo" class="h-12 w-auto">
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+            Email Preferences
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Manage your email notification preferences
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="token" value="{{ token }}">
+
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                        Select the types of emails you'd like to unsubscribe from:
+                    </p>
+
+                    {% for type, label in notification_types %}
+                    <div class="flex items-center">
+                        <input type="checkbox" id="unsubscribe_{{ type }}" name="unsubscribe_{{ type }}"
+                               class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <label for="unsubscribe_{{ type }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                            {{ label }}
+                        </label>
+                    </div>
+                    {% endfor %}
+
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="unsubscribe_all" name="unsubscribe_all"
+                                   class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <label for="unsubscribe_all" class="ml-3 text-sm font-medium text-red-600 dark:text-red-400">
+                                Unsubscribe from all emails
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Update Preferences
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="{% url 'home' %}" class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400">
+                    Return to {{ site_name }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% load humanize %}
+
+<div class="divide-y divide-gray-200 dark:divide-gray-700">
+    {% for invoice in pending_invoices %}
+    <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+         hx-get="{% url 'finance-frontend:invoice-detail-modal' invoice_number=invoice.invoice_number %}"
+         hx-target="#modal-container"
+         hx-swap="innerHTML">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {{ invoice.invoice_number }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Due: {{ invoice.due_date|date:"M d, Y"|default:"No due date" }}
+                </p>
+            </div>
+            <div class="ml-4 flex items-center space-x-3">
+                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                    ${{ invoice.amount_due|floatformat:2|intcomma }}
+                </span>
+                {% if invoice.due_date and invoice.due_date < now %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                    Overdue
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                    Pending
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="px-6 py-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No pending invoices</p>
+    </div>
+    {% endfor %}
+</div>

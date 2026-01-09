@@ -1,0 +1,229 @@
+{% extends 'base/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Tenant Settings{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Organization Settings</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="list-group list-group-flush">
+                    <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                        <i class="bi bi-building me-2"></i> General
+                    </a>
+                    <a href="#branding" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-palette me-2"></i> Branding
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-shield-lock me-2"></i> Security
+                    </a>
+                    <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-bell me-2"></i> Notifications
+                    </a>
+                    <a href="#integrations" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-plug me-2"></i> Integrations
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'tenants:update_settings' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Organization Name</label>
+                                    <input type="text" name="name" class="form-control" value="{{ tenant.name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Organization Slug</label>
+                                    <input type="text" class="form-control" value="{{ tenant.slug }}" disabled>
+                                    <small class="text-muted">Contact support to change your slug</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Industry</label>
+                                    <select name="industry" class="form-select">
+                                        <option value="">Select industry</option>
+                                        <option value="technology" {% if tenant.industry == 'technology' %}selected{% endif %}>Technology</option>
+                                        <option value="healthcare" {% if tenant.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                                        <option value="finance" {% if tenant.industry == 'finance' %}selected{% endif %}>Finance</option>
+                                        <option value="retail" {% if tenant.industry == 'retail' %}selected{% endif %}>Retail</option>
+                                        <option value="education" {% if tenant.industry == 'education' %}selected{% endif %}>Education</option>
+                                        <option value="other" {% if tenant.industry == 'other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Company Size</label>
+                                    <select name="company_size" class="form-select">
+                                        <option value="1-10" {% if tenant.company_size == '1-10' %}selected{% endif %}>1-10</option>
+                                        <option value="11-50" {% if tenant.company_size == '11-50' %}selected{% endif %}>11-50</option>
+                                        <option value="51-200" {% if tenant.company_size == '51-200' %}selected{% endif %}>51-200</option>
+                                        <option value="201-500" {% if tenant.company_size == '201-500' %}selected{% endif %}>201-500</option>
+                                        <option value="500+" {% if tenant.company_size == '500+' %}selected{% endif %}>500+</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Timezone</label>
+                                    <select name="timezone" class="form-select">
+                                        {% for tz in timezones %}
+                                        <option value="{{ tz }}" {% if tenant.timezone == tz %}selected{% endif %}>{{ tz }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Branding Settings -->
+                <div class="tab-pane fade" id="branding">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Branding</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'tenants:update_branding' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Logo</label>
+                                    {% if tenant.logo %}
+                                    <div class="mb-2">
+                                        <img src="{{ tenant.logo.url }}" alt="Logo" style="max-height: 60px;">
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" name="logo" class="form-control" accept="image/*">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Primary Color</label>
+                                    <input type="color" name="primary_color" class="form-control form-control-color"
+                                           value="{{ tenant.primary_color|default:'#0d6efd' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Secondary Color</label>
+                                    <input type="color" name="secondary_color" class="form-control form-control-color"
+                                           value="{{ tenant.secondary_color|default:'#6c757d' }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Branding</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'tenants:update_security' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="require_2fa" class="form-check-input" id="require2fa"
+                                               {% if tenant.require_2fa %}checked{% endif %}>
+                                        <label class="form-check-label" for="require2fa">Require 2FA for all users</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Session Timeout (minutes)</label>
+                                    <input type="number" name="session_timeout" class="form-control"
+                                           value="{{ tenant.session_timeout|default:60 }}" min="5" max="480">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">IP Whitelist (one per line)</label>
+                                    <textarea name="ip_whitelist" class="form-control" rows="4"
+                                              placeholder="192.168.1.0/24&#10;10.0.0.1">{{ tenant.ip_whitelist }}</textarea>
+                                    <small class="text-muted">Leave empty to allow all IPs</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Security Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notifications">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notification Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'tenants:update_notifications' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="email_notifications" class="form-check-input"
+                                               {% if tenant.email_notifications %}checked{% endif %}>
+                                        <label class="form-check-label">Email Notifications</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="slack_notifications" class="form-check-input"
+                                               {% if tenant.slack_notifications %}checked{% endif %}>
+                                        <label class="form-check-label">Slack Notifications</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notification Email</label>
+                                    <input type="email" name="notification_email" class="form-control"
+                                           value="{{ tenant.notification_email }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integrations -->
+                <div class="tab-pane fade" id="integrations">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Integrations</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Slack</h6>
+                                        <small class="text-muted">Connect with Slack for notifications</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Google Workspace</h6>
+                                        <small class="text-muted">Sync with Google Calendar and Meet</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Microsoft 365</h6>
+                                        <small class="text-muted">Sync with Outlook and Teams</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'base/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Appointments Calendar{% endblock %}
+
+{% block extra_css %}
+<style>
+.fc-event {
+    cursor: pointer;
+}
+.fc-event.confirmed {
+    background-color: #198754;
+    border-color: #198754;
+}
+.fc-event.pending {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+.fc-event.cancelled {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+.fc-event.completed {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Appointments Calendar</h2>
+        <div>
+            <a href="{% url 'appointment:list' %}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-list me-1"></i> List View
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
+                <i class="bi bi-plus-lg me-1"></i> New Appointment
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <!-- Filters -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Filters</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Staff Member</label>
+                        <select id="staffFilter" class="form-select">
+                            <option value="">All Staff</option>
+                            {% for staff in staff_members %}
+                            <option value="{{ staff.id }}">{{ staff.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Service</label>
+                        <select id="serviceFilter" class="form-select">
+                            <option value="">All Services</option>
+                            {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input status-filter" value="confirmed" checked>
+                            <label class="form-check-label">
+                                <span class="badge bg-success">Confirmed</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input status-filter" value="pending" checked>
+                            <label class="form-check-label">
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input status-filter" value="cancelled">
+                            <label class="form-check-label">
+                                <span class="badge bg-danger">Cancelled</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Appointments -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">Today's Appointments</h6>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                    {% for apt in todays_appointments %}
+                    <a href="#" class="list-group-item list-group-item-action"
+                       data-appointment-id="{{ apt.id }}">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ apt.start_time|time:"H:i" }}</strong>
+                            <span class="badge bg-{{ apt.status_color }}">{{ apt.get_status_display }}</span>
+                        </div>
+                        <small>{{ apt.client_name }} - {{ apt.service.name }}</small>
+                    </a>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted py-3">
+                        No appointments today
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Detail Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Appointment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="appointmentDetails">
+                <!-- Filled by JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" id="cancelAppointmentBtn">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmAppointmentBtn">Confirm</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Appointment Modal -->
+<div class="modal fade" id="newAppointmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'appointment:create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Service</label>
+                        <select name="service" class="form-select" required>
+                            {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }} ({{ service.duration }}min)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Staff Member</label>
+                        <select name="staff_member" class="form-select">
+                            <option value="">Any Available</option>
+                            {% for staff in staff_members %}
+                            <option value="{{ staff.id }}">{{ staff.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Time</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client Email</label>
+                        <input type="email" name="client_email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" name="client_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'assets/js/vendor/fullcalendar.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        slotMinTime: '08:00:00',
+        slotMaxTime: '20:00:00',
+        events: '{% url "appointment:api_events" %}',
+        eventClick: function(info) {
+            showAppointmentDetails(info.event.id);
+        },
+        eventClassNames: function(arg) {
+            return [arg.event.extendedProps.status];
+        }
+    });
+    calendar.render();
+
+    // Filter handlers
+    document.getElementById('staffFilter').addEventListener('change', function() {
+        calendar.refetchEvents();
+    });
+    document.getElementById('serviceFilter').addEventListener('change', function() {
+        calendar.refetchEvents();
+    });
+});
+
+function showAppointmentDetails(appointmentId) {
+    fetch(`{% url 'appointment:api_detail' 0 %}`.replace('0', appointmentId))
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('appointmentDetails').innerHTML = `
+                <p><strong>Service:</strong> ${data.service}</p>
+                <p><strong>Client:</strong> ${data.client_name}</p>
+                <p><strong>Date:</strong> ${data.date}</p>
+                <p><strong>Time:</strong> ${data.time}</p>
+                <p><strong>Staff:</strong> ${data.staff}</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+                <p><strong>Notes:</strong> ${data.notes || 'None'}</p>
+            `;
+            new bootstrap.Modal(document.getElementById('appointmentModal')).show();
+        });
+}
+</script>
+{% endblock %}

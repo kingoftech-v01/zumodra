@@ -3,8 +3,15 @@ Services Views - Zumodra Freelance Marketplace
 
 Views for browsing services, managing provider profiles, handling proposals,
 contracts, and reviews.
+
+Security Features:
+- Tenant isolation on all queries
+- Role-based access control via decorators
+- Object-level permission checks
+- Audit logging for sensitive operations
 """
 
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
@@ -18,6 +25,16 @@ from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable, GeocoderTimedOut
 from decimal import Decimal
 from django.utils import timezone
+
+# Import security decorators
+from core.decorators import (
+    require_tenant_user,
+    audit_access,
+    rate_limit,
+)
+
+logger = logging.getLogger(__name__)
+security_logger = logging.getLogger('security.services')
 
 from .models import (
     ServiceCategory,
@@ -137,9 +154,15 @@ def service_detail(request, service_uuid):
 
 
 @login_required
+@require_tenant_user
+@rate_limit('like_service', '30/minute')  # Prevent like/unlike spam
 def like_service(request, service_uuid):
     """
     Toggle like/unlike a service.
+
+    Security:
+    - Requires authenticated tenant user
+    - Rate limited to prevent abuse
     """
     service = get_object_or_404(Service, uuid=service_uuid)
     like, created = ServiceLike.objects.get_or_create(
@@ -629,14 +652,25 @@ def submit_proposal(request, request_uuid):
 
 
 @login_required
+@require_tenant_user
+@audit_access('accept_proposal')
 def accept_proposal(request, proposal_id):
     """
     Client accepts a proposal and creates a contract with escrow.
+
+    Security:
+    - Requires authenticated tenant user
+    - Only the request client can accept proposals
+    - Audit logged for financial transaction
     """
     proposal = get_object_or_404(ServiceProposal, id=proposal_id)
 
     # Ensure user is the client who made the request
     if proposal.client_request.client != request.user:
+        security_logger.warning(
+            f"PROPOSAL_ACCEPT_DENIED: user={request.user.id} attempted to accept "
+            f"proposal={proposal_id} owned by user={proposal.client_request.client.id}"
+        )
         messages.error(request, 'You do not have permission to accept this proposal')
         return redirect('browse_services')
 
@@ -673,6 +707,12 @@ def accept_proposal(request, proposal_id):
             agreed_deadline=agreed_deadline if agreed_deadline else None,
             status=ServiceContract.ContractStatus.PENDING_PAYMENT,
             escrow_transaction=escrow
+        )
+
+        # Audit log the contract creation
+        security_logger.info(
+            f"CONTRACT_CREATED: user={request.user.id} proposal={proposal_id} "
+            f"contract={contract.id} escrow={escrow.id} amount={proposal.proposed_rate}"
         )
 
         messages.success(request, 'Proposal accepted! Contract created. Please fund the escrow to start work.')
@@ -734,6 +774,8 @@ def my_contracts(request):
 
 
 @login_required
+@require_tenant_user
+@audit_access('update_contract_status')
 def update_contract_status(request, contract_id):
     """
     Update contract status with full escrow lifecycle integration.
@@ -745,6 +787,11 @@ def update_contract_status(request, contract_id):
     - DELIVERED -> COMPLETED (client accepts, escrow released)
     - Any -> DISPUTED (either party raises dispute)
     - Any -> CANCELLED (with potential refund)
+
+    Security:
+    - Requires authenticated tenant user
+    - Only contract participants can update status
+    - Audit logged for status changes
     """
     contract = get_object_or_404(ServiceContract, id=contract_id)
 
@@ -753,6 +800,10 @@ def update_contract_status(request, contract_id):
     is_provider = contract.provider.user == request.user
 
     if not (is_client or is_provider):
+        security_logger.warning(
+            f"CONTRACT_UPDATE_DENIED: user={request.user.id} attempted to update "
+            f"contract={contract_id} where they are not a participant"
+        )
         messages.error(request, 'You do not have permission to update this contract')
         return redirect('browse_services')
 
@@ -817,17 +868,28 @@ def update_contract_status(request, contract_id):
 
 
 @login_required
+@require_tenant_user
+@audit_access('fund_contract')
 def fund_contract(request, contract_id):
     """
     Client funds the escrow for a contract via Stripe.
 
     This creates a Stripe PaymentIntent and processes the payment.
     On success, escrow status changes to 'funded' and contract to 'FUNDED'.
+
+    Security:
+    - Requires authenticated tenant user
+    - Only contract client can fund
+    - Audit logged for financial transaction
     """
     contract = get_object_or_404(ServiceContract, id=contract_id)
 
     # Only client can fund
     if contract.client != request.user:
+        security_logger.warning(
+            f"FUND_CONTRACT_DENIED: user={request.user.id} attempted to fund "
+            f"contract={contract_id} owned by client={contract.client.id}"
+        )
         messages.error(request, 'Only the client can fund this contract')
         return redirect('services:view_contract', contract_id=contract_id)
 
@@ -874,11 +936,18 @@ def fund_contract(request, contract_id):
 
 
 @login_required
+@require_tenant_user
+@audit_access('create_dispute')
 def create_dispute(request, contract_id):
     """
     Either party raises a dispute on a contract.
 
     Valid for contracts that are: FUNDED, IN_PROGRESS, DELIVERED, or REVISION_REQUESTED.
+
+    Security:
+    - Requires authenticated tenant user
+    - Only contract participants can dispute
+    - Audit logged for financial dispute
     """
     contract = get_object_or_404(ServiceContract, id=contract_id)
 
@@ -887,6 +956,10 @@ def create_dispute(request, contract_id):
     is_provider = contract.provider.user == request.user
 
     if not (is_client or is_provider):
+        security_logger.warning(
+            f"DISPUTE_DENIED: user={request.user.id} attempted to dispute "
+            f"contract={contract_id} where they are not a participant"
+        )
         messages.error(request, 'You do not have permission to dispute this contract')
         return redirect('browse_services')
 

@@ -1,0 +1,38 @@
+{% extends "base/base.html" %}
+{% load static i18n %}
+
+{% block title %}Unsubscribed{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <div class="p-4 bg-green-100 dark:bg-green-900 rounded-full">
+                <svg class="h-12 w-12 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+            Successfully Unsubscribed
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Your email preferences have been updated.
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                You will no longer receive the selected email notifications.
+                You can update your preferences at any time from your account settings.
+            </p>
+
+            <a href="{% url 'home' %}"
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                Return to {{ site_name }}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

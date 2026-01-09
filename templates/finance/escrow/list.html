@@ -1,0 +1,77 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block breadcrumb %}
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><span class="text-gray-900 dark:text-gray-100 font-medium">Escrow</span></li>
+{% endblock %}
+
+{% block page_title %}Escrow Transactions{% endblock %}
+{% block page_description %}Manage your escrow transactions as buyer or seller{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">As Buyer</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">${{ total_as_buyer|floatformat:2|intcomma }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">As Seller</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">${{ total_as_seller|floatformat:2|intcomma }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Pending</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pending_count }}</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <form id="escrow-filters" hx-get="{% url 'finance-frontend:escrow-list-partial' %}" hx-target="#escrow-list" hx-trigger="change, submit" hx-push-url="true">
+            <div class="flex flex-wrap gap-4 items-end">
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+                    <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <option value="">All Roles</option>
+                        <option value="buyer" {% if current_filters.role == 'buyer' %}selected{% endif %}>As Buyer</option>
+                        <option value="seller" {% if current_filters.role == 'seller' %}selected{% endif %}>As Seller</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <option value="">All Status</option>
+                        <option value="initialized" {% if current_filters.status == 'initialized' %}selected{% endif %}>Initialized</option>
+                        <option value="funded" {% if current_filters.status == 'funded' %}selected{% endif %}>Funded</option>
+                        <option value="service_delivered" {% if current_filters.status == 'service_delivered' %}selected{% endif %}>Delivered</option>
+                        <option value="released" {% if current_filters.status == 'released' %}selected{% endif %}>Released</option>
+                        <option value="dispute" {% if current_filters.status == 'dispute' %}selected{% endif %}>Disputed</option>
+                        <option value="refunded" {% if current_filters.status == 'refunded' %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                <button type="button" onclick="document.getElementById('escrow-filters').reset(); htmx.trigger('#escrow-filters', 'change');"
+                        class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    Clear Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Escrow List -->
+    <div id="escrow-list"
+         hx-get="{% url 'finance-frontend:escrow-list-partial' %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div class="flex justify-center py-12">
+            <svg class="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+{% endblock %}

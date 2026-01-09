@@ -12,3 +12,10 @@ class IntegrationsConfig(AppConfig):
             import integrations.signals  # noqa
         except ImportError:
             pass
+
+        # Connect outbound webhook signals
+        try:
+            from integrations.webhook_signals import connect_all_webhook_signals
+            connect_all_webhook_signals()
+        except ImportError:
+            pass

@@ -575,4 +575,293 @@ CELERY_BEAT_SCHEDULE = {
         'options': {'queue': 'default', 'priority': 5},
         'description': 'Celery worker health check',
     },
+
+
+    # ==========================================================================
+    # SERVICES (MARKETPLACE) TASKS
+    # ==========================================================================
+
+    'send-contract-reminders': {
+        'task': 'services.tasks.send_contract_reminders',
+        'schedule': crontab(hour=9, minute=0),  # Daily at 9 AM
+        'options': {'queue': 'default'},
+        'description': 'Send reminders for pending contracts',
+    },
+
+    'expire-old-proposals': {
+        'task': 'services.tasks.expire_old_proposals',
+        'schedule': crontab(hour=1, minute=0),  # Daily at 1 AM
+        'options': {'queue': 'default'},
+        'description': 'Expire proposals pending more than 30 days',
+    },
+
+    'calculate-provider-ratings': {
+        'task': 'services.tasks.calculate_provider_ratings',
+        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
+        'options': {'queue': 'default'},
+        'description': 'Recalculate aggregate provider ratings',
+    },
+
+    'cleanup-abandoned-requests': {
+        'task': 'services.tasks.cleanup_abandoned_requests',
+        'schedule': crontab(hour=3, minute=0),  # Daily at 3 AM
+        'options': {'queue': 'default'},
+        'description': 'Clean up abandoned client requests',
+    },
+
+    'update-contract-statuses': {
+        'task': 'services.tasks.update_contract_statuses',
+        'schedule': crontab(hour='*/6', minute=0),  # Every 6 hours
+        'options': {'queue': 'default'},
+        'description': 'Update contract statuses based on deadlines',
+    },
+
+    'update-service-statistics': {
+        'task': 'services.tasks.update_service_statistics',
+        'schedule': crontab(hour=4, minute=0),  # Daily at 4 AM
+        'options': {'queue': 'default'},
+        'description': 'Update service view and order statistics',
+    },
+
+    'process-escrow-releases': {
+        'task': 'services.tasks.process_escrow_releases',
+        'schedule': crontab(hour='*/4', minute=30),  # Every 4 hours
+        'options': {'queue': 'payments'},
+        'description': 'Process pending escrow releases',
+    },
+
+
+    # ==========================================================================
+    # CONFIGURATIONS TASKS
+    # ==========================================================================
+
+    'sync-skills-from-external': {
+        'task': 'configurations.tasks.sync_skills_from_external',
+        'schedule': crontab(hour=5, minute=0, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'default'},
+        'description': 'Sync skills from external sources',
+    },
+
+    'cleanup-unused-categories': {
+        'task': 'configurations.tasks.cleanup_unused_categories',
+        'schedule': crontab(hour=4, minute=0, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'default'},
+        'description': 'Clean up orphaned categories',
+    },
+
+    'update-company-stats': {
+        'task': 'configurations.tasks.update_company_stats',
+        'schedule': crontab(hour=2, minute=30),  # Daily at 2:30 AM
+        'options': {'queue': 'default'},
+        'description': 'Update company statistics',
+    },
+
+    'check-data-integrity': {
+        'task': 'configurations.tasks.check_data_integrity',
+        'schedule': crontab(hour=3, minute=30, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'default'},
+        'description': 'Run data integrity checks on configuration data',
+    },
+
+    'warm-configuration-cache': {
+        'task': 'configurations.tasks.warm_configuration_cache',
+        'schedule': crontab(hour='*/4', minute=0),  # Every 4 hours
+        'options': {'queue': 'low_priority'},
+        'description': 'Pre-warm configuration cache',
+    },
+
+
+    # ==========================================================================
+    # MARKETING TASKS
+    # ==========================================================================
+
+    'process-scheduled-campaigns': {
+        'task': 'marketing.tasks.process_scheduled_campaigns',
+        'schedule': timedelta(hours=1),  # Every hour
+        'options': {'queue': 'emails'},
+        'description': 'Process and send scheduled marketing campaigns',
+    },
+
+    'calculate-conversion-metrics': {
+        'task': 'marketing.tasks.calculate_conversion_metrics',
+        'schedule': crontab(hour=1, minute=0),  # Daily at 1 AM
+        'options': {'queue': 'analytics'},
+        'description': 'Calculate daily conversion metrics',
+    },
+
+    'cleanup-old-visits': {
+        'task': 'marketing.tasks.cleanup_old_visits',
+        'schedule': crontab(hour=4, minute=0, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'low_priority'},
+        'description': 'Clean up visit tracking data older than 90 days',
+    },
+
+    'sync-newsletter-subscribers': {
+        'task': 'marketing.tasks.sync_newsletter_subscribers',
+        'schedule': timedelta(hours=2),  # Every 2 hours
+        'options': {'queue': 'emails'},
+        'description': 'Sync newsletter subscribers with email service',
+    },
+
+    'calculate-lead-scores': {
+        'task': 'marketing.tasks.calculate_lead_scores',
+        'schedule': crontab(hour='*/6', minute=30),  # Every 6 hours
+        'options': {'queue': 'analytics'},
+        'description': 'Calculate lead scores for prospects',
+    },
+
+    'update-campaign-analytics': {
+        'task': 'marketing.tasks.update_campaign_analytics',
+        'schedule': crontab(hour='*/4', minute=15),  # Every 4 hours
+        'options': {'queue': 'analytics'},
+        'description': 'Update analytics for sent campaigns',
+    },
+
+    'analyze-ab-tests': {
+        'task': 'marketing.tasks.analyze_ab_tests',
+        'schedule': crontab(hour=10, minute=0),  # Daily at 10 AM
+        'options': {'queue': 'analytics'},
+        'description': 'Analyze A/B test results and determine winners',
+    },
+
+
+    # ==========================================================================
+    # MESSAGES SYSTEM TASKS
+    # ==========================================================================
+
+    'cleanup-old-messages': {
+        'task': 'messages_sys.tasks.cleanup_old_messages',
+        'schedule': crontab(hour=3, minute=0, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'default'},
+        'description': 'Archive/delete old messages per retention policy',
+    },
+
+    'send-unread-notifications': {
+        'task': 'messages_sys.tasks.send_unread_notifications',
+        'schedule': crontab(hour='*/4', minute=0),  # Every 4 hours
+        'options': {'queue': 'emails'},
+        'description': 'Send email notifications for unread messages',
+    },
+
+    'update-conversation-stats': {
+        'task': 'messages_sys.tasks.update_conversation_stats',
+        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
+        'options': {'queue': 'default'},
+        'description': 'Update conversation statistics',
+    },
+
+    'update-delivery-status': {
+        'task': 'messages_sys.tasks.update_delivery_status',
+        'schedule': timedelta(minutes=5),  # Every 5 minutes
+        'options': {'queue': 'default'},
+        'description': 'Update message delivery status',
+    },
+
+    'generate-contact-suggestions': {
+        'task': 'messages_sys.tasks.generate_contact_suggestions',
+        'schedule': crontab(hour=5, minute=0),  # Daily at 5 AM
+        'options': {'queue': 'default'},
+        'description': 'Generate contact suggestions for users',
+    },
+
+    'detect-spam-messages': {
+        'task': 'messages_sys.tasks.detect_spam_messages',
+        'schedule': timedelta(hours=1),  # Every hour
+        'options': {'queue': 'default'},
+        'description': 'Detect and flag potential spam messages',
+    },
+
+
+    # ==========================================================================
+    # ADDITIONAL FINANCE TASKS
+    # ==========================================================================
+
+    'sync-stripe-payments': {
+        'task': 'finance.tasks.sync_stripe_payments',
+        'schedule': timedelta(hours=1),  # Every hour
+        'options': {'queue': 'payments'},
+        'description': 'Sync payment statuses from Stripe',
+    },
+
+    'process-pending-refunds': {
+        'task': 'finance.tasks.process_pending_refunds',
+        'schedule': crontab(hour='*/4', minute=0),  # Every 4 hours
+        'options': {'queue': 'payments'},
+        'description': 'Process pending refund requests',
+    },
+
+    'update-subscription-status': {
+        'task': 'finance.tasks.update_subscription_status',
+        'schedule': crontab(hour=0, minute=30),  # Daily at 12:30 AM
+        'options': {'queue': 'payments'},
+        'description': 'Update subscription statuses based on payments',
+    },
+
+    'process-escrow-transactions': {
+        'task': 'finance.tasks.process_escrow_transactions',
+        'schedule': crontab(hour='*/6', minute=15),  # Every 6 hours
+        'options': {'queue': 'payments'},
+        'description': 'Process pending escrow transactions',
+    },
+
+    'generate-daily-financial-report': {
+        'task': 'finance.tasks.generate_daily_financial_report',
+        'schedule': crontab(hour=6, minute=0),  # Daily at 6 AM
+        'options': {'queue': 'analytics'},
+        'description': 'Generate daily financial summary report',
+    },
+
+
+    # ==========================================================================
+    # SECURITY TASKS
+    # ==========================================================================
+
+    'cleanup-audit-logs': {
+        'task': 'security.tasks.cleanup_audit_logs',
+        'schedule': crontab(hour=4, minute=0, day_of_week='sunday'),  # Weekly
+        'options': {'queue': 'default'},
+        'description': 'Archive and cleanup old audit logs',
+    },
+
+    'analyze-failed-logins': {
+        'task': 'security.tasks.analyze_failed_logins',
+        'schedule': timedelta(minutes=30),  # Every 30 minutes
+        'options': {'queue': 'default'},
+        'description': 'Analyze failed logins to detect brute force attacks',
+    },
+
+    'expire-sessions': {
+        'task': 'security.tasks.expire_sessions',
+        'schedule': crontab(hour='*/6', minute=0),  # Every 6 hours
+        'options': {'queue': 'default'},
+        'description': 'Clean up expired sessions and tokens',
+    },
+
+    'generate-security-report': {
+        'task': 'security.tasks.generate_security_report',
+        'schedule': crontab(hour=6, minute=30),  # Daily at 6:30 AM
+        'options': {'queue': 'default'},
+        'description': 'Generate daily security summary report',
+    },
+
+    'detect-anomalies': {
+        'task': 'security.tasks.detect_anomalies',
+        'schedule': crontab(hour='*/2', minute=0),  # Every 2 hours
+        'options': {'queue': 'default'},
+        'description': 'Detect anomalous activity patterns',
+    },
+
+    'check-password-expiry': {
+        'task': 'security.tasks.check_password_expiry',
+        'schedule': crontab(hour=7, minute=0),  # Daily at 7 AM
+        'options': {'queue': 'emails'},
+        'description': 'Check for expired passwords and send notifications',
+    },
+
+    'update-ip-reputation': {
+        'task': 'security.tasks.update_ip_reputation',
+        'schedule': crontab(hour='*/4', minute=30),  # Every 4 hours
+        'options': {'queue': 'default'},
+        'description': 'Update IP reputation scores based on activity',
+    },
 }

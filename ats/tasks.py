@@ -8,6 +8,12 @@ This module contains async tasks for ATS operations:
 - Pipeline statistics updates
 - Interview reminders
 - Job posting expiration
+
+Security Features:
+- SecureTenantTask for permission-validated operations
+- Tenant isolation on all queries
+- Audit logging for bulk operations
+- Rate limiting on sensitive operations
 """
 
 import logging
@@ -20,7 +26,11 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.db.models import Avg, Count, F, Q
 
+# Import secure task base classes
+from core.tasks.secure_task import SecureTenantTask, PermissionValidatedTask
+
 logger = logging.getLogger(__name__)
+security_logger = logging.getLogger('security.ats.tasks')
 
 
 # ==================== AI MATCH SCORING ====================
@@ -669,64 +679,106 @@ def process_candidate_application(self, application_id):
 
 # ==================== BULK OPERATIONS ====================
 
-@shared_task(
-    bind=True,
-    name='ats.tasks.bulk_move_applications',
-    max_retries=2,
-    soft_time_limit=600,
-)
-def bulk_move_applications(self, application_ids, target_stage_id, user_id=None):
+class BulkMoveApplicationsTask(SecureTenantTask):
     """
-    Bulk move applications to a different pipeline stage.
+    Secure task for bulk moving applications.
 
-    Args:
-        application_ids: List of application IDs
-        target_stage_id: Target pipeline stage ID
-        user_id: ID of user performing the action
-
-    Returns:
-        dict: Summary of move operation
+    Requires:
+    - User must be authenticated
+    - User must have recruiter, hr_manager, or admin role
+    - Applications must belong to user's tenant
     """
-    from ats.models import Application, PipelineStage
+    name = 'ats.tasks.bulk_move_applications'
+    max_retries = 2
+    soft_time_limit = 600
+    required_roles = ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner']
 
-    try:
-        now = timezone.now()
+    def run(self, application_ids, target_stage_id, user_id=None, tenant_id=None):
+        """
+        Bulk move applications to a different pipeline stage.
 
-        target_stage = PipelineStage.objects.get(id=target_stage_id)
-        moved = 0
-        errors = []
+        Args:
+            application_ids: List of application IDs
+            target_stage_id: Target pipeline stage ID
+            user_id: ID of user performing the action
+            tenant_id: ID of the tenant context
 
-        for app_id in application_ids:
-            try:
-                Application.objects.filter(id=app_id).update(
-                    current_stage=target_stage,
-                    stage_entered_at=now,
-                    updated_at=now
-                )
-                moved += 1
+        Returns:
+            dict: Summary of move operation
+        """
+        from ats.models import Application, PipelineStage
 
-            except Exception as e:
-                errors.append({
-                    'application_id': app_id,
-                    'error': str(e)
-                })
+        # Set context for permission validation
+        self.user_id = user_id
+        self.tenant_id = tenant_id
 
-        logger.info(f"Bulk moved {moved} applications to stage {target_stage.name}")
+        # Validate permissions before proceeding
+        if user_id:
+            self.require_role('recruiter')  # Or hr_manager, admin, owner
 
-        return {
-            'status': 'success',
-            'moved_count': moved,
-            'error_count': len(errors),
-            'errors': errors,
-            'target_stage': target_stage.name,
-        }
+        try:
+            now = timezone.now()
 
-    except PipelineStage.DoesNotExist:
-        return {
-            'status': 'error',
-            'error': 'Target stage not found',
-        }
+            target_stage = PipelineStage.objects.get(id=target_stage_id)
+            moved = 0
+            errors = []
+            skipped = 0
 
-    except Exception as e:
-        logger.error(f"Error in bulk move: {str(e)}")
-        raise self.retry(exc=e)
+            for app_id in application_ids:
+                try:
+                    # SECURITY: Verify application belongs to current tenant
+                    if tenant_id:
+                        app_exists = Application.objects.filter(
+                            id=app_id,
+                            tenant_id=tenant_id
+                        ).exists()
+                        if not app_exists:
+                            skipped += 1
+                            security_logger.warning(
+                                f"BULK_MOVE_SKIPPED: user={user_id} attempted to move "
+                                f"application={app_id} from different tenant"
+                            )
+                            continue
+
+                    Application.objects.filter(id=app_id).update(
+                        current_stage=target_stage,
+                        stage_entered_at=now,
+                        updated_at=now
+                    )
+                    moved += 1
+
+                except Exception as e:
+                    errors.append({
+                        'application_id': app_id,
+                        'error': str(e)
+                    })
+
+            # Security audit log
+            security_logger.info(
+                f"BULK_MOVE_APPLICATIONS: user={user_id} tenant={tenant_id} "
+                f"moved={moved} skipped={skipped} errors={len(errors)} "
+                f"target_stage={target_stage.name}"
+            )
+
+            return {
+                'status': 'success',
+                'moved_count': moved,
+                'skipped_count': skipped,
+                'error_count': len(errors),
+                'errors': errors,
+                'target_stage': target_stage.name,
+            }
+
+        except PipelineStage.DoesNotExist:
+            return {
+                'status': 'error',
+                'error': 'Target stage not found',
+            }
+
+        except Exception as e:
+            logger.error(f"Error in bulk move: {str(e)}")
+            raise self.retry(exc=e)
+
+
+# Register the task
+bulk_move_applications = BulkMoveApplicationsTask()

@@ -1,0 +1,427 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Security Dashboard" %} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Security" %}</span>
+</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Security Dashboard" %}{% endblock %}
+
+{% block page_description %}
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    {% trans "Monitor security events, audit logs, and session activity." %}
+</p>
+{% endblock %}
+
+{% block page_actions %}
+<div class="flex items-center space-x-3">
+    <form method="get" class="flex items-center space-x-2">
+        <label for="days" class="text-sm text-gray-500 dark:text-gray-400">{% trans "Period:" %}</label>
+        <select name="days" id="days" onchange="this.form.submit()"
+                class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm">
+            <option value="1" {% if period_days == 1 %}selected{% endif %}>{% trans "24 hours" %}</option>
+            <option value="7" {% if period_days == 7 %}selected{% endif %}>{% trans "7 days" %}</option>
+            <option value="30" {% if period_days == 30 %}selected{% endif %}>{% trans "30 days" %}</option>
+            <option value="90" {% if period_days == 90 %}selected{% endif %}>{% trans "90 days" %}</option>
+        </select>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {# Alert Banner for Suspicious Activity #}
+    {% if failed_by_ip %}
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                    {% trans "Suspicious Activity Detected" %}
+                </h3>
+                <p class="mt-1 text-sm text-red-700 dark:text-red-400">
+                    {% blocktrans count counter=failed_by_ip|length %}
+                    {{ counter }} IP address has 3+ failed login attempts.
+                    {% plural %}
+                    {{ counter }} IP addresses have 3+ failed login attempts.
+                    {% endblocktrans %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Stats Cards #}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {# Total Audit Logs #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Total Audit Logs" %}</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.total_audit_logs|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <span class="text-blue-600 dark:text-blue-400 font-medium">{{ stats.audit_logs_today|default:0 }}</span> {% trans "today" %}
+            </p>
+        </div>
+
+        {# Security Events Today #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Events Today" %}</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.security_events_today|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        {# Failed Logins Today #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Failed Logins" %}</p>
+                    <p class="mt-1 text-2xl font-semibold {% if stats.failed_logins_today > 10 %}text-red-600 dark:text-red-400{% else %}text-gray-900 dark:text-white{% endif %}">{{ stats.failed_logins_today|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        {# Active Sessions #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Active Sessions" %}</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.active_sessions|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{% url 'security:sessions' %}" class="mt-2 inline-block text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                {% trans "Manage Sessions" %}
+            </a>
+        </div>
+
+        {# Pending Password Resets #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Pending Resets" %}</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.pending_password_resets|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        {# Audit Logs Today #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% trans "Logs Today" %}</p>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.audit_logs_today|default:0 }}</p>
+                </div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{% url 'security:audit-logs' %}" class="mt-2 inline-block text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                {% trans "View All Logs" %}
+            </a>
+        </div>
+    </div>
+
+    {# Analysis Grids #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {# Audit Logs by Action #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Audit Logs by Action" %}</h3>
+            </div>
+            <div class="p-4">
+                {% if audit_by_action %}
+                <div class="space-y-3">
+                    {% for item in audit_by_action %}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                {% if item.action == 'CREATE' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
+                                {% elif item.action == 'UPDATE' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
+                                {% elif item.action == 'DELETE' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                                {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                {{ item.action }}
+                            </span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ item.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No audit logs in this period." %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Audit Logs by Model #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Most Modified Models" %}</h3>
+            </div>
+            <div class="p-4">
+                {% if audit_by_model %}
+                <div class="space-y-2">
+                    {% for item in audit_by_model %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ item.model_name }}</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ item.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No data available." %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Security Events by Type #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Events by Type" %}</h3>
+            </div>
+            <div class="p-4">
+                {% if events_by_type %}
+                <div class="space-y-2">
+                    {% for item in events_by_type %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ item.event_type|title }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                            {% if 'login' in item.event_type %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
+                            {% elif 'lockout' in item.event_type %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                            {% elif 'password' in item.event_type %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400
+                            {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                            {{ item.count }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No events in this period." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Suspicious Activity - Failed Logins by IP #}
+    {% if failed_by_ip %}
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Suspicious IPs (3+ Failed Attempts)" %}</h3>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "IP Address" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Failed Attempts" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Risk Level" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for item in failed_by_ip %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <code class="text-sm font-mono text-gray-900 dark:text-white">{{ item.ip_address }}</code>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-medium {% if item.count >= 10 %}text-red-600 dark:text-red-400{% elif item.count >= 5 %}text-yellow-600 dark:text-yellow-400{% else %}text-gray-900 dark:text-white{% endif %}">
+                                {{ item.count }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if item.count >= 10 %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{% trans "High" %}</span>
+                            {% elif item.count >= 5 %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">{% trans "Medium" %}</span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">{% trans "Low" %}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Recent Activity Tables #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {# Recent Audit Logs #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Audit Logs" %}</h3>
+                <a href="{% url 'security:audit-logs' %}" class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400">{% trans "View All" %}</a>
+            </div>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+                {% for log in recent_audit_logs %}
+                <li class="px-6 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium
+                                    {% if log.action == 'CREATE' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
+                                    {% elif log.action == 'UPDATE' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
+                                    {% elif log.action == 'DELETE' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {{ log.action }}
+                                </span>
+                                <span class="text-sm text-gray-900 dark:text-white truncate">{{ log.model_name }}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                {{ log.object_repr|truncatechars:40 }}
+                            </p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0 text-right">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ log.actor.email|default:"System" }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ log.timestamp|timesince }} ago</p>
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "No audit logs yet." %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {# Recent Security Events #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Security Events" %}</h3>
+            </div>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+                {% for event in recent_security_events %}
+                <li class="px-6 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium
+                                    {% if 'login' in event.event_type %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
+                                    {% elif 'lockout' in event.event_type %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                                    {% elif 'password' in event.event_type %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400
+                                    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {{ event.event_type }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                {{ event.description|truncatechars:50 }}
+                            </p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0 text-right">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ event.user.email|default:"Anonymous" }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ event.timestamp|timesince }} ago</p>
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "No security events yet." %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    {# Recent Failed Logins and Active Sessions #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {# Recent Failed Logins #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Failed Logins" %}</h3>
+            </div>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-64 overflow-y-auto">
+                {% for attempt in recent_failed_logins %}
+                <li class="px-6 py-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-900 dark:text-white">{{ attempt.username_entered|truncatechars:30 }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                <code class="font-mono">{{ attempt.ip_address }}</code>
+                            </p>
+                        </div>
+                        <p class="text-xs text-gray-400 dark:text-gray-500">{{ attempt.attempted_at|timesince }} ago</p>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "No failed login attempts." %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {# Active Sessions by User #}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Sessions by User" %}</h3>
+                <a href="{% url 'security:sessions' %}" class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400">{% trans "Manage" %}</a>
+            </div>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-64 overflow-y-auto">
+                {% for session in sessions_by_user %}
+                <li class="px-6 py-3">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-900 dark:text-white truncate">{{ session.user__email }}</p>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            {{ session.count }} {% trans "sessions" %}
+                        </span>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "No active sessions." %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

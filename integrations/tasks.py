@@ -401,3 +401,78 @@ def _refresh_credentials(integration, provider):
         refresh_token=tokens.get('refresh_token'),
         expires_in=tokens.get('expires_in'),
     )
+
+
+# =============================================================================
+# OUTBOUND WEBHOOK TASKS
+# =============================================================================
+
+@shared_task(bind=True, max_retries=5, default_retry_delay=60)
+def deliver_outbound_webhook(self, delivery_id: str):
+    """
+    Deliver an outbound webhook asynchronously.
+
+    Args:
+        delivery_id: UUID of the OutboundWebhookDelivery to send
+    """
+    from .outbound_webhooks import OutboundWebhookDelivery, send_webhook_sync
+
+    try:
+        delivery = OutboundWebhookDelivery.objects.get(id=delivery_id)
+    except OutboundWebhookDelivery.DoesNotExist:
+        logger.error(f"Outbound webhook delivery not found: {delivery_id}")
+        return
+
+    try:
+        success = send_webhook_sync(delivery)
+
+        if not success and delivery.can_retry:
+            # Schedule retry with exponential backoff
+            countdown = 60 * (2 ** (delivery.retry_count - 1))
+            raise self.retry(countdown=countdown)
+
+    except Exception as e:
+        logger.error(f"Outbound webhook delivery failed: {e}")
+
+        if delivery.can_retry:
+            countdown = 60 * (2 ** delivery.retry_count)
+            raise self.retry(exc=e, countdown=countdown)
+
+
+@shared_task
+def retry_failed_outbound_webhooks():
+    """
+    Retry outbound webhooks that are due for retry.
+    Runs every 5 minutes via Celery Beat.
+    """
+    from .outbound_webhooks import OutboundWebhookDelivery
+
+    now = timezone.now()
+
+    deliveries = OutboundWebhookDelivery.objects.filter(
+        status='retrying',
+        next_retry_at__lte=now,
+    )
+
+    for delivery in deliveries:
+        if delivery.can_retry:
+            logger.info(f"Retrying outbound webhook: {delivery.id}")
+            deliver_outbound_webhook.delay(str(delivery.id))
+
+
+@shared_task
+def cleanup_old_outbound_deliveries():
+    """
+    Clean up old outbound webhook delivery records.
+    Runs daily via Celery Beat.
+    """
+    from .outbound_webhooks import OutboundWebhookDelivery
+
+    # Delete deliveries older than 30 days
+    threshold = timezone.now() - timedelta(days=30)
+
+    deleted_count, _ = OutboundWebhookDelivery.objects.filter(
+        created_at__lt=threshold
+    ).delete()
+
+    logger.info(f"Cleaned up {deleted_count} old outbound webhook deliveries")

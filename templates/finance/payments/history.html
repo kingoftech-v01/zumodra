@@ -1,0 +1,75 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block breadcrumb %}
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><span class="text-gray-900 dark:text-gray-100 font-medium">Payment History</span></li>
+{% endblock %}
+
+{% block page_title %}Payment History{% endblock %}
+{% block page_description %}View all your payment transactions{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total Spent</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">${{ total_spent|floatformat:2|intcomma }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Successful</p>
+            <p class="text-2xl font-semibold text-green-600 dark:text-green-400">{{ successful_count }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Failed</p>
+            <p class="text-2xl font-semibold text-red-600 dark:text-red-400">{{ failed_count }}</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <form id="payment-filters" hx-get="{% url 'finance-frontend:payment-list-partial' %}" hx-target="#payment-list" hx-trigger="change, submit" hx-push-url="true">
+            <div class="flex flex-wrap gap-4 items-end">
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <option value="">All</option>
+                        <option value="succeeded" {% if current_filters.status == 'succeeded' %}selected{% endif %}>Succeeded</option>
+                        <option value="failed" {% if current_filters.status == 'failed' %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ current_filters.start_date }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ current_filters.end_date }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                </div>
+                <button type="button" onclick="document.getElementById('payment-filters').reset(); htmx.trigger('#payment-filters', 'change');"
+                        class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Payment List -->
+    <div id="payment-list"
+         hx-get="{% url 'finance-frontend:payment-list-partial' %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div class="flex justify-center py-12">
+            <svg class="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+{% endblock %}

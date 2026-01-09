@@ -1,0 +1,242 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Onboarding" %} - {{ onboarding.employee.full_name }} - Zumodra{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <a href="{% url 'hr:onboarding-dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+        {% trans "Onboarding" %}
+    </a>
+</li>
+<li class="flex items-center">
+    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{{ onboarding.employee.full_name }}</span>
+</li>
+{% endblock %}
+
+{% block page_header %}
+{# Custom header with employee info #}
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {# Employee Header #}
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div class="flex items-center">
+                {% if onboarding.employee.user.profile_picture %}
+                <img class="h-16 w-16 rounded-full object-cover ring-4 ring-white dark:ring-gray-700"
+                     src="{{ onboarding.employee.user.profile_picture.url }}"
+                     alt="">
+                {% else %}
+                <div class="h-16 w-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center ring-4 ring-white dark:ring-gray-700">
+                    <span class="text-white text-xl font-semibold">
+                        {{ onboarding.employee.user.first_name|slice:":1" }}{{ onboarding.employee.user.last_name|slice:":1" }}
+                    </span>
+                </div>
+                {% endif %}
+                <div class="ml-4">
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ onboarding.employee.full_name }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ onboarding.employee.job_title|default:"-" }}</p>
+                    <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {% trans "Started:" %} {{ onboarding.start_date|date:"F d, Y" }}
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {# Progress Ring #}
+                <div class="flex items-center">
+                    <div class="relative h-20 w-20">
+                        <svg class="transform -rotate-90 h-20 w-20">
+                            <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="none"
+                                    class="text-gray-200 dark:text-gray-700"/>
+                            <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="none"
+                                    class="text-primary-600"
+                                    stroke-dasharray="226"
+                                    stroke-dashoffset="{{ 226|add:onboarding.completion_percentage|add:-226 }}"
+                                    stroke-linecap="round"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-lg font-bold text-gray-900 dark:text-white">{{ onboarding.completion_percentage|floatformat:0 }}%</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ onboarding.completed_tasks_count }}/{{ onboarding.total_tasks_count }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Tasks Completed" %}</p>
+                    </div>
+                </div>
+
+                {# Actions #}
+                <div class="flex items-center space-x-2">
+                    <a href="{% url 'hr:employee-detail' onboarding.employee.pk %}"
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        {% trans "View Profile" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Checklist Info #}
+    {% if onboarding.checklist %}
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <div>
+                <p class="text-sm font-medium text-blue-900 dark:text-blue-100">{% trans "Using Checklist:" %} {{ onboarding.checklist.name }}</p>
+                {% if onboarding.checklist.description %}
+                <p class="text-xs text-blue-700 dark:text-blue-300">{{ onboarding.checklist.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Tasks by Category #}
+    <div class="space-y-6">
+        {% for category, tasks in tasks_by_category.items %}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ category }}</h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                    {% with completed=0 %}
+                    {% for task in tasks %}{% if task.is_completed %}{% with completed=completed|add:1 %}{% endwith %}{% endif %}{% endfor %}
+                    {% endwith %}
+                    {{ tasks|length }} {% trans "tasks" %}
+                </span>
+            </div>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for progress in tasks %}
+                <li id="task-{{ progress.pk }}" class="p-4 sm:px-6 {% if progress.is_completed %}bg-gray-50 dark:bg-gray-700/30{% endif %}">
+                    <div class="flex items-start">
+                        {# Checkbox #}
+                        <div class="flex-shrink-0 mt-0.5">
+                            {% if progress.is_completed %}
+                            <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            {% else %}
+                            <button hx-post="{% url 'hr:onboarding-task-complete' progress.pk %}"
+                                    hx-target="#task-{{ progress.pk }}"
+                                    hx-swap="outerHTML"
+                                    class="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-primary-500 transition-colors flex items-center justify-center">
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        {# Task Content #}
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-sm font-medium {% if progress.is_completed %}text-gray-500 dark:text-gray-400 line-through{% else %}text-gray-900 dark:text-white{% endif %}">
+                                        {{ progress.task.name }}
+                                        {% if progress.task.is_required %}
+                                        <span class="ml-1 text-red-500">*</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if progress.task.description %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ progress.task.description }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-4 flex-shrink-0">
+                                    {% if progress.task.due_days %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                        {% if progress.is_overdue and not progress.is_completed %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400
+                                        {% else %}bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400{% endif %}">
+                                        {% trans "Day" %} {{ progress.task.due_days }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {# Completion Info #}
+                            {% if progress.is_completed %}
+                            <div class="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                                <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {% trans "Completed" %} {{ progress.completed_at|date:"M d, Y" }}
+                                {% if progress.completed_by %}
+                                {% trans "by" %} {{ progress.completed_by.get_full_name }}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {# Assignee #}
+                            {% if progress.task.assigned_to %}
+                            <div class="mt-2 flex items-center">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{% trans "Assigned to:" %}</span>
+                                <span class="ml-1 text-xs font-medium text-gray-700 dark:text-gray-300">{{ progress.task.assigned_to }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% empty %}
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <h4 class="mt-4 text-sm font-medium text-gray-900 dark:text-white">{% trans "No tasks" %}</h4>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "No onboarding tasks have been assigned." %}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Notes Section #}
+    {% if onboarding.notes %}
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Notes" %}</h3>
+        </div>
+        <div class="p-6">
+            <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{{ onboarding.notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Completion Status #}
+    {% if onboarding.completed_at %}
+    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
+        <svg class="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-green-900 dark:text-green-100">{% trans "Onboarding Complete!" %}</h3>
+        <p class="mt-2 text-sm text-green-700 dark:text-green-300">
+            {% trans "Completed on" %} {{ onboarding.completed_at|date:"F d, Y" }}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('htmx:afterSwap', function(evt) {
+    // Update progress after task completion
+    if (evt.detail.target.id.startsWith('task-')) {
+        htmx.trigger(document.body, 'taskCompleted');
+    }
+});
+</script>
+{% endblock %}

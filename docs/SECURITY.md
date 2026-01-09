@@ -1,7 +1,7 @@
 # Zumodra Security Documentation
 
-**Version:** 1.0.0
-**Last Updated:** December 2025
+**Version:** 1.1.0
+**Last Updated:** January 2026
 
 This document outlines security measures, policies, and best practices for the Zumodra platform.
 
@@ -183,16 +183,43 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 ```
 
-### Content Security Policy
+### Content Security Policy (CSP)
+
+Zumodra enforces a strict **local-only asset policy** with no external CDN dependencies:
 
 ```python
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "https://js.stripe.com")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-CSP_IMG_SRC = ("'self'", "data:", "https:")
-CSP_FRAME_SRC = ("https://js.stripe.com",)
-CSP_CONNECT_SRC = ("'self'", "wss://", "https://api.stripe.com")
+CONTENT_SECURITY_POLICY = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],
+    'style-src': ["'self'", "'unsafe-inline'"],  # inline for Alpine.js
+    'img-src': ["'self'", "data:", "blob:"],
+    'font-src': ["'self'"],
+    'connect-src': ["'self'", "wss:"],
+    'frame-src': ["'none'"],
+    'object-src': ["'none'"],
+    'base-uri': ["'self'"],
+    'form-action': ["'self'"],
+    'frame-ancestors': ["'none'"],
+}
 ```
+
+### Local Asset Policy
+
+All CSS, JavaScript, fonts, and icons are served locally from `staticfiles/`:
+
+```
+staticfiles/
+├── assets/
+│   ├── js/vendor/     # Alpine.js, HTMX, Chart.js, SortableJS
+│   ├── css/           # Icomoon icons, Leaflet
+│   └── fonts/         # Local web fonts
+└── dist/
+    └── output-tailwind.css  # Compiled Tailwind CSS
+```
+
+**Prohibited:** CDN-hosted JavaScript, CSS, fonts, or icons (jsdelivr, unpkg, cdnjs, Google Fonts, etc.)
+
+**Exception:** OpenStreetMap tiles for Leaflet maps (required for map functionality)
 
 ---
 
@@ -511,4 +538,4 @@ pip-audit
 
 **Document maintained by:** Security Team
 **Review frequency:** Monthly
-**Last security audit:** December 2025
+**Last security audit:** January 2026

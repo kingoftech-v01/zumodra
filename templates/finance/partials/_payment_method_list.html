@@ -1,0 +1,88 @@
+{% load humanize %}
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+    {% if payment_methods %}
+    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+        {% for method in payment_methods %}
+        <li class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <!-- Card Brand Icon -->
+                    <div class="flex-shrink-0 w-12">
+                        {% if method.card_brand == 'visa' %}
+                        <svg class="h-8" viewBox="0 0 50 50" fill="none">
+                            <rect width="50" height="35" rx="4" fill="#1A1F71"/>
+                            <text x="10" y="24" fill="white" font-size="12" font-weight="bold">VISA</text>
+                        </svg>
+                        {% elif method.card_brand == 'mastercard' %}
+                        <svg class="h-8" viewBox="0 0 50 50" fill="none">
+                            <circle cx="18" cy="17" r="12" fill="#EB001B"/>
+                            <circle cx="32" cy="17" r="12" fill="#F79E1B"/>
+                        </svg>
+                        {% elif method.card_brand == 'amex' %}
+                        <svg class="h-8" viewBox="0 0 50 50" fill="none">
+                            <rect width="50" height="35" rx="4" fill="#006FCF"/>
+                            <text x="8" y="24" fill="white" font-size="10" font-weight="bold">AMEX</text>
+                        </svg>
+                        {% else %}
+                        <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ method.card_brand|title }} **** {{ method.card_last4 }}
+                            {% if method.is_default %}
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                                Default
+                            </span>
+                            {% endif %}
+                        </p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Expires {{ method.card_exp_month|stringformat:"02d" }}/{{ method.card_exp_year }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    {% if not method.is_default %}
+                    <button hx-post="{% url 'finance-frontend:payment-method-default' pk=method.pk %}"
+                            hx-target="#payment-methods-list"
+                            hx-swap="innerHTML"
+                            class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                        Set Default
+                    </button>
+                    {% endif %}
+                    <button hx-delete="{% url 'finance-frontend:payment-method-delete' pk=method.pk %}"
+                            hx-confirm="Remove this payment method?"
+                            hx-target="#payment-methods-list"
+                            hx-swap="innerHTML"
+                            class="text-sm text-red-600 hover:text-red-700 dark:text-red-400">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="px-6 py-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No payment methods</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a payment method to make purchases.</p>
+        <div class="mt-6">
+            <button hx-get="{% url 'finance-frontend:payment-method-form' %}"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Payment Method
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>

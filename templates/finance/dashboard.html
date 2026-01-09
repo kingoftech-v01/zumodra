@@ -1,0 +1,164 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block breadcrumb %}
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><span class="text-gray-900 dark:text-gray-100 font-medium">Finance</span></li>
+{% endblock %}
+
+{% block page_title %}Finance Dashboard{% endblock %}
+{% block page_description %}Overview of your financial activities{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Quick Stats -->
+    <div id="finance-quick-stats"
+         hx-get="{% url 'finance-frontend:quick-stats' %}"
+         hx-trigger="load, every 60s"
+         hx-swap="innerHTML">
+        {% include "finance/partials/_quick_stats.html" %}
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Recent Payments & Pending Invoices -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Recent Payments -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Payments</h3>
+                    <a href="{% url 'finance-frontend:payment-history' %}"
+                       class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                        View all
+                    </a>
+                </div>
+                <div id="recent-payments"
+                     hx-get="{% url 'finance-frontend:recent-payments' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                    {% include "finance/partials/_recent_payments.html" %}
+                </div>
+            </div>
+
+            <!-- Pending Invoices -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Pending Invoices</h3>
+                    <a href="{% url 'finance-frontend:invoices' %}"
+                       class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                        View all
+                    </a>
+                </div>
+                <div id="pending-invoices"
+                     hx-get="{% url 'finance-frontend:pending-invoices' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                    {% include "finance/partials/_pending_invoices.html" %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Subscription & Escrow Summary -->
+        <div class="space-y-6">
+            <!-- Subscription Status -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Subscription</h3>
+                {% if subscription %}
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Plan</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ subscription.plan.name }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if subscription.status == 'active' %}
+                            bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                            {% elif subscription.status == 'past_due' %}
+                            bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                            {% else %}
+                            bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                            {% endif %}">
+                            {{ subscription.status|title }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Renews</span>
+                        <span class="text-sm text-gray-900 dark:text-white">{{ subscription.current_period_end|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'finance-frontend:subscription' %}"
+                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Manage Subscription
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">No active subscription</p>
+                    <a href="{% url 'finance-frontend:subscription' %}"
+                       class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                        View Plans
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Escrow Summary -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+                 id="escrow-summary"
+                 hx-get="{% url 'finance-frontend:escrow-summary' %}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+                {% include "finance/partials/_escrow_summary.html" %}
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Payment Methods</h3>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ payment_methods_count }} saved</span>
+                </div>
+                <a href="{% url 'finance-frontend:payment-methods' %}"
+                   class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Manage Payment Methods
+                </a>
+            </div>
+
+            <!-- Connected Account (Stripe Connect) -->
+            {% if connected_account %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Seller Account</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if connected_account.account_status == 'active' %}
+                            bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                            {% elif connected_account.account_status == 'restricted' %}
+                            bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                            {% else %}
+                            bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                            {% endif %}">
+                            {{ connected_account.account_status|title }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Payouts</span>
+                        <span class="text-sm text-gray-900 dark:text-white">
+                            {% if connected_account.payouts_enabled %}Enabled{% else %}Disabled{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'finance-frontend:connected-account' %}"
+                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Manage Seller Account
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

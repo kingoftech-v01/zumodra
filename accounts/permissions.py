@@ -396,6 +396,99 @@ class HasTenantRole(permissions.BasePermission):
         ).exists()
 
 
+class IsRecruiter(permissions.BasePermission):
+    """
+    Permission check for users with recruiter role or higher.
+
+    Allows: Owner, Admin, HR Manager, Recruiter, Hiring Manager
+    """
+    message = "You must be a recruiter to perform this action."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        tenant = getattr(request, 'tenant', None)
+        if not tenant:
+            return False
+
+        recruiter_roles = [
+            TenantUser.UserRole.OWNER,
+            TenantUser.UserRole.ADMIN,
+            TenantUser.UserRole.HR_MANAGER,
+            TenantUser.UserRole.RECRUITER,
+            TenantUser.UserRole.HIRING_MANAGER,
+        ]
+
+        return TenantUser.objects.filter(
+            user=request.user,
+            tenant=tenant,
+            is_active=True,
+            role__in=recruiter_roles
+        ).exists()
+
+
+class IsHiringManager(permissions.BasePermission):
+    """
+    Permission check for users with hiring manager role or higher.
+
+    Allows: Owner, Admin, HR Manager, Hiring Manager
+    """
+    message = "You must be a hiring manager to perform this action."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        tenant = getattr(request, 'tenant', None)
+        if not tenant:
+            return False
+
+        hiring_manager_roles = [
+            TenantUser.UserRole.OWNER,
+            TenantUser.UserRole.ADMIN,
+            TenantUser.UserRole.HR_MANAGER,
+            TenantUser.UserRole.HIRING_MANAGER,
+        ]
+
+        return TenantUser.objects.filter(
+            user=request.user,
+            tenant=tenant,
+            is_active=True,
+            role__in=hiring_manager_roles
+        ).exists()
+
+
+class IsHRManager(permissions.BasePermission):
+    """
+    Permission check for users with HR manager role or higher.
+
+    Allows: Owner, Admin, HR Manager
+    """
+    message = "You must be an HR manager to perform this action."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        tenant = getattr(request, 'tenant', None)
+        if not tenant:
+            return False
+
+        hr_manager_roles = [
+            TenantUser.UserRole.OWNER,
+            TenantUser.UserRole.ADMIN,
+            TenantUser.UserRole.HR_MANAGER,
+        ]
+
+        return TenantUser.objects.filter(
+            user=request.user,
+            tenant=tenant,
+            is_active=True,
+            role__in=hr_manager_roles
+        ).exists()
+
+
 class HasAnyTenantRole(permissions.BasePermission):
     """
     Permission check for any of the specified roles.

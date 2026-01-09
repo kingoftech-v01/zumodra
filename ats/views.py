@@ -39,6 +39,27 @@ from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
+# Import secure base classes and permissions from core
+from core.viewsets import (
+    SecureTenantViewSet,
+    SecureReadOnlyViewSet,
+    RoleBasedViewSet,
+    RecruiterViewSet,
+    HRViewSet,
+    BulkOperationViewSet,
+)
+from core.permissions import (
+    IsTenantUser,
+    IsTenantAdmin,
+    IsTenantOwner,
+    IsRecruiter,
+    IsHiringManager,
+    IsHRManager,
+    TenantObjectPermission,
+    IsOwnerOrReadOnly,
+    audited,
+)
+
 from .models import (
     JobCategory, Pipeline, PipelineStage, JobPosting,
     Candidate, Application, ApplicationActivity, ApplicationNote,
@@ -357,21 +378,29 @@ class IsTenantMember(permissions.BasePermission):
 
 # ==================== JOB CATEGORY VIEWSET ====================
 
-class JobCategoryViewSet(viewsets.ModelViewSet):
+class JobCategoryViewSet(SecureReadOnlyViewSet):
     """
     ViewSet for job categories.
 
     list: Get all categories (filterable)
     retrieve: Get specific category with children
-    create: Create new category
-    update: Update category
-    delete: Delete category
+    create: Create new category (admin only)
+    update: Update category (admin only)
+    delete: Delete category (admin only)
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via SecureReadOnlyViewSet
+    - Write operations require admin role
     """
     queryset = JobCategory.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsTenantMember]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser]
+    # Admin-only for write operations
+    action_permissions = {
+        'create': [permissions.IsAuthenticated, IsTenantAdmin],
+        'update': [permissions.IsAuthenticated, IsTenantAdmin],
+        'partial_update': [permissions.IsAuthenticated, IsTenantAdmin],
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = JobCategoryFilter
     search_fields = ['name', 'description']
@@ -408,21 +437,34 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
 
 # ==================== PIPELINE VIEWSET ====================
 
-class PipelineViewSet(viewsets.ModelViewSet):
+class PipelineViewSet(RoleBasedViewSet):
     """
     ViewSet for recruitment pipelines.
 
     list: Get all pipelines
     retrieve: Get pipeline with nested stages
-    create: Create pipeline with stages
-    update: Update pipeline
-    delete: Delete pipeline
+    create: Create pipeline with stages (recruiter/HR/admin)
+    update: Update pipeline (owner or admin)
+    delete: Delete pipeline (admin only)
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via RoleBasedViewSet
+    - Role-based access control for CRUD operations
     """
     queryset = Pipeline.objects.select_related('created_by').prefetch_related('stages')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser]
+    # Role requirements for actions
+    role_permissions = {
+        'list': [],  # Any authenticated tenant user
+        'retrieve': [],
+        'create': ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner'],
+        'update': ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner'],
+        'partial_update': ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner'],
+        'destroy': ['admin', 'owner'],
+        'add_stage': ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner'],
+        'reorder_stages': ['recruiter', 'hiring_manager', 'hr_manager', 'admin', 'owner'],
+        'set_default': ['admin', 'owner'],
+    }
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = PipelineFilter
     search_fields = ['name', 'description']
@@ -510,16 +552,21 @@ class PipelineViewSet(viewsets.ModelViewSet):
 
 # ==================== PIPELINE STAGE VIEWSET ====================
 
-class PipelineStageViewSet(viewsets.ModelViewSet):
+class PipelineStageViewSet(RecruiterViewSet):
     """
     ViewSet for pipeline stages.
 
     Security:
     - Tenant isolation via pipeline's tenant
+    - Recruiter/HR role required for modifications
+    - Uses RecruiterViewSet for appropriate role enforcement
     """
     queryset = PipelineStage.objects.select_related('pipeline')
     serializer_class = PipelineStageSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember]
+    # RecruiterViewSet provides: IsAuthenticated, IsTenantUser, IsRecruiter | IsHRManager | IsTenantAdmin
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
     filter_backends = [DjangoFilterBackend]
     filterset_class = PipelineStageFilter
 
@@ -547,15 +594,15 @@ class PipelineStageViewSet(viewsets.ModelViewSet):
 
 # ==================== JOB POSTING VIEWSET ====================
 
-class JobPostingViewSet(viewsets.ModelViewSet):
+class JobPostingViewSet(RecruiterViewSet):
     """
     ViewSet for job postings.
 
     list: Get all jobs (with extensive filters)
     retrieve: Get job with full details
-    create: Create new job posting
-    update: Update job posting
-    delete: Delete job posting
+    create: Create new job posting (recruiter/HR/admin)
+    update: Update job posting (owner, assigned recruiter, or admin)
+    delete: Delete job posting (admin only)
 
     Actions:
     - publish: Publish a draft job
@@ -565,13 +612,18 @@ class JobPostingViewSet(viewsets.ModelViewSet):
     - kanban: Get Kanban board data for a job
 
     Security:
-    - Tenant isolation via for_current_tenant()
-    - RBAC for write operations
+    - Tenant isolation via RecruiterViewSet
+    - RBAC for write operations with ownership validation
+    - Audit logging for sensitive operations
     """
     queryset = JobPosting.objects.select_related(
         'category', 'pipeline', 'hiring_manager', 'recruiter', 'created_by'
     )
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsTenantMember, IsOwnerOrReadOnly]
+    # RecruiterViewSet provides base permissions for recruiter roles
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    enable_audit_logging = True
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = JobPostingFilter
     search_fields = ['title', 'description', 'reference_code', 'requirements']
@@ -755,7 +807,7 @@ class JobPostingViewSet(viewsets.ModelViewSet):
 
 # ==================== CANDIDATE VIEWSET ====================
 
-class CandidateViewSet(viewsets.ModelViewSet):
+class CandidateViewSet(RecruiterViewSet):
     """
     ViewSet for candidates.
 
@@ -763,7 +815,7 @@ class CandidateViewSet(viewsets.ModelViewSet):
     retrieve: Get candidate with full details and applications
     create: Create new candidate (with resume upload)
     update: Update candidate
-    delete: Delete candidate
+    delete: Delete candidate (admin only)
 
     Actions:
     - merge: Merge duplicate candidates
@@ -771,12 +823,20 @@ class CandidateViewSet(viewsets.ModelViewSet):
     - applications: Get candidate's applications
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via RecruiterViewSet
     - File upload validation for resumes
     - Rate limiting on bulk operations
+    - Audit logging for bulk operations and sensitive changes
     """
     queryset = Candidate.objects.select_related('user', 'referred_by')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsRecruiterOrHiringManager]
+    # RecruiterViewSet provides role-based permissions for recruiters/HR
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+        'bulk_import': [permissions.IsAuthenticated, IsTenantUser, IsHRManager],
+        'merge': [permissions.IsAuthenticated, IsTenantUser, IsHRManager],
+    }
+    enable_audit_logging = True
+    sensitive_fields = ['email', 'phone', 'address']  # Fields requiring extra logging
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CandidateFilter
@@ -979,7 +1039,7 @@ class CandidateViewSet(viewsets.ModelViewSet):
 
 # ==================== APPLICATION VIEWSET ====================
 
-class ApplicationViewSet(viewsets.ModelViewSet):
+class ApplicationViewSet(RecruiterViewSet):
     """
     ViewSet for applications.
 
@@ -987,7 +1047,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     retrieve: Get application with full details
     create: Create new application
     update: Update application
-    delete: Delete application
+    delete: Delete application (admin only)
 
     Actions:
     - move_stage: Move to a different pipeline stage
@@ -997,18 +1057,23 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     - rate: Rate the application
     - notes: Get/add notes
     - activities: Get activity timeline
-    - bulk_action: Perform bulk operations
+    - bulk_action: Perform bulk operations (HR/admin)
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via RecruiterViewSet
     - RBAC for write operations
     - Rate limiting on application submission
-    - Audit logging for bulk operations
+    - Audit logging for bulk operations and status changes
     """
     queryset = Application.objects.select_related(
         'candidate', 'job', 'current_stage', 'assigned_to'
     )
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsRecruiterOrHiringManager]
+    # RecruiterViewSet provides base recruiter/HR permissions
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+        'bulk_action': [permissions.IsAuthenticated, IsTenantUser, IsHRManager],
+    }
+    enable_audit_logging = True
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ApplicationFilter
     search_fields = [
@@ -1321,15 +1386,15 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 # ==================== INTERVIEW VIEWSET ====================
 
-class InterviewViewSet(viewsets.ModelViewSet):
+class InterviewViewSet(RecruiterViewSet):
     """
     ViewSet for interviews.
 
     list: Get all interviews (filterable)
     retrieve: Get interview with full details
-    create: Schedule new interview
-    update: Update interview
-    delete: Delete interview
+    create: Schedule new interview (recruiter/hiring manager)
+    update: Update interview (organizer or admin)
+    delete: Delete interview (admin only)
 
     Actions:
     - reschedule: Reschedule the interview
@@ -1338,12 +1403,18 @@ class InterviewViewSet(viewsets.ModelViewSet):
     - feedback: Get/submit feedback
 
     Security:
-    - Tenant isolation via application's tenant
+    - Tenant isolation via RecruiterViewSet
+    - Role-based access for scheduling
+    - Participant validation for feedback
     """
     queryset = Interview.objects.select_related(
         'application__candidate', 'application__job', 'organizer'
     ).prefetch_related('interviewers', 'feedback')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsRecruiterOrHiringManager]
+    # RecruiterViewSet provides recruiter/HR permissions
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    enable_audit_logging = True
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = InterviewFilter
     search_fields = ['title', 'application__candidate__first_name']
@@ -1477,16 +1548,21 @@ class InterviewViewSet(viewsets.ModelViewSet):
 
 # ==================== INTERVIEW FEEDBACK VIEWSET ====================
 
-class InterviewFeedbackViewSet(viewsets.ModelViewSet):
+class InterviewFeedbackViewSet(SecureTenantViewSet):
     """
     ViewSet for interview feedback.
 
     Security:
-    - Tenant isolation via interview's application tenant
-    - Users can only see their own feedback unless they're staff
+    - Tenant isolation via SecureTenantViewSet
+    - Users can only see their own feedback unless they're HR/admin
+    - Interviewers can only submit feedback for their own interviews
     """
     queryset = InterviewFeedback.objects.select_related('interview', 'interviewer')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser]
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    tenant_field = None  # Linked through interview -> application
     filter_backends = [DjangoFilterBackend]
 
     def get_serializer_class(self):
@@ -1513,31 +1589,40 @@ class InterviewFeedbackViewSet(viewsets.ModelViewSet):
 
 # ==================== OFFER VIEWSET ====================
 
-class OfferViewSet(viewsets.ModelViewSet):
+class OfferViewSet(HRViewSet):
     """
     ViewSet for offers.
 
     list: Get all offers (filterable)
     retrieve: Get offer with full details
-    create: Create new offer
-    update: Update offer
-    delete: Delete offer
+    create: Create new offer (HR/admin)
+    update: Update offer (creator or admin)
+    delete: Delete offer (admin only)
 
     Actions:
     - send: Send offer to candidate
     - accept: Mark offer as accepted
     - decline: Mark offer as declined
-    - approve: Approve the offer
+    - approve: Approve the offer (requires approval permission)
     - withdraw: Withdraw the offer
 
     Security:
-    - Tenant isolation via application's tenant
+    - Tenant isolation via HRViewSet
+    - HR role required for offer management
+    - Approval workflow enforced
+    - Audit logging for offer actions
     """
     queryset = Offer.objects.select_related(
         'application__candidate', 'application__job',
         'approved_by', 'created_by'
     )
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsRecruiterOrHiringManager]
+    # HRViewSet provides HR role permissions
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+        'approve': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    enable_audit_logging = True
+    sensitive_fields = ['base_salary', 'bonus', 'equity']  # Sensitive compensation data
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = OfferFilter
     search_fields = ['job_title', 'application__candidate__first_name']
@@ -1681,7 +1766,7 @@ class OfferViewSet(viewsets.ModelViewSet):
 
 # ==================== SAVED SEARCH VIEWSET ====================
 
-class SavedSearchViewSet(viewsets.ModelViewSet):
+class SavedSearchViewSet(SecureTenantViewSet):
     """
     ViewSet for saved searches.
 
@@ -1697,9 +1782,11 @@ class SavedSearchViewSet(viewsets.ModelViewSet):
     Security:
     - User can only access their own saved searches
     - Run action filters candidates by current tenant
+    - Ownership validation on all operations
     """
     queryset = SavedSearch.objects.all()
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
+    tenant_field = None  # Searches linked via user
     filter_backends = [DjangoFilterBackend]
     filterset_class = SavedSearchFilter
     lookup_field = 'uuid'
@@ -2172,7 +2259,7 @@ class BulkOperationsView(APIView):
 
 # ==================== INTERVIEW SLOT VIEWSET ====================
 
-class InterviewSlotViewSet(viewsets.ModelViewSet):
+class InterviewSlotViewSet(SecureTenantViewSet):
     """
     ViewSet for managing interviewer availability slots.
 
@@ -2183,11 +2270,16 @@ class InterviewSlotViewSet(viewsets.ModelViewSet):
     - Finding common slots for panel interviews
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via SecureTenantViewSet
     - Users can only manage their own slots unless admin
+    - Recruiters can view all slots for scheduling
     """
     queryset = InterviewSlot.objects.select_related('interviewer', 'booked_interview')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    tenant_field = None  # Slots linked via interviewer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['start_time', 'created_at']
     ordering = ['start_time']
@@ -2694,7 +2786,7 @@ class InterviewSchedulingView(APIView):
 
 # ==================== OFFER TEMPLATE VIEWSET ====================
 
-class OfferTemplateViewSet(viewsets.ModelViewSet):
+class OfferTemplateViewSet(HRViewSet):
     """
     ViewSet for managing offer letter templates.
 
@@ -2703,10 +2795,16 @@ class OfferTemplateViewSet(viewsets.ModelViewSet):
     - Apply template to an offer
 
     Security:
-    - Tenant isolation via for_current_tenant()
+    - Tenant isolation via HRViewSet
+    - HR role required for template management
+    - Audit logging for template changes
     """
     queryset = OfferTemplate.objects.select_related('created_by')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember, IsRecruiterOrHiringManager]
+    # HRViewSet provides HR role permissions
+    action_permissions = {
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    enable_audit_logging = True
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'description', 'department']
     ordering_fields = ['name', 'created_at', 'is_default']
@@ -2774,20 +2872,28 @@ class OfferTemplateViewSet(viewsets.ModelViewSet):
 
 # ==================== OFFER APPROVAL VIEWSET ====================
 
-class OfferApprovalViewSet(viewsets.ModelViewSet):
+class OfferApprovalViewSet(SecureTenantViewSet):
     """
     ViewSet for managing offer approvals.
 
     Provides:
     - List approvals for an offer
-    - Request new approval
-    - Approve/reject actions
+    - Request new approval (HR/admin)
+    - Approve/reject actions (assigned approver only)
 
     Security:
-    - Tenant isolation via offer's application tenant
+    - Tenant isolation via SecureTenantViewSet
+    - Approval actions restricted to assigned approver
+    - Audit logging for all approval actions
     """
     queryset = OfferApproval.objects.select_related('offer', 'approver', 'requested_by')
-    permission_classes = [permissions.IsAuthenticated, IsTenantMember]
+    permission_classes = [permissions.IsAuthenticated, IsTenantUser]
+    action_permissions = {
+        'create': [permissions.IsAuthenticated, IsTenantUser, IsHRManager],
+        'destroy': [permissions.IsAuthenticated, IsTenantAdmin],
+    }
+    enable_audit_logging = True
+    tenant_field = None  # Linked through offer -> application
     filter_backends = [DjangoFilterBackend]
     lookup_field = 'uuid'
 

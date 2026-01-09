@@ -15,6 +15,12 @@
 #   Migrate:   docker compose exec web python manage.py migrate_schemas
 #   Static:    docker compose exec web python manage.py collectstatic
 #
+# ENVIRONMENT (set in .env or override):
+#   CREATE_DEMO_TENANT=true  - Auto-create demo tenant on startup
+#   RUN_TESTS=true           - Run pytest suite on startup
+#   TEST_COVERAGE=true       - Include coverage report
+#   TESTS_FAIL_FAST=true     - Stop on first test failure
+#
 # SERVICES:
 #   web           - Django application (http://localhost:8002)
 #   channels      - WebSocket server (http://localhost:8003)
@@ -164,6 +170,10 @@ services:
     environment:
       <<: *common-env
       SERVICE_TYPE: web
+      CREATE_DEMO_TENANT: ${CREATE_DEMO_TENANT:-true}
+      RUN_TESTS: ${RUN_TESTS:-true}
+      TEST_COVERAGE: ${TEST_COVERAGE:-false}
+      TESTS_FAIL_FAST: ${TESTS_FAIL_FAST:-false}
     volumes:
       - .:/app
       - static_volume:/app/static

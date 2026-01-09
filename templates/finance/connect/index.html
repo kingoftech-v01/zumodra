@@ -1,0 +1,194 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block breadcrumb %}
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
+<li><span class="text-gray-400 mx-2">/</span></li>
+<li><span class="text-gray-900 dark:text-gray-100 font-medium">Seller Account</span></li>
+{% endblock %}
+
+{% block page_title %}Seller Account{% endblock %}
+{% block page_description %}Manage your Stripe Connect account to receive payments{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {% if connected_account %}
+    <!-- Account Status Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 rounded-full
+                    {% if connected_account.account_status == 'active' %}
+                    bg-green-100 dark:bg-green-900
+                    {% elif connected_account.account_status == 'restricted' %}
+                    bg-yellow-100 dark:bg-yellow-900
+                    {% else %}
+                    bg-gray-100 dark:bg-gray-700
+                    {% endif %}">
+                    <svg class="h-6 w-6
+                        {% if connected_account.account_status == 'active' %}
+                        text-green-600 dark:text-green-400
+                        {% elif connected_account.account_status == 'restricted' %}
+                        text-yellow-600 dark:text-yellow-400
+                        {% else %}
+                        text-gray-600 dark:text-gray-400
+                        {% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Account Status</h3>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        {% if connected_account.account_status == 'active' %}
+                        bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                        {% elif connected_account.account_status == 'restricted' %}
+                        bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                        {% else %}
+                        bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                        {% endif %}">
+                        {{ connected_account.account_status|title }}
+                    </span>
+                </div>
+            </div>
+            <button hx-post="{% url 'finance-frontend:connect-refresh-status' %}"
+                    hx-swap="outerHTML"
+                    hx-target="closest .bg-white"
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Refresh Status
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Charges</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">
+                    {% if connected_account.charges_enabled %}
+                    <span class="text-green-600 dark:text-green-400">Enabled</span>
+                    {% else %}
+                    <span class="text-red-600 dark:text-red-400">Disabled</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Payouts</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">
+                    {% if connected_account.payouts_enabled %}
+                    <span class="text-green-600 dark:text-green-400">Enabled</span>
+                    {% else %}
+                    <span class="text-red-600 dark:text-red-400">Disabled</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Country</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">
+                    {{ connected_account.country|default:"Not set" }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Section (if incomplete) -->
+    {% if connected_account.account_status != 'active' %}
+    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Complete Your Account Setup</h3>
+                <p class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                    Your account requires additional information before you can receive payments.
+                </p>
+                <div class="mt-4">
+                    <a href="#"
+                       hx-post="{% url 'finance-frontend:connect-onboarding' %}"
+                       hx-vals='{"return_url": "{{ request.build_absolute_uri }}", "refresh_url": "{{ request.build_absolute_uri }}"}'
+                       class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 font-medium text-sm">
+                        Continue Onboarding
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard Link -->
+    {% if connected_account.account_status == 'active' %}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Stripe Dashboard</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Access your Stripe Express dashboard to view your earnings, manage payouts, and update your account settings.
+        </p>
+        <a href="#"
+           hx-get="{% url 'finance-frontend:connect-dashboard-link' %}"
+           hx-swap="none"
+           class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+            Open Stripe Dashboard
+        </a>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Account - Setup CTA -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-center mb-6">
+                <div class="p-4 bg-primary-100 dark:bg-primary-900 rounded-full">
+                    <svg class="h-12 w-12 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Become a Seller</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">
+                Connect your bank account to start receiving payments for your services on the marketplace.
+            </p>
+            <form hx-post="{% url 'finance-frontend:connect-create' %}"
+                  hx-swap="innerHTML"
+                  hx-target="body"
+                  class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Country</label>
+                        <select id="country" name="country"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="business_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">Business Type</label>
+                        <select id="business_type" name="business_type"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                            <option value="individual">Individual</option>
+                            <option value="company">Company</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit"
+                        class="w-full inline-flex justify-center items-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium">
+                    Get Started
+                </button>
+            </form>
+            <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                By continuing, you agree to our <a href="#" class="text-primary-600 hover:underline">Terms of Service</a>
+                and Stripe's <a href="https://stripe.com/connect-account/legal" target="_blank" class="text-primary-600 hover:underline">Connected Account Agreement</a>.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -101,6 +101,46 @@ urlpatterns = [
     # ==================== Services Marketplace ====================
     # /api/v1/marketplace/ - Original services marketplace endpoints
     path('marketplace/', include(services_router.urls)),
+
+    # ==================== Finance & Payments ====================
+    # /api/v1/finance/ - Payments, subscriptions, invoices, escrow, Stripe Connect
+    path('finance/', include('finance.api.urls')),
+
+    # ==================== Messages ====================
+    # /api/v1/messages/ - Conversations, messages, contacts (REST complement to WebSocket)
+    path('messages/', include('messages_sys.api.urls')),
+
+    # ==================== Configurations ====================
+    # /api/v1/configurations/ - Skills, companies, sites, departments, roles, FAQs
+    path('configurations/', include('configurations.api.urls')),
+
+    # ==================== Marketing ====================
+    # /api/v1/marketing/ - Visit tracking, prospects, newsletters, analytics
+    path('marketing/', include('marketing.api.urls')),
+
+    # ==================== Security ====================
+    # /api/v1/security/ - Audit logs, security events, sessions, failed logins
+    path('security/', include('security.api.urls')),
+
+    # ==================== Services (New Marketplace API) ====================
+    # /api/v1/services/ - Full services marketplace CRUD with filters
+    path('services/', include('services.api.urls')),
+
+    # ==================== Blog ====================
+    # /api/v1/blog/ - Blog posts, categories, comments, tags
+    path('blog/', include('blog.api.urls')),
+
+    # ==================== Newsletter ====================
+    # /api/v1/newsletter/ - Newsletters, subscriptions, campaigns
+    path('newsletter/', include('newsletter.api.urls')),
+
+    # ==================== Appointment ====================
+    # /api/v1/appointment/ - Appointment booking system
+    path('appointment/', include('appointment.api.urls')),
+
+    # ==================== Dashboard ====================
+    # /api/v1/dashboard/ - Dashboard widgets and metrics
+    path('dashboard/', include('dashboard.api.urls')),
 ]
 
 
@@ -154,4 +194,62 @@ AI Matching (/api/v1/ai/):
 Marketplace (/api/v1/marketplace/):
 - Services, providers, requests, proposals, contracts
 - Original services marketplace functionality
+
+Finance (/api/v1/finance/):
+- Payments, subscriptions, invoices, refunds
+- Escrow transactions, disputes, payouts
+- Stripe Connect: connected accounts, payouts, transfers
+- See finance.api.urls for full endpoint list
+
+Messages (/api/v1/messages/):
+- Conversations, messages (REST complement to WebSocket)
+- Contacts, friend requests, block lists
+- User status, message search
+- See messages_sys.api.urls for full endpoint list
+
+Configurations (/api/v1/configurations/):
+- Skills, companies, sites, departments, roles
+- FAQs, testimonials, partnerships, trusted companies
+- See configurations.api.urls for full endpoint list
+
+Marketing (/api/v1/marketing/):
+- Visit tracking, prospects, newsletters
+- Conversions, analytics, subscriber management
+- See marketing.api.urls for full endpoint list
+
+Security (/api/v1/security/):
+- Audit logs, security events, failed logins
+- User sessions, password reset requests
+- Security analytics and monitoring
+- See security.api.urls for full endpoint list
+
+Services (/api/v1/services/):
+- Categories, tags, providers, services
+- Client requests, proposals, contracts
+- Reviews, messages, analytics
+- See services.api.urls for full endpoint list
+
+Blog (/api/v1/blog/):
+- Blog posts (Wagtail-backed)
+- Categories, comments, tags
+- Featured posts, related posts
+- See blog.api.urls for full endpoint list
+
+Newsletter (/api/v1/newsletter/):
+- Newsletters, subscriptions
+- Messages, articles, submissions
+- Campaign management
+- See newsletter.api.urls for full endpoint list
+
+Appointment (/api/v1/appointment/):
+- Services, staff members
+- Appointments, bookings
+- Working hours, days off, config
+- See appointment.api.urls for full endpoint list
+
+Dashboard (/api/v1/dashboard/):
+- Overview, quick stats
+- Global search, upcoming interviews
+- ATS/HR metrics, activity feed
+- See dashboard.api.urls for full endpoint list
 """

@@ -37,6 +37,8 @@ SERVICE_TYPE="${SERVICE_TYPE:-web}"
 SKIP_MIGRATIONS="${SKIP_MIGRATIONS:-false}"
 SKIP_COLLECTSTATIC="${SKIP_COLLECTSTATIC:-false}"
 CREATE_DEMO_TENANT="${CREATE_DEMO_TENANT:-false}"
+RUN_TESTS="${RUN_TESTS:-false}"
+TESTS_FAIL_FAST="${TESTS_FAIL_FAST:-false}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -414,6 +416,47 @@ bootstrap_demo_tenant() {
 }
 
 # -----------------------------------------------------------------------------
+# Run Tests (optional)
+# -----------------------------------------------------------------------------
+run_tests() {
+    if [ "$RUN_TESTS" != "true" ] && [ "$RUN_TESTS" != "1" ]; then
+        log_info "Skipping tests (RUN_TESTS not set)"
+        return 0
+    fi
+
+    log_info "=========================================="
+    log_info "Running Test Suite"
+    log_info "=========================================="
+
+    local pytest_args="-v --tb=short"
+
+    # Add fail-fast if enabled
+    if [ "$TESTS_FAIL_FAST" = "true" ] || [ "$TESTS_FAIL_FAST" = "1" ]; then
+        pytest_args="$pytest_args -x"
+    fi
+
+    # Add coverage if requested
+    if [ "$TEST_COVERAGE" = "true" ] || [ "$TEST_COVERAGE" = "1" ]; then
+        pytest_args="$pytest_args --cov --cov-report=term-missing"
+    fi
+
+    log_info "Running: pytest $pytest_args"
+
+    if pytest $pytest_args; then
+        log_info "=========================================="
+        log_info "All tests passed successfully!"
+        log_info "=========================================="
+        return 0
+    else
+        log_error "=========================================="
+        log_error "Some tests failed!"
+        log_error "=========================================="
+        # Don't exit - just warn, so the app still starts
+        return 1
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Migration Lock (for production with multiple replicas)
 # Uses Redis to ensure only one instance runs migrations at a time
 # -----------------------------------------------------------------------------
@@ -486,6 +529,7 @@ main() {
             run_collectstatic
             bootstrap_demo_tenant
             verify_django_setup
+            run_tests || log_warn "Tests had failures, but continuing..."
             release_migration_lock
             log_info "Migration lock released"
         elif [ "$lock_status" = "WAITING" ]; then
@@ -499,6 +543,7 @@ main() {
             run_collectstatic
             bootstrap_demo_tenant
             verify_django_setup
+            run_tests || log_warn "Tests had failures, but continuing..."
         fi
     fi
     # Note: celery services do NOT run migrations - web container handles all migrations

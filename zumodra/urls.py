@@ -276,6 +276,15 @@ urlpatterns += i18n_patterns(
     # Newsletter
     path('newsletter/', include('newsletter.urls')),
 
+    # Configurations (staff dashboard)
+    path('configurations/', include('configurations.urls', namespace='configurations')),
+
+    # Marketing (staff dashboard)
+    path('marketing/', include('marketing.urls', namespace='marketing')),
+
+    # Security (staff dashboard)
+    path('security/', include('security.urls', namespace='security')),
+
     # Wagtail documents
     path('documents/', include(wagtaildocs_urls)),
 
@@ -322,6 +331,11 @@ API Endpoints:
     /api/v1/notifications/  - Notification system
     /api/v1/ai/             - AI matching and recommendations
     /api/v1/marketplace/    - Services marketplace
+    /api/v1/finance/        - Finance & payments
+    /api/v1/messages/       - Messaging (REST complement to WebSocket)
+    /api/v1/configurations/ - Configuration management
+    /api/v1/marketing/      - Marketing & analytics
+    /api/v1/security/       - Security monitoring
     /api/legacy/            - Legacy API (backwards compatibility)
 
 API Documentation:
@@ -358,7 +372,11 @@ Application Features (with language prefix):
     /<lang>/services/       - Services marketplace
     /<lang>/notifications/  - Notifications
     /<lang>/analytics/      - Analytics
+    /<lang>/finance/        - Finance (payments, subscriptions)
     /<lang>/newsletter/     - Newsletter
+    /<lang>/configurations/ - Configurations dashboard (staff)
+    /<lang>/marketing/      - Marketing dashboard (staff)
+    /<lang>/security/       - Security dashboard (staff)
     /<lang>/blog/           - Blog
 
 Content Management:
