@@ -19,5 +19,15 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def save_user_profile(sender, instance, **kwargs):
     """Save profile when user is saved."""
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
+    try:
+        # Use getattr with default to avoid triggering DB query
+        # Profile may not exist in public schema context
+        profile = getattr(instance, '_profile_cache', None)
+        if profile is None:
+            # Try to get cached profile without triggering DB
+            cached = instance.__dict__.get('profile', None)
+            if cached is not None:
+                cached.save()
+    except Exception:
+        # Profile may not exist in public schema - ignore silently
+        pass

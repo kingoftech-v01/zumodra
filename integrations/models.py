@@ -711,7 +711,12 @@ class WebhookEndpoint(models.Model):
 
     def get_full_url(self):
         """Get the full webhook URL."""
-        base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+        # Use centralized domain config - falls back safely for dev/prod
+        base_url = getattr(settings, 'SITE_URL', None) or getattr(settings, 'BASE_URL', '')
+        if not base_url:
+            # Import here to avoid circular imports
+            from core.domain import get_site_url
+            base_url = get_site_url()
         return f"{base_url}/api/integrations/{self.endpoint_path}/"
 
     def record_received(self, success=True):

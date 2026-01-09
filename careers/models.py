@@ -371,9 +371,15 @@ class CareerSite(TenantAwareModelMixin, models.Model):
         if self.custom_domain and self.custom_domain_verified:
             protocol = 'https' if self.custom_domain_ssl else 'http'
             return f"{protocol}://{self.custom_domain}"
-        # Use subdomain on main careers domain
-        base_domain = getattr(settings, 'CAREERS_BASE_DOMAIN', 'careers.zumodra.com')
-        return f"https://{self.subdomain}.{base_domain}"
+        # Use subdomain on main careers domain from centralized config
+        base_domain = getattr(settings, 'CAREERS_BASE_DOMAIN', '')
+        if not base_domain:
+            # Fall back to constructing from PRIMARY_DOMAIN
+            primary = getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+            base_domain = f"careers.{primary}"
+        # Use http for localhost (development), https for production
+        protocol = 'http' if 'localhost' in base_domain else 'https'
+        return f"{protocol}://{self.subdomain}.{base_domain}"
 
     def get_active_jobs_count(self):
         """Return count of active job listings."""

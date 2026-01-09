@@ -3,15 +3,49 @@ Management command to set up a beta tenant for early adopters.
 Creates a tenant with beta-specific feature flags and configuration.
 """
 
+import os
 from datetime import timedelta
 from decimal import Decimal
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connection
 from django.utils import timezone
 from django.utils.text import slugify
 
 User = get_user_model()
+
+
+def _get_beta_domain():
+    """Get beta domain from centralized configuration."""
+    # Try environment first (for management command context)
+    domain = os.environ.get('TENANT_BASE_DOMAIN') or os.environ.get('BASE_DOMAIN')
+    if not domain:
+        domain = getattr(settings, 'TENANT_BASE_DOMAIN', None)
+    if not domain:
+        domain = getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+    return domain
+
+
+def _get_site_url():
+    """Get site URL from centralized configuration."""
+    url = os.environ.get('SITE_URL')
+    if not url:
+        url = getattr(settings, 'SITE_URL', '')
+    if not url and getattr(settings, 'DEBUG', False):
+        port = os.environ.get('WEB_PORT', '8002')
+        url = f"http://localhost:{port}"
+    return url
+
+
+def _get_protocol():
+    """Get protocol based on environment."""
+    site_url = _get_site_url()
+    if site_url and site_url.startswith('https://'):
+        return 'https'
+    if getattr(settings, 'DEBUG', False):
+        return 'http'
+    return 'https'
 
 
 class Command(BaseCommand):
@@ -49,7 +83,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--domain',
             type=str,
-            help='Custom domain for tenant (default: slug.beta.zumodra.local)'
+            help=f'Custom domain for tenant (default: slug.beta.{_get_beta_domain()})'
         )
         parser.add_argument(
             '--skip-welcome-email',
@@ -124,8 +158,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"   Created: {tenant.name}"))
             self.stdout.write(f"   Schema: {tenant.schema_name}")
 
-            # Create domain
-            domain_name = custom_domain or f"{tenant_slug}.beta.zumodra.local"
+            # Create domain using centralized config
+            base_domain = _get_beta_domain()
+            domain_name = custom_domain or f"{tenant_slug}.beta.{base_domain}"
             Domain.objects.create(
                 domain=domain_name,
                 tenant=tenant,
@@ -176,12 +211,13 @@ class Command(BaseCommand):
                 self.stdout.write("\n5. Welcome email skipped")
 
             # Summary
+            protocol = _get_protocol()
             self.stdout.write("\n" + "=" * 60)
             self.stdout.write(self.style.SUCCESS("Beta tenant setup complete!"))
             self.stdout.write("=" * 60)
-            self.stdout.write(f"\n  Tenant URL: http://{domain_name}")
-            self.stdout.write(f"  Admin URL: http://{domain_name}/admin/")
-            self.stdout.write(f"  API URL: http://{domain_name}/api/v1/")
+            self.stdout.write(f"\n  Tenant URL: {protocol}://{domain_name}")
+            self.stdout.write(f"  Admin URL: {protocol}://{domain_name}/admin/")
+            self.stdout.write(f"  API URL: {protocol}://{domain_name}/api/v1/")
             self.stdout.write(f"\n  Login Credentials:")
             self.stdout.write(f"    Email: {owner_email}")
             self.stdout.write(f"    Password: {password}")
@@ -366,6 +402,7 @@ class Command(BaseCommand):
             from django.core.mail import send_mail
             from django.conf import settings
 
+            protocol = _get_protocol()
             subject = f"Welcome to Zumodra Beta - {tenant.name}"
             message = f"""
 Welcome to Zumodra Beta!
@@ -374,7 +411,7 @@ Your beta account for {tenant.name} has been created.
 
 Login Details:
 --------------
-URL: http://{domain}
+URL: {protocol}://{domain}
 Email: {admin.email}
 Password: {password}
 

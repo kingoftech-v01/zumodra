@@ -224,6 +224,14 @@ class TenantSettingsFactory(DjangoModelFactory):
     career_page_title = 'Careers'
 
 
+def _get_test_base_domain():
+    """Get base domain for test fixtures from centralized config."""
+    import os
+    from django.conf import settings
+    domain = os.environ.get('TENANT_BASE_DOMAIN') or getattr(settings, 'TENANT_BASE_DOMAIN', 'localhost')
+    return domain
+
+
 class DomainFactory(DjangoModelFactory):
     """Factory for tenant domains."""
 
@@ -231,7 +239,7 @@ class DomainFactory(DjangoModelFactory):
         model = 'tenants.Domain'
 
     tenant = factory.SubFactory(TenantFactory)
-    domain = factory.LazyAttribute(lambda o: f"{o.tenant.slug}.zumodra.local")
+    domain = factory.LazyAttribute(lambda o: f"{o.tenant.slug}.{_get_test_base_domain()}")
     is_primary = True
     is_careers_domain = False
     ssl_enabled = True

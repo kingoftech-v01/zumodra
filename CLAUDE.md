@@ -147,3 +147,51 @@ Key startup options:
 - `CREATE_DEMO_TENANT=true` - Auto-create demo tenant on startup
 - `RUN_TESTS=true` - Run pytest suite on startup
 - `TEST_COVERAGE=true` - Include test coverage report
+
+### Domain Configuration
+
+All domain references are centralized and environment-driven. Never hard-code domain names.
+
+**Environment Variables:**
+```bash
+# Primary domain for the platform
+PRIMARY_DOMAIN=zumodra.com       # Production
+PRIMARY_DOMAIN=localhost         # Development (default when DEBUG=True)
+
+# Full site URL (includes protocol and port)
+SITE_URL=https://zumodra.com     # Production
+SITE_URL=http://localhost:8002   # Development (auto-detected from WEB_PORT)
+
+# Tenant subdomain base
+TENANT_BASE_DOMAIN=zumodra.com   # Production: tenants are {slug}.zumodra.com
+TENANT_BASE_DOMAIN=localhost     # Development: tenants are {slug}.localhost
+
+# Optional specialized domains
+API_BASE_URL=https://api.zumodra.com/api
+CAREERS_BASE_DOMAIN=careers.zumodra.com
+EMAIL_DOMAIN=zumodra.com
+ANONYMIZED_EMAIL_DOMAIN=anonymized.zumodra.com
+```
+
+**Centralized Utilities (core/domain.py):**
+```python
+from core.domain import (
+    get_primary_domain,      # Get PRIMARY_DOMAIN
+    get_site_url,            # Get SITE_URL with protocol
+    get_tenant_url,          # Build tenant-specific URL
+    build_absolute_url,      # Build full URL for a path
+    get_noreply_email,       # Get noreply@{domain}
+    is_development_domain,   # Check if running locally
+)
+```
+
+**Development Notes:**
+- `localhost` is only used when `DEBUG=True` and no domain is configured
+- The Django Site framework is auto-synced on server startup via `core/apps.py`
+- Run `python manage.py sync_site_domain` to manually sync the Site object
+- Test fixtures in `conftest.py` use `TENANT_BASE_DOMAIN` for domain generation
+
+**Security Considerations:**
+- SSRF protection validators intentionally block `localhost` and private IP ranges
+- These localhost references in security code are intentional and should NOT be changed
+- See `core/validators.py` for the SSRF protection implementation

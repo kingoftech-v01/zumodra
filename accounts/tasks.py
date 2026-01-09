@@ -630,8 +630,8 @@ def send_employment_verification_email(self, verification_id: int) -> Dict[str, 
                 'verification_id': verification_id,
             }
 
-        # Generate verification URL
-        base_url = getattr(settings, 'FRONTEND_URL', 'https://zumodra.com')
+        # Generate verification URL from centralized config
+        base_url = getattr(settings, 'FRONTEND_URL', None) or getattr(settings, 'SITE_URL', '')
         verification_url = f"{base_url}/verify/employment/{verification.verification_token}/"
 
         # Prepare email context
@@ -750,8 +750,8 @@ def send_education_verification_email(self, verification_id: int) -> Dict[str, A
                 'verification_id': verification_id,
             }
 
-        # Generate verification URL
-        base_url = getattr(settings, 'FRONTEND_URL', 'https://zumodra.com')
+        # Generate verification URL from centralized config
+        base_url = getattr(settings, 'FRONTEND_URL', None) or getattr(settings, 'SITE_URL', '')
         verification_url = f"{base_url}/verify/education/{verification.verification_token}/"
 
         # Prepare email context
@@ -909,8 +909,8 @@ def send_verification_reminder(self, verification_id: int, verification_type: st
                 'verification_id': verification_id,
             }
 
-        # Generate verification URL
-        base_url = getattr(settings, 'FRONTEND_URL', 'https://zumodra.com')
+        # Generate verification URL from centralized config
+        base_url = getattr(settings, 'FRONTEND_URL', None) or getattr(settings, 'SITE_URL', '')
         verification_url = f"{base_url}/verify/{verification_type}/{verification.verification_token}/"
 
         context = {

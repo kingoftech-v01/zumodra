@@ -34,20 +34,38 @@ User = get_user_model()
 # DEMO DATA CONFIGURATION
 # =============================================================================
 
-# Get base domain from environment (e.g., localhost, zumodra.com)
-BASE_DOMAIN = os.environ.get('BASE_DOMAIN', 'localhost')
+# Get base domain from environment or Django settings
+# Priority: TENANT_BASE_DOMAIN > BASE_DOMAIN > PRIMARY_DOMAIN > 'localhost'
+def _get_demo_domain():
+    """Get the base domain for demo tenant from centralized config."""
+    domain = os.environ.get('TENANT_BASE_DOMAIN') or os.environ.get('BASE_DOMAIN')
+    if not domain:
+        domain = getattr(settings, 'TENANT_BASE_DOMAIN', None)
+    if not domain:
+        domain = getattr(settings, 'PRIMARY_DOMAIN', None)
+    if not domain:
+        domain = os.environ.get('PRIMARY_DOMAIN', 'localhost')
+    return domain
+
+def _get_demo_email_domain():
+    """Get email domain for demo users - uses demo subdomain of primary domain."""
+    primary = os.environ.get('PRIMARY_DOMAIN') or getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+    return f"demo.{primary}"
+
+BASE_DOMAIN = _get_demo_domain()
+EMAIL_DOMAIN = _get_demo_email_domain()
 
 DEMO_TENANT_CONFIG = {
     'name': 'Demo Company',
     'slug': 'demo',
     'schema': 'demo',
-    'domain': f'demo.{BASE_DOMAIN}',  # Will be demo.localhost or demo.zumodra.com
-    'owner_email': 'admin@demo.zumodra.local',
+    'domain': f'demo.{BASE_DOMAIN}',  # e.g., demo.localhost or demo.zumodra.com
+    'owner_email': f'admin@{EMAIL_DOMAIN}',
 }
 
 DEMO_USERS = {
     'admin': {
-        'email': 'admin@demo.zumodra.local',
+        'email': f'admin@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Demo',
         'last_name': 'Admin',
@@ -55,35 +73,35 @@ DEMO_USERS = {
         'is_superuser': True,
     },
     'hr_manager': {
-        'email': 'hr@demo.zumodra.local',
+        'email': f'hr@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Sarah',
         'last_name': 'Johnson',
         'role': 'HR_MANAGER',
     },
     'recruiter': {
-        'email': 'recruiter@demo.zumodra.local',
+        'email': f'recruiter@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Michael',
         'last_name': 'Chen',
         'role': 'RECRUITER',
     },
     'hiring_manager': {
-        'email': 'hiring@demo.zumodra.local',
+        'email': f'hiring@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Emily',
         'last_name': 'Davis',
         'role': 'HIRING_MANAGER',
     },
     'employee': {
-        'email': 'employee@demo.zumodra.local',
+        'email': f'employee@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'John',
         'last_name': 'Smith',
         'role': 'EMPLOYEE',
     },
     'candidate': {
-        'email': 'candidate@demo.zumodra.local',
+        'email': f'candidate@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Alex',
         'last_name': 'Wilson',
@@ -586,7 +604,7 @@ class Command(BaseCommand):
         for i in range(25):
             first_name = random.choice(FIRST_NAMES)
             last_name = random.choice(LAST_NAMES)
-            email = f'{first_name.lower()}.{last_name.lower()}.emp{i}@demo.local'
+            email = f'{first_name.lower()}.{last_name.lower()}.emp{i}@{EMAIL_DOMAIN}'
 
             user, _ = User.objects.get_or_create(
                 email=email,
@@ -662,7 +680,7 @@ class Command(BaseCommand):
         for i in range(10):
             first_name = random.choice(FIRST_NAMES)
             last_name = random.choice(LAST_NAMES)
-            email = f'{first_name.lower()}.{last_name.lower()}.provider{i}@demo.local'
+            email = f'{first_name.lower()}.{last_name.lower()}.provider{i}@{EMAIL_DOMAIN}'
 
             user, _ = User.objects.get_or_create(
                 email=email,

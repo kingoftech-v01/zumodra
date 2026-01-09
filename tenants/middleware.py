@@ -39,7 +39,9 @@ TENANT_RESOLUTION_RATE_WINDOW = 60  # seconds
 TENANT_CACHE_PREFIX = 'tenant:'
 TENANT_CACHE_TIMEOUT = getattr(settings, 'TENANT_CACHE_TIMEOUT', 300)  # 5 minutes default
 TENANT_HEADER_NAME = getattr(settings, 'TENANT_HEADER_NAME', 'X-Tenant-ID')
-TENANT_BASE_DOMAIN = getattr(settings, 'TENANT_BASE_DOMAIN', 'zumodra.rhematek-solutions.com')
+# Get tenant base domain from settings - no hard-coded fallback for production
+# Development uses 'localhost' via settings.py defaults
+TENANT_BASE_DOMAIN = getattr(settings, 'TENANT_BASE_DOMAIN', '')
 
 
 class TenantURLConfMiddleware:

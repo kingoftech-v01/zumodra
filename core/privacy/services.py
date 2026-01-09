@@ -933,8 +933,17 @@ class AnonymizationService:
     - Field-level anonymization
     """
 
-    # Default anonymization values
-    ANONYMOUS_EMAIL_DOMAIN = 'anonymized.zumodra.local'
+    # Default anonymization values - use centralized domain config
+    @property
+    def ANONYMOUS_EMAIL_DOMAIN(self):
+        from django.conf import settings
+        domain = getattr(settings, 'ANONYMIZED_EMAIL_DOMAIN', '')
+        if not domain:
+            primary = getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+            domain = f"anonymized.{primary}"
+        return domain
+
+    _ANONYMOUS_EMAIL_DOMAIN = None  # Backwards compatibility placeholder
     ANONYMOUS_PHONE = '+10000000000'
     ANONYMOUS_STRING = '[ANONYMIZED]'
     ANONYMOUS_IP = '0.0.0.0'

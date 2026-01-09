@@ -373,15 +373,60 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'custom_account_u.CustomUser'
 
-# Email Settings
+# =============================================================================
+# DOMAIN CONFIGURATION
+# =============================================================================
+# Canonical domain settings - used throughout the application for URLs, emails, etc.
+# These should be set in environment variables for production deployments.
+#
+# For development, defaults to 'localhost' which is the ONLY acceptable dev domain.
+# For production, set these via environment variables - never hard-code domains.
+# =============================================================================
+
+# Primary domain (without protocol) - the main canonical domain
+# Development: localhost (automatically used if DEBUG=True and not set)
+# Production: yourdomain.com
+PRIMARY_DOMAIN = env('PRIMARY_DOMAIN', default=env('BASE_DOMAIN', default='localhost' if DEBUG else ''))
+
+# Full site URL including protocol - used for absolute URLs, emails, redirects
+# Development: http://localhost:8002
+# Production: https://yourdomain.com
+_default_site_url = f"http://localhost:{env('WEB_PORT', default='8002')}" if DEBUG else ''
+SITE_URL = env('SITE_URL', default=_default_site_url)
+
+# Base domain for tenant subdomains
+# Tenants are accessed at: {tenant-slug}.{TENANT_BASE_DOMAIN}
+TENANT_BASE_DOMAIN = env('TENANT_BASE_DOMAIN', default=PRIMARY_DOMAIN)
+
+# API base URL (optional, defaults to SITE_URL/api)
+API_BASE_URL = env('API_BASE_URL', default=f"{SITE_URL}/api" if SITE_URL else '')
+
+# Domain for public career pages
+CAREERS_BASE_DOMAIN = env('CAREERS_BASE_DOMAIN', default=f"careers.{PRIMARY_DOMAIN}" if PRIMARY_DOMAIN else '')
+
+# Domain for GDPR-anonymized emails
+ANONYMIZED_EMAIL_DOMAIN = env('ANONYMIZED_EMAIL_DOMAIN', default=f"anonymized.{PRIMARY_DOMAIN}" if PRIMARY_DOMAIN else '')
+
+# Domain for outbound emails (defaults to PRIMARY_DOMAIN)
+EMAIL_DOMAIN = env('EMAIL_DOMAIN', default=PRIMARY_DOMAIN)
+
+# Legacy alias for backwards compatibility
+BASE_DOMAIN = PRIMARY_DOMAIN
+BASE_URL = SITE_URL
+
+# =============================================================================
+# EMAIL SETTINGS
+# =============================================================================
 EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = env('EMAIL_HOST', default='localhost')
-EMAIL_PORT = env.int('EMAIL_PORT', default=587)
-EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST = env('EMAIL_HOST', default='mailhog' if DEBUG else '')
+EMAIL_PORT = env.int('EMAIL_PORT', default=1025 if DEBUG else 587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=False if DEBUG else True)
 EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@localhost')
+# Use domain config for default email - avoids hard-coded localhost
+_default_from_email = f"noreply@{EMAIL_DOMAIN}" if EMAIL_DOMAIN else 'noreply@localhost'
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=_default_from_email)
 
 # Stripe Settings
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default='')

@@ -26,11 +26,17 @@ class Command(BaseCommand):
             default='Demo Company',
             help='Name for the demo tenant (default: Demo Company)'
         )
+        # Build default email from centralized domain config
+        from django.conf import settings
+        import os
+        primary_domain = os.environ.get('PRIMARY_DOMAIN') or getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+        default_email = f'demo@demo.{primary_domain}'
+
         parser.add_argument(
             '--admin-email',
             type=str,
-            default='demo@zumodra.local',
-            help='Admin email for demo tenant (default: demo@zumodra.local)'
+            default=default_email,
+            help=f'Admin email for demo tenant (default: {default_email})'
         )
         parser.add_argument(
             '--admin-password',
@@ -308,7 +314,9 @@ class Command(BaseCommand):
         for i in range(num_employees):
             first_name = random.choice(first_names)
             last_name = random.choice(last_names)
-            email = f'{first_name.lower()}.{last_name.lower()}.emp{i}@{tenant.slug}.local'
+            # Use tenant-specific email domain from centralized config
+            primary_domain = getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+            email = f'{first_name.lower()}.{last_name.lower()}.emp{i}@{tenant.slug}.{primary_domain}'
 
             user = User.objects.create_user(
                 email=email,

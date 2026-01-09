@@ -105,7 +105,9 @@ class TenantService:
             )
         else:
             # Create default subdomain
-            default_domain = f"{slug}.{getattr(settings, 'TENANT_BASE_DOMAIN', 'zumodra.com')}"
+            # Use centralized domain config - TENANT_BASE_DOMAIN from settings
+            tenant_base = getattr(settings, 'TENANT_BASE_DOMAIN', '') or getattr(settings, 'PRIMARY_DOMAIN', 'localhost')
+            default_domain = f"{slug}.{tenant_base}"
             Domain.objects.create(
                 tenant=tenant,
                 domain=default_domain,
@@ -380,7 +382,12 @@ class InvitationService:
         """Send invitation email to invitee."""
         try:
             # Build invitation URL
-            invitation_url = f"{settings.SITE_URL}/join/{invitation.token}/"
+            # Use centralized domain config for absolute URLs
+            site_url = getattr(settings, 'SITE_URL', '') or getattr(settings, 'BASE_URL', '')
+            if not site_url:
+                from core.domain import get_site_url
+                site_url = get_site_url()
+            invitation_url = f"{site_url}/join/{invitation.token}/"
 
             # Render email
             subject = f"You're invited to join {invitation.tenant.name}"

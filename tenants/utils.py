@@ -23,9 +23,12 @@ from django.http import HttpRequest
 logger = logging.getLogger(__name__)
 
 
-# Configuration
-TENANT_BASE_DOMAIN = getattr(settings, 'TENANT_BASE_DOMAIN', 'zumodra.com')
-TENANT_PROTOCOL = getattr(settings, 'TENANT_PROTOCOL', 'https')
+# Configuration - domain settings from centralized config
+# No hard-coded domain fallbacks - use settings.py defaults
+TENANT_BASE_DOMAIN = getattr(settings, 'TENANT_BASE_DOMAIN', '')
+# Protocol: https for production, http for development (localhost)
+_is_dev = getattr(settings, 'DEBUG', False) or 'localhost' in TENANT_BASE_DOMAIN
+TENANT_PROTOCOL = getattr(settings, 'TENANT_PROTOCOL', 'http' if _is_dev else 'https')
 TENANT_CACHE_PREFIX = 'tenant:'
 TENANT_CACHE_TIMEOUT = getattr(settings, 'TENANT_CACHE_TIMEOUT', 300)
 

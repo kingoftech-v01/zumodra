@@ -7,13 +7,22 @@ properly populated.
 
 Usage:
     python manage.py create_demo_tenant
-    python manage.py create_demo_tenant --domain zumodra.com
-    BASE_DOMAIN=zumodra.com python manage.py create_demo_tenant
+    python manage.py create_demo_tenant --domain yourdomain.com
+    PRIMARY_DOMAIN=yourdomain.com python manage.py create_demo_tenant
 """
 
 import os
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection
+
+
+def _get_base_domain():
+    """Get base domain from centralized configuration."""
+    domain = os.environ.get('PRIMARY_DOMAIN') or os.environ.get('BASE_DOMAIN')
+    if not domain:
+        domain = getattr(settings, 'PRIMARY_DOMAIN', None) or getattr(settings, 'TENANT_BASE_DOMAIN', None)
+    return domain or 'localhost'
 
 
 class Command(BaseCommand):
@@ -28,8 +37,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '--domain',
             type=str,
-            default=os.environ.get('BASE_DOMAIN', 'localhost'),
-            help='Base domain for the tenant (e.g., zumodra.com). Default: localhost or BASE_DOMAIN env var'
+            default=_get_base_domain(),
+            help=f'Base domain for the tenant. Default: {_get_base_domain()} (from PRIMARY_DOMAIN env var)'
         )
 
     def handle(self, *args, **options):
@@ -76,11 +85,12 @@ class Command(BaseCommand):
         self.stdout.write('   This may take a few minutes...')
 
         try:
+            demo_email = f'admin@demo.{base_domain}'
             tenant = Tenant.objects.create(
                 name='Demo Company',
                 slug='demo',
                 schema_name='demo',
-                owner_email='admin@demo.zumodra.local',
+                owner_email=demo_email,
                 plan=plan,
             )
             self.stdout.write(self.style.SUCCESS(f'   Created tenant: {tenant.name} ({tenant.schema_name})'))
@@ -101,7 +111,7 @@ class Command(BaseCommand):
 
         # Step 3: Create demo data
         self.stdout.write('\n[3] Creating demo users and data...')
-        self._create_demo_data(tenant)
+        self._create_demo_data(tenant, base_domain)
 
         self.stdout.write('\n' + '=' * 60)
         self.stdout.write(self.style.SUCCESS('DEMO TENANT CREATED SUCCESSFULLY!'))
@@ -152,12 +162,13 @@ class Command(BaseCommand):
         MigrationExecutor.apply_migration = patched_apply
         self.stdout.write('   Installed Wagtail migration fix')
 
-    def _create_demo_data(self, tenant):
+    def _create_demo_data(self, tenant, base_domain='localhost'):
         """Create demo users and basic data."""
         from django.contrib.auth import get_user_model
         from django_tenants.utils import schema_context
 
         User = get_user_model()
+        demo_email = f'admin@demo.{base_domain}'
 
         with schema_context('demo'):
             # Import tenant-specific models within schema context
@@ -165,7 +176,7 @@ class Command(BaseCommand):
 
             # Create admin user
             admin, created = User.objects.get_or_create(
-                email='admin@demo.zumodra.local',
+                email=demo_email,
                 defaults={
                     'first_name': 'Demo',
                     'last_name': 'Admin',

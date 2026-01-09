@@ -4,9 +4,43 @@ Creates OpenAPI/Swagger documentation from DRF viewsets.
 """
 
 import json
-import os
+import os as os_module
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+
+
+def _get_api_servers():
+    """Get API server URLs from centralized configuration."""
+    servers = []
+
+    # Production server from environment
+    primary_domain = getattr(settings, 'PRIMARY_DOMAIN', '')
+    if primary_domain and 'localhost' not in primary_domain:
+        servers.append({
+            'url': f'https://api.{primary_domain}/v1',
+            'description': 'Production'
+        })
+        servers.append({
+            'url': f'https://staging-api.{primary_domain}/v1',
+            'description': 'Staging'
+        })
+
+    # Development server
+    site_url = getattr(settings, 'SITE_URL', '')
+    if site_url:
+        servers.append({
+            'url': f'{site_url}/api/v1',
+            'description': 'Development'
+        })
+    else:
+        # Fallback for development
+        port = os_module.environ.get('WEB_PORT', '8002')
+        servers.append({
+            'url': f'http://localhost:{port}/api/v1',
+            'description': 'Development (local)'
+        })
+
+    return servers
 
 
 class Command(BaseCommand):
@@ -62,7 +96,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  Output: {output_dir}/")
 
         # Create output directory
-        os.makedirs(output_dir, exist_ok=True)
+        os_module.makedirs(output_dir, exist_ok=True)
 
         try:
             if output_format == 'openapi':
@@ -113,12 +147,8 @@ class Command(BaseCommand):
             },
         }
 
-        # Add servers
-        schema['servers'] = [
-            {'url': 'https://api.zumodra.com/v1', 'description': 'Production'},
-            {'url': 'https://staging-api.zumodra.com/v1', 'description': 'Staging'},
-            {'url': 'http://localhost:8000/api/v1', 'description': 'Development'},
-        ]
+        # Add servers from centralized configuration
+        schema['servers'] = _get_api_servers()
 
         # Add security schemes
         schema['components'] = schema.get('components', {})
@@ -137,7 +167,7 @@ class Command(BaseCommand):
         schema['security'] = [{'bearerAuth': []}, {'apiKey': []}]
 
         # Write output
-        output_file = os.path.join(output_dir, 'openapi.json')
+        output_file = os_module.path.join(output_dir, 'openapi.json')
         with open(output_file, 'w') as f:
             json.dump(schema, f, indent=2)
 
@@ -146,7 +176,7 @@ class Command(BaseCommand):
         # Also create YAML version
         try:
             import yaml
-            yaml_file = os.path.join(output_dir, 'openapi.yaml')
+            yaml_file = os_module.path.join(output_dir, 'openapi.yaml')
             with open(yaml_file, 'w') as f:
                 yaml.dump(schema, f, default_flow_style=False, sort_keys=False)
             self.stdout.write(f"  Created: {yaml_file}")
@@ -234,7 +264,7 @@ class Command(BaseCommand):
         self._generate_openapi(output_dir, title, version, include_private, split_by_app)
 
         # Read the generated schema
-        schema_file = os.path.join(output_dir, 'openapi.json')
+        schema_file = os_module.path.join(output_dir, 'openapi.json')
         with open(schema_file, 'r') as f:
             schema = json.load(f)
 
@@ -280,7 +310,7 @@ The API supports the following authentication methods:
                 md_content += f"| `{endpoint['method']}` | `{endpoint['path']}` | {endpoint['summary']} |\n"
 
         # Write Markdown file
-        md_file = os.path.join(output_dir, 'API.md')
+        md_file = os_module.path.join(output_dir, 'API.md')
         with open(md_file, 'w') as f:
             f.write(md_content)
 
@@ -350,7 +380,7 @@ The API supports the following authentication methods:
 </html>
 """
 
-        html_file = os.path.join(output_dir, 'index.html')
+        html_file = os_module.path.join(output_dir, 'index.html')
         with open(html_file, 'w') as f:
             f.write(html_content)
 
