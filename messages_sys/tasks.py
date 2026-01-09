@@ -425,10 +425,110 @@ def generate_contact_suggestions(self):
 
 
 def _generate_user_suggestions(user):
-    """Generate contact suggestions for a user."""
-    # Placeholder - would implement graph-based suggestion algorithm
-    # Based on mutual connections, shared conversations, etc.
-    return []
+    """
+    Generate contact suggestions for a user based on graph analysis.
+
+    Algorithm:
+    1. Find all conversations the user participates in
+    2. Get all other participants from those conversations
+    3. For group conversations, suggest users the user hasn't directly messaged
+    4. Rank by number of shared group conversations (mutual connections)
+    5. Limit to top suggestions
+
+    Returns:
+        list: List of suggested user IDs with scores
+    """
+    from django.contrib.auth import get_user_model
+    from messages_sys.models import Conversation
+    from collections import Counter
+
+    User = get_user_model()
+
+    try:
+        # Get all conversations the user participates in
+        user_conversations = Conversation.objects.filter(
+            participants=user
+        ).prefetch_related('participants')
+
+        # Track potential suggestions with scores
+        suggestion_scores = Counter()
+
+        # Get users the user has direct (1-on-1) conversations with
+        direct_contacts = set()
+
+        for conv in user_conversations:
+            participants = list(conv.participants.exclude(id=user.id).values_list('id', flat=True))
+
+            if len(participants) == 1:
+                # This is a direct 1-on-1 conversation
+                direct_contacts.add(participants[0])
+            else:
+                # This is a group conversation - all participants are potential suggestions
+                for participant_id in participants:
+                    if participant_id not in direct_contacts:
+                        # Increase score for each shared group conversation
+                        suggestion_scores[participant_id] += 1
+
+        # Remove users who are already direct contacts from suggestions
+        for contact_id in direct_contacts:
+            if contact_id in suggestion_scores:
+                del suggestion_scores[contact_id]
+
+        # Also find colleagues (users in same organization/tenant)
+        # This adds users who might be relevant but haven't chatted yet
+        try:
+            if hasattr(user, 'employee_record') and user.employee_record:
+                employee = user.employee_record
+                # Get colleagues in same department
+                if employee.department:
+                    colleagues = User.objects.filter(
+                        employee_record__department=employee.department,
+                        is_active=True
+                    ).exclude(
+                        id=user.id
+                    ).exclude(
+                        id__in=direct_contacts
+                    ).values_list('id', flat=True)[:20]
+
+                    for colleague_id in colleagues:
+                        # Add with lower score than conversation-based suggestions
+                        if colleague_id not in suggestion_scores:
+                            suggestion_scores[colleague_id] = 0.5
+        except Exception:
+            # If employee record lookup fails, continue without colleague suggestions
+            pass
+
+        # Sort by score (descending) and get top 10 suggestions
+        top_suggestions = suggestion_scores.most_common(10)
+
+        # Return list of suggestion dicts with user details
+        suggestions = []
+        if top_suggestions:
+            suggested_ids = [uid for uid, score in top_suggestions]
+            suggested_users = User.objects.filter(
+                id__in=suggested_ids,
+                is_active=True
+            ).values('id', 'email', 'first_name', 'last_name')
+
+            # Create a map for quick lookup
+            user_map = {u['id']: u for u in suggested_users}
+
+            for uid, score in top_suggestions:
+                if uid in user_map:
+                    u = user_map[uid]
+                    suggestions.append({
+                        'user_id': str(uid),
+                        'email': u['email'],
+                        'name': f"{u['first_name']} {u['last_name']}".strip() or u['email'],
+                        'score': float(score),
+                        'reason': 'shared_conversations' if score >= 1 else 'colleague'
+                    })
+
+        return suggestions
+
+    except Exception as e:
+        logger.error(f"Error generating suggestions for user {user.id}: {e}")
+        return []
 
 
 # ==================== SPAM DETECTION ====================

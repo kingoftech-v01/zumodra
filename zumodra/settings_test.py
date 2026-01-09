@@ -28,28 +28,23 @@ PASSWORD_HASHERS = [
 # DATABASE CONFIGURATION
 # =============================================================================
 
-# Use in-memory SQLite for faster tests (disable for PostGIS-specific tests)
+# Use PostgreSQL for tests (required for ArrayField in ai_matching models)
+# The ai_matching app uses PostgreSQL-specific features like ArrayField
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ.get('TEST_DB_NAME', 'zumodra_test'),
+        'USER': os.environ.get('TEST_DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', 'zumodra_dev_password'),
+        'HOST': os.environ.get('TEST_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('TEST_DB_PORT', '5434'),
+        'TEST': {
+            'NAME': 'zumodra_test',
+        },
     }
 }
-
-# For PostGIS-specific tests, use this configuration instead:
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'zumodra_test',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'localhost',
-#         'PORT': '5433',
-#         'TEST': {
-#             'NAME': 'zumodra_test',
-#         },
-#     }
-# }
 
 # Disable django-tenants for testing (use single schema)
 DATABASE_ROUTERS = []

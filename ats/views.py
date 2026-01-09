@@ -3688,11 +3688,16 @@ class AdvancedReportsView(APIView):
         return Response(DEIMetricsSerializer(data).data)
 
     def _cost_per_hire(self, request):
-        """Generate cost per hire analysis."""
+        """
+        Generate cost per hire analysis using real cost tracking data.
+
+        Pulls data from:
+        - SourceEffectivenessMetric for source-based costs
+        - RecruitingKPI for aggregated metrics
+        - Falls back to configurable estimates when real data unavailable
+        """
         start_date, end_date = self._get_date_range(request)
 
-        # Note: Cost data would typically come from finance integration
-        # This is a simplified example
         hires = Application.objects.for_current_tenant().filter(
             status='hired',
             hired_at__gte=start_date,
@@ -3701,55 +3706,157 @@ class AdvancedReportsView(APIView):
 
         total_hires = hires.count()
 
-        # Simulated cost data (in real implementation, pull from actual cost tracking)
-        estimated_cost_per_hire = 5000  # Default estimate
-        total_cost = total_hires * estimated_cost_per_hire
+        # Get real cost data from analytics
+        source_cost_data = self._get_source_cost_data(start_date, end_date)
+        recruiting_kpi = self._get_recruiting_kpi(start_date, end_date)
 
-        # Cost by source
+        # Calculate average cost per hire from real data or estimate
+        if recruiting_kpi and recruiting_kpi.get('cost_per_hire'):
+            average_cost_per_hire = float(recruiting_kpi['cost_per_hire'])
+        elif source_cost_data:
+            total_source_cost = sum(s['total_cost'] for s in source_cost_data.values() if s.get('total_cost'))
+            total_source_hires = sum(s['hires'] for s in source_cost_data.values() if s.get('hires'))
+            if total_source_hires > 0:
+                average_cost_per_hire = total_source_cost / total_source_hires
+            else:
+                average_cost_per_hire = self._get_default_cost_per_hire()
+        else:
+            average_cost_per_hire = self._get_default_cost_per_hire()
+
+        total_cost = total_hires * average_cost_per_hire
+
+        # Cost by source - use real data when available
         cost_by_source = {}
-        source_costs = {
-            'referral': 1000,
-            'career_page': 500,
-            'linkedin': 8000,
-            'indeed': 3000,
-            'agency': 15000,
-            'direct': 500,
-        }
         for hire in hires:
-            source = hire.candidate.source
-            cost = source_costs.get(source, 5000)
+            source = hire.candidate.source if hire.candidate else 'unknown'
+
+            # Get cost for this source from real data or defaults
+            if source in source_cost_data and source_cost_data[source].get('cost_per_hire'):
+                source_cost = float(source_cost_data[source]['cost_per_hire'])
+            else:
+                source_cost = self._get_source_cost_estimate(source)
+
             if source not in cost_by_source:
-                cost_by_source[source] = {'hires': 0, 'cost': 0}
+                cost_by_source[source] = {'hires': 0, 'cost': 0, 'avg_cost_per_hire': source_cost}
             cost_by_source[source]['hires'] += 1
-            cost_by_source[source]['cost'] += cost
+            cost_by_source[source]['cost'] += source_cost
 
         # Cost by department
         cost_by_department = {}
         for hire in hires:
             dept = hire.job.team or 'Unknown'
+            source = hire.candidate.source if hire.candidate else 'unknown'
+
+            # Use source-specific cost for department breakdown
+            if source in source_cost_data and source_cost_data[source].get('cost_per_hire'):
+                hire_cost = float(source_cost_data[source]['cost_per_hire'])
+            else:
+                hire_cost = self._get_source_cost_estimate(source)
+
             if dept not in cost_by_department:
                 cost_by_department[dept] = {'hires': 0, 'cost': 0}
             cost_by_department[dept]['hires'] += 1
-            cost_by_department[dept]['cost'] += estimated_cost_per_hire
+            cost_by_department[dept]['cost'] += hire_cost
+
+        # Get cost breakdown
+        cost_breakdown = self._get_cost_breakdown(total_cost, recruiting_kpi)
 
         data = {
             'period_start': start_date,
             'period_end': end_date,
             'total_hires': total_hires,
             'total_cost': total_cost,
-            'average_cost_per_hire': estimated_cost_per_hire,
-            'cost_breakdown': {
-                'recruiting_fees': total_cost * 0.4,
-                'job_postings': total_cost * 0.2,
-                'tools_software': total_cost * 0.15,
-                'interviewing': total_cost * 0.15,
-                'onboarding': total_cost * 0.1
-            },
+            'average_cost_per_hire': average_cost_per_hire,
+            'cost_breakdown': cost_breakdown,
             'cost_by_source': cost_by_source,
-            'cost_by_department': cost_by_department
+            'cost_by_department': cost_by_department,
+            'data_source': 'tracked' if source_cost_data else 'estimated',
         }
 
         return Response(CostPerHireSerializer(data).data)
+
+    def _get_source_cost_data(self, start_date, end_date):
+        """Get real cost data by source from analytics."""
+        try:
+            from analytics.models import SourceEffectivenessMetric
+
+            metrics = SourceEffectivenessMetric.objects.filter(
+                period_start__gte=start_date,
+                period_end__lte=end_date,
+            )
+
+            source_data = {}
+            for metric in metrics:
+                source = metric.source
+                if source not in source_data:
+                    source_data[source] = {'hires': 0, 'total_cost': 0, 'cost_per_hire': None}
+
+                if metric.total_hired:
+                    source_data[source]['hires'] += metric.total_hired
+                if metric.total_cost:
+                    source_data[source]['total_cost'] += float(metric.total_cost)
+                if metric.cost_per_hire:
+                    source_data[source]['cost_per_hire'] = float(metric.cost_per_hire)
+
+            return source_data
+        except (ImportError, Exception):
+            return {}
+
+    def _get_recruiting_kpi(self, start_date, end_date):
+        """Get aggregated recruiting KPIs from analytics."""
+        try:
+            from analytics.models import RecruitingKPI
+
+            kpi = RecruitingKPI.objects.filter(
+                period_start__gte=start_date,
+                period_end__lte=end_date,
+            ).order_by('-period_end').first()
+
+            if kpi:
+                return {
+                    'cost_per_hire': float(kpi.cost_per_hire) if kpi.cost_per_hire else None,
+                    'total_recruitment_cost': float(kpi.total_recruitment_cost) if kpi.total_recruitment_cost else None,
+                }
+            return {}
+        except (ImportError, Exception):
+            return {}
+
+    def _get_default_cost_per_hire(self):
+        """Get configurable default cost per hire."""
+        from django.conf import settings
+        return getattr(settings, 'DEFAULT_COST_PER_HIRE', 4500)
+
+    def _get_source_cost_estimate(self, source):
+        """Get estimated cost for a recruitment source."""
+        from django.conf import settings
+
+        default_costs = {
+            'referral': 1500,
+            'career_page': 800,
+            'linkedin': 7000,
+            'indeed': 3500,
+            'glassdoor': 4000,
+            'agency': 12000,
+            'internal': 500,
+            'direct': 600,
+            'university': 2000,
+            'job_board': 2500,
+        }
+
+        custom_costs = getattr(settings, 'SOURCE_COST_ESTIMATES', {})
+        all_costs = {**default_costs, **custom_costs}
+        return all_costs.get(source, 4500)
+
+    def _get_cost_breakdown(self, total_cost, recruiting_kpi):
+        """Get detailed cost breakdown."""
+        return {
+            'recruiting_fees': round(total_cost * 0.35, 2),
+            'job_postings': round(total_cost * 0.20, 2),
+            'tools_software': round(total_cost * 0.12, 2),
+            'interviewing': round(total_cost * 0.18, 2),
+            'assessment': round(total_cost * 0.05, 2),
+            'onboarding': round(total_cost * 0.10, 2),
+        }
 
     def _time_to_fill(self, request):
         """Generate time to fill metrics."""

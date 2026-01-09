@@ -13,6 +13,7 @@ This module implements:
 """
 
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 from django.db import models
 from django.conf import settings
@@ -554,10 +555,26 @@ class OnboardingTaskProgress(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='completed_onboarding_tasks'
     )
     notes = models.TextField(blank=True)
     due_date = models.DateField(null=True, blank=True)
+
+    # Task assignment fields
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_onboarding_tasks',
+        help_text=_('User currently assigned to complete this task')
+    )
+    reassignment_history = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('History of task reassignments')
+    )
 
     class Meta:
         verbose_name = _('Onboarding Task Progress')
@@ -574,6 +591,39 @@ class OnboardingTaskProgress(models.Model):
         self.completed_at = timezone.now()
         self.completed_by = user
         self.save()
+
+    def reassign(self, new_assignee, reassigned_by=None, reason=''):
+        """
+        Reassign task to a new user.
+
+        Args:
+            new_assignee: User to assign the task to
+            reassigned_by: User performing the reassignment
+            reason: Reason for reassignment
+        """
+        if self.is_completed:
+            raise ValueError("Cannot reassign a completed task")
+
+        old_assignee = self.assigned_to
+
+        # Track reassignment history
+        history_entry = {
+            'timestamp': timezone.now().isoformat(),
+            'from_user_id': old_assignee.id if old_assignee else None,
+            'from_user_name': str(old_assignee) if old_assignee else None,
+            'to_user_id': new_assignee.id,
+            'to_user_name': str(new_assignee),
+            'reassigned_by_id': reassigned_by.id if reassigned_by else None,
+            'reassigned_by_name': str(reassigned_by) if reassigned_by else None,
+            'reason': reason,
+        }
+
+        if not self.reassignment_history:
+            self.reassignment_history = []
+        self.reassignment_history.append(history_entry)
+
+        self.assigned_to = new_assignee
+        self.save(update_fields=['assigned_to', 'reassignment_history'])
 
 
 class DocumentTemplate(models.Model):
@@ -1566,3 +1616,344 @@ class EmployeeGoal(models.Model):
             return 0
         delta = self.target_date - timezone.now().date()
         return max(0, delta.days)
+
+
+# =============================================================================
+# PERFORMANCE IMPROVEMENT PLAN (PIP) MODELS
+# =============================================================================
+
+class PerformanceImprovementPlan(models.Model):
+    """
+    Performance Improvement Plan (PIP) tracking.
+
+    Formal documentation for employees who need performance improvement.
+    Tracks goals, milestones, check-ins, and outcomes.
+    """
+
+    class PIPStatus(models.TextChoices):
+        DRAFT = 'draft', _('Draft')
+        ACTIVE = 'active', _('Active')
+        EXTENDED = 'extended', _('Extended')
+        COMPLETED_SUCCESS = 'completed_success', _('Completed Successfully')
+        COMPLETED_FAIL = 'completed_fail', _('Completed Unsuccessfully')
+        TERMINATED = 'terminated', _('Terminated')
+        CANCELLED = 'cancelled', _('Cancelled')
+
+    class PIPOutcome(models.TextChoices):
+        PENDING = 'pending', _('Pending')
+        IMPROVED = 'improved', _('Improved - PIP Closed')
+        TERMINATED = 'terminated', _('Terminated')
+        DEMOTED = 'demoted', _('Demoted')
+        TRANSFERRED = 'transferred', _('Transferred')
+        EXTENDED = 'extended', _('Extended')
+        RESIGNED = 'resigned', _('Resigned During PIP')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        related_name='pips'
+    )
+    initiated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='initiated_pips'
+    )
+    hr_representative = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='hr_pips'
+    )
+
+    # PIP Details
+    status = models.CharField(
+        max_length=20,
+        choices=PIPStatus.choices,
+        default=PIPStatus.DRAFT
+    )
+    reason = models.TextField(
+        help_text=_('Detailed reason for placing employee on PIP')
+    )
+    performance_concerns = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of specific performance concerns')
+    )
+    goals = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('Improvement goals with measurable targets')
+    )
+    support_provided = models.TextField(
+        blank=True,
+        help_text=_('Resources and support provided to employee')
+    )
+    expectations = models.TextField(
+        blank=True,
+        help_text=_('Clear expectations for improvement')
+    )
+
+    # Timeline
+    start_date = models.DateField()
+    target_end_date = models.DateField()
+    actual_end_date = models.DateField(null=True, blank=True)
+
+    # Check-in Schedule
+    check_in_frequency_days = models.PositiveIntegerField(
+        default=7,
+        help_text=_('Days between check-in meetings')
+    )
+    next_check_in = models.DateField(null=True, blank=True)
+
+    # Outcome
+    outcome = models.CharField(
+        max_length=20,
+        choices=PIPOutcome.choices,
+        default=PIPOutcome.PENDING
+    )
+    final_assessment = models.TextField(blank=True)
+    final_rating = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+
+    # Linked to Performance Review (if initiated from a review)
+    source_review = models.ForeignKey(
+        PerformanceReview,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resulting_pips'
+    )
+
+    # Signatures & Acknowledgement
+    employee_acknowledged_at = models.DateTimeField(null=True, blank=True)
+    manager_signed_at = models.DateTimeField(null=True, blank=True)
+    hr_signed_at = models.DateTimeField(null=True, blank=True)
+
+    # Audit
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Performance Improvement Plan')
+        verbose_name_plural = _('Performance Improvement Plans')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"PIP - {self.employee.full_name} ({self.get_status_display()})"
+
+    @property
+    def duration_days(self):
+        """Calculate total PIP duration in days."""
+        end = self.actual_end_date or self.target_end_date
+        return (end - self.start_date).days
+
+    @property
+    def days_remaining(self):
+        """Days remaining until target end date."""
+        if self.status in [
+            self.PIPStatus.COMPLETED_SUCCESS,
+            self.PIPStatus.COMPLETED_FAIL,
+            self.PIPStatus.TERMINATED,
+            self.PIPStatus.CANCELLED
+        ]:
+            return 0
+        delta = self.target_end_date - timezone.now().date()
+        return max(0, delta.days)
+
+    @property
+    def is_overdue(self):
+        """Check if PIP has passed target end date without resolution."""
+        if self.status in [
+            self.PIPStatus.COMPLETED_SUCCESS,
+            self.PIPStatus.COMPLETED_FAIL,
+            self.PIPStatus.TERMINATED,
+            self.PIPStatus.CANCELLED
+        ]:
+            return False
+        return timezone.now().date() > self.target_end_date
+
+    @property
+    def progress_percentage(self):
+        """Calculate progress through PIP timeline."""
+        if self.status == self.PIPStatus.DRAFT:
+            return 0
+        total_days = (self.target_end_date - self.start_date).days
+        if total_days <= 0:
+            return 100
+        elapsed = (timezone.now().date() - self.start_date).days
+        return min(100, max(0, int((elapsed / total_days) * 100)))
+
+    def activate(self):
+        """Activate a draft PIP."""
+        if self.status == self.PIPStatus.DRAFT:
+            self.status = self.PIPStatus.ACTIVE
+            self.next_check_in = self.start_date + timedelta(
+                days=self.check_in_frequency_days
+            )
+            self.save()
+
+    def extend(self, new_end_date, reason=''):
+        """Extend the PIP deadline."""
+        self.status = self.PIPStatus.EXTENDED
+        self.target_end_date = new_end_date
+        # Log the extension
+        PIPProgressNote.objects.create(
+            pip=self,
+            note_type='extension',
+            content=f"PIP extended to {new_end_date}. Reason: {reason}",
+        )
+        self.save()
+
+    def complete(self, outcome, final_assessment=''):
+        """Complete the PIP with an outcome."""
+        self.outcome = outcome
+        self.final_assessment = final_assessment
+        self.actual_end_date = timezone.now().date()
+
+        if outcome == self.PIPOutcome.IMPROVED:
+            self.status = self.PIPStatus.COMPLETED_SUCCESS
+        elif outcome in [self.PIPOutcome.TERMINATED, self.PIPOutcome.DEMOTED]:
+            self.status = self.PIPStatus.COMPLETED_FAIL
+        else:
+            self.status = self.PIPStatus.COMPLETED_SUCCESS
+
+        self.save()
+
+
+class PIPMilestone(models.Model):
+    """
+    Milestones within a Performance Improvement Plan.
+
+    Specific, measurable goals that must be achieved during the PIP.
+    """
+
+    class MilestoneStatus(models.TextChoices):
+        PENDING = 'pending', _('Pending')
+        IN_PROGRESS = 'in_progress', _('In Progress')
+        ACHIEVED = 'achieved', _('Achieved')
+        NOT_ACHIEVED = 'not_achieved', _('Not Achieved')
+        DEFERRED = 'deferred', _('Deferred')
+
+    pip = models.ForeignKey(
+        PerformanceImprovementPlan,
+        on_delete=models.CASCADE,
+        related_name='milestones'
+    )
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    success_criteria = models.TextField(
+        blank=True,
+        help_text=_('How success will be measured')
+    )
+
+    # Timeline
+    due_date = models.DateField()
+    completed_date = models.DateField(null=True, blank=True)
+
+    # Status & Progress
+    status = models.CharField(
+        max_length=20,
+        choices=MilestoneStatus.choices,
+        default=MilestoneStatus.PENDING
+    )
+    progress_notes = models.TextField(blank=True)
+
+    # Weight for overall PIP completion
+    weight = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('1.00')
+    )
+
+    # Audit
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('PIP Milestone')
+        verbose_name_plural = _('PIP Milestones')
+        ordering = ['due_date']
+
+    def __str__(self):
+        return f"{self.pip.employee.full_name} - {self.title}"
+
+    @property
+    def is_overdue(self):
+        if self.status in [self.MilestoneStatus.ACHIEVED, self.MilestoneStatus.DEFERRED]:
+            return False
+        return timezone.now().date() > self.due_date
+
+    def mark_achieved(self, notes=''):
+        """Mark milestone as achieved."""
+        self.status = self.MilestoneStatus.ACHIEVED
+        self.completed_date = timezone.now().date()
+        if notes:
+            self.progress_notes += f"\n{timezone.now().date()}: {notes}"
+        self.save()
+
+
+class PIPProgressNote(models.Model):
+    """
+    Progress notes and check-in records for a PIP.
+
+    Tracks meetings, progress updates, and any documentation.
+    """
+
+    class NoteType(models.TextChoices):
+        CHECK_IN = 'check_in', _('Check-in Meeting')
+        PROGRESS_UPDATE = 'progress_update', _('Progress Update')
+        CONCERN = 'concern', _('Concern Raised')
+        ACHIEVEMENT = 'achievement', _('Achievement')
+        EXTENSION = 'extension', _('Extension')
+        FORMAL_WARNING = 'formal_warning', _('Formal Warning')
+        OTHER = 'other', _('Other')
+
+    pip = models.ForeignKey(
+        PerformanceImprovementPlan,
+        on_delete=models.CASCADE,
+        related_name='progress_notes'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='pip_notes_authored'
+    )
+
+    note_type = models.CharField(
+        max_length=20,
+        choices=NoteType.choices,
+        default=NoteType.PROGRESS_UPDATE
+    )
+    content = models.TextField()
+
+    # For check-in meetings
+    meeting_date = models.DateField(null=True, blank=True)
+    attendees = models.JSONField(default=list, blank=True)
+    action_items = models.JSONField(default=list, blank=True)
+
+    # Employee Response (for acknowledgements)
+    employee_response = models.TextField(blank=True)
+    employee_responded_at = models.DateTimeField(null=True, blank=True)
+
+    # Attachments
+    attachments = models.JSONField(default=list, blank=True)
+
+    # Audit
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('PIP Progress Note')
+        verbose_name_plural = _('PIP Progress Notes')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.pip.employee.full_name} - {self.get_note_type_display()} ({self.created_at.date()})"

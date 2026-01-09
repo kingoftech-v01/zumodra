@@ -61,10 +61,121 @@ def create_onboarding(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=TimeOffRequest)
 def notify_time_off_request(sender, instance, created, **kwargs):
-    """Send notification when time off request is created or status changes."""
-    if created:
-        # TODO: Send notification to manager
-        pass
+    """
+    Send notification when time off request is created or status changes.
+
+    Notifications are sent:
+    - To manager when a new request is created (pending approval)
+    - To employee when request is approved/rejected
+    - To HR for compliance tracking
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        from notifications.models import Notification
+        from django.conf import settings
+
+        employee = instance.employee
+        requester_user = employee.user if hasattr(employee, 'user') else None
+
+        if created:
+            # New request - notify manager
+            manager = employee.manager
+            if manager and hasattr(manager, 'user') and manager.user:
+                Notification.objects.create(
+                    user=manager.user,
+                    notification_type='time_off_request',
+                    title='New Time Off Request',
+                    message=f'{employee.full_name} has submitted a time off request '
+                            f'for {instance.start_date} to {instance.end_date} '
+                            f'({instance.total_days} days - {instance.time_off_type.name})',
+                    action_url=f'/hr/time-off/requests/{instance.id}/',
+                    context_data={
+                        'request_id': instance.id,
+                        'employee_id': employee.id,
+                        'employee_name': employee.full_name,
+                        'start_date': str(instance.start_date),
+                        'end_date': str(instance.end_date),
+                        'days': float(instance.total_days),
+                        'type': instance.time_off_type.name,
+                    }
+                )
+                logger.info(f"Time off request notification sent to manager {manager.full_name}")
+
+        else:
+            # Status changed - check if approved/rejected
+            old_status = getattr(instance, '_original_status', None)
+            current_status = instance.status
+
+            if old_status != current_status:
+                # Status changed - notify the employee
+                if requester_user:
+                    if current_status == TimeOffRequest.RequestStatus.APPROVED:
+                        Notification.objects.create(
+                            user=requester_user,
+                            notification_type='time_off_approved',
+                            title='Time Off Request Approved',
+                            message=f'Your time off request for {instance.start_date} to '
+                                    f'{instance.end_date} has been approved.',
+                            action_url=f'/hr/my-time-off/',
+                            context_data={
+                                'request_id': instance.id,
+                                'start_date': str(instance.start_date),
+                                'end_date': str(instance.end_date),
+                            }
+                        )
+                        logger.info(f"Time off approval notification sent to {employee.full_name}")
+
+                    elif current_status == TimeOffRequest.RequestStatus.REJECTED:
+                        Notification.objects.create(
+                            user=requester_user,
+                            notification_type='time_off_rejected',
+                            title='Time Off Request Rejected',
+                            message=f'Your time off request for {instance.start_date} to '
+                                    f'{instance.end_date} has been rejected. '
+                                    f'Reason: {instance.rejection_reason or "Not specified"}',
+                            action_url=f'/hr/my-time-off/',
+                            context_data={
+                                'request_id': instance.id,
+                                'start_date': str(instance.start_date),
+                                'end_date': str(instance.end_date),
+                                'rejection_reason': instance.rejection_reason or '',
+                            }
+                        )
+                        logger.info(f"Time off rejection notification sent to {employee.full_name}")
+
+                    elif current_status == TimeOffRequest.RequestStatus.CANCELLED:
+                        # Notify manager if employee cancelled
+                        manager = employee.manager
+                        if manager and hasattr(manager, 'user') and manager.user:
+                            Notification.objects.create(
+                                user=manager.user,
+                                notification_type='time_off_cancelled',
+                                title='Time Off Request Cancelled',
+                                message=f'{employee.full_name} has cancelled their time off request '
+                                        f'for {instance.start_date} to {instance.end_date}.',
+                                action_url=f'/hr/time-off/requests/',
+                            )
+
+    except ImportError:
+        # Notifications app not available
+        logger.debug("Notifications app not available, skipping time off notification")
+    except Exception as e:
+        logger.error(f"Error sending time off notification: {e}")
+
+
+@receiver(pre_save, sender=TimeOffRequest)
+def store_original_status(sender, instance, **kwargs):
+    """Store original status for comparison in post_save."""
+    if instance.pk:
+        try:
+            original = TimeOffRequest.objects.get(pk=instance.pk)
+            instance._original_status = original.status
+        except TimeOffRequest.DoesNotExist:
+            instance._original_status = None
+    else:
+        instance._original_status = None
 
 
 @receiver(post_save, sender=Offboarding)

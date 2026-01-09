@@ -28,7 +28,9 @@ from .models import (
     Employee, TimeOffType, TimeOffRequest,
     OnboardingChecklist, OnboardingTask, EmployeeOnboarding,
     OnboardingTaskProgress, DocumentTemplate, EmployeeDocument,
-    Offboarding, PerformanceReview
+    Offboarding, PerformanceReview,
+    # PIP models
+    PerformanceImprovementPlan, PIPMilestone, PIPProgressNote,
 )
 from .serializers import (
     EmployeeMinimalSerializer, EmployeeListSerializer,
@@ -44,7 +46,13 @@ from .serializers import (
     OffboardingSerializer, OffboardingStepSerializer,
     PerformanceReviewSerializer, PerformanceReviewSubmitSerializer,
     PerformanceReviewCompleteSerializer,
-    TeamCalendarEventSerializer
+    TeamCalendarEventSerializer,
+    # PIP Serializers
+    PerformanceImprovementPlanSerializer, PerformanceImprovementPlanListSerializer,
+    PIPMilestoneSerializer, PIPProgressNoteSerializer,
+    PIPCreateSerializer, PIPActivateSerializer, PIPExtendSerializer,
+    PIPCompleteSerializer, PIPCheckInSerializer, PIPMilestoneUpdateSerializer,
+    PIPSummarySerializer, ManagerPIPDashboardSerializer,
 )
 from .filters import (
     EmployeeFilter, TimeOffRequestFilter,
@@ -1740,4 +1748,425 @@ class HRReportsView(APIView):
         pending_requests_count = pending_requests.count()
         pending_requests_days = pending_requests.aggregate(total=Sum('total_days'))['total'] or Decimal('0')
         return Response({'period_start': period_start, 'period_end': period_end, 'total_days_taken': float(total_days_taken), 'total_days_available': float(total_days_available), 'utilization_rate': round(utilization_rate, 2), 'by_leave_type': by_leave_type, 'by_department': by_department, 'average_days_per_employee': round(average_days_per_employee, 2), 'pending_requests_count': pending_requests_count, 'pending_requests_days': float(pending_requests_days)})
+
+
+# ==================== PIP (PERFORMANCE IMPROVEMENT PLAN) VIEWSETS ====================
+
+class PerformanceImprovementPlanViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for Performance Improvement Plans.
+
+    Provides:
+    - CRUD operations for PIPs
+    - PIP activation workflow
+    - Check-in recording
+    - Extension requests
+    - Completion with outcomes
+
+    Filters:
+    - status: Filter by PIP status
+    - employee: Filter by employee ID
+    - outcome: Filter by outcome
+    """
+    queryset = PerformanceImprovementPlan.objects.select_related(
+        'employee', 'employee__user', 'initiated_by'
+    ).prefetch_related('milestones', 'progress_notes')
+    permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'outcome', 'employee']
+    search_fields = ['employee__first_name', 'employee__last_name', 'reason']
+    ordering_fields = ['start_date', 'target_end_date', 'created_at']
+    ordering = ['-created_at']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PerformanceImprovementPlanListSerializer
+        if self.action == 'create_pip':
+            return PIPCreateSerializer
+        return PerformanceImprovementPlanSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        # HR/Admin can see all PIPs
+        if user.is_staff:
+            return queryset
+
+        # Managers can see PIPs for their direct reports
+        try:
+            user_employee = user.employee_record
+            return queryset.filter(
+                Q(employee__manager=user_employee) |
+                Q(initiated_by=user)
+            )
+        except Employee.DoesNotExist:
+            return queryset.filter(initiated_by=user)
+
+    @action(detail=False, methods=['post'])
+    def create_pip(self, request):
+        """Create a new PIP with milestones."""
+        serializer = PIPCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        from .services import PIPService
+        result = PIPService.create_pip(
+            employee=serializer.validated_data['employee_id'],
+            initiated_by=request.user,
+            reason=serializer.validated_data['reason'],
+            performance_concerns=serializer.validated_data.get('performance_concerns', []),
+            support_provided=serializer.validated_data.get('support_provided', ''),
+            start_date=serializer.validated_data['start_date'],
+            duration_days=serializer.validated_data['duration_days'],
+            check_in_frequency_days=serializer.validated_data.get('check_in_frequency_days', 7),
+            goals=serializer.validated_data.get('goals', []),
+        )
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        pip_serializer = PerformanceImprovementPlanSerializer(
+            result.data,
+            context={'request': request}
+        )
+        return Response(pip_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'])
+    def activate(self, request, pk=None):
+        """Activate a draft PIP."""
+        pip = self.get_object()
+
+        if pip.status != 'draft':
+            return Response(
+                {'detail': 'Only draft PIPs can be activated.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        from .services import PIPService
+        result = PIPService.activate_pip(pip.id, request.user)
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.get_serializer(result.data)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def record_check_in(self, request, pk=None):
+        """Record a check-in meeting for a PIP."""
+        pip = self.get_object()
+
+        if pip.status not in ['active', 'extended']:
+            return Response(
+                {'detail': 'Check-ins can only be recorded for active PIPs.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = PIPCheckInSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        from .services import PIPService
+        result = PIPService.record_check_in(
+            pip_id=pip.id,
+            content=serializer.validated_data['content'],
+            meeting_date=serializer.validated_data.get('meeting_date'),
+            author=request.user,
+        )
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Process milestone updates if provided
+        milestone_updates = serializer.validated_data.get('milestone_updates', [])
+        for update in milestone_updates:
+            PIPService.update_milestone(
+                milestone_id=update.get('milestone_id'),
+                status=update.get('status'),
+                progress_notes=update.get('progress_notes'),
+                author=request.user,
+            )
+
+        pip.refresh_from_db()
+        pip_serializer = self.get_serializer(pip)
+        return Response(pip_serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def extend(self, request, pk=None):
+        """Extend a PIP deadline."""
+        pip = self.get_object()
+
+        if pip.status not in ['active', 'extended']:
+            return Response(
+                {'detail': 'Only active PIPs can be extended.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = PIPExtendSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        from .services import PIPService
+        result = PIPService.extend_pip(
+            pip_id=pip.id,
+            additional_days=serializer.validated_data['additional_days'],
+            reason=serializer.validated_data['reason'],
+            author=request.user,
+        )
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        pip_serializer = self.get_serializer(result.data)
+        return Response(pip_serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """Complete a PIP with an outcome."""
+        pip = self.get_object()
+
+        if pip.status not in ['active', 'extended']:
+            return Response(
+                {'detail': 'Only active PIPs can be completed.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = PIPCompleteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        from .services import PIPService
+        result = PIPService.complete_pip(
+            pip_id=pip.id,
+            outcome=serializer.validated_data['outcome'],
+            final_assessment=serializer.validated_data['final_assessment'],
+            final_rating=serializer.validated_data.get('final_rating'),
+            author=request.user,
+        )
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        pip_serializer = self.get_serializer(result.data)
+        return Response(pip_serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """Cancel a PIP."""
+        pip = self.get_object()
+
+        if pip.status in ['completed_success', 'completed_failure']:
+            return Response(
+                {'detail': 'Completed PIPs cannot be cancelled.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reason = request.data.get('reason', '')
+
+        pip.status = 'cancelled'
+        pip.save()
+
+        # Record cancellation note
+        PIPProgressNote.objects.create(
+            pip=pip,
+            note_type='other',
+            content=f"PIP cancelled. Reason: {reason}" if reason else "PIP cancelled.",
+            author=request.user,
+        )
+
+        serializer = self.get_serializer(pip)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def summary(self, request, pk=None):
+        """Get comprehensive PIP summary."""
+        pip = self.get_object()
+
+        from .services import PIPService
+        result = PIPService.get_pip_summary(pip.id)
+
+        if not result.success:
+            return Response(
+                {'detail': result.message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(result.data)
+
+    @action(detail=False, methods=['get'])
+    def dashboard(self, request):
+        """Get manager's PIP dashboard."""
+        user = request.user
+
+        # Get PIPs for direct reports
+        try:
+            user_employee = user.employee_record
+            base_queryset = self.get_queryset().filter(
+                Q(employee__manager=user_employee) |
+                Q(initiated_by=user)
+            )
+        except Employee.DoesNotExist:
+            base_queryset = self.get_queryset().filter(initiated_by=user)
+
+        today = timezone.now().date()
+
+        # Active PIPs
+        active_pips = base_queryset.filter(status__in=['active', 'extended'])
+
+        # Overdue PIPs
+        overdue_pips = active_pips.filter(target_end_date__lt=today)
+
+        # Upcoming check-ins (next 7 days)
+        upcoming_check_ins = []
+        for pip in active_pips.filter(next_check_in__lte=today + timedelta(days=7)):
+            upcoming_check_ins.append({
+                'pip_id': pip.id,
+                'employee_name': pip.employee.full_name,
+                'next_check_in': pip.next_check_in,
+                'days_until': (pip.next_check_in - today).days if pip.next_check_in else None,
+            })
+
+        # Recently completed (last 30 days)
+        recently_completed = base_queryset.filter(
+            status__in=['completed_success', 'completed_failure'],
+            actual_end_date__gte=today - timedelta(days=30)
+        )
+
+        # Stats
+        stats = {
+            'total_active': active_pips.count(),
+            'overdue': overdue_pips.count(),
+            'completed_success': base_queryset.filter(status='completed_success').count(),
+            'completed_failure': base_queryset.filter(status='completed_failure').count(),
+        }
+
+        return Response({
+            'active_pips': PerformanceImprovementPlanListSerializer(active_pips, many=True).data,
+            'overdue_pips': PerformanceImprovementPlanListSerializer(overdue_pips, many=True).data,
+            'upcoming_check_ins': upcoming_check_ins,
+            'recently_completed': PerformanceImprovementPlanListSerializer(recently_completed, many=True).data,
+            'stats': stats,
+        })
+
+    @action(detail=False, methods=['get'])
+    def for_employee(self, request):
+        """Get PIPs for a specific employee."""
+        employee_id = request.query_params.get('employee_id')
+        if not employee_id:
+            return Response(
+                {'detail': 'employee_id is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        queryset = self.get_queryset().filter(employee_id=employee_id)
+        serializer = PerformanceImprovementPlanListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class PIPMilestoneViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for PIP milestones.
+    """
+    queryset = PIPMilestone.objects.select_related('pip', 'pip__employee')
+    serializer_class = PIPMilestoneSerializer
+    permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['pip', 'status']
+    ordering_fields = ['due_date', 'created_at']
+    ordering = ['due_date']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        if user.is_staff:
+            return queryset
+
+        try:
+            user_employee = user.employee_record
+            return queryset.filter(
+                Q(pip__employee__manager=user_employee) |
+                Q(pip__initiated_by=user)
+            )
+        except Employee.DoesNotExist:
+            return queryset.filter(pip__initiated_by=user)
+
+    @action(detail=True, methods=['post'])
+    def update_status(self, request, pk=None):
+        """Update milestone status."""
+        milestone = self.get_object()
+
+        serializer = PIPMilestoneUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        new_status = serializer.validated_data.get('status')
+        progress_notes = serializer.validated_data.get('progress_notes', '')
+
+        if new_status:
+            milestone.status = new_status
+            if new_status == 'achieved':
+                milestone.completed_date = timezone.now().date()
+
+        if progress_notes:
+            milestone.progress_notes = (milestone.progress_notes or '') + f"\n\n{timezone.now().strftime('%Y-%m-%d')}: {progress_notes}"
+
+        milestone.save()
+
+        # Create progress note
+        PIPProgressNote.objects.create(
+            pip=milestone.pip,
+            note_type='progress_update',
+            content=f"Milestone '{milestone.title}' updated to {new_status}. {progress_notes}".strip(),
+            author=request.user,
+        )
+
+        serializer = self.get_serializer(milestone)
+        return Response(serializer.data)
+
+
+class PIPProgressNoteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for PIP progress notes.
+    """
+    queryset = PIPProgressNote.objects.select_related(
+        'pip', 'pip__employee', 'author'
+    )
+    serializer_class = PIPProgressNoteSerializer
+    permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['pip', 'note_type']
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        if user.is_staff:
+            return queryset
+
+        try:
+            user_employee = user.employee_record
+            return queryset.filter(
+                Q(pip__employee__manager=user_employee) |
+                Q(pip__initiated_by=user) |
+                Q(author=user)
+            )
+        except Employee.DoesNotExist:
+            return queryset.filter(Q(pip__initiated_by=user) | Q(author=user))
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 

@@ -22,6 +22,130 @@ from django.db.models import Count, Sum
 logger = logging.getLogger(__name__)
 
 
+# ==================== STORAGE CALCULATION ====================
+
+def _calculate_storage_usage(tenant):
+    """
+    Calculate total storage used by a tenant across all file types.
+
+    Includes:
+    - User documents (resumes, cover letters)
+    - Employee documents (HR records, contracts)
+    - Job posting attachments
+    - Profile images and logos
+    - Message attachments
+    - Integration cached files
+
+    Args:
+        tenant: The Tenant object to calculate storage for
+
+    Returns:
+        int: Total bytes used by the tenant
+    """
+    import os
+    from django.db import connection
+    from django.conf import settings
+
+    total_bytes = 0
+
+    try:
+        # Use tenant schema context for accurate queries
+        with connection.cursor() as cursor:
+            # Query ats.Candidate resume files
+            try:
+                from ats.models import Candidate
+                candidates = Candidate.objects.filter(resume__isnull=False)
+                for candidate in candidates:
+                    if candidate.resume and hasattr(candidate.resume, 'size'):
+                        try:
+                            total_bytes += candidate.resume.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+            # Query hr_core.EmployeeDocument files
+            try:
+                from hr_core.models import EmployeeDocument
+                employee_docs = EmployeeDocument.objects.filter(file__isnull=False)
+                for doc in employee_docs:
+                    if doc.file and hasattr(doc.file, 'size'):
+                        try:
+                            total_bytes += doc.file.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+            # Query accounts user profile images
+            try:
+                from accounts.models import User
+                users = User.objects.filter(avatar__isnull=False).exclude(avatar='')
+                for user in users:
+                    if user.avatar and hasattr(user.avatar, 'size'):
+                        try:
+                            total_bytes += user.avatar.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+            # Query services.Contract attachments
+            try:
+                from services.models import Contract, ContractDocument
+                contract_docs = ContractDocument.objects.filter(file__isnull=False)
+                for doc in contract_docs:
+                    if doc.file and hasattr(doc.file, 'size'):
+                        try:
+                            total_bytes += doc.file.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+            # Query messages_sys.Message attachments
+            try:
+                from messages_sys.models import MessageAttachment
+                attachments = MessageAttachment.objects.filter(file__isnull=False)
+                for attachment in attachments:
+                    if attachment.file and hasattr(attachment.file, 'size'):
+                        try:
+                            total_bytes += attachment.file.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+            # Query blog images and media
+            try:
+                from blog.models import BlogPost
+                posts = BlogPost.objects.filter(featured_image__isnull=False)
+                for post in posts:
+                    if post.featured_image and hasattr(post.featured_image, 'size'):
+                        try:
+                            total_bytes += post.featured_image.size
+                        except (OSError, AttributeError):
+                            pass
+            except Exception:
+                pass
+
+        # Also check tenant-specific media folder if it exists
+        tenant_media_path = os.path.join(settings.MEDIA_ROOT, f'tenants/{tenant.schema_name}')
+        if os.path.exists(tenant_media_path):
+            for root, dirs, files in os.walk(tenant_media_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    try:
+                        total_bytes += os.path.getsize(file_path)
+                    except (OSError, IOError):
+                        pass
+
+    except Exception as e:
+        logger.warning(f"Error calculating storage for tenant {tenant.name}: {e}")
+
+    return total_bytes
+
+
 # ==================== USAGE LIMITS ====================
 
 @shared_task(
@@ -385,8 +509,8 @@ def calculate_tenant_usage(self):
                     status__in=['active', 'probation', 'on_leave']
                 ).count()
 
-                # Calculate storage usage (placeholder - implement actual calculation)
-                # usage.storage_used_bytes = calculate_storage_usage(tenant)
+                # Calculate storage usage
+                usage.storage_used_bytes = _calculate_storage_usage(tenant)
 
                 # Reset monthly counts if new month
                 if usage.month_reset_at and usage.month_reset_at.month != now.month:

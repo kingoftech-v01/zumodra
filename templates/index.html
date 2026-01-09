@@ -129,64 +129,63 @@
                 <h3 class="heading3">{% trans "Top Categories" %}</h3>
                 <p class="body2 text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
             </div>
-            <a href="{{ job_search_url|default:'#' }}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
+            <a href="{% url 'services:service_list' %}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
         </div>
-                <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
-                    <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 1">
-                        <div class="icon pb-4 w-fit line-before line-2px">
-                            <span class="icon-graphic text-5xl"></span>
-                        </div>
-                        <h6 class="heading6 mt-5">Graphic & Design</h6>
-                        <div class="list_category flex flex-col gap-2.5 mt-3">
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Logo Design</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Brand Identity Design</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Advertising Graphic Design</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Web Graphics Design</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Packaging Design</a>
-                        </div>
+        <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
+            {% if categories %}
+                {% for category in categories %}
+                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: {{ forloop.counter }}">
+                    <div class="icon pb-4 w-fit line-before line-2px">
+                        <span class="{{ category.icon|default:'ph ph-squares-four' }} text-5xl" {% if category.color %}style="color: {{ category.color }}"{% endif %}></span>
                     </div>
-                    <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 2">
-                        <div class="icon pb-4 w-fit line-before line-2px">
-                            <span class="icon-writing text-5xl"></span>
-                        </div>
-                        <h6 class="heading6 mt-5">Wrting</h6>
-                        <div class="list_category flex flex-col gap-2.5 mt-3">
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Content Writing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Blog Writing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Article Writing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Technical Writing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Editing and Proofreading</a>
-                        </div>
+                    <h6 class="heading6 mt-5">{{ category.name }}</h6>
+                    <p class="text-secondary text-sm mt-2">{{ category.description|truncatechars:80 }}</p>
+                    <div class="mt-3">
+                        <span class="text-primary text-sm font-medium">{{ category.service_count }} {% trans "services" %}</span>
                     </div>
-                    <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 3">
-                        <div class="icon pb-4 w-fit line-before line-2px">
-                            <span class="icon-video text-5xl"></span>
-                        </div>
-                        <h6 class="heading6 mt-5">Videos</h6>
-                        <div class="list_category flex flex-col gap-2.5 mt-3">
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Video Production</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Video Editing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Motion Graphics</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Product Demonstrations</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Video Marketing Strategy</a>
-                        </div>
+                    {% if category.subcategories.exists %}
+                    <div class="list_category flex flex-col gap-2.5 mt-3">
+                        {% for subcategory in category.subcategories.all|slice:":5" %}
+                        <a href="{% url 'services:service_list' %}?category={{ subcategory.id }}" class="inline-block w-fit line-before text-secondary hover:text-black">{{ subcategory.name }}</a>
+                        {% endfor %}
                     </div>
-                    <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 4">
-                        <div class="icon pb-4 w-fit line-before line-2px">
-                            <span class="icon-marketing text-5xl"></span>
-                        </div>
-                        <h6 class="heading6 mt-5">Digital Marketing</h6>
-                        <div class="list_category flex flex-col gap-2.5 mt-3">
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Social Media Marketing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Search Engine Optimization</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Pay-Per-Click Advertising</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Email Marketing</a>
-                            <a href="jobs-default.html" class="inline-block w-fit line-before text-secondary hover:text-black">Digital Advertising Campaigns</a>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
-            </div>
-        </section>
+                {% endfor %}
+            {% else %}
+                {% comment %} Fallback static categories when database is empty {% endcomment %}
+                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 1">
+                    <div class="icon pb-4 w-fit line-before line-2px">
+                        <span class="ph ph-paint-brush text-5xl text-primary"></span>
+                    </div>
+                    <h6 class="heading6 mt-5">{% trans "Graphic & Design" %}</h6>
+                    <p class="text-secondary text-sm mt-2">{% trans "Logo design, branding, illustrations and more" %}</p>
+                </div>
+                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 2">
+                    <div class="icon pb-4 w-fit line-before line-2px">
+                        <span class="ph ph-code text-5xl text-primary"></span>
+                    </div>
+                    <h6 class="heading6 mt-5">{% trans "Development" %}</h6>
+                    <p class="text-secondary text-sm mt-2">{% trans "Web, mobile, and software development" %}</p>
+                </div>
+                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 3">
+                    <div class="icon pb-4 w-fit line-before line-2px">
+                        <span class="ph ph-megaphone text-5xl text-primary"></span>
+                    </div>
+                    <h6 class="heading6 mt-5">{% trans "Digital Marketing" %}</h6>
+                    <p class="text-secondary text-sm mt-2">{% trans "SEO, social media, and advertising" %}</p>
+                </div>
+                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 4">
+                    <div class="icon pb-4 w-fit line-before line-2px">
+                        <span class="ph ph-pencil-line text-5xl text-primary"></span>
+                    </div>
+                    <h6 class="heading6 mt-5">{% trans "Writing & Translation" %}</h6>
+                    <p class="text-secondary text-sm mt-2">{% trans "Content writing, copywriting, and translation" %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
 
 {% comment %} FEATURED SERVICES SECTION {% endcomment %}
 <section class="feature_services lg:py-20 sm:py-14 py-10">
@@ -1192,23 +1191,23 @@
         <section class="counter lg:py-15 sm:py-12 py-8 bg-[#FAF7F1]">
             <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
                 <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-                    <h2 class="heading2 pb-1 text-center">2,5M+</h2>
-                    <span class="body1 text-center">Jobs Available</span>
+                    <h2 class="heading2 pb-1 text-center">{{ stats.total_services|default:"500" }}+</h2>
+                    <span class="body1 text-center">{% trans "Services Available" %}</span>
                 </div>
                 <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
                 <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-                    <h2 class="heading2 pb-1 text-center">177k+</h2>
-                    <span class="body1 text-center">New Jobs This Week!</span>
+                    <h2 class="heading2 pb-1 text-center">{{ stats.total_categories|default:"50" }}+</h2>
+                    <span class="body1 text-center">{% trans "Categories" %}</span>
                 </div>
                 <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
                 <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-                    <h2 class="heading2 pb-1 text-center">298k+</h2>
-                    <span class="body1 text-center">Companies Hiring</span>
+                    <h2 class="heading2 pb-1 text-center">{{ stats.total_users|default:"1000" }}+</h2>
+                    <span class="body1 text-center">{% trans "Active Users" %}</span>
                 </div>
                 <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
                 <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-                    <h2 class="heading2 pb-1 text-center">5M+</h2>
-                    <span class="body1 text-center">Total Freelancers</span>
+                    <h2 class="heading2 pb-1 text-center">{{ stats.total_providers|default:"200" }}+</h2>
+                    <span class="body1 text-center">{% trans "Verified Providers" %}</span>
                 </div>
             </div>
         </section>

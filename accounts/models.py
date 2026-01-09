@@ -1594,10 +1594,53 @@ class CandidateCV(models.Model):
         self.save()
 
     def calculate_interview_rate(self):
-        """Calculate interview rate based on applications."""
-        # This would query related applications
-        # Placeholder for actual implementation
-        pass
+        """
+        Calculate interview rate based on applications using this CV.
+
+        Returns the percentage of applications that led to at least one interview.
+        The rate is stored on the interview_rate field and also returned.
+        """
+        from decimal import Decimal
+
+        # If no applications recorded, rate is 0
+        if self.applications_count == 0:
+            self.interview_rate = Decimal('0.00')
+            self.save(update_fields=['interview_rate'])
+            return self.interview_rate
+
+        # Query applications for this user that may have used this CV
+        # Applications that have reached interview stage have interviews
+        try:
+            from ats.models import Application, Interview
+
+            # Get applications for this user (could be associated with any CV)
+            user_applications = Application.objects.filter(
+                candidate__user=self.user
+            )
+
+            # Count applications that have at least one interview
+            applications_with_interviews = user_applications.filter(
+                interviews__isnull=False
+            ).distinct().count()
+
+            total_applications = user_applications.count()
+
+            if total_applications == 0:
+                # Use stored applications count as fallback
+                self.interview_rate = Decimal('0.00')
+            else:
+                # Calculate percentage: (interviews / total) * 100
+                rate = (Decimal(applications_with_interviews) / Decimal(total_applications)) * 100
+                self.interview_rate = rate.quantize(Decimal('0.01'))
+
+            self.save(update_fields=['interview_rate'])
+            return self.interview_rate
+
+        except ImportError:
+            # ATS module not available
+            self.interview_rate = Decimal('0.00')
+            self.save(update_fields=['interview_rate'])
+            return self.interview_rate
 
     @classmethod
     def get_best_match_for_job(cls, user, job_description: str, job_keywords: list = None):

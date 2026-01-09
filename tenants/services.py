@@ -429,6 +429,8 @@ class InvitationService:
         Returns:
             Accepted invitation or None if invalid
         """
+        from accounts.models import TenantUser
+
         invitation = TenantInvitation.objects.filter(
             token=token,
             status=TenantInvitation.InvitationStatus.PENDING
@@ -445,8 +447,46 @@ class InvitationService:
         # Mark invitation as accepted
         invitation.accept(user)
 
-        # Add user to tenant (implementation depends on accounts app)
-        # TenantUser.objects.create(tenant=invitation.tenant, user=user, role=invitation.role)
+        # Add user to tenant with assigned role
+        # Map invitation role to TenantUser role
+        role_mapping = {
+            'owner': TenantUser.UserRole.OWNER,
+            'admin': TenantUser.UserRole.ADMIN,
+            'hr_manager': TenantUser.UserRole.HR_MANAGER,
+            'recruiter': TenantUser.UserRole.RECRUITER,
+            'hiring_manager': TenantUser.UserRole.HIRING_MANAGER,
+            'employee': TenantUser.UserRole.EMPLOYEE,
+            'viewer': TenantUser.UserRole.VIEWER,
+        }
+        tenant_role = role_mapping.get(invitation.role, TenantUser.UserRole.EMPLOYEE)
+
+        # Create or update TenantUser membership
+        tenant_user, created = TenantUser.objects.update_or_create(
+            tenant=invitation.tenant,
+            user=user,
+            defaults={
+                'role': tenant_role,
+                'is_active': True,
+                'is_primary_tenant': not user.tenant_memberships.filter(is_primary_tenant=True).exists(),
+            }
+        )
+
+        # Update tenant's user count in usage tracking
+        try:
+            usage = TenantUsage.objects.filter(tenant=invitation.tenant).first()
+            if usage:
+                usage.user_count = invitation.tenant.members.filter(is_active=True).count()
+                usage.save(update_fields=['user_count'])
+        except Exception:
+            pass
+
+        # Log the acceptance
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(
+            f"User {user.email} accepted invitation to tenant {invitation.tenant.name} "
+            f"with role {tenant_role}"
+        )
 
         return invitation
 

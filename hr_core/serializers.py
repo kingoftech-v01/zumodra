@@ -22,7 +22,9 @@ from .models import (
     # New models
     EmployeeCompensation, TimeOffBalance, TimeOffAccrualLog,
     TimeOffBlackoutDate, SkillCategory, Skill, EmployeeSkill,
-    Certification, EmployeeActivityLog, EmployeeGoal
+    Certification, EmployeeActivityLog, EmployeeGoal,
+    # PIP models
+    PerformanceImprovementPlan, PIPMilestone, PIPProgressNote,
 )
 from custom_account_u.models import CustomUser
 from configurations.models import Department
@@ -1428,3 +1430,305 @@ class EmployeeExtendedDetailSerializer(EmployeeDetailSerializer):
             # Compensation
             'compensation_history',
         ]
+
+
+# ==================== PIP (PERFORMANCE IMPROVEMENT PLAN) SERIALIZERS ====================
+
+class PIPMilestoneSerializer(serializers.ModelSerializer):
+    """Serializer for PIP milestones/goals"""
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    is_overdue = serializers.SerializerMethodField()
+    days_until_due = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PIPMilestone
+        fields = [
+            'id', 'pip', 'title', 'description',
+            'success_criteria', 'due_date', 'weight',
+            'status', 'status_display', 'progress_notes',
+            'completed_date', 'is_overdue', 'days_until_due',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'completed_date', 'created_at', 'updated_at']
+
+    def get_is_overdue(self, obj):
+        if obj.status in ['achieved', 'deferred'] or not obj.due_date:
+            return False
+        return timezone.now().date() > obj.due_date
+
+    def get_days_until_due(self, obj):
+        if not obj.due_date:
+            return None
+        delta = (obj.due_date - timezone.now().date()).days
+        return delta
+
+
+class PIPMilestoneCreateSerializer(serializers.Serializer):
+    """Serializer for creating milestones during PIP creation"""
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField(required=False, allow_blank=True)
+    success_criteria = serializers.CharField()
+    due_date = serializers.DateField(required=False, allow_null=True)
+    weight = serializers.DecimalField(
+        max_digits=4, decimal_places=2, default=1.0,
+        min_value=Decimal('0.1'), max_value=Decimal('10.0')
+    )
+
+
+class PIPProgressNoteSerializer(serializers.ModelSerializer):
+    """Serializer for PIP progress notes and check-ins"""
+    author = UserMinimalSerializer(read_only=True)
+    note_type_display = serializers.CharField(source='get_note_type_display', read_only=True)
+
+    class Meta:
+        model = PIPProgressNote
+        fields = [
+            'id', 'pip', 'note_type', 'note_type_display',
+            'content', 'meeting_date', 'attendees', 'action_items',
+            'employee_response', 'employee_responded_at',
+            'attachments', 'author', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'author', 'created_at', 'updated_at']
+
+
+class PIPProgressNoteCreateSerializer(serializers.Serializer):
+    """Serializer for creating progress notes"""
+    note_type = serializers.ChoiceField(choices=[
+        ('check_in', 'Check-in Meeting'),
+        ('progress_update', 'Progress Update'),
+        ('concern', 'Concern Raised'),
+        ('achievement', 'Achievement'),
+        ('extension', 'Extension'),
+        ('formal_warning', 'Formal Warning'),
+        ('other', 'Other'),
+    ])
+    content = serializers.CharField()
+    meeting_date = serializers.DateField(required=False, allow_null=True)
+    attendees = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+    action_items = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+
+
+class PerformanceImprovementPlanListSerializer(serializers.ModelSerializer):
+    """Compact serializer for listing PIPs"""
+    employee = EmployeeMinimalSerializer(read_only=True)
+    initiated_by = UserMinimalSerializer(read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    outcome_display = serializers.CharField(source='get_outcome_display', read_only=True)
+    milestones_count = serializers.SerializerMethodField()
+    progress_percentage = serializers.SerializerMethodField()
+    days_remaining = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PerformanceImprovementPlan
+        fields = [
+            'id', 'uuid', 'employee', 'status', 'status_display',
+            'outcome', 'outcome_display', 'start_date', 'target_end_date',
+            'next_check_in', 'initiated_by', 'milestones_count',
+            'progress_percentage', 'days_remaining', 'created_at'
+        ]
+        read_only_fields = fields
+
+    def get_milestones_count(self, obj):
+        return obj.milestones.count()
+
+    def get_progress_percentage(self, obj):
+        total = obj.milestones.count()
+        if total == 0:
+            return 0
+        completed = obj.milestones.filter(status='completed').count()
+        return int((completed / total) * 100)
+
+    def get_days_remaining(self, obj):
+        if not obj.target_end_date:
+            return None
+        delta = (obj.target_end_date - timezone.now().date()).days
+        return max(0, delta)
+
+
+class PerformanceImprovementPlanSerializer(serializers.ModelSerializer):
+    """
+    Full serializer for Performance Improvement Plans.
+    Includes milestones and progress notes.
+    """
+    employee = EmployeeMinimalSerializer(read_only=True)
+    employee_id = serializers.PrimaryKeyRelatedField(
+        queryset=Employee.objects.all(),
+        source='employee',
+        write_only=True
+    )
+    initiated_by = UserMinimalSerializer(read_only=True)
+    hr_representative = UserMinimalSerializer(read_only=True)
+    milestones = PIPMilestoneSerializer(many=True, read_only=True)
+    progress_notes = PIPProgressNoteSerializer(many=True, read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    outcome_display = serializers.CharField(source='get_outcome_display', read_only=True)
+
+    # Computed fields
+    progress_percentage = serializers.SerializerMethodField()
+    days_remaining = serializers.SerializerMethodField()
+    is_overdue = serializers.SerializerMethodField()
+    can_activate = serializers.SerializerMethodField()
+    can_extend = serializers.SerializerMethodField()
+    can_complete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PerformanceImprovementPlan
+        fields = [
+            'id', 'uuid', 'employee', 'employee_id', 'initiated_by', 'hr_representative',
+            # Details
+            'reason', 'performance_concerns', 'goals', 'support_provided', 'expectations',
+            # Timeline
+            'start_date', 'target_end_date', 'actual_end_date',
+            'check_in_frequency_days', 'next_check_in',
+            # Status
+            'status', 'status_display', 'outcome', 'outcome_display', 'final_rating',
+            # Completion
+            'final_assessment',
+            # Signatures
+            'employee_acknowledged_at', 'manager_signed_at', 'hr_signed_at',
+            # Related
+            'milestones', 'progress_notes',
+            # Computed
+            'progress_percentage', 'days_remaining', 'is_overdue',
+            'can_activate', 'can_extend', 'can_complete',
+            # Timestamps
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = [
+            'id', 'uuid', 'initiated_by', 'hr_representative',
+            'actual_end_date', 'created_at', 'updated_at'
+        ]
+
+    def get_progress_percentage(self, obj):
+        total = obj.milestones.count()
+        if total == 0:
+            return 0
+        achieved = obj.milestones.filter(status='achieved').count()
+        return int((achieved / total) * 100)
+
+    def get_days_remaining(self, obj):
+        if not obj.target_end_date:
+            return None
+        delta = (obj.target_end_date - timezone.now().date()).days
+        return max(0, delta)
+
+    def get_is_overdue(self, obj):
+        if obj.status in ['completed_success', 'completed_fail', 'terminated', 'cancelled']:
+            return False
+        if not obj.target_end_date:
+            return False
+        return timezone.now().date() > obj.target_end_date
+
+    def get_can_activate(self, obj):
+        return obj.status == 'draft'
+
+    def get_can_extend(self, obj):
+        return obj.status in ['active', 'extended']
+
+    def get_can_complete(self, obj):
+        return obj.status in ['active', 'extended']
+
+    def validate(self, data):
+        """Validate PIP data"""
+        start_date = data.get('start_date')
+        target_end_date = data.get('target_end_date')
+
+        if start_date and target_end_date:
+            if target_end_date <= start_date:
+                raise serializers.ValidationError({
+                    'target_end_date': 'Target end date must be after start date.'
+                })
+
+        return data
+
+
+class PIPCreateSerializer(serializers.Serializer):
+    """Serializer for creating a new PIP with milestones"""
+    employee_id = serializers.PrimaryKeyRelatedField(
+        queryset=Employee.objects.all()
+    )
+    reason = serializers.CharField()
+    performance_concerns = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        default=list
+    )
+    support_provided = serializers.CharField(required=False, allow_blank=True, default='')
+    expectations = serializers.CharField(required=False, allow_blank=True, default='')
+    start_date = serializers.DateField()
+    duration_days = serializers.IntegerField(min_value=14, max_value=365)
+    check_in_frequency_days = serializers.IntegerField(
+        min_value=1, max_value=30, default=7
+    )
+    goals = PIPMilestoneCreateSerializer(many=True, required=False, default=list)
+
+
+class PIPActivateSerializer(serializers.Serializer):
+    """Serializer for activating a PIP"""
+    send_notification = serializers.BooleanField(default=True)
+    notification_message = serializers.CharField(required=False, allow_blank=True)
+
+
+class PIPExtendSerializer(serializers.Serializer):
+    """Serializer for extending a PIP"""
+    additional_days = serializers.IntegerField(min_value=7, max_value=90)
+    reason = serializers.CharField()
+
+
+class PIPCompleteSerializer(serializers.Serializer):
+    """Serializer for completing a PIP"""
+    outcome = serializers.ChoiceField(choices=[
+        ('improved', 'Improved - Goals Met'),
+        ('terminated', 'Terminated - Goals Not Met'),
+        ('resigned', 'Employee Resigned'),
+    ])
+    final_assessment = serializers.CharField()
+    final_rating = serializers.IntegerField(
+        required=False, allow_null=True, min_value=1, max_value=5
+    )
+
+
+class PIPCheckInSerializer(serializers.Serializer):
+    """Serializer for recording a PIP check-in"""
+    content = serializers.CharField()
+    meeting_date = serializers.DateField(required=False, allow_null=True)
+    attendees = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+    action_items = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+    milestone_updates = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+        default=list
+    )
+
+
+class PIPMilestoneUpdateSerializer(serializers.Serializer):
+    """Serializer for updating milestone progress"""
+    milestone_id = serializers.IntegerField()
+    status = serializers.ChoiceField(
+        choices=['pending', 'in_progress', 'completed', 'missed'],
+        required=False
+    )
+    progress_notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class PIPSummarySerializer(serializers.Serializer):
+    """Serializer for PIP summary data"""
+    pip = PerformanceImprovementPlanListSerializer()
+    total_milestones = serializers.IntegerField()
+    completed_milestones = serializers.IntegerField()
+    missed_milestones = serializers.IntegerField()
+    in_progress_milestones = serializers.IntegerField()
+    total_check_ins = serializers.IntegerField()
+    average_rating = serializers.FloatField(allow_null=True)
+    last_check_in_date = serializers.DateTimeField(allow_null=True)
+    days_in_pip = serializers.IntegerField()
+    days_remaining = serializers.IntegerField(allow_null=True)
+
+
+class ManagerPIPDashboardSerializer(serializers.Serializer):
+    """Serializer for manager's PIP dashboard"""
+    active_pips = PerformanceImprovementPlanListSerializer(many=True)
+    overdue_pips = PerformanceImprovementPlanListSerializer(many=True)
+    upcoming_check_ins = serializers.ListField(child=serializers.DictField())
+    recently_completed = PerformanceImprovementPlanListSerializer(many=True)
+    stats = serializers.DictField()

@@ -27,7 +27,7 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import CareerPage, JobListing, PublicApplication
+from .models import CareerPage, CareerSite, JobListing, PublicApplication, JobAlert
 from .serializers import (
     PublicCareerSiteSerializer,
     PublicJobListSerializer,
@@ -576,14 +576,108 @@ class JobAlertSubscribeView(CareerSiteContextMixin, FormView):
         return form
 
     def form_valid(self, form):
-        """Handle subscription."""
-        # TODO: Create JobAlertSubscription model and save
-        # For now, just show success message
+        """Handle job alert subscription."""
+        # Get or create the career site for this tenant
+        career_site = CareerSite.objects.first()
+        if not career_site:
+            # Create a default career site if none exists
+            career_site = CareerSite.objects.create(
+                subdomain='default',
+                company_name='Company',
+            )
+
+        email = form.cleaned_data['email']
+
+        # Check if subscription already exists
+        existing = JobAlert.objects.filter(
+            career_site=career_site,
+            email=email
+        ).first()
+
+        if existing:
+            if existing.status == JobAlert.AlertStatus.UNSUBSCRIBED:
+                # Reactivate the subscription
+                existing.status = JobAlert.AlertStatus.PENDING
+                existing.departments = form.cleaned_data.get('departments', [])
+                existing.job_types = form.cleaned_data.get('job_types', [])
+                existing.remote_only = form.cleaned_data.get('remote_only', False)
+                existing.frequency = form.cleaned_data.get('frequency', 'weekly')
+                existing.save()
+                messages.success(
+                    self.request,
+                    _("Your subscription has been reactivated. Please check your email to confirm.")
+                )
+            else:
+                messages.info(
+                    self.request,
+                    _("You are already subscribed to job alerts.")
+                )
+            return redirect('careers:template:alert-confirmed')
+
+        # Create new job alert subscription
+        job_alert = JobAlert.objects.create(
+            career_site=career_site,
+            email=email,
+            departments=form.cleaned_data.get('departments', []),
+            job_types=form.cleaned_data.get('job_types', []),
+            remote_only=form.cleaned_data.get('remote_only', False),
+            frequency=form.cleaned_data.get('frequency', 'weekly'),
+            ip_address=self.get_client_ip(),
+            status=JobAlert.AlertStatus.PENDING,
+        )
+
+        # Send confirmation email
+        self.send_confirmation_email(job_alert)
+
         messages.success(
             self.request,
             _("You have been subscribed to job alerts. Please check your email to confirm.")
         )
         return redirect('careers:template:alert-confirmed')
+
+    def get_client_ip(self):
+        """Get client IP address from request."""
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = self.request.META.get('REMOTE_ADDR')
+        return ip
+
+    def send_confirmation_email(self, job_alert):
+        """Send confirmation email to subscriber."""
+        try:
+            from django.core.mail import send_mail
+            from django.template.loader import render_to_string
+            from django.conf import settings
+
+            # Build confirmation URL
+            confirm_url = self.request.build_absolute_uri(
+                reverse('careers:template:alert-confirm', kwargs={
+                    'token': str(job_alert.confirmation_token)
+                })
+            )
+
+            subject = _("Confirm your job alert subscription")
+            message = render_to_string('careers/emails/confirm_subscription.txt', {
+                'job_alert': job_alert,
+                'confirm_url': confirm_url,
+            })
+            html_message = render_to_string('careers/emails/confirm_subscription.html', {
+                'job_alert': job_alert,
+                'confirm_url': confirm_url,
+            })
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[job_alert.email],
+                html_message=html_message,
+                fail_silently=True,
+            )
+        except Exception as e:
+            logger.error(f"Failed to send confirmation email: {e}")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -599,6 +693,71 @@ class JobAlertConfirmedView(CareerSiteContextMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['meta_title'] = _('Subscription Confirmed')
         return context
+
+
+class JobAlertConfirmTokenView(View):
+    """Handle email confirmation token for job alerts."""
+
+    def get(self, request, token):
+        """Confirm the subscription using the token."""
+        try:
+            job_alert = JobAlert.objects.get(confirmation_token=token)
+
+            if job_alert.status == JobAlert.AlertStatus.PENDING:
+                job_alert.confirm()
+                messages.success(
+                    request,
+                    _("Your job alert subscription has been confirmed! You will now receive alerts for new jobs.")
+                )
+            elif job_alert.status == JobAlert.AlertStatus.ACTIVE:
+                messages.info(
+                    request,
+                    _("Your subscription was already confirmed.")
+                )
+            else:
+                messages.warning(
+                    request,
+                    _("This subscription is no longer active.")
+                )
+
+            return redirect('careers:template:alert-confirmed')
+
+        except JobAlert.DoesNotExist:
+            messages.error(
+                request,
+                _("Invalid confirmation link. Please try subscribing again.")
+            )
+            return redirect('careers:template:subscribe')
+
+
+class JobAlertUnsubscribeTokenView(View):
+    """Handle unsubscribe token for job alerts."""
+
+    def get(self, request, token):
+        """Unsubscribe using the token."""
+        try:
+            job_alert = JobAlert.objects.get(unsubscribe_token=token)
+
+            if job_alert.status != JobAlert.AlertStatus.UNSUBSCRIBED:
+                job_alert.unsubscribe()
+                messages.success(
+                    request,
+                    _("You have been unsubscribed from job alerts.")
+                )
+            else:
+                messages.info(
+                    request,
+                    _("You were already unsubscribed.")
+                )
+
+            return redirect('careers:template:alert-unsubscribed')
+
+        except JobAlert.DoesNotExist:
+            messages.error(
+                request,
+                _("Invalid unsubscribe link.")
+            )
+            return redirect('careers:template:home')
 
 
 class JobAlertUnsubscribedView(CareerSiteContextMixin, TemplateView):

@@ -108,6 +108,14 @@ twilio>=8.0.0
 openai>=1.0.0
 
 # -----------------------------------------------------------------------------
+# AI Matching (Resume Parsing & Embeddings)
+# -----------------------------------------------------------------------------
+sentence-transformers>=2.2.0  # Local embedding fallback
+pdfplumber>=0.9.0  # PDF resume parsing
+python-docx>=0.8.11  # DOCX resume parsing
+PyPDF2>=3.0.0  # PDF parsing fallback
+
+# -----------------------------------------------------------------------------
 # AWS S3 Storage
 # -----------------------------------------------------------------------------
 boto3>=1.28.0
@@ -263,6 +271,8 @@ frozenlist==1.8.0
 multidict==6.7.0
 yarl==1.22.0
 propcache==0.4.1
+httpx[http2]>=0.27.0  # HTTP/2 client for APNS push notifications
+h2>=4.0.0  # HTTP/2 protocol support
 
 # -----------------------------------------------------------------------------
 # CLI & Terminal

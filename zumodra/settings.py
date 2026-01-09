@@ -1138,6 +1138,43 @@ TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4')
 
+# AI Matching / Embedding Configuration
+OPENAI_EMBEDDING_MODEL = env('OPENAI_EMBEDDING_MODEL', default='text-embedding-ada-002')
+OPENAI_EMBEDDING_DIMENSION = 1536  # ada-002 produces 1536-dimensional vectors
+
+# Fallback to local sentence-transformers model when OpenAI is unavailable
+AI_MATCHING_FALLBACK_MODEL = env('AI_MATCHING_FALLBACK_MODEL', default='all-MiniLM-L6-v2')
+AI_MATCHING_FALLBACK_DIMENSION = 384  # MiniLM produces 384-dimensional vectors
+
+# AI Matching cache settings
+AI_MATCHING_CACHE_TTL = 86400 * 7  # 7 days for embedding cache
+
+# ==================== LINKEDIN INTEGRATION ====================
+
+LINKEDIN_CLIENT_ID = env('LINKEDIN_CLIENT_ID', default='')
+LINKEDIN_CLIENT_SECRET = env('LINKEDIN_CLIENT_SECRET', default='')
+LINKEDIN_ORGANIZATION_ID = env('LINKEDIN_ORGANIZATION_ID', default='')
+LINKEDIN_JOBS_API_BASE = 'https://api.linkedin.com/v2'
+LINKEDIN_OAUTH_URL = 'https://www.linkedin.com/oauth/v2'
+
+# ==================== INDEED INTEGRATION ====================
+
+INDEED_PUBLISHER_ID = env('INDEED_PUBLISHER_ID', default='')
+INDEED_API_TOKEN = env('INDEED_API_TOKEN', default='')
+INDEED_GRAPHQL_ENDPOINT = 'https://apis.indeed.com/graphql'
+INDEED_XML_FEED_ENDPOINT = 'https://www.indeed.com/publisher'
+
+# ==================== APPLE PUSH NOTIFICATIONS (APNS) ====================
+
+APNS_USE_SANDBOX = env.bool('APNS_USE_SANDBOX', default=True)  # True for development
+APNS_KEY_ID = env('APNS_KEY_ID', default='')
+APNS_TEAM_ID = env('APNS_TEAM_ID', default='')
+APNS_AUTH_KEY_PATH = env('APNS_AUTH_KEY_PATH', default='')  # Path to .p8 file
+APNS_BUNDLE_ID = env('APNS_BUNDLE_ID', default='com.zumodra.app')
+# Alternative: Certificate-based auth
+APNS_CERT_PATH = env('APNS_CERT_PATH', default='')
+APNS_CERT_PASSWORD = env('APNS_CERT_PASSWORD', default='')
+
 # ==================== TENANT CONFIGURATION ====================
 
 # Public schema URL routing

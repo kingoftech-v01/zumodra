@@ -72,7 +72,9 @@ from .template_views import (
     ApplicationPageView,
     ApplicationSuccessView,
     JobAlertSubscribeView,
+    JobAlertConfirmTokenView,
     JobAlertConfirmedView,
+    JobAlertUnsubscribeTokenView,
     JobAlertUnsubscribedView,
     CareersSitemapView,
     RobotsTxtView,
@@ -142,8 +144,10 @@ template_patterns = [
     path('application/<uuid:uuid>/success/', ApplicationSuccessView.as_view(), name='application-success'),
 
     # Job alerts
-    path('alerts/', JobAlertSubscribeView.as_view(), name='alert-subscribe'),
+    path('alerts/', JobAlertSubscribeView.as_view(), name='subscribe'),
+    path('alerts/confirm/<uuid:token>/', JobAlertConfirmTokenView.as_view(), name='alert-confirm'),
     path('alerts/confirmed/', JobAlertConfirmedView.as_view(), name='alert-confirmed'),
+    path('alerts/unsubscribe/<uuid:token>/', JobAlertUnsubscribeTokenView.as_view(), name='alert-unsubscribe'),
     path('alerts/unsubscribed/', JobAlertUnsubscribedView.as_view(), name='alert-unsubscribed'),
 
     # SEO

@@ -13,7 +13,9 @@ from .models import (
     # New models
     EmployeeCompensation, TimeOffBalance, TimeOffAccrualLog,
     TimeOffBlackoutDate, SkillCategory, Skill, EmployeeSkill,
-    Certification, EmployeeActivityLog, EmployeeGoal
+    Certification, EmployeeActivityLog, EmployeeGoal,
+    # PIP models
+    PerformanceImprovementPlan, PIPMilestone, PIPProgressNote,
 )
 
 
@@ -523,3 +525,243 @@ class EmployeeGoalAdmin(admin.ModelAdmin):
             pct, color, pct
         )
     progress_bar.short_description = 'Progress'
+
+
+# ==================== PIP (PERFORMANCE IMPROVEMENT PLAN) ADMIN ====================
+
+class PIPMilestoneInline(admin.TabularInline):
+    model = PIPMilestone
+    extra = 0
+    fields = ['title', 'description', 'due_date', 'status', 'weight']
+    readonly_fields = ['completed_date']
+
+
+class PIPProgressNoteInline(admin.TabularInline):
+    model = PIPProgressNote
+    extra = 0
+    fields = ['note_type', 'content', 'author', 'created_at']
+    readonly_fields = ['created_at', 'author']
+    ordering = ['-created_at']
+
+
+@admin.register(PerformanceImprovementPlan)
+class PerformanceImprovementPlanAdmin(admin.ModelAdmin):
+    list_display = [
+        'employee', 'status_badge', 'outcome_badge', 'start_date',
+        'target_end_date', 'progress_display', 'next_check_in', 'initiated_by'
+    ]
+    list_filter = ['status', 'outcome', 'start_date', 'target_end_date']
+    search_fields = [
+        'employee__first_name', 'employee__last_name',
+        'employee__user__email', 'employee__employee_id',
+        'reason', 'final_assessment'
+    ]
+    readonly_fields = [
+        'uuid', 'created_at', 'updated_at', 'actual_end_date'
+    ]
+    raw_id_fields = ['employee', 'initiated_by', 'hr_representative']
+    date_hierarchy = 'start_date'
+    inlines = [PIPMilestoneInline, PIPProgressNoteInline]
+
+    fieldsets = (
+        ('Employee Information', {
+            'fields': ('employee', 'initiated_by', 'hr_representative')
+        }),
+        ('PIP Details', {
+            'fields': ('reason', 'performance_concerns', 'goals', 'support_provided', 'expectations')
+        }),
+        ('Timeline', {
+            'fields': (
+                'start_date', 'target_end_date', 'actual_end_date',
+                'check_in_frequency_days', 'next_check_in'
+            )
+        }),
+        ('Status', {
+            'fields': ('status', 'outcome', 'final_rating')
+        }),
+        ('Completion', {
+            'fields': ('final_assessment',),
+            'classes': ('collapse',)
+        }),
+        ('Signatures', {
+            'fields': ('employee_acknowledged_at', 'manager_signed_at', 'hr_signed_at'),
+            'classes': ('collapse',)
+        }),
+        ('Metadata', {
+            'fields': ('uuid', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def status_badge(self, obj):
+        colors = {
+            'draft': '#6b7280',
+            'active': '#3b82f6',
+            'extended': '#f59e0b',
+            'completed_success': '#10b981',
+            'completed_failure': '#ef4444',
+            'cancelled': '#9ca3af',
+        }
+        color = colors.get(obj.status, '#6b7280')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+
+    def outcome_badge(self, obj):
+        if not obj.outcome:
+            return '-'
+        colors = {
+            'improved': '#10b981',
+            'extended': '#f59e0b',
+            'terminated': '#ef4444',
+            'resigned': '#9ca3af',
+        }
+        color = colors.get(obj.outcome, '#6b7280')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_outcome_display()
+        )
+    outcome_badge.short_description = 'Outcome'
+
+    def progress_display(self, obj):
+        total = obj.milestones.count()
+        if total == 0:
+            return '-'
+        completed = obj.milestones.filter(status='completed').count()
+        pct = int((completed / total) * 100)
+        if pct >= 100:
+            color = '#10b981'
+        elif pct >= 50:
+            color = '#f59e0b'
+        else:
+            color = '#ef4444'
+        return format_html(
+            '<div style="width: 80px; background: #e5e7eb; border-radius: 4px;">'
+            '<div style="width: {}%; background: {}; height: 8px; border-radius: 4px;"></div>'
+            '</div> {}/{}',
+            pct, color, completed, total
+        )
+    progress_display.short_description = 'Progress'
+
+
+@admin.register(PIPMilestone)
+class PIPMilestoneAdmin(admin.ModelAdmin):
+    list_display = [
+        'title', 'pip_employee', 'status_badge', 'due_date',
+        'weight', 'completed_date'
+    ]
+    list_filter = ['status', 'due_date']
+    search_fields = [
+        'title', 'description',
+        'pip__employee__first_name', 'pip__employee__last_name'
+    ]
+    readonly_fields = ['created_at', 'updated_at', 'completed_date']
+    raw_id_fields = ['pip']
+    date_hierarchy = 'due_date'
+
+    fieldsets = (
+        ('Milestone', {
+            'fields': ('pip', 'title', 'description')
+        }),
+        ('Success Criteria', {
+            'fields': ('success_criteria', 'weight')
+        }),
+        ('Timeline', {
+            'fields': ('due_date', 'completed_date')
+        }),
+        ('Status', {
+            'fields': ('status', 'progress_notes')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def pip_employee(self, obj):
+        return obj.pip.employee
+    pip_employee.short_description = 'Employee'
+
+    def status_badge(self, obj):
+        colors = {
+            'pending': '#6b7280',
+            'in_progress': '#3b82f6',
+            'completed': '#10b981',
+            'missed': '#ef4444',
+        }
+        color = colors.get(obj.status, '#6b7280')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+
+
+@admin.register(PIPProgressNote)
+class PIPProgressNoteAdmin(admin.ModelAdmin):
+    list_display = [
+        'pip_employee', 'note_type_badge', 'content_preview',
+        'author', 'created_at'
+    ]
+    list_filter = ['note_type', 'created_at']
+    search_fields = [
+        'content', 'pip__employee__first_name',
+        'pip__employee__last_name', 'author__email'
+    ]
+    readonly_fields = ['created_at', 'updated_at']
+    raw_id_fields = ['pip', 'author']
+    date_hierarchy = 'created_at'
+
+    fieldsets = (
+        ('Note Details', {
+            'fields': ('pip', 'note_type', 'content')
+        }),
+        ('Meeting Details', {
+            'fields': ('meeting_date', 'attendees', 'action_items')
+        }),
+        ('Employee Response', {
+            'fields': ('employee_response', 'employee_responded_at'),
+            'classes': ('collapse',)
+        }),
+        ('Attachments', {
+            'fields': ('attachments',),
+            'classes': ('collapse',)
+        }),
+        ('Metadata', {
+            'fields': ('author', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def pip_employee(self, obj):
+        return obj.pip.employee
+    pip_employee.short_description = 'Employee'
+
+    def note_type_badge(self, obj):
+        colors = {
+            'check_in': '#3b82f6',
+            'milestone_update': '#8b5cf6',
+            'manager_feedback': '#f59e0b',
+            'employee_response': '#10b981',
+            'hr_note': '#ec4899',
+            'extension_note': '#6366f1',
+            'final_assessment': '#ef4444',
+        }
+        color = colors.get(obj.note_type, '#6b7280')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_note_type_display()
+        )
+    note_type_badge.short_description = 'Type'
+
+    def content_preview(self, obj):
+        if len(obj.content) > 60:
+            return obj.content[:60] + '...'
+        return obj.content
+    content_preview.short_description = 'Content'

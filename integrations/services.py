@@ -32,6 +32,7 @@ from .models import (
     WebhookEndpoint,
     WebhookDelivery,
 )
+from .providers.job_boards import LinkedInProvider, IndeedProvider
 
 logger = logging.getLogger(__name__)
 
@@ -846,9 +847,92 @@ class CalendarIntegrationService(BaseIntegrationService):
         return False
 
     def _revoke_token(self):
-        """Revoke OAuth tokens."""
-        # Google and Microsoft have different revocation endpoints
-        pass
+        """
+        Revoke OAuth tokens for Google and Microsoft.
+
+        Google: POST to https://oauth2.googleapis.com/revoke
+        Microsoft: Clear tokens (Microsoft doesn't have a revocation endpoint)
+
+        Returns:
+            bool: True if revocation was successful, False otherwise
+        """
+        import requests
+
+        provider = self.integration.provider
+
+        if provider == 'google_calendar':
+            return self._revoke_google_token()
+        elif provider == 'outlook_calendar':
+            return self._revoke_microsoft_token()
+        else:
+            self.log_event('token_revocation_skipped', f'Unsupported provider: {provider}')
+            return True  # Nothing to revoke
+
+    def _revoke_google_token(self):
+        """Revoke Google OAuth token."""
+        import requests
+
+        try:
+            access_token = self.credentials.access_token if self.credentials else None
+            if not access_token:
+                return True  # Nothing to revoke
+
+            # Google token revocation endpoint
+            revoke_url = 'https://oauth2.googleapis.com/revoke'
+
+            response = requests.post(
+                revoke_url,
+                params={'token': access_token},
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                self.log_event('token_revoked', 'Google OAuth token revoked successfully')
+                # Clear stored tokens
+                self._clear_stored_tokens()
+                return True
+            else:
+                self.log_event(
+                    'token_revocation_failed',
+                    f'Google revocation failed: {response.status_code}'
+                )
+                # Even if revocation fails, clear local tokens
+                self._clear_stored_tokens()
+                return False
+
+        except requests.RequestException as e:
+            self.log_event('token_revocation_error', f'Google revocation error: {str(e)}')
+            # Clear local tokens anyway for security
+            self._clear_stored_tokens()
+            return False
+
+    def _revoke_microsoft_token(self):
+        """
+        Revoke Microsoft OAuth token.
+
+        Note: Microsoft doesn't have a traditional token revocation endpoint.
+        We clear local tokens so the session cannot be renewed.
+        The access token will naturally expire (usually 1 hour).
+        """
+        try:
+            # Clear the stored tokens
+            self._clear_stored_tokens()
+
+            self.log_event('token_revoked', 'Microsoft OAuth tokens cleared (session invalidated)')
+            return True
+
+        except Exception as e:
+            self.log_event('token_revocation_error', f'Microsoft revocation error: {str(e)}')
+            return False
+
+    def _clear_stored_tokens(self):
+        """Clear all stored OAuth tokens."""
+        if self.credentials:
+            self.credentials.access_token = ''
+            self.credentials.refresh_token = ''
+            self.credentials.expires_at = None
+            self.credentials.save()
 
 
 class SlackIntegrationService(BaseIntegrationService):
@@ -1057,27 +1141,227 @@ class ATSIntegrationService(BaseIntegrationService):
         return True
 
     def _post_linkedin_job(self, job_data: Dict) -> str:
-        """Post job to LinkedIn."""
-        # LinkedIn Jobs API implementation
-        raise NotImplementedError("LinkedIn Jobs API integration required")
+        """
+        Post job to LinkedIn using LinkedInProvider.
+
+        Args:
+            job_data: Job posting data with title, description, location, etc.
+
+        Returns:
+            External job ID from LinkedIn
+        """
+        try:
+            provider = LinkedInProvider(integration=self.integration)
+            result = provider.post_job(job_data)
+
+            # Log the successful posting
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='job_posted',
+                event_data={
+                    'provider': 'linkedin',
+                    'external_id': result.get('external_id'),
+                    'job_title': job_data.get('title'),
+                },
+                status='processed'
+            )
+
+            return result.get('external_id', '')
+
+        except Exception as e:
+            logger.error(f"LinkedIn job posting failed: {e}")
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='job_post_failed',
+                event_data={
+                    'provider': 'linkedin',
+                    'error': str(e),
+                    'job_title': job_data.get('title'),
+                },
+                status='failed'
+            )
+            raise
 
     def _post_indeed_job(self, job_data: Dict) -> str:
-        """Post job to Indeed."""
-        # Indeed Publisher API implementation
-        raise NotImplementedError("Indeed Publisher API integration required")
+        """
+        Post job to Indeed using IndeedProvider.
+
+        Args:
+            job_data: Job posting data with title, description, location, etc.
+
+        Returns:
+            External job ID from Indeed
+        """
+        try:
+            provider = IndeedProvider(integration=self.integration)
+            result = provider.post_job(job_data)
+
+            # Log the successful posting
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='job_posted',
+                event_data={
+                    'provider': 'indeed',
+                    'external_id': result.get('external_id'),
+                    'job_title': job_data.get('title'),
+                    'url': result.get('url'),
+                },
+                status='processed'
+            )
+
+            return result.get('external_id', '')
+
+        except Exception as e:
+            logger.error(f"Indeed job posting failed: {e}")
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='job_post_failed',
+                event_data={
+                    'provider': 'indeed',
+                    'error': str(e),
+                    'job_title': job_data.get('title'),
+                },
+                status='failed'
+            )
+            raise
 
     def _sync_linkedin_applications(self) -> List[Dict]:
-        """Sync applications from LinkedIn."""
-        # LinkedIn Apply API implementation
-        return []
+        """
+        Sync applications from LinkedIn for all posted jobs.
+
+        Returns:
+            List of normalized application data
+        """
+        try:
+            provider = LinkedInProvider(integration=self.integration)
+            all_applications = []
+
+            # Get external job IDs from integration config or events
+            job_ids = self._get_posted_job_ids('linkedin')
+
+            for job_id in job_ids:
+                applications = provider.get_applications(job_id)
+                all_applications.extend(applications)
+
+            # Log sync event
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='applications_synced',
+                event_data={
+                    'provider': 'linkedin',
+                    'count': len(all_applications),
+                    'job_count': len(job_ids),
+                },
+                status='processed'
+            )
+
+            return all_applications
+
+        except Exception as e:
+            logger.error(f"LinkedIn application sync failed: {e}")
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='applications_sync_failed',
+                event_data={
+                    'provider': 'linkedin',
+                    'error': str(e),
+                },
+                status='failed'
+            )
+            return []
 
     def _sync_indeed_applications(self) -> List[Dict]:
-        """Sync applications from Indeed."""
-        # Indeed Apply API implementation
-        return []
+        """
+        Sync applications from Indeed for all posted jobs.
+
+        Returns:
+            List of normalized application data
+        """
+        try:
+            provider = IndeedProvider(integration=self.integration)
+            all_applications = []
+
+            # Get external job IDs from integration config or events
+            job_ids = self._get_posted_job_ids('indeed')
+
+            for job_id in job_ids:
+                applications = provider.get_applications(job_id)
+                all_applications.extend(applications)
+
+            # Log sync event
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='applications_synced',
+                event_data={
+                    'provider': 'indeed',
+                    'count': len(all_applications),
+                    'job_count': len(job_ids),
+                },
+                status='processed'
+            )
+
+            return all_applications
+
+        except Exception as e:
+            logger.error(f"Indeed application sync failed: {e}")
+            IntegrationEvent.objects.create(
+                integration=self.integration,
+                event_type='applications_sync_failed',
+                event_data={
+                    'provider': 'indeed',
+                    'error': str(e),
+                },
+                status='failed'
+            )
+            return []
+
+    def _get_posted_job_ids(self, provider: str) -> List[str]:
+        """
+        Get external job IDs that have been posted to a provider.
+
+        Args:
+            provider: Provider name (linkedin, indeed)
+
+        Returns:
+            List of external job IDs
+        """
+        # Query integration events for successfully posted jobs
+        events = IntegrationEvent.objects.filter(
+            integration=self.integration,
+            event_type='job_posted',
+            status='processed',
+            event_data__provider=provider,
+        ).values_list('event_data', flat=True)
+
+        job_ids = []
+        for event_data in events:
+            if event_data and 'external_id' in event_data:
+                job_ids.append(event_data['external_id'])
+
+        return job_ids
 
     def _do_token_refresh(self) -> bool:
-        """Refresh OAuth token for job boards."""
+        """
+        Refresh OAuth token for job boards.
+
+        LinkedIn requires token refresh every 60 days.
+        Indeed uses API keys which don't need refresh.
+        """
+        if self.integration.provider == 'linkedin':
+            try:
+                provider = LinkedInProvider(integration=self.integration)
+                if self.credentials and self.credentials.can_refresh:
+                    tokens = provider.refresh_access_token(self.credentials.refresh_token)
+                    self.credentials.update_tokens(
+                        access_token=tokens.get('access_token'),
+                        refresh_token=tokens.get('refresh_token'),
+                        expires_in=tokens.get('expires_in'),
+                    )
+                    return True
+            except Exception as e:
+                logger.error(f"LinkedIn token refresh failed: {e}")
+                return False
+        # Indeed uses API keys - no refresh needed
         return True
 
 

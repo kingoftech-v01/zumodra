@@ -105,42 +105,140 @@ def calculate_match_scores(self):
 
 def _calculate_application_match_score(application):
     """
-    Calculate match score for a single application.
+    Calculate match score for a single application using AI matching service.
 
-    This is a placeholder implementation. In production, this would
-    integrate with an AI/ML service for sophisticated matching.
+    This function integrates with the ai_matching app when available,
+    falling back to basic matching when AI services are unavailable.
 
     Args:
-        application: Application object
+        application: Application object with job and candidate relations
 
     Returns:
         float: Match score between 0 and 100
     """
+    job = application.job
+    candidate = getattr(application, 'candidate', None)
+
+    # Try AI-powered matching first
+    try:
+        from ai_matching.services import MatchingService
+
+        matching_service = MatchingService()
+
+        # Build candidate profile from application data
+        candidate_profile = {
+            'skills': [],
+            'experience_years': 0,
+            'education_level': None,
+            'location': None,
+        }
+
+        if candidate:
+            candidate_profile['skills'] = getattr(candidate, 'skills', []) or []
+            candidate_profile['experience_years'] = getattr(candidate, 'years_experience', 0) or 0
+            candidate_profile['location'] = {
+                'city': getattr(candidate, 'city', ''),
+                'country': getattr(candidate, 'country', ''),
+            }
+
+            # Extract education level from education JSON
+            education = getattr(candidate, 'education', []) or []
+            if education:
+                # Find highest degree
+                degree_levels = {'phd': 5, 'master': 4, 'bachelor': 3, 'associate': 2, 'high_school': 1}
+                max_level = 0
+                for edu in education:
+                    degree = edu.get('degree', '').lower()
+                    for level_name, level_val in degree_levels.items():
+                        if level_name in degree and level_val > max_level:
+                            max_level = level_val
+                            candidate_profile['education_level'] = level_name
+
+        # Get resume text if available
+        resume_text = getattr(candidate, 'resume_text', '') or getattr(application, 'resume_text', '') or ''
+
+        # Calculate AI match score
+        result = matching_service.calculate_match(
+            job_id=job.id,
+            candidate_profile=candidate_profile,
+            resume_text=resume_text,
+        )
+
+        if result and result.get('success'):
+            # Return AI score (weighted composite score)
+            ai_score = result.get('overall_score', 0)
+            # Scale to 0-100 if needed
+            if 0 <= ai_score <= 1:
+                return ai_score * 100
+            return min(max(ai_score, 0), 100)
+
+    except ImportError:
+        logger.debug("AI matching service not available, using basic matching")
+    except Exception as e:
+        logger.warning(f"AI matching failed for application {application.id}: {e}")
+
+    # Fallback to basic matching algorithm
+    return _basic_match_score(application, job, candidate)
+
+
+def _basic_match_score(application, job, candidate):
+    """
+    Basic match score calculation without AI.
+
+    Used as fallback when AI matching is unavailable.
+    """
     score = 0
     max_score = 100
 
-    job = application.job
-
     # Skills matching (40 points max)
-    # Placeholder - would compare candidate skills vs job requirements
-    if hasattr(application, 'candidate') and application.candidate:
-        score += 30  # Base score for having a profile
+    if candidate:
+        candidate_skills = set(s.lower() for s in (getattr(candidate, 'skills', []) or []))
+        job_skills = set()
+
+        # Get required skills from job
+        if hasattr(job, 'required_skills'):
+            job_skills = set(s.lower() for s in (job.required_skills or []))
+        elif hasattr(job, 'skills'):
+            job_skills = set(s.lower() for s in (job.skills or []))
+
+        if job_skills:
+            skill_overlap = len(candidate_skills.intersection(job_skills))
+            skill_ratio = skill_overlap / len(job_skills) if job_skills else 0
+            score += skill_ratio * 40
+        else:
+            # No job skills defined, give partial credit for having skills
+            score += 20 if candidate_skills else 10
 
     # Experience matching (30 points max)
-    if hasattr(job, 'experience_level') and hasattr(application, 'years_experience'):
-        experience_match = 20
-        score += experience_match
+    candidate_experience = getattr(candidate, 'years_experience', 0) or 0
+    required_experience = getattr(job, 'min_experience_years', 0) or 0
+
+    if candidate_experience >= required_experience:
+        score += 30
+    elif required_experience > 0:
+        experience_ratio = candidate_experience / required_experience
+        score += experience_ratio * 30
 
     # Location matching (15 points max)
-    if hasattr(job, 'remote_policy') and job.remote_policy == 'remote':
+    remote_policy = getattr(job, 'remote_policy', None)
+    if remote_policy == 'remote':
         score += 15  # Remote jobs match everyone
+    elif remote_policy == 'hybrid':
+        score += 10  # Partial credit for hybrid
+    elif candidate:
+        # Check location match
+        candidate_location = getattr(candidate, 'city', '') or ''
+        job_location = getattr(job, 'location', '') or getattr(job, 'city', '') or ''
+        if candidate_location and job_location:
+            if candidate_location.lower() in job_location.lower() or job_location.lower() in candidate_location.lower():
+                score += 15
 
     # Cover letter bonus (15 points)
     if hasattr(application, 'cover_letter') and application.cover_letter:
         score += 15
 
     # Normalize to 0-100 scale
-    return min(max(score, 0), max_score)
+    return min(max(round(score, 2), 0), max_score)
 
 
 @shared_task(

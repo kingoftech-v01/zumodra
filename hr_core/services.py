@@ -38,6 +38,9 @@ from .models import (
     EmployeeDocument,
     Offboarding,
     PerformanceReview,
+    PerformanceImprovementPlan,
+    PIPMilestone,
+    PIPProgressNote,
 )
 
 logger = logging.getLogger(__name__)
@@ -979,33 +982,247 @@ class TimeOffService:
         Returns:
             Accrual amount in days
         """
-        # Base accrual rates (days per month)
-        base_rate = Decimal('1.25')  # 15 days per year
+        # Use the enhanced AccrualPolicy for calculation
+        return AccrualPolicy.calculate_accrual(employee, period)
 
-        # Adjust for years of service
+
+class AccrualPolicy:
+    """
+    Enhanced accrual policy calculator supporting:
+    - Years of service tiers
+    - Employment type adjustments
+    - Annual caps and carryover rules
+    - Pro-rated first-year accruals
+    - Custom policy configurations
+    """
+
+    # Default accrual tiers (years of service -> annual days)
+    DEFAULT_TIERS = {
+        0: Decimal('15.00'),    # 0-1 years: 15 days/year
+        2: Decimal('18.00'),    # 2-4 years: 18 days/year
+        5: Decimal('20.00'),    # 5-9 years: 20 days/year
+        10: Decimal('25.00'),   # 10+ years: 25 days/year
+    }
+
+    # Employment type multipliers
+    EMPLOYMENT_MULTIPLIERS = {
+        'full_time': Decimal('1.00'),
+        'part_time': Decimal('0.50'),
+        'contract': Decimal('0.00'),
+        'temporary': Decimal('0.00'),
+        'intern': Decimal('0.25'),
+    }
+
+    # Default policy settings
+    DEFAULT_POLICY = {
+        'max_annual_accrual': Decimal('30.00'),    # Cap at 30 days/year
+        'max_carryover': Decimal('10.00'),          # Max days to carry over
+        'carryover_expires_months': 3,              # Carryover expires after Q1
+        'pro_rate_first_year': True,                # Pro-rate for partial first year
+        'accrual_start_date': 'hire_date',          # or 'first_of_month'
+        'frontload_accrual': False,                 # Grant annual amount upfront
+    }
+
+    @classmethod
+    def calculate_accrual(
+        cls,
+        employee: Employee,
+        period: str = 'monthly',
+        custom_tiers: Dict[int, Decimal] = None,
+        custom_policy: Dict[str, Any] = None
+    ) -> Decimal:
+        """
+        Calculate time off accrual for an employee with enhanced policy support.
+
+        Args:
+            employee: The employee
+            period: Accrual period ('monthly', 'bi_weekly', 'annual')
+            custom_tiers: Optional custom accrual tiers
+            custom_policy: Optional custom policy settings
+
+        Returns:
+            Accrual amount in days for the specified period
+        """
+        tiers = custom_tiers or cls.DEFAULT_TIERS
+        policy = {**cls.DEFAULT_POLICY, **(custom_policy or {})}
+
+        # Get base annual accrual from tiers
         years = employee.years_of_service
-        if years >= 10:
-            multiplier = Decimal('1.50')  # 22.5 days
-        elif years >= 5:
-            multiplier = Decimal('1.25')  # 18.75 days
-        elif years >= 2:
-            multiplier = Decimal('1.10')  # 16.5 days
-        else:
-            multiplier = Decimal('1.00')
+        annual_days = cls._get_tier_accrual(years, tiers)
 
-        # Adjust for employment type
-        if employee.employment_type == 'part_time':
-            multiplier *= Decimal('0.50')
-        elif employee.employment_type in ['contract', 'temporary']:
+        # Apply employment type multiplier
+        emp_type = employee.employment_type or 'full_time'
+        multiplier = cls.EMPLOYMENT_MULTIPLIERS.get(emp_type, Decimal('1.00'))
+        annual_days *= multiplier
+
+        # Apply annual cap
+        max_annual = policy.get('max_annual_accrual', Decimal('30.00'))
+        annual_days = min(annual_days, max_annual)
+
+        # Pro-rate first year if applicable
+        if policy.get('pro_rate_first_year') and years < 1:
+            annual_days = cls._prorate_first_year(employee, annual_days)
+
+        # Convert to requested period
+        if period == 'bi_weekly':
+            return (annual_days / Decimal('26')).quantize(Decimal('0.01'))
+        elif period == 'monthly':
+            return (annual_days / Decimal('12')).quantize(Decimal('0.01'))
+        elif period == 'annual':
+            return annual_days.quantize(Decimal('0.01'))
+        elif period == 'weekly':
+            return (annual_days / Decimal('52')).quantize(Decimal('0.01'))
+        else:
+            return (annual_days / Decimal('12')).quantize(Decimal('0.01'))
+
+    @classmethod
+    def _get_tier_accrual(cls, years_of_service: float, tiers: Dict[int, Decimal]) -> Decimal:
+        """Get the appropriate accrual rate based on years of service."""
+        applicable_tier = Decimal('0')
+        for tier_years, tier_days in sorted(tiers.items()):
+            if years_of_service >= tier_years:
+                applicable_tier = tier_days
+            else:
+                break
+        return applicable_tier
+
+    @classmethod
+    def _prorate_first_year(cls, employee: Employee, annual_days: Decimal) -> Decimal:
+        """Pro-rate accrual for first year based on hire date."""
+        if not employee.hire_date:
+            return annual_days
+
+        hire_date = employee.hire_date
+        today = timezone.now().date()
+
+        # Calculate days from hire date to end of year
+        year_end = date(hire_date.year, 12, 31)
+        if hire_date > today:
             return Decimal('0')
 
-        monthly_accrual = base_rate * multiplier
+        # If hired after today in this calendar year, calculate remaining
+        days_in_year = (year_end - date(hire_date.year, 1, 1)).days + 1
+        days_employed = (min(year_end, today) - hire_date).days + 1
+        prorate_factor = Decimal(str(days_employed)) / Decimal(str(days_in_year))
 
-        if period == 'bi_weekly':
-            return monthly_accrual / 2
-        elif period == 'annual':
-            return monthly_accrual * 12
-        return monthly_accrual
+        return (annual_days * prorate_factor).quantize(Decimal('0.01'))
+
+    @classmethod
+    def calculate_carryover(
+        cls,
+        employee: Employee,
+        remaining_balance: Decimal,
+        custom_policy: Dict[str, Any] = None
+    ) -> Decimal:
+        """
+        Calculate the amount of time off that can be carried over to the next year.
+
+        Args:
+            employee: The employee
+            remaining_balance: Current remaining balance
+            custom_policy: Optional custom policy settings
+
+        Returns:
+            Amount that can be carried over
+        """
+        policy = {**cls.DEFAULT_POLICY, **(custom_policy or {})}
+        max_carryover = policy.get('max_carryover', Decimal('10.00'))
+
+        return min(remaining_balance, max_carryover)
+
+    @classmethod
+    def calculate_annual_balance(
+        cls,
+        employee: Employee,
+        time_off_type_id: int = None,
+        as_of_date: date = None
+    ) -> Dict[str, Decimal]:
+        """
+        Calculate comprehensive time off balance for an employee.
+
+        Args:
+            employee: The employee
+            time_off_type_id: Optional specific time off type
+            as_of_date: Date to calculate as of (default: today)
+
+        Returns:
+            Dict with balance details
+        """
+        from .models import TimeOffBalance, TimeOffRequest, TimeOffAccrualLog
+
+        if as_of_date is None:
+            as_of_date = timezone.now().date()
+
+        # Get or create balance record
+        balances = TimeOffBalance.objects.filter(
+            employee=employee,
+            year=as_of_date.year
+        )
+        if time_off_type_id:
+            balances = balances.filter(time_off_type_id=time_off_type_id)
+
+        result = {
+            'total_entitled': Decimal('0'),
+            'carryover': Decimal('0'),
+            'used': Decimal('0'),
+            'pending': Decimal('0'),
+            'available': Decimal('0'),
+            'accrued_to_date': Decimal('0'),
+        }
+
+        for balance in balances:
+            result['total_entitled'] += balance.entitled_days
+            result['carryover'] += balance.carried_over
+            result['used'] += balance.used_days
+            result['pending'] += balance.pending_days
+            result['available'] += balance.available_days
+
+            # Calculate accrued to date
+            annual_accrual = cls.calculate_accrual(employee, 'annual')
+            months_elapsed = as_of_date.month
+            accrued = (annual_accrual * Decimal(str(months_elapsed)) / Decimal('12'))
+            result['accrued_to_date'] += accrued.quantize(Decimal('0.01'))
+
+        return result
+
+    @classmethod
+    def get_accrual_schedule(
+        cls,
+        employee: Employee,
+        year: int = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Get the accrual schedule for an employee for a given year.
+
+        Args:
+            employee: The employee
+            year: Calendar year (default: current year)
+
+        Returns:
+            List of monthly accrual entries
+        """
+        if year is None:
+            year = timezone.now().year
+
+        monthly_accrual = cls.calculate_accrual(employee, 'monthly')
+        schedule = []
+
+        for month in range(1, 13):
+            accrual_date = date(year, month, 1)
+
+            # Skip months before hire date
+            if employee.hire_date and accrual_date < employee.hire_date.replace(day=1):
+                continue
+
+            schedule.append({
+                'month': month,
+                'month_name': accrual_date.strftime('%B'),
+                'accrual_date': accrual_date,
+                'amount': monthly_accrual,
+                'running_total': monthly_accrual * month,
+            })
+
+        return schedule
 
     @staticmethod
     def get_team_calendar(
@@ -1218,20 +1435,28 @@ class OnboardingService:
     @transaction.atomic
     def reassign_task(
         task_progress_id: int,
-        new_assignee
+        new_assignee,
+        reassigned_by=None,
+        reason: str = '',
+        send_notification: bool = True
     ) -> ServiceResult:
         """
-        Reassign an onboarding task.
+        Reassign an onboarding task to a new user.
 
         Args:
             task_progress_id: ID of task progress record
             new_assignee: User to assign the task to
+            reassigned_by: User performing the reassignment
+            reason: Reason for reassignment
+            send_notification: Whether to notify the new assignee
 
         Returns:
             ServiceResult indicating success
         """
         try:
-            task_progress = OnboardingTaskProgress.objects.get(id=task_progress_id)
+            task_progress = OnboardingTaskProgress.objects.select_related(
+                'task', 'onboarding__employee', 'assigned_to'
+            ).get(id=task_progress_id)
 
             if task_progress.is_completed:
                 return ServiceResult(
@@ -1240,12 +1465,50 @@ class OnboardingService:
                     errors={'task': _('Already completed.')}
                 )
 
-            # Note: Would need to add an 'assigned_to' field to OnboardingTaskProgress
-            # For now, just update notes
-            task_progress.notes = f"Reassigned to: {new_assignee}"
-            task_progress.save(update_fields=['notes'])
+            old_assignee = task_progress.assigned_to
 
-            logger.info(f"Onboarding task {task_progress_id} reassigned")
+            # Use the model's reassign method
+            task_progress.reassign(
+                new_assignee=new_assignee,
+                reassigned_by=reassigned_by,
+                reason=reason
+            )
+
+            # Send notification to new assignee
+            if send_notification:
+                try:
+                    from notifications.services import NotificationService
+
+                    employee = task_progress.onboarding.employee
+                    NotificationService.create_and_send(
+                        recipient=new_assignee,
+                        notification_type='onboarding_task_assigned',
+                        title=_('Onboarding Task Assigned'),
+                        message=_(
+                            'You have been assigned an onboarding task: %(task)s '
+                            'for %(employee)s'
+                        ) % {
+                            'task': task_progress.task.title,
+                            'employee': employee.full_name,
+                        },
+                        action_url=f'/hr/onboarding/{task_progress.onboarding.id}/tasks/',
+                        context_data={
+                            'task_id': task_progress.id,
+                            'task_title': task_progress.task.title,
+                            'employee_name': employee.full_name,
+                            'due_date': str(task_progress.due_date) if task_progress.due_date else None,
+                            'previous_assignee': str(old_assignee) if old_assignee else None,
+                        }
+                    )
+                except ImportError:
+                    logger.warning("Notification service not available")
+                except Exception as notify_error:
+                    logger.warning(f"Failed to send task assignment notification: {notify_error}")
+
+            logger.info(
+                f"Onboarding task {task_progress_id} reassigned from "
+                f"{old_assignee} to {new_assignee}"
+            )
 
             return ServiceResult(
                 success=True,
@@ -1259,12 +1522,124 @@ class OnboardingService:
                 message=_('Task not found.'),
                 errors={'task_progress_id': _('Task does not exist.')}
             )
+        except ValueError as ve:
+            return ServiceResult(
+                success=False,
+                message=str(ve),
+                errors={'task': str(ve)}
+            )
         except Exception as e:
             logger.exception(f"Error reassigning task: {e}")
             return ServiceResult(
                 success=False,
                 message=_('Failed to reassign task.'),
                 errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    def bulk_reassign_tasks(
+        task_progress_ids: List[int],
+        new_assignee,
+        reassigned_by=None,
+        reason: str = ''
+    ) -> ServiceResult:
+        """
+        Reassign multiple onboarding tasks to a new user.
+
+        Args:
+            task_progress_ids: List of task progress IDs
+            new_assignee: User to assign tasks to
+            reassigned_by: User performing the reassignment
+            reason: Reason for reassignment
+
+        Returns:
+            ServiceResult with reassignment results
+        """
+        results = {
+            'successful': [],
+            'failed': [],
+        }
+
+        for task_id in task_progress_ids:
+            result = OnboardingService.reassign_task(
+                task_progress_id=task_id,
+                new_assignee=new_assignee,
+                reassigned_by=reassigned_by,
+                reason=reason,
+                send_notification=False  # Send single notification for bulk
+            )
+            if result.success:
+                results['successful'].append(task_id)
+            else:
+                results['failed'].append({
+                    'task_id': task_id,
+                    'error': result.message,
+                })
+
+        # Send single notification for bulk reassignment
+        if results['successful']:
+            try:
+                from notifications.services import NotificationService
+
+                NotificationService.create_and_send(
+                    recipient=new_assignee,
+                    notification_type='onboarding_tasks_assigned',
+                    title=_('Onboarding Tasks Assigned'),
+                    message=_(
+                        'You have been assigned %(count)d onboarding tasks.'
+                    ) % {'count': len(results['successful'])},
+                    action_url='/hr/onboarding/my-tasks/',
+                    context_data={
+                        'task_count': len(results['successful']),
+                        'task_ids': results['successful'],
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Failed to send bulk assignment notification: {e}")
+
+        success = len(results['failed']) == 0
+        return ServiceResult(
+            success=success,
+            message=_(
+                'Reassigned %(success)d tasks successfully. %(fail)d failed.'
+            ) % {
+                'success': len(results['successful']),
+                'fail': len(results['failed']),
+            },
+            data=results
+        )
+
+    @staticmethod
+    def get_task_assignment_history(task_progress_id: int) -> ServiceResult:
+        """
+        Get the reassignment history for a task.
+
+        Args:
+            task_progress_id: ID of task progress record
+
+        Returns:
+            ServiceResult with assignment history
+        """
+        try:
+            task_progress = OnboardingTaskProgress.objects.get(id=task_progress_id)
+
+            history = task_progress.reassignment_history or []
+
+            return ServiceResult(
+                success=True,
+                message=_('Assignment history retrieved.'),
+                data={
+                    'current_assignee': task_progress.assigned_to,
+                    'history': history,
+                    'total_reassignments': len(history),
+                }
+            )
+
+        except OnboardingTaskProgress.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('Task not found.'),
+                errors={'task_progress_id': _('Task does not exist.')}
             )
 
     @staticmethod
@@ -1643,5 +2018,557 @@ class PerformanceService:
             return ServiceResult(
                 success=False,
                 message=_('Failed to approve review.'),
+                errors={'__all__': str(e)}
+            )
+
+
+# =============================================================================
+# PERFORMANCE IMPROVEMENT PLAN (PIP) SERVICE
+# =============================================================================
+
+class PIPService:
+    """
+    Service for Performance Improvement Plan management.
+
+    Handles:
+    - PIP creation and activation
+    - Milestone tracking
+    - Progress notes and check-ins
+    - PIP completion and outcomes
+    """
+
+    @staticmethod
+    @transaction.atomic
+    def create_pip(
+        employee: Employee,
+        initiated_by,
+        reason: str,
+        start_date: date,
+        duration_days: int = 90,
+        performance_concerns: List[str] = None,
+        goals: List[Dict] = None,
+        expectations: str = '',
+        support_provided: str = '',
+        hr_representative=None,
+        source_review: PerformanceReview = None,
+        check_in_frequency_days: int = 7
+    ) -> ServiceResult:
+        """
+        Create a Performance Improvement Plan.
+
+        Args:
+            employee: Employee being placed on PIP
+            initiated_by: Manager/HR initiating the PIP
+            reason: Detailed reason for PIP
+            start_date: PIP start date
+            duration_days: PIP duration (default 90 days)
+            performance_concerns: List of specific concerns
+            goals: List of improvement goals
+            expectations: Clear expectations for employee
+            support_provided: Resources/support offered
+            hr_representative: HR contact for the PIP
+            source_review: Performance review that triggered PIP
+
+        Returns:
+            ServiceResult with created PIP
+        """
+        try:
+            # Check for existing active PIP
+            active_pip = PerformanceImprovementPlan.objects.filter(
+                employee=employee,
+                status__in=['draft', 'active', 'extended']
+            ).exists()
+
+            if active_pip:
+                return ServiceResult(
+                    success=False,
+                    message=_('Employee already has an active PIP.'),
+                    errors={'employee': _('Active PIP exists.')}
+                )
+
+            # Calculate target end date
+            target_end_date = start_date + timedelta(days=duration_days)
+
+            pip = PerformanceImprovementPlan.objects.create(
+                employee=employee,
+                initiated_by=initiated_by,
+                hr_representative=hr_representative,
+                reason=reason,
+                performance_concerns=performance_concerns or [],
+                goals=goals or [],
+                expectations=expectations,
+                support_provided=support_provided,
+                start_date=start_date,
+                target_end_date=target_end_date,
+                source_review=source_review,
+                status=PerformanceImprovementPlan.PIPStatus.DRAFT,
+                check_in_frequency_days=check_in_frequency_days
+            )
+
+            # Create milestones from goals if provided
+            if goals:
+                for i, goal in enumerate(goals):
+                    milestone_date = start_date + timedelta(
+                        days=int(duration_days * (i + 1) / len(goals))
+                    )
+                    PIPMilestone.objects.create(
+                        pip=pip,
+                        title=goal.get('title', f'Goal {i + 1}'),
+                        description=goal.get('description', ''),
+                        success_criteria=goal.get('success_criteria', ''),
+                        due_date=milestone_date,
+                        weight=Decimal(str(goal.get('weight', 1.0)))
+                    )
+
+            logger.info(f"PIP created for employee {employee.employee_id}")
+
+            return ServiceResult(
+                success=True,
+                message=_('Performance Improvement Plan created.'),
+                data=pip
+            )
+
+        except Exception as e:
+            logger.exception(f"Error creating PIP: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to create PIP.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    @transaction.atomic
+    def activate_pip(pip_id: int, manager) -> ServiceResult:
+        """
+        Activate a draft PIP and notify employee.
+
+        Args:
+            pip_id: ID of the PIP
+            manager: Manager activating the PIP
+
+        Returns:
+            ServiceResult indicating success
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.get(id=pip_id)
+
+            if pip.status != PerformanceImprovementPlan.PIPStatus.DRAFT:
+                return ServiceResult(
+                    success=False,
+                    message=_('PIP is not in draft status.'),
+                    errors={'status': _('Invalid PIP status.')}
+                )
+
+            pip.activate()
+            pip.manager_signed_at = timezone.now()
+            pip.save()
+
+            # Create initial progress note
+            PIPProgressNote.objects.create(
+                pip=pip,
+                author=manager,
+                note_type=PIPProgressNote.NoteType.OTHER,
+                content=_('PIP activated. Employee notified of performance improvement requirements.')
+            )
+
+            logger.info(f"PIP {pip_id} activated for employee {pip.employee.employee_id}")
+
+            return ServiceResult(
+                success=True,
+                message=_('PIP activated successfully.'),
+                data=pip
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error activating PIP: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to activate PIP.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    @transaction.atomic
+    def record_check_in(
+        pip_id: int,
+        author,
+        content: str,
+        meeting_date: date = None,
+        attendees: List[str] = None,
+        action_items: List[str] = None
+    ) -> ServiceResult:
+        """
+        Record a check-in meeting for a PIP.
+
+        Args:
+            pip_id: ID of the PIP
+            author: User recording the check-in
+            content: Check-in notes
+            meeting_date: Date of meeting
+            attendees: List of attendee names
+            action_items: List of action items
+
+        Returns:
+            ServiceResult with created note
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.get(id=pip_id)
+
+            if pip.status not in ['active', 'extended']:
+                return ServiceResult(
+                    success=False,
+                    message=_('PIP is not active.'),
+                    errors={'status': _('Invalid PIP status.')}
+                )
+
+            note = PIPProgressNote.objects.create(
+                pip=pip,
+                author=author,
+                note_type=PIPProgressNote.NoteType.CHECK_IN,
+                content=content,
+                meeting_date=meeting_date or timezone.now().date(),
+                attendees=attendees or [],
+                action_items=action_items or []
+            )
+
+            # Update next check-in date
+            pip.next_check_in = timezone.now().date() + timedelta(days=pip.check_in_frequency_days)
+            pip.save()
+
+            logger.info(f"Check-in recorded for PIP {pip_id}")
+
+            return ServiceResult(
+                success=True,
+                message=_('Check-in recorded successfully.'),
+                data=note
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error recording check-in: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to record check-in.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    @transaction.atomic
+    def record_progress(
+        pip_id: int,
+        milestone_id: int,
+        status: str,
+        progress_notes: str = '',
+        author=None
+    ) -> ServiceResult:
+        """
+        Record progress on a PIP milestone.
+
+        Args:
+            pip_id: ID of the PIP
+            milestone_id: ID of the milestone
+            status: New status for milestone
+            progress_notes: Notes on progress
+            author: User recording the progress
+
+        Returns:
+            ServiceResult indicating success
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.get(id=pip_id)
+            milestone = PIPMilestone.objects.get(id=milestone_id, pip=pip)
+
+            old_status = milestone.status
+            milestone.status = status
+            if progress_notes:
+                milestone.progress_notes += f"\n{timezone.now().date()}: {progress_notes}"
+
+            if status == 'achieved':
+                milestone.completed_date = timezone.now().date()
+
+            milestone.save()
+
+            # Create progress note
+            if author:
+                PIPProgressNote.objects.create(
+                    pip=pip,
+                    author=author,
+                    note_type=PIPProgressNote.NoteType.PROGRESS_UPDATE,
+                    content=f"Milestone '{milestone.title}' updated: {old_status} -> {status}. {progress_notes}"
+                )
+
+            logger.info(f"Milestone {milestone_id} progress recorded for PIP {pip_id}")
+
+            return ServiceResult(
+                success=True,
+                message=_('Progress recorded successfully.'),
+                data=milestone
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except PIPMilestone.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('Milestone not found.'),
+                errors={'milestone_id': _('Milestone does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error recording progress: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to record progress.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    @transaction.atomic
+    def extend_pip(
+        pip_id: int,
+        new_end_date: date,
+        reason: str,
+        author=None
+    ) -> ServiceResult:
+        """
+        Extend a PIP deadline.
+
+        Args:
+            pip_id: ID of the PIP
+            new_end_date: New target end date
+            reason: Reason for extension
+            author: User extending the PIP
+
+        Returns:
+            ServiceResult indicating success
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.get(id=pip_id)
+
+            if pip.status not in ['active', 'extended']:
+                return ServiceResult(
+                    success=False,
+                    message=_('PIP is not active.'),
+                    errors={'status': _('Invalid PIP status.')}
+                )
+
+            if new_end_date <= pip.target_end_date:
+                return ServiceResult(
+                    success=False,
+                    message=_('New end date must be after current end date.'),
+                    errors={'new_end_date': _('Invalid date.')}
+                )
+
+            old_end_date = pip.target_end_date
+            pip.extend(new_end_date, reason)
+
+            # Create extension note
+            if author:
+                PIPProgressNote.objects.create(
+                    pip=pip,
+                    author=author,
+                    note_type=PIPProgressNote.NoteType.EXTENSION,
+                    content=f"PIP extended from {old_end_date} to {new_end_date}. Reason: {reason}"
+                )
+
+            logger.info(f"PIP {pip_id} extended to {new_end_date}")
+
+            return ServiceResult(
+                success=True,
+                message=_('PIP extended successfully.'),
+                data=pip
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error extending PIP: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to extend PIP.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    @transaction.atomic
+    def complete_pip(
+        pip_id: int,
+        outcome: str,
+        final_assessment: str,
+        final_rating: int = None,
+        author=None
+    ) -> ServiceResult:
+        """
+        Complete a PIP with an outcome.
+
+        Args:
+            pip_id: ID of the PIP
+            outcome: PIP outcome (improved, terminated, etc.)
+            final_assessment: Final assessment text
+            final_rating: Final rating (1-5)
+            author: User completing the PIP
+
+        Returns:
+            ServiceResult indicating success
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.get(id=pip_id)
+
+            if pip.status not in ['active', 'extended']:
+                return ServiceResult(
+                    success=False,
+                    message=_('PIP is not active.'),
+                    errors={'status': _('Invalid PIP status.')}
+                )
+
+            pip.complete(outcome, final_assessment)
+            if final_rating:
+                pip.final_rating = final_rating
+            pip.save()
+
+            # Create completion note
+            if author:
+                PIPProgressNote.objects.create(
+                    pip=pip,
+                    author=author,
+                    note_type=PIPProgressNote.NoteType.OTHER,
+                    content=f"PIP completed with outcome: {outcome}. Assessment: {final_assessment}"
+                )
+
+            logger.info(f"PIP {pip_id} completed with outcome: {outcome}")
+
+            return ServiceResult(
+                success=True,
+                message=_('PIP completed successfully.'),
+                data=pip
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error completing PIP: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to complete PIP.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    def get_pip_summary(pip_id: int) -> ServiceResult:
+        """
+        Get a comprehensive PIP summary.
+
+        Args:
+            pip_id: ID of the PIP
+
+        Returns:
+            ServiceResult with PIP summary data
+        """
+        try:
+            pip = PerformanceImprovementPlan.objects.select_related(
+                'employee', 'initiated_by', 'hr_representative'
+            ).prefetch_related(
+                'milestones', 'progress_notes'
+            ).get(id=pip_id)
+
+            milestones = pip.milestones.all()
+            progress_notes = pip.progress_notes.all()[:10]
+
+            # Calculate milestone completion
+            total_milestones = milestones.count()
+            achieved_milestones = milestones.filter(status='achieved').count()
+            milestone_completion = (
+                (achieved_milestones / total_milestones * 100)
+                if total_milestones > 0 else 0
+            )
+
+            summary = {
+                'pip': pip,
+                'milestones': list(milestones),
+                'recent_notes': list(progress_notes),
+                'milestone_completion': milestone_completion,
+                'total_milestones': total_milestones,
+                'achieved_milestones': achieved_milestones,
+                'overdue_milestones': milestones.filter(
+                    status__in=['pending', 'in_progress'],
+                    due_date__lt=timezone.now().date()
+                ).count(),
+                'days_remaining': pip.days_remaining,
+                'progress_percentage': pip.progress_percentage,
+                'check_ins_count': pip.progress_notes.filter(
+                    note_type='check_in'
+                ).count(),
+            }
+
+            return ServiceResult(
+                success=True,
+                message=_('PIP summary retrieved.'),
+                data=summary
+            )
+
+        except PerformanceImprovementPlan.DoesNotExist:
+            return ServiceResult(
+                success=False,
+                message=_('PIP not found.'),
+                errors={'pip_id': _('PIP does not exist.')}
+            )
+        except Exception as e:
+            logger.exception(f"Error getting PIP summary: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to get PIP summary.'),
+                errors={'__all__': str(e)}
+            )
+
+    @staticmethod
+    def get_active_pips_for_manager(manager) -> ServiceResult:
+        """
+        Get all active PIPs for a manager's direct reports.
+
+        Args:
+            manager: Manager user
+
+        Returns:
+            ServiceResult with list of active PIPs
+        """
+        try:
+            pips = PerformanceImprovementPlan.objects.filter(
+                employee__manager__user=manager,
+                status__in=['draft', 'active', 'extended']
+            ).select_related('employee').prefetch_related('milestones')
+
+            return ServiceResult(
+                success=True,
+                message=_('Active PIPs retrieved.'),
+                data=list(pips)
+            )
+
+        except Exception as e:
+            logger.exception(f"Error getting active PIPs: {e}")
+            return ServiceResult(
+                success=False,
+                message=_('Failed to get active PIPs.'),
                 errors={'__all__': str(e)}
             )

@@ -26,6 +26,9 @@ from .views import (
     EmployeeDocumentViewSet,
     OffboardingViewSet,
     PerformanceReviewViewSet,
+    PerformanceImprovementPlanViewSet,
+    PIPMilestoneViewSet,
+    PIPProgressNoteViewSet,
     # Special Views
     OrgChartView,
     TeamCalendarView,
@@ -59,6 +62,11 @@ router.register(r'offboardings', OffboardingViewSet, basename='offboarding')
 
 # Performance review endpoints
 router.register(r'performance-reviews', PerformanceReviewViewSet, basename='performance-review')
+
+# Performance Improvement Plan (PIP) endpoints
+router.register(r'pips', PerformanceImprovementPlanViewSet, basename='pip')
+router.register(r'pip-milestones', PIPMilestoneViewSet, basename='pip-milestone')
+router.register(r'pip-progress-notes', PIPProgressNoteViewSet, basename='pip-progress-note')
 
 urlpatterns = [
     # Special views (non-CRUD endpoints)

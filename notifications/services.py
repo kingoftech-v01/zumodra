@@ -418,10 +418,183 @@ class PushNotificationService(BaseNotificationService):
         apns_token: str,
         started_at: datetime,
     ) -> NotificationResult:
-        """Send notification via Apple Push Notification Service."""
-        # APNS implementation would require more setup (certificates, etc.)
-        # This is a placeholder for the actual implementation
-        raise NotImplementedError("APNS support requires additional configuration")
+        """
+        Send notification via Apple Push Notification Service.
+
+        Supports both JWT (Auth Key) and certificate-based authentication.
+        Uses HTTP/2 APNs Provider API.
+        """
+        import time
+        import jwt
+        import httpx
+
+        # Get APNS configuration from settings
+        use_sandbox = getattr(settings, 'APNS_USE_SANDBOX', True)
+        key_id = getattr(settings, 'APNS_KEY_ID', '')
+        team_id = getattr(settings, 'APNS_TEAM_ID', '')
+        auth_key_path = getattr(settings, 'APNS_AUTH_KEY_PATH', '')
+        bundle_id = getattr(settings, 'APNS_BUNDLE_ID', 'com.zumodra.app')
+        cert_path = getattr(settings, 'APNS_CERT_PATH', '')
+        cert_password = getattr(settings, 'APNS_CERT_PASSWORD', '')
+
+        # Determine APNS endpoint
+        if use_sandbox:
+            apns_host = 'https://api.sandbox.push.apple.com'
+        else:
+            apns_host = 'https://api.push.apple.com'
+
+        # Build the notification payload
+        payload = {
+            'aps': {
+                'alert': {
+                    'title': notification.title,
+                    'body': notification.message[:1024],
+                },
+                'sound': 'default',
+                'badge': 1,
+            },
+            'notification_id': str(notification.uuid),
+            'notification_type': notification.notification_type,
+            'action_url': notification.action_url or '',
+        }
+
+        # Add any custom context data
+        if notification.context_data:
+            payload.update(notification.context_data)
+
+        url = f"{apns_host}/3/device/{apns_token}"
+
+        headers = {
+            'apns-topic': bundle_id,
+            'apns-push-type': 'alert',
+            'apns-priority': '10',
+            'apns-expiration': '0',
+        }
+
+        try:
+            # Prefer JWT authentication (Auth Key .p8 file)
+            if auth_key_path and key_id and team_id:
+                token = self._generate_apns_jwt(auth_key_path, key_id, team_id)
+                headers['authorization'] = f'bearer {token}'
+
+                with httpx.Client(http2=True, timeout=30.0) as client:
+                    response = client.post(
+                        url,
+                        json=payload,
+                        headers=headers,
+                    )
+
+            # Fall back to certificate-based authentication
+            elif cert_path:
+                with httpx.Client(
+                    http2=True,
+                    timeout=30.0,
+                    cert=(cert_path, cert_password) if cert_password else cert_path
+                ) as client:
+                    response = client.post(
+                        url,
+                        json=payload,
+                        headers=headers,
+                    )
+            else:
+                raise ValueError(
+                    "APNS requires either Auth Key (.p8) or certificate (.p12) configuration"
+                )
+
+            # Handle response
+            if response.status_code == 200:
+                # Success
+                self.create_delivery_log(
+                    notification=notification,
+                    status='sent',
+                    request_payload=payload,
+                    response_code=response.status_code,
+                    started_at=started_at,
+                )
+
+                notification.mark_as_sent()
+
+                return NotificationResult(
+                    success=True,
+                    notification_id=notification.id,
+                    channel_type=self.channel_type,
+                )
+
+            elif response.status_code == 410:
+                # Device token is no longer active - mark for removal
+                logger.warning(f"APNS token inactive: {apns_token[:20]}...")
+                self._invalidate_apns_token(notification.recipient, apns_token)
+                raise ValueError("Device token is no longer active")
+
+            elif response.status_code == 400:
+                # Bad request
+                error_data = response.json() if response.text else {}
+                reason = error_data.get('reason', 'BadRequest')
+                raise ValueError(f"APNS bad request: {reason}")
+
+            elif response.status_code == 403:
+                # Authentication error
+                raise ValueError("APNS authentication failed - check credentials")
+
+            elif response.status_code == 429:
+                # Too many requests
+                raise ValueError("APNS rate limit exceeded")
+
+            else:
+                error_data = response.json() if response.text else {}
+                reason = error_data.get('reason', f'HTTP {response.status_code}')
+                raise ValueError(f"APNS error: {reason}")
+
+        except httpx.HTTPError as e:
+            logger.error(f"APNS HTTP error: {e}")
+            raise ValueError(f"APNS connection error: {str(e)}")
+
+    def _generate_apns_jwt(
+        self,
+        auth_key_path: str,
+        key_id: str,
+        team_id: str
+    ) -> str:
+        """
+        Generate JWT token for APNS authentication.
+
+        The token is valid for 1 hour per Apple's requirements.
+        """
+        import time
+        import jwt
+
+        with open(auth_key_path, 'r') as key_file:
+            auth_key = key_file.read()
+
+        token = jwt.encode(
+            {
+                'iss': team_id,
+                'iat': int(time.time()),
+            },
+            auth_key,
+            algorithm='ES256',
+            headers={
+                'kid': key_id,
+            }
+        )
+
+        return token
+
+    def _invalidate_apns_token(self, user, apns_token: str):
+        """Mark an APNS token as invalid and remove it from user preferences."""
+        try:
+            prefs = NotificationPreference.objects.filter(
+                user=user,
+                apns_token=apns_token
+            ).first()
+
+            if prefs:
+                prefs.apns_token = ''
+                prefs.save(update_fields=['apns_token'])
+                logger.info(f"Invalidated APNS token for user {user.id}")
+
+        except Exception as e:
+            logger.warning(f"Failed to invalidate APNS token: {e}")
 
 
 class InAppNotificationService(BaseNotificationService):
