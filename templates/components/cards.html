@@ -1,28 +1,34 @@
 {% comment %}
-Zumodra Card Component Templates
+=============================================================================
+Zumodra Unified Card Component
+=============================================================================
+
 Usage: {% include "components/cards.html" with variant="default" title="Card Title" %}
 
-Available variants: default, hover, clickable, flat, elevated, outlined
-Color accents: primary, secondary, success, warning, error
+Available variants: default, glass, hover, clickable, flat, elevated, outlined, stats, profile, list
+Available colors: primary, accent, success, warning, danger
+
+All cards use the unified .zu-card classes from zumodra-design-system.css
+Light backgrounds with glassmorphism effects available via glass variant
+=============================================================================
 {% endcomment %}
 
 {% comment %}
 ==============================================================================
-DEFAULT CARD
-Usage: {% include "components/cards.html" with variant="default" title="Card Title" body="Card content here" %}
+DEFAULT CARD - Standard card with subtle shadow
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "default" %}
-<div class="card{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if header or title %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
@@ -30,14 +36,14 @@ Usage: {% include "components/cards.html" with variant="default" title="Card Tit
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
     {% endif %}
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -46,25 +52,65 @@ Usage: {% include "components/cards.html" with variant="default" title="Card Tit
 
 {% comment %}
 ==============================================================================
-HOVER CARD (with hover effects)
-Usage: {% include "components/cards.html" with variant="hover" title="Hover Card" body="Hover to see effect" %}
+GLASS CARD - Glassmorphism effect with frosted translucent background
+==============================================================================
+{% endcomment %}
+
+{% if variant == "glass" %}
+<div class="zu-card zu-glass-card{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if image %}
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="zu-card__image" loading="lazy">
+    {% endif %}
+
+    {% if header or title %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
+        </div>
+        {% if header_actions %}
+        <div class="zu-card__actions">
+            {{ header_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if body or content %}
+    <div class="zu-card__body">
+        {% if body %}{{ body|safe }}{% endif %}
+        {% if content %}{{ content|safe }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if footer %}
+    <div class="zu-card__footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+HOVER CARD - Enhanced hover effects
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "hover" %}
-<div class="card card-hover{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-card--hover{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if image %}
-    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="zu-card__image" loading="lazy">
     {% endif %}
 
     {% if header or title %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
@@ -72,14 +118,14 @@ Usage: {% include "components/cards.html" with variant="hover" title="Hover Card
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
     {% endif %}
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -88,28 +134,27 @@ Usage: {% include "components/cards.html" with variant="hover" title="Hover Card
 
 {% comment %}
 ==============================================================================
-CLICKABLE CARD (interactive, link to another page)
-Usage: {% include "components/cards.html" with variant="clickable" title="Click Me" href="/destination" %}
+CLICKABLE CARD - Interactive card that links to another page
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "clickable" %}
-<a href="{{ href|default:'#' }}" class="card card-clickable{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" style="text-decoration: none; color: inherit; display: block;"{% if id %} id="{{ id }}"{% endif %}{% if target %} target="{{ target }}"{% endif %}>
+<a href="{{ href|default:'#' }}" class="zu-card zu-card--clickable{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}{% if target %} target="{{ target }}"{% endif %}>
     {% if image %}
-    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="zu-card__image" loading="lazy">
     {% endif %}
 
     {% if title or subtitle %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
     </div>
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
@@ -119,21 +164,20 @@ Usage: {% include "components/cards.html" with variant="clickable" title="Click 
 
 {% comment %}
 ==============================================================================
-FLAT CARD (no shadow)
-Usage: {% include "components/cards.html" with variant="flat" title="Flat Card" %}
+FLAT CARD - No shadow, border only
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "flat" %}
-<div class="card card-flat{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-card--flat{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if header or title %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
@@ -141,14 +185,14 @@ Usage: {% include "components/cards.html" with variant="flat" title="Flat Card" 
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
     {% endif %}
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -157,25 +201,24 @@ Usage: {% include "components/cards.html" with variant="flat" title="Flat Card" 
 
 {% comment %}
 ==============================================================================
-ELEVATED CARD (stronger shadow)
-Usage: {% include "components/cards.html" with variant="elevated" title="Elevated Card" %}
+ELEVATED CARD - Stronger shadow for emphasis
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "elevated" %}
-<div class="card card-elevated{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-card--elevated{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if image %}
-    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top">
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="zu-card__image" loading="lazy">
     {% endif %}
 
     {% if header or title %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
@@ -183,14 +226,14 @@ Usage: {% include "components/cards.html" with variant="elevated" title="Elevate
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
     {% endif %}
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -199,21 +242,20 @@ Usage: {% include "components/cards.html" with variant="elevated" title="Elevate
 
 {% comment %}
 ==============================================================================
-OUTLINED CARD (stronger border)
-Usage: {% include "components/cards.html" with variant="outlined" title="Outlined Card" %}
+OUTLINED CARD - Prominent border, minimal background
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "outlined" %}
-<div class="card card-outlined{% if color %} card-{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-card--outlined{% if color %} zu-card--{{ color }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if header or title %}
-    <div class="card-header">
-        <div>
-            {% if title %}<h3 class="card-header-title">{{ title }}</h3>{% endif %}
-            {% if subtitle %}<p class="card-header-subtitle">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__header">
+        <div class="zu-card__header-content">
+            {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+            {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         </div>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
@@ -221,14 +263,14 @@ Usage: {% include "components/cards.html" with variant="outlined" title="Outline
     {% endif %}
 
     {% if body or content %}
-    <div class="card-body">
+    <div class="zu-card__body">
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
     {% endif %}
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -237,26 +279,25 @@ Usage: {% include "components/cards.html" with variant="outlined" title="Outline
 
 {% comment %}
 ==============================================================================
-IMAGE CARD (with featured image)
-Usage: {% include "components/cards.html" with variant="image" image="/path/to/image.jpg" title="Featured" %}
+IMAGE CARD - Featured image with content below
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "image" %}
-<div class="card card-hover{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-card--hover{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if image %}
-    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="card-image card-image-top" loading="lazy">
+    <img src="{{ image }}" alt="{{ image_alt|default:title }}" class="zu-card__image" loading="lazy">
     {% endif %}
 
-    <div class="card-body">
-        {% if title %}<h3 class="card-header-title" style="margin-bottom: var(--spacing-2);">{{ title }}</h3>{% endif %}
-        {% if subtitle %}<p class="card-header-subtitle" style="margin-bottom: var(--spacing-3);">{{ subtitle }}</p>{% endif %}
+    <div class="zu-card__body">
+        {% if title %}<h3 class="zu-card__title">{{ title }}</h3>{% endif %}
+        {% if subtitle %}<p class="zu-card__subtitle">{{ subtitle }}</p>{% endif %}
         {% if body %}{{ body|safe }}{% endif %}
         {% if content %}{{ content|safe }}{% endif %}
     </div>
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -265,77 +306,66 @@ Usage: {% include "components/cards.html" with variant="image" image="/path/to/i
 
 {% comment %}
 ==============================================================================
-STATS CARD (for dashboard metrics)
-Usage: {% include "components/cards.html" with variant="stats" title="Total Users" value="1,234" change="+12%" trend="up" %}
+STATS CARD - Dashboard metrics with trend indicator
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "stats" %}
-<div class="card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
-    <div class="card-body">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0 0 var(--spacing-1) 0;">{{ title }}</p>
-                <p style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin: 0;">{{ value }}</p>
-                {% if change %}
-                <p style="font-size: var(--font-size-sm); margin: var(--spacing-2) 0 0 0; display: flex; align-items: center; gap: var(--spacing-1);">
-                    {% if trend == "up" %}
-                    <span style="color: var(--color-success);">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                            <polyline points="17 6 23 6 23 12"></polyline>
-                        </svg>
-                        {{ change }}
-                    </span>
-                    {% elif trend == "down" %}
-                    <span style="color: var(--color-error);">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-                            <polyline points="17 18 23 18 23 12"></polyline>
-                        </svg>
-                        {{ change }}
-                    </span>
-                    {% else %}
-                    <span style="color: var(--color-text-tertiary);">{{ change }}</span>
-                    {% endif %}
-                    {% if period %}<span style="color: var(--color-text-tertiary);">{{ period }}</span>{% endif %}
-                </p>
-                {% endif %}
-            </div>
-            {% if icon %}
-            <div style="width: 48px; height: 48px; border-radius: var(--radius-lg); background-color: var(--color-{{ icon_color|default:'primary' }}-light); display: flex; align-items: center; justify-content: center; color: var(--color-{{ icon_color|default:'primary' }});">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    {{ icon|safe }}
+<div class="zu-card zu-stats-card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="zu-stats-card__content">
+        <div class="zu-stats-card__info">
+            <p class="zu-stats-card__label">{{ title }}</p>
+            <p class="zu-stats-card__value">{{ value }}</p>
+            {% if change %}
+            <div class="zu-stats-card__trend zu-stats-card__trend--{{ trend|default:'neutral' }}">
+                {% if trend == "up" %}
+                <svg class="zu-stats-card__trend-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
                 </svg>
+                {% elif trend == "down" %}
+                <svg class="zu-stats-card__trend-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                    <polyline points="17 18 23 18 23 12"></polyline>
+                </svg>
+                {% endif %}
+                <span class="zu-stats-card__change">{{ change }}</span>
+                {% if period %}<span class="zu-stats-card__period">{{ period }}</span>{% endif %}
             </div>
             {% endif %}
         </div>
+        {% if icon %}
+        <div class="zu-stats-card__icon zu-stats-card__icon--{{ icon_color|default:'primary' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                {{ icon|safe }}
+            </svg>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}
 
 {% comment %}
 ==============================================================================
-PROFILE CARD
-Usage: {% include "components/cards.html" with variant="profile" name="John Doe" role="Developer" avatar="/path/to/avatar.jpg" %}
+PROFILE CARD - User profile with avatar
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "profile" %}
-<div class="card card-hover{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
-    <div class="card-body" style="text-align: center; padding: var(--spacing-8);">
-        <div class="avatar avatar-xl" style="margin: 0 auto var(--spacing-4);">
+<div class="zu-card zu-card--hover zu-profile-card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="zu-profile-card__content">
+        <div class="zu-avatar zu-avatar--xl">
             {% if avatar %}
-            <img src="{{ avatar }}" alt="{{ name }}">
+            <img src="{{ avatar }}" alt="{{ name }}" class="zu-avatar__image">
             {% else %}
-            {{ name|slice:":2"|upper }}
+            <span class="zu-avatar__initials">{{ name|slice:":2"|upper }}</span>
             {% endif %}
         </div>
-        <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0 0 var(--spacing-1) 0;">{{ name }}</h3>
-        {% if role %}<p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0 0 var(--spacing-3) 0;">{{ role }}</p>{% endif %}
-        {% if bio %}<p style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 var(--spacing-4) 0;">{{ bio }}</p>{% endif %}
+        <h3 class="zu-profile-card__name">{{ name }}</h3>
+        {% if role %}<p class="zu-profile-card__role">{{ role }}</p>{% endif %}
+        {% if bio %}<p class="zu-profile-card__bio">{{ bio }}</p>{% endif %}
         {% if actions %}
-        <div style="display: flex; gap: var(--spacing-2); justify-content: center;">
+        <div class="zu-profile-card__actions">
             {{ actions|safe }}
         </div>
         {% endif %}
@@ -345,53 +375,52 @@ Usage: {% include "components/cards.html" with variant="profile" name="John Doe"
 
 {% comment %}
 ==============================================================================
-LIST CARD (card with list items)
-Usage: {% include "components/cards.html" with variant="list" title="Recent Activity" items=items_list %}
+LIST CARD - Card containing a list of items
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "list" %}
-<div class="card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+<div class="zu-card zu-list-card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
     {% if title %}
-    <div class="card-header">
-        <h3 class="card-header-title">{{ title }}</h3>
+    <div class="zu-card__header">
+        <h3 class="zu-card__title">{{ title }}</h3>
         {% if header_actions %}
-        <div class="card-header-actions">
+        <div class="zu-card__actions">
             {{ header_actions|safe }}
         </div>
         {% endif %}
     </div>
     {% endif %}
 
-    <div style="padding: 0;">
+    <div class="zu-list-card__items">
         {% for item in items %}
-        <div style="display: flex; align-items: center; gap: var(--spacing-3); padding: var(--spacing-3) var(--spacing-4); border-bottom: 1px solid var(--color-border-primary);">
+        <div class="zu-list-card__item">
             {% if item.icon %}
-            <div style="flex-shrink: 0; color: var(--color-{{ item.icon_color|default:'text-tertiary' }});">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <div class="zu-list-card__item-icon zu-list-card__item-icon--{{ item.icon_color|default:'muted' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     {{ item.icon|safe }}
                 </svg>
             </div>
             {% endif %}
-            <div style="flex: 1; min-width: 0;">
-                <p style="font-size: var(--font-size-sm); color: var(--color-text-primary); margin: 0;">{{ item.title }}</p>
-                {% if item.subtitle %}<p style="font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin: var(--spacing-0-5) 0 0 0;">{{ item.subtitle }}</p>{% endif %}
+            <div class="zu-list-card__item-content">
+                <p class="zu-list-card__item-title">{{ item.title }}</p>
+                {% if item.subtitle %}<p class="zu-list-card__item-subtitle">{{ item.subtitle }}</p>{% endif %}
             </div>
             {% if item.action %}
-            <div style="flex-shrink: 0;">
+            <div class="zu-list-card__item-action">
                 {{ item.action|safe }}
             </div>
             {% endif %}
         </div>
         {% empty %}
-        <div style="padding: var(--spacing-8); text-align: center; color: var(--color-text-tertiary);">
-            <p style="margin: 0;">{{ empty_message|default:"No items to display" }}</p>
+        <div class="zu-list-card__empty">
+            <p>{{ empty_message|default:"No items to display" }}</p>
         </div>
         {% endfor %}
     </div>
 
     {% if footer %}
-    <div class="card-footer">
+    <div class="zu-card__footer">
         {{ footer|safe }}
     </div>
     {% endif %}
@@ -400,36 +429,57 @@ Usage: {% include "components/cards.html" with variant="list" title="Recent Acti
 
 {% comment %}
 ==============================================================================
-CARD EXAMPLES - For reference/documentation
+FEATURE CARD - Highlight a feature or benefit
+==============================================================================
+{% endcomment %}
+
+{% if variant == "feature" %}
+<div class="zu-card zu-feature-card{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if icon %}
+    <div class="zu-feature-card__icon zu-feature-card__icon--{{ icon_color|default:'primary' }}">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            {{ icon|safe }}
+        </svg>
+    </div>
+    {% endif %}
+    {% if title %}<h3 class="zu-feature-card__title">{{ title }}</h3>{% endif %}
+    {% if body %}<p class="zu-feature-card__body">{{ body }}</p>{% endif %}
+    {% if link_text and link_href %}
+    <a href="{{ link_href }}" class="zu-feature-card__link">
+        {{ link_text }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% comment %}
+==============================================================================
+USAGE EXAMPLES
 ==============================================================================
 
 {# Basic card #}
 {% include "components/cards.html" with variant="default" title="Card Title" body="<p>Card content goes here</p>" %}
 
-{# Card with subtitle and footer #}
-{% include "components/cards.html" with variant="default" title="Card Title" subtitle="Supporting text" body="<p>Main content</p>" footer="<button class='btn btn-primary'>Action</button>" %}
+{# Glassmorphism card #}
+{% include "components/cards.html" with variant="glass" title="Glass Card" body="<p>Frosted glass effect</p>" %}
 
 {# Hover effect card #}
 {% include "components/cards.html" with variant="hover" title="Hover Me" body="<p>Hover to see the effect</p>" %}
 
 {# Clickable card #}
-{% include "components/cards.html" with variant="clickable" title="Click Me" body="<p>Click anywhere on the card</p>" href="/destination" %}
-
-{# Card with color accent #}
-{% include "components/cards.html" with variant="default" title="Important Notice" body="<p>This card has a color accent</p>" color="primary" %}
-
-{# Image card #}
-{% include "components/cards.html" with variant="image" image="/static/images/cover.jpg" title="Featured Article" body="<p>Article excerpt...</p>" %}
+{% include "components/cards.html" with variant="clickable" title="Click Me" body="<p>Click anywhere</p>" href="/destination" %}
 
 {# Stats card #}
 {% include "components/cards.html" with variant="stats" title="Revenue" value="$12,345" change="+15%" trend="up" period="vs last month" icon="<path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/>" %}
 
 {# Profile card #}
-{% include "components/cards.html" with variant="profile" name="Jane Smith" role="Product Designer" avatar="/static/avatars/jane.jpg" bio="Creating delightful user experiences" %}
+{% include "components/cards.html" with variant="profile" name="Jane Smith" role="Product Designer" avatar="/static/avatars/jane.jpg" bio="Creating delightful experiences" %}
 
-{# List card #}
-{% with items=recent_activities %}
-{% include "components/cards.html" with variant="list" title="Recent Activity" items=items %}
-{% endwith %}
+{# Feature card #}
+{% include "components/cards.html" with variant="feature" title="Fast & Reliable" body="Built for speed and performance" icon="<path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/>" %}
 
 {% endcomment %}

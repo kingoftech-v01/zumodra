@@ -1,7 +1,7 @@
 {% load static i18n %}
 
-<!-- Sidebar -->
-<aside class="flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300"
+<!-- Sidebar with Glassmorphism -->
+<aside class="zu-sidebar flex flex-col w-64 transition-all duration-300"
        :class="{ 'sidebar-collapsed': !sidebarOpen }"
        x-data="{
            activeSection: '{{ active_section|default:"dashboard" }}',
@@ -9,12 +9,12 @@
        }">
 
     <!-- Logo Area -->
-    <div class="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="zu-sidebar__header flex items-center justify-between h-16 px-4">
         <a href="{% url 'dashboard:index' %}" class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <div class="zu-logo w-8 h-8 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-lg">Z</span>
             </div>
-            <span class="sidebar-text text-xl font-bold text-gray-900 dark:text-white" x-show="sidebarOpen">Zumodra</span>
+            <span class="sidebar-text zu-sidebar__brand text-xl font-bold" x-show="sidebarOpen">Zumodra</span>
         </a>
         <button @click="sidebarOpen = !sidebarOpen"
                 class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none hidden lg:block"

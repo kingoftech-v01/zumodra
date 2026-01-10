@@ -1,37 +1,42 @@
 {% comment %}
-Zumodra Button Component Templates
+=============================================================================
+Zumodra Unified Button Component
+=============================================================================
+
 Usage: {% include "components/buttons.html" with variant="primary" text="Click me" %}
 
-Available variants: primary, secondary, outline, ghost, danger, success, warning
-Available sizes: xs, sm, (default), lg, xl
-Additional classes: btn-block (full width), btn-icon (icon only), btn-loading
+Available variants: primary, secondary, outline, ghost, danger, success, warning, accent
+Available sizes: sm, (default), lg
+Additional options: block (full width), icon_only (icon button), loading
+
+All buttons use the unified .zu-btn classes from zumodra-design-system.css
+=============================================================================
 {% endcomment %}
 
 {% comment %}
 ==============================================================================
-PRIMARY BUTTON
-Usage: {% include "components/buttons.html" with variant="primary" text="Save Changes" %}
+PRIMARY BUTTON - Main CTA, uses accent coral color
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "primary" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-primary{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--primary{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -40,29 +45,28 @@ Usage: {% include "components/buttons.html" with variant="primary" text="Save Ch
 
 {% comment %}
 ==============================================================================
-SECONDARY BUTTON
-Usage: {% include "components/buttons.html" with variant="secondary" text="Learn More" %}
+SECONDARY BUTTON - Professional slate blue, secondary actions
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "secondary" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-secondary{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--secondary{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -71,29 +75,28 @@ Usage: {% include "components/buttons.html" with variant="secondary" text="Learn
 
 {% comment %}
 ==============================================================================
-OUTLINE BUTTON
-Usage: {% include "components/buttons.html" with variant="outline" text="Cancel" %}
+OUTLINE BUTTON - Bordered, transparent background
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "outline" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-outline{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--outline{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -102,29 +105,28 @@ Usage: {% include "components/buttons.html" with variant="outline" text="Cancel"
 
 {% comment %}
 ==============================================================================
-GHOST BUTTON
-Usage: {% include "components/buttons.html" with variant="ghost" text="Skip" %}
+GHOST BUTTON - Minimal, no border, transparent
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "ghost" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-ghost{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--ghost{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -133,29 +135,28 @@ Usage: {% include "components/buttons.html" with variant="ghost" text="Skip" %}
 
 {% comment %}
 ==============================================================================
-DANGER BUTTON
-Usage: {% include "components/buttons.html" with variant="danger" text="Delete" %}
+DANGER BUTTON - Destructive actions, red theme
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "danger" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-danger{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--danger{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -164,29 +165,28 @@ Usage: {% include "components/buttons.html" with variant="danger" text="Delete" 
 
 {% comment %}
 ==============================================================================
-SUCCESS BUTTON
-Usage: {% include "components/buttons.html" with variant="success" text="Approve" %}
+SUCCESS BUTTON - Confirmations, approvals
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "success" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-success{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--success{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -195,29 +195,28 @@ Usage: {% include "components/buttons.html" with variant="success" text="Approve
 
 {% comment %}
 ==============================================================================
-WARNING BUTTON
-Usage: {% include "components/buttons.html" with variant="warning" text="Warning" %}
+WARNING BUTTON - Caution actions
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "warning" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-warning{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--warning{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -226,22 +225,51 @@ Usage: {% include "components/buttons.html" with variant="warning" text="Warning
 
 {% comment %}
 ==============================================================================
-ICON BUTTON
-Usage: {% include "components/buttons.html" with variant="icon" icon="<path d='...'/>" aria_label="Close" %}
+ACCENT BUTTON - Gold accent for special emphasis
+==============================================================================
+{% endcomment %}
+
+{% if variant == "accent" %}
+<button
+    type="{{ type|default:'button' }}"
+    class="zu-btn zu-btn--accent{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    {% if disabled %}disabled{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
+>
+    {% if icon_left %}
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {{ icon_left|safe }}
+    </svg>
+    {% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
+    {% if icon_right %}
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {{ icon_right|safe }}
+    </svg>
+    {% endif %}
+</button>
+{% endif %}
+
+{% comment %}
+==============================================================================
+ICON BUTTON - Icon only, square aspect
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "icon" %}
 <button
     type="{{ type|default:'button' }}"
-    class="btn btn-{{ btn_style|default:'ghost' }} btn-icon{% if size %} btn-{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--{{ btn_style|default:'ghost' }} zu-btn--icon{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     aria-label="{{ aria_label }}"
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon|safe }}
     </svg>
 </button>
@@ -249,29 +277,28 @@ Usage: {% include "components/buttons.html" with variant="icon" icon="<path d='.
 
 {% comment %}
 ==============================================================================
-LINK BUTTON
-Usage: {% include "components/buttons.html" with variant="link" href="/path" text="Go to page" %}
+LINK BUTTON - Anchor styled as button
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "link" %}
 <a
     href="{{ href|default:'#' }}"
-    class="btn btn-{{ btn_style|default:'primary' }}{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--{{ btn_style|default:'primary' }}{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if id %}id="{{ id }}"{% endif %}
     {% if target %}target="{{ target }}"{% endif %}
     {% if rel %}rel="{{ rel }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -280,48 +307,41 @@ Usage: {% include "components/buttons.html" with variant="link" href="/path" tex
 
 {% comment %}
 ==============================================================================
-BUTTON GROUP
-Usage:
-{% include "components/buttons.html" with variant="group" %}
-    <button class="btn btn-outline">Left</button>
-    <button class="btn btn-outline">Center</button>
-    <button class="btn btn-outline">Right</button>
-{% endinclude %}
+BUTTON GROUP - Group of related buttons
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "group" %}
-<div class="btn-group{% if extra_class %} {{ extra_class }}{% endif %}" role="group" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
+<div class="zu-btn-group{% if extra_class %} {{ extra_class }}{% endif %}" role="group" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
     {{ content|safe }}
 </div>
 {% endif %}
 
 {% comment %}
 ==============================================================================
-SUBMIT BUTTON (for forms)
-Usage: {% include "components/buttons.html" with variant="submit" text="Submit Form" %}
+SUBMIT BUTTON - Form submission
 ==============================================================================
 {% endcomment %}
 
 {% if variant == "submit" %}
 <button
     type="submit"
-    class="btn btn-{{ btn_style|default:'primary' }}{% if size %} btn-{{ size }}{% endif %}{% if block %} btn-block{% endif %}{% if loading %} btn-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    class="zu-btn zu-btn--{{ btn_style|default:'primary' }}{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     {% if disabled %}disabled{% endif %}
     {% if id %}id="{{ id }}"{% endif %}
     {% if name %}name="{{ name }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if form %}form="{{ form }}"{% endif %}
-    {% if data_attrs %}{{ data_attrs }}{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
 >
     {% if icon_left %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_left|safe }}
     </svg>
     {% endif %}
-    {% if text %}{{ text }}{% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
     {% if icon_right %}
-    <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {{ icon_right|safe }}
     </svg>
     {% endif %}
@@ -330,38 +350,61 @@ Usage: {% include "components/buttons.html" with variant="submit" text="Submit F
 
 {% comment %}
 ==============================================================================
-BUTTON EXAMPLES - For reference/documentation
-Copy these examples into your templates
+GLASSMORPHISM BUTTON - Special button with frosted glass effect
+==============================================================================
+{% endcomment %}
+
+{% if variant == "glass" %}
+<button
+    type="{{ type|default:'button' }}"
+    class="zu-btn zu-btn--glass{% if size == 'sm' %} zu-btn--sm{% elif size == 'lg' %} zu-btn--lg{% endif %}{% if block %} zu-btn--full{% endif %}{% if loading %} zu-btn--loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    {% if disabled %}disabled{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if data_attrs %}{{ data_attrs|safe }}{% endif %}
+>
+    {% if icon_left %}
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {{ icon_left|safe }}
+    </svg>
+    {% endif %}
+    {% if text %}<span>{{ text }}</span>{% endif %}
+    {% if icon_right %}
+    <svg class="zu-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {{ icon_right|safe }}
+    </svg>
+    {% endif %}
+</button>
+{% endif %}
+
+{% comment %}
+==============================================================================
+USAGE EXAMPLES
 ==============================================================================
 
-{# Primary button #}
-{% include "components/buttons.html" with variant="primary" text="Save Changes" %}
+{# Primary CTA button #}
+{% include "components/buttons.html" with variant="primary" text="Get Started" %}
 
-{# Primary button with icon #}
-{% include "components/buttons.html" with variant="primary" text="Download" icon_left="<path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/>" %}
+{# Secondary with icon #}
+{% include "components/buttons.html" with variant="secondary" text="Download" icon_left="<path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/>" %}
 
-{# Small secondary button #}
-{% include "components/buttons.html" with variant="secondary" text="Learn More" size="sm" %}
+{# Small outline button #}
+{% include "components/buttons.html" with variant="outline" text="Cancel" size="sm" %}
 
-{# Large outline button #}
-{% include "components/buttons.html" with variant="outline" text="Cancel" size="lg" %}
+{# Large danger button #}
+{% include "components/buttons.html" with variant="danger" text="Delete" size="lg" %}
 
-{# Full width danger button #}
-{% include "components/buttons.html" with variant="danger" text="Delete Account" block=True %}
-
-{# Disabled button #}
-{% include "components/buttons.html" with variant="primary" text="Unavailable" disabled=True %}
-
-{# Loading button #}
-{% include "components/buttons.html" with variant="primary" text="Processing..." loading=True %}
+{# Full width success button #}
+{% include "components/buttons.html" with variant="success" text="Approve Application" block=True %}
 
 {# Icon only button #}
 {% include "components/buttons.html" with variant="icon" icon="<line x1='18' y1='6' x2='6' y2='18'/><line x1='6' y1='6' x2='18' y2='18'/>" aria_label="Close" %}
 
-{# Link styled as button #}
-{% include "components/buttons.html" with variant="link" href="/signup" text="Sign Up" btn_style="primary" %}
+{# Glassmorphism button #}
+{% include "components/buttons.html" with variant="glass" text="Explore Features" %}
 
 {# Submit button for forms #}
-{% include "components/buttons.html" with variant="submit" text="Submit" id="submit-btn" %}
+{% include "components/buttons.html" with variant="submit" text="Submit Application" id="submit-btn" %}
 
 {% endcomment %}
