@@ -33,6 +33,7 @@ from .models import (
     Service, ServiceCategory, ServiceTag, ServiceImage,
     ServiceProvider, ServiceProposal, ServiceContract,
     ServiceReview, ClientRequest, ContractMessage,
+    CrossTenantServiceRequest,
 )
 
 
@@ -497,6 +498,113 @@ class ClientRequestForm(forms.ModelForm):
             raise ValidationError({
                 'budget_max': _('Maximum budget must be greater than minimum budget.')
             })
+
+        return cleaned_data
+
+
+# =============================================================================
+# CROSS-TENANT REQUEST FORMS
+# =============================================================================
+
+class CrossTenantServiceRequestForm(forms.ModelForm):
+    """
+    Secure form for cross-tenant service requests.
+
+    Supports both ORGANIZATIONAL and PERSONAL hiring contexts:
+    - ORGANIZATIONAL: User hiring on behalf of their tenant/company
+    - PERSONAL: User hiring for themselves
+    """
+
+    class Meta:
+        model = CrossTenantServiceRequest
+        fields = [
+            'title', 'description', 'budget',
+            'deadline', 'hiring_context', 'requirements',
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'rows': 6,
+                'placeholder': _('Describe your project requirements, goals, and expectations...')
+            }),
+            'requirements': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': _('List specific requirements, deliverables, or constraints...')
+            }),
+            'deadline': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-input'
+            }),
+            'hiring_context': forms.RadioSelect(attrs={
+                'class': 'form-radio'
+            }),
+            'budget': forms.NumberInput(attrs={
+                'placeholder': _('e.g., 5000'),
+                'class': 'form-input',
+                'min': '0',
+                'step': '0.01'
+            }),
+        }
+        labels = {
+            'hiring_context': _('Hiring For'),
+            'budget': _('Budget (CAD)'),
+            'deadline': _('Desired Completion Date'),
+        }
+        help_texts = {
+            'hiring_context': _('Choose whether this is a personal hire or on behalf of your organization'),
+            'budget': _('Your maximum budget for this project'),
+        }
+
+    def __init__(self, *args, user=None, tenant=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.tenant = tenant
+
+        # If user has no tenant, force PERSONAL context
+        if not tenant:
+            self.fields['hiring_context'].initial = CrossTenantServiceRequest.HiringContext.PERSONAL
+            self.fields['hiring_context'].widget = forms.HiddenInput()
+
+        # Add CSS classes for styling
+        for field_name, field in self.fields.items():
+            if field_name not in ['hiring_context']:
+                if 'class' not in field.widget.attrs:
+                    field.widget.attrs['class'] = 'form-input'
+
+    def clean_title(self):
+        title = self.cleaned_data.get('title', '')
+        NoXSS()(title)
+        NoSQLInjection()(title)
+        return sanitize_plain_text(title)
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description', '')
+        NoSQLInjection()(description)
+        return sanitize_html(description)
+
+    def clean_requirements(self):
+        requirements = self.cleaned_data.get('requirements', '')
+        if requirements:
+            NoSQLInjection()(requirements)
+            return sanitize_html(requirements)
+        return requirements
+
+    def clean_budget(self):
+        budget = self.cleaned_data.get('budget')
+        if budget and budget < 0:
+            raise ValidationError(_('Budget must be a positive number.'))
+        return budget
+
+    def clean(self):
+        cleaned_data = super().clean()
+        hiring_context = cleaned_data.get('hiring_context')
+
+        # Validate hiring context based on user's tenant status
+        if hiring_context == CrossTenantServiceRequest.HiringContext.ORGANIZATIONAL:
+            if not self.tenant:
+                raise ValidationError({
+                    'hiring_context': _('You must be part of an organization to hire on its behalf. '
+                                       'Please select "Personal" or join/create an organization.')
+                })
 
         return cleaned_data
 
