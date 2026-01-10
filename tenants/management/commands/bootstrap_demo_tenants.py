@@ -467,7 +467,7 @@ class Command(BaseCommand):
                 'bio': f'Demo {tenant_type} provider',
                 'tagline': 'Quality services delivered',
                 'hourly_rate': Decimal(100),
-                'status': 'available',
+                'availability_status': 'available',
                 'is_verified': True,
                 'marketplace_enabled': True,  # Enable marketplace
                 'rating_avg': Decimal('4.5'),
