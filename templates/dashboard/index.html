@@ -35,26 +35,28 @@
 {% block page_title %}{% trans "Dashboard" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--text-tertiary);">
     {% trans "Welcome back! Here's an overview of your workspace." %}
 </p>
 {% endblock %}
 
 {% block page_actions %}
 <button type="button"
-        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        class="zumodra-btn zumodra-btn--outline"
         hx-get="{% url 'dashboard:htmx-quick-stats' %}"
         hx-target="#quick-stats-container"
         hx-swap="innerHTML"
         hx-indicator="#refresh-indicator">
-    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
     </svg>
     {% trans "Refresh" %}
-    <svg id="refresh-indicator" class="htmx-indicator ml-2 h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
+    <div id="refresh-indicator" class="htmx-indicator" style="margin-left: 0.5rem;">
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    </div>
 </button>
 {% endblock %}
 
@@ -77,13 +79,15 @@ x-init="startAutoRefresh()"
 x-on:beforeunload.window="stopAutoRefresh()">
 
     {# ===== QUICK STATS SECTION ===== #}
-    <section class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+    <section class="mb-8 animate-on-load" data-animation="fade-up" data-delay="0">
+        <div class="flex items-center justify-between mb-5">
+            <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">
                 {% trans "Quick Stats" %}
             </h2>
             <button @click="showAllStats = !showAllStats"
-                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                    style="font-size: 0.875rem; font-weight: 500; color: var(--accent-coral); background: none; border: none; cursor: pointer; transition: opacity 0.15s ease;"
+                    onmouseover="this.style.opacity='0.8'"
+                    onmouseout="this.style.opacity='1'">
                 <span x-show="!showAllStats">{% trans "Show All" %}</span>
                 <span x-show="showAllStats">{% trans "Show Less" %}</span>
             </button>
@@ -93,7 +97,23 @@ x-on:beforeunload.window="stopAutoRefresh()">
              hx-get="{% url 'dashboard:htmx-quick-stats' %}"
              hx-trigger="refresh"
              hx-swap="innerHTML">
-            {% include "dashboard/partials/_quick_stats.html" %}
+            <!-- Quick Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {% include "components/stats_card.html" with title="Open Jobs" value=stats.open_jobs|default:"0" icon="jobs" delay="0" %}
+                {% include "components/stats_card.html" with title="Total Candidates" value=stats.total_candidates|default:"0" icon="users" icon_variant="success" delay="50" %}
+                {% include "components/stats_card.html" with title="Active Applications" value=stats.active_applications|default:"0" icon="applications" icon_variant="info" delay="100" %}
+                {% include "components/stats_card.html" with title="Pending Interviews" value=stats.pending_interviews|default:"0" icon="interviews" icon_variant="warning" delay="150" %}
+
+                <!-- Extended Stats (shown when expanded) -->
+                <template x-if="showAllStats">
+                    <div class="contents">
+                        {% include "components/stats_card.html" with title="New This Week" value=stats.new_candidates_week|default:"0" change="+12%" change_type="increase" icon="chart" icon_variant="gold" delay="200" %}
+                        {% include "components/stats_card.html" with title="Total Employees" value=stats.total_employees|default:"0" icon="users" delay="250" %}
+                        {% include "components/stats_card.html" with title="Time Off Requests" value=stats.pending_time_off|default:"0" icon="time" icon_variant="warning" delay="300" %}
+                        {% include "components/stats_card.html" with title="Satisfaction Score" value="92%" icon="star" icon_variant="gold" delay="350" %}
+                    </div>
+                </template>
+            </div>
         </div>
     </section>
 
@@ -101,76 +121,134 @@ x-on:beforeunload.window="stopAutoRefresh()">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {# ===== UPCOMING INTERVIEWS WIDGET ===== #}
-        <section class="lg:col-span-2">
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <section class="lg:col-span-2 animate-on-load" data-animation="fade-up" data-delay="200">
+            <div class="zumodra-widget">
+                <div class="zumodra-widget__header">
                     <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                            {% trans "Upcoming Interviews" %}
-                        </h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {% trans "Scheduled for the next 7 days" %}
-                        </p>
+                        <h3 class="zumodra-widget__title">{% trans "Upcoming Interviews" %}</h3>
+                        <p class="zumodra-widget__subtitle">{% trans "Scheduled for the next 7 days" %}</p>
                     </div>
                     <button type="button"
-                            class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                            class="zumodra-btn zumodra-btn--ghost"
+                            style="padding: 0.5rem;"
                             hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
                             hx-target="#upcoming-interviews-container"
                             hx-swap="innerHTML"
                             hx-indicator="#interviews-indicator">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        <svg id="interviews-indicator" class="htmx-indicator h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                        <div id="interviews-indicator" class="htmx-indicator">
+                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                     </button>
                 </div>
                 <div id="upcoming-interviews-container"
                      hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
                      hx-trigger="load delay:100ms"
                      hx-swap="innerHTML">
-                    {% include "dashboard/partials/_upcoming_interviews.html" %}
+                    {% if upcoming_interviews %}
+                    <div>
+                        {% for interview in upcoming_interviews %}
+                        <div class="zumodra-interview-card">
+                            <div class="zumodra-interview-card__time">
+                                <div class="zumodra-interview-card__day">{{ interview.scheduled_at|date:"d" }}</div>
+                                <div class="zumodra-interview-card__month">{{ interview.scheduled_at|date:"M" }}</div>
+                            </div>
+                            <div class="zumodra-interview-card__details">
+                                <p class="zumodra-interview-card__title">{{ interview.candidate.full_name }}</p>
+                                <p class="zumodra-interview-card__meta">{{ interview.job.title }} &bull; {{ interview.scheduled_at|time:"H:i" }}</p>
+                            </div>
+                            <span class="badge {% if interview.interview_type == 'video' %}badge-info{% elif interview.interview_type == 'phone' %}badge-warning{% else %}badge-primary{% endif %}">
+                                {{ interview.get_interview_type_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="zumodra-empty">
+                        <svg class="zumodra-empty__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <h3 class="zumodra-empty__title">{% trans "No upcoming interviews" %}</h3>
+                        <p class="zumodra-empty__text">{% trans "Schedule interviews from the applications page." %}</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </section>
 
         {# ===== RECENT ACTIVITY WIDGET ===== #}
-        <section class="lg:col-span-1">
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                            {% trans "Recent Activity" %}
-                        </h3>
+        <section class="lg:col-span-1 animate-on-load" data-animation="fade-up" data-delay="300">
+            <div class="zumodra-widget">
+                <div class="zumodra-widget__header">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <h3 class="zumodra-widget__title">{% trans "Recent Activity" %}</h3>
                         {% if unread_notifications > 0 %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                            {{ unread_notifications }} {% trans "unread" %}
-                        </span>
+                        <span class="badge badge-primary">{{ unread_notifications }} {% trans "unread" %}</span>
                         {% endif %}
                     </div>
                     <button type="button"
-                            class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                            class="zumodra-btn zumodra-btn--ghost"
+                            style="padding: 0.5rem;"
                             hx-get="{% url 'dashboard:htmx-recent-activity' %}"
                             hx-target="#recent-activity-container"
                             hx-swap="innerHTML"
                             hx-indicator="#activity-indicator">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        <svg id="activity-indicator" class="htmx-indicator h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                        <div id="activity-indicator" class="htmx-indicator">
+                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                     </button>
                 </div>
                 <div id="recent-activity-container"
                      hx-get="{% url 'dashboard:htmx-recent-activity' %}"
                      hx-trigger="load delay:200ms"
                      hx-swap="innerHTML"
-                     class="max-h-96 overflow-y-auto">
-                    {% include "dashboard/partials/_recent_activity.html" %}
+                     style="max-height: 24rem; overflow-y: auto;">
+                    {% if recent_activity %}
+                    <ul class="zumodra-activity-list">
+                        {% for activity in recent_activity %}
+                        <li class="zumodra-activity-item">
+                            <div class="zumodra-activity-item__icon">
+                                {% if activity.type == 'application' %}
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                {% elif activity.type == 'interview' %}
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                {% else %}
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div class="zumodra-activity-item__content">
+                                <p class="zumodra-activity-item__title">{{ activity.message }}</p>
+                                <p class="zumodra-activity-item__meta">{{ activity.created_at|timesince }} ago</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="zumodra-empty">
+                        <svg class="zumodra-empty__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        <h3 class="zumodra-empty__title">{% trans "No recent activity" %}</h3>
+                        <p class="zumodra-empty__text">{% trans "Your activity will appear here." %}</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </section>
@@ -178,85 +256,49 @@ x-on:beforeunload.window="stopAutoRefresh()">
     </div>
 
     {# ===== QUICK ACTIONS SECTION ===== #}
-    <section class="mt-8">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+    <section class="mt-8 animate-on-load" data-animation="fade-up" data-delay="400">
+        <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0 0 1rem;">
             {% trans "Quick Actions" %}
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             {# Post New Job #}
-            <a href="{% url 'ats:job_create' %}"
-               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                            {% trans "Post New Job" %}
-                        </p>
-                    </div>
+            <a href="{% url 'ats:job_create' %}" class="zumodra-action-card">
+                <div class="zumodra-action-card__icon" style="background: var(--accent-coral-light); color: var(--accent-coral);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
                 </div>
+                <span class="zumodra-action-card__text">{% trans "Post New Job" %}</span>
             </a>
 
             {# View Candidates #}
-            <a href="{% url 'ats:candidates' %}"
-               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">
-                            {% trans "View Candidates" %}
-                        </p>
-                    </div>
+            <a href="{% url 'ats:candidates' %}" class="zumodra-action-card">
+                <div class="zumodra-action-card__icon" style="background: var(--success-light); color: var(--success);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
                 </div>
+                <span class="zumodra-action-card__text">{% trans "View Candidates" %}</span>
             </a>
 
-            {# Schedule Interview #}
-            <a href="{% url 'ats:applications' %}"
-               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400">
-                            {% trans "Applications" %}
-                        </p>
-                    </div>
+            {# Applications #}
+            <a href="{% url 'ats:applications' %}" class="zumodra-action-card">
+                <div class="zumodra-action-card__icon" style="background: var(--warning-light); color: var(--warning);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                 </div>
+                <span class="zumodra-action-card__text">{% trans "Applications" %}</span>
             </a>
 
             {# Employee Directory #}
-            <a href="{% url 'hr:employees' %}"
-               class="group relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
-                            {% trans "Employees" %}
-                        </p>
-                    </div>
+            <a href="{% url 'hr:employees' %}" class="zumodra-action-card">
+                <div class="zumodra-action-card__icon" style="background: var(--info-light); color: var(--info);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
                 </div>
+                <span class="zumodra-action-card__text">{% trans "Employees" %}</span>
             </a>
         </div>
     </section>

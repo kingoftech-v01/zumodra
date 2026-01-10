@@ -46,8 +46,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta_description %}Zumodra - Verify. Recruit. Hire. Risk-Free.{% endblock %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#E8705C" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1E2432" media="(prefers-color-scheme: dark)">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
@@ -66,6 +66,10 @@
     {# Core Tailwind CSS (pre-compiled) #}
     <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}">
+
+    {# Zumodra Design System #}
+    <link rel="stylesheet" href="{% static 'css/dark-mode.css' %}">
+    <link rel="stylesheet" href="{% static 'css/zumodra-animations.css' %}">
 
     {# Component CSS #}
     <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}">
@@ -126,7 +130,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="{% block body_class %}flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100{% endblock %}"
+<body class="{% block body_class %}flex flex-col min-h-screen zumodra-bg text-gray-900 dark:text-gray-100{% endblock %}"
       x-data="{
           darkMode: localStorage.getItem('darkMode') === 'true',
           sidebarOpen: true,
@@ -135,60 +139,62 @@
       x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val) }); if (darkMode) document.documentElement.classList.add('dark')"
       :class="{ 'dark': darkMode }">
 
+    {# ===== ATMOSPHERIC BACKGROUND LAYERS ===== #}
+    <div class="zumodra-bg-mesh" aria-hidden="true"></div>
+    <div class="zumodra-bg-noise" aria-hidden="true"></div>
+
     {# ===== TOAST NOTIFICATION CONTAINER ===== #}
     <div id="toast-container"
-         class="fixed top-4 right-4 z-50 space-y-2"
+         class="fixed top-4 right-4 z-50 space-y-3"
          x-data="{ toasts: [] }"
          @toast.window="toasts.push({id: Date.now(), message: $event.detail.message, type: $event.detail.type || 'info'}); setTimeout(() => toasts.shift(), 5000)">
         <template x-for="toast in toasts" :key="toast.id">
             <div x-show="true"
-                 x-transition:enter="transform ease-out duration-300 transition"
-                 x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                 x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-                 x-transition:leave="transition ease-in duration-100"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+                 x-transition:enter="transform ease-out duration-400 transition"
+                 x-transition:enter-start="translate-x-full opacity-0"
+                 x-transition:enter-end="translate-x-0 opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-x-0"
+                 x-transition:leave-end="opacity-0 translate-x-full"
+                 class="zumodra-toast max-w-sm w-full pointer-events-auto"
                  :class="{
-                     'border-l-4 border-green-500': toast.type === 'success',
-                     'border-l-4 border-red-500': toast.type === 'error',
-                     'border-l-4 border-yellow-500': toast.type === 'warning',
-                     'border-l-4 border-blue-500': toast.type === 'info'
+                     'zumodra-toast--success': toast.type === 'success',
+                     'zumodra-toast--error': toast.type === 'error',
+                     'zumodra-toast--warning': toast.type === 'warning',
+                     'zumodra-toast--info': toast.type === 'info'
                  }">
-                <div class="p-4 flex items-start">
-                    <div class="flex-shrink-0">
+                <div class="p-4 flex items-start gap-3">
+                    <div class="flex-shrink-0 zumodra-toast__icon">
                         <template x-if="toast.type === 'success'">
-                            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                         </template>
                         <template x-if="toast.type === 'error'">
-                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                             </svg>
                         </template>
                         <template x-if="toast.type === 'warning'">
-                            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                             </svg>
                         </template>
                         <template x-if="toast.type === 'info'">
-                            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
                         </template>
                     </div>
-                    <div class="ml-3 w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100" x-text="toast.message"></p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium zumodra-toast__message" x-text="toast.message"></p>
                     </div>
-                    <div class="ml-4 flex-shrink-0 flex">
-                        <button @click="toasts = toasts.filter(t => t.id !== toast.id)"
-                                class="inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <button @click="toasts = toasts.filter(t => t.id !== toast.id)"
+                            class="flex-shrink-0 zumodra-toast__close">
+                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </template>
@@ -208,31 +214,35 @@
 
     {# ===== LOADING OVERLAY ===== #}
     <div id="loading-overlay"
-         class="fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 hidden items-center justify-center"
+         class="fixed inset-0 z-50 hidden items-center justify-center"
+         style="background: var(--bg-overlay);"
          x-data="{ show: false }"
          x-show="show"
          x-on:loading.window="show = true"
          x-on:loaded.window="show = false"
-         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         <div class="flex flex-col items-center">
-            <svg class="animate-spin h-12 w-12 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">{% trans "Loading..." %}</p>
+            <div class="zumodra-loader">
+                <div class="zumodra-loader__ring"></div>
+                <div class="zumodra-loader__ring"></div>
+                <div class="zumodra-loader__ring"></div>
+            </div>
+            <p class="mt-6 text-sm font-medium" style="color: var(--text-secondary); font-family: var(--font-body);">{% trans "Loading..." %}</p>
         </div>
     </div>
 
     {# ===== SCROLL TO TOP BUTTON ===== #}
-    <button class="scroll-to-top-btn fixed bottom-6 right-6 z-40 p-3 rounded-full bg-primary text-white shadow-lg opacity-0 invisible transition-all duration-300"
+    <button class="zumodra-scroll-top fixed bottom-6 right-6 z-40 opacity-0 invisible transition-all duration-300"
             aria-label="Scroll to top"
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <span class="ph-bold ph-caret-up text-xl"></span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
     </button>
 
     {# ===== LOCAL JAVASCRIPT - NO CDN ===== #}
@@ -275,7 +285,7 @@
 
         // Scroll to top button visibility
         window.addEventListener('scroll', function() {
-            const btn = document.querySelector('.scroll-to-top-btn');
+            const btn = document.querySelector('.zumodra-scroll-top');
             if (btn) {
                 if (window.scrollY > 300) {
                     btn.classList.remove('opacity-0', 'invisible');
@@ -287,6 +297,9 @@
             }
         });
     </script>
+
+    {# Zumodra Micro-Interactions #}
+    <script src="{% static 'js/micro-interactions.js' %}"></script>
 
     {# ===== LEGACY JS (jQuery) - Only when needed ===== #}
     {% block js_legacy %}
