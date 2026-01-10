@@ -228,7 +228,8 @@
             <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Verification" %}</span>
         </a>
 
-        <!-- Careers (Public Job Board) -->
+        <!-- Careers (Public Job Board) - COMPANY TENANTS ONLY -->
+        {% if request.tenant.tenant_type == 'company' %}
         <a href="{% url 'careers_public:template:home' %}"
            class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
            :class="activeSection === 'careers' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
@@ -237,6 +238,7 @@
             </svg>
             <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Careers" %}</span>
         </a>
+        {% endif %}
 
         <!-- Blog -->
         <a href="{% url 'blog:search' %}"

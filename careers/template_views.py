@@ -213,6 +213,18 @@ class JobAlertForm(forms.Form):
 class CareerSiteContextMixin:
     """Mixin to add career site configuration to context."""
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                raise Http404(
+                    _("Career pages are only available for company tenants. "
+                      "Freelancer tenants can showcase services at /services/")
+                )
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_career_site(self):
         """Get the active career page configuration."""
         try:
@@ -698,6 +710,16 @@ class JobAlertConfirmedView(CareerSiteContextMixin, TemplateView):
 class JobAlertConfirmTokenView(View):
     """Handle email confirmation token for job alerts."""
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                raise Http404(
+                    _("Career pages are only available for company tenants.")
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, token):
         """Confirm the subscription using the token."""
         try:
@@ -732,6 +754,16 @@ class JobAlertConfirmTokenView(View):
 
 class JobAlertUnsubscribeTokenView(View):
     """Handle unsubscribe token for job alerts."""
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                raise Http404(
+                    _("Career pages are only available for company tenants.")
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, token):
         """Unsubscribe using the token."""
@@ -775,6 +807,16 @@ class JobAlertUnsubscribedView(CareerSiteContextMixin, TemplateView):
 class RobotsTxtView(View):
     """Generate robots.txt for career pages."""
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                raise Http404(
+                    _("Career pages are only available for company tenants.")
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         from django.http import HttpResponse
         lines = [
@@ -786,8 +828,18 @@ class RobotsTxtView(View):
         return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-class CareersSitemapView(CareerSiteContextMixin, View):
+class CareersSitemapView(View):
     """Generate sitemap for career pages."""
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                raise Http404(
+                    _("Career pages are only available for company tenants.")
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
         from django.http import HttpResponse

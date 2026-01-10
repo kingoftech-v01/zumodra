@@ -88,6 +88,17 @@ class PublicCareerSiteView(CORSMixin, APIView):
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, domain):
         from careers.services import CareerSiteService
         from careers.serializers import CareerSitePublicSerializer
@@ -117,6 +128,17 @@ class PublicCareerSiteJobsView(CORSMixin, generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, domain):
         from careers.services import CareerSiteService
@@ -164,6 +186,17 @@ class PublicCareerSiteJobDetailView(CORSMixin, APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, domain, slug):
         from careers.services import CareerSiteService
@@ -222,6 +255,17 @@ class PublicApplicationSubmitView(CORSMixin, APIView):
     throttle_classes = [ApplicationSubmitThrottle]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     allow_cors = True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, domain, job_slug=None):
         from careers.services import CareerSiteService, PublicApplicationService
@@ -328,6 +372,17 @@ class JobAlertSubscribeView(CORSMixin, APIView):
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request):
         from careers.services import CareerSiteService, JobAlertService
 
@@ -389,6 +444,17 @@ class JobAlertConfirmView(CORSMixin, APIView):
     permission_classes = [permissions.AllowAny]
     allow_cors = True
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, token):
         from careers.services import JobAlertService
 
@@ -421,6 +487,17 @@ class JobAlertUnsubscribeView(CORSMixin, APIView):
     """
     permission_classes = [permissions.AllowAny]
     allow_cors = True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, token):
         from careers.services import JobAlertService
@@ -458,6 +535,17 @@ class PublicCareerSiteDepartmentsView(CORSMixin, APIView):
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, domain):
         from careers.services import CareerSiteService
 
@@ -482,6 +570,17 @@ class PublicCareerSiteLocationsView(CORSMixin, APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
     allow_cors = True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate tenant type before processing request."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can have career pages
+        if hasattr(request, 'tenant') and request.tenant:
+            if request.tenant.tenant_type != 'company':
+                return Response(
+                    {'error': 'Career pages are only available for company tenants.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, domain):
         from careers.services import CareerSiteService
