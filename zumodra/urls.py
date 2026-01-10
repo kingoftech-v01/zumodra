@@ -285,6 +285,9 @@ urlpatterns += i18n_patterns(
     # Security (staff dashboard)
     path('security/', include('security.urls', namespace='security')),
 
+    # Careers (public job listings - also available with i18n prefix)
+    path('careers/', include('careers.urls', namespace='careers')),
+
     # Wagtail documents
     path('documents/', include(wagtaildocs_urls)),
 
