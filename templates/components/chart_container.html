@@ -1,7 +1,6 @@
 {% load static i18n %}
 
-{#
-    Chart Container Component for Chart.js
+{% comment %} Chart Container Component for Chart.js
 
     Usage:
     {% include "components/chart_container.html" with chart_id="revenue-chart" chart_type="line" title="Revenue Over Time" %}
@@ -13,8 +12,7 @@
     - subtitle: Chart subtitle (optional)
     - height: Chart height in pixels (default: 300)
     - data_url: HTMX endpoint for chart data (optional)
-    - period_selector: Show period selector (day, week, month, year)
-#}
+    - period_selector: Show period selector (day, week, month, year) {% endcomment %}
 
 <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden"
      x-data="{

@@ -1,6 +1,5 @@
 {% load static i18n humanize %}
-{#
-    Time-Off List Partial (HTMX-swappable)
+{% comment %} Time-Off List Partial (HTMX-swappable)
 
     Usage:
     {% include "hr/partials/_timeoff_list.html" with requests=time_off_requests %}
@@ -9,8 +8,7 @@
     - requests: QuerySet of TimeOffRequest instances
     - show_employee: Boolean to show employee column (optional, default True)
     - can_approve: Boolean to show approve/reject buttons (optional)
-    - compact: Boolean for compact view (optional)
-#}
+    - compact: Boolean for compact view (optional) {% endcomment %}
 
 <div id="timeoff-list-partial" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
     <div class="overflow-x-auto">

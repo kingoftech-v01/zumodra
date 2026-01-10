@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA BREADCRUMB SECTION COMPONENT
    =============================================================================
 
@@ -20,24 +20,24 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 <section class="breadcrumb_block relative lg:pt-40 sm:pt-32 pt-24 lg:pb-20 sm:pb-14 pb-10">
-    {# Background Image or Gradient #}
+    {% comment %} Background Image or Gradient {% endcomment %}
     <div class="bg_img absolute top-0 left-0 w-full h-full z-[-1]">
         {% if background_image %}
         <img src="{{ background_image }}" alt="" class="w-full h-full object-cover" />
         {% else %}
         <div class="w-full h-full bg-gradient-to-br from-primary via-primary/90 to-primary/70"></div>
         {% endif %}
-        {# Overlay for better text contrast #}
+        {% comment %} Overlay for better text contrast {% endcomment %}
         <div class="absolute inset-0 bg-black/30"></div>
     </div>
 
     <div class="container relative text-center">
-        {# Breadcrumb Navigation #}
+        {% comment %} Breadcrumb Navigation {% endcomment %}
         <nav class="breadcrumb_nav flex items-center justify-center gap-2 mb-5" aria-label="{% trans 'Breadcrumb' %}">
             <a href="{% url 'home' %}" class="text-white/80 caption1 hover:text-white hover:underline transition-colors">
                 {% trans 'Home' %}
@@ -57,20 +57,20 @@
             {% endif %}
         </nav>
 
-        {# Page Title #}
+        {% comment %} Page Title {% endcomment %}
         <h1 class="heading2 text-white">{{ title }}</h1>
         {% if subtitle %}
         <p class="body1 text-white/90 mt-2">{{ subtitle }}</p>
         {% endif %}
 
-        {# Search Form (Optional) #}
+        {% comment %} Search Form (Optional) {% endcomment %}
         {% if show_search %}
         <form class="form_search relative xl:w-[75%] lg:w-[85%] w-full mx-auto md:mt-10 mt-7 lg:p-3.5 p-2 bg-white rounded-lg shadow-lg"
               action="{{ search_action|default:'#' }}"
               method="get">
             {% csrf_token %}
             <div class="form_inner flex max-lg:flex-wrap items-center h-full">
-                {# Keyword Input #}
+                {% comment %} Keyword Input {% endcomment %}
                 <div class="form_input relative flex-grow xl:max-w-[360px] lg:max-w-[250px] w-full h-full lg:pl-3">
                     <span class="ph ph-magnifying-glass text-2xl text-secondary"></span>
                     <input type="text"
@@ -82,7 +82,7 @@
 
                 <div class="line w-px h-8 bg-line mx-6 max-lg:hidden"></div>
 
-                {# Location Dropdown #}
+                {% comment %} Location Dropdown {% endcomment %}
                 <div class="select_block relative lg:flex-grow lg:max-w-[300px] max-lg:flex-1 max-lg:w-full max-lg:mt-3 max-lg:pl-3 h-full"
                      x-data="{ open: false, selected: '{% trans "All Locations" %}' }">
                     <span class="ph ph-map-pin text-2xl text-secondary max-lg:hidden"></span>
@@ -111,7 +111,7 @@
 
                 <div class="line w-px h-8 bg-line mx-6 max-lg:hidden"></div>
 
-                {# Category Dropdown #}
+                {% comment %} Category Dropdown {% endcomment %}
                 <div class="select_block relative lg:flex-grow lg:max-w-[300px] max-lg:flex-1 max-lg:w-full max-lg:mt-3 max-lg:pl-3 h-full"
                      x-data="{ open: false, selected: '{% trans "All Categories" %}' }">
                     <span class="ph ph-squares-four text-2xl text-secondary max-lg:hidden"></span>
@@ -138,7 +138,7 @@
                     </ul>
                 </div>
 
-                {# Search Button #}
+                {% comment %} Search Button {% endcomment %}
                 <button type="submit" class="button-main lg:flex-shrink-0 max-lg:w-full max-lg:mt-4 lg:ml-3">
                     {% trans 'Search' %}
                 </button>

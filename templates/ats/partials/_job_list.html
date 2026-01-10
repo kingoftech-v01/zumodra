@@ -1,15 +1,13 @@
 {% load static i18n humanize %}
 
-{#
-    Job List Partial for HTMX updates
+{% comment %} Job List Partial for HTMX updates
 
     Usage: This partial is returned when HTMX requests the job list
     with filters, search, or pagination changes.
 
     Variables:
     - jobs: QuerySet of JobPosting objects
-    - page_obj: Django Page object for pagination (optional)
-#}
+    - page_obj: Django Page object for pagination (optional) {% endcomment %}
 
 {% for job in jobs %}
 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">

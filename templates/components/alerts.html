@@ -388,31 +388,31 @@ GLASSMORPHISM ALERT - Frosted glass effect
 USAGE EXAMPLES
 ==============================================================================
 
-{# Basic info alert #}
+{% comment %} Basic info alert {% endcomment %}
 {% include "components/alerts.html" with variant="info" title="Did you know?" message="You can customize your dashboard in settings." %}
 
-{# Success alert with dismiss #}
+{% comment %} Success alert with dismiss {% endcomment %}
 {% include "components/alerts.html" with variant="success" title="Success!" message="Your profile has been updated." dismissible=True %}
 
-{# Warning alert #}
+{% comment %} Warning alert {% endcomment %}
 {% include "components/alerts.html" with variant="warning" title="Warning" message="Your session will expire in 5 minutes." %}
 
-{# Error alert #}
+{% comment %} Error alert {% endcomment %}
 {% include "components/alerts.html" with variant="error" title="Error" message="Failed to save changes. Please try again." %}
 
-{# Banner alert #}
+{% comment %} Banner alert {% endcomment %}
 {% include "components/alerts.html" with variant="banner" type="info" message="New feature available!" link_text="Learn more" link_url="/changelog" dismissible=True %}
 
-{# Inline validation error #}
+{% comment %} Inline validation error {% endcomment %}
 {% include "components/alerts.html" with variant="inline" type="error" message="This email is already registered." %}
 
-{# Alert with action button #}
+{% comment %} Alert with action button {% endcomment %}
 {% include "components/alerts.html" with variant="action" type="warning" title="Subscription expiring" message="Your subscription expires in 3 days." action_text="Renew Now" action_url="/billing" secondary_action_text="Dismiss" secondary_action_dismiss=True %}
 
-{# Error list #}
+{% comment %} Error list {% endcomment %}
 {% include "components/alerts.html" with variant="list" type="error" title="Please fix the following:" messages=error_list %}
 
-{# Glassmorphism alert #}
+{% comment %} Glassmorphism alert {% endcomment %}
 {% include "components/alerts.html" with variant="glass" title="Welcome!" message="Thanks for joining us." dismissible=True %}
 
 {% endcomment %}

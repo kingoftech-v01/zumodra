@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA SERVICE CARD COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "list" %}
-{# List Layout #}
+{% comment %} List Layout {% endcomment %}
 <li class="item">
     <div class="service_item service_item_list overflow-hidden relative flex gap-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
         <a href="{{ service.get_absolute_url }}" class="service_thumb flex-shrink-0 w-[280px]">
@@ -84,10 +84,10 @@
 </li>
 
 {% else %}
-{# Grid Layout (Default) #}
+{% comment %} Grid Layout (Default) {% endcomment %}
 <li class="item h-full">
     <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-        {# Wishlist Button #}
+        {% comment %} Wishlist Button {% endcomment %}
         {% if show_wishlist|default:True %}
         <button class="add_wishlist_btn absolute top-4 right-4 z-10"
                 hx-post="{% url 'services:service_bookmark' service.id %}"
@@ -98,7 +98,7 @@
         </button>
         {% endif %}
 
-        {# Service Thumbnail #}
+        {% comment %} Service Thumbnail {% endcomment %}
         <a href="{{ service.get_absolute_url }}" class="service_thumb block aspect-[4/3] overflow-hidden">
             {% if service.thumbnail %}
             <img src="{{ service.thumbnail.url }}" alt="{{ service.title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
@@ -109,9 +109,9 @@
             {% endif %}
         </a>
 
-        {# Service Info #}
+        {% comment %} Service Info {% endcomment %}
         <div class="service_info py-5 px-4">
-            {# Category and Rating #}
+            {% comment %} Category and Rating {% endcomment %}
             <div class="flex items-center justify-between">
                 <a href="#" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category.name }}</a>
                 {% if service.rating %}
@@ -123,12 +123,12 @@
                 {% endif %}
             </div>
 
-            {# Service Title #}
+            {% comment %} Service Title {% endcomment %}
             <a href="{{ service.get_absolute_url }}" class="service_title text-title pt-2 duration-300 hover:text-primary line-clamp-2">
                 {{ service.title }}
             </a>
 
-            {# Author and Price #}
+            {% comment %} Author and Price {% endcomment %}
             <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
                 <a href="{{ service.provider.get_absolute_url }}" class="service_author flex items-center gap-2">
                     {% if service.provider.profile_picture %}

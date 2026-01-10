@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA DASHBOARD INDEX TEMPLATE
    =============================================================================
 
@@ -27,7 +27,7 @@
 
    Author: Rhematek Solutions
    Last Updated: 2025-12-30
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% extends "base/dashboard_base.html" %}
 {% load static i18n %}
@@ -78,7 +78,7 @@
 x-init="startAutoRefresh()"
 x-on:beforeunload.window="stopAutoRefresh()">
 
-    {# ===== QUICK STATS SECTION ===== #}
+    {% comment %} ===== QUICK STATS SECTION ===== {% endcomment %}
     <section class="mb-8 animate-on-load" data-animation="fade-up" data-delay="0">
         <div class="flex items-center justify-between mb-5">
             <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">
@@ -116,10 +116,10 @@ x-on:beforeunload.window="stopAutoRefresh()">
         </div>
     </section>
 
-    {# ===== MAIN DASHBOARD GRID ===== #}
+    {% comment %} ===== MAIN DASHBOARD GRID ===== {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {# ===== UPCOMING INTERVIEWS WIDGET ===== #}
+        {% comment %} ===== UPCOMING INTERVIEWS WIDGET ===== {% endcomment %}
         <section class="lg:col-span-2 animate-on-load" data-animation="fade-up" data-delay="200">
             <div class="zu-card">
                 <div class="zu-card__header">
@@ -180,7 +180,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
             </div>
         </section>
 
-        {# ===== RECENT ACTIVITY WIDGET ===== #}
+        {% comment %} ===== RECENT ACTIVITY WIDGET ===== {% endcomment %}
         <section class="lg:col-span-1 animate-on-load" data-animation="fade-up" data-delay="300">
             <div class="zu-card">
                 <div class="zu-card__header">
@@ -254,13 +254,13 @@ x-on:beforeunload.window="stopAutoRefresh()">
 
     </div>
 
-    {# ===== QUICK ACTIONS SECTION ===== #}
+    {% comment %} ===== QUICK ACTIONS SECTION ===== {% endcomment %}
     <section class="mt-8 animate-on-load" data-animation="fade-up" data-delay="400">
         <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0 0 1rem;">
             {% trans "Quick Actions" %}
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {# Post New Job #}
+            {% comment %} Post New Job {% endcomment %}
             <a href="{% url 'ats:job_create' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--accent-coral-light); color: var(--accent-coral);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -270,7 +270,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                 <span class="zu-action-card__text">{% trans "Post New Job" %}</span>
             </a>
 
-            {# View Candidates #}
+            {% comment %} View Candidates {% endcomment %}
             <a href="{% url 'ats:candidates' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--success-light); color: var(--success);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -280,7 +280,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                 <span class="zu-action-card__text">{% trans "View Candidates" %}</span>
             </a>
 
-            {# Applications #}
+            {% comment %} Applications {% endcomment %}
             <a href="{% url 'ats:applications' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--warning-light); color: var(--warning);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -290,7 +290,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                 <span class="zu-action-card__text">{% trans "Applications" %}</span>
             </a>
 
-            {# Employee Directory #}
+            {% comment %} Employee Directory {% endcomment %}
             <a href="{% url 'hr:employees' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--info-light); color: var(--info);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">

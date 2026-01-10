@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA EMPLOYER CARD COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "list" %}
-{# List Layout #}
+{% comment %} List Layout {% endcomment %}
 <li class="employers_item employers_item_list flex items-center gap-5 relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <a href="{{ employer.get_absolute_url }}" class="flex-shrink-0">
         {% if employer.logo %}
@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    {# Verified Badge #}
+    {% comment %} Verified Badge {% endcomment %}
     {% if employer.is_verified %}
     <div class="absolute top-4 left-4 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded flex items-center gap-1">
         <span class="ph-fill ph-shield-check"></span>
@@ -89,12 +89,12 @@
 </li>
 
 {% else %}
-{# Grid Layout (Default) #}
+{% comment %} Grid Layout (Default) {% endcomment %}
 <li class="employers_item relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <div class="employers_inner">
-        {# Employer Profile #}
+        {% comment %} Employer Profile {% endcomment %}
         <a href="{{ employer.get_absolute_url }}" class="flex flex-col items-center justify-center">
-            {# Logo #}
+            {% comment %} Logo {% endcomment %}
             {% if employer.logo %}
             <img src="{{ employer.logo.url }}" alt="{{ employer.name }}" class="w-20 h-20 rounded-lg object-cover" />
             {% else %}
@@ -103,15 +103,15 @@
             </div>
             {% endif %}
 
-            {# Name #}
+            {% comment %} Name {% endcomment %}
             <strong class="employers_name -style-1 text-title mt-3 duration-300 hover:text-primary text-center">{{ employer.name }}</strong>
 
-            {# Industry #}
+            {% comment %} Industry {% endcomment %}
             {% if employer.industry %}
             <p class="text-secondary text-sm mt-0.5 text-center">{{ employer.industry }}</p>
             {% endif %}
 
-            {# Location #}
+            {% comment %} Location {% endcomment %}
             {% if employer.location %}
             <div class="flex items-center gap-1 mt-1">
                 <span class="ph ph-map-pin text-xl text-secondary"></span>
@@ -119,7 +119,7 @@
             </div>
             {% endif %}
 
-            {# Rating #}
+            {% comment %} Rating {% endcomment %}
             {% if employer.rating %}
             <div class="flex items-center gap-1 mt-1">
                 <span class="ph-fill ph-star text-yellow"></span>
@@ -129,7 +129,7 @@
             {% endif %}
         </a>
 
-        {# Stats #}
+        {% comment %} Stats {% endcomment %}
         <div class="employers_more_info flex flex-wrap items-center justify-between gap-2 mt-4 pt-4 border-t border-line">
             <span class="employers_jobs text-secondary text-sm">
                 <span class="ph-bold ph-briefcase mr-1"></span>
@@ -142,7 +142,7 @@
         </div>
     </div>
 
-    {# Wishlist Button #}
+    {% comment %} Wishlist Button {% endcomment %}
     {% if show_wishlist|default:True %}
     <button class="add_wishlist_btn absolute top-4 right-4"
             hx-post="{% url 'ats:employer_bookmark' employer.id %}"
@@ -153,7 +153,7 @@
     </button>
     {% endif %}
 
-    {# Verified Badge #}
+    {% comment %} Verified Badge {% endcomment %}
     {% if employer.is_verified %}
     <div class="absolute top-4 left-4 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded flex items-center gap-1">
         <span class="ph-fill ph-shield-check"></span>

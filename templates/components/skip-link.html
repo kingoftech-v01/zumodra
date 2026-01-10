@@ -23,7 +23,7 @@ Example target element:
 
 {% load i18n %}
 
-{# Default values #}
+{% comment %} Default values {% endcomment %}
 {% with target_id=target_id|default:"main-content" %}
 {% with label=label|default:_("Skip to main content") %}
 {% with nav_label=nav_label|default:_("Skip to navigation") %}
@@ -31,7 +31,7 @@ Example target element:
 {% with show_nav_link=show_nav_link|default:False %}
 {% with show_footer_link=show_footer_link|default:False %}
 
-{# Single skip link version #}
+{% comment %} Single skip link version {% endcomment %}
 {% if not show_nav_link and not show_footer_link %}
 <a href="#{{ target_id }}"
    class="skip-link"
@@ -40,7 +40,7 @@ Example target element:
     {{ label }}
 </a>
 {% else %}
-{# Multiple skip links version #}
+{% comment %} Multiple skip links version {% endcomment %}
 <nav class="skip-links" aria-label="{% trans 'Skip links' %}">
     <a href="#{{ target_id }}"
        class="skip-link"

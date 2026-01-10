@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "Your interview has been scheduled. Please review the details." %}{% endblock %}
 
 {% block email_content %}
-{# Greeting #}
+{% comment %} Greeting {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding-bottom: 20px;">
@@ -24,7 +24,7 @@
     </tr>
 </table>
 
-{# Interview details card #}
+{% comment %} Interview details card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
@@ -39,7 +39,7 @@
                 <tr>
                     <td>
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                            {# Date #}
+                            {% comment %} Date {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #dbeafe;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -55,7 +55,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Time #}
+                            {% comment %} Time {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #dbeafe;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -71,7 +71,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Duration #}
+                            {% comment %} Duration {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #dbeafe;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -87,7 +87,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Location/Link #}
+                            {% comment %} Location/Link {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -115,7 +115,7 @@
     </tr>
 </table>
 
-{# Interviewer info #}
+{% comment %} Interviewer info {% endcomment %}
 {% if interviewer_name %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -141,7 +141,7 @@
 </table>
 {% endif %}
 
-{# Additional notes #}
+{% comment %} Additional notes {% endcomment %}
 {% if interview_notes %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -157,7 +157,7 @@
 </table>
 {% endif %}
 
-{# CTA Buttons #}
+{% comment %} CTA Buttons {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 24px 0;">

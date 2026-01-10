@@ -60,7 +60,7 @@
 </div>
 {% else %}
 <div id="main-content" x-data="{ activeTab: 'pending' }">
-    {# Stats Cards #}
+    {% comment %} Stats Cards {% endcomment %}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
             <div class="flex items-center">
@@ -116,10 +116,10 @@
         </div>
     </div>
 
-    {# Filters #}
+    {% comment %} Filters {% endcomment %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 mb-6">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {# Search #}
+            {% comment %} Search {% endcomment %}
             <div class="relative flex-1 max-w-md">
                 <input type="text"
                        name="q"
@@ -139,7 +139,7 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                {# Status Filter #}
+                {% comment %} Status Filter {% endcomment %}
                 <select name="status"
                         hx-get="{% url 'hr:timeoff-list' %}"
                         hx-trigger="change"
@@ -154,7 +154,7 @@
                     <option value="cancelled" {% if current_filters.status == 'cancelled' %}selected{% endif %}>{% trans "Cancelled" %}</option>
                 </select>
 
-                {# Department Filter #}
+                {% comment %} Department Filter {% endcomment %}
                 <select name="department"
                         hx-get="{% url 'hr:timeoff-list' %}"
                         hx-trigger="change"
@@ -168,7 +168,7 @@
                     {% endfor %}
                 </select>
 
-                {# Time Off Type Filter #}
+                {% comment %} Time Off Type Filter {% endcomment %}
                 <select name="type"
                         hx-get="{% url 'hr:timeoff-list' %}"
                         hx-trigger="change"
@@ -182,7 +182,7 @@
                     {% endfor %}
                 </select>
 
-                {# Date Range #}
+                {% comment %} Date Range {% endcomment %}
                 <div class="flex items-center space-x-2">
                     <input type="date"
                            name="start_date"
@@ -208,19 +208,19 @@
         </div>
     </div>
 
-    {# Time Off Requests Container #}
+    {% comment %} Time Off Requests Container {% endcomment %}
     <div id="timeoff-container">
         {% include "hr/partials/_timeoff_list.html" with requests=time_off_requests can_approve=can_approve %}
     </div>
 
-    {# Pagination #}
+    {% comment %} Pagination {% endcomment %}
     {% if page_obj %}
     <div class="mt-6">
         {% include "components/pagination.html" %}
     </div>
     {% endif %}
 
-    {# Who's Out Section #}
+    {% comment %} Who's Out Section {% endcomment %}
     {% if on_leave_today %}
     <div class="mt-8">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Who's Out Today" %}</h3>

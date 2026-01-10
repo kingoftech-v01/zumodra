@@ -1,11 +1,11 @@
 {% load static i18n %}
 
-{# ============================================================================
+{% comment %} ============================================================================
    ZUMODRA NOTIFICATION DROPDOWN COMPONENT
    ============================================================================
    Premium notifications dropdown with real-time WebSocket updates,
    glassmorphism styling, and smooth animations.
-   ============================================================================ #}
+   ============================================================================ {% endcomment %}
 
 <!-- Notifications Dropdown -->
 <div class="relative" x-data="{ open: false, notifications: [], unreadCount: {{ unread_notifications_count|default:0 }} }"

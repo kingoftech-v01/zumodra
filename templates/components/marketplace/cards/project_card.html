@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA PROJECT CARD COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "list" %}
-{# List Layout #}
+{% comment %} List Layout {% endcomment %}
 <li class="projects_item projects_item_list flex items-start gap-5 relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <div class="projects_content flex-grow">
         <div class="flex flex-wrap items-start justify-between gap-4">
@@ -62,7 +62,7 @@
         </p>
         {% endif %}
 
-        {# Skills/Tags #}
+        {% comment %} Skills/Tags {% endcomment %}
         <div class="flex flex-wrap items-center gap-2 mt-3">
             {% for skill in project.skills_required.all|slice:":5" %}
             <span class="tag caption2 bg-surface">{{ skill.name }}</span>
@@ -71,7 +71,7 @@
 
         <div class="projects_more_info flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-line">
             <div class="flex items-center gap-4">
-                {# Client Info #}
+                {% comment %} Client Info {% endcomment %}
                 <a href="{{ project.client.get_absolute_url }}" class="flex items-center gap-2">
                     {% if project.client.logo %}
                     <img src="{{ project.client.logo.url }}" alt="{{ project.client.name }}" class="w-8 h-8 rounded-full object-cover" />
@@ -82,13 +82,13 @@
                     {% endif %}
                     <span class="text-sm text-secondary">{{ project.client.name }}</span>
                 </a>
-                {# Proposals Count #}
+                {% comment %} Proposals Count {% endcomment %}
                 <span class="text-sm text-secondary">
                     <span class="ph-bold ph-user-list mr-1"></span>
                     {{ project.proposals_count|default:0 }} {% trans 'proposals' %}
                 </span>
             </div>
-            {# Budget #}
+            {% comment %} Budget {% endcomment %}
             <div class="projects_price">
                 {% if project.budget_min and project.budget_max %}
                 <span class="price text-title">${{ project.budget_min|floatformat:0 }} - ${{ project.budget_max|floatformat:0 }}</span>
@@ -103,10 +103,10 @@
 </li>
 
 {% else %}
-{# Grid Layout (Default) #}
+{% comment %} Grid Layout (Default) {% endcomment %}
 <li class="projects_item relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <div class="projects_inner">
-        {# Header #}
+        {% comment %} Header {% endcomment %}
         <div class="flex items-start justify-between gap-2">
             <a href="{{ project.get_absolute_url }}">
                 <strong class="projects_name text-title duration-300 hover:text-primary line-clamp-2">{{ project.title }}</strong>
@@ -122,7 +122,7 @@
             {% endif %}
         </div>
 
-        {# Meta Info #}
+        {% comment %} Meta Info {% endcomment %}
         <div class="flex flex-wrap items-center gap-3 mt-2">
             {% if project.category %}
             <span class="tag caption2 bg-surface">{{ project.category.name }}</span>
@@ -133,14 +133,14 @@
             </div>
         </div>
 
-        {# Description #}
+        {% comment %} Description {% endcomment %}
         {% if project.description %}
         <p class="projects_desc text-secondary mt-3 line-clamp-3">
             {{ project.description|truncatewords:25 }}
         </p>
         {% endif %}
 
-        {# Skills/Tags #}
+        {% comment %} Skills/Tags {% endcomment %}
         <div class="flex flex-wrap items-center gap-2 mt-3 pb-4 border-b border-line">
             {% for skill in project.skills_required.all|slice:":3" %}
             <span class="tag caption2 bg-surface">{{ skill.name }}</span>
@@ -150,7 +150,7 @@
             {% endif %}
         </div>
 
-        {# Footer #}
+        {% comment %} Footer {% endcomment %}
         <div class="projects_more_info flex flex-wrap items-center justify-between gap-2 mt-4">
             <span class="text-sm text-secondary">
                 <span class="ph-bold ph-user-list mr-1"></span>

@@ -25,7 +25,7 @@
     <div class="container mx-auto">
         <div class="flex items-center justify-between h-20 px-4">
 
-            {# ========== LOGO ========== #}
+            {% comment %} ========== LOGO ========== {% endcomment %}
             <div class="flex items-center">
                 <a href="{% url 'home' %}" class="flex items-center" aria-label="Zumodra Home">
                     <img src="{% static 'assets/images/rhematekCS.png' %}"
@@ -39,11 +39,11 @@
                 </a>
             </div>
 
-            {# ========== DESKTOP NAVIGATION ========== #}
+            {% comment %} ========== DESKTOP NAVIGATION ========== {% endcomment %}
             <nav class="hidden lg:flex items-center gap-1" aria-label="Main navigation">
                 <ul class="flex items-center gap-1">
 
-                    {# Home #}
+                    {% comment %} Home {% endcomment %}
                     <li>
                         <a href="{% url 'home' %}"
                            class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
@@ -52,7 +52,7 @@
                         </a>
                     </li>
 
-                    {# Browse - What you can find/search #}
+                    {% comment %} Browse - What you can find/search {% endcomment %}
                     <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
                                 :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
@@ -89,7 +89,7 @@
                         </div>
                     </li>
 
-                    {# Solutions - What Zumodra offers #}
+                    {% comment %} Solutions - What Zumodra offers {% endcomment %}
                     <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
                                 :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
@@ -126,7 +126,7 @@
                         </div>
                     </li>
 
-                    {# Company #}
+                    {% comment %} Company {% endcomment %}
                     <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
                                 :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
@@ -160,7 +160,7 @@
                         </div>
                     </li>
 
-                    {# Blog #}
+                    {% comment %} Blog {% endcomment %}
                     <li>
                         <a href="{% url 'wagtail_serve' '' %}"
                            class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
@@ -171,10 +171,10 @@
                 </ul>
             </nav>
 
-            {# ========== RIGHT SIDE (Language + Auth) ========== #}
+            {% comment %} ========== RIGHT SIDE (Language + Auth) ========== {% endcomment %}
             <div class="flex items-center gap-3">
 
-                {# Language Selector #}
+                {% comment %} Language Selector {% endcomment %}
                 <form action="{% url 'set_language' %}" method="post" class="hidden sm:block">
                     {% csrf_token %}
                     <select name="language"
@@ -192,7 +192,7 @@
                     <input type="hidden" name="next" value="{{ request.path }}">
                 </form>
 
-                {# Auth Buttons #}
+                {% comment %} Auth Buttons {% endcomment %}
                 <div class="hidden lg:flex items-center gap-2">
                     {% if user.is_authenticated %}
                         <a href="{% url 'dashboard:index' %}"
@@ -220,7 +220,7 @@
                     {% endif %}
                 </div>
 
-                {# Mobile Menu Toggle #}
+                {% comment %} Mobile Menu Toggle {% endcomment %}
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                         type="button"
                         class="lg:hidden p-2 rounded-lg transition-colors {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    {# ========== MOBILE MENU ========== #}
+    {% comment %} ========== MOBILE MENU ========== {% endcomment %}
     <div x-show="mobileMenuOpen"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 -translate-y-2"
@@ -249,7 +249,7 @@
         <nav class="container mx-auto px-4 py-6">
             <ul class="space-y-2">
 
-                {# Home #}
+                {% comment %} Home {% endcomment %}
                 <li>
                     <a href="{% url 'home' %}"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
@@ -259,7 +259,7 @@
                     </a>
                 </li>
 
-                {# Browse #}
+                {% comment %} Browse {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -287,7 +287,7 @@
                     </ul>
                 </li>
 
-                {# Solutions #}
+                {% comment %} Solutions {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -315,7 +315,7 @@
                     </ul>
                 </li>
 
-                {# Company #}
+                {% comment %} Company {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -357,7 +357,7 @@
                     </ul>
                 </li>
 
-                {# Blog #}
+                {% comment %} Blog {% endcomment %}
                 <li>
                     <a href="{% url 'wagtail_serve' '' %}"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
@@ -368,7 +368,7 @@
                 </li>
             </ul>
 
-            {# Mobile Language Selector #}
+            {% comment %} Mobile Language Selector {% endcomment %}
             <div class="mt-6 pt-6 border-t border-gray-200">
                 <form action="{% url 'set_language' %}" method="post">
                     {% csrf_token %}
@@ -388,7 +388,7 @@
                 </form>
             </div>
 
-            {# Mobile Auth Buttons #}
+            {% comment %} Mobile Auth Buttons {% endcomment %}
             {% if not user.is_authenticated %}
             <div class="mt-6 space-y-3">
                 <a href="{% url 'account_login' %}"

@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "A new contract has been created. Please review the details." %}{% endblock %}
 
 {% block email_content %}
-{# Greeting #}
+{% comment %} Greeting {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding-bottom: 20px;">
@@ -24,7 +24,7 @@
     </tr>
 </table>
 
-{# Contract details card #}
+{% comment %} Contract details card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
@@ -46,7 +46,7 @@
                 <tr>
                     <td>
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                            {# Contract ID #}
+                            {% comment %} Contract ID {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -61,7 +61,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Client #}
+                            {% comment %} Client {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -76,7 +76,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Freelancer #}
+                            {% comment %} Freelancer {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -91,7 +91,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Contract Type #}
+                            {% comment %} Contract Type {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -106,7 +106,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Amount #}
+                            {% comment %} Amount {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -129,7 +129,7 @@
     </tr>
 </table>
 
-{# Milestones #}
+{% comment %} Milestones {% endcomment %}
 {% if milestones %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -161,7 +161,7 @@
 </table>
 {% endif %}
 
-{# Escrow notice #}
+{% comment %} Escrow notice {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px; padding: 16px;">
@@ -182,7 +182,7 @@
     </tr>
 </table>
 
-{# CTA Button #}
+{% comment %} CTA Button {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 24px 0;">

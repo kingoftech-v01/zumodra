@@ -28,30 +28,30 @@
      @open-mobile-menu.window="open = true"
      @keydown.escape.window="open = false">
 
-    {# Backdrop #}
+    {% comment %} Backdrop {% endcomment %}
     <div class="absolute inset-0 bg-black/50 transition-opacity duration-300"
          :class="open ? 'opacity-100 pointer-events-auto' : 'opacity-0'"
          @click="open = false"></div>
 
-    {# Menu Panel #}
+    {% comment %} Menu Panel {% endcomment %}
     <div class="absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300 pointer-events-auto overflow-hidden"
          :class="open ? 'translate-x-0' : '-translate-x-full'">
 
-        {# Close Button #}
+        {% comment %} Close Button {% endcomment %}
         <button @click="open = false"
                 class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-surface hover:bg-gray-200 transition-colors z-10">
             <span class="ph-bold ph-x text-lg"></span>
             <span class="sr-only">{% trans 'Close menu' %}</span>
         </button>
 
-        {# Logo #}
+        {% comment %} Logo {% endcomment %}
         <div class="flex items-center justify-center pt-5 pb-4 border-b border-line">
             <a href="{% url 'home' %}" class="logo">
                 <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="h-8" />
             </a>
         </div>
 
-        {# Mobile Search #}
+        {% comment %} Mobile Search {% endcomment %}
         {% url 'dashboard:global-search' as mobile_search_url %}
         {% if mobile_search_url %}
         <form class="relative mx-5 mt-4"
@@ -70,10 +70,10 @@
         <div id="mobile-search-results" class="mx-5"></div>
         {% endif %}
 
-        {# Navigation #}
+        {% comment %} Navigation {% endcomment %}
         <nav class="mt-4 px-5 overflow-y-auto" style="max-height: calc(100vh - 200px);">
             <ul class="space-y-1">
-                {# Home #}
+                {% comment %} Home {% endcomment %}
                 <li>
                     <a href="{% url 'home' %}"
                        class="flex items-center gap-3 px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
@@ -82,7 +82,7 @@
                     </a>
                 </li>
 
-                {# For Candidates - Expandable #}
+                {% comment %} For Candidates - Expandable {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
@@ -108,7 +108,7 @@
                     </ul>
                 </li>
 
-                {# For Employers - Expandable #}
+                {% comment %} For Employers - Expandable {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
@@ -133,7 +133,7 @@
                     </ul>
                 </li>
 
-                {# Pages - Expandable #}
+                {% comment %} Pages - Expandable {% endcomment %}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="w-full flex items-center justify-between px-4 py-3 text-lg font-semibold text-secondary hover:bg-surface hover:text-primary rounded-lg transition-colors">
@@ -156,7 +156,7 @@
                 </li>
             </ul>
 
-            {# Auth Buttons for Mobile #}
+            {% comment %} Auth Buttons for Mobile {% endcomment %}
             {% if not user.is_authenticated %}
             <div class="mt-6 pt-6 border-t border-line space-y-3">
                 <a href="{% url 'account_login' %}"

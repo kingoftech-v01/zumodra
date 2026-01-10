@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "Reminder: Your interview is coming up soon." %}{% endblock %}
 
 {% block email_content %}
-{# Greeting #}
+{% comment %} Greeting {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding-bottom: 20px;">
@@ -24,7 +24,7 @@
     </tr>
 </table>
 
-{# Countdown card #}
+{% comment %} Countdown card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 20px 0;">
@@ -40,12 +40,12 @@
     </tr>
 </table>
 
-{# Interview details card #}
+{% comment %} Interview details card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #f8fafc; border-radius: 8px; padding: 24px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                {# Date & Time #}
+                {% comment %} Date & Time {% endcomment %}
                 <tr>
                     <td style="padding-bottom: 16px;">
                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -61,7 +61,7 @@
                         </table>
                     </td>
                 </tr>
-                {# Location/Link #}
+                {% comment %} Location/Link {% endcomment %}
                 <tr>
                     <td>
                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -85,7 +85,7 @@
     </tr>
 </table>
 
-{# Tips section #}
+{% comment %} Tips section {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding: 24px 0;">
@@ -162,7 +162,7 @@
     </tr>
 </table>
 
-{# CTA Button #}
+{% comment %} CTA Button {% endcomment %}
 {% if is_virtual %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>

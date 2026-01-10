@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA DASHBOARD BASE TEMPLATE
    =============================================================================
 
@@ -50,41 +50,41 @@
 
    Author: Rhematek Solutions
    Last Updated: 2025-12-30
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% extends "base/base.html" %}
 {% load static i18n %}
 
 {% block body %}
-{# ===== DASHBOARD LAYOUT CONTAINER ===== #}
-{# Flexbox layout with fixed sidebar and scrollable content area #}
+{% comment %} ===== DASHBOARD LAYOUT CONTAINER ===== {% endcomment %}
+{% comment %} Flexbox layout with fixed sidebar and scrollable content area {% endcomment %}
 <div class="flex h-screen overflow-hidden">
 
-    {# ===== SIDEBAR NAVIGATION ===== #}
-    {# Collapsible left navigation menu #}
-    {# State controlled by sidebarOpen variable from parent template #}
+    {% comment %} ===== SIDEBAR NAVIGATION ===== {% endcomment %}
+    {% comment %} Collapsible left navigation menu {% endcomment %}
+    {% comment %} State controlled by sidebarOpen variable from parent template {% endcomment %}
     {% include "components/sidebar.html" %}
 
-    {# ===== MAIN CONTENT AREA ===== #}
-    {# Flex column layout: header (fixed) + scrollable content #}
+    {% comment %} ===== MAIN CONTENT AREA ===== {% endcomment %}
+    {% comment %} Flex column layout: header (fixed) + scrollable content {% endcomment %}
     <div class="flex-1 flex flex-col overflow-hidden">
 
-        {# ===== TOP HEADER BAR ===== #}
-        {# Contains: hamburger menu, search, notifications, user menu #}
+        {% comment %} ===== TOP HEADER BAR ===== {% endcomment %}
+        {% comment %} Contains: hamburger menu, search, notifications, user menu {% endcomment %}
         {% include "components/header.html" %}
 
-        {# ===== SCROLLABLE MAIN CONTENT ===== #}
+        {% comment %} ===== SCROLLABLE MAIN CONTENT ===== {% endcomment %}
         <main class="zu-main flex-1 overflow-y-auto relative">
-            {# Light theme background with subtle pattern #}
+            {% comment %} Light theme background with subtle pattern {% endcomment %}
             <div class="zu-main__bg" aria-hidden="true"></div>
 
-            {# ===== BREADCRUMB NAVIGATION ===== #}
-            {# Hierarchical navigation showing current location #}
-            {# Home icon is always first, child templates add additional items #}
+            {% comment %} ===== BREADCRUMB NAVIGATION ===== {% endcomment %}
+            {% comment %} Hierarchical navigation showing current location {% endcomment %}
+            {% comment %} Home icon is always first, child templates add additional items {% endcomment %}
             <div class="zu-breadcrumb relative z-10">
                 <nav class="flex" aria-label="Breadcrumb">
                     <ol class="flex items-center space-x-2">
-                        {# Home/Dashboard link - always present #}
+                        {% comment %} Home/Dashboard link - always present {% endcomment %}
                         <li>
                             <a href="{% url 'dashboard:index' %}" class="zu-breadcrumb__home">
                                 <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -92,44 +92,42 @@
                                 </svg>
                             </a>
                         </li>
-                        {# Additional breadcrumb items from child templates #}
-                        {# Example usage:
+                        {% comment %} Additional breadcrumb items from child templates {% endcomment %}
+                        {% comment %} Example usage:
                            {% block breadcrumb %}
                            <li><span class="zumodra-breadcrumb-sep">/</span></li>
                            <li><a href="{% url 'ats:jobs' %}" class="zumodra-breadcrumb-link">Jobs</a></li>
                            <li><span class="zumodra-breadcrumb-sep">/</span></li>
                            <li><span class="zumodra-breadcrumb-current">Current Page</span></li>
-                           {% endblock %}
-                        #}
+                           {% endblock %} {% endcomment %}
                         {% block breadcrumb %}{% endblock %}
                     </ol>
                 </nav>
             </div>
 
-            {# ===== PAGE HEADER SECTION ===== #}
-            {# Contains page title, description, and action buttons #}
-            {# Override entire block with page_header, or use sub-blocks #}
+            {% comment %} ===== PAGE HEADER SECTION ===== {% endcomment %}
+            {% comment %} Contains page title, description, and action buttons {% endcomment %}
+            {% comment %} Override entire block with page_header, or use sub-blocks {% endcomment %}
             {% block page_header %}
             <div class="zu-page-header relative z-10">
                 <div class="md:flex md:items-center md:justify-between">
-                    {# Left side: Title and description #}
+                    {% comment %} Left side: Title and description {% endcomment %}
                     <div class="flex-1 min-w-0 animate-on-load" data-animation="fade-up" data-delay="0">
-                        {# Page title - required for every page #}
+                        {% comment %} Page title - required for every page {% endcomment %}
                         <h1 class="zu-page-title">
                             {% block page_title %}Dashboard{% endblock %}
                         </h1>
-                        {# Optional subtitle/description #}
-                        {# Example: <p class="mt-1 text-sm text-gray-500">Manage your job postings</p> #}
+                        {% comment %} Optional subtitle/description {% endcomment %}
+                        {% comment %} Example: <p class="mt-1 text-sm text-gray-500">Manage your job postings</p> {% endcomment %}
                         {% block page_description %}{% endblock %}
                     </div>
-                    {# Right side: Action buttons #}
-                    {# Example usage:
+                    {% comment %} Right side: Action buttons {% endcomment %}
+                    {% comment %} Example usage:
                        {% block page_actions %}
                        <a href="{% url 'ats:job_create' %}" class="zumodra-btn zumodra-btn--primary">
                            + New Job
                        </a>
-                       {% endblock %}
-                    #}
+                       {% endblock %} {% endcomment %}
                     <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3 animate-on-load" data-animation="fade-up" data-delay="100">
                         {% block page_actions %}{% endblock %}
                     </div>
@@ -137,13 +135,13 @@
             </div>
             {% endblock %}
 
-            {# ===== PAGE CONTENT AREA ===== #}
+            {% comment %} ===== PAGE CONTENT AREA ===== {% endcomment %}
             <div class="px-4 sm:px-6 lg:px-8 pb-8 relative z-10">
 
-                {# ===== FLASH MESSAGES ===== #}
-                {# Django messages framework integration #}
-                {# Displays success, error, warning, info messages from views #}
-                {# Each message is dismissible with Alpine.js #}
+                {% comment %} ===== FLASH MESSAGES ===== {% endcomment %}
+                {% comment %} Django messages framework integration {% endcomment %}
+                {% comment %} Displays success, error, warning, info messages from views {% endcomment %}
+                {% comment %} Each message is dismissible with Alpine.js {% endcomment %}
                 {% if messages %}
                 <div class="mb-6 space-y-3">
                     {% for message in messages %}
@@ -181,23 +179,23 @@
                 </div>
                 {% endif %}
 
-                {# ===== MAIN CONTENT BLOCK ===== #}
-                {# Child templates insert their content here #}
-                {# This is where tables, forms, cards, etc. go #}
+                {% comment %} ===== MAIN CONTENT BLOCK ===== {% endcomment %}
+                {% comment %} Child templates insert their content here {% endcomment %}
+                {% comment %} This is where tables, forms, cards, etc. go {% endcomment %}
                 {% block content %}{% endblock %}
             </div>
         </main>
     </div>
 </div>
 
-{# ===== MODAL CONTAINER ===== #}
-{# HTMX loads modal content into this container #}
-{# Usage: hx-target="#modal-container" hx-swap="innerHTML" #}
+{% comment %} ===== MODAL CONTAINER ===== {% endcomment %}
+{% comment %} HTMX loads modal content into this container {% endcomment %}
+{% comment %} Usage: hx-target="#modal-container" hx-swap="innerHTML" {% endcomment %}
 <div id="modal-container"></div>
 
 {% endblock %}
 
-{# ===== DASHBOARD-SPECIFIC JAVASCRIPT ===== #}
+{% comment %} ===== DASHBOARD-SPECIFIC JAVASCRIPT ===== {% endcomment %}
 {% block extra_js %}
 {{ block.super }}
 <script>

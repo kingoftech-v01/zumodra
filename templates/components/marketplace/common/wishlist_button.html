@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA WISHLIST BUTTON COMPONENT
    =============================================================================
 
@@ -17,12 +17,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n %}
 
 {% if layout == "large" %}
-{# Large Button (for detail pages) #}
+{% comment %} Large Button (for detail pages) {% endcomment %}
 <button class="wishlist_btn flex items-center justify-center w-12 h-12 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary {% if is_bookmarked %}bg-primary text-white border-primary{% endif %}"
         hx-post="{% url item_type|add:'_bookmark' item.id %}"
         hx-swap="outerHTML"
@@ -36,7 +36,7 @@
 </button>
 
 {% elif layout == "text" %}
-{# Button with Text #}
+{% comment %} Button with Text {% endcomment %}
 <button class="wishlist_btn flex items-center gap-2 px-4 py-2 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary {% if is_bookmarked %}bg-primary text-white border-primary{% endif %}"
         hx-post="{% url item_type|add:'_bookmark' item.id %}"
         hx-swap="outerHTML"
@@ -52,7 +52,7 @@
 </button>
 
 {% elif layout == "border" %}
-{# Bordered Icon Button #}
+{% comment %} Bordered Icon Button {% endcomment %}
 <button class="wishlist_btn -relative -border flex items-center justify-center w-9 h-9 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary {% if is_bookmarked %}bg-primary/10 text-primary border-primary{% endif %}"
         hx-post="{% url item_type|add:'_bookmark' item.id %}"
         hx-swap="outerHTML"
@@ -66,7 +66,7 @@
 </button>
 
 {% else %}
-{# Default (positioned absolute, for cards) #}
+{% comment %} Default (positioned absolute, for cards) {% endcomment %}
 <button class="wishlist_btn absolute top-4 right-4 flex items-center justify-center w-8 h-8 bg-white/90 rounded-full shadow-sm duration-300 hover:bg-primary hover:text-white {% if is_bookmarked %}bg-primary text-white{% endif %}"
         hx-post="{% url item_type|add:'_bookmark' item.id %}"
         hx-swap="outerHTML"

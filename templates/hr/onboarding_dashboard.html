@@ -53,7 +53,7 @@
 </div>
 {% else %}
 <div class="space-y-6">
-    {# Stats Cards #}
+    {% comment %} Stats Cards {% endcomment %}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5">
             <div class="flex items-center">
@@ -109,7 +109,7 @@
         </div>
     </div>
 
-    {# Active Onboardings #}
+    {% comment %} Active Onboardings {% endcomment %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Active Onboardings" %}</h3>
@@ -144,7 +144,7 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-6">
-                            {# Progress Bar #}
+                            {% comment %} Progress Bar {% endcomment %}
                             <div class="w-40">
                                 <div class="flex items-center justify-between text-sm mb-1">
                                     <span class="text-gray-500 dark:text-gray-400">{% trans "Progress" %}</span>
@@ -154,14 +154,14 @@
                                     <div class="bg-primary-600 h-2 rounded-full transition-all" style="width: {{ onboarding.completion_percentage }}%;"></div>
                                 </div>
                             </div>
-                            {# Task Count #}
+                            {% comment %} Task Count {% endcomment %}
                             <div class="text-center">
                                 <p class="text-lg font-semibold text-gray-900 dark:text-white">
                                     {{ onboarding.completed_tasks_count }}/{{ onboarding.total_tasks_count }}
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{% trans "Tasks" %}</p>
                             </div>
-                            {# Arrow #}
+                            {% comment %} Arrow {% endcomment %}
                             <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
@@ -182,7 +182,7 @@
         {% endif %}
     </div>
 
-    {# Recently Completed #}
+    {% comment %} Recently Completed {% endcomment %}
     {% if completed_onboardings %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -224,7 +224,7 @@
     </div>
     {% endif %}
 
-    {# Available Checklists #}
+    {% comment %} Available Checklists {% endcomment %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Onboarding Checklists" %}</h3>
@@ -274,7 +274,7 @@
     </div>
 </div>
 
-{# Modal Container #}
+{% comment %} Modal Container {% endcomment %}
 <div id="modal-container"></div>
 {% endif %}
 {% endblock %}

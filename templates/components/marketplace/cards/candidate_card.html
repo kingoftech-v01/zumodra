@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA CANDIDATE CARD COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "list" %}
-{# List Layout #}
+{% comment %} List Layout {% endcomment %}
 <li class="candidates_item candidates_item_list flex items-center gap-5 relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <a href="{{ candidate.get_absolute_url }}" class="flex-shrink-0">
         {% if candidate.profile_picture %}
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    {# Top Rated Badge #}
+    {% comment %} Top Rated Badge {% endcomment %}
     {% if candidate.is_top_rated %}
     <div class="absolute top-4 left-4 px-2 py-1 bg-yellow text-white text-xs font-semibold rounded">
         {% trans 'Top Rated' %}
@@ -94,12 +94,12 @@
 </li>
 
 {% else %}
-{# Grid Layout (Default) #}
+{% comment %} Grid Layout (Default) {% endcomment %}
 <li class="candidates_item {% if candidate.is_top_rated %}is_top_rate{% endif %} relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
     <div class="candidates_innner">
-        {# Candidate Profile #}
+        {% comment %} Candidate Profile {% endcomment %}
         <a href="{{ candidate.get_absolute_url }}" class="flex flex-col items-center justify-center">
-            {# Avatar #}
+            {% comment %} Avatar {% endcomment %}
             {% if candidate.profile_picture %}
             <img src="{{ candidate.profile_picture.url }}" alt="{{ candidate.get_full_name }}" class="w-20 h-20 rounded-full object-cover" />
             {% else %}
@@ -108,15 +108,15 @@
             </div>
             {% endif %}
 
-            {# Name #}
+            {% comment %} Name {% endcomment %}
             <strong class="candidates_name -style-1 text-title mt-3 duration-300 hover:text-primary text-center">{{ candidate.get_full_name }}</strong>
 
-            {# Headline #}
+            {% comment %} Headline {% endcomment %}
             {% if candidate.headline %}
             <p class="text-secondary text-sm mt-0.5 text-center line-clamp-1">{{ candidate.headline }}</p>
             {% endif %}
 
-            {# Location #}
+            {% comment %} Location {% endcomment %}
             {% if candidate.location %}
             <div class="flex items-center gap-1 mt-1">
                 <span class="ph ph-map-pin text-xl text-secondary"></span>
@@ -124,7 +124,7 @@
             </div>
             {% endif %}
 
-            {# Rating #}
+            {% comment %} Rating {% endcomment %}
             {% if candidate.rating %}
             <div class="flex items-center gap-1 mt-1">
                 <span class="ph-fill ph-star text-yellow"></span>
@@ -134,14 +134,14 @@
             {% endif %}
         </a>
 
-        {# Skills/Tags #}
+        {% comment %} Skills/Tags {% endcomment %}
         <div class="list_tag flex items-center justify-center gap-2.5 flex-wrap sm:py-5 py-3 border-b border-line">
             {% for skill in candidate.skills.all|slice:":3" %}
             <span class="candidates_tag tag bg-surface caption1">{{ skill.name }}</span>
             {% endfor %}
         </div>
 
-        {# Projects and Rate #}
+        {% comment %} Projects and Rate {% endcomment %}
         <div class="candidates_more_info flex flex-wrap items-center justify-between gap-2 mt-3">
             <span class="candidates_projects text-secondary">{{ candidate.completed_projects|default:0 }} {% trans 'Projects' %}</span>
             <div class="candidates_price">
@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    {# Wishlist Button #}
+    {% comment %} Wishlist Button {% endcomment %}
     {% if show_wishlist|default:True %}
     <button class="add_wishlist_btn absolute top-4 right-4"
             hx-post="{% url 'ats:candidate_bookmark' candidate.id %}"
@@ -166,14 +166,14 @@
     </button>
     {% endif %}
 
-    {# Top Rated Badge #}
+    {% comment %} Top Rated Badge {% endcomment %}
     {% if candidate.is_top_rated %}
     <div class="absolute top-4 left-4 px-2 py-1 bg-yellow text-white text-xs font-semibold rounded">
         {% trans 'Top Rated' %}
     </div>
     {% endif %}
 
-    {# Verified Badge #}
+    {% comment %} Verified Badge {% endcomment %}
     {% if candidate.is_verified %}
     <div class="absolute bottom-4 right-4">
         {% include "components/trust_badge.html" with level="verified" size="sm" %}

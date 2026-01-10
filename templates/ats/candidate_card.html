@@ -1,10 +1,8 @@
 {% load static i18n humanize %}
 
-{#
-    Candidate Card for Kanban Board
+{% comment %} Candidate Card for Kanban Board
 
-    Usage: {% include "ats/candidate_card.html" with application=application %}
-#}
+    Usage: {% include "ats/candidate_card.html" with application=application %} {% endcomment %}
 
 <div class="candidate-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow"
      data-application-id="{{ application.id }}"

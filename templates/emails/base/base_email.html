@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA EMAIL BASE TEMPLATE
    =============================================================================
 
@@ -28,7 +28,7 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-01
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load static %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -39,7 +39,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>{% block title %}Zumodra{% endblock %}</title>
 
-    {# Preheader text - shows as preview in email clients #}
+    {% comment %} Preheader text - shows as preview in email clients {% endcomment %}
     {% block preheader %}
     <span style="display: none !important; visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
         {% block preheader_text %}{% endblock %}
@@ -85,19 +85,19 @@
 </head>
 <body id="body" style="margin: 0; padding: 0; background-color: #f4f4f4;">
 
-    {# Wrapper table #}
+    {% comment %} Wrapper table {% endcomment %}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
 
-                {# Container #}
+                {% comment %} Container {% endcomment %}
                 <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
 
-                    {# ===== HEADER ===== #}
+                    {% comment %} ===== HEADER ===== {% endcomment %}
                     {% block email_header %}
                     <tr>
                         <td align="center" style="background-color: #2563eb; padding: 30px 40px;">
-                            {# Logo - using text as fallback #}
+                            {% comment %} Logo - using text as fallback {% endcomment %}
                             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center">
@@ -120,24 +120,24 @@
                     </tr>
                     {% endblock %}
 
-                    {# ===== MAIN CONTENT ===== #}
+                    {% comment %} ===== MAIN CONTENT ===== {% endcomment %}
                     <tr>
                         <td class="mobile-padding" style="padding: 40px;">
                             {% block email_content %}
-                            {# Child templates insert content here #}
+                            {% comment %} Child templates insert content here {% endcomment %}
                             {% endblock %}
                         </td>
                     </tr>
 
-                    {# ===== CALL TO ACTION (Optional) ===== #}
+                    {% comment %} ===== CALL TO ACTION (Optional) ===== {% endcomment %}
                     {% block email_cta %}{% endblock %}
 
-                    {# ===== FOOTER ===== #}
+                    {% comment %} ===== FOOTER ===== {% endcomment %}
                     {% block email_footer %}
                     <tr>
                         <td style="background-color: #f8fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                                {# Company info #}
+                                {% comment %} Company info {% endcomment %}
                                 <tr>
                                     <td align="center" style="padding-bottom: 20px;">
                                         <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #64748b;">
@@ -146,7 +146,7 @@
                                     </td>
                                 </tr>
 
-                                {# Links #}
+                                {% comment %} Links {% endcomment %}
                                 <tr>
                                     <td align="center" style="padding-bottom: 20px;">
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -173,10 +173,10 @@
                                     </td>
                                 </tr>
 
-                                {# Unsubscribe (if applicable) #}
+                                {% comment %} Unsubscribe (if applicable) {% endcomment %}
                                 {% block unsubscribe %}{% endblock %}
 
-                                {# Address #}
+                                {% comment %} Address {% endcomment %}
                                 <tr>
                                     <td align="center">
                                         <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #94a3b8;">
@@ -191,12 +191,12 @@
                     {% endblock %}
 
                 </table>
-                {# End Container #}
+                {% comment %} End Container {% endcomment %}
 
             </td>
         </tr>
     </table>
-    {# End Wrapper #}
+    {% comment %} End Wrapper {% endcomment %}
 
 </body>
 </html>

@@ -383,28 +383,28 @@ GLASSMORPHISM BUTTON - Special button with frosted glass effect
 USAGE EXAMPLES
 ==============================================================================
 
-{# Primary CTA button #}
+{% comment %} Primary CTA button {% endcomment %}
 {% include "components/buttons.html" with variant="primary" text="Get Started" %}
 
-{# Secondary with icon #}
+{% comment %} Secondary with icon {% endcomment %}
 {% include "components/buttons.html" with variant="secondary" text="Download" icon_left="<path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/>" %}
 
-{# Small outline button #}
+{% comment %} Small outline button {% endcomment %}
 {% include "components/buttons.html" with variant="outline" text="Cancel" size="sm" %}
 
-{# Large danger button #}
+{% comment %} Large danger button {% endcomment %}
 {% include "components/buttons.html" with variant="danger" text="Delete" size="lg" %}
 
-{# Full width success button #}
+{% comment %} Full width success button {% endcomment %}
 {% include "components/buttons.html" with variant="success" text="Approve Application" block=True %}
 
-{# Icon only button #}
+{% comment %} Icon only button {% endcomment %}
 {% include "components/buttons.html" with variant="icon" icon="<line x1='18' y1='6' x2='6' y2='18'/><line x1='6' y1='6' x2='18' y2='18'/>" aria_label="Close" %}
 
-{# Glassmorphism button #}
+{% comment %} Glassmorphism button {% endcomment %}
 {% include "components/buttons.html" with variant="glass" text="Explore Features" %}
 
-{# Submit button for forms #}
+{% comment %} Submit button for forms {% endcomment %}
 {% include "components/buttons.html" with variant="submit" text="Submit Application" id="submit-btn" %}
 
 {% endcomment %}

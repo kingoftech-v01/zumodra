@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA FILTER SIDEBAR COMPONENT
    =============================================================================
 
@@ -18,7 +18,7 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
@@ -26,7 +26,7 @@
      class="filter_sidebar lg:sticky lg:top-24 lg:w-[300px] w-full flex-shrink-0 overflow-hidden rounded-lg bg-white shadow-md"
      x-data="{ mobileOpen: false }">
 
-    {# Mobile Filter Toggle (visible on mobile) #}
+    {% comment %} Mobile Filter Toggle (visible on mobile) {% endcomment %}
     <button @click="mobileOpen = !mobileOpen"
             class="lg:hidden flex items-center justify-between w-full p-4 border-b border-line">
         <span class="text-button flex items-center gap-2">
@@ -46,7 +46,7 @@
           hx-swap="innerHTML"
           hx-push-url="true">
 
-        {# Filter Header #}
+        {% comment %} Filter Header {% endcomment %}
         <div class="filter_header flex items-center justify-between p-5 border-b border-line max-lg:hidden">
             <h6 class="heading6">{% trans 'Filters' %}</h6>
             <a href="{{ request.path }}" class="text-primary caption1 hover:underline">
@@ -54,10 +54,10 @@
             </a>
         </div>
 
-        {# Filter Content #}
+        {% comment %} Filter Content {% endcomment %}
         <div class="filter_content p-5 space-y-5">
 
-            {# Location Filter #}
+            {% comment %} Location Filter {% endcomment %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
                     <strong class="text-button">{% trans 'Location' %}</strong>
@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            {# Job Type Filter (for jobs/candidates) #}
+            {% comment %} Job Type Filter (for jobs/candidates) {% endcomment %}
             {% if filter_type == "jobs" or filter_type == "candidates" or not filter_type %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
@@ -118,7 +118,7 @@
             </div>
             {% endif %}
 
-            {# Category Filter (for services) #}
+            {% comment %} Category Filter (for services) {% endcomment %}
             {% if filter_type == "services" %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
@@ -154,7 +154,7 @@
             </div>
             {% endif %}
 
-            {# Experience Level Filter #}
+            {% comment %} Experience Level Filter {% endcomment %}
             {% if filter_type != "services" %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
@@ -182,7 +182,7 @@
             </div>
             {% endif %}
 
-            {# Salary/Price Range Filter #}
+            {% comment %} Salary/Price Range Filter {% endcomment %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
                     <strong class="text-button">
@@ -219,7 +219,7 @@
                 </div>
             </div>
 
-            {# Skills Filter #}
+            {% comment %} Skills Filter {% endcomment %}
             <div class="filter_group" x-data="{ open: true }">
                 <button type="button" @click="open = !open" class="flex items-center justify-between w-full text-left">
                     <strong class="text-button">{% trans 'Skills' %}</strong>
@@ -257,7 +257,7 @@
                 </div>
             </div>
 
-            {# Verified Only Filter #}
+            {% comment %} Verified Only Filter {% endcomment %}
             <div class="filter_group pt-3 border-t border-line">
                 <label class="filter_checkbox flex items-center gap-2 cursor-pointer hover:text-primary">
                     <input type="checkbox" name="verified_only" value="true" class="w-4 h-4 rounded border-line text-primary focus:ring-primary"
@@ -267,7 +267,7 @@
                 </label>
             </div>
 
-            {# Apply Filters Button (for non-HTMX fallback) #}
+            {% comment %} Apply Filters Button (for non-HTMX fallback) {% endcomment %}
             <noscript>
                 <button type="submit" class="button-main w-full mt-3">
                     {% trans 'Apply Filters' %}

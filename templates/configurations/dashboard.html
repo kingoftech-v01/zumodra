@@ -40,9 +40,9 @@
     {% endif %}
 {% endif %}
 <div class="space-y-6">
-    {# Quick Stats Grid #}
+    {% comment %} Quick Stats Grid {% endcomment %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {# Skills Stats #}
+        {% comment %} Skills Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -66,7 +66,7 @@
             </a>
         </div>
 
-        {# Companies Stats #}
+        {% comment %} Companies Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -90,7 +90,7 @@
             </a>
         </div>
 
-        {# Jobs Stats #}
+        {% comment %} Jobs Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        {# Content Stats #}
+        {% comment %} Content Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    {# Organization Structure #}
+    {% comment %} Organization Structure {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -161,7 +161,7 @@
             </div>
         </div>
 
-        {# Skills by Category #}
+        {% comment %} Skills by Category {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Skills by Category" %}</h3>
@@ -185,14 +185,14 @@
         </div>
     </div>
 
-    {# Website Content Overview #}
+    {% comment %} Website Content Overview {% endcomment %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Website Content" %}</h3>
         </div>
         <div class="p-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {# FAQs #}
+                {% comment %} FAQs {% endcomment %}
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
@@ -212,7 +212,7 @@
                     </a>
                 </div>
 
-                {# Testimonials #}
+                {% comment %} Testimonials {% endcomment %}
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
@@ -232,7 +232,7 @@
                     </a>
                 </div>
 
-                {# Partnerships #}
+                {% comment %} Partnerships {% endcomment %}
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
@@ -247,7 +247,7 @@
                     </div>
                 </div>
 
-                {# Trusted Companies #}
+                {% comment %} Trusted Companies {% endcomment %}
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
@@ -265,9 +265,9 @@
         </div>
     </div>
 
-    {# Recent Items #}
+    {% comment %} Recent Items {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Recent Skills #}
+        {% comment %} Recent Skills {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recent Skills" %}</h3>
@@ -294,7 +294,7 @@
             </ul>
         </div>
 
-        {# Recent Companies #}
+        {% comment %} Recent Companies {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recent Companies" %}</h3>

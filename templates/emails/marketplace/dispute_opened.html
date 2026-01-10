@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "A dispute has been opened regarding your project." %}{% endblock %}
 
 {% block email_content %}
-{# Alert header #}
+{% comment %} Alert header {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding-bottom: 20px;">
@@ -29,7 +29,7 @@
     </tr>
 </table>
 
-{# Dispute details card #}
+{% comment %} Dispute details card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 24px;">
@@ -44,7 +44,7 @@
                 <tr>
                     <td>
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                            {# Dispute ID #}
+                            {% comment %} Dispute ID {% endcomment %}
                             <tr>
                                 <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -59,7 +59,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Opened By #}
+                            {% comment %} Opened By {% endcomment %}
                             <tr>
                                 <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -74,7 +74,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Amount in Dispute #}
+                            {% comment %} Amount in Dispute {% endcomment %}
                             <tr>
                                 <td style="padding: 10px 0; border-bottom: 1px solid #fecaca;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -89,7 +89,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Reason #}
+                            {% comment %} Reason {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0;">
                                     <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #7f1d1d;">{% trans "Reason" %}</span><br>
@@ -104,7 +104,7 @@
     </tr>
 </table>
 
-{# Dispute description #}
+{% comment %} Dispute description {% endcomment %}
 {% if dispute_description %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -126,7 +126,7 @@
 </table>
 {% endif %}
 
-{# What to do next #}
+{% comment %} What to do next {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding: 20px 0;">
@@ -187,7 +187,7 @@
     </tr>
 </table>
 
-{# Response deadline warning #}
+{% comment %} Response deadline warning {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 16px;">
@@ -208,7 +208,7 @@
     </tr>
 </table>
 
-{# CTA Button #}
+{% comment %} CTA Button {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 24px 0;">

@@ -1,7 +1,6 @@
 {% load static i18n %}
 
-{#
-    HTMX-powered Pagination Component
+{% comment %} HTMX-powered Pagination Component
 
     Usage:
     {% include "components/pagination.html" with page_obj=page_obj %}
@@ -9,8 +8,7 @@
     Context variables:
     - page_obj: Django Page object from Paginator
     - paginate_url: Base URL for pagination (optional, uses current URL if not provided)
-    - target_id: HTMX target for content swap (default: #main-content)
-#}
+    - target_id: HTMX target for content swap (default: #main-content) {% endcomment %}
 
 {% if page_obj.has_other_pages %}
 <nav class="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6"

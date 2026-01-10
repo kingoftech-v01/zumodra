@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA CTA BANNER SECTION COMPONENT
    =============================================================================
 
@@ -21,12 +21,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "gradient" %}
-{# Gradient Background Layout #}
+{% comment %} Gradient Background Layout {% endcomment %}
 <section class="banner lg:py-20 sm:py-14 py-10">
     <div class="container">
         <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70">
@@ -53,7 +53,7 @@
 </section>
 
 {% elif layout == "centered" %}
-{# Centered Text Layout #}
+{% comment %} Centered Text Layout {% endcomment %}
 <section class="banner lg:py-20 sm:py-14 py-10 {{ bg_class|default:'bg-surface' }}">
     <div class="container">
         <div class="banner_content text-center max-w-3xl mx-auto">
@@ -78,22 +78,22 @@
 </section>
 
 {% else %}
-{# Image Background Layout (Default) #}
+{% comment %} Image Background Layout (Default) {% endcomment %}
 <section class="banner lg:pb-20 sm:pb-14 pb-10">
     <div class="container">
         <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl">
-            {# Background Image #}
+            {% comment %} Background Image {% endcomment %}
             <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
                 {% if background_image %}
                 <img src="{{ background_image }}" alt="" class="w-full h-full object-cover" />
                 {% else %}
                 <div class="w-full h-full bg-gradient-to-br from-primary via-primary/90 to-primary/70"></div>
                 {% endif %}
-                {# Overlay #}
+                {% comment %} Overlay {% endcomment %}
                 <div class="absolute inset-0 bg-black/20"></div>
             </div>
 
-            {# Banner Content #}
+            {% comment %} Banner Content {% endcomment %}
             <div class="banner_content relative z-10 max-w-xl">
                 <h4 class="heading4 text-white">
                     {{ title|default:_("Embrace Independence<br>Start Your Freelance Journey Now")|safe }}

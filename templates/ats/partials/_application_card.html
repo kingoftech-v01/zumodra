@@ -1,13 +1,11 @@
 {% load static i18n humanize %}
 
-{#
-    Application Card Partial for Pipeline Kanban Board
+{% comment %} Application Card Partial for Pipeline Kanban Board
 
     Usage: {% include "ats/partials/_application_card.html" with application=application %}
 
     This is the card component shown in the Kanban pipeline board.
-    Designed for drag-and-drop functionality with HTMX updates.
-#}
+    Designed for drag-and-drop functionality with HTMX updates. {% endcomment %}
 
 <div class="candidate-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
      data-application-id="{{ application.id }}"

@@ -461,25 +461,25 @@ FEATURE CARD - Highlight a feature or benefit
 USAGE EXAMPLES
 ==============================================================================
 
-{# Basic card #}
+{% comment %} Basic card {% endcomment %}
 {% include "components/cards.html" with variant="default" title="Card Title" body="<p>Card content goes here</p>" %}
 
-{# Glassmorphism card #}
+{% comment %} Glassmorphism card {% endcomment %}
 {% include "components/cards.html" with variant="glass" title="Glass Card" body="<p>Frosted glass effect</p>" %}
 
-{# Hover effect card #}
+{% comment %} Hover effect card {% endcomment %}
 {% include "components/cards.html" with variant="hover" title="Hover Me" body="<p>Hover to see the effect</p>" %}
 
-{# Clickable card #}
+{% comment %} Clickable card {% endcomment %}
 {% include "components/cards.html" with variant="clickable" title="Click Me" body="<p>Click anywhere</p>" href="/destination" %}
 
-{# Stats card #}
+{% comment %} Stats card {% endcomment %}
 {% include "components/cards.html" with variant="stats" title="Revenue" value="$12,345" change="+15%" trend="up" period="vs last month" icon="<path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/>" %}
 
-{# Profile card #}
+{% comment %} Profile card {% endcomment %}
 {% include "components/cards.html" with variant="profile" name="Jane Smith" role="Product Designer" avatar="/static/avatars/jane.jpg" bio="Creating delightful experiences" %}
 
-{# Feature card #}
+{% comment %} Feature card {% endcomment %}
 {% include "components/cards.html" with variant="feature" title="Fast & Reliable" body="Built for speed and performance" icon="<path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/>" %}
 
 {% endcomment %}

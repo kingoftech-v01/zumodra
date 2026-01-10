@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "You've received a new proposal for your project." %}{% endblock %}
 
 {% block email_content %}
-{# Greeting #}
+{% comment %} Greeting {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="padding-bottom: 20px;">
@@ -24,12 +24,12 @@
     </tr>
 </table>
 
-{# Proposal card #}
+{% comment %} Proposal card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #f8fafc; border-radius: 8px; padding: 24px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                {# Freelancer info #}
+                {% comment %} Freelancer info {% endcomment %}
                 <tr>
                     <td style="padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -55,7 +55,7 @@
                         </table>
                     </td>
                 </tr>
-                {# Proposal details #}
+                {% comment %} Proposal details {% endcomment %}
                 <tr>
                     <td style="padding: 20px 0;">
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -73,7 +73,7 @@
                         </table>
                     </td>
                 </tr>
-                {# Cover letter excerpt #}
+                {% comment %} Cover letter excerpt {% endcomment %}
                 <tr>
                     <td style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
                         <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b; text-transform: uppercase;">{% trans "Cover Letter" %}</span>
@@ -87,7 +87,7 @@
     </tr>
 </table>
 
-{# Freelancer stats #}
+{% comment %} Freelancer stats {% endcomment %}
 {% if freelancer_rating %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -113,7 +113,7 @@
 </table>
 {% endif %}
 
-{# CTA Button #}
+{% comment %} CTA Button {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 10px 0 20px;">

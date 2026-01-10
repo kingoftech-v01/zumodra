@@ -1,6 +1,5 @@
 {% load i18n %}
-{#
-    CV Selector Component - allows user to select which CV to use when applying
+{% comment %} CV Selector Component - allows user to select which CV to use when applying
 
     Usage:
     {% include "components/cv_selector.html" with cvs=user.cvs.all recommended_cv=recommended selected_cv_id=selected %}
@@ -9,8 +8,7 @@
     - cvs: QuerySet of CandidateCV objects
     - recommended_cv: AI-recommended CV for this job (optional)
     - selected_cv_id: Currently selected CV ID (optional)
-    - job: Job object for matching keywords (optional)
-#}
+    - job: Job object for matching keywords (optional) {% endcomment %}
 
 <div class="cv-selector" x-data="{ selectedCv: '{{ selected_cv_id|default:'' }}', showAll: false }">
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">

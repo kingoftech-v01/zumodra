@@ -55,7 +55,7 @@
     {% endif %}
 {% endif %}
 <div class="space-y-6">
-    {# Alert Banner for Suspicious Activity #}
+    {% comment %} Alert Banner for Suspicious Activity {% endcomment %}
     {% if failed_by_ip %}
     <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
         <div class="flex">
@@ -80,9 +80,9 @@
     </div>
     {% endif %}
 
-    {# Stats Cards #}
+    {% comment %} Stats Cards {% endcomment %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {# Total Audit Logs #}
+        {% comment %} Total Audit Logs {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -100,7 +100,7 @@
             </p>
         </div>
 
-        {# Security Events Today #}
+        {% comment %} Security Events Today {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -115,7 +115,7 @@
             </div>
         </div>
 
-        {# Failed Logins Today #}
+        {% comment %} Failed Logins Today {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        {# Active Sessions #}
+        {% comment %} Active Sessions {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -148,7 +148,7 @@
             </a>
         </div>
 
-        {# Pending Password Resets #}
+        {% comment %} Pending Password Resets {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -163,7 +163,7 @@
             </div>
         </div>
 
-        {# Audit Logs Today #}
+        {% comment %} Audit Logs Today {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -182,9 +182,9 @@
         </div>
     </div>
 
-    {# Analysis Grids #}
+    {% comment %} Analysis Grids {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {# Audit Logs by Action #}
+        {% comment %} Audit Logs by Action {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Audit Logs by Action" %}</h3>
@@ -213,7 +213,7 @@
             </div>
         </div>
 
-        {# Audit Logs by Model #}
+        {% comment %} Audit Logs by Model {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Most Modified Models" %}</h3>
@@ -234,7 +234,7 @@
             </div>
         </div>
 
-        {# Security Events by Type #}
+        {% comment %} Security Events by Type {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Events by Type" %}</h3>
@@ -262,7 +262,7 @@
         </div>
     </div>
 
-    {# Suspicious Activity - Failed Logins by IP #}
+    {% comment %} Suspicious Activity - Failed Logins by IP {% endcomment %}
     {% if failed_by_ip %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -310,9 +310,9 @@
     </div>
     {% endif %}
 
-    {# Recent Activity Tables #}
+    {% comment %} Recent Activity Tables {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Recent Audit Logs #}
+        {% comment %} Recent Audit Logs {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Audit Logs" %}</h3>
@@ -351,7 +351,7 @@
             </ul>
         </div>
 
-        {# Recent Security Events #}
+        {% comment %} Recent Security Events {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Security Events" %}</h3>
@@ -389,9 +389,9 @@
         </div>
     </div>
 
-    {# Recent Failed Logins and Active Sessions #}
+    {% comment %} Recent Failed Logins and Active Sessions {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Recent Failed Logins #}
+        {% comment %} Recent Failed Logins {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Failed Logins" %}</h3>
@@ -417,7 +417,7 @@
             </ul>
         </div>
 
-        {# Active Sessions by User #}
+        {% comment %} Active Sessions by User {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Sessions by User" %}</h3>

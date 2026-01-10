@@ -413,13 +413,13 @@ Usage: {% include "components/loading.html" with variant="dashboard" %}
 >
     <span class="sr-only">Loading dashboard...</span>
 
-    {# Header #}
+    {% comment %} Header {% endcomment %}
     <div style="margin-bottom: var(--spacing-6);">
         <div class="skeleton skeleton-title" style="width: 200px; margin-bottom: var(--spacing-2);"></div>
         <div class="skeleton skeleton-text" style="width: 300px;"></div>
     </div>
 
-    {# Stats row #}
+    {% comment %} Stats row {% endcomment %}
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
         {% for i in "1234" %}
         <div class="card">
@@ -432,9 +432,9 @@ Usage: {% include "components/loading.html" with variant="dashboard" %}
         {% endfor %}
     </div>
 
-    {# Main content area #}
+    {% comment %} Main content area {% endcomment %}
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-4);">
-        {# Chart area #}
+        {% comment %} Chart area {% endcomment %}
         <div class="card">
             <div class="card-header">
                 <div class="skeleton skeleton-title" style="width: 150px;"></div>
@@ -444,7 +444,7 @@ Usage: {% include "components/loading.html" with variant="dashboard" %}
             </div>
         </div>
 
-        {# Activity list #}
+        {% comment %} Activity list {% endcomment %}
         <div class="card">
             <div class="card-header">
                 <div class="skeleton skeleton-title" style="width: 120px;"></div>
@@ -508,62 +508,62 @@ Usage: {% include "components/loading.html" with variant="fullpage" message="Loa
 LOADING EXAMPLES - For reference/documentation
 ==============================================================================
 
-{# Single text line #}
+{% comment %} Single text line {% endcomment %}
 {% include "components/loading.html" with variant="text" width="80%" %}
 
-{# Title skeleton #}
+{% comment %} Title skeleton {% endcomment %}
 {% include "components/loading.html" with variant="title" %}
 
-{# Paragraph with 4 lines #}
+{% comment %} Paragraph with 4 lines {% endcomment %}
 {% include "components/loading.html" with variant="paragraph" lines=4 %}
 
-{# Avatar (various sizes) #}
+{% comment %} Avatar (various sizes) {% endcomment %}
 {% include "components/loading.html" with variant="avatar" size="sm" %}
 {% include "components/loading.html" with variant="avatar" %}
 {% include "components/loading.html" with variant="avatar" size="lg" %}
 {% include "components/loading.html" with variant="avatar" size="xl" %}
 
-{# Image placeholder #}
+{% comment %} Image placeholder {% endcomment %}
 {% include "components/loading.html" with variant="image" aspect_ratio="16/9" %}
 
-{# Card skeleton #}
+{% comment %} Card skeleton {% endcomment %}
 {% include "components/loading.html" with variant="card" show_image=True show_footer=True %}
 
-{# Table skeleton #}
+{% comment %} Table skeleton {% endcomment %}
 {% include "components/loading.html" with variant="table" rows=5 cols=4 %}
 
-{# List skeleton #}
+{% comment %} List skeleton {% endcomment %}
 {% include "components/loading.html" with variant="list" items=5 show_avatar=True show_action=True %}
 
-{# Profile card skeleton #}
+{% comment %} Profile card skeleton {% endcomment %}
 {% include "components/loading.html" with variant="profile" %}
 
-{# Stats card skeleton #}
+{% comment %} Stats card skeleton {% endcomment %}
 {% include "components/loading.html" with variant="stats" %}
 
-{# Form skeleton #}
+{% comment %} Form skeleton {% endcomment %}
 {% include "components/loading.html" with variant="form" fields=4 %}
 
-{# Grid of cards #}
+{% comment %} Grid of cards {% endcomment %}
 {% include "components/loading.html" with variant="grid" cards=6 columns=3 %}
 
-{# Comment/message skeleton #}
+{% comment %} Comment/message skeleton {% endcomment %}
 {% include "components/loading.html" with variant="comment" count=3 %}
 
-{# Sidebar skeleton #}
+{% comment %} Sidebar skeleton {% endcomment %}
 {% include "components/loading.html" with variant="sidebar" items=6 %}
 
-{# Header skeleton #}
+{% comment %} Header skeleton {% endcomment %}
 {% include "components/loading.html" with variant="header" %}
 
-{# Full dashboard skeleton #}
+{% comment %} Full dashboard skeleton {% endcomment %}
 {% include "components/loading.html" with variant="dashboard" %}
 
-{# Spinner (inline) #}
+{% comment %} Spinner (inline) {% endcomment %}
 {% include "components/loading.html" with variant="spinner" %}
 {% include "components/loading.html" with variant="spinner" size="lg" %}
 
-{# Full page loading #}
+{% comment %} Full page loading {% endcomment %}
 {% include "components/loading.html" with variant="fullpage" message="Loading your dashboard..." %}
 
 {% endcomment %}

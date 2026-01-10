@@ -120,7 +120,7 @@
 
 {% block page_actions %}
 <div class="flex items-center space-x-3">
-    {# Search Employee #}
+    {% comment %} Search Employee {% endcomment %}
     <div class="relative">
         <input type="text"
                id="org-search"
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    {# Department Filter #}
+    {% comment %} Department Filter {% endcomment %}
     <select id="department-filter"
             hx-get="{% url 'hr:org-chart' %}"
             hx-trigger="change"
@@ -148,7 +148,7 @@
         {% endfor %}
     </select>
 
-    {# View Toggle #}
+    {% comment %} View Toggle {% endcomment %}
     <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
         <button id="view-tree"
                 class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors bg-gray-100 dark:bg-gray-600"
@@ -166,7 +166,7 @@
         </button>
     </div>
 
-    {# Zoom Controls #}
+    {% comment %} Zoom Controls {% endcomment %}
     <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
         <button id="zoom-out" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-l-lg" title="{% trans 'Zoom Out' %}">
             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,7 +181,7 @@
         </button>
     </div>
 
-    {# Expand/Collapse All #}
+    {% comment %} Expand/Collapse All {% endcomment %}
     <button id="expand-all"
             class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,7 +190,7 @@
         {% trans "Expand All" %}
     </button>
 
-    {# Export #}
+    {% comment %} Export {% endcomment %}
     <button id="export-org-chart"
             class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

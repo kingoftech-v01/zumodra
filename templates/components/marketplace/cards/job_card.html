@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA JOB CARD COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static %}
 
 {% if layout == "list" %}
-{# List Layout #}
+{% comment %} List Layout {% endcomment %}
 <li class="jobs_item jobs_item_list flex flex-wrap items-center gap-5 px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
     <a href="{{ job.get_absolute_url }}" class="overflow-hidden flex-shrink-0 w-15 h-15">
         {% if job.company.logo %}
@@ -80,11 +80,11 @@
 </li>
 
 {% else %}
-{# Grid Layout (Default) #}
+{% comment %} Grid Layout (Default) {% endcomment %}
 <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-    {# Job Info Header #}
+    {% comment %} Job Info Header {% endcomment %}
     <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
-        {# Company Logo #}
+        {% comment %} Company Logo {% endcomment %}
         <a href="{{ job.get_absolute_url }}" class="overflow-hidden flex-shrink-0 w-15 h-15">
             {% if job.company.logo %}
             <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" class="jobs_avatar w-full h-full object-cover rounded-lg" />
@@ -95,18 +95,18 @@
             {% endif %}
         </a>
 
-        {# Job Content #}
+        {% comment %} Job Content {% endcomment %}
         <div class="jobs_content flex items-center justify-between gap-2 w-full">
             <a href="{{ job.get_absolute_url }}" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
                 <span class="jobs_company text-sm font-semibold text-primary">{{ job.company.name }}</span>
                 <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
                 <div class="flex flex-wrap items-center gap-5 gap-y-1">
-                    {# Location #}
+                    {% comment %} Location {% endcomment %}
                     <div class="jobs_address -style-1 text-secondary">
                         <span class="ph ph-map-pin text-lg"></span>
                         <span class="address caption1 align-top">{{ job.location }}</span>
                     </div>
-                    {# Posted Date #}
+                    {% comment %} Posted Date {% endcomment %}
                     <div class="jobs_date text-secondary">
                         <span class="ph ph-calendar-blank text-lg"></span>
                         <span class="date caption1 align-top">{{ job.created_at|timesince }} {% trans 'ago' %}</span>
@@ -114,7 +114,7 @@
                 </div>
             </a>
 
-            {# Wishlist Button #}
+            {% comment %} Wishlist Button {% endcomment %}
             {% if show_wishlist|default:True %}
             <button class="add_wishlist_btn -relative -border"
                     hx-post="{% url 'ats:job_bookmark' job.id %}"
@@ -127,9 +127,9 @@
         </div>
     </div>
 
-    {# Job Footer: Tags and Price #}
+    {% comment %} Job Footer: Tags and Price {% endcomment %}
     <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
-        {# Tags #}
+        {% comment %} Tags {% endcomment %}
         <div class="flex flex-wrap items-center gap-2.5">
             {% for tag in job.tags.all|slice:":2" %}
             <span class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ tag.name }}</span>
@@ -139,7 +139,7 @@
             {% endif %}
         </div>
 
-        {# Price/Salary #}
+        {% comment %} Price/Salary {% endcomment %}
         <div class="jobs_price">
             {% if job.salary_min and job.salary_max %}
             <span class="price text-title">${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}</span>

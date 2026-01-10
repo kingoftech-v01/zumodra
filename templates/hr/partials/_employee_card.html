@@ -1,6 +1,5 @@
 {% load static i18n humanize %}
-{#
-    Employee Card Partial
+{% comment %} Employee Card Partial
 
     Usage:
     {% include "hr/partials/_employee_card.html" with employee=employee %}
@@ -8,12 +7,11 @@
     Context variables:
     - employee: Employee model instance
     - compact: Boolean for compact view (optional)
-    - show_actions: Boolean to show action buttons (optional, default True)
-#}
+    - show_actions: Boolean to show action buttons (optional, default True) {% endcomment %}
 
 <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow group">
     <div class="p-6 text-center">
-        {# Profile Image #}
+        {% comment %} Profile Image {% endcomment %}
         {% if employee.user.profile_picture %}
         <img class="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-white dark:ring-gray-700 group-hover:ring-primary-100 dark:group-hover:ring-primary-900/20 transition-all"
              src="{{ employee.user.profile_picture.url }}"
@@ -26,7 +24,7 @@
         </div>
         {% endif %}
 
-        {# Employee Name and Title #}
+        {% comment %} Employee Name and Title {% endcomment %}
         <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white truncate">
             {{ employee.full_name }}
         </h3>
@@ -34,14 +32,14 @@
             {{ employee.job_title|default:_("No Title") }}
         </p>
 
-        {# Department #}
+        {% comment %} Department {% endcomment %}
         {% if employee.department %}
         <p class="text-sm text-primary-600 dark:text-primary-400 truncate">
             {{ employee.department.name }}
         </p>
         {% endif %}
 
-        {# Status Badge #}
+        {% comment %} Status Badge {% endcomment %}
         <div class="mt-3 flex justify-center">
             {% if employee.status == 'active' %}
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
@@ -75,7 +73,7 @@
             {% endif %}
         </div>
 
-        {# Contact Actions #}
+        {% comment %} Contact Actions {% endcomment %}
         {% if show_actions|default:True and not compact %}
         <div class="mt-4 flex justify-center space-x-3">
             <a href="mailto:{{ employee.user.email }}"
@@ -105,7 +103,7 @@
         {% endif %}
     </div>
 
-    {# View Profile Link #}
+    {% comment %} View Profile Link {% endcomment %}
     <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 text-center border-t border-gray-100 dark:border-gray-700">
         <a href="{% url 'hr:employee-detail' employee.pk %}"
            class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors">

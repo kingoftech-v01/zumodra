@@ -209,7 +209,7 @@
         </div>
 
         {% if featured_services %}
-            {# Dynamic Services from Database #}
+            {% comment %} Dynamic Services from Database {% endcomment %}
             <ul class="list grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
                 {% for service in featured_services %}
                 <li class="item animate animate_top" style="--i: {{ forloop.counter }}; animation-delay: {{ forloop.counter|add:'0' }}00ms;">
@@ -262,12 +262,12 @@
                 {% endfor %}
             </ul>
 
-            {# View All Services Button #}
+            {% comment %} View All Services Button {% endcomment %}
             <div class="flex items-center justify-center md:mt-10 mt-7">
                 <a href="{% url 'services:service_list' %}" class="btn-primary">{% trans "View All Services" %}</a>
             </div>
         {% else %}
-            {# Empty State - No Services Available #}
+            {% comment %} Empty State - No Services Available {% endcomment %}
             <div class="empty-state text-center py-16">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-50 to-cyan-50 mb-6">
                     <span class="ph ph-briefcase text-5xl text-gradient-primary"></span>
@@ -298,7 +298,7 @@
                 </div>
             </div>
 
-            {# Decorative gradient orbs #}
+            {% comment %} Decorative gradient orbs {% endcomment %}
             <div class="absolute -top-20 -right-20 w-64 h-64 bg-cyan-400 rounded-full opacity-20 blur-3xl"></div>
             <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-teal-400 rounded-full opacity-20 blur-3xl"></div>
         </div>

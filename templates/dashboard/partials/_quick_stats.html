@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    DASHBOARD QUICK STATS PARTIAL
    =============================================================================
 
@@ -21,14 +21,14 @@
 
    Author: Rhematek Solutions
    Last Updated: 2025-12-30
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n %}
 
-{# Stats cards grid - responsive layout #}
+{% comment %} Stats cards grid - responsive layout {% endcomment %}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-    {# ===== OPEN JOBS CARD ===== #}
+    {% comment %} ===== OPEN JOBS CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--primary">
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    {# ===== CANDIDATES CARD ===== #}
+    {% comment %} ===== CANDIDATES CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--success">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    {# ===== ACTIVE APPLICATIONS CARD ===== #}
+    {% comment %} ===== ACTIVE APPLICATIONS CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--warning">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    {# ===== PENDING INTERVIEWS CARD ===== #}
+    {% comment %} ===== PENDING INTERVIEWS CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--info">
@@ -124,8 +124,8 @@
 
 </div>
 
-{# ===== EXPANDED STATS (HR METRICS) ===== #}
-{# Shown when "Show All" is clicked - controlled by Alpine.js in parent #}
+{% comment %} ===== EXPANDED STATS (HR METRICS) ===== {% endcomment %}
+{% comment %} Shown when "Show All" is clicked - controlled by Alpine.js in parent {% endcomment %}
 <div x-show="showAllStats"
      x-transition:enter="transition ease-out duration-200"
      x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -135,7 +135,7 @@
      x-transition:leave-end="opacity-0 transform -translate-y-2"
      class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
 
-    {# ===== TOTAL EMPLOYEES CARD ===== #}
+    {% comment %} ===== TOTAL EMPLOYEES CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--primary">
@@ -156,7 +156,7 @@
         </div>
     </div>
 
-    {# ===== PENDING TIME OFF CARD ===== #}
+    {% comment %} ===== PENDING TIME OFF CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--warning">
@@ -184,7 +184,7 @@
         </div>
     </div>
 
-    {# ===== NEW THIS WEEK CARD ===== #}
+    {% comment %} ===== NEW THIS WEEK CARD ===== {% endcomment %}
     <div class="zu-stats-card">
         <div class="zu-stats-card__header">
             <div class="zu-stats-card__icon zu-stats-card__icon--success">

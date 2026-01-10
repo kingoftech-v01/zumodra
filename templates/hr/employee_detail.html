@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block page_header %}
-{# Custom header with employee info #}
+{% comment %} Custom header with employee info {% endcomment %}
 {% endblock %}
 
 {% block content %}
@@ -45,13 +45,13 @@
 </div>
 {% else %}
 <div id="main-content" x-data="{ activeTab: 'overview' }">
-    {# Employee Header Card #}
+    {% comment %} Employee Header Card {% endcomment %}
     <div class="zu-card mb-6">
         <div class="zu-card__body">
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                {# Left: Profile Info #}
+                {% comment %} Left: Profile Info {% endcomment %}
                 <div class="flex items-start">
-                    {# Avatar #}
+                    {% comment %} Avatar {% endcomment %}
                     <div class="flex-shrink-0">
                         {% if employee.user.profile_picture %}
                         <img class="h-24 w-24 rounded-full object-cover ring-4 ring-white dark:ring-gray-700"
@@ -66,11 +66,11 @@
                         {% endif %}
                     </div>
 
-                    {# Employee Details #}
+                    {% comment %} Employee Details {% endcomment %}
                     <div class="ml-6">
                         <div class="flex items-center">
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ employee.full_name }}</h1>
-                            {# Status Badge #}
+                            {% comment %} Status Badge {% endcomment %}
                             {% if employee.status == 'active' %}
                             <span class="ml-3 zu-badge zu-badge--success">{{ employee.get_status_display }}</span>
                             {% elif employee.status == 'probation' %}
@@ -117,7 +117,7 @@
                                 {% trans "Joined" %} {{ employee.hire_date|date:"M Y" }}
                             </span>
                         </div>
-                        {# Contact Icons #}
+                        {% comment %} Contact Icons {% endcomment %}
                         <div class="mt-4 flex items-center space-x-3">
                             <a href="mailto:{{ employee.user.email }}"
                                class="zu-btn zu-btn--secondary">
@@ -137,9 +137,9 @@
                     </div>
                 </div>
 
-                {# Right: Quick Stats & Actions #}
+                {% comment %} Right: Quick Stats & Actions {% endcomment %}
                 <div class="flex flex-col items-end space-y-4">
-                    {# Action Buttons #}
+                    {% comment %} Action Buttons {% endcomment %}
                     {% if can_edit %}
                     <div class="flex items-center space-x-2">
                         <a href="{% url 'hr:employee-edit' employee.pk %}"
@@ -152,7 +152,7 @@
                     </div>
                     {% endif %}
 
-                    {# Quick Stats #}
+                    {% comment %} Quick Stats {% endcomment %}
                     <div class="flex items-center space-x-6 text-center">
                         <div>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ employee.years_of_service|floatformat:1 }}</p>
@@ -173,7 +173,7 @@
             </div>
         </div>
 
-        {# Tab Navigation #}
+        {% comment %} Tab Navigation {% endcomment %}
         <div class="border-t border-gray-200 dark:border-gray-700">
             <nav class="flex -mb-px overflow-x-auto" aria-label="Tabs">
                 <button @click="activeTab = 'overview'"
@@ -222,14 +222,14 @@
         </div>
     </div>
 
-    {# Tab Content #}
+    {% comment %} Tab Content {% endcomment %}
     <div class="space-y-6">
-        {# ===== OVERVIEW TAB ===== #}
+        {% comment %} ===== OVERVIEW TAB ===== {% endcomment %}
         <div x-show="activeTab === 'overview'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {# Left Column - Employment Details #}
+                {% comment %} Left Column - Employment Details {% endcomment %}
                 <div class="lg:col-span-2 space-y-6">
-                    {# Employment Information #}
+                    {% comment %} Employment Information {% endcomment %}
                     <div class="zu-card">
                         <div class="zu-card__header">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Employment Information" %}</h3>
@@ -273,13 +273,13 @@
                         </div>
                     </div>
 
-                    {# Skills & Certifications #}
+                    {% comment %} Skills & Certifications {% endcomment %}
                     <div class="zu-card">
                         <div class="zu-card__header flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Skills & Certifications" %}</h3>
                         </div>
                         <div class="zu-card__body">
-                            {# Skills #}
+                            {% comment %} Skills {% endcomment %}
                             {% if skills %}
                             <div class="mb-6">
                                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{% trans "Skills" %}</h4>
@@ -302,7 +302,7 @@
                             </div>
                             {% endif %}
 
-                            {# Certifications #}
+                            {% comment %} Certifications {% endcomment %}
                             {% if certifications %}
                             <div>
                                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{% trans "Certifications" %}</h4>
@@ -339,7 +339,7 @@
                         </div>
                     </div>
 
-                    {# Direct Reports #}
+                    {% comment %} Direct Reports {% endcomment %}
                     {% if direct_reports %}
                     <div class="zu-card">
                         <div class="zu-card__header">
@@ -368,9 +368,9 @@
                     {% endif %}
                 </div>
 
-                {# Right Column - Sidebar Info #}
+                {% comment %} Right Column - Sidebar Info {% endcomment %}
                 <div class="space-y-6">
-                    {# Contact Information #}
+                    {% comment %} Contact Information {% endcomment %}
                     <div class="zu-card">
                         <div class="zu-card__header">
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Contact Information" %}</h3>
@@ -387,7 +387,7 @@
                         </div>
                     </div>
 
-                    {# Time Off Balances #}
+                    {% comment %} Time Off Balances {% endcomment %}
                     <div class="zu-card">
                         <div class="zu-card__header">
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Time Off Balances" %}</h3>
@@ -414,7 +414,7 @@
                         </div>
                     </div>
 
-                    {# Emergency Contact #}
+                    {% comment %} Emergency Contact {% endcomment %}
                     {% if can_view_sensitive and employee.emergency_contact_name %}
                     <div class="zu-card">
                         <div class="zu-card__header">
@@ -437,7 +437,7 @@
                     </div>
                     {% endif %}
 
-                    {# Activity Log #}
+                    {% comment %} Activity Log {% endcomment %}
                     <div class="zu-card">
                         <div class="zu-card__header">
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Recent Activity" %}</h3>
@@ -462,7 +462,7 @@
             </div>
         </div>
 
-        {# ===== DOCUMENTS TAB ===== #}
+        {% comment %} ===== DOCUMENTS TAB ===== {% endcomment %}
         <div x-show="activeTab === 'documents'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -496,7 +496,7 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
-                            {# Status Badge #}
+                            {% comment %} Status Badge {% endcomment %}
                             {% if doc.status == 'signed' %}
                             <span class="zu-badge zu-badge--success">
                                 {% trans "Signed" %}
@@ -526,9 +526,9 @@
             </div>
         </div>
 
-        {# ===== TIME OFF TAB ===== #}
+        {% comment %} ===== TIME OFF TAB ===== {% endcomment %}
         <div x-show="activeTab === 'timeoff'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-            {# Time Off Balances Summary #}
+            {% comment %} Time Off Balances Summary {% endcomment %}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {% for balance in time_off_balances %}
                 <div class="zu-card">
@@ -545,7 +545,7 @@
                 {% endfor %}
             </div>
 
-            {# Pending Requests #}
+            {% comment %} Pending Requests {% endcomment %}
             {% if pending_time_off %}
             <div class="mb-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Pending Requests" %}</h3>
@@ -553,7 +553,7 @@
             </div>
             {% endif %}
 
-            {# Past Requests #}
+            {% comment %} Past Requests {% endcomment %}
             <div>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Request History" %}</h3>
                 {% with employee.time_off_requests.all|slice:":10" as past_requests %}
@@ -562,10 +562,10 @@
             </div>
         </div>
 
-        {# ===== PERFORMANCE TAB ===== #}
+        {% comment %} ===== PERFORMANCE TAB ===== {% endcomment %}
         <div x-show="activeTab === 'performance'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {# Active Goals #}
+                {% comment %} Active Goals {% endcomment %}
                 <div class="lg:col-span-2">
                     <div class="zu-card">
                         <div class="zu-card__header">
@@ -616,7 +616,7 @@
                     </div>
                 </div>
 
-                {# Performance Reviews #}
+                {% comment %} Performance Reviews {% endcomment %}
                 <div>
                     <div class="zu-card">
                         <div class="zu-card__header">
@@ -653,7 +653,7 @@
                         </ul>
                     </div>
 
-                    {# Next Review #}
+                    {% comment %} Next Review {% endcomment %}
                     {% if employee.next_review_date %}
                     <div class="mt-6 bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                         <div class="flex items-center">

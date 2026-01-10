@@ -6,7 +6,7 @@
 {% block preheader_text %}{% trans "Congratulations! You've received a job offer." %}{% endblock %}
 
 {% block email_content %}
-{# Celebration header #}
+{% comment %} Celebration header {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding-bottom: 24px;">
@@ -29,7 +29,7 @@
     </tr>
 </table>
 
-{# Offer details card #}
+{% comment %} Offer details card {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 24px;">
@@ -51,7 +51,7 @@
                 <tr>
                     <td>
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                            {# Salary #}
+                            {% comment %} Salary {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -66,7 +66,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Employment Type #}
+                            {% comment %} Employment Type {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -81,7 +81,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Start Date #}
+                            {% comment %} Start Date {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #bbf7d0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -96,7 +96,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            {# Location #}
+                            {% comment %} Location {% endcomment %}
                             <tr>
                                 <td style="padding: 12px 0;">
                                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -119,7 +119,7 @@
     </tr>
 </table>
 
-{# Benefits summary #}
+{% comment %} Benefits summary {% endcomment %}
 {% if benefits %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
@@ -150,7 +150,7 @@
 </table>
 {% endif %}
 
-{# Response deadline #}
+{% comment %} Response deadline {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="background-color: #fef3c7; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
@@ -171,7 +171,7 @@
     </tr>
 </table>
 
-{# CTA Buttons #}
+{% comment %} CTA Buttons {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding: 24px 0;">
@@ -195,7 +195,7 @@
     </tr>
 </table>
 
-{# Contact info #}
+{% comment %} Contact info {% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td style="border-top: 1px solid #e2e8f0; padding-top: 24px;">

@@ -1,0 +1,88 @@
+{% comment %}
+=============================================================================
+   DYNAMIC FEATURED SERVICES SECTION
+=============================================================================
+Replace the hardcoded Featured Services section in index.html (starting around line 198)
+with this dynamic version that uses data from the database.
+=============================================================================
+{% endcomment %}
+{% load static i18n %}
+
+{% comment %} FEATURED SERVICES SECTION {% endcomment %}
+<section class="list_services lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="heading flex flex-col items-center">
+            <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Featured Services" %}</h3>
+            <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover our featured services from verified providers" %}</p>
+        </div>
+
+        {% if featured_services %}
+            <ul class="list grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
+                {% for service in featured_services %}
+                <li class="item animate animate_top" style="--i: {{ forloop.counter }}">
+                    <div class="service_item overflow-hidden relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                        <button class="add_wishlist_btn">
+                            <span class="ph ph-heart text-xl"></span>
+                            <span class="ph-fill ph-heart text-xl"></span>
+                            <span class="blind">button add to wishlist</span>
+                        </button>
+                        <a href="{% url 'services:service_detail' service.uuid %}" class="service_thumb">
+                            {% if service.avatar %}
+                            <img src="{{ service.avatar.url }}" alt="{{ service.title }}" class="w-full h-48 object-cover" />
+                            {% else %}
+                            <img src="{% static 'assets/images/service/placeholder.webp' %}" alt="{{ service.title }}" class="w-full h-48 object-cover" />
+                            {% endif %}
+                        </a>
+                        <div class="service_info py-5 px-4">
+                            <div class="flex items-center justify-between">
+                                {% if service.category_name %}
+                                <a href="{% url 'services:service_list' %}?category={{ service.category_slug }}" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category_name }}</a>
+                                {% else %}
+                                <span class="tag caption2 bg-surface">{% trans "Service" %}</span>
+                                {% endif %}
+                                <div class="rate flex items-center gap-1">
+                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                    <strong class="service_rate text-button-sm">{{ service.rating_avg|floatformat:1 }}</strong>
+                                    <span class="service_rate_quantity caption1 text-secondary">({{ service.total_reviews }})</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'services:service_detail' service.uuid %}" class="service_title text-title pt-2 duration-300 hover:text-primary line-clamp-2">{{ service.title }}</a>
+                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                <a href="#" class="service_author flex items-center gap-2">
+                                    {% if service.provider_avatar %}
+                                    <img src="{{ service.provider_avatar.url }}" alt="{{ service.provider_name }}" class="service_author_avatar w-8 h-8 rounded-full object-cover" />
+                                    {% else %}
+                                    <div class="service_author_avatar w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <span class="text-primary text-sm font-bold">{{ service.provider_name|slice:":1"|upper }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <span class="service_author_name -style-1">{{ service.provider_name }}</span>
+                                </a>
+                                <div class="service_price whitespace-nowrap">
+                                    <span class="text-secondary">From </span>
+                                    <span class="price text-title">${{ service.price|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% comment %} View All Button {% endcomment %}
+            <div class="flex items-center justify-center md:mt-10 mt-7">
+                <a href="{% url 'services:service_list' %}" class="button-main">{% trans "View All Services" %}</a>
+            </div>
+        {% else %}
+            {% comment %} Empty State {% endcomment %}
+            <div class="text-center py-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface mb-4">
+                    <span class="ph ph-briefcase text-4xl text-secondary"></span>
+                </div>
+                <h4 class="heading5 text-secondary">{% trans "No Featured Services Yet" %}</h4>
+                <p class="body2 text-secondary mt-2">{% trans "Services will appear here once providers start offering them." %}</p>
+                <a href="{% url 'become_seller' %}" class="button-main mt-6">{% trans "Become a Service Provider" %}</a>
+            </div>
+        {% endif %}
+    </div>
+</section>

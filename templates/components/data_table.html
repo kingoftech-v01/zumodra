@@ -1,6 +1,6 @@
 {% load static i18n %}
 
-{# ============================================================================
+{% comment %} ============================================================================
    ZUMODRA DATA TABLE COMPONENT
    ============================================================================
    Premium data table with HTMX sorting, filtering, and pagination.
@@ -17,7 +17,7 @@
    - sort_order: 'asc' or 'desc'
    - search_url: URL for search/filter endpoint
    - bulk_actions: List of bulk action definitions
-   ============================================================================ #}
+   ============================================================================ {% endcomment %}
 
 <div class="zu-table-container"
      id="{{ table_id|default:'data-table' }}"

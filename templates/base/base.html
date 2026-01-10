@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA MODERN BASE TEMPLATE
    =============================================================================
 
@@ -10,30 +10,30 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-01
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% extends "base/unified_base.html" %}
 
 {% load static i18n %}
 
-{# Override meta description if needed #}
+{% comment %} Override meta description if needed {% endcomment %}
 {% block meta_description %}{{ block.super }}{% endblock %}
 
-{# Additional CSS for dashboard/app pages #}
+{% comment %} Additional CSS for dashboard/app pages {% endcomment %}
 {% block extra_css %}
 {{ block.super }}
-{# Chart.js for analytics - loaded only when needed #}
+{% comment %} Chart.js for analytics - loaded only when needed {% endcomment %}
 {% endblock %}
 
-{# Map navigation block to header for compatibility #}
+{% comment %} Map navigation block to header for compatibility {% endcomment %}
 {% block header %}
 {% block navigation %}{% endblock %}
 {% endblock %}
 
-{# Legacy JS block - includes Chart.js for dashboards #}
+{% comment %} Legacy JS block - includes Chart.js for dashboards {% endcomment %}
 {% block js_legacy %}
 {{ block.super }}
-{# Chart.js for data visualization #}
+{% comment %} Chart.js for data visualization {% endcomment %}
 <script src="{% static 'assets/js/vendor/chart.min.js' %}"></script>
 <script src="{% static 'assets/js/apexcharts.js' %}"></script>
 {% endblock %}

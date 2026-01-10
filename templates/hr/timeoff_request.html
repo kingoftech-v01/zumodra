@@ -51,7 +51,7 @@
 <div id="main-content" x-data="timeOffRequest()">
     <div class="max-w-3xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {# Left: Form #}
+            {% comment %} Left: Form {% endcomment %}
             <div class="lg:col-span-2">
                 <form hx-post="{% url 'hr:timeoff-request' %}"
                       hx-target="#form-response"
@@ -65,7 +65,7 @@
                     </div>
 
                     <div class="p-6 space-y-6">
-                        {# Time Off Type #}
+                        {% comment %} Time Off Type {% endcomment %}
                         <div>
                             <label for="time_off_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 {% trans "Type of Time Off" %} <span class="text-red-500">*</span>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
 
-                        {# Date Selection #}
+                        {% comment %} Date Selection {% endcomment %}
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -127,7 +127,7 @@
                             </div>
                         </div>
 
-                        {# Half Day Option #}
+                        {% comment %} Half Day Option {% endcomment %}
                         <div x-show="startDate === endDate && startDate !== ''" x-transition>
                             <div class="flex items-center space-x-4">
                                 <label class="inline-flex items-center">
@@ -154,7 +154,7 @@
                             </div>
                         </div>
 
-                        {# Calculated Days Display #}
+                        {% comment %} Calculated Days Display {% endcomment %}
                         <div x-show="totalDays > 0" x-transition
                              class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                             <div class="flex items-center justify-between">
@@ -163,7 +163,7 @@
                             </div>
                         </div>
 
-                        {# Reason #}
+                        {% comment %} Reason {% endcomment %}
                         <div>
                             <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 {% trans "Reason" %} <span class="text-gray-400">({% trans "optional" %})</span>
@@ -175,7 +175,7 @@
                                       placeholder="{% trans 'Add any notes or reason for this time off request...' %}"></textarea>
                         </div>
 
-                        {# Supporting Document #}
+                        {% comment %} Supporting Document {% endcomment %}
                         <div>
                             <label for="document" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 {% trans "Supporting Document" %} <span class="text-gray-400">({% trans "optional" %})</span>
@@ -196,11 +196,11 @@
                             </div>
                         </div>
 
-                        {# Form Response Area #}
+                        {% comment %} Form Response Area {% endcomment %}
                         <div id="form-response"></div>
                     </div>
 
-                    {# Form Actions #}
+                    {% comment %} Form Actions {% endcomment %}
                     <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end space-x-3">
                         <a href="{% url 'hr:my-time-off' %}"
                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
@@ -219,9 +219,9 @@
                 </form>
             </div>
 
-            {# Right: Balance Summary #}
+            {% comment %} Right: Balance Summary {% endcomment %}
             <div>
-                {# Current Balances #}
+                {% comment %} Current Balances {% endcomment %}
                 <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mb-6">
                     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Your Balances" %}</h3>
@@ -252,7 +252,7 @@
                     </div>
                 </div>
 
-                {# Request Guidelines #}
+                {% comment %} Request Guidelines {% endcomment %}
                 <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-medium text-gray-900 dark:text-white">{% trans "Guidelines" %}</h3>

@@ -51,9 +51,9 @@
     {% endif %}
 {% endif %}
 <div class="space-y-6">
-    {# Key Metrics #}
+    {% comment %} Key Metrics {% endcomment %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {# Traffic #}
+        {% comment %} Traffic {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        {# Prospects #}
+        {% comment %} Prospects {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        {# Conversion Rate #}
+        {% comment %} Conversion Rate {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        {# Revenue #}
+        {% comment %} Revenue {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -127,9 +127,9 @@
         </div>
     </div>
 
-    {# Traffic Sources and Newsletter #}
+    {% comment %} Traffic Sources and Newsletter {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Traffic by Source #}
+        {% comment %} Traffic by Source {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Traffic by Source" %}</h3>
@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        {# Newsletter Stats #}
+        {% comment %} Newsletter Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Newsletter" %}</h3>
@@ -196,9 +196,9 @@
         </div>
     </div>
 
-    {# Recent Prospects and Conversions #}
+    {% comment %} Recent Prospects and Conversions {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Recent Prospects #}
+        {% comment %} Recent Prospects {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recent Prospects" %}</h3>
@@ -233,7 +233,7 @@
             </ul>
         </div>
 
-        {# Conversions by Type #}
+        {% comment %} Conversions by Type {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Conversions by Type" %}</h3>
@@ -260,9 +260,9 @@
         </div>
     </div>
 
-    {# Traffic by Device and Country #}
+    {% comment %} Traffic by Device and Country {% endcomment %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {# Traffic by Device #}
+        {% comment %} Traffic by Device {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Traffic by Device" %}</h3>
@@ -298,7 +298,7 @@
             </div>
         </div>
 
-        {# Traffic by Country #}
+        {% comment %} Traffic by Country {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Top Countries" %}</h3>

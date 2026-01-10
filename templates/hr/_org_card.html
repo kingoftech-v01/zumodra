@@ -1,10 +1,8 @@
 {% load static i18n %}
 
-{#
-    Organization Chart Card Component
+{% comment %} Organization Chart Card Component
 
-    Usage: {% include "hr/_org_card.html" with employee=employee compact=False %}
-#}
+    Usage: {% include "hr/_org_card.html" with employee=employee compact=False %} {% endcomment %}
 
 <div class="{% if compact %}w-48{% else %}w-64{% endif %} bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
      hx-get="{% url 'hr:employee_detail' employee.id %}"

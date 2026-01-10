@@ -1,6 +1,5 @@
 {% load static i18n humanize %}
-{#
-    Employee List Partial (HTMX-swappable)
+{% comment %} Employee List Partial (HTMX-swappable)
 
     Usage:
     {% include "hr/partials/_employee_list.html" with employees=employees %}
@@ -9,11 +8,10 @@
     - employees: QuerySet of Employee instances
     - view_mode: 'grid' or 'list' (optional, uses Alpine.js if not set)
     - show_pagination: Boolean (optional, default True)
-    - page_obj: Pagination object (optional)
-#}
+    - page_obj: Pagination object (optional) {% endcomment %}
 
 <div id="employees-list-partial" x-data="{ viewMode: '{{ view_mode|default:'grid' }}' }">
-    {# Grid View #}
+    {% comment %} Grid View {% endcomment %}
     <div x-show="viewMode === 'grid'"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0"
@@ -34,7 +32,7 @@
         {% endfor %}
     </div>
 
-    {# List View #}
+    {% comment %} List View {% endcomment %}
     <div x-show="viewMode === 'list'"
          x-cloak
          x-transition:enter="transition ease-out duration-200"
@@ -178,7 +176,7 @@
         </div>
     </div>
 
-    {# Pagination #}
+    {% comment %} Pagination {% endcomment %}
     {% if show_pagination|default:True and page_obj %}
     <div class="mt-6">
         {% include "components/pagination.html" %}

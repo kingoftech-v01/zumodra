@@ -1,13 +1,11 @@
 {% load static i18n humanize %}
 
-{#
-    Recruiting Funnel Chart Component
+{% comment %} Recruiting Funnel Chart Component
 
     Usage: {% include "analytics/charts/funnel.html" %}
 
     Context:
-    - funnel_data: List of stages with counts and percentages
-#}
+    - funnel_data: List of stages with counts and percentages {% endcomment %}
 
 <div class="space-y-4">
     {% for stage in funnel_data %}

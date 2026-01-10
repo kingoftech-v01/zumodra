@@ -60,7 +60,7 @@
     <form method="post" class="space-y-6">
         {% csrf_token %}
 
-        {# Employee Header #}
+        {% comment %} Employee Header {% endcomment %}
         <div class="zu-card">
             <div class="zu-card__body">
                 <div class="flex items-center">
@@ -84,13 +84,13 @@
             </div>
         </div>
 
-        {# Employment Information #}
+        {% comment %} Employment Information {% endcomment %}
         <div class="zu-card">
             <div class="zu-card__header">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Employment Information" %}</h3>
             </div>
             <div class="zu-card__body space-y-6">
-                {# Job Title #}
+                {% comment %} Job Title {% endcomment %}
                 <div>
                     <label for="id_job_title" class="zu-label">
                         {% trans "Job Title" %}
@@ -105,7 +105,7 @@
                     {% endif %}
                 </div>
 
-                {# Department & Manager #}
+                {% comment %} Department & Manager {% endcomment %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <label for="id_department" class="zu-label">
@@ -132,7 +132,7 @@
                     </div>
                 </div>
 
-                {# Team #}
+                {% comment %} Team {% endcomment %}
                 <div>
                     <label for="id_team" class="zu-label">
                         {% trans "Team" %}
@@ -145,7 +145,7 @@
                            placeholder="{% trans 'e.g., Engineering, Sales, Marketing' %}">
                 </div>
 
-                {# Work Location & Employment Type #}
+                {% comment %} Work Location & Employment Type {% endcomment %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <label for="id_work_location" class="zu-label">
@@ -173,7 +173,7 @@
             </div>
         </div>
 
-        {# Emergency Contact #}
+        {% comment %} Emergency Contact {% endcomment %}
         <div class="zu-card">
             <div class="zu-card__header">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Emergency Contact" %}</h3>
@@ -219,7 +219,7 @@
             </div>
         </div>
 
-        {# Form Actions #}
+        {% comment %} Form Actions {% endcomment %}
         <div class="flex items-center justify-end space-x-4">
             <a href="{% url 'hr:employee-detail' employee.pk %}" class="zu-btn zu-btn--secondary">
                 {% trans "Cancel" %}

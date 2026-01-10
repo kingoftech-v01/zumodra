@@ -1,19 +1,17 @@
 {% load i18n %}
-{#
-Trust Badge Component
+{% comment %} Trust Badge Component
 Usage: {% include "components/trust_badge.html" with trust_score=user.trust_score size="sm"|"md"|"lg" show_details=True|False %}
 
 Parameters:
 - trust_score: TrustScore object (or None for new users)
 - size: "sm" (inline), "md" (card small), "lg" (card full)
 - show_details: Show breakdown of verification status
-- link: Optional URL to link badge to trust score page
-#}
+- link: Optional URL to link badge to trust score page {% endcomment %}
 
 {% with size=size|default:"md" show_details=show_details|default:False %}
 
 {% if size == "sm" %}
-{# Inline badge for lists and cards #}
+{% comment %} Inline badge for lists and cards {% endcomment %}
 <div class="inline-flex items-center gap-1.5">
     {% if trust_score %}
     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
@@ -51,7 +49,7 @@ Parameters:
 </div>
 
 {% elif size == "md" %}
-{# Medium card for profiles and sidebars #}
+{% comment %} Medium card for profiles and sidebars {% endcomment %}
 <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
     <div class="flex items-center justify-between mb-3">
         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Trust Score" %}</h4>
@@ -105,7 +103,7 @@ Parameters:
 </div>
 
 {% else %}
-{# Large card with full details #}
+{% comment %} Large card with full details {% endcomment %}
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Trust & Verification" %}</h3>
@@ -116,7 +114,7 @@ Parameters:
 
     {% if trust_score %}
     <div class="flex items-start gap-6">
-        {# Score Circle #}
+        {% comment %} Score Circle {% endcomment %}
         <div class="flex-shrink-0">
             <div class="relative w-24 h-24">
                 <svg class="w-24 h-24 transform -rotate-90">
@@ -132,7 +130,7 @@ Parameters:
             </div>
         </div>
 
-        {# Details #}
+        {% comment %} Details {% endcomment %}
         <div class="flex-1">
             <div class="flex items-center gap-2 mb-3">
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
@@ -145,7 +143,7 @@ Parameters:
                 </span>
             </div>
 
-            {# Verification Badges #}
+            {% comment %} Verification Badges {% endcomment %}
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <div class="flex items-center gap-2 p-2 rounded-lg {% if trust_score.is_id_verified %}bg-green-50 dark:bg-green-900/20{% else %}bg-gray-50 dark:bg-gray-700/50{% endif %}">
                     {% if trust_score.is_id_verified %}
@@ -166,7 +164,7 @@ Parameters:
             </div>
 
             {% if show_details %}
-            {# Score Breakdown #}
+            {% comment %} Score Breakdown {% endcomment %}
             <div class="space-y-2">
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-gray-600 dark:text-gray-400">{% trans "Reviews" %}</span>

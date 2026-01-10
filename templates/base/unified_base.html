@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA UNIFIED BASE TEMPLATE
    =============================================================================
 
@@ -35,13 +35,13 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-01
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load static i18n %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'en' }}" class="h-full">
 <head>
-    {# ===== META TAGS ===== #}
+    {% comment %} ===== META TAGS ===== {% endcomment %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta_description %}Zumodra - Verify. Recruit. Hire. Risk-Free.{% endblock %}">
@@ -51,42 +51,42 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-    {# Additional meta tags (Open Graph, Twitter Cards, etc.) #}
+    {% comment %} Additional meta tags (Open Graph, Twitter Cards, etc.) {% endcomment %}
     {% block meta_extra %}{% endblock %}
 
-    {# Page title #}
+    {% comment %} Page title {% endcomment %}
     <title>{% block title %}Zumodra{% endblock %}</title>
 
-    {# ===== FAVICON ===== #}
+    {% comment %} ===== FAVICON ===== {% endcomment %}
     <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/images/fav.png' %}">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/images/fav.png' %}">
 
-    {# ===== LOCAL CSS - NO CDN ===== #}
-    {# Core Tailwind CSS (pre-compiled) #}
+    {% comment %} ===== LOCAL CSS - NO CDN ===== {% endcomment %}
+    {% comment %} Core Tailwind CSS (pre-compiled) {% endcomment %}
     <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}">
 
-    {# Zumodra Design System #}
+    {% comment %} Zumodra Design System {% endcomment %}
     <link rel="stylesheet" href="{% static 'css/dark-mode.css' %}">
     <link rel="stylesheet" href="{% static 'css/zumodra-design-system.css' %}">
     <link rel="stylesheet" href="{% static 'css/zumodra-animations.css' %}">
 
-    {# Component CSS #}
+    {% comment %} Component CSS {% endcomment %}
     <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
 
-    {# Icon Fonts (Local) #}
+    {% comment %} Icon Fonts (Local) {% endcomment %}
     <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}">
 
-    {# Additional CSS for specific pages #}
+    {% comment %} Additional CSS for specific pages {% endcomment %}
     <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/quill.snow.css' %}">
 
-    {# ===== CRITICAL INLINE STYLES ===== #}
+    {% comment %} ===== CRITICAL INLINE STYLES ===== {% endcomment %}
     <style>
         /* Alpine.js cloak - prevents flash of unstyled content */
         [x-cloak] { display: none !important; }
@@ -127,7 +127,7 @@
         </style>
     </noscript>
 
-    {# ===== ADDITIONAL CSS ===== #}
+    {% comment %} ===== ADDITIONAL CSS ===== {% endcomment %}
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -140,11 +140,11 @@
       x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val) }); if (darkMode) document.documentElement.classList.add('dark')"
       :class="{ 'dark': darkMode }">
 
-    {# ===== ATMOSPHERIC BACKGROUND LAYERS ===== #}
+    {% comment %} ===== ATMOSPHERIC BACKGROUND LAYERS ===== {% endcomment %}
     <div class="zumodra-bg-mesh" aria-hidden="true"></div>
     <div class="zumodra-bg-noise" aria-hidden="true"></div>
 
-    {# ===== TOAST NOTIFICATION CONTAINER ===== #}
+    {% comment %} ===== TOAST NOTIFICATION CONTAINER ===== {% endcomment %}
     <div id="toast-container"
          class="fixed top-4 right-4 z-50 space-y-3"
          x-data="{ toasts: [] }"
@@ -202,18 +202,18 @@
     </div>
 
     {% block body %}
-    {# Header/Navigation #}
+    {% comment %} Header/Navigation {% endcomment %}
     {% block header %}{% endblock %}
 
     <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    {# Footer #}
+    {% comment %} Footer {% endcomment %}
     {% block footer %}{% endblock %}
     {% endblock body %}
 
-    {# ===== LOADING OVERLAY ===== #}
+    {% comment %} ===== LOADING OVERLAY ===== {% endcomment %}
     <div id="loading-overlay"
          class="fixed inset-0 z-50 hidden items-center justify-center"
          style="background: var(--bg-overlay);"
@@ -237,7 +237,7 @@
         </div>
     </div>
 
-    {# ===== SCROLL TO TOP BUTTON ===== #}
+    {% comment %} ===== SCROLL TO TOP BUTTON ===== {% endcomment %}
     <button class="zumodra-scroll-top fixed bottom-6 right-6 z-40 opacity-0 invisible transition-all duration-300"
             aria-label="Scroll to top"
             onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
@@ -246,18 +246,18 @@
         </svg>
     </button>
 
-    {# ===== LOCAL JAVASCRIPT - NO CDN ===== #}
-    {# Alpine.js Collapse Plugin - must load before Alpine.js #}
+    {% comment %} ===== LOCAL JAVASCRIPT - NO CDN ===== {% endcomment %}
+    {% comment %} Alpine.js Collapse Plugin - must load before Alpine.js {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js" defer></script>
 
-    {# Alpine.js - Reactive framework #}
+    {% comment %} Alpine.js - Reactive framework {% endcomment %}
     <script src="{% static 'assets/js/vendor/alpine.min.js' %}" defer></script>
 
-    {# HTMX - Dynamic HTML updates #}
+    {% comment %} HTMX - Dynamic HTML updates {% endcomment %}
     <script src="{% static 'assets/js/vendor/htmx.min.js' %}"></script>
     <script src="{% static 'assets/js/vendor/htmx-ws.min.js' %}"></script>
 
-    {# ===== HTMX CSRF CONFIGURATION ===== #}
+    {% comment %} ===== HTMX CSRF CONFIGURATION ===== {% endcomment %}
     <script>
         document.body.addEventListener('htmx:configRequest', function(evt) {
             evt.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]').content;
@@ -299,10 +299,10 @@
         });
     </script>
 
-    {# Zumodra Micro-Interactions #}
+    {% comment %} Zumodra Micro-Interactions {% endcomment %}
     <script src="{% static 'js/micro-interactions.js' %}"></script>
 
-    {# ===== LEGACY JS (jQuery) - Only when needed ===== #}
+    {% comment %} ===== LEGACY JS (jQuery) - Only when needed ===== {% endcomment %}
     {% block js_legacy %}
     <script src="{% static 'assets/js/jquery.min.js' %}"></script>
     <script src="{% static 'assets/js/slick.min.js' %}"></script>
@@ -310,7 +310,7 @@
     <script src="{% static 'assets/js/main.js' %}"></script>
     {% endblock js_legacy %}
 
-    {# ===== ADDITIONAL JS ===== #}
+    {% comment %} ===== ADDITIONAL JS ===== {% endcomment %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

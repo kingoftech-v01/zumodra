@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    DASHBOARD UPCOMING INTERVIEWS PARTIAL
    =============================================================================
 
@@ -22,7 +22,7 @@
 
    Author: Rhematek Solutions
    Last Updated: 2025-12-30
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n humanize %}
 
@@ -35,7 +35,7 @@
              @mouseleave="showActions = false">
             <div class="zu-interview-item__wrapper">
                 <div class="zu-interview-item__main">
-                    {# Interview Type Icon #}
+                    {% comment %} Interview Type Icon {% endcomment %}
                     <div class="zu-interview-item__icon-wrapper">
                         {% if interview.interview_type == 'video' %}
                         <div class="zu-avatar zu-avatar--md zu-avatar--info">
@@ -58,13 +58,13 @@
                         {% endif %}
                     </div>
 
-                    {# Interview Details #}
+                    {% comment %} Interview Details {% endcomment %}
                     <div class="zu-interview-item__details">
                         <div class="zu-interview-item__title-row">
                             <p class="zu-interview-item__title">
                                 {{ interview.application.candidate.full_name|default:"Unknown Candidate" }}
                             </p>
-                            {# Status Badge #}
+                            {% comment %} Status Badge {% endcomment %}
                             {% if interview.status == 'confirmed' %}
                             <span class="zu-badge zu-badge--success zu-badge--sm">{% trans "Confirmed" %}</span>
                             {% elif interview.status == 'scheduled' %}
@@ -75,7 +75,7 @@
                             {{ interview.application.job.title|default:"No Position" }}
                         </p>
                         <div class="zu-interview-item__meta">
-                            {# Date/Time #}
+                            {% comment %} Date/Time {% endcomment %}
                             <span class="zu-interview-item__meta-item">
                                 <svg class="zu-icon zu-icon--xs" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -88,7 +88,7 @@
                                 </svg>
                                 {{ interview.scheduled_start|time:"g:i A" }}
                             </span>
-                            {# Interview Type #}
+                            {% comment %} Interview Type {% endcomment %}
                             <span class="zu-interview-item__meta-item zu-interview-item__meta-item--type">
                                 {{ interview.interview_type|default:"Interview" }}
                             </span>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
 
-                {# Action Buttons #}
+                {% comment %} Action Buttons {% endcomment %}
                 <div class="zu-interview-item__actions"
                      x-show="showActions"
                      x-transition:enter="transition ease-out duration-150"
@@ -123,7 +123,7 @@
                     </a>
                 </div>
 
-                {# Time Until Interview #}
+                {% comment %} Time Until Interview {% endcomment %}
                 <div class="zu-interview-item__countdown" x-show="!showActions">
                     <p class="zu-interview-item__countdown-value">
                         {{ interview.scheduled_start|naturaltime }}
@@ -136,7 +136,7 @@
         </div>
         {% endfor %}
 
-        {# View All Link #}
+        {% comment %} View All Link {% endcomment %}
         <div class="zu-interview-list__footer">
             <a href="{% url 'ats:interviews' %}" class="zu-btn zu-btn--ghost">
                 {% trans "View all interviews" %}
@@ -147,7 +147,7 @@
         </div>
 
     {% else %}
-        {# Empty State #}
+        {% comment %} Empty State {% endcomment %}
         <div class="zu-empty">
             <svg class="zu-icon zu-icon--xl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>

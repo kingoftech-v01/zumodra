@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    ZUMODRA COUNTER STATS SECTION COMPONENT
    =============================================================================
 
@@ -16,12 +16,12 @@
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-03
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n static humanize %}
 
 {% if layout == "icons" %}
-{# With Icons Layout (for dashboards) #}
+{% comment %} With Icons Layout (for dashboards) {% endcomment %}
 <div class="list_counter grid 2xl:grid-cols-4 md:grid-cols-2 gap-6">
     {% for stat in stats %}
     <div class="counter_item flex items-center justify-between gap-4 p-6 rounded-lg bg-white shadow-sm">
@@ -39,7 +39,7 @@
         </div>
     </div>
     {% empty %}
-    {# Default stats if none provided #}
+    {% comment %} Default stats if none provided {% endcomment %}
     <div class="counter_item flex items-center justify-between gap-4 p-6 rounded-lg bg-white shadow-sm">
         <div class="counter_content">
             <span class="text-secondary text-sm">{% trans 'Applied Jobs' %}</span>
@@ -80,7 +80,7 @@
 </div>
 
 {% else %}
-{# Default Layout (4-column with dividers) #}
+{% comment %} Default Layout (4-column with dividers) {% endcomment %}
 <section class="counter lg:py-16 sm:py-12 py-8 {{ bg_class|default:'bg-surface' }}">
     <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
         {% for stat in stats %}
@@ -92,7 +92,7 @@
         <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
         {% endif %}
         {% empty %}
-        {# Default stats if none provided #}
+        {% comment %} Default stats if none provided {% endcomment %}
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 text-center">
             <h2 class="heading2 pb-1">2.5M+</h2>
             <span class="body1 text-secondary">{% trans 'Jobs Available' %}</span>

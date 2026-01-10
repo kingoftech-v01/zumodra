@@ -1,4 +1,4 @@
-{# =============================================================================
+{% comment %} =============================================================================
    DASHBOARD SEARCH RESULTS PARTIAL
    =============================================================================
 
@@ -23,7 +23,7 @@
 
    Author: Rhematek Solutions
    Last Updated: 2025-12-30
-   ============================================================================= #}
+   ============================================================================= {% endcomment %}
 
 {% load i18n %}
 
@@ -36,7 +36,7 @@
     {% if query and query|length >= 2 %}
 
         {% if total_count > 0 %}
-            {# Search Results Header #}
+            {% comment %} Search Results Header {% endcomment %}
             <div class="zu-search-results__header">
                 <p class="zu-search-results__count">
                     {% blocktrans count counter=total_count %}{{ counter }} result for "{{ query }}"{% plural %}{{ counter }} results for "{{ query }}"{% endblocktrans %}
@@ -45,7 +45,7 @@
 
             {% with index_counter=0 %}
 
-            {# ===== JOBS SECTION ===== #}
+            {% comment %} ===== JOBS SECTION ===== {% endcomment %}
             {% if jobs %}
             <div class="zu-search-results__section">
                 <h4 class="zu-search-results__section-title">
@@ -75,7 +75,7 @@
             </div>
             {% endif %}
 
-            {# ===== CANDIDATES SECTION ===== #}
+            {% comment %} ===== CANDIDATES SECTION ===== {% endcomment %}
             {% if candidates %}
             <div class="zu-search-results__section">
                 <h4 class="zu-search-results__section-title">
@@ -110,7 +110,7 @@
             </div>
             {% endif %}
 
-            {# ===== EMPLOYEES SECTION ===== #}
+            {% comment %} ===== EMPLOYEES SECTION ===== {% endcomment %}
             {% if employees %}
             <div class="zu-search-results__section">
                 <h4 class="zu-search-results__section-title">
@@ -143,7 +143,7 @@
             </div>
             {% endif %}
 
-            {# ===== APPLICATIONS SECTION ===== #}
+            {% comment %} ===== APPLICATIONS SECTION ===== {% endcomment %}
             {% if applications %}
             <div class="zu-search-results__section">
                 <h4 class="zu-search-results__section-title">
@@ -175,7 +175,7 @@
 
             {% endwith %}
 
-            {# View All Results Link #}
+            {% comment %} View All Results Link {% endcomment %}
             <div class="zu-search-results__footer">
                 <a href="{% url 'dashboard:global-search' %}?q={{ query }}" class="zu-btn zu-btn--ghost">
                     {% trans "View all results" %}
@@ -186,7 +186,7 @@
             </div>
 
         {% else %}
-            {# No Results #}
+            {% comment %} No Results {% endcomment %}
             <div class="zu-empty zu-empty--compact">
                 <svg class="zu-icon zu-icon--xl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -199,7 +199,7 @@
         {% endif %}
 
     {% else %}
-        {# Search Prompt #}
+        {% comment %} Search Prompt {% endcomment %}
         <div class="zu-empty zu-empty--compact">
             <svg class="zu-icon zu-icon--xl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>

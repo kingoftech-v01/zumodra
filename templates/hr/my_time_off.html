@@ -60,7 +60,7 @@
 </div>
 {% else %}
 <div class="space-y-6">
-    {# Time Off Balances #}
+    {% comment %} Time Off Balances {% endcomment %}
     <div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Your Balances" %}</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    {# Pending Requests #}
+    {% comment %} Pending Requests {% endcomment %}
     {% if pending_requests %}
     <div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Pending Requests" %}</h3>
@@ -150,7 +150,7 @@
     </div>
     {% endif %}
 
-    {# Upcoming Approved #}
+    {% comment %} Upcoming Approved {% endcomment %}
     {% if approved_requests %}
     <div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Upcoming Approved" %}</h3>
@@ -190,7 +190,7 @@
     </div>
     {% endif %}
 
-    {# Request History #}
+    {% comment %} Request History {% endcomment %}
     <div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Request History" %}</h3>
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">

@@ -19,14 +19,14 @@
 {% load i18n static %}
 
 <footer class="footer mt-auto relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);">
-    {# Decorative gradient background #}
+    {% comment %} Decorative gradient background {% endcomment %}
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute top-0 right-0 w-96 h-96 bg-teal-500 opacity-5 rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500 opacity-5 rounded-full blur-3xl"></div>
     </div>
 
     <div class="container relative z-10">
-        {# Footer Top - Logo & Social #}
+        {% comment %} Footer Top - Logo & Social {% endcomment %}
         <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-white/10">
             <a href="{% url 'home' %}" class="footer_logo group">
                 <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="h-[42px] w-auto transition-transform duration-300 group-hover:scale-105" />
@@ -63,9 +63,9 @@
             </div>
         </div>
 
-        {# Footer Content - Navigation Columns #}
+        {% comment %} Footer Content - Navigation Columns {% endcomment %}
         <div class="footer_content flex max-xl:flex-wrap items-start justify-between gap-y-8 md:py-10 py-7">
-            {# Categories #}
+            {% comment %} Categories {% endcomment %}
             <div class="footer_nav max-md:w-1/2">
                 <strong class="nav_heading text-sm font-semibold text-white mb-4 block">{% trans 'Categories' %}</strong>
                 <ul class="list_nav flex flex-col gap-3">
@@ -78,7 +78,7 @@
                 </ul>
             </div>
 
-            {# For Candidates #}
+            {% comment %} For Candidates {% endcomment %}
             <div class="footer_nav max-md:w-1/2">
                 <strong class="nav_heading text-sm font-semibold text-white mb-4 block">{% trans 'For Candidates' %}</strong>
                 <ul class="list_nav flex flex-col gap-3">
@@ -91,7 +91,7 @@
                 </ul>
             </div>
 
-            {# For Employers #}
+            {% comment %} For Employers {% endcomment %}
             <div class="footer_nav max-md:w-1/2">
                 <strong class="nav_heading text-sm font-semibold text-white mb-4 block">{% trans 'For Employers' %}</strong>
                 <ul class="list_nav flex flex-col gap-3">
@@ -104,7 +104,7 @@
                 </ul>
             </div>
 
-            {# Support #}
+            {% comment %} Support {% endcomment %}
             <div class="footer_nav max-md:w-1/2">
                 <strong class="nav_heading text-sm font-semibold text-white mb-4 block">{% trans 'Support' %}</strong>
                 <ul class="list_nav flex flex-col gap-3">
@@ -117,10 +117,10 @@
                 </ul>
             </div>
 
-            {# Newsletter & App Download #}
+            {% comment %} Newsletter & App Download {% endcomment %}
             <div class="flex-shrink-0 max-xl:w-full">
                 <div class="company-contact sm:w-[340px]">
-                    {# Newsletter Signup - Uses default newsletter if available #}
+                    {% comment %} Newsletter Signup - Uses default newsletter if available {% endcomment %}
                     {% url 'newsletter_subscribe_request' newsletter_slug='default' as newsletter_sub_url %}
                     {% if newsletter_sub_url %}
                     <strong class="heading block text-sm font-semibold text-white mb-4">{% trans 'Subscribe to Newsletter' %}</strong>
@@ -146,7 +146,7 @@
                     <p class="text-sm text-white/70">{% trans 'Newsletter subscription coming soon!' %}</p>
                     {% endif %}
 
-                    {# App Download #}
+                    {% comment %} App Download {% endcomment %}
                     <strong class="heading block text-sm font-semibold text-white mt-6 mb-4">{% trans 'Download App' %}</strong>
                     <div class="list-download flex items-start gap-3">
                         <a href="https://play.google.com/store/apps/details?id=com.zumodra"
@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        {# Footer Bottom - Copyright & Legal #}
+        {% comment %} Footer Bottom - Copyright & Legal {% endcomment %}
         <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-6 border-t border-white/10">
             <div class="left-block flex items-center gap-2">
                 <span class="ph-bold ph-shield-check text-teal-400"></span>

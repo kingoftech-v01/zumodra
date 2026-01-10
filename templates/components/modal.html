@@ -1,7 +1,6 @@
 {% load static i18n %}
 
-{#
-    Modal Component
+{% comment %} Modal Component
 
     Usage:
     {% include "components/modal.html" with modal_id="my-modal" modal_title="Modal Title" modal_size="md" %}
@@ -13,8 +12,7 @@
 
     Alpine.js control:
     x-data="{ modalOpen: false }"
-    @click="modalOpen = true"
-#}
+    @click="modalOpen = true" {% endcomment %}
 
 <div x-data="{ open: true }"
      x-show="open"
