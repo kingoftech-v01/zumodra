@@ -17,6 +17,11 @@ from django.shortcuts import render
 
 
 class Require2FAMiddleware(MiddlewareMixin):
+    """
+    Middleware to enforce 2FA if TWO_FACTOR_MANDATORY is True.
+    When TWO_FACTOR_MANDATORY is False, users can use the app without 2FA setup.
+    They can enable 2FA later from their account settings.
+    """
     allowed_urls = [
         'account_logout',
         'account_login',
@@ -36,6 +41,14 @@ class Require2FAMiddleware(MiddlewareMixin):
     ]
 
     def process_view(self, request, view_func, view_args, view_kwargs):
+        # Check if 2FA is mandatory from settings
+        two_factor_mandatory = getattr(settings, 'TWO_FACTOR_MANDATORY', False)
+
+        # If 2FA is not mandatory, don't enforce it
+        if not two_factor_mandatory:
+            return None
+
+        # If mandatory, enforce 2FA for authenticated users
         if request.user.is_authenticated and not is_mfa_enabled(request.user):
             if request.resolver_match and request.resolver_match.url_name not in self.allowed_urls:
                 return redirect(reverse('mfa_activate_totp'))

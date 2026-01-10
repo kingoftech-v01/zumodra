@@ -435,11 +435,13 @@ STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY', default='')
 # Allauth Settings
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# Email verification: 'mandatory', 'optional', or 'none'
+# Set to 'optional' for easier onboarding, users can verify later
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_ADAPTER = 'allauth_2fa.adapter.OTPAdapter'
+ACCOUNT_ADAPTER = 'custom_account_u.adapter.ZumodraAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -471,8 +473,10 @@ SOCIALACCOUNT_PROVIDERS = {
 
 
 # 2FA Settings
-ALLAUTH_2FA_FORCE_2FA = True
-TWO_FACTOR_MANDATORY = True
+# Set to False to make 2FA optional during signup/initial login
+# Users can enable 2FA later from their account settings
+ALLAUTH_2FA_FORCE_2FA = False
+TWO_FACTOR_MANDATORY = False
 
 # Login and Logout Redirect URLs
 LOGIN_REDIRECT_URL = '/'

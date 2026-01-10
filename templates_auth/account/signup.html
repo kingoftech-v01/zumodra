@@ -12,7 +12,7 @@
 
 {% get_providers as socialaccount_providers %}
 
-{# Social Signup Buttons #}
+{% comment %} Social Signup Buttons {% endcomment %}
 {% if socialaccount_providers %}
 <div class="space-y-3 mb-6">
     {% for provider in socialaccount_providers %}
@@ -39,7 +39,7 @@
     {% endfor %}
 </div>
 
-{# Divider #}
+{% comment %} Divider {% endcomment %}
 <div class="relative my-6">
     <div class="absolute inset-0 flex items-center">
         <div class="w-full border-t border-gray-200"></div>
@@ -50,11 +50,11 @@
 </div>
 {% endif %}
 
-{# Signup Form #}
+{% comment %} Signup Form {% endcomment %}
 <form id="signup_form" method="POST" action="{% url 'account_signup' %}" class="space-y-4">
     {% csrf_token %}
 
-    {# Email Field #}
+    {% comment %} Email Field {% endcomment %}
     <div>
         <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">
             {% trans "Email address" %} <span class="text-red-500">*</span>
@@ -77,7 +77,7 @@
         {% endif %}
     </div>
 
-    {# Password Fields #}
+    {% comment %} Password Fields {% endcomment %}
     <div>
         <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-1">
             {% trans "Password" %} <span class="text-red-500">*</span>
@@ -133,7 +133,7 @@
         {% endif %}
     </div>
 
-    {# Terms Agreement #}
+    {% comment %} Terms Agreement {% endcomment %}
     <div class="flex items-start">
         <input type="checkbox"
                name="terms"
@@ -149,7 +149,7 @@
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
     {% endif %}
 
-    {# Submit Button #}
+    {% comment %} Submit Button {% endcomment %}
     <button type="submit"
             class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200">
         <span class="ph-bold ph-user-plus text-lg"></span>
@@ -157,7 +157,7 @@
     </button>
 </form>
 
-{# Form Errors #}
+{% comment %} Form Errors {% endcomment %}
 {% if form.non_field_errors %}
 <div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
     <div class="flex items-start">
@@ -171,7 +171,7 @@
 </div>
 {% endif %}
 
-{# Sign In Link #}
+{% comment %} Sign In Link {% endcomment %}
 <p class="mt-6 text-center text-gray-600">
     {% trans "Already have an account?" %}
     <a href="{% url 'account_login' %}" class="text-blue-600 font-semibold hover:underline">
@@ -179,7 +179,7 @@
     </a>
 </p>
 
-{# Trust Indicators #}
+{% comment %} Trust Indicators {% endcomment %}
 <div class="mt-8 pt-6 border-t border-gray-200">
     <div class="flex items-center justify-center gap-6 text-gray-500 text-sm">
         <div class="flex items-center gap-1">
