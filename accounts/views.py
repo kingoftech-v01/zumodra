@@ -12,7 +12,7 @@ This module provides REST API endpoints for:
 """
 
 from rest_framework import viewsets, views, permissions, status, filters
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken

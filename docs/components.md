@@ -12,6 +12,54 @@ All components are located in `templates/components/` and built with:
 
 ## Component Catalog
 
+### 0. Company-Only Feature Wrappers
+
+**Files:**
+
+- `templates/components/company_only_wrapper_start.html`
+- `templates/components/company_only_wrapper_end.html`
+- `templates/components/company_only_check.html`
+
+Defensive checks for COMPANY-only features (ATS, HR, Careers, Analytics).
+
+**Usage:**
+
+```django
+{% include 'components/company_only_wrapper_start.html' with feature_name="ATS" %}
+<!-- Your ATS content here -->
+{% include 'components/company_only_wrapper_end.html' %}
+```
+
+**Features:**
+
+- Automatically shows warning for freelancer tenants
+- Provides "Switch to company account" link
+- Supports feature names: "ATS", "HR", "Careers", "Analytics"
+- Custom warning messages per feature type
+- Yellow warning box with icon
+- Dark mode support
+
+**Visual Design:**
+
+- Yellow warning banner with alert icon
+- Clear message explaining restriction
+- Inline link to switch tenant type
+- Non-intrusive but noticeable
+
+**Example Output (for freelancer tenants):**
+
+```
+⚠️ ATS features are only available for company tenants. [Switch to company account]
+```
+
+**Alternative (standalone check):**
+
+```django
+{% include 'components/company_only_check.html' with feature_name="HR" %}
+```
+
+---
+
 ### 1. Tenant Type Switcher
 **File:** `templates/components/tenant_type_switcher.html`
 
