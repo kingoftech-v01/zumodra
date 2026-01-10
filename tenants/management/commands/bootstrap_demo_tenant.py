@@ -746,7 +746,6 @@ class Command(BaseCommand):
                 KYCVerification.objects.get_or_create(
                     user=user,
                     verification_type='identity',
-                    tenant=tenant,
                     defaults={
                         'status': status,
                         'level': random.choice(['basic', 'standard', 'enhanced']),
@@ -757,7 +756,6 @@ class Command(BaseCommand):
                 # Trust Score
                 TrustScore.objects.get_or_create(
                     user=user,
-                    tenant=tenant,
                     defaults={
                         'entity_type': 'candidate' if key == 'candidate' else 'employer',
                         'trust_level': random.choice(['basic', 'verified', 'high']),

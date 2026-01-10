@@ -22,12 +22,17 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
+from core.models import TenantAwareModel
 
 
-class Employee(models.Model):
+class Employee(TenantAwareModel):
     """
     Employee record linking user to HR data.
     Distinct from TenantUser which handles access/permissions.
+
+    Note: Inherits from TenantAwareModel because employee records are
+    specific to each company/tenant. The same user can be an employee
+    at multiple companies with different records in each tenant.
     """
 
     class EmploymentStatus(models.TextChoices):
@@ -249,8 +254,14 @@ class Employee(models.Model):
         return delta.days / 365.25
 
 
-class TimeOffType(models.Model):
-    """Types of time off (vacation, sick, personal, etc.)"""
+class TimeOffType(TenantAwareModel):
+    """
+    Types of time off (vacation, sick, personal, etc.)
+
+    Note: Inherits from TenantAwareModel because each company/tenant
+    has its own time-off policies (e.g., Company A: 15 days PTO,
+    Company B: unlimited PTO).
+    """
 
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20, unique=True)
@@ -296,8 +307,13 @@ class TimeOffType(models.Model):
         return self.name
 
 
-class TimeOffRequest(models.Model):
-    """Employee time off/absence requests."""
+class TimeOffRequest(TenantAwareModel):
+    """
+    Employee time off/absence requests.
+
+    Note: Inherits from TenantAwareModel because time-off requests
+    are specific to a company/tenant's employee.
+    """
 
     class RequestStatus(models.TextChoices):
         DRAFT = 'draft', _('Draft')

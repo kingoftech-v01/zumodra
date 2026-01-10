@@ -1,0 +1,83 @@
+✅ Zumodra Frontend Redesign Checklist
+1. Typography Overhaul
+ Replace system fonts with a distinctive, brand‑appropriate combination (e.g., DM Serif Display + General Sans, Fraunces + Satoshi, or Clash Display + Switzer).
+
+ Implement typography setup in staticfiles/assets/scss/base/font.scss.
+
+ Define clear heading and body font hierarchy (H1–H6, paragraph, small text).
+
+ Adjust line heights, tracking, and spacing for better readability and elegance.
+
+ Ensure font loading is optimized (self‑hosted or local files, no external CDN).
+
+2. Color System Refinement
+ Move away from Tailwind’s default blue (#2563eb).
+
+ Define a new color palette in tailwind.config.js and staticfiles/css/dark-mode.css.
+
+ Propose and apply one of the following palette directions or variations:
+
+Warm coral + deep navy (approachable yet professional)
+
+Rich emerald + gold accents (trust and growth)
+
+Deep violet + warm cream (modern sophistication)
+
+ Apply consistent color logic for light/dark modes and accessibility compliance.
+
+3. Atmospheric Depth
+ Replace flat solid backgrounds (bg-white, bg-gray-50) with richer ones.
+
+ Introduce subtle gradient meshes for hero sections or dashboards.
+
+ Add noise/grain textures for tactile visual depth.
+
+ Use geometric patterns or decorative shapes in header/footer areas.
+
+ Experiment with layered transparencies (blurred/glassy layers).
+
+ Maintain performance and subtlety — no visual clutter.
+
+4. Spatial Composition
+ Break the standard sidebar‑header‑content layout in key templates.
+
+ Add asymmetrical layouts or elements overlapping the grid.
+
+ Introduce diagonal or non‑linear visual flow.
+
+ Use generous negative space deliberately for contrast.
+
+ Apply responsive layout variations that feel dynamic yet consistent.
+
+5. Motion and Micro‑Interactions
+ Create a cohesive motion design language across the frontend.
+
+ Add staggered page‑load animations (elements appearing with rhythm).
+
+ Implement scroll‑triggered transitions for section reveals.
+
+ Use orchestrated animation sequences (not random or isolated).
+
+ Refine hover/focus states with delightful, on‑brand microinteractions.
+
+ Centralize animation logic in staticfiles/js/micro-interactions.js.
+
+6. Component Personality
+ Redesign cards with depth, shadow layering, and hover animations.
+
+ Redesign buttons with unique colors, shapes (rounded corners, ghost styles), and motion feedback.
+
+ Redesign tables for modern data visualization — soft borders, hover rows, interactive sorting.
+
+ Redesign stat blocks / KPI components with icons, motion, or gradients.
+
+ Apply consistent aesthetic identity across all components.
+
+7. Brand Cohesion and Memorability
+ Establish a clear, recognizable visual identity (font + color + motion + component shape language).
+
+ Add at least one signature design element — something instantly recognizable as “Zumodra.”
+
+ Maintain accessibility, performance, and responsiveness throughout.
+
+ Ensure the entire system remains frontend‑only and production‑ready.
