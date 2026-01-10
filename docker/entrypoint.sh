@@ -328,13 +328,36 @@ run_migrations() {
 
     log_info "Running Django migrations (django-tenants)..."
 
-    # Step 0: Create migration files if any models changed (SKIP - migrations should be in Git)
-    # Note: makemigrations should be run during development, not in production
-    # Running it here causes permission errors for third-party packages like admin_honeypot
-    log_info "Step 0/3: Skipping makemigrations (migrations should be in Git repository)"
+    # Step 0: Create initial migrations for core apps if missing
+    log_info "Step 0/4: Checking for missing initial migrations..."
+
+    # Create tenants app initial migration if missing
+    if [ ! -f "tenants/migrations/0001_initial.py" ]; then
+        log_warn "tenants app missing initial migration, creating it..."
+        if python manage.py makemigrations tenants --noinput; then
+            log_info "✓ tenants initial migration created"
+        else
+            log_error "Failed to create tenants initial migration"
+            return 1
+        fi
+    else
+        log_info "✓ tenants app has initial migration"
+    fi
+
+    # Create accounts app initial migration if missing (tenant-specific app)
+    if [ ! -f "accounts/migrations/0001_initial.py" ]; then
+        log_warn "accounts app missing initial migration, creating it..."
+        if python manage.py makemigrations accounts --noinput; then
+            log_info "✓ accounts initial migration created"
+        else
+            log_warn "Could not create accounts initial migration (may depend on tenants)"
+        fi
+    else
+        log_info "✓ accounts app has initial migration"
+    fi
 
     # Step 1: Run migrations for SHARED_APPS on the public schema
-    log_info "Step 1/3: Migrating shared schema (public)..."
+    log_info "Step 1/4: Migrating shared schema (public)..."
     if python manage.py migrate_schemas --shared --noinput; then
         log_info "Shared schema migrations completed successfully!"
     else
@@ -343,7 +366,7 @@ run_migrations() {
     fi
 
     # Step 2: Run migrations for TENANT_APPS on all tenant schemas
-    log_info "Step 2/3: Migrating tenant schemas..."
+    log_info "Step 2/4: Migrating tenant schemas..."
     if python manage.py migrate_schemas --tenant --noinput; then
         log_info "Tenant schema migrations completed successfully!"
     else
@@ -351,8 +374,20 @@ run_migrations() {
         # Don't fail if there are no tenants - this is expected on first run
     fi
 
-    # Step 3: Verify critical imports and files
-    log_info "Step 3/3: Verifying critical imports..."
+    # Step 3: Create demo tenant if configured
+    if [ "$CREATE_DEMO_TENANT" = "true" ]; then
+        log_info "Step 3/4: Creating demo tenants..."
+        if python manage.py bootstrap_demo_tenants; then
+            log_info "✓ Demo tenants created successfully!"
+        else
+            log_warn "Demo tenant creation had issues (may already exist)"
+        fi
+    else
+        log_info "Step 3/4: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
+    fi
+
+    # Step 4: Verify critical imports and files
+    log_info "Step 4/4: Verifying critical imports..."
     if python scripts/verify_imports.py; then
         log_info "Import verification passed!"
     else
