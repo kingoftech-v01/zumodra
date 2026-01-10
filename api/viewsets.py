@@ -80,8 +80,8 @@ class DServiceProviderProfileViewSet(SecureTenantViewSet):
     serializer_class = DServiceProviderProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['availability_status', 'is_verified', 'is_mobile']
-    search_fields = ['bio', 'entity_name', 'city', 'country']
+    filterset_fields = ['availability_status', 'is_verified']
+    search_fields = ['bio', 'display_name', 'city', 'country']
     ordering_fields = ['rating_avg', 'total_reviews', 'completed_jobs_count', 'hourly_rate']
     tenant_field = None  # Provider profiles are linked via user, not direct tenant FK
 

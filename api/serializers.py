@@ -60,7 +60,7 @@ class DServiceProviderProfileSerializer(serializers.ModelSerializer):
             'uuid', 'user', 'bio', 'categories', 'rating_avg',
             'total_reviews', 'completed_jobs_count', 'hourly_rate',
             'address', 'city', 'country', 'availability_status',
-            'is_verified', 'is_mobile', 'image', 'entity_name'
+            'is_verified', 'avatar', 'display_name'
         ]
         read_only_fields = ['uuid', 'rating_avg', 'total_reviews', 'completed_jobs_count']
 
