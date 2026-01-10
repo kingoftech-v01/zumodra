@@ -146,6 +146,10 @@ class Tenant(TenantMixin):
         CANCELLED = 'cancelled', _('Cancelled')
         TRIAL = 'trial', _('Trial')
 
+    class TenantType(models.TextChoices):
+        COMPANY = 'company', _('Company')
+        FREELANCER = 'freelancer', _('Freelancer')
+
     # Identity
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255, help_text=_('Organization name'))
@@ -209,6 +213,25 @@ class Tenant(TenantMixin):
     state = models.CharField(max_length=100, blank=True)
     postal_code = models.CharField(max_length=20, blank=True)
     country = models.CharField(max_length=100, blank=True, default='CA')
+
+    # Tenant Type & Verification
+    tenant_type = models.CharField(
+        max_length=20,
+        choices=TenantType.choices,
+        default=TenantType.COMPANY,
+        db_index=True,
+        help_text=_('Company (jobs+services, employees) or Freelancer (services only, solo)')
+    )
+    ein_number = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text=_('EIN/Business registration number')
+    )
+    ein_verified = models.BooleanField(
+        default=False,
+        help_text=_('Business number verified via API')
+    )
+    ein_verified_at = models.DateTimeField(null=True, blank=True)
 
     # Settings Flags
     auto_create_schema = True
@@ -441,6 +464,33 @@ class Tenant(TenantMixin):
     def get_careers_domain(self):
         """Get the careers page domain if configured."""
         return self.domains.filter(is_careers_domain=True).first()
+
+    def can_create_jobs(self):
+        """Only COMPANY tenants can create job postings."""
+        return self.tenant_type == self.TenantType.COMPANY
+
+    def can_have_employees(self):
+        """Only COMPANY tenants can have multiple employees."""
+        return self.tenant_type == self.TenantType.COMPANY
+
+    def switch_to_freelancer(self):
+        """
+        Convert company to freelancer (must have ≤1 member).
+
+        Raises:
+            ValidationError: If tenant has more than 1 active member.
+        """
+        if self.members.filter(is_active=True).count() > 1:
+            raise ValidationError(
+                _("Cannot switch to freelancer with multiple members.")
+            )
+        self.tenant_type = self.TenantType.FREELANCER
+        self.save(update_fields=['tenant_type'])
+
+    def switch_to_company(self):
+        """Convert freelancer to company."""
+        self.tenant_type = self.TenantType.COMPANY
+        self.save(update_fields=['tenant_type'])
 
 
 class TenantSettings(models.Model):

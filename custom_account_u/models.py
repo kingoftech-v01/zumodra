@@ -14,46 +14,20 @@ class CustomUser(AbstractUser):
     anonymous_mode = models.BooleanField(default=False)
     c_u_uuid = models.CharField(default=uuid.uuid4, editable=False, unique=True)
 
-    # FREELANCER POOL STATUS
-    is_available_for_hire = models.BooleanField(
+    # USER VERIFICATION (GLOBAL, NOT TENANT-SPECIFIC)
+    cv_verified = models.BooleanField(
         default=False,
         db_index=True,
-        help_text=_('User is in public freelancer pool (available to all companies for hiring)')
+        help_text=_('User CV/professional credentials verified')
     )
-    freelancer_profile_complete = models.BooleanField(
+    cv_verified_at = models.DateTimeField(null=True, blank=True)
+
+    kyc_verified = models.BooleanField(
         default=False,
-        help_text=_('User has completed freelancer onboarding')
+        db_index=True,
+        help_text=_('User identity (KYC) verified')
     )
-
-    def join_tenant_as_employee(self, tenant):
-        """
-        Join tenant as employee and remove from public freelancer pool.
-
-        When a user accepts a tenant invitation and becomes an employee,
-        they are removed from the public freelancer marketplace to prevent
-        other companies from seeing/hiring them.
-
-        Args:
-            tenant: Tenant instance to join
-
-        Returns:
-            TenantUser instance (created or existing)
-        """
-        from accounts.models import TenantUser
-
-        # Create or get tenant membership
-        tenant_user, created = TenantUser.objects.get_or_create(
-            user=self,
-            tenant=tenant,
-            defaults={'role': TenantUser.UserRole.EMPLOYEE}
-        )
-
-        # Remove from public freelancer pool
-        if self.is_available_for_hire:
-            self.is_available_for_hire = False
-            self.save(update_fields=['is_available_for_hire'])
-
-        return tenant_user
+    kyc_verified_at = models.DateTimeField(null=True, blank=True)
 
 
 # # Common Profile Information shared by all users

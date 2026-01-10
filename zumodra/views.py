@@ -37,9 +37,13 @@ def home_view(request):
         # Platform-wide stats (public schema only)
         context['stats'] = {
             'total_users': User.objects.filter(is_active=True).count(),
-            'total_organizations': Tenant.objects.exclude(schema_name='public').count(),
+            'total_companies': Tenant.objects.filter(
+                tenant_type='company'
+            ).exclude(schema_name='public').count(),
+            'total_freelancers': Tenant.objects.filter(
+                tenant_type='freelancer'
+            ).count(),  # Freelancers are TENANTS, not users
             'total_services': PublicServiceCatalog.objects.filter(is_active=True).count(),
-            'total_freelancers': User.objects.filter(is_available_for_hire=True, is_active=True).count(),
         }
 
         # Featured services from marketplace catalog
@@ -75,9 +79,9 @@ def home_view(request):
         logger.warning(f"Error loading homepage data: {e}")
         context['stats'] = {
             'total_users': 0,
-            'total_organizations': 0,
-            'total_services': 0,
+            'total_companies': 0,
             'total_freelancers': 0,
+            'total_services': 0,
         }
         context['featured_services'] = []
         context['service_categories'] = []
