@@ -329,7 +329,7 @@ run_migrations() {
     log_info "Running Django migrations (django-tenants)..."
 
     # Step 0: Create migration files if any models changed
-    log_info "Step 0/3: Creating migration files (makemigrations)..."
+    log_info "Step 0/4: Creating migration files (makemigrations)..."
     if python manage.py makemigrations --noinput; then
         log_info "Migration files created/verified successfully!"
     else
@@ -337,7 +337,7 @@ run_migrations() {
     fi
 
     # Step 1: Run migrations for SHARED_APPS on the public schema
-    log_info "Step 1/3: Migrating shared schema (public)..."
+    log_info "Step 1/4: Migrating shared schema (public)..."
     if python manage.py migrate_schemas --shared --noinput; then
         log_info "Shared schema migrations completed successfully!"
     else
@@ -346,12 +346,25 @@ run_migrations() {
     fi
 
     # Step 2: Run migrations for TENANT_APPS on all tenant schemas
-    log_info "Step 2/3: Migrating tenant schemas..."
+    log_info "Step 2/4: Migrating tenant schemas..."
     if python manage.py migrate_schemas --tenant --noinput; then
         log_info "Tenant schema migrations completed successfully!"
     else
         log_warn "Tenant schema migration had issues (may be no tenants yet)"
         # Don't fail if there are no tenants - this is expected on first run
+    fi
+
+    # Step 3: Verify critical imports and files
+    log_info "Step 3/4: Verifying critical imports..."
+    if python scripts/verify_imports.py; then
+        log_info "Import verification passed!"
+    else
+        log_error "Import verification failed!"
+        log_error "This usually means the code needs to be pulled from Git:"
+        log_error "  git pull origin main"
+        log_error "Then rebuild the container:"
+        log_error "  docker-compose build --no-cache web"
+        # Don't fail startup - just warn
     fi
 }
 
