@@ -1,18 +1,14 @@
 {% comment %}
 =============================================================================
-   ZUMODRA PUBLIC HEADER - REDESIGNED FOR OPTIMAL UX
+   ZUMODRA PUBLIC HEADER - UNIVERSAL NAVIGATION
 =============================================================================
 
-   File: templates/components/public_header.html
-   Purpose: Main navigation header for public-facing pages
+   Clear, semantic navigation structure for all users:
+   - Browse (find what you need: services or jobs)
+   - Solutions (understand what Zumodra offers you)
+   - Company (learn about us)
 
-   Clear Navigation Structure:
-   - Find Work (for freelancers/candidates)
-   - Find Talent (for employers/companies)
-   - Company Info
-   - Blog
-
-   NO CDN DEPENDENCIES - Uses local Phosphor icons
+   NO role-specific language - works for everyone
 
    Author: Rhematek Solutions
    Last Updated: 2026-01-10
@@ -32,12 +28,10 @@
             {# ========== LOGO ========== #}
             <div class="flex items-center">
                 <a href="{% url 'home' %}" class="flex items-center" aria-label="Zumodra Home">
-                    {# Logo for transparent header #}
                     <img src="{% static 'assets/images/rhematekCS.png' %}"
                          alt="Zumodra"
                          class="h-10 w-auto transition-opacity duration-300"
                          :class="{ 'hidden': scrolled && {{ transparent|default:'false' }} }" />
-                    {# Logo for solid header #}
                     <img src="{% static 'assets/images/rhematekC.png' %}"
                          alt="Zumodra"
                          class="h-10 w-auto transition-opacity duration-300 {% if transparent %}hidden{% endif %}"
@@ -58,51 +52,13 @@
                         </a>
                     </li>
 
-                    {# Find Work (For Candidates/Freelancers) #}
+                    {# Browse - What you can find/search #}
                     <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
                                 :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
                                 aria-expanded="false"
                                 @click="open = !open">
-                            {% trans 'Find Work' %}
-                            <span class="ph-bold ph-caret-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open }"></span>
-                        </button>
-                        <div x-show="open"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
-                             style="display: none;">
-                            <a href="{% url 'careers:job_list' %}"
-                               class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <span class="ph-bold ph-briefcase text-xl text-primary"></span>
-                                <div>
-                                    <div class="font-medium">{% trans 'Browse Jobs' %}</div>
-                                    <div class="text-xs text-gray-500">{% trans 'Find your next opportunity' %}</div>
-                                </div>
-                            </a>
-                            <hr class="my-2 border-gray-100">
-                            <a href="{% url 'become_seller' %}"
-                               class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <span class="ph-bold ph-user-plus text-xl text-primary"></span>
-                                <div>
-                                    <div class="font-medium">{% trans 'Become a Freelancer' %}</div>
-                                    <div class="text-xs text-gray-500">{% trans 'Start offering your services' %}</div>
-                                </div>
-                            </a>
-                        </div>
-                    </li>
-
-                    {# Find Talent (For Employers) #}
-                    <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                        <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
-                                :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
-                                aria-expanded="false"
-                                @click="open = !open">
-                            {% trans 'Find Talent' %}
+                            {% trans 'Browse' %}
                             <span class="ph-bold ph-caret-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open }"></span>
                         </button>
                         <div x-show="open"
@@ -118,17 +74,53 @@
                                class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                                 <span class="ph-bold ph-storefront text-xl text-primary"></span>
                                 <div>
-                                    <div class="font-medium">{% trans 'Browse Services' %}</div>
+                                    <div class="font-medium">{% trans 'Services' %}</div>
                                     <div class="text-xs text-gray-500">{% trans 'Find professional services' %}</div>
                                 </div>
                             </a>
-                            <hr class="my-2 border-gray-100">
+                            <a href="{% url 'careers:job_list' %}"
+                               class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                <span class="ph-bold ph-briefcase text-xl text-primary"></span>
+                                <div>
+                                    <div class="font-medium">{% trans 'Jobs' %}</div>
+                                    <div class="text-xs text-gray-500">{% trans 'Discover opportunities' %}</div>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+
+                    {# Solutions - What Zumodra offers #}
+                    <li class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <button class="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
+                                :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }"
+                                aria-expanded="false"
+                                @click="open = !open">
+                            {% trans 'Solutions' %}
+                            <span class="ph-bold ph-caret-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open }"></span>
+                        </button>
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
+                             style="display: none;">
                             <a href="{% url 'become_buyer' %}"
                                class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <span class="ph-bold ph-users-three text-xl text-primary"></span>
+                                <span class="ph-bold ph-buildings text-xl text-primary"></span>
                                 <div>
-                                    <div class="font-medium">{% trans 'Hire Talent' %}</div>
-                                    <div class="text-xs text-gray-500">{% trans 'Post jobs & build your team' %}</div>
+                                    <div class="font-medium">{% trans 'For Businesses' %}</div>
+                                    <div class="text-xs text-gray-500">{% trans 'Hire talent & manage your team' %}</div>
+                                </div>
+                            </a>
+                            <a href="{% url 'become_seller' %}"
+                               class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                <span class="ph-bold ph-user-circle text-xl text-primary"></span>
+                                <div>
+                                    <div class="font-medium">{% trans 'For Professionals' %}</div>
+                                    <div class="text-xs text-gray-500">{% trans 'Grow your career & business' %}</div>
                                 </div>
                             </a>
                         </div>
@@ -267,41 +259,13 @@
                     </a>
                 </li>
 
-                {# Find Work #}
+                {# Browse #}
                 <li x-data="{ expanded: false }">
                     <button @click="expanded = !expanded"
                             class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <div class="flex items-center gap-3">
-                            <span class="ph-bold ph-briefcase text-xl"></span>
-                            <span class="font-medium">{% trans 'Find Work' %}</span>
-                        </div>
-                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
-                    </button>
-                    <ul x-show="expanded" x-collapse class="mt-2 ml-10 space-y-1">
-                        <li>
-                            <a href="{% url 'careers:job_list' %}"
-                               class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
-                               @click="mobileMenuOpen = false">
-                                {% trans 'Browse Jobs' %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'become_seller' %}"
-                               class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
-                               @click="mobileMenuOpen = false">
-                                {% trans 'Become a Freelancer' %}
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                {# Find Talent #}
-                <li x-data="{ expanded: false }">
-                    <button @click="expanded = !expanded"
-                            class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <span class="ph-bold ph-users-three text-xl"></span>
-                            <span class="font-medium">{% trans 'Find Talent' %}</span>
+                            <span class="ph-bold ph-magnifying-glass text-xl"></span>
+                            <span class="font-medium">{% trans 'Browse' %}</span>
                         </div>
                         <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
                     </button>
@@ -310,14 +274,42 @@
                             <a href="{% url 'services:service_list' %}"
                                class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
                                @click="mobileMenuOpen = false">
-                                {% trans 'Browse Services' %}
+                                {% trans 'Services' %}
                             </a>
                         </li>
+                        <li>
+                            <a href="{% url 'careers:job_list' %}"
+                               class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
+                               @click="mobileMenuOpen = false">
+                                {% trans 'Jobs' %}
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                {# Solutions #}
+                <li x-data="{ expanded: false }">
+                    <button @click="expanded = !expanded"
+                            class="flex items-center justify-between w-full px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="ph-bold ph-lightbulb text-xl"></span>
+                            <span class="font-medium">{% trans 'Solutions' %}</span>
+                        </div>
+                        <span class="ph-bold ph-caret-down transition-transform" :class="{ 'rotate-180': expanded }"></span>
+                    </button>
+                    <ul x-show="expanded" x-collapse class="mt-2 ml-10 space-y-1">
                         <li>
                             <a href="{% url 'become_buyer' %}"
                                class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
                                @click="mobileMenuOpen = false">
-                                {% trans 'Hire Talent' %}
+                                {% trans 'For Businesses' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'become_seller' %}"
+                               class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
+                               @click="mobileMenuOpen = false">
+                                {% trans 'For Professionals' %}
                             </a>
                         </li>
                     </ul>
