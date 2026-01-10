@@ -20,6 +20,13 @@ def check_imports():
             else:
                 errors.append("tenants/views.py missing 'api_view' import")
                 print("[ERROR] tenants/views.py missing 'api_view' import")
+
+            # Check for IsAuthenticated import
+            if 'from rest_framework.permissions import IsAuthenticated' in content:
+                print("[OK] tenants/views.py has IsAuthenticated import")
+            else:
+                errors.append("tenants/views.py missing 'IsAuthenticated' import")
+                print("[ERROR] tenants/views.py missing 'IsAuthenticated' import")
     except Exception as e:
         errors.append(f"Could not read tenants/views.py: {e}")
         print(f"[ERROR] Could not read tenants/views.py: {e}")
@@ -33,6 +40,13 @@ def check_imports():
             else:
                 errors.append("accounts/views.py missing 'api_view' import")
                 print("[ERROR] accounts/views.py missing 'api_view' import")
+
+            # Check for IsAuthenticated import
+            if 'from rest_framework.permissions import IsAuthenticated' in content:
+                print("[OK] accounts/views.py has IsAuthenticated import")
+            else:
+                errors.append("accounts/views.py missing 'IsAuthenticated' import")
+                print("[ERROR] accounts/views.py missing 'IsAuthenticated' import")
     except Exception as e:
         errors.append(f"Could not read accounts/views.py: {e}")
         print(f"[ERROR] Could not read accounts/views.py: {e}")
