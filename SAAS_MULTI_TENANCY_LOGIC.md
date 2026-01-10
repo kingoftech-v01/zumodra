@@ -205,11 +205,15 @@ class Employee(TenantAwareModel):  # ✅ Tenant-aware
 ## Implementation Checklist
 
 ### HR Models to Fix
-- [ ] Change `Employee(models.Model)` → `Employee(TenantAwareModel)`
-- [ ] Change `TimeOffType(models.Model)` → `TimeOffType(TenantAwareModel)`
-- [ ] Change `TimeOffRequest(models.Model)` → `TimeOffRequest(TenantAwareModel)`
-- [ ] Run makemigrations for hr_core app
-- [ ] Run migrate_schemas --shared and --tenant
+- [x] Change `Employee(models.Model)` → `Employee(TenantAwareModel)` ✅ COMPLETED
+- [x] Change `TimeOffType(models.Model)` → `TimeOffType(TenantAwareModel)` ✅ COMPLETED
+- [x] Change `TimeOffRequest(models.Model)` → `TimeOffRequest(TenantAwareModel)` ✅ COMPLETED
+- [x] Remove duplicate `uuid` field from Employee (TenantAwareModel provides `id` as UUID) ✅ COMPLETED
+- [ ] Clean rebuild: Delete all containers, images, and volumes
+- [ ] Run makemigrations for hr_core app (auto via entrypoint.sh)
+- [ ] Run migrate_schemas --shared and --tenant (auto via entrypoint.sh)
+
+**Note:** This is a breaking change requiring a clean database rebuild. The primary key changes from integer to UUID.
 
 ### Keep in Public Schema
 - [x] `CustomUser` - Already public

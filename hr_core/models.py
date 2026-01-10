@@ -30,9 +30,8 @@ class Employee(TenantAwareModel):
     Employee record linking user to HR data.
     Distinct from TenantUser which handles access/permissions.
 
-    Note: Inherits from TenantAwareModel because employee records are
-    specific to each company/tenant. The same user can be an employee
-    at multiple companies with different records in each tenant.
+    Inherits from TenantAwareModel for proper multi-tenant isolation.
+    Provides: tenant FK, UUID primary key, timestamps, is_active flag.
     """
 
     class EmploymentStatus(models.TextChoices):
@@ -52,7 +51,8 @@ class Employee(TenantAwareModel):
         INTERN = 'intern', _('Intern')
         TEMPORARY = 'temporary', _('Temporary')
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    # Note: id (UUID), tenant, created_at, updated_at, is_active inherited from TenantAwareModel
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
