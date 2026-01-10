@@ -12,52 +12,32 @@ import os
 # =============================================================================
 
 def home_view(request):
-    """Homepage with hero, features, and testimonials."""
+    """Public homepage with hero, features, and testimonials.
+
+    NOTE: This view runs in the PUBLIC schema, so it should NOT query
+    tenant-specific models (ServiceCategory, Service, ServiceProvider, etc.).
+    Those models only exist in tenant schemas and should be accessed via
+    tenant subdomains (e.g., demo.zumodra.com).
+    """
     from django.contrib.auth import get_user_model
-    from services.models import ServiceCategory, Service, ServiceProvider
+    from tenants.models import Tenant
 
     User = get_user_model()
 
     context = {}
 
     try:
-        # Get top categories with service count
-        categories = ServiceCategory.objects.filter(
-            parent__isnull=True  # Top-level categories only
-        ).annotate(
-            service_count=Count('services')
-        ).order_by('-service_count', 'sort_order')[:8]
-        context['categories'] = categories
-
-        # Get featured services (published, not private)
-        featured_services = Service.objects.filter(
-            is_published=True,
-            is_private=False
-        ).select_related(
-            'provider', 'provider__user', 'category'
-        ).order_by('-rating_avg', '-views_count')[:8]
-        context['featured_services'] = featured_services
-
-        # Get top freelancers/providers
-        top_providers = ServiceProvider.objects.filter(
-            is_verified=True,
-            is_private=False,
-            availability_status='available'
-        ).select_related('user').order_by(
-            '-rating_avg', '-completed_jobs_count'
-        )[:6]
-        context['top_providers'] = top_providers
-
-        # Get overall stats
+        # Get platform-wide stats (public schema only)
         context['stats'] = {
-            'total_services': Service.objects.filter(is_published=True).count(),
-            'total_providers': ServiceProvider.objects.filter(is_verified=True).count(),
-            'total_categories': ServiceCategory.objects.filter(parent__isnull=True).count(),
             'total_users': User.objects.filter(is_active=True).count(),
+            'total_organizations': Tenant.objects.exclude(schema_name='public').count(),
         }
     except Exception:
         # Handle case where tables don't exist yet (fresh install)
-        pass
+        context['stats'] = {
+            'total_users': 0,
+            'total_organizations': 0,
+        }
 
     return render(request, 'index.html', context)
 
