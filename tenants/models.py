@@ -1016,3 +1016,165 @@ class CircusaleUser(models.Model):
 
     def __str__(self):
         return f"{self.user} @ {self.circusale.name} ({self.get_role_display()})"
+
+
+# =============================================================================
+# PUBLIC MARKETPLACE CATALOG
+# =============================================================================
+
+class PublicServiceCatalog(models.Model):
+    """
+    Read-only public catalog of services published by tenants.
+    Denormalized for performance - synced via signals from tenant schemas.
+
+    This model lives in the PUBLIC schema and aggregates services marked as
+    `is_public=True` from all tenant schemas. It enables the public homepage
+    and marketplace browsing without requiring cross-schema queries.
+
+    Synchronization:
+    - Triggered by Service.post_save signal in tenant schemas
+    - Only services with is_public=True and provider.marketplace_enabled=True
+    - Denormalized data (name, price, category, etc.) for fast reads
+    - Auto-updated when source service changes
+    """
+
+    # Identity
+    id = models.BigAutoField(primary_key=True)
+    uuid = models.UUIDField(unique=True, db_index=True, help_text=_('Service UUID (same as source service)'))
+    tenant = models.ForeignKey(
+        'Tenant',
+        on_delete=models.CASCADE,
+        related_name='published_services',
+        help_text=_('Tenant/company offering this service')
+    )
+
+    # Service Reference (for sync tracking)
+    service_uuid = models.UUIDField(
+        db_index=True,
+        help_text=_('UUID of service in tenant schema')
+    )
+    tenant_schema_name = models.CharField(
+        max_length=63,
+        help_text=_('Schema name of tenant (for sync reference)')
+    )
+
+    # Denormalized Service Data
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+    description = models.TextField()
+    short_description = models.CharField(max_length=300, blank=True)
+
+    # Category (denormalized)
+    category_name = models.CharField(max_length=100, db_index=True, blank=True)
+    category_slug = models.SlugField(max_length=100, db_index=True, blank=True)
+
+    # Provider (denormalized)
+    provider_name = models.CharField(max_length=255)
+    provider_uuid = models.UUIDField()
+
+    # Pricing
+    service_type = models.CharField(
+        max_length=20,
+        help_text=_('fixed, hourly, or custom')
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Fixed price (for fixed/hourly types)')
+    )
+    price_min = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Minimum price (for custom quotes)')
+    )
+    price_max = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Maximum price (for custom quotes)')
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Media
+    thumbnail_url = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text=_('URL to service thumbnail image')
+    )
+
+    # Stats (denormalized from provider)
+    rating_avg = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text=_('Average provider rating')
+    )
+    review_count = models.PositiveIntegerField(
+        default=0,
+        help_text=_('Total provider reviews')
+    )
+    order_count = models.PositiveIntegerField(
+        default=0,
+        help_text=_('Total service orders/contracts')
+    )
+
+    # Status & Visibility
+    is_active = models.BooleanField(default=True, db_index=True)
+    is_featured = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_('Featured services appear prominently on homepage')
+    )
+
+    # Sync Tracking
+    published_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text=_('When service was first published to catalog')
+    )
+    synced_at = models.DateTimeField(
+        auto_now=True,
+        help_text=_('Last sync timestamp from tenant schema')
+    )
+
+    class Meta:
+        verbose_name = _('Public Service Catalog Entry')
+        verbose_name_plural = _('Public Service Catalog')
+        ordering = ['-is_featured', '-published_at']
+        indexes = [
+            models.Index(fields=['tenant', 'is_active'], name='catalog_tenant_active'),
+            models.Index(fields=['category_slug', 'is_active'], name='catalog_category_active'),
+            models.Index(fields=['-rating_avg', '-order_count'], name='catalog_rating_orders'),
+            models.Index(fields=['tenant_schema_name', 'service_uuid'], name='catalog_sync_ref'),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant_schema_name', 'service_uuid'],
+                name='unique_service_per_tenant_schema'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.name} by {self.tenant.name}"
+
+    def get_tenant_service_url(self):
+        """
+        Generate URL to view service in tenant context.
+        Returns absolute URL to service detail page on tenant subdomain.
+        """
+        domain = self.tenant.get_primary_domain()
+        if domain:
+            return f"https://{domain.domain}/services/service/{self.uuid}/"
+        return None
+
+    def get_public_request_url(self):
+        """
+        Generate URL for creating a cross-tenant service request.
+        Used by users browsing public marketplace to request this service.
+        """
+        from django.urls import reverse
+        return reverse('services:request_cross_tenant', kwargs={'catalog_service_uuid': self.uuid})

@@ -657,3 +657,254 @@ def _send_escrow_released_notification(contract):
         html_message=html_content,
         fail_silently=True,
     )
+
+
+# ==================== CROSS-TENANT MARKETPLACE ====================
+
+@shared_task(
+    bind=True,
+    name='services.tasks.notify_cross_tenant_request',
+    max_retries=3,
+    default_retry_delay=60,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+)
+def notify_cross_tenant_request(self, target_schema, request_uuid, requesting_tenant_schema):
+    """
+    Notify provider in their tenant schema about cross-tenant service request.
+
+    This task switches to the target tenant's schema and creates a notification
+    for the provider. The notification appears in their dashboard, allowing them
+    to review and respond to the cross-tenant service request.
+
+    Flow:
+    1. Called from CrossTenantServiceRequest.notify_provider_tenant()
+    2. Switches to target tenant schema
+    3. Creates notification for provider/admins
+    4. Provider sees notification in their dashboard
+    5. Provider can review request and accept/reject
+
+    Args:
+        target_schema (str): Schema name of provider's tenant
+        request_uuid (str): UUID of the CrossTenantServiceRequest
+        requesting_tenant_schema (str): Schema name of requesting tenant
+
+    Returns:
+        dict: Success status and notification ID
+
+    Raises:
+        Exception: If tenant not found or notification creation fails (retries 3 times)
+    """
+    from tenants.models import Tenant
+    from django_tenants.utils import schema_context
+
+    try:
+        # Get tenant models
+        target_tenant = Tenant.objects.get(schema_name=target_schema)
+        requesting_tenant = Tenant.objects.get(schema_name=requesting_tenant_schema)
+
+        logger.info(
+            f"Creating cross-tenant notification in {target_schema} "
+            f"for request {request_uuid} from {requesting_tenant_schema}"
+        )
+
+        # Switch to target tenant schema and create notification
+        with schema_context(target_schema):
+            # Import here to avoid circular imports
+            from notifications.models import Notification
+
+            # Create notification for provider
+            notification = Notification.objects.create(
+                notification_type='cross_tenant_request',
+                title=f"New service request from {requesting_tenant.name}",
+                message=(
+                    f"You have received a service request from {requesting_tenant.name}. "
+                    f"Request ID: {request_uuid}. "
+                    f"Please review and respond to this cross-organization request."
+                ),
+                metadata={
+                    'request_uuid': request_uuid,
+                    'requesting_tenant_schema': requesting_tenant_schema,
+                    'requesting_company_name': requesting_tenant.name,
+                    'type': 'cross_tenant_service_request',
+                },
+                # TODO: Send to all admins/managers in target tenant
+                # For now, notification goes to general notification stream
+                # recipient logic depends on your notification system
+            )
+
+            logger.info(
+                f"Created notification {notification.id} in {target_schema} "
+                f"for cross-tenant request {request_uuid}"
+            )
+
+            return {
+                'status': 'success',
+                'notification_id': notification.id,
+                'target_tenant': target_schema,
+                'request_uuid': request_uuid
+            }
+
+    except Tenant.DoesNotExist as e:
+        error_msg = f"Tenant not found: {e}"
+        logger.error(error_msg)
+        # Don't retry if tenant doesn't exist (permanent failure)
+        raise
+
+    except Exception as e:
+        error_msg = f"Failed to create cross-tenant notification: {e}"
+        logger.error(error_msg, exc_info=True)
+
+        # Retry on temporary failures
+        try:
+            raise self.retry(exc=e)
+        except self.MaxRetriesExceededError:
+            logger.error(
+                f"Max retries exceeded for cross-tenant notification "
+                f"(request {request_uuid}, target {target_schema})"
+            )
+            raise
+
+
+@shared_task(
+    bind=True,
+    name='services.tasks.sync_public_catalog_stats',
+    max_retries=3,
+    default_retry_delay=300,
+)
+def sync_public_catalog_stats(self):
+    """
+    Periodic task to sync public catalog statistics.
+
+    Updates service statistics in PublicServiceCatalog from source services
+    in tenant schemas. Runs periodically (e.g., hourly) to keep catalog fresh.
+
+    This ensures that:
+    - Order counts are accurate
+    - Provider ratings are up-to-date
+    - Review counts are current
+
+    Returns:
+        dict: Summary of sync operation
+    """
+    from tenants.models import Tenant, PublicServiceCatalog
+    from services.models import Service
+    from django_tenants.utils import schema_context
+
+    try:
+        logger.info("Starting public catalog stats sync...")
+
+        updated_count = 0
+        error_count = 0
+
+        # Process each tenant
+        for tenant in Tenant.objects.exclude(schema_name='public'):
+            try:
+                with schema_context(tenant.schema_name):
+                    # Get all public services in this tenant
+                    public_services = Service.objects.filter(
+                        is_public=True,
+                        is_active=True,
+                        published_to_catalog=True
+                    ).select_related('provider')
+
+                    for service in public_services:
+                        try:
+                            # Update catalog entry with latest stats
+                            PublicServiceCatalog.objects.filter(
+                                tenant_schema_name=tenant.schema_name,
+                                service_uuid=service.uuid
+                            ).update(
+                                order_count=service.order_count,
+                                rating_avg=service.provider.rating_avg,
+                                review_count=service.provider.total_reviews,
+                            )
+                            updated_count += 1
+
+                        except Exception as e:
+                            logger.error(
+                                f"Failed to sync service {service.uuid} stats: {e}"
+                            )
+                            error_count += 1
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to sync stats for tenant {tenant.schema_name}: {e}"
+                )
+                error_count += 1
+
+        logger.info(
+            f"Catalog stats sync complete. Updated: {updated_count}, Errors: {error_count}"
+        )
+
+        return {
+            'status': 'success',
+            'updated_count': updated_count,
+            'error_count': error_count,
+            'timestamp': timezone.now().isoformat(),
+        }
+
+    except Exception as e:
+        logger.error(f"Error syncing public catalog stats: {e}", exc_info=True)
+        raise self.retry(exc=e)
+
+
+@shared_task(
+    bind=True,
+    name='services.tasks.cleanup_expired_cross_tenant_requests',
+    max_retries=3,
+    default_retry_delay=300,
+)
+def cleanup_expired_cross_tenant_requests(self):
+    """
+    Clean up old pending cross-tenant requests.
+
+    Automatically cancels requests that have been pending for too long
+    (e.g., 30 days) to prevent cluttered request lists.
+
+    Returns:
+        dict: Summary of cleanup operation
+    """
+    from tenants.models import Tenant
+    from services.models import CrossTenantServiceRequest
+    from django_tenants.utils import schema_context
+
+    try:
+        cutoff_date = timezone.now() - timedelta(days=30)
+        cancelled_count = 0
+
+        logger.info(f"Cleaning up cross-tenant requests older than {cutoff_date}...")
+
+        # Process each tenant
+        for tenant in Tenant.objects.exclude(schema_name='public'):
+            try:
+                with schema_context(tenant.schema_name):
+                    # Find expired pending requests
+                    expired_requests = CrossTenantServiceRequest.objects.filter(
+                        status=CrossTenantServiceRequest.RequestStatus.PENDING,
+                        created_at__lt=cutoff_date
+                    )
+
+                    count = expired_requests.update(
+                        status=CrossTenantServiceRequest.RequestStatus.CANCELLED,
+                        provider_response='Request automatically cancelled after 30 days without response'
+                    )
+
+                    cancelled_count += count
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to cleanup requests for tenant {tenant.schema_name}: {e}"
+                )
+
+        logger.info(f"Cleanup complete. Cancelled {cancelled_count} expired cross-tenant requests.")
+
+        return {
+            'status': 'success',
+            'cancelled_count': cancelled_count,
+            'timestamp': timezone.now().isoformat(),
+        }
+
+    except Exception as e:
+        logger.error(f"Error cleaning up cross-tenant requests: {e}", exc_info=True)
+        raise self.retry(exc=e)

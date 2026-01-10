@@ -319,7 +319,19 @@ class ServiceProvider(TenantAwareModel):
     )
     is_verified = models.BooleanField(default=False, help_text=_("KYC verified"))
     is_featured = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False, help_text=_("Only visible via direct link"))
+
+    # MARKETPLACE VISIBILITY
+    marketplace_enabled = models.BooleanField(
+        default=False,
+        help_text=_('Provider can publish services to public marketplace')
+    )
+
+    # DEPRECATED - Use marketplace_enabled instead
+    is_private = models.BooleanField(
+        default=False,
+        help_text=_("DEPRECATED: Use marketplace_enabled instead. Only visible via direct link")
+    )
+
     is_accepting_projects = models.BooleanField(default=True)
     can_work_remotely = models.BooleanField(default=True)
     can_work_onsite = models.BooleanField(default=False)
@@ -491,8 +503,30 @@ class Service(TenantAwareModel):
     tags = models.ManyToManyField(ServiceTag, blank=True, related_name='services')
 
     # Status
-    is_active = models.BooleanField(default=True)
-    is_featured = models.BooleanField(default=False)
+    is_active = models.BooleanField(
+        default=True,
+        help_text=_('Service is active and available for booking within tenant')
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        help_text=_('Featured services appear prominently in tenant marketplace')
+    )
+
+    # PUBLIC MARKETPLACE FIELDS
+    is_public = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_('Publish to public marketplace (visible to all users/companies)')
+    )
+    published_to_catalog = models.BooleanField(
+        default=False,
+        help_text=_('Service is currently synced to public catalog')
+    )
+    catalog_synced_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_('Last sync timestamp with public catalog')
+    )
 
     # Stats
     view_count = models.PositiveIntegerField(default=0)
@@ -617,6 +651,161 @@ class ClientRequest(TenantAwareModel):
 
     def __str__(self):
         return f"{self.title} by {self.client.email}"
+
+
+class CrossTenantServiceRequest(TenantAwareModel):
+    """
+    Service request from one tenant to another tenant's public service.
+
+    This model represents a cross-tenant hiring request - when a user from
+    Company A wants to hire Company B for a public service. The request lives
+    in the REQUESTING tenant's schema (Company A) to ensure data ownership
+    and proper isolation.
+
+    Flow:
+    1. User in Company A browses PublicServiceCatalog (public schema)
+    2. Finds service from Company B
+    3. Creates CrossTenantServiceRequest in Company A's schema
+    4. System notifies Company B (async Celery task)
+    5. Company B reviews request in their dashboard
+    6. If accepted, creates ServiceContract in Company A's schema
+    """
+
+    class RequestStatus(models.TextChoices):
+        PENDING = 'pending', _('Pending Review')
+        ACCEPTED = 'accepted', _('Accepted')
+        REJECTED = 'rejected', _('Rejected')
+        CONVERTED = 'converted', _('Converted to Contract')
+        CANCELLED = 'cancelled', _('Cancelled')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    # Requesting Party (lives in this tenant's schema)
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='cross_tenant_requests_sent',
+        help_text=_('User requesting the service')
+    )
+
+    # Target Service (in another tenant's schema)
+    target_service_uuid = models.UUIDField(
+        db_index=True,
+        help_text=_('UUID of service in target tenant schema')
+    )
+    target_tenant_schema = models.CharField(
+        max_length=63,
+        help_text=_('Schema name of target tenant (provider)')
+    )
+    target_provider_uuid = models.UUIDField(
+        help_text=_('UUID of provider in target tenant schema')
+    )
+
+    # Request Details
+    title = models.CharField(
+        max_length=255,
+        help_text=_('Request title/summary')
+    )
+    description = models.TextField(
+        help_text=_('Detailed description of service requirements')
+    )
+    budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Proposed budget for the service')
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+    deadline = models.DateField(
+        null=True,
+        blank=True,
+        help_text=_('Desired completion date')
+    )
+
+    # Attachments (optional)
+    attachment_1 = models.FileField(
+        upload_to='cross_tenant_requests/',
+        blank=True,
+        null=True,
+        help_text=_('Supporting document or file')
+    )
+    attachment_2 = models.FileField(
+        upload_to='cross_tenant_requests/',
+        blank=True,
+        null=True
+    )
+
+    # Status & Response
+    status = models.CharField(
+        max_length=20,
+        choices=RequestStatus.choices,
+        default=RequestStatus.PENDING,
+        db_index=True
+    )
+    provider_response = models.TextField(
+        blank=True,
+        help_text=_('Provider response message')
+    )
+    responded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_('When provider responded')
+    )
+
+    # Contract Reference (if converted)
+    contract = models.ForeignKey(
+        'ServiceContract',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='originating_cross_tenant_request',
+        help_text=_('Resulting contract if request was accepted')
+    )
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Cross-Tenant Service Request")
+        verbose_name_plural = _("Cross-Tenant Service Requests")
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', '-created_at'], name='cross_req_status_created'),
+            models.Index(fields=['target_tenant_schema'], name='cross_req_target_tenant'),
+        ]
+
+    def __str__(self):
+        return f"{self.title} (→ {self.target_tenant_schema})"
+
+    def notify_provider_tenant(self):
+        """
+        Send notification to provider in their tenant schema.
+
+        Uses async Celery task to switch schemas and create notification.
+        The notification will appear in the provider's dashboard allowing them
+        to review and respond to the cross-tenant request.
+        """
+        from services.tasks import notify_cross_tenant_request
+
+        notify_cross_tenant_request.delay(
+            target_schema=self.target_tenant_schema,
+            request_uuid=str(self.uuid),
+            requesting_tenant_schema=self.tenant.schema_name
+        )
+
+    @property
+    def is_pending(self):
+        """Check if request is awaiting provider response."""
+        return self.status == self.RequestStatus.PENDING
+
+    @property
+    def is_resolved(self):
+        """Check if request has been answered (accepted/rejected/converted)."""
+        return self.status in [
+            self.RequestStatus.ACCEPTED,
+            self.RequestStatus.REJECTED,
+            self.RequestStatus.CONVERTED
+        ]
 
 
 class ProviderMatch(TenantAwareModel):
