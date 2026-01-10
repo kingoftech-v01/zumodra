@@ -5,41 +5,449 @@
 
 {% block meta_description %}{% trans "Discover professional services from verified providers. Find the perfect freelancer for your project." %}{% endblock %}
 
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-teal: #0f766e;
+        --primary-cyan: #06b6d4;
+        --accent-amber: #f59e0b;
+        --bg-navy: #0f172a;
+        --bg-slate: #1e293b;
+        --bg-slate-light: #334155;
+        --text-white: #f1f5f9;
+        --text-gray: #cbd5e1;
+        --text-muted: #94a3b8;
+    }
+
+    body {
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Hero Section with Animated Gradient */
+    .services-hero {
+        background: linear-gradient(135deg, var(--bg-navy) 0%, #1e3a5f 50%, var(--bg-slate) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .services-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .services-hero::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent 0%, var(--bg-navy) 100%);
+        pointer-events: none;
+    }
+
+    /* Search Bar */
+    .search-container {
+        position: relative;
+        z-index: 10;
+    }
+
+    .search-input {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 20px 24px 20px 56px;
+        color: var(--text-white);
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+    }
+
+    .search-input::placeholder {
+        color: var(--text-gray);
+    }
+
+    .search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--primary-cyan);
+        box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-cyan);
+        pointer-events: none;
+    }
+
+    .search-btn {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-cyan) 100%);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 16px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -8px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Glass Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Service Card */
+    .service-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.08);
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .service-card:nth-child(1) { animation-delay: 0.1s; transform: translateY(20px); }
+    .service-card:nth-child(2) { animation-delay: 0.2s; transform: translateY(20px); }
+    .service-card:nth-child(3) { animation-delay: 0.3s; transform: translateY(20px); }
+    .service-card:nth-child(4) { animation-delay: 0.4s; transform: translateY(20px); }
+    .service-card:nth-child(5) { animation-delay: 0.5s; transform: translateY(20px); }
+    .service-card:nth-child(6) { animation-delay: 0.6s; transform: translateY(20px); }
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 48px -12px rgba(15, 118, 110, 0.25);
+    }
+
+    .service-image {
+        position: relative;
+        height: 220px;
+        background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+        overflow: hidden;
+    }
+
+    .service-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .service-card:hover .service-image img {
+        transform: scale(1.08);
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: linear-gradient(135deg, var(--accent-amber) 0%, #ea580c 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .provider-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover;
+    }
+
+    .provider-initials {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-cyan) 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .verified-badge {
+        color: var(--primary-cyan);
+        filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.4));
+    }
+
+    .star-rating {
+        color: var(--accent-amber);
+    }
+
+    .price-tag {
+        font-size: 24px;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .view-btn {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-cyan) 100%);
+        color: white;
+        padding: 10px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .view-btn:hover {
+        transform: translateX(4px);
+        box-shadow: 0 8px 16px -4px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Filter Chip */
+    .filter-chip {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-gray);
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-chip:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text-white);
+    }
+
+    .filter-chip.active {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-cyan) 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    /* Price Input */
+    .price-input {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: var(--text-white);
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .price-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--primary-cyan);
+    }
+
+    .price-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    /* Select Dropdown */
+    .custom-select {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 12px 40px 12px 16px;
+        color: var(--text-white);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+    }
+
+    .custom-select:focus {
+        outline: none;
+        border-color: var(--primary-cyan);
+    }
+
+    /* Tag Badge */
+    .tag-badge {
+        background: rgba(15, 118, 110, 0.1);
+        color: var(--primary-cyan);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 32px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 24px;
+        border: 2px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 24px;
+        opacity: 0.4;
+    }
+
+    /* Skeleton Loading */
+    .skeleton {
+        background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 12px;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Mobile Filter Panel */
+    .filter-panel {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-navy);
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .filter-panel.open {
+        transform: translateX(0);
+    }
+
+    .page-background {
+        background: var(--bg-navy);
+        min-height: 100vh;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-white);
+        margin-bottom: 16px;
+    }
+
+    .results-count {
+        color: var(--text-gray);
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Responsive Typography */
+    @media (max-width: 768px) {
+        .price-tag {
+            font-size: 20px;
+        }
+
+        .service-image {
+            height: 180px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="zu-page-bg min-h-screen">
+<div class="page-background">
     <!-- Hero Section -->
-    <div class="zu-hero zu-hero--primary">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-            <div class="text-center">
-                <h1 class="zu-hero__title">
-                    {% trans "Find Professional Services" %}
+    <div class="services-hero py-20 md:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative z-10 text-center max-w-4xl mx-auto">
+                <!-- Animated Title -->
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6" style="color: var(--text-white); line-height: 1.1;">
+                    {% trans "Discover World-Class" %}
+                    <span style="background: linear-gradient(135deg, var(--primary-cyan) 0%, #22d3ee 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        {% trans "Services" %}
+                    </span>
                 </h1>
-                <p class="zu-hero__subtitle">
-                    {% trans "Connect with talented professionals ready to help you achieve your goals." %}
+
+                <p class="text-xl md:text-2xl mb-12" style="color: var(--text-gray); font-weight: 500;">
+                    {% trans "Connect with verified professionals and transform your ideas into reality" %}
                 </p>
 
-                <!-- Search Bar -->
-                <form method="get" action="" class="max-w-3xl mx-auto mt-8" id="search-form">
-                    <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Advanced Search -->
+                <form method="get" action="" id="search-form" class="search-container">
+                    <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1 relative">
-                            <input type="text"
-                                   name="search"
-                                   value="{{ search }}"
-                                   hx-get="{% url 'services:service_list' %}"
-                                   hx-trigger="keyup changed delay:500ms"
-                                   hx-target="#services-grid"
-                                   hx-swap="innerHTML"
-                                   hx-include="#search-form"
-                                   class="zu-input zu-input--lg zu-input--search"
-                                   placeholder="{% trans 'Search for services...' %}">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg class="zu-icon zu-icon--muted" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <path d="m21 21-4.35-4.35"></path>
-                                </svg>
-                            </div>
+                            <svg class="search-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="11" cy="11" r="8" stroke-width="2"></circle>
+                                <path d="m21 21-4.35-4.35" stroke-width="2" stroke-linecap="round"></path>
+                            </svg>
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ search }}"
+                                hx-get="{% url 'services:service_list' %}"
+                                hx-trigger="keyup changed delay:500ms"
+                                hx-target="#services-grid"
+                                hx-swap="innerHTML"
+                                hx-include="#search-form"
+                                class="search-input"
+                                placeholder="{% trans 'Search for services, skills, or providers...' %}">
                         </div>
-                        <button type="submit" class="zu-btn zu-btn--glass zu-btn--lg">
+                        <button type="submit" class="search-btn">
                             {% trans "Search" %}
                         </button>
                     </div>
@@ -49,112 +457,136 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="lg:grid lg:grid-cols-4 lg:gap-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div class="lg:grid lg:grid-cols-4 lg:gap-10">
 
             <!-- Sidebar Filters -->
             <aside class="hidden lg:block lg:col-span-1">
                 <div class="sticky top-24 space-y-6">
-                    <!-- Categories Filter -->
-                    <div class="zu-card">
-                        <div class="zu-card__header">
-                            <h3 class="zu-card__title">{% trans "Categories" %}</h3>
-                        </div>
-                        <div class="zu-card__body">
-                            <div class="space-y-3">
-                                <a href="{% url 'services:service_list' %}"
-                                   class="zu-link {% if not request.GET.category %}zu-link--active{% endif %}">
-                                    {% trans "All Categories" %}
-                                </a>
-                                {% for category in categories %}
-                                <a href="?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-get="{% url 'services:service_list' %}?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-target="#services-grid"
-                                   hx-swap="innerHTML"
-                                   class="zu-link {% if request.GET.category == category.id|stringformat:'s' %}zu-link--active{% endif %}">
-                                    {{ category.name }}
-                                </a>
-                                {% endfor %}
-                            </div>
+
+                    <!-- Categories -->
+                    <div class="glass-card">
+                        <h3 class="section-title">{% trans "Categories" %}</h3>
+                        <div class="space-y-2">
+                            <a href="{% url 'services:service_list' %}"
+                               class="filter-chip block {% if not request.GET.category %}active{% endif %}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="7" height="7" stroke-width="2" rx="1"></rect>
+                                    <rect x="14" y="3" width="7" height="7" stroke-width="2" rx="1"></rect>
+                                    <rect x="14" y="14" width="7" height="7" stroke-width="2" rx="1"></rect>
+                                    <rect x="3" y="14" width="7" height="7" stroke-width="2" rx="1"></rect>
+                                </svg>
+                                {% trans "All Categories" %}
+                            </a>
+                            {% for category in categories %}
+                            <a href="?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
+                               hx-get="{% url 'services:service_list' %}?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
+                               hx-target="#services-grid"
+                               hx-swap="innerHTML"
+                               class="filter-chip block {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                {{ category.name }}
+                            </a>
+                            {% endfor %}
                         </div>
                     </div>
 
-                    <!-- Price Range Filter -->
-                    <div class="zu-card">
-                        <div class="zu-card__header">
-                            <h3 class="zu-card__title">{% trans "Price Range" %}</h3>
-                        </div>
-                        <div class="zu-card__body">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="zu-label">{% trans "Min Price" %}</label>
-                                    <input type="number"
-                                           name="min_price"
-                                           value="{{ request.GET.min_price }}"
-                                           hx-get="{% url 'services:service_list' %}"
-                                           hx-trigger="change"
-                                           hx-target="#services-grid"
-                                           hx-swap="innerHTML"
-                                           hx-include="#search-form"
-                                           class="zu-input"
-                                           placeholder="$0">
-                                </div>
-                                <div>
-                                    <label class="zu-label">{% trans "Max Price" %}</label>
-                                    <input type="number"
-                                           name="max_price"
-                                           value="{{ request.GET.max_price }}"
-                                           hx-get="{% url 'services:service_list' %}"
-                                           hx-trigger="change"
-                                           hx-target="#services-grid"
-                                           hx-swap="innerHTML"
-                                           hx-include="#search-form"
-                                           class="zu-input"
-                                           placeholder="$1000">
-                                </div>
+                    <!-- Price Range -->
+                    <div class="glass-card">
+                        <h3 class="section-title">{% trans "Price Range" %}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--text-gray);">
+                                    {% trans "Minimum" %}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="min_price"
+                                    value="{{ request.GET.min_price }}"
+                                    hx-get="{% url 'services:service_list' %}"
+                                    hx-trigger="change"
+                                    hx-target="#services-grid"
+                                    hx-swap="innerHTML"
+                                    hx-include="#search-form"
+                                    class="price-input w-full"
+                                    placeholder="$0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--text-gray);">
+                                    {% trans "Maximum" %}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="max_price"
+                                    value="{{ request.GET.max_price }}"
+                                    hx-get="{% url 'services:service_list' %}"
+                                    hx-trigger="change"
+                                    hx-target="#services-grid"
+                                    hx-swap="innerHTML"
+                                    hx-include="#search-form"
+                                    class="price-input w-full"
+                                    placeholder="$10,000">
                             </div>
                         </div>
                     </div>
 
                     <!-- Popular Tags -->
-                    <div class="zu-card">
-                        <div class="zu-card__header">
-                            <h3 class="zu-card__title">{% trans "Popular Tags" %}</h3>
-                        </div>
-                        <div class="zu-card__body">
-                            <div class="flex flex-wrap gap-2">
-                                {% for tag in popular_tags %}
-                                <a href="?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-get="{% url 'services:service_list' %}?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-target="#services-grid"
-                                   hx-swap="innerHTML"
-                                   class="zu-badge {% if request.GET.tag == tag.name %}zu-badge--primary{% else %}zu-badge--muted{% endif %}">
-                                    {{ tag.name }}
-                                </a>
-                                {% endfor %}
-                            </div>
+                    {% if popular_tags %}
+                    <div class="glass-card">
+                        <h3 class="section-title">{% trans "Popular Skills" %}</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in popular_tags %}
+                            <a href="?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
+                               hx-get="{% url 'services:service_list' %}?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
+                               hx-target="#services-grid"
+                               hx-swap="innerHTML"
+                               class="tag-badge {% if request.GET.tag == tag.name %}active{% endif %}">
+                                {{ tag.name }}
+                            </a>
+                            {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
+
                 </div>
             </aside>
 
             <!-- Services Grid -->
             <div class="lg:col-span-3">
-                <!-- Sort & View Options -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-                    <p class="zu-text zu-text--muted">
-                        {% blocktrans with count=services.paginator.count %}
-                        {{ count }} services found
-                        {% endblocktrans %}
-                    </p>
+
+                <!-- Results Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+                    <div>
+                        <p class="results-count">
+                            {% blocktrans with count=services.paginator.count %}
+                            <span style="color: var(--text-white); font-weight: 700; font-size: 18px;">{{ count }}</span> services found
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+
                     <div class="flex items-center gap-4">
-                        <select name="sort"
-                                hx-get="{% url 'services:service_list' %}"
-                                hx-trigger="change"
-                                hx-target="#services-grid"
-                                hx-swap="innerHTML"
-                                hx-include="#search-form"
-                                class="zu-select">
+                        <!-- Mobile Filter Button -->
+                        <button
+                            type="button"
+                            onclick="document.getElementById('mobile-filters').classList.add('open')"
+                            class="lg:hidden filter-chip">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            {% trans "Filters" %}
+                        </button>
+
+                        <!-- Sort -->
+                        <select
+                            name="sort"
+                            hx-get="{% url 'services:service_list' %}"
+                            hx-trigger="change"
+                            hx-target="#services-grid"
+                            hx-swap="innerHTML"
+                            hx-include="#search-form"
+                            class="custom-select">
                             <option value="-created_at" {% if request.GET.sort == '-created_at' %}selected{% endif %}>{% trans "Newest First" %}</option>
                             <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>{% trans "Oldest First" %}</option>
                             <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>{% trans "Price: Low to High" %}</option>
@@ -164,143 +596,173 @@
                     </div>
                 </div>
 
-                <!-- Mobile Filter Button -->
-                <div class="lg:hidden mb-4">
-                    <button type="button"
-                            x-data
-                            @click="$dispatch('open-filters')"
-                            class="zu-btn zu-btn--outline zu-btn--full">
-                        <svg class="zu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                        {% trans "Filters" %}
-                    </button>
-                </div>
-
                 <!-- Services Grid -->
-                <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {% for service in services %}
-                    <div class="zu-card zu-card--hover">
-                        <!-- Service Thumbnail -->
-                        <a href="{% url 'service_detail' service.uuid %}" class="block">
-                            <div class="zu-card__image-container">
+                    <div class="service-card">
+                        <!-- Service Image -->
+                        <a href="{% url 'services:service_detail' service.uuid %}" class="block">
+                            <div class="service-image">
                                 {% if service.thumbnail %}
-                                <img src="{{ service.thumbnail.url }}"
-                                     alt="{{ service.name }}"
-                                     class="zu-card__image"
-                                     loading="lazy">
+                                <img src="{{ service.thumbnail.url }}" alt="{{ service.name }}" loading="lazy">
                                 {% else %}
-                                <div class="zu-card__image-placeholder">
-                                    <svg class="zu-icon zu-icon--xl zu-icon--muted" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                <div class="flex items-center justify-center h-full">
+                                    <svg class="w-20 h-20 opacity-30" style="color: var(--primary-cyan);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" stroke-width="1.5"></rect>
+                                        <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" stroke-width="1.5"></path>
                                     </svg>
                                 </div>
                                 {% endif %}
+
                                 {% if service.is_featured %}
-                                <span class="zu-badge zu-badge--warning zu-badge--floating">
-                                    {% trans "Featured" %}
+                                <span class="featured-badge">
+                                    ⭐ {% trans "Featured" %}
                                 </span>
                                 {% endif %}
                             </div>
                         </a>
 
-                        <div class="zu-card__body">
+                        <!-- Card Content -->
+                        <div class="p-6">
                             <!-- Provider Info -->
-                            <div class="flex items-center gap-3 mb-3">
+                            <div class="flex items-center gap-3 mb-4">
                                 {% if service.provider.avatar %}
-                                <img src="{{ service.provider.avatar.url }}"
-                                     alt="{{ service.provider.display_name }}"
-                                     class="zu-avatar zu-avatar--sm">
+                                <img src="{{ service.provider.avatar.url }}" alt="{{ service.provider.display_name }}" class="provider-avatar">
                                 {% else %}
-                                <div class="zu-avatar zu-avatar--sm">
-                                    <span class="zu-avatar__initials">
-                                        {{ service.provider.display_name|slice:":1"|upper }}
-                                    </span>
+                                <div class="provider-initials">
+                                    {{ service.provider.display_name|slice:":1"|upper }}
                                 </div>
                                 {% endif %}
-                                <div>
-                                    <a href="{% url 'provider_profile' service.provider.uuid %}"
-                                       class="zu-link zu-link--subtle">
-                                        {{ service.provider.display_name }}
+
+                                <div class="flex-1 min-w-0">
+                                    <a href="{% url 'services:provider_profile' service.provider.uuid %}" class="font-semibold hover:underline flex items-center gap-1" style="color: #1e293b;">
+                                        <span class="truncate">{{ service.provider.display_name }}</span>
+                                        {% if service.provider.is_verified %}
+                                        <svg class="verified-badge w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm4.707-12.707a1 1 0 00-1.414-1.414L10 13.172l-2.293-2.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {% endif %}
                                     </a>
-                                    {% if service.provider.is_verified %}
-                                    <svg class="zu-icon zu-icon--verified inline ml-1" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm4.707-12.707a1 1 0 00-1.414-1.414L10 13.172l-2.293-2.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                                    </svg>
-                                    {% endif %}
                                 </div>
                             </div>
 
                             <!-- Service Title -->
-                            <a href="{% url 'service_detail' service.uuid %}">
-                                <h3 class="zu-card__title zu-card__title--truncate-2">
+                            <a href="{% url 'services:service_detail' service.uuid %}">
+                                <h3 class="font-bold text-lg mb-3 line-clamp-2 hover:underline" style="color: #0f172a;">
                                     {{ service.name }}
                                 </h3>
                             </a>
 
                             <!-- Rating -->
-                            <div class="zu-rating mb-3">
-                                <svg class="zu-icon zu-icon--star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <div class="flex items-center gap-2 mb-4">
+                                <svg class="star-rating w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                 </svg>
-                                <span class="zu-rating__value">
-                                    {{ service.provider.rating_avg|floatformat:1 }}
-                                </span>
-                                <span class="zu-rating__count">
-                                    ({{ service.provider.total_reviews }})
-                                </span>
+                                <span class="font-bold" style="color: #0f172a;">{{ service.provider.rating_avg|floatformat:1 }}</span>
+                                <span class="text-sm" style="color: #64748b;">({{ service.provider.total_reviews }})</span>
                             </div>
 
                             <!-- Tags -->
                             {% if service.tags.exists %}
-                            <div class="flex flex-wrap gap-1 mb-4">
+                            <div class="flex flex-wrap gap-2 mb-4">
                                 {% for tag in service.tags.all|slice:":3" %}
-                                <span class="zu-badge zu-badge--sm zu-badge--muted">
-                                    {{ tag.name }}
-                                </span>
+                                <span class="tag-badge">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
                             {% endif %}
 
                             <!-- Price & CTA -->
-                            <div class="zu-card__footer">
+                            <div class="flex items-center justify-between pt-4 border-t" style="border-color: #e2e8f0;">
                                 <div>
-                                    <span class="zu-text zu-text--xs zu-text--muted">{% trans "Starting at" %}</span>
-                                    <p class="zu-price">
-                                        ${{ service.price|intcomma }}
-                                    </p>
+                                    <p class="text-xs mb-1" style="color: #64748b; font-weight: 500;">{% trans "Starting at" %}</p>
+                                    <p class="price-tag">${{ service.price|intcomma }}</p>
                                 </div>
-                                <a href="{% url 'service_detail' service.uuid %}" class="zu-btn zu-btn--ghost zu-btn--sm">
-                                    {% trans "View" %}
+                                <a href="{% url 'services:service_detail' service.uuid %}" class="view-btn">
+                                    {% trans "View Details" %} →
                                 </a>
                             </div>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="col-span-full zu-empty-state">
-                        <svg class="zu-empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M8 15h8"></path>
-                            <path d="M9 9h.01"></path>
-                            <path d="M15 9h.01"></path>
+
+                    <!-- Empty State -->
+                    <div class="col-span-full empty-state">
+                        <svg class="empty-icon" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke-width="1.5"></circle>
+                            <path d="M8 15h8M9 9h.01M15 9h.01" stroke-width="2" stroke-linecap="round"></path>
                         </svg>
-                        <h3 class="zu-empty-state__title">{% trans "No services found" %}</h3>
-                        <p class="zu-empty-state__description">
-                            {% trans "Try adjusting your search or filter criteria." %}
+                        <h3 class="text-2xl font-bold mb-3" style="color: var(--text-white);">
+                            {% trans "No services found" %}
+                        </h3>
+                        <p class="text-lg mb-6" style="color: var(--text-gray);">
+                            {% trans "Try adjusting your search or filter criteria to find what you're looking for." %}
                         </p>
+                        <a href="{% url 'services:service_list' %}" class="search-btn inline-block">
+                            {% trans "Clear Filters" %}
+                        </a>
                     </div>
+
                     {% endfor %}
                 </div>
 
                 <!-- Pagination -->
                 {% if services.has_other_pages %}
-                <div class="mt-8">
+                <div class="mt-12">
                     {% include "components/pagination.html" with page_obj=services %}
                 </div>
                 {% endif %}
+
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Mobile Filter Panel -->
+<div id="mobile-filters" class="filter-panel lg:hidden">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold" style="color: var(--text-white);">{% trans "Filters" %}</h2>
+            <button
+                type="button"
+                onclick="document.getElementById('mobile-filters').classList.remove('open')"
+                style="color: var(--text-white);">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Categories -->
+        <div class="mb-8">
+            <h3 class="section-title">{% trans "Categories" %}</h3>
+            <div class="space-y-2">
+                <a href="{% url 'services:service_list' %}" class="filter-chip block {% if not request.GET.category %}active{% endif %}">
+                    {% trans "All Categories" %}
+                </a>
+                {% for category in categories %}
+                <a href="?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
+                   class="filter-chip block {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Mobile Price Range -->
+        <div class="mb-8">
+            <h3 class="section-title">{% trans "Price Range" %}</h3>
+            <div class="space-y-4">
+                <input type="number" name="min_price" value="{{ request.GET.min_price }}" class="price-input w-full" placeholder="{% trans 'Min Price' %}">
+                <input type="number" name="max_price" value="{{ request.GET.max_price }}" class="price-input w-full" placeholder="{% trans 'Max Price' %}">
+            </div>
+        </div>
+
+        <button
+            type="button"
+            onclick="document.getElementById('mobile-filters').classList.remove('open')"
+            class="search-btn w-full">
+            {% trans "Apply Filters" %}
+        </button>
     </div>
 </div>
 {% endblock %}
