@@ -38,27 +38,27 @@
 {% endif %}
 
 {% comment %} HERO SLIDER SECTION {% endcomment %}
-<section class="slider">
+<section class="hero-animated">
     <div class="slider_inner relative md:h-[700px] max-md:py-28 overflow-hidden">
         <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]" aria-hidden="true">
             <img src="{% static 'assets/images/slider/index.jpg' %}" alt="{% trans 'Hero background' %}" class="w-full h-full object-cover" />
-            <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+            <div class="hero-gradient-overlay"></div>
         </div>
-        <div class="container h-full">
+        <div class="container h-full relative z-10">
             <div class="slider_content flex flex-col items-start justify-center sm:pt-20 pt-16 md:w-[720px] w-full h-full">
-                <h2 class="heading1 text-white animate animate_top" style="--i: 1">{% trans "Verify. Recruit. Hire. Risk-Free." %}</h2>
-                <p class="body2 text-white mt-5 animate animate_top" style="--i: 2">{% trans "Find verified freelancers and top talent for any project. Build trust with bidirectional KYC verification." %}</p>
+                <h2 class="heading-1 text-white animate animate_top" style="--i: 1">{% trans "Verify. Recruit. Hire. Risk-Free." %}</h2>
+                <p class="body-large text-white mt-5 animate animate_top opacity-90" style="--i: 2">{% trans "Find verified freelancers and top talent for any project. Build trust with bidirectional KYC verification." %}</p>
                 {% url 'services:service_list' as job_search_url %}
                 <div class="form_search z-[1] w-full md:mt-10 mt-7 animate animate_top" style="--i: 3">
-                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white" action="{{ job_search_url|default:'#' }}" method="get">
+                    <form class="glass-card-hover flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-xl" action="{{ job_search_url|default:'#' }}" method="get">
                         <div class="form_input relative w-full">
-                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
-                            <input type="text" name="q" class="input_search w-full h-full pl-10" placeholder="{% trans 'Job title, keywords, or company' %}" />
+                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl text-gray-500"></span>
+                            <input type="text" name="q" class="input-glass w-full h-full pl-10 border-0 focus:ring-2 focus:ring-cyan-400" placeholder="{% trans 'Job title, keywords, or company' %}" />
                         </div>
-                        <div class="select_block flex-shrink-0 sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                        <div class="select_block flex-shrink-0 sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-gray-200">
                             <div class="select">
-                                <span class="selected" data-title="{% trans 'All Categories' %}">{% trans "All Categories" %}</span>
-                                <ul class="list_option bg-white">
+                                <span class="selected font-medium" data-title="{% trans 'All Categories' %}">{% trans "All Categories" %}</span>
+                                <ul class="list_option bg-white shadow-xl rounded-xl border border-gray-100">
                                     <li data-item="{% trans 'Graphic & Design' %}">{% trans "Graphic & Design" %}</li>
                                     <li data-item="{% trans 'Writing & Translation' %}">{% trans "Writing & Translation" %}</li>
                                     <li data-item="{% trans 'Video & Animation' %}">{% trans "Video & Animation" %}</li>
@@ -66,17 +66,17 @@
                                     <li data-item="{% trans 'Programming & Tech' %}">{% trans "Programming & Tech" %}</li>
                                 </ul>
                             </div>
-                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl right-0"></span>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl right-0 text-gray-500"></span>
                         </div>
-                        <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">{% trans "Search" %}</button>
+                        <button type="submit" class="btn-primary max-sm:w-1/3 text-center flex-shrink-0">{% trans "Search" %}</button>
                     </form>
                 </div>
                 <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
-                    <strong class="text-button-sm text-white">{% trans "Popular:" %}</strong>
-                    <a href="{{ job_search_url|default:'#' }}?category=graphics" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Graphics" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=web" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Website" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=logo" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Logo" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=dev" class="tag -small -border border-opacity-20 text-button-sm text-white hover:text-black hover:bg-white">{% trans "Development" %}</a>
+                    <strong class="text-button-sm text-white font-semibold">{% trans "Popular:" %}</strong>
+                    <a href="{{ job_search_url|default:'#' }}?category=graphics" class="badge-glass text-button-sm">{% trans "Graphics" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=web" class="badge-glass text-button-sm">{% trans "Website" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=logo" class="badge-glass text-button-sm">{% trans "Logo" %}</a>
+                    <a href="{{ job_search_url|default:'#' }}?category=dev" class="badge-glass text-button-sm">{% trans "Development" %}</a>
                 </div>
             </div>
         </div>
@@ -130,31 +130,32 @@
         </section>
 
 {% comment %} TOP CATEGORIES SECTION {% endcomment %}
-<section class="top_categories lg:pt-20 sm:pt-14 pt-10">
+<section class="top_categories lg:pt-20 sm:pt-14 pt-10 bg-gradient-to-b from-white to-gray-50">
     <div class="container">
         <div class="heading flex items-end justify-between flex-wrap gap-4">
             <div class="left animate animate_top" style="--i: 1">
-                <h3 class="heading3">{% trans "Top Categories" %}</h3>
-                <p class="body2 text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
+                <h3 class="heading-3">{% trans "Top Categories" %}</h3>
+                <p class="body-large text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
             </div>
-            <a href="{% url 'services:service_list' %}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
+            <a href="{% url 'services:service_list' %}" class="text-button pb-0.5 border-b-2 border-teal-600 text-teal-600 duration-300 hover:text-teal-700 hover:border-teal-700 animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
         </div>
         <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
             {% if categories %}
                 {% for category in categories %}
-                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: {{ forloop.counter }}">
-                    <div class="icon pb-4 w-fit line-before line-2px">
-                        <span class="{{ category.icon|default:'ph ph-squares-four' }} text-5xl" {% if category.color %}style="color: {{ category.color }}"{% endif %}></span>
+                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: {{ forloop.counter }}">
+                    <div class="icon pb-4 w-fit relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
+                        <span class="{{ category.icon|default:'ph ph-squares-four' }} text-5xl text-gradient-primary relative z-10" {% if category.color %}style="background: linear-gradient(135deg, {{ category.color }}, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"{% endif %}></span>
                     </div>
-                    <h6 class="heading6 mt-5">{{ category.name }}</h6>
-                    <p class="text-secondary text-sm mt-2">{{ category.description|truncatechars:80 }}</p>
+                    <h6 class="heading-6 mt-5">{{ category.name }}</h6>
+                    <p class="text-secondary text-sm mt-2 opacity-80">{{ category.description|truncatechars:80 }}</p>
                     <div class="mt-3">
-                        <span class="text-primary text-sm font-medium">{{ category.service_count }} {% trans "services" %}</span>
+                        <span class="badge-primary text-sm font-medium">{{ category.service_count }} {% trans "services" %}</span>
                     </div>
                     {% if category.subcategories.exists %}
                     <div class="list_category flex flex-col gap-2.5 mt-3">
                         {% for subcategory in category.subcategories.all|slice:":5" %}
-                        <a href="{% url 'services:service_list' %}?category={{ subcategory.id }}" class="inline-block w-fit line-before text-secondary hover:text-black">{{ subcategory.name }}</a>
+                        <a href="{% url 'services:service_list' %}?category={{ subcategory.id }}" class="inline-block w-fit text-sm text-secondary hover:text-teal-600 transition-colors duration-200 relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:bg-teal-500 before:rounded-full before:-ml-3">{{ subcategory.name }}</a>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -162,33 +163,37 @@
                 {% endfor %}
             {% else %}
                 {% comment %} Fallback static categories when database is empty {% endcomment %}
-                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 1">
-                    <div class="icon pb-4 w-fit line-before line-2px">
-                        <span class="ph ph-paint-brush text-5xl text-primary"></span>
+                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 1">
+                    <div class="icon pb-4 w-fit relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
+                        <span class="ph ph-paint-brush text-5xl text-gradient-primary relative z-10"></span>
                     </div>
-                    <h6 class="heading6 mt-5">{% trans "Graphic & Design" %}</h6>
-                    <p class="text-secondary text-sm mt-2">{% trans "Logo design, branding, illustrations and more" %}</p>
+                    <h6 class="heading-6 mt-5">{% trans "Graphic & Design" %}</h6>
+                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Logo design, branding, illustrations and more" %}</p>
                 </div>
-                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 2">
-                    <div class="icon pb-4 w-fit line-before line-2px">
-                        <span class="ph ph-code text-5xl text-primary"></span>
+                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 2">
+                    <div class="icon pb-4 w-fit relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
+                        <span class="ph ph-code text-5xl text-gradient-primary relative z-10"></span>
                     </div>
-                    <h6 class="heading6 mt-5">{% trans "Development" %}</h6>
-                    <p class="text-secondary text-sm mt-2">{% trans "Web, mobile, and software development" %}</p>
+                    <h6 class="heading-6 mt-5">{% trans "Development" %}</h6>
+                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Web, mobile, and software development" %}</p>
                 </div>
-                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 3">
-                    <div class="icon pb-4 w-fit line-before line-2px">
-                        <span class="ph ph-megaphone text-5xl text-primary"></span>
+                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 3">
+                    <div class="icon pb-4 w-fit relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
+                        <span class="ph ph-megaphone text-5xl text-gradient-primary relative z-10"></span>
                     </div>
-                    <h6 class="heading6 mt-5">{% trans "Digital Marketing" %}</h6>
-                    <p class="text-secondary text-sm mt-2">{% trans "SEO, social media, and advertising" %}</p>
+                    <h6 class="heading-6 mt-5">{% trans "Digital Marketing" %}</h6>
+                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "SEO, social media, and advertising" %}</p>
                 </div>
-                <div class="category_item p-7.5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: 4">
-                    <div class="icon pb-4 w-fit line-before line-2px">
-                        <span class="ph ph-pencil-line text-5xl text-primary"></span>
+                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 4">
+                    <div class="icon pb-4 w-fit relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
+                        <span class="ph ph-pencil-line text-5xl text-gradient-primary relative z-10"></span>
                     </div>
-                    <h6 class="heading6 mt-5">{% trans "Writing & Translation" %}</h6>
-                    <p class="text-secondary text-sm mt-2">{% trans "Content writing, copywriting, and translation" %}</p>
+                    <h6 class="heading-6 mt-5">{% trans "Writing & Translation" %}</h6>
+                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Content writing, copywriting, and translation" %}</p>
                 </div>
             {% endif %}
         </div>
@@ -196,60 +201,59 @@
 </section>
 
 {% comment %} FEATURED SERVICES SECTION - DYNAMIC DATA {% endcomment %}
-<section class="feature_services lg:py-20 sm:py-14 py-10">
+<section class="feature_services lg:py-20 sm:py-14 py-10 bg-white">
     <div class="container">
         <div class="heading flex flex-col items-center">
-            <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Featured Services" %}</h3>
-            <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover our featured services from verified providers" %}</p>
+            <h3 class="heading-3 text-center animate animate_top" style="--i: 1">{% trans "Featured Services" %}</h3>
+            <p class="body-large text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover our featured services from verified providers" %}</p>
         </div>
 
         {% if featured_services %}
             {# Dynamic Services from Database #}
             <ul class="list grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
                 {% for service in featured_services %}
-                <li class="item animate animate_top" style="--i: {{ forloop.counter }}">
-                    <div class="service_item overflow-hidden relative rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
-                        <button class="add_wishlist_btn">
-                            <span class="ph ph-heart text-xl"></span>
-                            <span class="ph-fill ph-heart text-xl"></span>
+                <li class="item animate animate_top" style="--i: {{ forloop.counter }}; animation-delay: {{ forloop.counter|add:'0' }}00ms;">
+                    <div class="service-card-hover overflow-hidden relative rounded-20 bg-white shadow-lg duration-300 hover:shadow-2xl hover:scale-105">
+                        <button class="add_wishlist_btn absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white transition-all duration-200">
+                            <span class="ph ph-heart text-xl text-gray-600 hover:text-red-500"></span>
                             <span class="blind">button add to wishlist</span>
                         </button>
                         {% url 'services:service_detail' service.uuid as service_url %}
-                        <a href="{{ service_url|default:'#' }}" class="service_thumb">
+                        <a href="{{ service_url|default:'#' }}" class="service_thumb block overflow-hidden">
                             {% if service.avatar %}
-                            <img src="{{ service.avatar.url }}" alt="{{ service.name }}" class="w-full h-48 object-cover" />
+                            <img src="{{ service.avatar.url }}" alt="{{ service.name }}" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" />
                             {% else %}
-                            <img src="{% static 'assets/images/service/placeholder.webp' %}" alt="{{ service.name }}" class="w-full h-48 object-cover" onerror="this.src='{% static 'assets/images/service/1.webp' %}';" />
+                            <img src="{% static 'assets/images/service/placeholder.webp' %}" alt="{{ service.name }}" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" onerror="this.src='{% static 'assets/images/service/1.webp' %}';" />
                             {% endif %}
                         </a>
                         <div class="service_info py-5 px-4">
                             <div class="flex items-center justify-between">
                                 {% if service.category_name %}
-                                <a href="{% url 'services:service_list' %}?category={{ service.category_slug }}" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category_name }}</a>
+                                <a href="{% url 'services:service_list' %}?category={{ service.category_slug }}" class="badge-secondary text-xs">{{ service.category_name }}</a>
                                 {% else %}
-                                <span class="tag caption2 bg-surface">{% trans "Service" %}</span>
+                                <span class="badge-secondary text-xs">{% trans "Service" %}</span>
                                 {% endif %}
-                                <div class="rate flex items-center gap-1">
-                                    <span class="ph-fill ph-star text-yellow text-xs"></span>
-                                    <strong class="service_rate text-button-sm">{{ service.rating_avg|default:0.0|floatformat:1 }}</strong>
-                                    <span class="service_rate_quantity caption1 text-secondary">({{ service.total_reviews|default:0 }})</span>
+                                <div class="rating-display text-sm">
+                                    <span class="ph-fill ph-star text-amber-400"></span>
+                                    <strong class="font-semibold">{{ service.rating_avg|default:0.0|floatformat:1 }}</strong>
+                                    <span class="text-gray-500">({{ service.total_reviews|default:0 }})</span>
                                 </div>
                             </div>
-                            <a href="{{ service_url|default:'#' }}" class="service_title text-title pt-2 duration-300 hover:text-primary line-clamp-2">{{ service.name|truncatewords:10 }}</a>
-                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
-                                <a href="#" class="service_author flex items-center gap-2">
+                            <a href="{{ service_url|default:'#' }}" class="service_title block text-lg font-semibold pt-2 duration-300 hover:text-teal-600 line-clamp-2">{{ service.name|truncatewords:10 }}</a>
+                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-gray-100">
+                                <a href="#" class="service_author flex items-center gap-2 group">
                                     {% if service.provider_avatar %}
-                                    <img src="{{ service.provider_avatar }}" alt="{{ service.provider_name }}" class="service_author_avatar w-8 h-8 rounded-full object-cover" />
+                                    <img src="{{ service.provider_avatar }}" alt="{{ service.provider_name }}" class="avatar-sm" />
                                     {% else %}
-                                    <div class="service_author_avatar w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <span class="text-primary text-sm font-bold">{{ service.provider_name|slice:":1"|upper }}</span>
+                                    <div class="avatar-gradient-sm">
+                                        <span class="text-sm font-bold">{{ service.provider_name|slice:":1"|upper }}</span>
                                     </div>
                                     {% endif %}
-                                    <span class="service_author_name -style-1">{{ service.provider_name|truncatewords:2 }}</span>
+                                    <span class="text-sm text-gray-600 group-hover:text-teal-600 transition-colors">{{ service.provider_name|truncatewords:2 }}</span>
                                 </a>
-                                <div class="service_price whitespace-nowrap">
-                                    <span class="text-secondary">{% trans "From" %} </span>
-                                    <span class="price text-title">${{ service.price|default:0|floatformat:0 }}</span>
+                                <div class="price-display-secondary">
+                                    <span class="text-gray-500 text-xs">{% trans "From" %}</span>
+                                    <span class="price-gradient-text font-bold">${{ service.price|default:0|floatformat:0 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -260,39 +264,43 @@
 
             {# View All Services Button #}
             <div class="flex items-center justify-center md:mt-10 mt-7">
-                <a href="{% url 'services:service_list' %}" class="button-main">{% trans "View All Services" %}</a>
+                <a href="{% url 'services:service_list' %}" class="btn-primary">{% trans "View All Services" %}</a>
             </div>
         {% else %}
             {# Empty State - No Services Available #}
-            <div class="text-center py-16">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-surface mb-6">
-                    <span class="ph ph-briefcase text-5xl text-secondary"></span>
+            <div class="empty-state text-center py-16">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-50 to-cyan-50 mb-6">
+                    <span class="ph ph-briefcase text-5xl text-gradient-primary"></span>
                 </div>
-                <h4 class="heading5 text-secondary">{% trans "No Featured Services Yet" %}</h4>
-                <p class="body2 text-secondary mt-3 max-w-md mx-auto">{% trans "Services will appear here once providers start offering them. Be the first to join our marketplace!" %}</p>
+                <h4 class="heading-5 text-secondary">{% trans "No Featured Services Yet" %}</h4>
+                <p class="body-large text-secondary mt-3 max-w-md mx-auto opacity-80">{% trans "Services will appear here once providers start offering them. Be the first to join our marketplace!" %}</p>
                 <div class="flex items-center justify-center gap-4 mt-8">
-                    <a href="{% url 'become_seller' %}" class="button-main">{% trans "Become a Service Provider" %}</a>
-                    <a href="{% url 'services:service_list' %}" class="button-main -outline">{% trans "Browse All Services" %}</a>
+                    <a href="{% url 'become_seller' %}" class="btn-primary">{% trans "Become a Service Provider" %}</a>
+                    <a href="{% url 'services:service_list' %}" class="btn-secondary">{% trans "Browse All Services" %}</a>
                 </div>
             </div>
         {% endif %}
     </div>
 </section>
 {% comment %} CTA BANNER SECTION {% endcomment %}
-<section class="banner lg:pb-20 sm:pb-14 pb-10">
+<section class="banner lg:pb-20 sm:pb-14 pb-10 bg-gradient-to-b from-white to-gray-50">
     <div class="container">
-        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl animate animateZoomOutUp" style="--i: 5">
+        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-3xl animate animateZoomOutUp shadow-2xl" style="--i: 5">
             <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                <div style="background-color: #000000; opacity: 0.3; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+                <div class="hero-gradient-overlay opacity-80"></div>
                 <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Join our community' %}" class="w-full h-full object-cover" />
             </div>
-            <div class="banner_content">
-                <h4 class="heading4 text-white animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
-                <p class="desc mt-2 text-white animate animate_top" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
+            <div class="banner_content relative z-10">
+                <h4 class="heading-4 text-white animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
+                <p class="body-large mt-4 text-white opacity-95 animate animate_top max-w-2xl" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
                 <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'become_seller' %}" class="button-main bg-white">{% trans "Become A Seller" %}</a>
+                    <a href="{% url 'become_seller' %}" class="btn-primary bg-white text-gray-900 hover:bg-gray-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">{% trans "Become A Seller" %}</a>
                 </div>
             </div>
+
+            {# Decorative gradient orbs #}
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-cyan-400 rounded-full opacity-20 blur-3xl"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-teal-400 rounded-full opacity-20 blur-3xl"></div>
         </div>
     </div>
 </section>
