@@ -328,16 +328,13 @@ run_migrations() {
 
     log_info "Running Django migrations (django-tenants)..."
 
-    # Step 0: Create migration files if any models changed
-    log_info "Step 0/4: Creating migration files (makemigrations)..."
-    if python manage.py makemigrations --noinput; then
-        log_info "Migration files created/verified successfully!"
-    else
-        log_warn "makemigrations had warnings (non-fatal, continuing...)"
-    fi
+    # Step 0: Create migration files if any models changed (SKIP - migrations should be in Git)
+    # Note: makemigrations should be run during development, not in production
+    # Running it here causes permission errors for third-party packages like admin_honeypot
+    log_info "Step 0/3: Skipping makemigrations (migrations should be in Git repository)"
 
     # Step 1: Run migrations for SHARED_APPS on the public schema
-    log_info "Step 1/4: Migrating shared schema (public)..."
+    log_info "Step 1/3: Migrating shared schema (public)..."
     if python manage.py migrate_schemas --shared --noinput; then
         log_info "Shared schema migrations completed successfully!"
     else
@@ -346,7 +343,7 @@ run_migrations() {
     fi
 
     # Step 2: Run migrations for TENANT_APPS on all tenant schemas
-    log_info "Step 2/4: Migrating tenant schemas..."
+    log_info "Step 2/3: Migrating tenant schemas..."
     if python manage.py migrate_schemas --tenant --noinput; then
         log_info "Tenant schema migrations completed successfully!"
     else
@@ -355,7 +352,7 @@ run_migrations() {
     fi
 
     # Step 3: Verify critical imports and files
-    log_info "Step 3/4: Verifying critical imports..."
+    log_info "Step 3/3: Verifying critical imports..."
     if python scripts/verify_imports.py; then
         log_info "Import verification passed!"
     else
