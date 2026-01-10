@@ -147,7 +147,7 @@ urlpatterns += i18n_patterns(
     path('auth-test/', auth_test_view, name='auth_test'),
 
     # Services Marketplace (included with namespace for template compatibility)
-    path('services/', include('services.urls', namespace='services'))
+    path('services/', include('services.urls', namespace='services')),
 
     # Blog (Wagtail CMS)
     path('blog/', include('blog.urls')),
