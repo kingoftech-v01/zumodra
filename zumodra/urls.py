@@ -193,9 +193,6 @@ urlpatterns = [
 
     # Legacy API (for backwards compatibility)
     path('api/legacy/', include('api.urls')),
-
-    # Public Career Pages (no auth required, outside i18n)
-    path('careers/', include('careers.urls', namespace='careers')),
 ]
 
 # Import and add public verification view
