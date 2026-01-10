@@ -25,7 +25,7 @@
                             <input type="text"
                                    name="search"
                                    value="{{ search }}"
-                                   hx-get="{% url 'browse_services' %}"
+                                   hx-get="{% url 'services:service_list' %}"
                                    hx-trigger="keyup changed delay:500ms"
                                    hx-target="#services-grid"
                                    hx-swap="innerHTML"
@@ -62,13 +62,13 @@
                         </div>
                         <div class="zu-card__body">
                             <div class="space-y-3">
-                                <a href="{% url 'browse_services' %}"
+                                <a href="{% url 'services:service_list' %}"
                                    class="zu-link {% if not request.GET.category %}zu-link--active{% endif %}">
                                     {% trans "All Categories" %}
                                 </a>
                                 {% for category in categories %}
                                 <a href="?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-get="{% url 'browse_services' %}?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
+                                   hx-get="{% url 'services:service_list' %}?category={{ category.id }}{% if search %}&search={{ search }}{% endif %}"
                                    hx-target="#services-grid"
                                    hx-swap="innerHTML"
                                    class="zu-link {% if request.GET.category == category.id|stringformat:'s' %}zu-link--active{% endif %}">
@@ -91,7 +91,7 @@
                                     <input type="number"
                                            name="min_price"
                                            value="{{ request.GET.min_price }}"
-                                           hx-get="{% url 'browse_services' %}"
+                                           hx-get="{% url 'services:service_list' %}"
                                            hx-trigger="change"
                                            hx-target="#services-grid"
                                            hx-swap="innerHTML"
@@ -104,7 +104,7 @@
                                     <input type="number"
                                            name="max_price"
                                            value="{{ request.GET.max_price }}"
-                                           hx-get="{% url 'browse_services' %}"
+                                           hx-get="{% url 'services:service_list' %}"
                                            hx-trigger="change"
                                            hx-target="#services-grid"
                                            hx-swap="innerHTML"
@@ -125,7 +125,7 @@
                             <div class="flex flex-wrap gap-2">
                                 {% for tag in popular_tags %}
                                 <a href="?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
-                                   hx-get="{% url 'browse_services' %}?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
+                                   hx-get="{% url 'services:service_list' %}?tag={{ tag.name }}{% if search %}&search={{ search }}{% endif %}"
                                    hx-target="#services-grid"
                                    hx-swap="innerHTML"
                                    class="zu-badge {% if request.GET.tag == tag.name %}zu-badge--primary{% else %}zu-badge--muted{% endif %}">
@@ -149,7 +149,7 @@
                     </p>
                     <div class="flex items-center gap-4">
                         <select name="sort"
-                                hx-get="{% url 'browse_services' %}"
+                                hx-get="{% url 'services:service_list' %}"
                                 hx-trigger="change"
                                 hx-target="#services-grid"
                                 hx-swap="innerHTML"
