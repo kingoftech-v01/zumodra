@@ -259,16 +259,16 @@ urlpatterns += i18n_patterns(
     # Legacy standalone routes (redirects to frontend namespace)
     # Note: Dashboard, appointment, messages are now served via core.urls_frontend
     # Keep these only if you need backward-compatible URLs
-    path('app/messages/', include('messages_sys.urls')),        # Messages (standalone)
+    path('app/messages/', include('messages_sys.urls', namespace='messages_sys')),  # Messages (standalone)
 
     # Services Marketplace (tenant-specific)
-    path('services/', include('services.urls')),                # Services marketplace
+    path('services/', include('services.urls', namespace='services')),  # Services marketplace
 
     # Notifications (web views)
-    path('notifications/', include('notifications.urls')),      # In-app notifications
+    path('notifications/', include('notifications.urls', namespace='notifications')),  # In-app notifications
 
     # Analytics (web views)
-    path('analytics/', include('analytics.urls')),              # Analytics dashboards
+    path('analytics/', include('analytics.urls', namespace='analytics')),  # Analytics dashboards
 
     # Finance (payments, subscriptions, invoices)
     path('finance/', include('finance.urls', namespace='finance')),
@@ -289,7 +289,7 @@ urlpatterns += i18n_patterns(
     path('documents/', include(wagtaildocs_urls)),
 
     # Blog search (auxiliary)
-    path('blog/', include('blog.urls')),
+    path('blog/', include('blog.urls', namespace='blog')),
 
     # Development/testing
     path('auth-test/', auth_test_view, name='auth_test'),
