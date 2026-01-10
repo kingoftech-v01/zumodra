@@ -357,6 +357,7 @@ class Command(BaseCommand):
             user, created = User.objects.get_or_create(
                 email=config['email'],
                 defaults={
+                    'username': config['email'].split('@')[0],  # Generate username from email
                     'first_name': config['first_name'],
                     'last_name': config['last_name'],
                     'is_active': True,
