@@ -27,6 +27,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView
 
 from tenants.mixins import TenantViewMixin
+from tenants.decorators import require_tenant_type
 
 from .models import (
     JobPosting, JobCategory, Pipeline, PipelineStage,
@@ -111,10 +112,10 @@ class ATSPermissionMixin:
 # =============================================================================
 # JOB VIEWS
 # =============================================================================
-
+@require_tenant_type('company')
 class JobListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     """
-    Job listings with HTMX pagination and filtering.
+    Job listings with HTMX pagination and filtering - COMPANY ONLY.
 
     Displays all job postings with status filters, search, and quick actions.
     """
@@ -203,10 +204,10 @@ class JobListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
 
         return response
 
-
+@require_tenant_type('company')
 class JobDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     """
-    Job detail page with applicants list.
+    Job detail page with applicants list - COMPANY ONLY.
 
     Shows job details, requirements, and list of applicants.
     """
@@ -265,9 +266,9 @@ class JobDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
 
         return context
 
-
+@require_tenant_type('company')
 class JobCreateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, CreateView):
-    """Create a new job posting."""
+    """Create a new job posting - COMPANY ONLY."""
     model = JobPosting
     template_name = 'ats/job_form.html'
     fields = [
@@ -306,10 +307,10 @@ class JobCreateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, Cre
 # =============================================================================
 # CANDIDATE VIEWS
 # =============================================================================
-
+@require_tenant_type('company')
 class CandidateListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     """
-    Candidate directory with search and filtering.
+    Candidate directory with search and filtering - COMPANY ONLY.
 
     Displays all candidates in the talent pool with filters and bulk actions.
     """
@@ -386,9 +387,10 @@ class CandidateListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView
         return context
 
 
+@require_tenant_type('company')
 class CandidateDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     """
-    Candidate profile page with timeline.
+    Candidate profile page with timeline - COMPANY ONLY.
 
     Shows candidate details, resume, application history, and activity timeline.
     """
@@ -460,9 +462,10 @@ class CandidateDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, Detail
 # PIPELINE VIEWS
 # =============================================================================
 
+@require_tenant_type('company')
 class PipelineBoardView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView):
     """
-    Kanban pipeline board view.
+    Kanban pipeline board view - COMPANY ONLY.
 
     Displays applications organized by pipeline stages.
     Supports drag-and-drop with HTMX.
@@ -529,9 +532,10 @@ class PipelineBoardView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, Template
         return context
 
 
+@require_tenant_type('company')
 class ApplicationMoveView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    HTMX endpoint for moving application between pipeline stages.
+    HTMX endpoint for moving application between pipeline stages - COMPANY ONLY.
 
     Called when dragging a candidate card to a new column.
     """
@@ -587,9 +591,10 @@ class ApplicationMoveView(LoginRequiredMixin, TenantViewMixin, View):
         return response
 
 
+@require_tenant_type('company')
 class ApplicationBulkActionView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Handle bulk actions on applications.
+    Handle bulk actions on applications - COMPANY ONLY.
 
     Supports: bulk reject, bulk move stage, bulk archive.
     """
@@ -669,10 +674,10 @@ class ApplicationBulkActionView(LoginRequiredMixin, TenantViewMixin, View):
 # =============================================================================
 # INTERVIEW VIEWS
 # =============================================================================
-
+@require_tenant_type('company')
 class InterviewScheduleView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Interview scheduling modal/view.
+    Interview scheduling modal/view - COMPANY ONLY.
 
     Handles both the form display and scheduling submission.
     """
@@ -790,9 +795,10 @@ class InterviewScheduleView(LoginRequiredMixin, TenantViewMixin, View):
         return redirect('ats:application-detail', pk=application.pk)
 
 
+@require_tenant_type('company')
 class InterviewFeedbackView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Submit interview feedback.
+    Submit interview feedback - COMPANY ONLY.
     """
     template_name = 'ats/interview_feedback.html'
 
@@ -861,9 +867,10 @@ class InterviewFeedbackView(LoginRequiredMixin, TenantViewMixin, View):
 # APPLICATION VIEWS
 # =============================================================================
 
+@require_tenant_type('company')
 class ApplicationDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     """
-    Application detail view with full timeline and actions.
+    Application detail view with full timeline and actions - COMPANY ONLY.
     """
     model = Application
     template_name = 'ats/application_detail.html'
@@ -939,9 +946,10 @@ class ApplicationDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, Deta
         return context
 
 
+@require_tenant_type('company')
 class ApplicationNoteView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Add a note to an application.
+    Add a note to an application - COMPANY ONLY.
     """
 
     def post(self, request, application_pk):
@@ -974,9 +982,10 @@ class ApplicationNoteView(LoginRequiredMixin, TenantViewMixin, View):
 # OFFER VIEWS (Step 5 - End-to-End Hiring)
 # =============================================================================
 
+@require_tenant_type('company')
 class OfferListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     """
-    List all offers with filtering.
+    List all offers with filtering - COMPANY ONLY.
     """
     model = Offer
     template_name = 'ats/offer_list.html'
@@ -1012,9 +1021,10 @@ class OfferListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
         return context
 
 
+@require_tenant_type('company')
 class OfferDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     """
-    View offer details.
+    View offer details - COMPANY ONLY.
     """
     model = Offer
     template_name = 'ats/offer_detail.html'
@@ -1033,9 +1043,10 @@ class OfferDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView
         )
 
 
+@require_tenant_type('company')
 class OfferCreateView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Create a new offer for an application.
+    Create a new offer for an application - COMPANY ONLY.
     """
     template_name = 'ats/offer_form.html'
 
@@ -1143,9 +1154,10 @@ class OfferCreateView(LoginRequiredMixin, TenantViewMixin, View):
         return redirect('ats:offer-detail', pk=offer.pk)
 
 
+@require_tenant_type('company')
 class OfferActionView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Perform actions on offers (send, accept, decline, withdraw).
+    Perform actions on offers (send, accept, decline, withdraw) - COMPANY ONLY.
     """
 
     def post(self, request, pk, action):
@@ -1256,10 +1268,10 @@ class OfferActionView(LoginRequiredMixin, TenantViewMixin, View):
 
         return True, 'Offer withdrawn'
 
-
+@require_tenant_type('company')
 class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Publish a draft job posting.
+    Publish a draft job posting - COMPANY ONLY.
     """
 
     def post(self, request, pk):
@@ -1284,10 +1296,10 @@ class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
 
         return redirect('ats:job-detail', pk=pk)
 
-
+@require_tenant_type('company')
 class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Close an open job posting.
+    Close an open job posting - COMPANY ONLY.
     """
 
     def post(self, request, pk):

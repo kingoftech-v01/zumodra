@@ -653,3 +653,26 @@ class StripeBillingPortalSerializer(serializers.Serializer):
     """
 
     return_url = serializers.URLField()
+
+
+# ==================== VERIFICATION SERIALIZERS ====================
+
+class EINVerificationSerializer(serializers.Serializer):
+    """
+    Serializer for EIN/business number verification.
+    Validates EIN format (US: XX-XXXXXXX).
+    """
+    ein_number = serializers.CharField(max_length=50)
+
+    def validate_ein_number(self, value):
+        """Validate EIN format (US format)."""
+        import re
+
+        # US EIN format: XX-XXXXXXX
+        us_ein_pattern = r'^\d{2}-\d{7}$'
+        if not re.match(us_ein_pattern, value):
+            raise serializers.ValidationError(
+                _("Invalid EIN format. Expected format: XX-XXXXXXX (e.g., 12-3456789)")
+            )
+
+        return value

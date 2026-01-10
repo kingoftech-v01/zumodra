@@ -141,6 +141,7 @@ class ServiceProviderDetailSerializer(TenantAwareSerializer):
     provider_skills = ProviderSkillSerializer(many=True, read_only=True)
     full_address = serializers.CharField(read_only=True)
     coordinates = serializers.SerializerMethodField()
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
 
     class Meta:
         model = ServiceProvider
@@ -157,7 +158,7 @@ class ServiceProviderDetailSerializer(TenantAwareSerializer):
             'is_private', 'is_accepting_projects',
             'can_work_remotely', 'can_work_onsite',
             'stripe_onboarding_complete', 'stripe_payouts_enabled',
-            'last_active_at', 'created_at', 'updated_at'
+            'last_active_at', 'created_at', 'updated_at', 'tenant_type'
         ]
         read_only_fields = [
             'uuid', 'rating_avg', 'total_reviews', 'completed_jobs_count',
@@ -219,6 +220,8 @@ class ServiceDetailSerializer(TenantAwareSerializer):
     category = ServiceCategorySerializer(read_only=True)
     tags = ServiceTagSerializer(many=True, read_only=True)
     images = ServiceImageSerializer(many=True, read_only=True)
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
+    provider_tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = Service
@@ -229,7 +232,7 @@ class ServiceDetailSerializer(TenantAwareSerializer):
             'delivery_type', 'duration_days', 'revisions_included',
             'thumbnail', 'images', 'video_url', 'tags',
             'is_active', 'is_featured', 'view_count', 'order_count',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'tenant_type', 'provider_tenant_type'
         ]
         read_only_fields = [
             'uuid', 'slug', 'view_count', 'order_count',
@@ -401,6 +404,7 @@ class ServiceProposalDetailSerializer(TenantAwareSerializer):
     """Full proposal serializer."""
     provider = ServiceProviderListSerializer(read_only=True)
     client_request = ClientRequestListSerializer(read_only=True)
+    tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = ServiceProposal
@@ -408,7 +412,7 @@ class ServiceProposalDetailSerializer(TenantAwareSerializer):
             'id', 'uuid', 'client_request', 'provider',
             'proposed_rate', 'rate_type', 'estimated_hours',
             'cover_letter', 'proposed_timeline_days', 'attachments',
-            'status', 'created_at', 'updated_at'
+            'status', 'created_at', 'updated_at', 'tenant_type'
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']
 
@@ -459,6 +463,8 @@ class ServiceContractDetailSerializer(TenantAwareSerializer):
     provider_payout_amount = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
     )
+    client_tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
+    provider_tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = ServiceContract
@@ -471,7 +477,7 @@ class ServiceContractDetailSerializer(TenantAwareSerializer):
             'escrow_transaction', 'platform_fee_percent', 'provider_payout_amount',
             'status', 'started_at', 'delivered_at', 'completed_at',
             'cancelled_at', 'cancellation_reason',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'client_tenant_type', 'provider_tenant_type'
         ]
         read_only_fields = [
             'uuid', 'escrow_transaction', 'revisions_used',

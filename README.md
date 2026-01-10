@@ -190,6 +190,35 @@ celery -A zumodra beat --loglevel=info
 
 > See [docs/SECURITY.md](docs/SECURITY.md) for the complete security policy including CSP configuration.
 
+### Tenant Type System
+
+Zumodra supports two distinct tenant types with different capabilities:
+
+| Feature                  | COMPANY                | FREELANCER                   |
+|--------------------------|------------------------|------------------------------|
+| Create jobs (ATS)        | ✅ Yes                 | ❌ No                        |
+| Create services          | ✅ Yes                 | ✅ Yes                       |
+| Have employees (HR)      | ✅ Yes                 | ❌ No (single-user only)     |
+| Career page              | ✅ Yes                 | ❌ No                        |
+| Publish to marketplace   | ✅ Yes                 | ✅ Yes                       |
+| Switch tenant type       | ✅ Yes (if ≤1 member)  | ✅ Yes (always)              |
+
+**Key Concepts:**
+
+- **Freelancers are tenants** (not user states) - single-user organizations that provide services
+- **Tenants can switch types**: Company ↔ Freelancer
+- **Hiring contexts**: Users can hire services PERSONALLY or ON BEHALF of their tenant
+- **Verification levels**:
+  - User: CV verification + KYC verification (global, not tenant-specific)
+  - Tenant: EIN/business number verification (via API)
+
+**Documentation:**
+
+- [Tenant Type API Reference](docs/api/tenant_types.md) - Complete API guide
+- [Verification System](docs/verification.md) - CV/KYC/EIN verification workflows
+- [UI Components](docs/components.md) - 8 reusable components for tenant types
+- [Multi-Tenancy Logic](SAAS_MULTI_TENANCY_LOGIC.md) - Complete architecture documentation
+
 ---
 
 ## Technology Stack

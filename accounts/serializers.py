@@ -1144,3 +1144,72 @@ class CoopTermSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         from .models import CoopTerm
         self.Meta.model = CoopTerm
+
+
+# ==================== VERIFICATION SERIALIZERS ====================
+
+class KYCVerificationSerializer(serializers.Serializer):
+    """
+    Serializer for KYC document submission.
+    Supports passport, driver's license, and national ID.
+    """
+    document_type = serializers.ChoiceField(choices=[
+        ('passport', _('Passport')),
+        ('drivers_license', _("Driver's License")),
+        ('national_id', _('National ID')),
+    ])
+    document_file = serializers.FileField()
+    document_number = serializers.CharField(max_length=50)
+
+    def validate_document_file(self, value):
+        """Validate file size and type."""
+        # Max 5MB
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError(_("File size exceeds 5MB limit."))
+
+        # Allowed types
+        allowed_types = ['application/pdf', 'image/jpeg', 'image/png']
+        if value.content_type not in allowed_types:
+            raise serializers.ValidationError(_("Unsupported file type. Use PDF, JPEG, or PNG."))
+
+        return value
+
+
+class CVVerificationSerializer(serializers.Serializer):
+    """
+    Serializer for CV upload and verification.
+    Supports PDF, DOC, and DOCX formats.
+    """
+    cv_file = serializers.FileField()
+
+    def validate_cv_file(self, value):
+        """Validate CV file."""
+        # Max 5MB
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError(_("File size exceeds 5MB limit."))
+
+        # Allowed types
+        allowed_types = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ]
+        if value.content_type not in allowed_types:
+            raise serializers.ValidationError(_("Unsupported file type. Use PDF, DOC, or DOCX."))
+
+        return value
+
+
+class VerificationStatusSerializer(serializers.Serializer):
+    """
+    Serializer for verification status display.
+    Shows user CV/KYC verification and tenant EIN verification (if applicable).
+    """
+    cv_verified = serializers.BooleanField()
+    cv_verified_at = serializers.DateTimeField(allow_null=True)
+    kyc_verified = serializers.BooleanField()
+    kyc_verified_at = serializers.DateTimeField(allow_null=True)
+
+    # Optional tenant verification (if user has tenant)
+    ein_verified = serializers.BooleanField(required=False)
+    ein_verified_at = serializers.DateTimeField(allow_null=True, required=False)

@@ -1615,3 +1615,122 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
         terms = CoopTerm.objects.filter(student=profile).order_by('term_number')
         serializer = CoopTermSerializer(terms, many=True)
         return Response(serializer.data)
+
+
+# ==================== VERIFICATION API ENDPOINTS ====================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_kyc_verification(request):
+    """
+    Submit KYC documents for verification.
+
+    POST /api/verify/kyc/
+
+    Request body:
+    - document_type: passport, drivers_license, or national_id
+    - document_file: File upload (PDF, JPEG, PNG, max 5MB)
+    - document_number: Document number
+    """
+    from .serializers import KYCVerificationSerializer
+
+    serializer = KYCVerificationSerializer(data=request.data)
+
+    if serializer.is_valid():
+        document_file = serializer.validated_data['document_file']
+        document_type = serializer.validated_data['document_type']
+        document_number = serializer.validated_data['document_number']
+
+        # TODO: Save to KYCDocument model (implement when model is created)
+        # For now, just acknowledge submission
+
+        return Response({
+            'status': 'submitted',
+            'message': _('KYC documents submitted for review.'),
+            'document_type': document_type,
+        }, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_cv_verification(request):
+    """
+    Submit CV for verification.
+
+    POST /api/verify/cv/
+
+    Request body:
+    - cv_file: File upload (PDF, DOC, DOCX, max 5MB)
+    """
+    from .serializers import CVVerificationSerializer
+
+    serializer = CVVerificationSerializer(data=request.data)
+
+    if serializer.is_valid():
+        cv_file = serializer.validated_data['cv_file']
+
+        # TODO: Save to UserCV model (implement when model is created)
+        # For now, just acknowledge submission
+
+        return Response({
+            'status': 'submitted',
+            'message': _('CV submitted for verification.'),
+        }, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_verification_status(request):
+    """
+    Get user's verification status.
+
+    GET /api/verify/status/
+
+    Returns:
+    - cv_verified: boolean
+    - cv_verified_at: datetime or null
+    - kyc_verified: boolean
+    - kyc_verified_at: datetime or null
+    - ein_verified: boolean (if user has tenant)
+    - ein_verified_at: datetime or null (if user has tenant)
+    """
+    from .serializers import VerificationStatusSerializer
+
+    user = request.user
+
+    data = {
+        'cv_verified': user.cv_verified,
+        'cv_verified_at': user.cv_verified_at,
+        'kyc_verified': user.kyc_verified,
+        'kyc_verified_at': user.kyc_verified_at,
+    }
+
+    # Include tenant verification if user has tenant
+    if hasattr(request, 'tenant') and request.tenant:
+        data['ein_verified'] = request.tenant.ein_verified
+        data['ein_verified_at'] = request.tenant.ein_verified_at
+
+    serializer = VerificationStatusSerializer(data)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_submitted_documents(request):
+    """
+    Get list of submitted verification documents.
+
+    GET /api/verify/documents/
+
+    Returns list of KYC documents and CV documents.
+    """
+    # TODO: Implement when KYCDocument and UserCV models are created
+    return Response({
+        'kyc_documents': [],
+        'cv_documents': [],
+        'message': _('Document listing feature will be available soon.')
+    })

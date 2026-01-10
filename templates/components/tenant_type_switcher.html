@@ -1,0 +1,72 @@
+{% load i18n %}
+<!-- Tenant Type Switcher Component -->
+<div class="tenant-type-switcher card p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Organization Type" %}</h3>
+
+    <div class="current-type mb-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                     {% if tenant.tenant_type == 'company' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200{% else %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% endif %}">
+            {% if tenant.tenant_type == 'company' %}
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Company" %}
+            {% else %}
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Freelancer" %}
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="switch-actions">
+        {% if tenant.tenant_type == 'company' %}
+            <!-- Switch to Freelancer -->
+            {% with active_members=tenant.members.filter(is_active=True).count %}
+            {% if active_members <= 1 %}
+                <button
+                    hx-post="{% url 'tenants:switch_type' %}"
+                    hx-vals='{"type": "freelancer"}'
+                    hx-confirm="{% trans 'Are you sure you want to switch to freelancer? This will restrict you to services only.' %}"
+                    class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                    {% trans "Switch to Freelancer" %}
+                </button>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "As a freelancer, you cannot create jobs or have employees." %}
+                </p>
+            {% else %}
+                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="ml-3 text-sm text-yellow-700 dark:text-yellow-200">
+                            {% trans "Cannot switch to freelancer with multiple members. Remove all but 1 member first." %}
+                            <span class="font-medium">({{ active_members }} {% trans "members" %})</span>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+            {% endwith %}
+        {% else %}
+            <!-- Switch to Company -->
+            <button
+                hx-post="{% url 'tenants:switch_type' %}"
+                hx-vals='{"type": "company"}'
+                hx-confirm="{% trans 'Switch to Company? You will be able to create jobs, hire employees, and have a career page.' %}"
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+                {% trans "Switch to Company" %}
+            </button>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {% trans "As a company, you can create jobs, hire employees, and have a career page." %}
+            </p>
+        {% endif %}
+    </div>
+</div>

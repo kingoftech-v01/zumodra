@@ -19,6 +19,7 @@ This module defines URL patterns for:
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from . import views
 from .views import (
     PlanViewSet,
     TenantViewSet,
@@ -87,6 +88,10 @@ urlpatterns = [
 
     # Stripe webhooks (no auth required)
     path('webhooks/stripe/', StripeWebhookView.as_view(), name='stripe-webhook'),
+
+    # EIN verification endpoints
+    path('verify/ein/', views.submit_ein_verification, name='submit-ein'),
+    path('verify/ein/status/', views.get_ein_verification_status, name='ein-verification-status'),
 ]
 
 """

@@ -28,6 +28,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, UpdateView
 
 from tenants.mixins import TenantViewMixin
+from tenants.decorators import require_tenant_type
 
 from .models import (
     Employee, TimeOffType, TimeOffRequest, TimeOffBalance,
@@ -104,9 +105,10 @@ class HRPermissionMixin:
 # EMPLOYEE VIEWS
 # =============================================================================
 
+@require_tenant_type('company')
 class EmployeeDirectoryView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     """
-    Employee directory with search and filters.
+    Employee directory with search and filters - COMPANY ONLY.
 
     Displays all active employees with department/team filtering.
     """
@@ -197,9 +199,10 @@ class EmployeeDirectoryView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, List
         return context
 
 
+@require_tenant_type('company')
 class EmployeeDetailView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin, HTMXMixin, DetailView):
     """
-    Employee profile page with all details.
+    Employee profile page with all details - COMPANY ONLY.
 
     Shows:
     - Personal information
@@ -308,9 +311,10 @@ class EmployeeDetailView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin,
         return context
 
 
+@require_tenant_type('company')
 class EmployeeEditView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin, UpdateView):
     """
-    Edit employee profile.
+    Edit employee profile - COMPANY ONLY.
     """
     model = Employee
     template_name = 'hr/employee_form.html'
@@ -353,9 +357,10 @@ class EmployeeEditView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin, U
 # TIME-OFF VIEWS
 # =============================================================================
 
+@require_tenant_type('company')
 class TimeOffCalendarView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView):
     """
-    Team calendar view showing all time-off.
+    Team calendar view showing all time-off - COMPANY ONLY.
 
     Displays a calendar with scheduled time-off for the team.
     """
@@ -428,9 +433,10 @@ class TimeOffCalendarView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, Templa
         return context
 
 
+@require_tenant_type('company')
 class TimeOffRequestView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Submit time-off request.
+    Submit time-off request - COMPANY ONLY.
     """
     template_name = 'hr/time_off_request.html'
 
@@ -544,9 +550,10 @@ class TimeOffRequestView(LoginRequiredMixin, TenantViewMixin, View):
         return redirect('hr:my-time-off')
 
 
+@require_tenant_type('company')
 class TimeOffApprovalView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin, View):
     """
-    Approve or reject time-off requests.
+    Approve or reject time-off requests - COMPANY ONLY.
     """
 
     def post(self, request, pk):
@@ -600,9 +607,10 @@ class TimeOffApprovalView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+@require_tenant_type('company')
 class MyTimeOffView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView):
     """
-    View for employees to see their time-off history and balances.
+    View for employees to see their time-off history and balances - COMPANY ONLY.
     """
     template_name = 'hr/my_time_off.html'
 
@@ -649,9 +657,10 @@ class MyTimeOffView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView
 # ORG CHART VIEW
 # =============================================================================
 
+@require_tenant_type('company')
 class OrgChartView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView):
     """
-    Organization chart visualization.
+    Organization chart visualization - COMPANY ONLY.
 
     Displays hierarchical view of the organization.
     """
@@ -699,9 +708,10 @@ class OrgChartView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, TemplateView)
         return context
 
 
+@require_tenant_type('company')
 class OrgChartDataView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    JSON endpoint for org chart data (for dynamic loading).
+    JSON endpoint for org chart data (for dynamic loading) - COMPANY ONLY.
     """
 
     def get(self, request):
@@ -738,9 +748,10 @@ class OrgChartDataView(LoginRequiredMixin, TenantViewMixin, View):
 # ONBOARDING VIEWS
 # =============================================================================
 
+@require_tenant_type('company')
 class OnboardingDashboardView(LoginRequiredMixin, TenantViewMixin, HRPermissionMixin, HTMXMixin, TemplateView):
     """
-    Onboarding dashboard for HR to track all onboardings.
+    Onboarding dashboard for HR to track all onboardings - COMPANY ONLY.
     """
     template_name = 'hr/onboarding_dashboard.html'
 
@@ -771,9 +782,10 @@ class OnboardingDashboardView(LoginRequiredMixin, TenantViewMixin, HRPermissionM
         return context
 
 
+@require_tenant_type('company')
 class OnboardingDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     """
-    Individual onboarding progress view.
+    Individual onboarding progress view - COMPANY ONLY.
     """
     model = EmployeeOnboarding
     template_name = 'hr/onboarding_detail.html'
@@ -810,9 +822,10 @@ class OnboardingDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, Detai
         return context
 
 
+@require_tenant_type('company')
 class OnboardingTaskCompleteView(LoginRequiredMixin, TenantViewMixin, View):
     """
-    Mark an onboarding task as complete.
+    Mark an onboarding task as complete - COMPANY ONLY.
     """
 
     def post(self, request, pk):

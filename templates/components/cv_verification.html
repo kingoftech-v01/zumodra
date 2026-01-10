@@ -1,0 +1,112 @@
+{% load i18n %}
+<!-- CV Verification Component -->
+<div class="cv-verification-component card p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "CV Verification" %}</h3>
+
+    {% if user.cv_verified %}
+        <!-- Verified State -->
+        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
+            <div class="flex">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                        {% trans "CV verified" %} - {{ user.cv_verified_at|date:"SHORT_DATETIME_FORMAT" }}
+                    </p>
+                    <p class="mt-1 text-sm text-green-700 dark:text-green-300">
+                        {% trans "Your professional credentials have been verified by our team" %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Unverified State - Show Upload Form -->
+        <form hx-post="{% url 'accounts:upload_cv' %}"
+              hx-encoding="multipart/form-data"
+              hx-target="#cv-upload-result"
+              hx-indicator="#cv-loading"
+              class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="cv_file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "Upload CV" %}
+                </label>
+
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label for="cv_file" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                <span>{% trans "Upload a file" %}</span>
+                                <input id="cv_file"
+                                       name="cv_file"
+                                       type="file"
+                                       accept=".pdf,.doc,.docx"
+                                       class="sr-only"
+                                       required>
+                            </label>
+                            <p class="pl-1">{% trans "or drag and drop" %}</p>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            {% trans "PDF, DOC, DOCX up to 5MB" %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "Upload for Verification" %}
+                </button>
+
+                <div id="cv-loading" class="htmx-indicator">
+                    <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+        </form>
+
+        <div id="cv-upload-result" class="mt-4"></div>
+
+        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+            <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "What happens after upload?" %}
+            </h4>
+            <ul class="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-1 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "Our team will review your CV within 1-2 business days" %}
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-1 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                    </svg>
+                    {% trans "You will receive email notification once verified" %}
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-1 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "Verified badge will appear on your profile" %}
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+</div>

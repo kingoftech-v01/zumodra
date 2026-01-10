@@ -1316,3 +1316,74 @@ class FeatureFlagView(views.APIView):
             'has_access': has_access,
             'plan': tenant.plan.name
         })
+
+
+# ==================== EIN VERIFICATION API ENDPOINTS ====================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_ein_verification(request):
+    """
+    Submit EIN for business verification.
+
+    POST /api/verify/ein/
+
+    Request body:
+    - ein_number: EIN in format XX-XXXXXXX
+
+    Requires: User must be part of a tenant
+    """
+    from .serializers import EINVerificationSerializer
+
+    # Must be part of a tenant
+    if not hasattr(request, 'tenant') or not request.tenant:
+        return Response(
+            {'error': _('You must be part of a tenant to verify EIN.')},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    serializer = EINVerificationSerializer(data=request.data)
+
+    if serializer.is_valid():
+        ein_number = serializer.validated_data['ein_number']
+
+        # Update tenant with EIN
+        tenant = request.tenant
+        tenant.ein_number = ein_number
+        tenant.save(update_fields=['ein_number'])
+
+        # TODO: Call external API to verify EIN (implement when API is available)
+        # For now, mark as pending
+
+        return Response({
+            'status': 'submitted',
+            'message': _('EIN submitted for verification.'),
+            'ein_number': ein_number,
+        }, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ein_verification_status(request):
+    """
+    Get EIN verification status for tenant.
+
+    GET /api/verify/ein/status/
+
+    Requires: User must be part of a tenant
+    """
+    if not hasattr(request, 'tenant') or not request.tenant:
+        return Response(
+            {'error': _('You must be part of a tenant.')},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    tenant = request.tenant
+
+    return Response({
+        'ein_number': tenant.ein_number,
+        'ein_verified': tenant.ein_verified,
+        'ein_verified_at': tenant.ein_verified_at,
+    })

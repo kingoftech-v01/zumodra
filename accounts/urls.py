@@ -11,6 +11,7 @@ This module configures URL patterns for the accounts REST API:
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from . import views
 from .views import (
     TenantUserViewSet,
     UserProfileViewSet,
@@ -92,6 +93,12 @@ urlpatterns = [
         EmploymentVerificationResponseView.as_view(),
         name='employment-verification-response'
     ),
+
+    # User verification endpoints (CV, KYC)
+    path('verify/kyc/', views.submit_kyc_verification, name='submit-kyc'),
+    path('verify/cv/', views.submit_cv_verification, name='submit-cv'),
+    path('verify/status/', views.get_verification_status, name='verification-status'),
+    path('verify/documents/', views.get_submitted_documents, name='verification-documents'),
 
     # Router URLs (ViewSets)
     path('', include(router.urls)),

@@ -102,7 +102,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """
-    Full employee detail serializer with nested relationships.
+    Full employee detail serializer with nested relationships - COMPANY ONLY.
     Used for retrieve and update operations.
     """
     user = UserMinimalSerializer(read_only=True)
@@ -127,6 +127,8 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
     years_of_service = serializers.FloatField(read_only=True)
     is_active_employee = serializers.BooleanField(read_only=True)
     full_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
+    can_have_employees = serializers.SerializerMethodField()
 
     class Meta:
         model = Employee
@@ -148,6 +150,8 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'emergency_contact_relationship',
             # Computed
             'years_of_service', 'is_active_employee',
+            # Tenant type
+            'tenant_type', 'can_have_employees',
             # Timestamps
             'created_at', 'updated_at'
         ]
@@ -158,6 +162,10 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
 
     def get_direct_reports_count(self, obj):
         return obj.direct_reports.count()
+
+    def get_can_have_employees(self, obj):
+        """Check if tenant can have employees (COMPANY only)."""
+        return obj.tenant.can_have_employees() if hasattr(obj, 'tenant') and obj.tenant else False
 
     def validate_manager_id(self, value):
         """Prevent circular manager relationships"""
@@ -281,7 +289,7 @@ class TimeOffTypeSerializer(serializers.ModelSerializer):
 
 class TimeOffRequestSerializer(serializers.ModelSerializer):
     """
-    Serializer for time off requests with balance validation.
+    Serializer for time off requests with balance validation - COMPANY ONLY.
     Includes approval workflow fields.
     """
     employee = EmployeeMinimalSerializer(read_only=True)
@@ -299,6 +307,7 @@ class TimeOffRequestSerializer(serializers.ModelSerializer):
     approver = UserMinimalSerializer(read_only=True)
     can_approve = serializers.SerializerMethodField()
     can_cancel = serializers.SerializerMethodField()
+    tenant_type = serializers.CharField(source='employee.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = TimeOffRequest
@@ -310,7 +319,7 @@ class TimeOffRequestSerializer(serializers.ModelSerializer):
             'approver', 'approved_at', 'rejection_reason',
             'supporting_document',
             'can_approve', 'can_cancel',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'tenant_type'
         ]
         read_only_fields = [
             'id', 'uuid', 'status', 'approver', 'approved_at',
@@ -432,7 +441,7 @@ class OnboardingTaskSerializer(serializers.ModelSerializer):
 
 
 class OnboardingChecklistSerializer(serializers.ModelSerializer):
-    """Serializer for onboarding checklist templates"""
+    """Serializer for onboarding checklist templates - COMPANY ONLY"""
     tasks = OnboardingTaskSerializer(many=True, read_only=True)
     tasks_count = serializers.SerializerMethodField()
     department_name = serializers.CharField(
@@ -440,6 +449,7 @@ class OnboardingChecklistSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True
     )
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
 
     class Meta:
         model = OnboardingChecklist
@@ -447,7 +457,7 @@ class OnboardingChecklistSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'employment_type',
             'department', 'department_name', 'is_active',
             'tasks', 'tasks_count',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'tenant_type'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -779,7 +789,7 @@ class OffboardingStepSerializer(serializers.Serializer):
 
 class PerformanceReviewSerializer(serializers.ModelSerializer):
     """
-    Serializer for performance reviews.
+    Serializer for performance reviews - COMPANY ONLY.
     Supports different review workflows and states.
     """
     employee = EmployeeMinimalSerializer(read_only=True)
@@ -799,6 +809,7 @@ class PerformanceReviewSerializer(serializers.ModelSerializer):
     can_submit_self_assessment = serializers.SerializerMethodField()
     can_submit_manager_review = serializers.SerializerMethodField()
     can_complete = serializers.SerializerMethodField()
+    tenant_type = serializers.CharField(source='employee.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = PerformanceReview
@@ -819,7 +830,7 @@ class PerformanceReviewSerializer(serializers.ModelSerializer):
             # Workflow
             'can_submit_self_assessment', 'can_submit_manager_review', 'can_complete',
             # Timestamps
-            'created_at', 'updated_at', 'completed_at'
+            'created_at', 'updated_at', 'completed_at', 'tenant_type'
         ]
         read_only_fields = [
             'id', 'uuid', 'status', 'employee_signed_at', 'manager_signed_at',

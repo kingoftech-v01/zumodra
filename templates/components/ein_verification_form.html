@@ -1,0 +1,108 @@
+{% load i18n %}
+<!-- EIN Verification Form Component -->
+<div class="ein-verification-form card p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Business Verification" %}</h3>
+
+    {% if tenant.ein_verified %}
+        <!-- Verified State -->
+        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-md mb-4">
+            <div class="flex">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                        {% trans "Business verified" %} - {{ tenant.ein_verified_at|date:"SHORT_DATETIME_FORMAT" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <dl class="space-y-2">
+            <div class="flex justify-between">
+                <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "EIN / Business Number" %}:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ tenant.ein_number }}</dd>
+            </div>
+        </dl>
+
+    {% else %}
+        <!-- Unverified State - Show Form -->
+        <form hx-post="{% url 'tenants:verify_ein' %}"
+              hx-target="#verification-result"
+              hx-indicator="#ein-loading"
+              class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="ein_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {% trans "EIN / Business Registration Number" %}
+                </label>
+                <input type="text"
+                       id="ein_number"
+                       name="ein_number"
+                       value="{{ tenant.ein_number }}"
+                       placeholder="12-3456789"
+                       pattern="\d{2}-\d{7}"
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                       required>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {% trans "Enter your Employer Identification Number or business registration number (Format: XX-XXXXXXX)" %}
+                </p>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {% trans "Verify Business" %}
+                </button>
+
+                <div id="ein-loading" class="htmx-indicator">
+                    <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+        </form>
+
+        <div id="verification-result" class="mt-4"></div>
+
+        {% if tenant.ein_number %}
+        <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Your business number is saved but pending verification. Click 'Verify Business' to complete verification." %}
+            </p>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{% trans "Why verify your business?" %}</h4>
+        <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+            <li class="flex items-start">
+                <svg class="w-4 h-4 mr-1 mt-0.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Build trust with clients and partners" %}
+            </li>
+            <li class="flex items-start">
+                <svg class="w-4 h-4 mr-1 mt-0.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Unlock premium features and higher transaction limits" %}
+            </li>
+            <li class="flex items-start">
+                <svg class="w-4 h-4 mr-1 mt-0.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                {% trans "Get verified badge on your profile" %}
+            </li>
+        </ul>
+    </div>
+</div>

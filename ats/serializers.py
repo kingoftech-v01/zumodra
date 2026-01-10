@@ -278,7 +278,7 @@ class PipelineStageCreateSerializer(serializers.ModelSerializer):
 
 
 class PipelineSerializer(serializers.ModelSerializer):
-    """Pipeline serializer with nested stages and metrics."""
+    """Pipeline serializer with nested stages and metrics - COMPANY ONLY."""
     stages = PipelineStageSerializer(many=True, read_only=True)
     created_by = UserMinimalSerializer(read_only=True)
     jobs_count = serializers.SerializerMethodField()
@@ -286,6 +286,7 @@ class PipelineSerializer(serializers.ModelSerializer):
     total_applications = serializers.ReadOnlyField()
     average_time_to_hire_days = serializers.SerializerMethodField()
     conversion_rate = serializers.ReadOnlyField()
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
 
     class Meta:
         model = Pipeline
@@ -293,7 +294,7 @@ class PipelineSerializer(serializers.ModelSerializer):
             'id', 'uuid', 'name', 'description', 'is_default', 'is_active',
             'created_by', 'created_at', 'updated_at', 'stages', 'jobs_count',
             'stages_count', 'total_applications', 'average_time_to_hire_days',
-            'conversion_rate'
+            'conversion_rate', 'tenant_type'
         ]
         read_only_fields = ['id', 'uuid', 'created_at', 'updated_at', 'stages_count',
                           'total_applications', 'conversion_rate']
@@ -393,7 +394,7 @@ class JobPostingListSerializer(serializers.ModelSerializer):
 
 
 class JobPostingDetailSerializer(serializers.ModelSerializer):
-    """Detailed job posting serializer."""
+    """Detailed job posting serializer - COMPANY ONLY."""
     category = JobCategoryListSerializer(read_only=True)
     pipeline = PipelineListSerializer(read_only=True)
     hiring_manager = UserMinimalSerializer(read_only=True)
@@ -402,6 +403,8 @@ class JobPostingDetailSerializer(serializers.ModelSerializer):
     applications_count = serializers.SerializerMethodField()
     applications_by_stage = serializers.SerializerMethodField()
     salary_range_display = serializers.ReadOnlyField()
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
+    can_create_jobs = serializers.SerializerMethodField()
 
     class Meta:
         model = JobPosting
@@ -424,8 +427,13 @@ class JobPostingDetailSerializer(serializers.ModelSerializer):
             'published_on_job_boards',
             'meta_title', 'meta_description',
             'created_at', 'updated_at', 'published_at', 'closed_at',
-            'created_by', 'applications_count', 'applications_by_stage'
+            'created_by', 'applications_count', 'applications_by_stage',
+            'tenant_type', 'can_create_jobs'
         ]
+
+    def get_can_create_jobs(self, obj):
+        """Check if tenant can create jobs (COMPANY only)."""
+        return obj.tenant.can_create_jobs() if hasattr(obj, 'tenant') and obj.tenant else False
 
     def get_applications_count(self, obj):
         return obj.applications.count()
@@ -597,7 +605,7 @@ class CandidateListSerializer(serializers.ModelSerializer):
 
 
 class CandidateDetailSerializer(serializers.ModelSerializer):
-    """Detailed candidate serializer with computed fields."""
+    """Detailed candidate serializer with computed fields - COMPANY ONLY."""
     user = UserMinimalSerializer(read_only=True)
     referred_by = UserMinimalSerializer(read_only=True)
     full_name = serializers.ReadOnlyField()
@@ -610,6 +618,7 @@ class CandidateDetailSerializer(serializers.ModelSerializer):
     days_since_last_activity = serializers.ReadOnlyField()
     applications = serializers.SerializerMethodField()
     skill_summary = serializers.SerializerMethodField()
+    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
 
     class Meta:
         model = Candidate
@@ -631,7 +640,7 @@ class CandidateDetailSerializer(serializers.ModelSerializer):
             'applications_count', 'active_applications_count',
             'days_since_last_activity',
             'created_at', 'updated_at', 'last_activity_at',
-            'applications'
+            'applications', 'tenant_type'
         ]
 
     def get_applications(self, obj):
@@ -857,7 +866,7 @@ class ApplicationListSerializer(serializers.ModelSerializer):
 
 
 class ApplicationDetailSerializer(serializers.ModelSerializer):
-    """Detailed application serializer with computed fields and nested relations."""
+    """Detailed application serializer with computed fields and nested relations - COMPANY ONLY."""
     candidate = CandidateListSerializer(read_only=True)
     job = JobPostingListSerializer(read_only=True)
     current_stage = PipelineStageSerializer(read_only=True)
@@ -884,6 +893,9 @@ class ApplicationDetailSerializer(serializers.ModelSerializer):
     # Hybrid Match Score (Step 4 - Three-Score Breakdown)
     match_score = serializers.SerializerMethodField()
 
+    # Tenant type
+    tenant_type = serializers.CharField(source='job.tenant.tenant_type', read_only=True)
+
     class Meta:
         model = Application
         fields = [
@@ -902,7 +914,8 @@ class ApplicationDetailSerializer(serializers.ModelSerializer):
             'interviews_count', 'has_pending_interviews', 'average_interview_rating',
             'skill_match_score', 'match_score',
             # Related
-            'interviews', 'offers', 'activities', 'notes_count'
+            'interviews', 'offers', 'activities', 'notes_count',
+            'tenant_type'
         ]
 
     def get_interviews(self, obj):
@@ -1204,12 +1217,13 @@ class InterviewListSerializer(serializers.ModelSerializer):
 
 
 class InterviewDetailSerializer(serializers.ModelSerializer):
-    """Detailed interview serializer."""
+    """Detailed interview serializer - COMPANY ONLY."""
     application = ApplicationListSerializer(read_only=True)
     interviewers = UserMinimalSerializer(many=True, read_only=True)
     organizer = UserMinimalSerializer(read_only=True)
     feedback = serializers.SerializerMethodField()
     duration_minutes = serializers.ReadOnlyField()
+    tenant_type = serializers.CharField(source='application.job.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = Interview
@@ -1222,7 +1236,7 @@ class InterviewDetailSerializer(serializers.ModelSerializer):
             'interviewers', 'organizer',
             'calendar_event_id', 'candidate_notified', 'interviewers_notified',
             'preparation_notes', 'interview_guide',
-            'created_at', 'updated_at', 'feedback'
+            'created_at', 'updated_at', 'feedback', 'tenant_type'
         ]
 
     def get_feedback(self, obj):
@@ -1408,7 +1422,7 @@ class OfferListSerializer(serializers.ModelSerializer):
 
 
 class OfferDetailSerializer(serializers.ModelSerializer):
-    """Detailed offer serializer."""
+    """Detailed offer serializer - COMPANY ONLY."""
     application = ApplicationListSerializer(read_only=True)
     approved_by = UserMinimalSerializer(read_only=True)
     created_by = UserMinimalSerializer(read_only=True)
@@ -1416,6 +1430,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         source='get_status_display',
         read_only=True
     )
+    tenant_type = serializers.CharField(source='application.job.tenant.tenant_type', read_only=True)
 
     class Meta:
         model = Offer
@@ -1433,7 +1448,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             'approved_by', 'approved_at',
             'response_notes', 'decline_reason',
             'created_at', 'updated_at', 'sent_at', 'responded_at',
-            'created_by'
+            'created_by', 'tenant_type'
         ]
 
 
