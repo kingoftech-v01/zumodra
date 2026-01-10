@@ -521,7 +521,6 @@ class Command(BaseCommand):
                         'current_stage': stage,
                         'status': random.choice(['new', 'in_review', 'shortlisted']),
                         'ai_match_score': Decimal(random.randint(45, 98)),
-                        'rule_match_score': Decimal(random.randint(40, 95)),
                     }
                 )
                 if app_created:
