@@ -450,12 +450,18 @@ def dispatch_webhook(
         Number of webhooks queued for delivery
     """
     from .tasks import deliver_outbound_webhook
+    from django.db import ProgrammingError, OperationalError
 
-    webhooks = OutboundWebhook.objects.filter(
-        tenant_id=tenant_id,
-        is_enabled=True,
-        status__in=[OutboundWebhook.Status.ACTIVE]
-    )
+    try:
+        webhooks = OutboundWebhook.objects.filter(
+            tenant_id=tenant_id,
+            is_enabled=True,
+            status__in=[OutboundWebhook.Status.ACTIVE]
+        )
+    except (ProgrammingError, OperationalError) as e:
+        # Table doesn't exist yet (during initial migrations)
+        logger.debug(f"Webhook table not available yet: {e}")
+        return 0
 
     queued = 0
     for webhook in webhooks:

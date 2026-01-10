@@ -718,7 +718,7 @@ class Command(BaseCommand):
                         'bio': f'Experienced freelancer specializing in {random.choice(SERVICE_CATEGORIES)[0]}',
                         'tagline': 'Quality work, delivered on time',
                         'hourly_rate': Decimal(random.randint(50, 200)),
-                        'status': 'available',
+                        'availability_status': 'available',
                         'is_verified': random.choice([True, True, False]),
                         'rating_avg': Decimal(str(round(random.uniform(3.5, 5.0), 1))),
                         'total_reviews': random.randint(0, 50),
