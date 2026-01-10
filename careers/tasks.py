@@ -56,7 +56,7 @@ def process_public_applications(self):
         # Find unprocessed public applications
         pending_applications = PublicApplication.objects.filter(
             is_processed=False,
-            created_at__lt=now - timedelta(minutes=1)  # Wait 1 min before processing
+            submitted_at__lt=now - timedelta(minutes=1)  # Wait 1 min before processing
         ).select_related('job_listing')[:50]  # Process in batches
 
         for public_app in pending_applications:
@@ -377,7 +377,7 @@ def sync_job_listings(self):
         # Find open jobs without listings
         open_jobs = JobPosting.objects.filter(
             status='open',
-            is_internal=False
+            is_internal_only=False
         ).exclude(
             public_listing__isnull=False
         )

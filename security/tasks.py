@@ -116,14 +116,14 @@ def analyze_failed_logins(self):
     Returns:
         dict: Summary of analysis and alerts.
     """
-    from security.models import FailedLogin, SecurityEvent
+    from security.models import FailedLoginAttempt, SecurityEvent
 
     try:
         now = timezone.now()
         check_window = now - timedelta(hours=1)
 
         # Find IPs with multiple failures
-        ip_failures = FailedLogin.objects.filter(
+        ip_failures = FailedLoginAttempt.objects.filter(
             created_at__gte=check_window
         ).values('ip_address').annotate(
             count=Count('id')
@@ -162,7 +162,7 @@ def analyze_failed_logins(self):
                 logger.error(f"Error creating security event for IP {ip}: {e}")
 
         # Find targeted accounts
-        account_targets = FailedLogin.objects.filter(
+        account_targets = FailedLoginAttempt.objects.filter(
             created_at__gte=check_window
         ).values('username').annotate(
             count=Count('id'),
@@ -335,11 +335,11 @@ def generate_security_report(self):
             ).values_list('severity', 'count')
         )
 
-        failed_logins = FailedLogin.objects.filter(
+        failed_logins = FailedLoginAttempt.objects.filter(
             created_at__date=yesterday.date()
         ).count()
 
-        unique_ips_failed = FailedLogin.objects.filter(
+        unique_ips_failed = FailedLoginAttempt.objects.filter(
             created_at__date=yesterday.date()
         ).values('ip_address').distinct().count()
 
@@ -639,14 +639,14 @@ def update_ip_reputation(self):
     Returns:
         dict: Summary of updates.
     """
-    from security.models import FailedLogin
+    from security.models import FailedLoginAttempt
 
     try:
         now = timezone.now()
         check_window = now - timedelta(days=7)
 
         # Get IP activity summary
-        ip_activity = FailedLogin.objects.filter(
+        ip_activity = FailedLoginAttempt.objects.filter(
             created_at__gte=check_window
         ).values('ip_address').annotate(
             failure_count=Count('id')
