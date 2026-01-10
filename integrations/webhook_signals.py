@@ -93,6 +93,74 @@ def dispatch_webhook_for_model(
 
 
 # =============================================================================
+# TENANTS APP WEBHOOKS
+# =============================================================================
+
+def connect_tenants_webhooks():
+    """Connect webhook signals for tenants app."""
+    try:
+        from tenants.models import Tenant
+
+        @receiver(post_save, sender=Tenant)
+        def tenant_saved(sender, instance, created, **kwargs):
+            # For tenant webhooks, use the tenant itself as the tenant_id
+            event = 'tenant.created' if created else 'tenant.updated'
+
+            # Build tenant payload with type information
+            payload = {
+                'id': str(instance.id),
+                'uuid': str(instance.uuid),
+                'name': instance.name,
+                'slug': instance.slug,
+                'tenant_type': instance.tenant_type,
+                'can_create_jobs': instance.can_create_jobs(),
+                'can_have_employees': instance.can_have_employees(),
+                'status': instance.status,
+                'industry': instance.industry,
+                'company_size': instance.company_size,
+                'ein_number': instance.ein_number,
+                'ein_verified': instance.ein_verified,
+                'created_at': str(instance.created_at),
+                'updated_at': str(instance.updated_at),
+            }
+
+            try:
+                from .outbound_webhooks import dispatch_webhook
+                dispatch_webhook(
+                    tenant_id=instance.id,
+                    app_name='tenants',
+                    event_type=event,
+                    data=payload,
+                    event_id=str(instance.id)
+                )
+            except Exception as e:
+                logger.error(f"Failed to dispatch tenant webhook: {e}")
+
+        @receiver(post_delete, sender=Tenant)
+        def tenant_deleted(sender, instance, **kwargs):
+            try:
+                from .outbound_webhooks import dispatch_webhook
+                dispatch_webhook(
+                    tenant_id=instance.id,
+                    app_name='tenants',
+                    event_type='tenant.deleted',
+                    data={
+                        'id': str(instance.id),
+                        'uuid': str(instance.uuid),
+                        'name': instance.name,
+                        'tenant_type': instance.tenant_type,
+                    },
+                    event_id=str(instance.id)
+                )
+            except Exception as e:
+                logger.error(f"Failed to dispatch tenant deletion webhook: {e}")
+
+        logger.info("Tenants webhook signals connected")
+    except ImportError as e:
+        logger.warning(f"Could not connect Tenants webhooks: {e}")
+
+
+# =============================================================================
 # ACCOUNTS APP WEBHOOKS
 # =============================================================================
 
@@ -526,6 +594,7 @@ def connect_newsletter_webhooks():
 
 def connect_all_webhook_signals():
     """Connect all webhook signals for all apps."""
+    connect_tenants_webhooks()
     connect_accounts_webhooks()
     connect_ats_webhooks()
     connect_hr_core_webhooks()
