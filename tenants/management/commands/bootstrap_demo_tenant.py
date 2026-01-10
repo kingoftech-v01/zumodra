@@ -412,6 +412,7 @@ class Command(BaseCommand):
         for name, icon, color in JOB_CATEGORIES:
             cat, _ = JobCategory.objects.get_or_create(
                 name=name,
+                tenant=tenant,
                 defaults={'slug': slugify(name), 'icon': icon, 'color': color}
             )
             categories.append(cat)
@@ -670,6 +671,7 @@ class Command(BaseCommand):
         for name, icon, color in SERVICE_CATEGORIES:
             cat, _ = ServiceCategory.objects.get_or_create(
                 name=name,
+                tenant=tenant,
                 defaults={'slug': slugify(name), 'icon': icon, 'color': color}
             )
             categories.append(cat)
