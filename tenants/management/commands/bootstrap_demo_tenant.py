@@ -422,6 +422,7 @@ class Command(BaseCommand):
         # Create pipeline with stages
         pipeline, _ = Pipeline.objects.get_or_create(
             name='Default Pipeline',
+            tenant=tenant,
             defaults={'is_default': True, 'created_by': admin}
         )
 
@@ -452,6 +453,7 @@ class Command(BaseCommand):
             city, state, country = random.choice(CITIES)
             job, created = JobPosting.objects.get_or_create(
                 reference_code=f'DEMO-{str(i + 1).zfill(4)}',
+                tenant=tenant,
                 defaults={
                     'title': title,
                     'slug': slugify(f'{title}-{i}'),
@@ -492,6 +494,7 @@ class Command(BaseCommand):
 
             candidate, created = Candidate.objects.get_or_create(
                 email=f'{first_name.lower()}.{last_name.lower()}{i}@example.com',
+                tenant=tenant,
                 defaults={
                     'first_name': first_name,
                     'last_name': last_name,
@@ -513,6 +516,7 @@ class Command(BaseCommand):
                 app, app_created = Application.objects.get_or_create(
                     candidate=candidate,
                     job=job,
+                    tenant=tenant,
                     defaults={
                         'current_stage': stage,
                         'status': random.choice(['new', 'in_review', 'shortlisted']),
@@ -532,6 +536,7 @@ class Command(BaseCommand):
             try:
                 Interview.objects.get_or_create(
                     application=app,
+                    tenant=tenant,
                     defaults={
                         'interview_type': random.choice(['phone', 'video', 'onsite', 'technical']),
                         'scheduled_start': timezone.now() + timedelta(days=random.randint(1, 14)),
@@ -552,6 +557,7 @@ class Command(BaseCommand):
             try:
                 Offer.objects.get_or_create(
                     application=app,
+                    tenant=tenant,
                     defaults={
                         'position_title': app.job.title,
                         'base_salary': app.job.salary_max or Decimal(100000),
@@ -575,6 +581,7 @@ class Command(BaseCommand):
         # Create time-off types
         pto, _ = TimeOffType.objects.get_or_create(
             code='PTO',
+            tenant=tenant,
             defaults={
                 'name': 'Paid Time Off',
                 'is_accrued': True,
@@ -584,6 +591,7 @@ class Command(BaseCommand):
         )
         sick, _ = TimeOffType.objects.get_or_create(
             code='SICK',
+            tenant=tenant,
             defaults={
                 'name': 'Sick Leave',
                 'is_accrued': True,
@@ -593,6 +601,7 @@ class Command(BaseCommand):
         )
         TimeOffType.objects.get_or_create(
             code='PERSONAL',
+            tenant=tenant,
             defaults={
                 'name': 'Personal Day',
                 'is_accrued': False,
@@ -611,6 +620,7 @@ class Command(BaseCommand):
             user, _ = User.objects.get_or_create(
                 email=email,
                 defaults={
+                    'username': email.split('@')[0],  # Generate username from email
                     'first_name': first_name,
                     'last_name': last_name,
                     'is_active': True,
@@ -622,6 +632,7 @@ class Command(BaseCommand):
 
             emp, created = Employee.objects.get_or_create(
                 user=user,
+                tenant=tenant,
                 defaults={
                     'employee_id': f'EMP-{str(i + 1).zfill(4)}',
                     'job_title': random.choice(JOB_TITLES),
@@ -643,6 +654,7 @@ class Command(BaseCommand):
                     employee=emp,
                     time_off_type=random.choice([pto, sick]),
                     start_date=timezone.now().date() + timedelta(days=random.randint(7, 60)),
+                    tenant=tenant,
                     defaults={
                         'end_date': timezone.now().date() + timedelta(days=random.randint(8, 65)),
                         'status': random.choice(['pending', 'approved', 'pending']),
@@ -688,6 +700,7 @@ class Command(BaseCommand):
             user, _ = User.objects.get_or_create(
                 email=email,
                 defaults={
+                    'username': email.split('@')[0],  # Generate username from email
                     'first_name': first_name,
                     'last_name': last_name,
                     'is_active': True,
@@ -700,6 +713,7 @@ class Command(BaseCommand):
             try:
                 provider, created = ServiceProvider.objects.get_or_create(
                     user=user,
+                    tenant=tenant,
                     defaults={
                         'display_name': f'{first_name} {last_name}',
                         'bio': f'Experienced freelancer specializing in {random.choice(SERVICE_CATEGORIES)[0]}',
@@ -733,6 +747,7 @@ class Command(BaseCommand):
                 KYCVerification.objects.get_or_create(
                     user=user,
                     verification_type='identity',
+                    tenant=tenant,
                     defaults={
                         'status': status,
                         'level': random.choice(['basic', 'standard', 'enhanced']),
@@ -743,6 +758,7 @@ class Command(BaseCommand):
                 # Trust Score
                 TrustScore.objects.get_or_create(
                     user=user,
+                    tenant=tenant,
                     defaults={
                         'entity_type': 'candidate' if key == 'candidate' else 'employer',
                         'trust_level': random.choice(['basic', 'verified', 'high']),
