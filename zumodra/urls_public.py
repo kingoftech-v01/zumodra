@@ -155,8 +155,7 @@ urlpatterns += i18n_patterns(
 
     # Authentication
     path('accounts/', include('allauth.urls')),
-    path('accounts/two-factor/', include('allauth.mfa.urls')),
-    path('authentication/', include('allauth_2fa.urls')),
+    path('accounts/two-factor/', include('allauth.mfa.urls')),  # Built-in MFA URLs (allauth 65.3.0+)
 
     # Newsletter
     path('newsletter/', include('newsletter.urls')),

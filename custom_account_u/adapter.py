@@ -11,13 +11,13 @@ Author: Rhematek Solutions
 
 from django.conf import settings
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth_2fa.adapter import OTPAdapter
 
 
-class ZumodraAccountAdapter(OTPAdapter):
+class ZumodraAccountAdapter(DefaultAccountAdapter):
     """
-    Custom adapter that extends OTPAdapter for 2FA support
-    while adding Zumodra-specific signup logic.
+    Custom adapter for Zumodra-specific account logic.
+    Note: MFA/2FA support is now built into django-allauth 65.3.0+
+    and doesn't require a separate adapter.
     """
 
     def save_user(self, request, user, form, commit=True):

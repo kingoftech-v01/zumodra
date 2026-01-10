@@ -54,9 +54,8 @@ TENANT_APPS = [
     'django_otp.plugins.otp_hotp',
     'django_otp.plugins.otp_email',
     'django_otp.plugins.otp_static',
-    'allauth_2fa',
     'allauth',
-    'allauth.mfa',
+    'allauth.mfa',  # Built-in MFA support (TOTP, WebAuthn) in allauth 65.3.0+
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
@@ -157,7 +156,6 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'custom_account_u.middleware.Require2FAMiddleware',
-    'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'custom_account_u.middleware.AuthSecurityMiddleware',

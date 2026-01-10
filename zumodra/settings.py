@@ -76,13 +76,12 @@ SHARED_APPS = [
     # Must be in SHARED to allow login/signup on public site
     'allauth',
     'allauth.account',
-    'allauth.mfa',
+    'allauth.mfa',  # Built-in MFA support (TOTP, WebAuthn) in allauth 65.3.0+
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.linkedin',
-    'allauth_2fa',
 
     # Two-Factor Authentication - SHARED (tied to user accounts)
     'django_otp',
@@ -221,7 +220,6 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'custom_account_u.middleware.Require2FAMiddleware',
-    'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
 
     # Messages & Security
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -472,10 +470,14 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-# 2FA Settings
-# Set to False to make 2FA optional during signup/initial login
-# Users can enable 2FA later from their account settings
-ALLAUTH_2FA_FORCE_2FA = False
+# Multi-Factor Authentication Settings (django-allauth 65.3.0+ built-in MFA)
+# Allauth now has TOTP and WebAuthn support built-in
+MFA_SUPPORTED_TYPES = ['totp', 'webauthn']  # Supported MFA methods
+MFA_PASSKEY_LOGIN_ENABLED = True  # Enable WebAuthn passkey login
+MFA_TOTP_PERIOD = 30  # TOTP period in seconds
+MFA_TOTP_DIGITS = 6  # Number of TOTP digits
+
+# Legacy 2FA settings (kept for backwards compatibility)
 TWO_FACTOR_MANDATORY = False
 
 # Login and Logout Redirect URLs

@@ -246,8 +246,7 @@ urlpatterns += i18n_patterns(
 
     # Authentication (hidden from public but functional)
     path('accounts/', include('allauth.urls')),                 # allauth URLs
-    path('accounts/two-factor/', include('allauth.mfa.urls')),  # MFA URLs
-    path('authentication/', include('allauth_2fa.urls')),       # 2FA URLs
+    path('accounts/two-factor/', include('allauth.mfa.urls')),  # MFA URLs (built-in allauth 65.3.0+)
 
     # Frontend Template Views (HTMX-powered)
     # All frontend views including dashboard, appointments, messages are handled through core.urls_frontend
