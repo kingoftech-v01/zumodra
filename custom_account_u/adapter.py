@@ -102,16 +102,22 @@ class ZumodraAccountAdapter(OTPAdapter):
         """
         # Check if user has any tenant assignments
         from accounts.models import TenantUser
+        from django.db import ProgrammingError, OperationalError
 
         if request.user.is_authenticated:
-            tenant_user = TenantUser.objects.filter(
-                user=request.user,
-                is_active=True
-            ).first()
+            try:
+                tenant_user = TenantUser.objects.filter(
+                    user=request.user,
+                    is_active=True
+                ).first()
 
-            if tenant_user:
-                # Redirect to tenant dashboard
-                return f'/dashboard/'
+                if tenant_user:
+                    # Redirect to tenant dashboard
+                    return f'/dashboard/'
+            except (ProgrammingError, OperationalError):
+                # Table doesn't exist yet (during initial setup/migrations)
+                # Fall through to default redirect
+                pass
 
         # Default redirect
         return super().get_login_redirect_url(request)
