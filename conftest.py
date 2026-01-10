@@ -2467,3 +2467,102 @@ def csrf_test_client(db, client):
     """
     from django.test import Client
     return Client(enforce_csrf_checks=True)
+
+
+# ============================================================================
+# INTEGRATION TEST FIXTURES (New for comprehensive test coverage)
+# ============================================================================
+
+@pytest.fixture
+def webhook_subscription(db, tenant):
+    """
+    Create test webhook subscription for integration testing.
+
+    Returns an active OutboundWebhook configured for testing webhook dispatch,
+    signature verification, and retry logic.
+    """
+    from integrations.models import OutboundWebhook
+
+    webhook = OutboundWebhook.objects.create(
+        tenant=tenant,
+        name='Test Webhook',
+        url='https://webhook.example.com/test',
+        secret='test_secret_key_12345',
+        status='active',
+        events=['job.created', 'job.updated', 'application.created'],
+        description='Test webhook for automated testing'
+    )
+    return webhook
+
+
+@pytest.fixture
+def celery_config():
+    """
+    Celery configuration for testing.
+
+    Configures Celery to execute tasks synchronously in tests
+    for predictable and fast test execution.
+    """
+    return {
+        'broker_url': 'memory://',
+        'result_backend': 'cache+memory://',
+        'task_always_eager': True,  # Execute tasks synchronously
+        'task_eager_propagates': True,  # Propagate exceptions
+        'task_store_eager_result': True,
+        'broker_connection_retry_on_startup': True,
+    }
+
+
+@pytest.fixture
+def mock_stripe():
+    """
+    Mock Stripe API for testing payment integrations.
+
+    Provides mocked Stripe Account and PaymentIntent objects
+    for testing Stripe Connect and payment flows without
+    making actual API calls.
+
+    Usage:
+        def test_create_payment(mock_stripe):
+            mock_stripe['payment'].create.return_value = {'id': 'pi_test123'}
+            # Test code here
+    """
+    from unittest.mock import patch, MagicMock
+
+    with patch('stripe.Account') as mock_account, \
+         patch('stripe.PaymentIntent') as mock_payment, \
+         patch('stripe.AccountLink') as mock_account_link, \
+         patch('stripe.Payout') as mock_payout:
+
+        # Configure default return values
+        mock_account.create.return_value = MagicMock(
+            id='acct_test123',
+            charges_enabled=True,
+            payouts_enabled=True,
+            details_submitted=True
+        )
+
+        mock_payment.create.return_value = MagicMock(
+            id='pi_test123',
+            status='succeeded',
+            amount=10000,
+            currency='usd'
+        )
+
+        mock_account_link.create.return_value = MagicMock(
+            url='https://connect.stripe.com/setup/test123'
+        )
+
+        mock_payout.create.return_value = MagicMock(
+            id='po_test123',
+            status='paid',
+            amount=10000,
+            currency='usd'
+        )
+
+        yield {
+            'account': mock_account,
+            'payment': mock_payment,
+            'account_link': mock_account_link,
+            'payout': mock_payout
+        }

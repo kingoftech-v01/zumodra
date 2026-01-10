@@ -230,3 +230,98 @@ dd72348 fix: add services namespace to public URLs for template compatibility
 ```
 
 If you don't see `26c9bb8` as the latest commit, run `git pull origin main`.
+
+---
+
+## Troubleshooting Migration Issues
+
+### Server Log Analysis
+
+If the server starts successfully but migrations haven't been applied, follow these diagnostic steps.
+
+#### Symptoms
+- Application starts but database tables are missing
+- Migration steps don't appear in startup logs
+- Database errors about missing tables or columns
+
+#### Required Logs
+
+Check the **FULL startup logs** from the beginning of the container restart:
+
+```bash
+docker compose logs web | head -100
+```
+
+Look for these steps:
+- Step 0/4: Checking for missing initial migrations...
+- Step 1/4: Migrating shared schema (public)...
+- Step 2/4: Migrating tenant schemas...
+- Step 3/4: Creating demo tenants...
+- Step 4/4: Verifying critical imports...
+
+#### Expected vs Actual Behavior
+
+**Expected**: Entrypoint runs migration steps BEFORE starting the application
+**Actual**: If migrations are skipped, application starts immediately without migration steps
+
+#### Possible Causes
+
+1. **Server hasn't pulled the latest code**
+   - Solution: Run `git pull origin main` and rebuild containers
+
+2. **Container restart didn't trigger full entrypoint execution**
+   - Solution: Use `docker compose down` then `docker compose up -d --build`
+
+3. **Migrations ran but failed silently**
+   - Solution: Check logs for error messages during migration steps
+
+#### Diagnostic Commands
+
+Run these on your server to diagnose the issue:
+
+```bash
+# Check if latest code is pulled
+cd /app && git log --oneline -1
+# Should show the latest commit (e.g., 9cc13a9 or newer)
+
+# Check if migration files exist
+ls -la tenants/migrations/
+ls -la accounts/migrations/
+ls -la custom_account_u/migrations/
+
+# Check database migration status
+docker compose exec web python manage.py showmigrations
+
+# Restart with full rebuild to trigger entrypoint
+docker compose down
+docker compose up -d --build
+
+# Watch logs for migration steps
+docker compose logs -f web
+```
+
+#### Manual Migration Trigger
+
+If automatic migrations fail, run them manually:
+
+```bash
+# Shared schema migrations
+docker compose exec web python manage.py migrate_schemas --shared
+
+# Tenant schema migrations
+docker compose exec web python manage.py migrate_schemas --tenant
+
+# Verify migrations applied
+docker compose exec web python manage.py showmigrations
+```
+
+#### Verification
+
+After fixing migration issues, verify:
+
+- [ ] All migration steps appear in startup logs
+- [ ] `showmigrations` shows all migrations applied (marked with [X])
+- [ ] Application can access database tables
+- [ ] No table/column not found errors in logs
+- [ ] Tenant creation works without errors
+

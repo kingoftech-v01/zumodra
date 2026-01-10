@@ -5,7 +5,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 import time
 import logging
-from zumodra import settings
+from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponseForbidden
 from django.core.mail import send_mail

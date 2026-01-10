@@ -224,3 +224,239 @@ staticfiles/
 - [ ] Dark mode works on all pages
 - [ ] WCAG 2.1 AA compliance
 - [ ] Design token documentation complete
+
+---
+
+## Implementation Checklist
+
+### Project Context
+
+This is a senior frontend/UI engineer guide for globally unifying and upgrading the frontend design across the entire multi-app Django SaaS project.
+
+**Tech Stack:**
+- Django templates + static HTML/CSS/JS (no React)
+- All assets served locally (no external CDNs)
+- Multiple dashboards and reused components
+
+### Design Preferences
+
+**Overall Look:**
+- Light background with high text contrast
+- Subtle alternating section backgrounds (pure white and slightly tinted variant)
+- Clean, professional, production-ready (not generic AI-generated UI)
+- Fully unified SVG icon language (same stroke weight, sizes, color logic)
+- Carefully tuned spacing, alignment, and visual hierarchy
+- Glassmorphism aesthetic: translucent surfaces, soft background blur, subtle depth effects
+
+### Primary Goals
+
+1. **Unified Design System** - Single cohesive design applied consistently across every page/app/dashboard
+2. **Modern Visual Style** - Clean, professional, production-ready feel
+3. **Light Background Design** - Strong text contrast with subtle section alternation
+4. **Unified Icon Set** - SVG icons with consistent stroke/size, appropriate icons for all actions
+5. **Improved Layout** - Better spacing, alignment, hierarchy for balanced, scannable pages
+
+### Implementation Tasks
+
+#### 1. Design System Audit
+
+Scan entire project (templates and static files) to identify:
+
+**Component Types:**
+- Buttons (primary, secondary, danger, ghost, etc.)
+- Tables (data tables, sortable columns, pagination)
+- Cards (dashboard cards, content cards, stat cards)
+- Sidebars and navigation (main nav, secondary nav, breadcrumbs)
+- Forms (input fields, textareas, selects, checkboxes, radio buttons)
+- Alerts and notifications (success, error, warning, info)
+- Badges and tags (status indicators, labels)
+- Modals and dialogs (confirmation, forms, info)
+- Dropdowns and menus (action menus, filters)
+- Stats boxes (metric displays, KPI cards)
+- Tabs and accordions
+- Loading states and spinners
+
+**Current Problems:**
+- Inconsistent colors across components
+- Mixed font families and sizes
+- Varied shadow styles and intensities
+- Different border radius values
+- Missing or inconsistent icons
+- Ad-hoc spacing (no systematic scale)
+- Duplicated CSS rules
+- Inline styles scattered throughout templates
+
+#### 2. Define Unified Design System
+
+Create central CSS files with:
+
+**CSS Variables:**
+```css
+/* Color Palette */
+--color-primary: ...
+--color-secondary: ...
+--color-success: ...
+--color-danger: ...
+--color-warning: ...
+--color-info: ...
+--color-text: ...
+--color-text-secondary: ...
+--color-background: ...
+--color-background-alt: ...
+
+/* Spacing Scale */
+--space-xs: ...
+--space-sm: ...
+--space-md: ...
+--space-lg: ...
+--space-xl: ...
+
+/* Border Radius */
+--radius-sm: ...
+--radius-md: ...
+--radius-lg: ...
+
+/* Shadows */
+--shadow-sm: ...
+--shadow-md: ...
+--shadow-lg: ...
+
+/* Glassmorphism */
+--glass-blur: ...
+--glass-opacity: ...
+```
+
+**Typography Pairing:**
+- Choose distinctive but professional heading font
+- Select readable body text font
+- Define font size scale
+- Set line heights and letter spacing
+- Wire globally through base templates
+
+**Canonical Component Styles:**
+- Buttons (all variants with hover/active/focus states)
+- Cards (standard card, stat card, dashboard card)
+- Tables (header, rows, hover, sorting indicators)
+- Badges (status variants, sizes)
+- Alerts (all severity levels)
+- Input fields (text, select, checkbox, radio, textarea)
+- Navigation components (navbar, sidebar, breadcrumbs)
+- Dashboard components (stat cards, charts containers)
+
+#### 3. Unify Icons and Visual Language
+
+**Icon System:**
+- Select one consistent icon style (outline SVG recommended)
+- Define standard icon sizes (16px, 20px, 24px, 32px)
+- Set color logic (inherit, primary, secondary, muted)
+- Replace all mismatched/low-quality icons
+- Ensure uniform alignment across app
+- Add icons to all important actions/sections
+
+**Icon Locations:**
+- Navigation menu items
+- Action buttons (save, delete, edit, export)
+- Status indicators (success, error, warning)
+- Form labels (where helpful)
+- Empty states
+- Dashboard stat cards
+- Table action columns
+
+#### 4. Apply Design System Everywhere
+
+**Template Refactoring:**
+- Replace ad-hoc styles with unified component classes
+- Remove inline CSS and style attributes
+- Migrate duplicated CSS to shared files
+- Use template inheritance for common layouts
+- Apply consistent spacing scale
+- Ensure same visual language across all dashboards
+
+**Shared Visual Elements:**
+- Same card style everywhere
+- Same sidebar/navbar style
+- Same typography rules
+- Same spacing scale
+- Same color palette
+- Same shadow system
+- Same glassmorphism effects
+
+#### 5. Add Production-Grade Motion
+
+**Micro-interactions:**
+- Light transitions on hover states (200-300ms)
+- Smooth dropdown animations
+- Modal fade-in/out effects
+- Loading state transitions
+- Page transition smoothness
+
+**Accessibility:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+#### 6. Production-Ready Requirements
+
+**Constraints:**
+- Do not break existing URLs or view logic
+- Preserve Django template tags and blocks
+- Maintain template inheritance structure
+- Keep HTML structure compatible
+- Avoid unnecessary libraries
+- Prefer clean, maintainable CSS
+- Use small, focused JS enhancements only
+
+**Quality Checklist:**
+- [ ] All pages use unified CSS variables
+- [ ] No inline styles remain
+- [ ] Icons are consistent across all pages
+- [ ] Spacing follows systematic scale
+- [ ] Colors match design system palette
+- [ ] Typography is unified
+- [ ] Hover/focus/active states are clear
+- [ ] Components are reusable
+- [ ] Responsive on all screen sizes
+- [ ] Accessible (WCAG AA minimum)
+- [ ] Reduced motion preference respected
+- [ ] No broken layouts or visual bugs
+- [ ] Glassmorphism applied consistently
+
+### Working Style
+
+**Iterative Approach:**
+1. Show unified CSS for component group
+2. Demonstrate before/after for key templates
+3. Make components reusable across codebase
+4. Replace old variants with new canonical versions
+5. Document assumptions and decisions
+
+**Sensible Defaults:**
+- Professional SaaS dashboard aesthetic
+- Consistent across entire project
+- Clean, modern, production-ready
+- Not flashy or over-designed
+
+### Scope
+
+**Apply design system to ALL:**
+- Dashboard pages
+- List views and tables
+- Detail views
+- Form pages
+- Settings pages
+- Authentication pages
+- Profile pages
+- Empty states
+- Error pages
+- Navigation components
+- Modal dialogs
+- Dropdown menus
+- Notification systems
+
+**Goal:** Entire site feels like one coherent, professionally designed product.
+

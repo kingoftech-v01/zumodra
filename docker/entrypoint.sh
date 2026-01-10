@@ -318,6 +318,39 @@ wait_for_rabbitmq() {
 }
 
 # -----------------------------------------------------------------------------
+# Fix Migration Directory Permissions (Docker compatibility)
+# -----------------------------------------------------------------------------
+fix_migration_permissions() {
+    log_info "Ensuring migration directories have correct permissions..."
+
+    # List of core apps that need migration directories
+    local apps=("tenants" "accounts" "custom_account_u" "ats" "hr_core" "services" "finance" "notifications" "messages_sys")
+
+    for app in "${apps[@]}"; do
+        local migration_dir="${app}/migrations"
+
+        # Create migrations directory if it doesn't exist
+        if [ ! -d "$migration_dir" ]; then
+            log_info "Creating migrations directory for ${app}..."
+            mkdir -p "$migration_dir"
+            touch "${migration_dir}/__init__.py"
+        fi
+
+        # Ensure directory is writable (fixes Docker permission issues)
+        if [ -d "$migration_dir" ]; then
+            chmod -R 755 "$migration_dir" 2>/dev/null || log_warn "Could not fix permissions for ${migration_dir}"
+
+            # If initial migration exists but has permission issues, try to fix
+            if [ -f "${migration_dir}/0001_initial.py" ]; then
+                chmod 644 "${migration_dir}/0001_initial.py" 2>/dev/null || true
+            fi
+        fi
+    done
+
+    log_info "Migration directory permissions verified"
+}
+
+# -----------------------------------------------------------------------------
 # Run Django Migrations (django-tenants compatible)
 # -----------------------------------------------------------------------------
 run_migrations() {
@@ -328,7 +361,10 @@ run_migrations() {
 
     log_info "Running Django migrations (django-tenants)..."
 
-    # Step 0: Create initial migrations for core apps if missing
+    # Step 0A: Fix migration directory permissions (Docker compatibility)
+    fix_migration_permissions
+
+    # Step 0B: Create initial migrations for core apps if missing
     log_info "Step 0/4: Checking for missing initial migrations..."
 
     # Create tenants app initial migration if missing

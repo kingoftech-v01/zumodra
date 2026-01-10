@@ -3,7 +3,7 @@ from django.db.models import Prefetch, Q
 from django.utils import timezone
 from django.core.cache import cache
 import uuid
-from zumodra import settings
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
@@ -25,7 +25,6 @@ class ConversationManager(models.Manager):
         return (
             self.get_queryset()
             .filter(participants=user)
-            .select_related()
             .prefetch_related(
                 Prefetch(
                     'participants',

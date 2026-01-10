@@ -1,73 +1,142 @@
 {% extends "account/base.html" %}
+{% load i18n static %}
 
-{% load i18n %}
-
-{% block head_title %}{% trans "Email Addresses" %}{% endblock head_title %}
+{% block head_title %}{% trans "Email Addresses" %} - Zumodra{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Email Addresses" %}</h1>
+<div class="zu-text-center" style="margin-bottom: var(--zu-space-6);">
+    <div style="margin: 0 auto var(--zu-space-4); width: 4rem; height: 4rem; background: var(--zu-info-100); border-radius: var(--zu-radius-full); display: flex; align-items: center; justify-content: center;">
+        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 2rem; height: 2rem; color: var(--zu-info-600);">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
+    </div>
+    <h1 style="font-size: var(--zu-text-2xl); font-weight: var(--zu-font-bold); color: var(--zu-text-primary); margin-bottom: var(--zu-space-2);">{% trans "Email Addresses" %}</h1>
+    <p style="color: var(--zu-text-secondary);">{% trans "Manage your email addresses" %}</p>
+</div>
+
 {% if emailaddresses %}
-<p>{% trans 'The following email addresses are associated with your account:' %}</p>
+<p style="font-size: var(--zu-text-sm); color: var(--zu-text-secondary); margin-bottom: var(--zu-space-4);">{% trans 'The following email addresses are associated with your account:' %}</p>
 
-<form action="{% url 'account_email' %}" class="email_list" method="post">
-{% csrf_token %}
-<fieldset class="blockLabels">
+<form action="{% url 'account_email' %}" method="post" style="margin-bottom: var(--zu-space-6);">
+    {% csrf_token %}
 
-  {% for emailaddress in emailaddresses %}
-<div class="ctrlHolder">
-      <label for="email_radio_{{forloop.counter}}" class="{% if emailaddress.primary %}primary_email{%endif%}">
+    <div class="zu-card" style="margin-bottom: var(--zu-space-4);">
+        {% for emailaddress in emailaddresses %}
+        <label for="email_radio_{{forloop.counter}}" style="display: flex; align-items: center; gap: var(--zu-space-3); padding: var(--zu-space-4); border-bottom: 1px solid var(--zu-border-light); cursor: pointer; {% if emailaddress.primary %}background: var(--zu-success-50);{% endif %}">
+            <input id="email_radio_{{forloop.counter}}"
+                   type="radio"
+                   name="email"
+                   {% if emailaddress.primary or emailaddresses|length == 1 %}checked="checked"{% endif %}
+                   value="{{emailaddress.email}}"
+                   style="width: 1rem; height: 1rem; accent-color: var(--zu-teal-600);">
 
-      <input id="email_radio_{{forloop.counter}}" type="radio" name="email" {% if emailaddress.primary or emailaddresses|length == 1 %}checked="checked"{%endif %} value="{{emailaddress.email}}"/>
+            <div style="flex: 1; min-width: 0;">
+                <p style="font-weight: var(--zu-font-medium); color: var(--zu-text-primary); word-break: break-all;">{{ emailaddress.email }}</p>
+                <div style="display: flex; gap: var(--zu-space-2); margin-top: var(--zu-space-1);">
+                    {% if emailaddress.verified %}
+                    <span style="display: inline-flex; align-items: center; gap: var(--zu-space-1); padding: var(--zu-space-0-5) var(--zu-space-2); background: var(--zu-success-100); color: var(--zu-success-700); font-size: var(--zu-text-xs); font-weight: var(--zu-font-medium); border-radius: var(--zu-radius-full);">
+                        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 0.75rem; height: 0.75rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {% trans "Verified" %}
+                    </span>
+                    {% else %}
+                    <span style="display: inline-flex; align-items: center; gap: var(--zu-space-1); padding: var(--zu-space-0-5) var(--zu-space-2); background: var(--zu-warning-100); color: var(--zu-warning-700); font-size: var(--zu-text-xs); font-weight: var(--zu-font-medium); border-radius: var(--zu-radius-full);">
+                        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 0.75rem; height: 0.75rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                        {% trans "Unverified" %}
+                    </span>
+                    {% endif %}
+                    {% if emailaddress.primary %}
+                    <span style="display: inline-flex; align-items: center; gap: var(--zu-space-1); padding: var(--zu-space-0-5) var(--zu-space-2); background: var(--zu-teal-100); color: var(--zu-teal-700); font-size: var(--zu-text-xs); font-weight: var(--zu-font-medium); border-radius: var(--zu-radius-full);">
+                        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 0.75rem; height: 0.75rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                        </svg>
+                        {% trans "Primary" %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </label>
+        {% endfor %}
+    </div>
 
-{{ emailaddress.email }}
-    {% if emailaddress.verified %}
-    <span class="verified">{% trans "Verified" %}</span>
-    {% else %}
-    <span class="unverified">{% trans "Unverified" %}</span>
-    {% endif %}
-      {% if emailaddress.primary %}<span class="primary">{% trans "Primary" %}</span>{% endif %}
-</label>
-</div>
-  {% endfor %}
-
-<div class="buttonHolder">
-      <button class="secondaryAction" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
-      <button class="secondaryAction" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
-      <button class="primaryAction" type="submit" name="action_remove" >{% trans 'Remove' %}</button>
-</div>
-
-</fieldset>
+    <div style="display: flex; flex-wrap: wrap; gap: var(--zu-space-2);">
+        <button class="zu-btn zu-btn--secondary" type="submit" name="action_primary">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+            {% trans 'Make Primary' %}
+        </button>
+        <button class="zu-btn zu-btn--secondary" type="submit" name="action_send">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+            {% trans 'Re-send Verification' %}
+        </button>
+        <button class="zu-btn zu-btn--danger" type="submit" name="action_remove" id="remove_email_btn">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+            {% trans 'Remove' %}
+        </button>
+    </div>
 </form>
 
 {% else %}
 {% include "account/snippets/warn_no_email.html" %}
 {% endif %}
 
-  {% if can_add_email %}
-    <h2>{% trans "Add Email Address" %}</h2>
+{% if can_add_email %}
+<div style="border-top: 1px solid var(--zu-border-light); padding-top: var(--zu-space-6);">
+    <h2 style="font-size: var(--zu-text-lg); font-weight: var(--zu-font-semibold); color: var(--zu-text-primary); margin-bottom: var(--zu-space-4);">{% trans "Add Email Address" %}</h2>
 
-    <form method="post" action="{% url 'account_email' %}" class="add_email">
+    <form method="post" action="{% url 'account_email' %}" style="display: flex; flex-direction: column; gap: var(--zu-space-4);">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button name="action_add" type="submit">{% trans "Add Email" %}</button>
+
+        <div class="zu-form-group">
+            <label for="id_email" class="zu-label">{% trans "Email Address" %}</label>
+            <div class="zu-input-icon-wrapper" style="position: relative;">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position: absolute; left: var(--zu-space-3); top: 50%; transform: translateY(-50%); color: var(--zu-text-muted); width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                <input type="email"
+                       name="email"
+                       id="id_email"
+                       class="zu-input"
+                       style="padding-left: var(--zu-space-10);"
+                       placeholder="{% trans 'Enter email address' %}"
+                       required>
+            </div>
+            {% if form.email.errors %}
+            <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-sm); color: var(--zu-error-600);">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <button name="action_add" type="submit" class="zu-btn zu-btn--primary zu-btn--full" style="gap: var(--zu-space-2);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            {% trans "Add Email" %}
+        </button>
     </form>
-  {% endif %}
-
+</div>
+{% endif %}
 {% endblock content %}
-
 
 {% block extra_body %}
 <script type="text/javascript">
 (function() {
-  var message = "{% trans 'Do you really want to remove the selected email address?' %}";
-  var actions = document.getElementsByName('action_remove');
-  if (actions.length) {
-    actions[0].addEventListener("click", function(e) {
-      if (! confirm(message)) {
-        e.preventDefault();
-      }
-    });
-  }
+    var message = "{% trans 'Do you really want to remove the selected email address?' %}";
+    var actions = document.getElementsByName('action_remove');
+    if (actions.length) {
+        actions[0].addEventListener("click", function(e) {
+            if (!confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    }
 })();
 </script>
 {% endblock extra_body %}

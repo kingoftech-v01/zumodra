@@ -1,33 +1,87 @@
 {% extends "account/base.html" %}
-{% load i18n %}
-{% block head_title %}
-    {% trans "Email Address" %}
-{% endblock head_title %}
+{% load i18n static %}
+
+{% block head_title %}{% trans "Email Address" %} - Zumodra{% endblock %}
+
 {% block content %}
-    <h1>{% trans "Email Address" %}</h1>
-    {% if emailaddresses %}
-        {% if current_emailaddress %}
-            <p>
-                {% trans 'The following email address is associated with your account:' %} <a href="mailto:{{ current_emailaddress.email }}">{{ current_emailaddress.email }}</a>
-            </p>
-        {% endif %}
-        {% if new_emailaddress %}
-            <p>
-                {% trans 'Your email address is still pending verification:' %} <a href="mailto:{{ new_emailaddress.email }}">{{ new_emailaddress.email }}</a>
-            </p>
-            <form method="post" action="{% url 'account_email' %}">
-                {% csrf_token %}
-                <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
-                <button type="submit" name="action_send">{% trans 'Re-send Verification' %}</button>
-            </form>
-        {% endif %}
-    {% else %}
-        {% include "account/snippets/warn_no_email.html" %}
+<div class="zu-text-center" style="margin-bottom: var(--zu-space-6);">
+    <div style="margin: 0 auto var(--zu-space-4); width: 4rem; height: 4rem; background: var(--zu-info-100); border-radius: var(--zu-radius-full); display: flex; align-items: center; justify-content: center;">
+        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 2rem; height: 2rem; color: var(--zu-info-600);">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
+    </div>
+    <h1 style="font-size: var(--zu-text-2xl); font-weight: var(--zu-font-bold); color: var(--zu-text-primary); margin-bottom: var(--zu-space-2);">{% trans "Email Address" %}</h1>
+</div>
+
+{% if emailaddresses %}
+    {% if current_emailaddress %}
+    <div class="zu-card" style="padding: var(--zu-space-4); margin-bottom: var(--zu-space-4);">
+        <p style="font-size: var(--zu-text-sm); color: var(--zu-text-secondary); margin-bottom: var(--zu-space-2);">{% trans 'The following email address is associated with your account:' %}</p>
+        <p style="font-weight: var(--zu-font-medium); color: var(--zu-text-primary);">
+            <a href="mailto:{{ current_emailaddress.email }}" style="color: var(--zu-text-link); text-decoration: none;">{{ current_emailaddress.email }}</a>
+        </p>
+    </div>
     {% endif %}
-    <h2>{% trans "Change Email Address" %}</h2>
-    <form method="post" action="{% url 'account_email' %}">
+
+    {% if new_emailaddress %}
+    <div class="zu-alert zu-alert--warning" style="margin-bottom: var(--zu-space-4);">
+        <svg class="zu-icon zu-alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        <div class="zu-alert__content">
+            <p class="zu-alert__message">
+                {% trans 'Your email address is still pending verification:' %}
+                <a href="mailto:{{ new_emailaddress.email }}" style="color: inherit; font-weight: var(--zu-font-medium);">{{ new_emailaddress.email }}</a>
+            </p>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'account_email' %}" style="margin-bottom: var(--zu-space-6);">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button name="action_add" type="submit">{% trans "Change Email" %}</button>
+        <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
+        <button type="submit" name="action_send" class="zu-btn zu-btn--secondary zu-btn--full" style="gap: var(--zu-space-2);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+            {% trans 'Re-send Verification' %}
+        </button>
     </form>
+    {% endif %}
+{% else %}
+    {% include "account/snippets/warn_no_email.html" %}
+{% endif %}
+
+<div style="border-top: 1px solid var(--zu-border-light); padding-top: var(--zu-space-6);">
+    <h2 style="font-size: var(--zu-text-lg); font-weight: var(--zu-font-semibold); color: var(--zu-text-primary); margin-bottom: var(--zu-space-4);">{% trans "Change Email Address" %}</h2>
+
+    <form method="post" action="{% url 'account_email' %}" style="display: flex; flex-direction: column; gap: var(--zu-space-4);">
+        {% csrf_token %}
+
+        <div class="zu-form-group">
+            <label for="id_email" class="zu-label">{% trans "New Email Address" %}</label>
+            <div class="zu-input-icon-wrapper" style="position: relative;">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position: absolute; left: var(--zu-space-3); top: 50%; transform: translateY(-50%); color: var(--zu-text-muted); width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                <input type="email"
+                       name="email"
+                       id="id_email"
+                       class="zu-input"
+                       style="padding-left: var(--zu-space-10);"
+                       placeholder="{% trans 'Enter new email address' %}"
+                       required>
+            </div>
+            {% if form.email.errors %}
+            <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-sm); color: var(--zu-error-600);">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <button name="action_add" type="submit" class="zu-btn zu-btn--primary zu-btn--full" style="gap: var(--zu-space-2);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            {% trans "Change Email" %}
+        </button>
+    </form>
+</div>
 {% endblock content %}
