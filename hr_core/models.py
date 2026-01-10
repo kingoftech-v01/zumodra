@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
-from core.models import TenantAwareModel
+from core.db.models import TenantAwareModel
 
 
 class Employee(TenantAwareModel):
