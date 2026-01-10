@@ -365,7 +365,7 @@ run_migrations() {
     fix_migration_permissions
 
     # Step 1: Run migrations for SHARED_APPS on the public schema
-    log_info "Step 1/3: Migrating shared schema (public)..."
+    log_info "Step 1/4: Migrating shared schema (public)..."
     if python manage.py migrate_schemas --shared --noinput; then
         log_info "Shared schema migrations completed successfully!"
     else
@@ -373,25 +373,35 @@ run_migrations() {
         return 1
     fi
 
-    # Step 2: Run migrations for TENANT_APPS on all tenant schemas
-    log_info "Step 2/3: Migrating tenant schemas..."
+    # Step 2: Migrate existing tenant schemas (if any exist)
+    log_info "Step 2/4: Migrating existing tenant schemas..."
     if python manage.py migrate_schemas --tenant --noinput; then
-        log_info "Tenant schema migrations completed successfully!"
+        log_info "Existing tenant schema migrations completed successfully!"
     else
         log_warn "Tenant schema migration had issues (may be no tenants yet)"
         # Don't fail if there are no tenants - this is expected on first run
     fi
 
-    # Step 3: Create demo tenant if configured
+    # Step 3: Create demo tenants if configured
     if [ "$CREATE_DEMO_TENANT" = "true" ]; then
-        log_info "Step 3/3: Creating demo tenants..."
+        log_info "Step 3/4: Creating demo tenants..."
         if python manage.py bootstrap_demo_tenants; then
             log_info "✓ Demo tenants created successfully!"
         else
             log_warn "Demo tenant creation had issues (may already exist)"
         fi
+
+        # Step 4: Run tenant migrations again for newly created demo tenants
+        log_info "Step 4/4: Migrating newly created demo tenant schemas..."
+        if python manage.py migrate_schemas --tenant --noinput; then
+            log_info "✓ Demo tenant schema migrations completed successfully!"
+        else
+            log_error "Demo tenant schema migration failed!"
+            return 1
+        fi
     else
-        log_info "Step 3/3: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
+        log_info "Step 3/4: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
+        log_info "Step 4/4: No new tenants to migrate"
     fi
 }
 

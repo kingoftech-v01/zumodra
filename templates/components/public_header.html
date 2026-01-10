@@ -91,17 +91,17 @@
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
                              class="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-line p-2 z-50">
-                            {% url 'services:service_list' as browse_jobs_url %}
+                            {% url 'careers:job_list' as browse_jobs_url %}
                             {% if browse_jobs_url %}<a href="{{ browse_jobs_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Jobs' %}</a>{% endif %}
-                            {% url 'services:browse_services' as services_browse_url %}
+                            {% url 'services:service_list' as services_browse_url %}
                             {% if services_browse_url %}
-                            <a href="{{ services_browse_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Projects' %}</a>
+                            <a href="{{ services_browse_url }}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Browse Services' %}</a>
                             {% endif %}
                             <hr class="my-2 border-line">
                             <a href="{% url 'become_seller' %}" class="block px-4 py-2 text-sm text-secondary hover:bg-surface hover:text-primary rounded-lg">{% trans 'Become a Freelancer' %}</a>
                         </div>
                     </li>
-                    {% url 'services:browse_services' as services_url %}
+                    {% url 'services:service_list' as services_url %}
                     {% if services_url %}
                     <li class="h-full relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                         <a href="#"

@@ -447,9 +447,9 @@ class Command(BaseCommand):
             )
             stages.append(stage)
 
-        # Create job postings
+        # Create job postings - create ALL job titles for comprehensive demo
         jobs = []
-        for i, title in enumerate(JOB_TITLES[:15]):
+        for i, title in enumerate(JOB_TITLES):
             city, state, country = random.choice(CITIES)
             job, created = JobPosting.objects.get_or_create(
                 reference_code=f'DEMO-{str(i + 1).zfill(4)}',
@@ -729,6 +729,77 @@ class Command(BaseCommand):
             except Exception:
                 pass
         self.stdout.write(f"   Service providers: {len(providers)}")
+
+        # Create services for each provider
+        services = []
+        service_titles = [
+            'Professional Website Development',
+            'Mobile App Development (iOS/Android)',
+            'Logo & Brand Identity Design',
+            'SEO & Digital Marketing',
+            'Business Consulting Services',
+            'Content Writing & Copywriting',
+            'Video Editing & Production',
+            'Data Analysis & Reporting',
+            'Social Media Management',
+            'E-commerce Store Setup',
+            'UI/UX Design Services',
+            'Cloud Migration & DevOps',
+            'API Development & Integration',
+            'Database Design & Optimization',
+            'WordPress Website Development',
+            'Graphic Design Services',
+            'Email Marketing Campaigns',
+            'Product Photography',
+            'Virtual Assistant Services',
+            'Translation Services',
+        ]
+
+        for provider in providers:
+            # Each provider creates 1-3 services
+            num_services = random.randint(1, 3)
+            for _ in range(num_services):
+                if not service_titles:
+                    break
+
+                title = random.choice(service_titles)
+                service_titles.remove(title)
+
+                # 70% public, 30% private
+                is_private = random.random() > 0.7
+                marketplace_enabled = not is_private
+
+                try:
+                    service, created = Service.objects.get_or_create(
+                        provider=provider,
+                        tenant=tenant,
+                        title=title,
+                        defaults={
+                            'slug': slugify(f'{title}-{provider.id}'),
+                            'description': f'Professional {title.lower()} service with high quality delivery. '
+                                         f'{random.randint(3, 10)}+ years of experience. '
+                                         f'Delivered {random.randint(20, 150)}+ successful projects.',
+                            'short_description': f'Expert {title.lower()} - Quick turnaround, quality guaranteed',
+                            'category': random.choice(categories),
+                            'service_type': random.choice(['fixed', 'hourly', 'package']),
+                            'delivery_type': random.choice(['remote', 'onsite', 'hybrid']),
+                            'price': Decimal(random.randint(100, 5000)),
+                            'delivery_days': random.randint(1, 30),
+                            'revisions_allowed': random.randint(1, 5),
+                            'is_active': True,
+                            'is_private': is_private,
+                            'marketplace_enabled': marketplace_enabled,
+                            'is_featured': random.choice([True, False, False, False]),
+                            'view_count': random.randint(0, 500),
+                            'order_count': random.randint(0, 50),
+                        }
+                    )
+                    if created:
+                        services.append(service)
+                except Exception as e:
+                    pass
+
+        self.stdout.write(f"   Services created: {len(services)} ({sum(1 for s in services if not s.is_private)} public, {sum(1 for s in services if s.is_private)} private)")
 
     def _create_verification_data(self, users):
         """Create verification and trust score demo data."""

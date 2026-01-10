@@ -60,59 +60,81 @@ geolocator = Nominatim(user_agent="zumodra_app")
 def browse_services(request):
     """
     Browse all services with filtering and search capabilities.
+    Handles empty database gracefully (e.g., during initial setup).
     """
-    services_query = Service.objects.select_related('provider', 'category').prefetch_related('tags', 'images')
+    try:
+        services_query = Service.objects.select_related('provider', 'category').prefetch_related('tags', 'images')
 
-    # Search by name or description
-    search = request.GET.get('search', '')
-    if search:
-        services_query = services_query.filter(
-            Q(name__icontains=search) |
-            Q(description__icontains=search) |
-            Q(tags__name__icontains=search)
-        ).distinct()
+        # Search by name or description
+        search = request.GET.get('search', '')
+        if search:
+            services_query = services_query.filter(
+                Q(name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(tags__name__icontains=search)
+            ).distinct()
 
-    # Filter by category
-    category_id = request.GET.get('category')
-    if category_id:
-        services_query = services_query.filter(category_id=category_id)
+        # Filter by category
+        category_id = request.GET.get('category')
+        if category_id:
+            services_query = services_query.filter(category_id=category_id)
 
-    # Filter by price range
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    if min_price:
-        services_query = services_query.filter(price__gte=min_price)
-    if max_price:
-        services_query = services_query.filter(price__lte=max_price)
+        # Filter by price range
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        if min_price:
+            services_query = services_query.filter(price__gte=min_price)
+        if max_price:
+            services_query = services_query.filter(price__lte=max_price)
 
-    # Filter by tags
-    tag = request.GET.get('tag')
-    if tag:
-        services_query = services_query.filter(tags__name__iexact=tag)
+        # Filter by tags
+        tag = request.GET.get('tag')
+        if tag:
+            services_query = services_query.filter(tags__name__iexact=tag)
 
-    # Sorting
-    sort_by = request.GET.get('sort', '-created_at')
-    allowed_sorts = ['-created_at', 'created_at', 'price', '-price', 'name']
-    if sort_by in allowed_sorts:
-        services_query = services_query.order_by(sort_by)
+        # Sorting
+        sort_by = request.GET.get('sort', '-created_at')
+        allowed_sorts = ['-created_at', 'created_at', 'price', '-price', 'name']
+        if sort_by in allowed_sorts:
+            services_query = services_query.order_by(sort_by)
 
-    # Pagination
-    paginator = Paginator(services_query, 12)
-    page_number = request.GET.get('page', 1)
-    services = paginator.get_page(page_number)
+        # Pagination
+        paginator = Paginator(services_query, 12)
+        page_number = request.GET.get('page', 1)
+        services = paginator.get_page(page_number)
 
-    # Get categories and tags for filters
-    categories = ServiceCategory.objects.all()
-    popular_tags = ServiceTag.objects.annotate(
-        service_count=Count('services')
-    ).order_by('-service_count')[:10]
+        # Get categories and tags for filters
+        categories = ServiceCategory.objects.all()
+        popular_tags = ServiceTag.objects.annotate(
+            service_count=Count('services')
+        ).order_by('-service_count')[:10]
 
-    context = {
-        'services': services,
-        'categories': categories,
-        'popular_tags': popular_tags,
-        'search': search,
-    }
+        context = {
+            'services': services,
+            'categories': categories,
+            'popular_tags': popular_tags,
+            'search': search,
+        }
+
+    except Exception as e:
+        # Handle case where tables don't exist yet (during migrations)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Error loading services: {e}")
+
+        # Return empty context to display "no services" message
+        from django.core.paginator import Paginator, EmptyPage
+        empty_list = []
+        paginator = Paginator(empty_list, 12)
+
+        context = {
+            'services': paginator.get_page(1),
+            'categories': [],
+            'popular_tags': [],
+            'search': request.GET.get('search', ''),
+            'error_message': 'Services will be available once the system is fully initialized.',
+        }
+
     return render(request, 'services/browse_services.html', context)
 
 
