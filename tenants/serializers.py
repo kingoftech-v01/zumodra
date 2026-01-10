@@ -132,11 +132,15 @@ class TenantSerializer(serializers.ModelSerializer):
     trial_days_remaining = serializers.ReadOnlyField()
     is_on_trial = serializers.ReadOnlyField()
     primary_domain = serializers.SerializerMethodField()
+    can_create_jobs = serializers.SerializerMethodField()
+    can_have_employees = serializers.SerializerMethodField()
+    ein_verified = serializers.ReadOnlyField()
 
     class Meta:
         model = Tenant
         fields = [
             'id', 'uuid', 'name', 'slug', 'status',
+            'tenant_type', 'can_create_jobs', 'can_have_employees',
             'plan', 'plan_id',
             'trial_ends_at', 'paid_until', 'on_trial',
             'trial_days_remaining', 'is_on_trial',
@@ -144,13 +148,16 @@ class TenantSerializer(serializers.ModelSerializer):
             'industry', 'company_size', 'website', 'logo',
             'address_line1', 'address_line2', 'city', 'state',
             'postal_code', 'country',
+            'ein_number', 'ein_verified',
             'primary_domain',
             'created_at', 'updated_at', 'activated_at'
         ]
         read_only_fields = [
-            'id', 'uuid', 'slug', 'status',
+            'id', 'uuid', 'slug', 'status', 'tenant_type',
+            'can_create_jobs', 'can_have_employees',
             'trial_ends_at', 'paid_until', 'on_trial',
             'trial_days_remaining', 'is_on_trial',
+            'ein_verified',
             'created_at', 'updated_at', 'activated_at'
         ]
 
@@ -158,6 +165,14 @@ class TenantSerializer(serializers.ModelSerializer):
         """Get the primary domain for this tenant."""
         primary = obj.domains.filter(is_primary=True).first()
         return primary.domain if primary else None
+
+    def get_can_create_jobs(self, obj):
+        """Check if tenant can create job postings (COMPANY only)."""
+        return obj.can_create_jobs()
+
+    def get_can_have_employees(self, obj):
+        """Check if tenant can have multiple employees (COMPANY only)."""
+        return obj.can_have_employees()
 
 
 class TenantUpdateSerializer(serializers.ModelSerializer):
@@ -170,7 +185,7 @@ class TenantUpdateSerializer(serializers.ModelSerializer):
         fields = [
             'name', 'industry', 'company_size', 'website', 'logo',
             'address_line1', 'address_line2', 'city', 'state',
-            'postal_code', 'country'
+            'postal_code', 'country', 'ein_number'
         ]
 
 
@@ -179,13 +194,19 @@ class TenantPublicSerializer(serializers.ModelSerializer):
     Public tenant information (for career pages, public profiles).
     """
 
+    can_create_jobs = serializers.SerializerMethodField()
+
     class Meta:
         model = Tenant
         fields = [
-            'uuid', 'name', 'logo', 'industry', 'company_size',
-            'website', 'city', 'country'
+            'uuid', 'name', 'tenant_type', 'logo', 'industry', 'company_size',
+            'website', 'city', 'country', 'can_create_jobs', 'ein_verified'
         ]
         read_only_fields = fields
+
+    def get_can_create_jobs(self, obj):
+        """Check if tenant can create job postings (COMPANY only)."""
+        return obj.can_create_jobs()
 
 
 # ==================== TENANT SETTINGS SERIALIZERS ====================
