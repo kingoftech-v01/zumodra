@@ -103,11 +103,6 @@ urlpatterns = [
     # API endpoints accessible from public schema
     path('api/', include('api.urls')),
     path('api/v1/', include('api.urls_v1')),
-
-    # Public Career Pages (Disabled - careers is tenant-specific)
-    # Note: careers app depends on ats tables which are tenant-specific
-    # Jobs are only available within tenant contexts (subdomain access)
-    # path('careers/', include('careers.urls', namespace='careers_public')),
 ]
 
 # Add API documentation URLs if drf-spectacular is installed
@@ -148,6 +143,9 @@ urlpatterns += i18n_patterns(
 
     # Services Marketplace (included with namespace for template compatibility)
     path('services/', include('services.urls', namespace='services')),
+
+    # Careers (public job listings)
+    path('careers/', include('careers.urls', namespace='careers')),
 
     # Blog (Wagtail CMS)
     path('blog/', include('blog.urls')),
