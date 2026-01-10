@@ -27,7 +27,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     ]
     list_filter = ['status', 'employment_type', 'department']
     search_fields = ['employee_id', 'user__first_name', 'user__last_name', 'user__email']
-    readonly_fields = ['uuid', 'employee_id', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'employee_id', 'created_at', 'updated_at']
     raw_id_fields = ['user', 'manager', 'department', 'from_application']
     date_hierarchy = 'hire_date'
 
@@ -104,7 +104,7 @@ class TimeOffRequestAdmin(admin.ModelAdmin):
     ]
     list_filter = ['status', 'time_off_type', 'start_date']
     search_fields = ['employee__user__email', 'employee__employee_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['employee', 'approver']
     date_hierarchy = 'start_date'
 
@@ -183,7 +183,7 @@ class EmployeeDocumentAdmin(admin.ModelAdmin):
     list_display = ['title', 'employee', 'category', 'status', 'requires_signature', 'created_at']
     list_filter = ['category', 'status', 'requires_signature']
     search_fields = ['title', 'employee__user__email']
-    readonly_fields = ['uuid', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['employee', 'template', 'uploaded_by']
 
 
@@ -195,7 +195,7 @@ class OffboardingAdmin(admin.ModelAdmin):
     ]
     list_filter = ['separation_type', 'eligible_for_rehire']
     search_fields = ['employee__user__email', 'employee__employee_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['employee', 'processed_by']
 
     def completion_status(self, obj):
@@ -213,7 +213,7 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
     ]
     list_filter = ['status', 'review_type', 'overall_rating']
     search_fields = ['employee__user__email', 'employee__employee_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['employee', 'reviewer']
     date_hierarchy = 'review_period_end'
 
@@ -228,7 +228,7 @@ class EmployeeCompensationAdmin(admin.ModelAdmin):
     ]
     list_filter = ['change_reason', 'currency', 'effective_date']
     search_fields = ['employee__user__email', 'employee__employee_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at', 'salary_change_percentage']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'salary_change_percentage']
     raw_id_fields = ['employee', 'approved_by', 'created_by']
     date_hierarchy = 'effective_date'
 
@@ -284,7 +284,7 @@ class TimeOffBalanceAdmin(admin.ModelAdmin):
     ]
     list_filter = ['time_off_type', 'year']
     search_fields = ['employee__user__email', 'employee__employee_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at']
+    readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['employee', 'time_off_type']
 
 
@@ -389,7 +389,7 @@ class CertificationAdmin(admin.ModelAdmin):
     ]
     list_filter = ['is_verified', 'is_active', 'issuing_organization']
     search_fields = ['name', 'employee__user__email', 'credential_id']
-    readonly_fields = ['uuid', 'created_at', 'updated_at', 'is_expired', 'days_until_expiry']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'is_expired', 'days_until_expiry']
     raw_id_fields = ['employee', 'verified_by']
     date_hierarchy = 'issue_date'
 
@@ -440,7 +440,7 @@ class EmployeeActivityLogAdmin(admin.ModelAdmin):
     list_filter = ['activity_type', 'created_at']
     search_fields = ['employee__user__email', 'description']
     readonly_fields = [
-        'uuid', 'employee', 'activity_type', 'description',
+        'id', 'employee', 'activity_type', 'description',
         'old_value', 'new_value', 'metadata', 'performed_by', 'created_at'
     ]
     date_hierarchy = 'created_at'
@@ -468,7 +468,7 @@ class EmployeeGoalAdmin(admin.ModelAdmin):
     ]
     list_filter = ['status', 'category', 'priority']
     search_fields = ['title', 'employee__user__email', 'description']
-    readonly_fields = ['uuid', 'created_at', 'updated_at', 'is_overdue', 'days_remaining']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'is_overdue', 'days_remaining']
     raw_id_fields = ['employee', 'performance_review', 'approved_by']
     date_hierarchy = 'target_date'
 
@@ -557,7 +557,7 @@ class PerformanceImprovementPlanAdmin(admin.ModelAdmin):
         'reason', 'final_assessment'
     ]
     readonly_fields = [
-        'uuid', 'created_at', 'updated_at', 'actual_end_date'
+        'id', 'created_at', 'updated_at', 'actual_end_date'
     ]
     raw_id_fields = ['employee', 'initiated_by', 'hr_representative']
     date_hierarchy = 'start_date'
@@ -588,7 +588,7 @@ class PerformanceImprovementPlanAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Metadata', {
-            'fields': ('uuid', 'created_at', 'updated_at'),
+            'fields': ('id', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
