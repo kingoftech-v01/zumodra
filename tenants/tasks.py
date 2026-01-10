@@ -79,7 +79,8 @@ def _calculate_storage_usage(tenant):
 
             # Query accounts user profile images
             try:
-                from accounts.models import User
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
                 users = User.objects.filter(avatar__isnull=False).exclude(avatar='')
                 for user in users:
                     if user.avatar and hasattr(user.avatar, 'size'):

@@ -13,8 +13,10 @@ import os
 
 def home_view(request):
     """Homepage with hero, features, and testimonials."""
+    from django.contrib.auth import get_user_model
     from services.models import ServiceCategory, Service, ServiceProvider
-    from accounts.models import User
+
+    User = get_user_model()
 
     context = {}
 

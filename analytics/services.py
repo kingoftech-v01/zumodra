@@ -1227,8 +1227,10 @@ class AnalyticsService:
         Returns:
             Dict with performance metrics (or list if no recruiter_id)
         """
+        from django.contrib.auth import get_user_model
         from ats.models import Application
-        from accounts.models import User
+
+        User = get_user_model()
 
         applications = Application.objects.filter(
             applied_at__gte=self.date_filter.start_date,
