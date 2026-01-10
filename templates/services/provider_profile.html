@@ -300,4 +300,11 @@
         </div>
     </div>
 </div>
+
+<!-- Tenant Profile Card -->
+{% if request.tenant.tenant_type == 'company' %}
+    {% include 'components/company_profile_card.html' with tenant=request.tenant services_count=services_count jobs_count=jobs_count %}
+{% else %}
+    {% include 'components/freelancer_profile_card.html' with tenant=request.tenant services_count=services_count %}
+{% endif %}
 {% endblock %}

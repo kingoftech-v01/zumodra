@@ -29,6 +29,8 @@
 {% endblock %}
 
 {% block content %}
+<!-- Hiring Context Selector -->
+{% include 'components/hiring_context_selector.html' with hiring_context=hiring_context %}
 <div class="max-w-3xl">
     <form method="post" class="space-y-8">
         {% csrf_token %}

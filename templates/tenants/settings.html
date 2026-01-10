@@ -226,4 +226,10 @@
         </div>
     </div>
 </div>
+
+<!-- Tenant Type Switcher -->
+<div class="mt-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{% trans "Organization Type" %}</h3>
+    {% include 'components/tenant_type_switcher.html' with tenant=request.tenant %}
+</div>
 {% endblock %}

@@ -28,6 +28,14 @@
 {% block meta_description %}{% trans "Zumodra - Verify. Recruit. Hire. Risk-Free. The trusted platform for verified freelancers and employers. Find top talent or your next opportunity today." %}{% endblock %}
 
 {% block content %}
+<!-- Platform Stats -->
+{% if stats %}
+<div class="text-sm text-gray-600 dark:text-gray-400">
+    <span>{{ stats.total_companies }} {% trans "Companies" %}</span>
+    <span class="mx-2">•</span>
+    <span>{{ stats.total_freelancers }} {% trans "Freelancers" %}</span>
+</div>
+{% endif %}
 
 {% comment %} HERO SLIDER SECTION {% endcomment %}
 <section class="slider">

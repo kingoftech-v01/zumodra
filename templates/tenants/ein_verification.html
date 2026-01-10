@@ -1,0 +1,12 @@
+{% extends "base/dashboard_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Business Verification" %} - Zumodra{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{% trans "Business Verification" %}</h1>
+
+    {% include 'components/ein_verification_form.html' with tenant=request.tenant %}
+</div>
+{% endblock %}

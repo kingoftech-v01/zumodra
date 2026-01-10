@@ -225,4 +225,9 @@
         </div>
     </div>
 </div>
+
+<!-- Hiring Context Badge -->
+{% if hiring_context %}
+    {% include 'components/hiring_context_badge.html' with hiring_context=hiring_context %}
+{% endif %}
 {% endblock %}
