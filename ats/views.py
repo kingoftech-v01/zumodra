@@ -651,6 +651,16 @@ class JobPostingViewSet(RecruiterViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can create jobs
+        from tenants.validators import validate_company_can_create_jobs
+        from django.core.exceptions import ValidationError
+
+        try:
+            validate_company_can_create_jobs(self.request.tenant)
+        except ValidationError as e:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied(str(e))
+
         # Auto-generate reference code if not provided
         instance = serializer.save(created_by=self.request.user)
         if not instance.reference_code:
@@ -689,6 +699,16 @@ class JobPostingViewSet(RecruiterViewSet):
     @action(detail=True, methods=['post'])
     def clone(self, request, uuid=None):
         """Clone a job posting."""
+        # TENANT TYPE VALIDATION: Only COMPANY tenants can create jobs (including clones)
+        from tenants.validators import validate_company_can_create_jobs
+        from django.core.exceptions import ValidationError
+
+        try:
+            validate_company_can_create_jobs(self.request.tenant)
+        except ValidationError as e:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied(str(e))
+
         job = self.get_object()
         serializer = JobPostingCloneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

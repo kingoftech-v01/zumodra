@@ -662,10 +662,14 @@ class CrossTenantServiceRequest(TenantAwareModel):
     in the REQUESTING tenant's schema (Company A) to ensure data ownership
     and proper isolation.
 
+    UPDATED: Now supports two hiring contexts:
+    - ORGANIZATIONAL: User hiring on behalf of their tenant/organization
+    - PERSONAL: User hiring for themselves (personal use)
+
     Flow:
     1. User in Company A browses PublicServiceCatalog (public schema)
     2. Finds service from Company B
-    3. Creates CrossTenantServiceRequest in Company A's schema
+    3. Creates CrossTenantServiceRequest in Company A's schema (with hiring_context)
     4. System notifies Company B (async Celery task)
     5. Company B reviews request in their dashboard
     6. If accepted, creates ServiceContract in Company A's schema
@@ -677,6 +681,10 @@ class CrossTenantServiceRequest(TenantAwareModel):
         REJECTED = 'rejected', _('Rejected')
         CONVERTED = 'converted', _('Converted to Contract')
         CANCELLED = 'cancelled', _('Cancelled')
+
+    class HiringContext(models.TextChoices):
+        ORGANIZATIONAL = 'organizational', _('On behalf of tenant/organization')
+        PERSONAL = 'personal', _('Personal user hiring')
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
@@ -742,6 +750,13 @@ class CrossTenantServiceRequest(TenantAwareModel):
         choices=RequestStatus.choices,
         default=RequestStatus.PENDING,
         db_index=True
+    )
+    hiring_context = models.CharField(
+        max_length=20,
+        choices=HiringContext.choices,
+        default=HiringContext.ORGANIZATIONAL,
+        db_index=True,
+        help_text=_('Is this request for organization or personal use?')
     )
     provider_response = models.TextField(
         blank=True,

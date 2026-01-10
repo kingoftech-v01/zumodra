@@ -653,6 +653,9 @@ class TenantInvitation(models.Model):
     """
     Invitations to join a tenant organization.
     Used for onboarding new team members.
+
+    IMPORTANT: Only COMPANY tenants can send invitations.
+    FREELANCER tenants cannot invite employees (single-user only).
     """
 
     class InvitationStatus(models.TextChoices):
@@ -675,8 +678,12 @@ class TenantInvitation(models.Model):
         related_name='sent_invitations'
     )
 
-    # Role assignment
-    role = models.CharField(max_length=50, default='member')
+    # Role assignment (uses TenantUser.UserRole choices)
+    assigned_role = models.CharField(
+        max_length=20,
+        default='employee',
+        help_text=_('Role assigned to user upon accepting invitation')
+    )
 
     # Status
     status = models.CharField(
@@ -701,12 +708,34 @@ class TenantInvitation(models.Model):
     def __str__(self):
         return f"Invitation to {self.email} for {self.tenant.name}"
 
+    def clean(self):
+        """Validate invitation rules."""
+        super().clean()
+        # Import validators here to avoid circular imports
+        from .validators import validate_company_can_receive_invitations
+
+        # Freelancers cannot send invitations
+        validate_company_can_receive_invitations(self.tenant)
+
     @property
     def is_expired(self):
         return timezone.now() > self.expires_at
 
     def accept(self, user):
-        """Mark invitation as accepted."""
+        """Accept invitation and create TenantUser with assigned role."""
+        from accounts.models import TenantUser
+
+        # Create TenantUser with the assigned role
+        TenantUser.objects.get_or_create(
+            user=user,
+            tenant=self.tenant,
+            defaults={
+                'role': self.assigned_role,
+                'is_active': True,
+            }
+        )
+
+        # Mark invitation as accepted
         self.status = self.InvitationStatus.ACCEPTED
         self.accepted_at = timezone.now()
         self.save(update_fields=['status', 'accepted_at'])
