@@ -37,7 +37,8 @@
             <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Dashboard" %}</span>
         </a>
 
-        <!-- ATS Section -->
+        <!-- ATS Section (COMPANY TENANTS ONLY) -->
+        {% if request.tenant.tenant_type == 'company' %}
         <div x-data="{ open: expandedMenus.ats || activeSection.startsWith('ats') }">
             <button @click="open = !open; expandedMenus.ats = open"
                     class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -94,8 +95,10 @@
                 </a>
             </div>
         </div>
+        {% endif %}
 
-        <!-- HR Section -->
+        <!-- HR Section (COMPANY TENANTS ONLY) -->
+        {% if request.tenant.tenant_type == 'company' %}
         <div x-data="{ open: expandedMenus.hr || activeSection.startsWith('hr') }">
             <button @click="open = !open; expandedMenus.hr = open"
                     class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -140,6 +143,7 @@
                 </a>
             </div>
         </div>
+        {% endif %}
 
         <!-- Analytics -->
         <a href="{% url 'analytics:dashboard' %}"
