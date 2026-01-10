@@ -173,8 +173,8 @@ class DomainAdmin(admin.ModelAdmin):
 
 @admin.register(TenantInvitation)
 class TenantInvitationAdmin(admin.ModelAdmin):
-    list_display = ['email', 'tenant', 'role', 'status', 'invited_by', 'created_at', 'expires_at']
-    list_filter = ['status', 'role', 'tenant']
+    list_display = ['email', 'tenant', 'assigned_role', 'status', 'invited_by', 'created_at', 'expires_at']
+    list_filter = ['status', 'assigned_role', 'tenant']
     search_fields = ['email', 'tenant__name']
     readonly_fields = ['uuid', 'token', 'created_at', 'accepted_at']
 
