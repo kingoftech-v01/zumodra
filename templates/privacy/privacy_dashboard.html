@@ -8,15 +8,15 @@
 {% if request.tenant %}
     {% if request.tenant.tenant_type == 'company' %}
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"/>
             </svg>
             {% trans "Company" %}
         </span>
     {% else %}
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
             </svg>
             {% trans "Freelancer" %}
         </span>
@@ -27,11 +27,15 @@
         <div class="col-lg-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>
-                    <i class="fas fa-user-shield me-2"></i>
+                    <svg class="w-6 h-6 inline-block me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                    </svg>
                     {% trans "Privacy Dashboard" %}
                 </h2>
-                <a href="{% url 'privacy:export' %}" class="btn btn-primary">
-                    <i class="fas fa-download me-2"></i>
+                <a href="{% url 'privacy:export' %}" class="zu-btn zu-btn--primary">
+                    <svg class="w-4 h-4 inline-block me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                    </svg>
                     {% trans "Export My Data" %}
                 </a>
             </div>
@@ -41,14 +45,16 @@
     <div class="row">
         <!-- Privacy Policy Status -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-white">
+            <div class="zu-card h-100 shadow-sm">
+                <div class="zu-card__header bg-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-file-contract text-primary me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-primary me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
                         {% trans "Privacy Policy" %}
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="zu-card__body">
                     {% if privacy_policy %}
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
@@ -60,21 +66,25 @@
                         </div>
                         {% if policy_accepted %}
                         <span class="badge bg-success">
-                            <i class="fas fa-check me-1"></i>
+                            <svg class="w-3 h-3 inline-block me-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                            </svg>
                             {% trans "Accepted" %}
                         </span>
                         {% else %}
                         <span class="badge bg-warning text-dark">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <svg class="w-3 h-3 inline-block me-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                            </svg>
                             {% trans "Action Required" %}
                         </span>
                         {% endif %}
                     </div>
-                    <a href="{% url 'privacy:policy' %}" class="btn btn-sm btn-outline-primary">
+                    <a href="{% url 'privacy:policy' %}" class="zu-btn zu-btn--outline btn-sm">
                         {% trans "Read Policy" %}
                     </a>
                     {% if not policy_accepted %}
-                    <a href="{% url 'privacy:consent' 'privacy_policy' %}" class="btn btn-sm btn-primary ms-2">
+                    <a href="{% url 'privacy:consent' 'privacy_policy' %}" class="zu-btn zu-btn--primary btn-sm ms-2">
                         {% trans "Accept Policy" %}
                     </a>
                     {% endif %}
@@ -87,36 +97,47 @@
 
         <!-- Quick Actions -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-white">
+            <div class="zu-card h-100 shadow-sm">
+                <div class="zu-card__header bg-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-bolt text-warning me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-warning me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+                        </svg>
                         {% trans "Your Rights" %}
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="zu-card__body">
                     <div class="row g-2">
                         <div class="col-6">
-                            <a href="{% url 'privacy:request_create' %}?type=access" class="btn btn-outline-primary w-100 py-3">
-                                <i class="fas fa-eye d-block mb-2 fa-lg"></i>
+                            <a href="{% url 'privacy:request_create' %}?type=access" class="zu-btn zu-btn--outline w-100 py-3">
+                                <svg class="w-6 h-6 d-block mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
                                 {% trans "Access My Data" %}
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'privacy:export' %}" class="btn btn-outline-success w-100 py-3">
-                                <i class="fas fa-file-export d-block mb-2 fa-lg"></i>
+                            <a href="{% url 'privacy:export' %}" class="zu-btn zu-btn--outline w-100 py-3">
+                                <svg class="w-6 h-6 d-block mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                </svg>
                                 {% trans "Export Data" %}
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'privacy:request_create' %}?type=rectification" class="btn btn-outline-info w-100 py-3">
-                                <i class="fas fa-edit d-block mb-2 fa-lg"></i>
+                            <a href="{% url 'privacy:request_create' %}?type=rectification" class="zu-btn zu-btn--outline w-100 py-3">
+                                <svg class="w-6 h-6 d-block mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+                                </svg>
                                 {% trans "Correct Data" %}
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'privacy:request_create' %}?type=erasure" class="btn btn-outline-danger w-100 py-3">
-                                <i class="fas fa-trash-alt d-block mb-2 fa-lg"></i>
+                            <a href="{% url 'privacy:request_create' %}?type=erasure" class="zu-btn zu-btn--outline w-100 py-3">
+                                <svg class="w-6 h-6 d-block mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                </svg>
                                 {% trans "Delete My Data" %}
                             </a>
                         </div>
@@ -129,17 +150,19 @@
     <div class="row">
         <!-- Active Consents -->
         <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-success me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                         {% trans "Your Consents" %}
                     </h5>
                     <span class="badge bg-primary">
                         {{ active_consents|length }} {% trans "Active" %}
                     </span>
                 </div>
-                <div class="card-body p-0">
+                <div class="zu-card__body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
@@ -177,7 +200,7 @@
                                     </td>
                                     <td class="text-end">
                                         <a href="{% url 'privacy:consent' consent.consent_type %}"
-                                           class="btn btn-sm btn-outline-secondary">
+                                           class="zu-btn zu-btn--outline btn-sm">
                                             {% trans "Manage" %}
                                         </a>
                                     </td>
@@ -198,14 +221,16 @@
 
         <!-- Data Subject Requests -->
         <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header bg-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-file-alt text-info me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-info me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
                         {% trans "Your Requests" %}
                     </h5>
                 </div>
-                <div class="card-body p-0">
+                <div class="zu-card__body p-0">
                     {% if pending_dsrs %}
                     <ul class="list-group list-group-flush">
                         {% for dsr in pending_dsrs %}
@@ -249,7 +274,9 @@
                             {{ dsr.completed_at|date:"M d" }}
                             {% if dsr.response_file %}
                             <a href="{% url 'privacy:download_export' dsr.pk %}" class="ms-1">
-                                <i class="fas fa-download"></i>
+                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                                </svg>
                             </a>
                             {% endif %}
                         </li>
@@ -264,14 +291,16 @@
     <!-- Consent History -->
     <div class="row">
         <div class="col-lg-12 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header bg-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-history text-secondary me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-secondary me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                         {% trans "Consent History" %}
                     </h5>
                 </div>
-                <div class="card-body p-0">
+                <div class="zu-card__body p-0">
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
                             <thead class="table-light">
@@ -321,25 +350,31 @@
     {% if purpose_consents %}
     <div class="row">
         <div class="col-lg-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header bg-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-database text-primary me-2"></i>
+                        <svg class="w-5 h-5 inline-block text-primary me-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
+                        </svg>
                         {% trans "Data Processing Purposes" %}
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="zu-card__body">
                     <div class="row g-3">
                         {% for item in purpose_consents %}
                         <div class="col-md-6 col-lg-4">
-                            <div class="card border {% if item.has_consent %}border-success{% else %}border-secondary{% endif %}">
-                                <div class="card-body">
+                            <div class="zu-card border {% if item.has_consent %}border-success{% else %}border-secondary{% endif %}">
+                                <div class="zu-card__body">
                                     <div class="d-flex justify-content-between">
                                         <h6 class="card-title">{{ item.purpose.name }}</h6>
                                         {% if item.has_consent %}
-                                        <i class="fas fa-check-circle text-success"></i>
+                                        <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
                                         {% else %}
-                                        <i class="fas fa-times-circle text-secondary"></i>
+                                        <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
                                         {% endif %}
                                     </div>
                                     <p class="card-text small text-muted">
@@ -350,7 +385,7 @@
                                             {{ item.purpose.get_legal_basis_display }}
                                         </span>
                                         <a href="{% url 'privacy:consent' item.purpose.code %}"
-                                           class="btn btn-sm {% if item.has_consent %}btn-outline-success{% else %}btn-primary{% endif %}">
+                                           class="zu-btn btn-sm {% if item.has_consent %}zu-btn--outline{% else %}zu-btn--primary{% endif %}">
                                             {% if item.has_consent %}
                                             {% trans "Manage" %}
                                             {% else %}

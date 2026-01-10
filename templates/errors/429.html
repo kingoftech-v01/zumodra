@@ -4,21 +4,33 @@
 {% block title %}{% trans "Too Many Requests" %} - Zumodra{% endblock %}
 {% block meta_description %}{% trans "You've made too many requests. Please wait before trying again." %}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/zumodra-design-system.css' %}">
+<style>
+    @keyframes pulse-ring {
+        0% { transform: scale(0.8); opacity: 0.8; }
+        50% { transform: scale(1.2); opacity: 0.3; }
+        100% { transform: scale(0.8); opacity: 0.8; }
+    }
+    .zu-pulse-ring { animation: pulse-ring 2s ease-in-out infinite; }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+<div class="min-h-screen flex flex-col" style="background: var(--zu-bg-canvas);">
     <!-- Header with Logo -->
     <header class="p-6 flex justify-between items-center">
         <a href="/" class="inline-flex items-center">
-            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">Zumodra</span>
+            <span class="text-2xl font-bold" style="color: var(--zu-teal-600);">Zumodra</span>
         </a>
         <!-- Dark Mode Toggle -->
         <button @click="darkMode = !darkMode"
-                class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <svg x-show="!darkMode" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                class="zu-btn zu-btn--ghost zu-btn--icon">
+            <svg x-show="!darkMode" class="zu-icon zu-icon--lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
             </svg>
-            <svg x-show="darkMode" x-cloak class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+            <svg x-show="darkMode" x-cloak class="zu-icon zu-icon--lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
             </svg>
         </button>
     </header>
@@ -51,63 +63,69 @@
               }
           }">
         <div class="max-w-lg w-full text-center">
-            <!-- Illustration -->
-            <div class="mb-8">
-                <svg class="mx-auto h-40 w-40 text-orange-500 dark:text-orange-400" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Speedometer -->
-                    <circle cx="100" cy="100" r="70" stroke="currentColor" stroke-width="4" fill="none"/>
-                    <circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="2" opacity="0.3" fill="none"/>
+            <!-- Illustration - Speedometer at max -->
+            <div class="mb-8 relative">
+                <svg class="mx-auto h-48 w-48" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Pulse rings -->
+                    <circle class="zu-pulse-ring" cx="100" cy="100" r="75" stroke="#E8705C" stroke-width="1" fill="none" opacity="0.3"/>
+                    <circle class="zu-pulse-ring" style="animation-delay: 0.5s;" cx="100" cy="100" r="85" stroke="#E8705C" stroke-width="1" fill="none" opacity="0.2"/>
+                    <!-- Outer speedometer ring -->
+                    <circle cx="100" cy="100" r="65" stroke="#0D5C63" stroke-width="3" fill="none"/>
+                    <circle cx="100" cy="100" r="55" stroke="#0D5C63" stroke-width="1" opacity="0.3" fill="none"/>
+                    <!-- Speed zone indicator (green to red arc) -->
+                    <path d="M45 130 A60 60 0 0 1 70 55" stroke="#10B981" stroke-width="6" stroke-linecap="round" fill="none"/>
+                    <path d="M70 55 A60 60 0 0 1 130 55" stroke="#D4A853" stroke-width="6" stroke-linecap="round" fill="none"/>
+                    <path d="M130 55 A60 60 0 0 1 155 130" stroke="#E8705C" stroke-width="6" stroke-linecap="round" fill="none"/>
                     <!-- Speed marks -->
-                    <path d="M100 40L100 50" stroke="currentColor" stroke-width="3"/>
-                    <path d="M140 60L133 67" stroke="currentColor" stroke-width="3"/>
-                    <path d="M160 100L150 100" stroke="currentColor" stroke-width="3"/>
-                    <path d="M140 140L133 133" stroke="currentColor" stroke-width="3"/>
-                    <path d="M60 60L67 67" stroke="currentColor" stroke-width="3"/>
-                    <path d="M40 100L50 100" stroke="currentColor" stroke-width="3"/>
-                    <path d="M60 140L67 133" stroke="currentColor" stroke-width="3"/>
-                    <!-- Needle (pointing to max/red zone) -->
-                    <path d="M100 100L140 75" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-                    <circle cx="100" cy="100" r="8" fill="currentColor"/>
-                    <!-- Red zone indicator -->
-                    <path d="M130 55 A60 60 0 0 1 160 100" stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+                    <line x1="100" y1="40" x2="100" y2="50" stroke="#0D5C63" stroke-width="2"/>
+                    <line x1="145" y1="60" x2="138" y2="67" stroke="#0D5C63" stroke-width="2"/>
+                    <line x1="160" y1="100" x2="150" y2="100" stroke="#0D5C63" stroke-width="2"/>
+                    <line x1="55" y1="60" x2="62" y2="67" stroke="#0D5C63" stroke-width="2"/>
+                    <line x1="40" y1="100" x2="50" y2="100" stroke="#0D5C63" stroke-width="2"/>
+                    <!-- Needle pointing to red zone -->
+                    <path d="M100 100L142 72" stroke="#E8705C" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="100" cy="100" r="10" fill="#0D5C63"/>
+                    <circle cx="100" cy="100" r="6" fill="#E8705C"/>
+                    <!-- 429 label -->
+                    <text x="100" y="145" text-anchor="middle" fill="#0D5C63" font-size="20" font-weight="bold">429</text>
                 </svg>
             </div>
 
             <!-- Error Message -->
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-4" style="color: var(--zu-text-primary);">
                 {% trans "Slow Down!" %}
             </h1>
-            <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            <p class="text-lg mb-6" style="color: var(--zu-text-secondary);">
                 {% trans "You've made too many requests in a short period. Please wait a moment before trying again." %}
             </p>
 
-            <!-- Countdown Timer -->
-            <div class="mb-8">
-                <div class="inline-flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
+            <!-- Countdown Timer Card -->
+            <div class="zu-card zu-card--elevated mb-8">
+                <div class="zu-card__body p-8">
                     <div class="text-center">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2" x-show="!canRetry">
+                        <p class="text-sm mb-2" style="color: var(--zu-text-muted);" x-show="!canRetry">
                             {% trans "Retry available in:" %}
                         </p>
-                        <p class="text-sm text-green-500 dark:text-green-400 mb-2" x-show="canRetry" x-cloak>
+                        <p class="text-sm mb-2" style="color: var(--zu-success-500);" x-show="canRetry" x-cloak>
                             {% trans "You can retry now!" %}
                         </p>
-                        <div class="text-4xl font-bold text-primary-600 dark:text-primary-400" x-show="!canRetry">
+                        <div class="text-5xl font-bold" style="color: var(--zu-teal-600);" x-show="!canRetry">
                             <span x-text="formatTime(countdown)"></span>
                         </div>
-                        <div class="text-4xl font-bold text-green-500 dark:text-green-400" x-show="canRetry" x-cloak>
-                            <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        <div x-show="canRetry" x-cloak>
+                            <svg class="zu-icon mx-auto" style="width: 48px; height: 48px; color: var(--zu-success-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="max-w-xs mx-auto mb-8">
-                <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-primary-500 rounded-full transition-all duration-1000"
-                         :style="'width: ' + ((retryAfter - countdown) / retryAfter * 100) + '%'"></div>
+                    <!-- Progress Bar -->
+                    <div class="mt-6 max-w-xs mx-auto">
+                        <div class="h-2 rounded-full overflow-hidden" style="background: var(--zu-bg-subtle);">
+                            <div class="h-full rounded-full transition-all duration-1000"
+                                 style="background: linear-gradient(90deg, var(--zu-teal-500), var(--zu-coral-500));"
+                                 :style="'width: ' + ((retryAfter - countdown) / retryAfter * 100) + '%'"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -115,50 +133,65 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                 <button @click="window.location.reload()"
                         :disabled="!canRetry"
-                        :class="canRetry ? 'bg-primary-600 hover:bg-primary-700 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
-                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        class="zu-btn zu-btn--lg w-full sm:w-auto"
+                        :class="canRetry ? 'zu-btn--primary' : 'zu-btn--secondary'"
+                        :style="!canRetry ? 'opacity: 0.5; cursor: not-allowed;' : ''">
+                    <svg class="zu-btn__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
                     </svg>
                     {% trans "Try Again" %}
                 </button>
-                <a href="/"
-                   class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors w-full sm:w-auto justify-center">
-                    <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                <a href="/" class="zu-btn zu-btn--secondary zu-btn--lg w-full sm:w-auto">
+                    <svg class="zu-btn__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                     </svg>
-                    {% trans "Go Home" %}
+                    {% trans "Go Back Home" %}
                 </a>
             </div>
 
-            <!-- Rate Limits Explanation -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {% trans "Rate Limits" %}
-                </h2>
-                <div class="text-left text-sm text-gray-600 dark:text-gray-300 space-y-2">
-                    <p>{% trans "To ensure a smooth experience for all users, we limit the number of requests you can make:" %}</p>
-                    <ul class="list-disc list-inside space-y-1 ml-2">
-                        <li>{% trans "API requests: 100 per minute" %}</li>
-                        <li>{% trans "Search queries: 30 per minute" %}</li>
-                        <li>{% trans "File uploads: 10 per minute" %}</li>
+            <!-- Rate Limits Card -->
+            <div class="zu-card mb-8 text-left">
+                <div class="zu-card__header">
+                    <h2 class="zu-card__title">
+                        {% trans "Rate Limits" %}
+                    </h2>
+                </div>
+                <div class="zu-card__body">
+                    <p class="text-sm mb-4" style="color: var(--zu-text-secondary);">
+                        {% trans "To ensure a smooth experience for all users, we limit the number of requests you can make:" %}
+                    </p>
+                    <ul class="space-y-2 text-sm" style="color: var(--zu-text-secondary);">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 rounded-full mr-2" style="background: var(--zu-teal-500);"></span>
+                            {% trans "API requests: 100 per minute" %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 rounded-full mr-2" style="background: var(--zu-gold-500);"></span>
+                            {% trans "Search queries: 30 per minute" %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 rounded-full mr-2" style="background: var(--zu-coral-500);"></span>
+                            {% trans "File uploads: 10 per minute" %}
+                        </li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Upgrade CTA -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-6 text-white">
+            <!-- Upgrade CTA Card -->
+            <div class="zu-card" style="background: linear-gradient(135deg, var(--zu-teal-600), var(--zu-teal-700)); border: none;">
+                <div class="zu-card__body text-center text-white">
+                    <svg class="zu-icon mx-auto mb-3" style="width: 32px; height: 32px; color: var(--zu-gold-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+                    </svg>
                     <h3 class="text-lg font-semibold mb-2">
                         {% trans "Need Higher Limits?" %}
                     </h3>
-                    <p class="text-primary-100 mb-4 text-sm">
+                    <p class="text-sm opacity-80 mb-4">
                         {% trans "Upgrade to our Premium plan for increased rate limits and priority access." %}
                     </p>
-                    <a href="#pricing"
-                       class="inline-flex items-center px-4 py-2 bg-white text-primary-600 font-medium rounded-lg hover:bg-primary-50 transition-colors">
-                        <svg class="mr-2 -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    <a href="#pricing" class="zu-btn" style="background: white; color: var(--zu-teal-600);">
+                        <svg class="zu-btn__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
                         </svg>
                         {% trans "View Premium Plans" %}
                     </a>
@@ -169,7 +202,7 @@
 
     <!-- Footer -->
     <footer class="p-6 text-center">
-        <p class="text-xs text-gray-400 dark:text-gray-500">
+        <p class="text-xs" style="color: var(--zu-text-muted);">
             &copy; {% now "Y" %} Zumodra. {% trans "All rights reserved." %}
         </p>
     </footer>

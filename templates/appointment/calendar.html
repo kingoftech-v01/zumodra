@@ -33,11 +33,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Appointments Calendar</h2>
         <div>
-            <a href="{% url 'appointment:list' %}" class="btn btn-outline-secondary me-2">
-                <i class="bi bi-list me-1"></i> List View
+            <a href="{% url 'appointment:list' %}" class="zu-btn zu-btn--outline me-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                List View
             </a>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
-                <i class="bi bi-plus-lg me-1"></i> New Appointment
+            <button class="zu-btn zu-btn--primary" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New Appointment
             </button>
         </div>
     </div>
@@ -45,31 +47,31 @@
     <div class="row">
         <div class="col-lg-3 mb-4">
             <!-- Filters -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
+            <div class="zu-card shadow-sm mb-4">
+                <div class="zu-card__header">
                     <h6 class="mb-0">Filters</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Staff Member</label>
-                        <select id="staffFilter" class="form-select">
+                <div class="zu-card__body">
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Staff Member</label>
+                        <select id="staffFilter" class="zu-input">
                             <option value="">All Staff</option>
                             {% for staff in staff_members %}
                             <option value="{{ staff.id }}">{{ staff.user.get_full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Service</label>
-                        <select id="serviceFilter" class="form-select">
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Service</label>
+                        <select id="serviceFilter" class="zu-input">
                             <option value="">All Services</option>
                             {% for service in services %}
                             <option value="{{ service.id }}">{{ service.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Status</label>
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input status-filter" value="confirmed" checked>
                             <label class="form-check-label">
@@ -93,8 +95,8 @@
             </div>
 
             <!-- Today's Appointments -->
-            <div class="card shadow-sm">
-                <div class="card-header">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header">
                     <h6 class="mb-0">Today's Appointments</h6>
                 </div>
                 <div class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
@@ -117,8 +119,8 @@
         </div>
 
         <div class="col-lg-9">
-            <div class="card shadow-sm">
-                <div class="card-body">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__body">
                     <div id="calendar"></div>
                 </div>
             </div>
@@ -127,47 +129,47 @@
 </div>
 
 <!-- Appointment Detail Modal -->
-<div class="modal fade" id="appointmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Appointment Details</h5>
+<div class="zu-modal fade" id="appointmentModal" tabindex="-1">
+    <div class="zu-modal__dialog">
+        <div class="zu-modal__content">
+            <div class="zu-modal__header">
+                <h5 class="zu-modal__title">Appointment Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="appointmentDetails">
+            <div class="zu-modal__body" id="appointmentDetails">
                 <!-- Filled by JS -->
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger" id="cancelAppointmentBtn">Cancel</button>
-                <button type="button" class="btn btn-success" id="confirmAppointmentBtn">Confirm</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="zu-modal__footer">
+                <button type="button" class="zu-btn zu-btn--outline" id="cancelAppointmentBtn" style="color: var(--zu-danger, #dc3545); border-color: var(--zu-danger, #dc3545);">Cancel</button>
+                <button type="button" class="zu-btn zu-btn--primary" id="confirmAppointmentBtn" style="background-color: var(--zu-success, #198754); border-color: var(--zu-success, #198754);">Confirm</button>
+                <button type="button" class="zu-btn zu-btn--secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- New Appointment Modal -->
-<div class="modal fade" id="newAppointmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Appointment</h5>
+<div class="zu-modal fade" id="newAppointmentModal" tabindex="-1">
+    <div class="zu-modal__dialog">
+        <div class="zu-modal__content">
+            <div class="zu-modal__header">
+                <h5 class="zu-modal__title">New Appointment</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="{% url 'appointment:create' %}">
                 {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Service</label>
-                        <select name="service" class="form-select" required>
+                <div class="zu-modal__body">
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Service</label>
+                        <select name="service" class="zu-input" required>
                             {% for service in services %}
                             <option value="{{ service.id }}">{{ service.name }} ({{ service.duration }}min)</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Staff Member</label>
-                        <select name="staff_member" class="form-select">
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Staff Member</label>
+                        <select name="staff_member" class="zu-input">
                             <option value="">Any Available</option>
                             {% for staff in staff_members %}
                             <option value="{{ staff.id }}">{{ staff.user.get_full_name }}</option>
@@ -176,30 +178,34 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" name="date" class="form-control" required>
+                            <div class="zu-form-group">
+                                <label class="zu-label">Date</label>
+                                <input type="date" name="date" class="zu-input" required>
+                            </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Time</label>
-                            <input type="time" name="time" class="form-control" required>
+                            <div class="zu-form-group">
+                                <label class="zu-label">Time</label>
+                                <input type="time" name="time" class="zu-input" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Client Email</label>
-                        <input type="email" name="client_email" class="form-control" required>
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Client Email</label>
+                        <input type="email" name="client_email" class="zu-input" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Client Name</label>
-                        <input type="text" name="client_name" class="form-control" required>
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Client Name</label>
+                        <input type="text" name="client_name" class="zu-input" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    <div class="zu-form-group mb-3">
+                        <label class="zu-label">Notes</label>
+                        <textarea name="notes" class="zu-input" rows="2"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Appointment</button>
+                <div class="zu-modal__footer">
+                    <button type="button" class="zu-btn zu-btn--secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="zu-btn zu-btn--primary">Create Appointment</button>
                 </div>
             </form>
         </div>

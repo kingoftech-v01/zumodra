@@ -5,16 +5,16 @@
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
     <a href="{% url 'provider_dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
         {% trans "Provider Dashboard" %}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
     <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Edit Profile" %}</span>
 </li>
@@ -34,169 +34,183 @@
         {% csrf_token %}
 
         <!-- Profile Photo -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Profile Photo" %}</h3>
-            <div class="flex items-center gap-6">
-                <div class="flex-shrink-0">
-                    <div id="preview-container" class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                        {% if provider.avatar %}
-                        <img src="{{ provider.avatar.url }}" class="w-full h-full object-cover">
-                        {% else %}
-                        <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        {% endif %}
+        <div class="zu-card">
+            <div class="zu-card__header">
+                <h3 class="zu-card__title">{% trans "Profile Photo" %}</h3>
+            </div>
+            <div class="zu-card__body">
+                <div class="flex items-center gap-6">
+                    <div class="flex-shrink-0">
+                        <div id="preview-container" class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                            {% if provider.avatar %}
+                            <img src="{{ provider.avatar.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <svg class="zu-icon w-12 h-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label for="image" class="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        {% trans "Change Photo" %}
-                    </label>
-                    <input type="file" name="image" id="image" accept="image/*" class="hidden" onchange="previewImage(this)">
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{% trans "JPG, PNG or GIF. Max 5MB." %}</p>
+                    <div>
+                        <label for="image" class="zu-btn zu-btn--secondary cursor-pointer">
+                            <svg class="zu-icon w-5 h-5 mr-2 -ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            {% trans "Change Photo" %}
+                        </label>
+                        <input type="file" name="image" id="image" accept="image/*" class="hidden" onchange="previewImage(this)">
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{% trans "JPG, PNG or GIF. Max 5MB." %}</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Basic Information -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Basic Information" %}</h3>
-            <div class="space-y-6">
-                <div>
-                    <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {% trans "Bio" %} <span class="text-red-500">*</span>
-                    </label>
-                    <textarea name="bio"
-                              id="bio"
-                              rows="4"
-                              required
-                              class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                              placeholder="{% trans 'Tell clients about yourself...' %}">{{ provider.bio }}</textarea>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Minimum 100 characters recommended." %}</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="hourly_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {% trans "Hourly Rate" %} ($)
+        <div class="zu-card">
+            <div class="zu-card__header">
+                <h3 class="zu-card__title">{% trans "Basic Information" %}</h3>
+            </div>
+            <div class="zu-card__body">
+                <div class="space-y-6">
+                    <div class="zu-form-group">
+                        <label for="bio" class="zu-label zu-label--required">
+                            {% trans "Bio" %}
                         </label>
-                        <input type="number"
-                               name="hourly_rate"
-                               id="hourly_rate"
-                               min="0"
-                               step="0.01"
-                               value="{{ provider.hourly_rate|default:'' }}"
-                               class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                               placeholder="50.00">
+                        <textarea name="bio"
+                                  id="bio"
+                                  rows="4"
+                                  required
+                                  class="zu-input zu-textarea"
+                                  placeholder="{% trans 'Tell clients about yourself...' %}">{{ provider.bio }}</textarea>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Minimum 100 characters recommended." %}</p>
                     </div>
 
-                    <div>
-                        <label for="availability_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {% trans "Availability" %}
-                        </label>
-                        <select name="availability_status"
-                                id="availability_status"
-                                class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                            <option value="available" {% if provider.availability_status == 'available' %}selected{% endif %}>{% trans "Available" %}</option>
-                            <option value="busy" {% if provider.availability_status == 'busy' %}selected{% endif %}>{% trans "Busy" %}</option>
-                            <option value="unavailable" {% if provider.availability_status == 'unavailable' %}selected{% endif %}>{% trans "Unavailable" %}</option>
-                            <option value="on_vacation" {% if provider.availability_status == 'on_vacation' %}selected{% endif %}>{% trans "On Vacation" %}</option>
-                        </select>
-                    </div>
-                </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="zu-form-group">
+                            <label for="hourly_rate" class="zu-label">
+                                {% trans "Hourly Rate" %} ($)
+                            </label>
+                            <input type="number"
+                                   name="hourly_rate"
+                                   id="hourly_rate"
+                                   min="0"
+                                   step="0.01"
+                                   value="{{ provider.hourly_rate|default:'' }}"
+                                   class="zu-input"
+                                   placeholder="50.00">
+                        </div>
 
-                <div>
-                    <label class="flex items-center">
-                        <input type="checkbox" name="is_mobile" {% if provider.is_mobile %}checked{% endif %} class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{% trans "I can travel to client locations" %}</span>
-                    </label>
+                        <div class="zu-form-group">
+                            <label for="availability_status" class="zu-label">
+                                {% trans "Availability" %}
+                            </label>
+                            <select name="availability_status"
+                                    id="availability_status"
+                                    class="zu-input zu-select">
+                                <option value="available" {% if provider.availability_status == 'available' %}selected{% endif %}>{% trans "Available" %}</option>
+                                <option value="busy" {% if provider.availability_status == 'busy' %}selected{% endif %}>{% trans "Busy" %}</option>
+                                <option value="unavailable" {% if provider.availability_status == 'unavailable' %}selected{% endif %}>{% trans "Unavailable" %}</option>
+                                <option value="on_vacation" {% if provider.availability_status == 'on_vacation' %}selected{% endif %}>{% trans "On Vacation" %}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="zu-form-group">
+                        <label class="zu-checkbox">
+                            <input type="checkbox" name="is_mobile" {% if provider.is_mobile %}checked{% endif %} class="zu-checkbox__input">
+                            <span class="zu-checkbox__label">{% trans "I can travel to client locations" %}</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Location -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Location" %}</h3>
-            <div class="space-y-6">
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {% trans "Street Address" %}
-                    </label>
-                    <input type="text"
-                           name="address"
-                           id="address"
-                           value="{{ provider.address }}"
-                           class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                           placeholder="{% trans '123 Main Street' %}">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {% trans "City" %}
+        <div class="zu-card">
+            <div class="zu-card__header">
+                <h3 class="zu-card__title">{% trans "Location" %}</h3>
+            </div>
+            <div class="zu-card__body">
+                <div class="space-y-6">
+                    <div class="zu-form-group">
+                        <label for="address" class="zu-label">
+                            {% trans "Street Address" %}
                         </label>
                         <input type="text"
-                               name="city"
-                               id="city"
-                               value="{{ provider.city }}"
-                               class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                               placeholder="{% trans 'Montreal' %}">
+                               name="address"
+                               id="address"
+                               value="{{ provider.address }}"
+                               class="zu-input"
+                               placeholder="{% trans '123 Main Street' %}">
                     </div>
 
-                    <div>
-                        <label for="postal_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {% trans "Postal Code" %}
-                        </label>
-                        <input type="text"
-                               name="postal_code"
-                               id="postal_code"
-                               value="{{ provider.postal_code }}"
-                               class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                               placeholder="H2X 1Y4">
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="zu-form-group">
+                            <label for="city" class="zu-label">
+                                {% trans "City" %}
+                            </label>
+                            <input type="text"
+                                   name="city"
+                                   id="city"
+                                   value="{{ provider.city }}"
+                                   class="zu-input"
+                                   placeholder="{% trans 'Montreal' %}">
+                        </div>
 
-                    <div>
-                        <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {% trans "Country" %}
-                        </label>
-                        <input type="text"
-                               name="country"
-                               id="country"
-                               value="{{ provider.country }}"
-                               class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                               placeholder="{% trans 'Canada' %}">
+                        <div class="zu-form-group">
+                            <label for="postal_code" class="zu-label">
+                                {% trans "Postal Code" %}
+                            </label>
+                            <input type="text"
+                                   name="postal_code"
+                                   id="postal_code"
+                                   value="{{ provider.postal_code }}"
+                                   class="zu-input"
+                                   placeholder="H2X 1Y4">
+                        </div>
+
+                        <div class="zu-form-group">
+                            <label for="country" class="zu-label">
+                                {% trans "Country" %}
+                            </label>
+                            <input type="text"
+                                   name="country"
+                                   id="country"
+                                   value="{{ provider.country }}"
+                                   class="zu-input"
+                                   placeholder="{% trans 'Canada' %}">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Categories -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Service Categories" %}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{% trans "Select the categories that best describe your services." %}</p>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {% for category in categories %}
-                <label class="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
-                    <input type="checkbox" name="categories" value="{{ category.id }}" {% if category in provider.categories.all %}checked{% endif %} class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700">
-                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ category.name }}</span>
-                </label>
-                {% empty %}
-                <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{% trans "No categories available." %}</p>
-                {% endfor %}
+        <div class="zu-card">
+            <div class="zu-card__header">
+                <h3 class="zu-card__title">{% trans "Service Categories" %}</h3>
+            </div>
+            <div class="zu-card__body">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{% trans "Select the categories that best describe your services." %}</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for category in categories %}
+                    <label class="zu-checkbox flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
+                        <input type="checkbox" name="categories" value="{{ category.id }}" {% if category in provider.categories.all %}checked{% endif %} class="zu-checkbox__input">
+                        <span class="zu-checkbox__label">{{ category.name }}</span>
+                    </label>
+                    {% empty %}
+                    <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{% trans "No categories available." %}</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
         <!-- Submit -->
         <div class="flex items-center justify-end gap-4">
-            <a href="{% url 'provider_dashboard' %}"
-               class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+            <a href="{% url 'provider_dashboard' %}" class="zu-btn zu-btn--secondary">
                 {% trans "Cancel" %}
             </a>
-            <button type="submit"
-                    class="px-6 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+            <button type="submit" class="zu-btn zu-btn--primary">
                 {% trans "Save Changes" %}
             </button>
         </div>

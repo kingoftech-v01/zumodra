@@ -27,7 +27,7 @@
 
 {% load i18n %}
 
-<div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50"
+<div class="zu-search-results"
      x-data="{ activeIndex: -1 }"
      @keydown.arrow-down.prevent="activeIndex = Math.min(activeIndex + 1, {{ total_count|default:0 }} - 1)"
      @keydown.arrow-up.prevent="activeIndex = Math.max(activeIndex - 1, -1)"
@@ -37,8 +37,8 @@
 
         {% if total_count > 0 %}
             {# Search Results Header #}
-            <div class="px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <div class="zu-search-results__header">
+                <p class="zu-search-results__count">
                     {% blocktrans count counter=total_count %}{{ counter }} result for "{{ query }}"{% plural %}{{ counter }} results for "{{ query }}"{% endblocktrans %}
                 </p>
             </div>
@@ -47,32 +47,25 @@
 
             {# ===== JOBS SECTION ===== #}
             {% if jobs %}
-            <div class="px-4 py-2">
-                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                    <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            <div class="zu-search-results__section">
+                <h4 class="zu-search-results__section-title">
+                    <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                     {% trans "Jobs" %}
                 </h4>
-                <ul class="mt-2 space-y-1">
+                <ul class="zu-search-results__list">
                     {% for job in jobs %}
-                    <li>
+                    <li class="zu-search-results__item">
                         <a href="{% url 'ats:job_detail' job.uuid %}"
                            data-index="{{ forloop.counter0 }}"
-                           class="flex items-center px-3 py-2 text-sm rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 focus:bg-indigo-50 dark:focus:bg-indigo-900/20 focus:outline-none transition-colors duration-150"
-                           :class="{ 'bg-indigo-50 dark:bg-indigo-900/20': activeIndex === {{ forloop.counter0 }} }">
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white truncate">
-                                    {{ job.title }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    {{ job.location|default:"Remote" }}
-                                </p>
+                           class="zu-search-results__link"
+                           :class="{ 'zu-search-results__link--active': activeIndex === {{ forloop.counter0 }} }">
+                            <div class="zu-search-results__item-content">
+                                <p class="zu-search-results__item-title">{{ job.title }}</p>
+                                <p class="zu-search-results__item-subtitle">{{ job.location|default:"Remote" }}</p>
                             </div>
-                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                {% if job.status == 'open' %}bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200
-                                {% elif job.status == 'closed' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
-                                {% else %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200{% endif %}">
+                            <span class="zu-badge {% if job.status == 'open' %}zu-badge--success{% elif job.status == 'closed' %}zu-badge--neutral{% else %}zu-badge--warning{% endif %} zu-badge--sm">
                                 {{ job.status|title }}
                             </span>
                         </a>
@@ -84,29 +77,29 @@
 
             {# ===== CANDIDATES SECTION ===== #}
             {% if candidates %}
-            <div class="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
-                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                    <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <div class="zu-search-results__section">
+                <h4 class="zu-search-results__section-title">
+                    <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     {% trans "Candidates" %}
                 </h4>
-                <ul class="mt-2 space-y-1">
+                <ul class="zu-search-results__list">
                     {% for candidate in candidates %}
-                    <li>
+                    <li class="zu-search-results__item">
                         <a href="{% url 'ats:candidate_detail' candidate.uuid %}"
                            data-index="{{ forloop.counter0|add:jobs|length }}"
-                           class="flex items-center px-3 py-2 text-sm rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 focus:bg-indigo-50 dark:focus:bg-indigo-900/20 focus:outline-none transition-colors duration-150">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                           class="zu-search-results__link">
+                            <div class="zu-avatar zu-avatar--sm zu-avatar--neutral">
+                                <span class="zu-avatar__initials">
                                     {{ candidate.first_name|slice:":1"|upper }}{{ candidate.last_name|slice:":1"|upper }}
                                 </span>
                             </div>
-                            <div class="ml-3 flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white truncate">
+                            <div class="zu-search-results__item-content">
+                                <p class="zu-search-results__item-title">
                                     {{ candidate.first_name }} {{ candidate.last_name }}
                                 </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                <p class="zu-search-results__item-subtitle">
                                     {{ candidate.current_title|default:candidate.email }}
                                 </p>
                             </div>
@@ -119,30 +112,28 @@
 
             {# ===== EMPLOYEES SECTION ===== #}
             {% if employees %}
-            <div class="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
-                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                    <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            <div class="zu-search-results__section">
+                <h4 class="zu-search-results__section-title">
+                    <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
                     {% trans "Employees" %}
                 </h4>
-                <ul class="mt-2 space-y-1">
+                <ul class="zu-search-results__list">
                     {% for employee in employees %}
-                    <li>
+                    <li class="zu-search-results__item">
                         <a href="{% url 'hr:employee_detail' employee.uuid %}"
-                           class="flex items-center px-3 py-2 text-sm rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 focus:bg-indigo-50 dark:focus:bg-indigo-900/20 focus:outline-none transition-colors duration-150">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                                <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                           class="zu-search-results__link">
+                            <div class="zu-avatar zu-avatar--sm zu-avatar--primary">
+                                <span class="zu-avatar__initials">
                                     {{ employee.name|slice:":2"|upper }}
                                 </span>
                             </div>
-                            <div class="ml-3 flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white truncate">
-                                    {{ employee.name }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            <div class="zu-search-results__item-content">
+                                <p class="zu-search-results__item-title">{{ employee.name }}</p>
+                                <p class="zu-search-results__item-subtitle">
                                     {{ employee.job_title|default:employee.email }}
-                                    {% if employee.employee_id %}<span class="text-gray-400"> - #{{ employee.employee_id }}</span>{% endif %}
+                                    {% if employee.employee_id %}<span class="zu-search-results__item-id"> - #{{ employee.employee_id }}</span>{% endif %}
                                 </p>
                             </div>
                         </a>
@@ -154,31 +145,25 @@
 
             {# ===== APPLICATIONS SECTION ===== #}
             {% if applications %}
-            <div class="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
-                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                    <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            <div class="zu-search-results__section">
+                <h4 class="zu-search-results__section-title">
+                    <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     {% trans "Applications" %}
                 </h4>
-                <ul class="mt-2 space-y-1">
+                <ul class="zu-search-results__list">
                     {% for application in applications %}
-                    <li>
+                    <li class="zu-search-results__item">
                         <a href="{% url 'ats:application_detail' application.uuid %}"
-                           class="flex items-center px-3 py-2 text-sm rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 focus:bg-indigo-50 dark:focus:bg-indigo-900/20 focus:outline-none transition-colors duration-150">
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white truncate">
-                                    {{ application.candidate_name }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                           class="zu-search-results__link">
+                            <div class="zu-search-results__item-content">
+                                <p class="zu-search-results__item-title">{{ application.candidate_name }}</p>
+                                <p class="zu-search-results__item-subtitle">
                                     {% trans "Applied for" %}: {{ application.job_title }}
                                 </p>
                             </div>
-                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                {% if application.status == 'hired' %}bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200
-                                {% elif application.status == 'rejected' %}bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200
-                                {% elif application.status == 'interviewing' %}bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200
-                                {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                            <span class="zu-badge {% if application.status == 'hired' %}zu-badge--success{% elif application.status == 'rejected' %}zu-badge--error{% elif application.status == 'interviewing' %}zu-badge--info{% else %}zu-badge--neutral{% endif %} zu-badge--sm">
                                 {{ application.status|title|default:"New" }}
                             </span>
                         </a>
@@ -191,26 +176,23 @@
             {% endwith %}
 
             {# View All Results Link #}
-            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
-                <a href="{% url 'dashboard:global-search' %}?q={{ query }}"
-                   class="flex items-center justify-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+            <div class="zu-search-results__footer">
+                <a href="{% url 'dashboard:global-search' %}?q={{ query }}" class="zu-btn zu-btn--ghost">
                     {% trans "View all results" %}
-                    <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                     </svg>
                 </a>
             </div>
 
         {% else %}
             {# No Results #}
-            <div class="px-4 py-8 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            <div class="zu-empty zu-empty--compact">
+                <svg class="zu-icon zu-icon--xl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    {% trans "No results found" %}
-                </h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h3 class="zu-empty__title">{% trans "No results found" %}</h3>
+                <p class="zu-empty__text">
                     {% blocktrans %}No matches for "{{ query }}". Try a different search term.{% endblocktrans %}
                 </p>
             </div>
@@ -218,20 +200,18 @@
 
     {% else %}
         {# Search Prompt #}
-        <div class="px-4 py-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        <div class="zu-empty zu-empty--compact">
+            <svg class="zu-icon zu-icon--xl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                {% trans "Search Zumodra" %}
-            </h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <h3 class="zu-empty__title">{% trans "Search Zumodra" %}</h3>
+            <p class="zu-empty__text">
                 {% trans "Type at least 2 characters to search jobs, candidates, employees, and applications." %}
             </p>
-            <div class="mt-4 text-xs text-gray-400 dark:text-gray-500">
-                <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">Ctrl</kbd>
+            <div class="zu-search-results__keyboard-hint">
+                <kbd class="zu-kbd">Ctrl</kbd>
                 +
-                <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">K</kbd>
+                <kbd class="zu-kbd">K</kbd>
                 {% trans "to focus search" %}
             </div>
         </div>

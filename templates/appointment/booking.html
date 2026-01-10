@@ -7,11 +7,11 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header">
                     <h4 class="mb-0">Book an Appointment</h4>
                 </div>
-                <div class="card-body">
+                <div class="zu-card__body">
                     <form method="post" action="{% url 'appointment:book' %}" id="bookingForm">
                         {% csrf_token %}
 
@@ -21,11 +21,11 @@
                             <div class="row">
                                 {% for service in services %}
                                 <div class="col-md-6 mb-3">
-                                    <div class="card h-100 service-card" data-service-id="{{ service.id }}"
+                                    <div class="zu-card h-100 service-card" data-service-id="{{ service.id }}"
                                          data-duration="{{ service.duration.total_seconds }}" style="cursor: pointer;">
-                                        <div class="card-body">
-                                            <h6 class="card-title">{{ service.name }}</h6>
-                                            <p class="card-text text-muted small">{{ service.description|truncatewords:20 }}</p>
+                                        <div class="zu-card__body">
+                                            <h6 class="zu-card__title">{{ service.name }}</h6>
+                                            <p class="zu-card__text text-muted small">{{ service.description|truncatewords:20 }}</p>
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <span class="badge bg-primary">${{ service.price }}</span>
                                                 <small class="text-muted">{{ service.duration }} min</small>
@@ -44,14 +44,14 @@
                             <div class="row" id="staffList">
                                 {% for staff in staff_members %}
                                 <div class="col-md-4 mb-3">
-                                    <div class="card h-100 staff-card" data-staff-id="{{ staff.id }}" style="cursor: pointer;">
-                                        <div class="card-body text-center">
+                                    <div class="zu-card h-100 staff-card" data-staff-id="{{ staff.id }}" style="cursor: pointer;">
+                                        <div class="zu-card__body text-center">
                                             {% if staff.photo %}
                                             <img src="{{ staff.photo.url }}" class="rounded-circle mb-2" width="60" height="60">
                                             {% else %}
                                             <div class="bg-secondary rounded-circle d-inline-block mb-2"
                                                  style="width: 60px; height: 60px; line-height: 60px;">
-                                                <i class="bi bi-person text-white"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                             </div>
                                             {% endif %}
                                             <h6 class="mb-1">{{ staff.user.get_full_name }}</h6>
@@ -69,13 +69,15 @@
                             <h5 class="mb-3">3. Select Date & Time</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Date</label>
-                                    <input type="date" name="date" id="appointmentDate" class="form-control"
-                                           min="{{ today|date:'Y-m-d' }}" required>
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Date</label>
+                                        <input type="date" name="date" id="appointmentDate" class="zu-input"
+                                               min="{{ today|date:'Y-m-d' }}" required>
+                                    </div>
                                 </div>
                             </div>
                             <div id="timeSlots" class="mb-3">
-                                <label class="form-label">Available Time Slots</label>
+                                <label class="zu-label">Available Time Slots</label>
                                 <div class="row" id="timeSlotsContainer">
                                     <p class="text-muted">Select a date to see available slots</p>
                                 </div>
@@ -88,48 +90,59 @@
                             <h5 class="mb-3">4. Your Details</h5>
                             {% if user.is_authenticated %}
                             <div class="alert alert-info">
-                                <i class="bi bi-info-circle me-2"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                 Booking as {{ user.get_full_name|default:user.email }}
                             </div>
                             {% else %}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">First Name</label>
-                                    <input type="text" name="first_name" class="form-control" required>
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">First Name</label>
+                                        <input type="text" name="first_name" class="zu-input" required>
+                                    </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Last Name</label>
-                                    <input type="text" name="last_name" class="form-control" required>
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Last Name</label>
+                                        <input type="text" name="last_name" class="zu-input" required>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" required>
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Email</label>
+                                        <input type="email" name="email" class="zu-input" required>
+                                    </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Phone</label>
-                                    <input type="tel" name="phone" class="form-control" required>
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Phone</label>
+                                        <input type="tel" name="phone" class="zu-input" required>
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
-                            <div class="mb-3">
-                                <label class="form-label">Notes (optional)</label>
-                                <textarea name="notes" class="form-control" rows="3"
+                            <div class="zu-form-group mb-3">
+                                <label class="zu-label">Notes (optional)</label>
+                                <textarea name="notes" class="zu-input" rows="3"
                                           placeholder="Any special requests or information"></textarea>
                             </div>
                         </div>
 
                         <!-- Navigation Buttons -->
                         <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;">
-                                <i class="bi bi-arrow-left me-1"></i> Previous
+                            <button type="button" class="zu-btn zu-btn--outline" id="prevBtn" style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                Previous
                             </button>
-                            <button type="button" class="btn btn-primary" id="nextBtn">
-                                Next <i class="bi bi-arrow-right ms-1"></i>
+                            <button type="button" class="zu-btn zu-btn--primary" id="nextBtn">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
-                            <button type="submit" class="btn btn-success d-none" id="submitBtn">
-                                <i class="bi bi-check-lg me-1"></i> Confirm Booking
+                            <button type="submit" class="zu-btn zu-btn--primary d-none" id="submitBtn" style="background-color: var(--zu-success, #198754); border-color: var(--zu-success, #198754);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Confirm Booking
                             </button>
                         </div>
                     </form>
@@ -139,11 +152,11 @@
 
         <!-- Booking Summary Sidebar -->
         <div class="col-lg-4">
-            <div class="card shadow-sm sticky-top" style="top: 20px;">
-                <div class="card-header">
+            <div class="zu-card shadow-sm sticky-top" style="top: 20px;">
+                <div class="zu-card__header">
                     <h5 class="mb-0">Booking Summary</h5>
                 </div>
-                <div class="card-body">
+                <div class="zu-card__body">
                     <div id="summaryContent">
                         <p class="text-muted">Select a service to begin</p>
                     </div>
@@ -225,7 +238,7 @@ function loadTimeSlots(date) {
             data.slots.forEach(slot => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'btn btn-outline-primary m-1 time-slot-btn';
+                btn.className = 'zu-btn zu-btn--outline m-1 time-slot-btn';
                 btn.textContent = slot.time;
                 btn.dataset.slot = slot.id;
                 btn.addEventListener('click', function() {

@@ -1,24 +1,25 @@
 {% load static i18n %}
 
-{#
-    Zumodra Data Table Component with HTMX sorting, filtering, and pagination
+{# ============================================================================
+   ZUMODRA DATA TABLE COMPONENT
+   ============================================================================
+   Premium data table with HTMX sorting, filtering, and pagination.
+   Uses unified zu-* design system with glassmorphism effects.
 
-    Usage:
-    {% include "components/data_table.html" with table_id="jobs-table" columns=columns rows=rows %}
+   Usage:
+   {% include "components/data_table.html" with table_id="jobs-table" columns=columns rows=rows %}
 
-    Context variables:
-    - table_id: Unique ID for the table
-    - columns: List of column definitions [{"key": "name", "label": "Name", "sortable": True}]
-    - rows: QuerySet or list of row data
-    - sort_by: Current sort column
-    - sort_order: 'asc' or 'desc'
-    - search_url: URL for search/filter endpoint
-    - bulk_actions: List of bulk action definitions
-    - animate: Enable entrance animation (optional, default: true)
-#}
+   Context variables:
+   - table_id: Unique ID for the table
+   - columns: List of column definitions [{"key": "name", "label": "Name", "sortable": True}]
+   - rows: QuerySet or list of row data
+   - sort_by: Current sort column
+   - sort_order: 'asc' or 'desc'
+   - search_url: URL for search/filter endpoint
+   - bulk_actions: List of bulk action definitions
+   ============================================================================ #}
 
-<div class="zumodra-table{% if animate != False %} animate-on-load{% endif %}"
-     {% if animate != False %}data-animation="fade-up"{% endif %}
+<div class="zu-table-container"
      id="{{ table_id|default:'data-table' }}"
      x-data="{
          selectedRows: [],
@@ -27,10 +28,10 @@
      }">
 
     <!-- Table Header with Search and Filters -->
-    <div class="zumodra-table__header">
+    <div class="zu-table__header">
         <!-- Search -->
-        <div class="zumodra-table__search">
-            <svg class="zumodra-table__search-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="zu-table__search">
+            <svg class="zu-icon zu-table__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text"
@@ -40,40 +41,38 @@
                    hx-target="#{{ table_id|default:'data-table' }}-body"
                    hx-swap="innerHTML"
                    hx-indicator="#{{ table_id|default:'data-table' }}-loading"
-                   class="zumodra-table__search-input"
+                   class="zu-table__search-input"
                    placeholder="{% trans 'Search...' %}">
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-3">
+        <div class="zu-table__actions">
             <!-- Bulk Actions Dropdown -->
             <div x-show="selectedRows.length > 0" x-cloak class="relative">
                 <button @click="bulkActionsOpen = !bulkActionsOpen"
-                        class="zumodra-btn zumodra-btn--ghost zumodra-btn--sm">
+                        class="zu-btn zu-btn--ghost zu-btn--sm">
                     <span x-text="selectedRows.length + ' {% trans 'selected' %}'"></span>
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
                 <div x-show="bulkActionsOpen"
                      @click.away="bulkActionsOpen = false"
                      x-transition:enter="transition ease-out duration-100"
-                     x-transition:enter-start="transform opacity-0 scale-95"
-                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-75"
-                     x-transition:leave-start="transform opacity-100 scale-100"
-                     x-transition:leave-end="transform opacity-0 scale-95"
-                     class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-10"
-                     style="background: var(--dropdown-bg); border: 1px solid var(--border-primary);">
-                    <div class="py-1">
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     class="zu-dropdown zu-dropdown--right"
+                     x-cloak>
+                    <div class="zu-dropdown__body">
                         {% for action in bulk_actions %}
                         <button hx-post="{{ action.url }}"
                                 hx-vals='js:{"ids": JSON.stringify(selectedRows)}'
                                 hx-target="#{{ table_id|default:'data-table' }}"
                                 hx-swap="outerHTML"
-                                style="display: block; width: 100%; text-align: left; padding: 0.625rem 1rem; font-size: 0.875rem; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; transition: all 0.15s ease;"
-                                onmouseover="this.style.background='var(--dropdown-hover)'; this.style.color='var(--accent-coral)'"
-                                onmouseout="this.style.background='transparent'; this.style.color='var(--text-secondary)'">
+                                class="zu-dropdown__item">
                             {{ action.label }}
                         </button>
                         {% endfor %}
@@ -87,11 +86,11 @@
                     hx-get="{{ filter_url|default:'' }}"
                     hx-target="#filter-panel"
                     hx-swap="innerHTML"
-                    class="zumodra-btn zumodra-btn--outline zumodra-btn--sm">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    class="zu-btn zu-btn--outline zu-btn--sm">
+                <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
-                {% trans "Filters" %}
+                <span>{% trans "Filters" %}</span>
             </button>
             {% endif %}
 
@@ -100,11 +99,11 @@
             <button type="button"
                     hx-get="{{ export_url }}"
                     hx-swap="none"
-                    class="zumodra-btn zumodra-btn--outline zumodra-btn--sm">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    class="zu-btn zu-btn--outline zu-btn--sm">
+                <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>
-                {% trans "Export" %}
+                <span>{% trans "Export" %}</span>
             </button>
             {% endif %}
         </div>
@@ -114,50 +113,48 @@
     <div id="filter-panel"></div>
 
     <!-- Loading Indicator -->
-    <div id="{{ table_id|default:'data-table' }}-loading" class="htmx-indicator" style="position: absolute; inset: 0; background: var(--bg-overlay); display: flex; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(4px);">
-        <div class="zumodra-loader">
-            <div class="zumodra-loader__ring"></div>
-            <div class="zumodra-loader__ring"></div>
-            <div class="zumodra-loader__ring"></div>
+    <div id="{{ table_id|default:'data-table' }}-loading" class="htmx-indicator zu-table__loading">
+        <div class="zu-loader">
+            <div class="zu-loader__spinner"></div>
         </div>
     </div>
 
     <!-- Table -->
-    <div class="relative overflow-x-auto">
-        <table style="width: 100%;">
-            <thead>
+    <div class="zu-table__wrapper">
+        <table class="zu-table">
+            <thead class="zu-table__head">
                 <tr>
                     <!-- Select All Checkbox -->
-                    <th style="width: 3rem; padding: 0.875rem 1rem;">
+                    <th class="zu-table__th zu-table__th--checkbox">
                         <input type="checkbox"
                                x-model="selectAll"
                                @change="selectedRows = selectAll ? {{ row_ids|default:'[]' }} : []"
-                               style="width: 1rem; height: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--input-border); accent-color: var(--accent-coral);">
+                               class="zu-checkbox">
                     </th>
 
                     {% for column in columns %}
-                    <th {% if column.sortable %}data-sortable{% endif %}
+                    <th class="zu-table__th{% if column.sortable %} zu-table__th--sortable{% endif %}"
                         {% if column.sortable %}
                         hx-get="{{ sort_url|default:'' }}?sort={{ column.key }}&order={% if sort_by == column.key and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
                         hx-target="#{{ table_id|default:'data-table' }}-body"
                         hx-swap="innerHTML"
                         {% endif %}>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="zu-table__th-content">
                             <span>{{ column.label }}</span>
                             {% if column.sortable %}
-                            <span>
+                            <span class="zu-table__sort-icon">
                                 {% if sort_by == column.key %}
                                     {% if sort_order == 'asc' %}
-                                    <svg class="w-4 h-4" style="color: var(--accent-coral);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg class="zu-icon--sm zu-table__sort-icon--active" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                                     </svg>
                                     {% else %}
-                                    <svg class="w-4 h-4" style="color: var(--accent-coral);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg class="zu-icon--sm zu-table__sort-icon--active" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                     {% endif %}
                                 {% else %}
-                                <svg class="w-4 h-4" style="opacity: 0.4;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                                 </svg>
                                 {% endif %}
@@ -168,34 +165,32 @@
                     {% endfor %}
 
                     <!-- Actions Column -->
-                    <th style="width: 6rem;">
+                    <th class="zu-table__th zu-table__th--actions">
                         <span class="sr-only">{% trans "Actions" %}</span>
                     </th>
                 </tr>
             </thead>
-            <tbody id="{{ table_id|default:'data-table' }}-body">
+            <tbody id="{{ table_id|default:'data-table' }}-body" class="zu-table__body">
                 {% block table_body %}
                 {% for row in rows %}
-                <tr>
-                    <td style="width: 3rem; padding: 1rem;">
+                <tr class="zu-table__row">
+                    <td class="zu-table__td zu-table__td--checkbox">
                         <input type="checkbox"
                                :value="{{ row.id }}"
                                x-model="selectedRows"
-                               style="width: 1rem; height: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--input-border); accent-color: var(--accent-coral);">
+                               class="zu-checkbox">
                     </td>
                     {% for column in columns %}
-                    <td {% if forloop.first %}style="font-weight: 500; color: var(--text-primary);"{% endif %}>
+                    <td class="zu-table__td{% if forloop.first %} zu-table__td--primary{% endif %}">
                         {{ row|get_attr:column.key }}
                     </td>
                     {% endfor %}
-                    <td style="text-align: right;">
-                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                    <td class="zu-table__td zu-table__td--actions">
+                        <div class="zu-table__row-actions">
                             {% if row_actions %}
                             {% for action in row_actions %}
                             <a href="{{ action.url|format_url:row.id }}"
-                               style="color: var(--text-tertiary); padding: 0.375rem; border-radius: var(--radius-sm); transition: all 0.15s ease;"
-                               onmouseover="this.style.color='var(--accent-coral)'; this.style.background='var(--bg-hover)'"
-                               onmouseout="this.style.color='var(--text-tertiary)'; this.style.background='transparent'"
+                               class="zu-btn--icon-sm"
                                title="{{ action.label }}">
                                 {{ action.icon|safe }}
                             </a>
@@ -207,12 +202,12 @@
                 {% empty %}
                 <tr>
                     <td colspan="{{ columns|length|add:2 }}">
-                        <div class="zumodra-empty">
-                            <svg class="zumodra-empty__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <div class="zu-empty">
+                            <svg class="zu-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                             </svg>
-                            <h3 class="zumodra-empty__title">{% trans "No data found" %}</h3>
-                            <p class="zumodra-empty__text">{% trans "Try adjusting your search or filters." %}</p>
+                            <h3 class="zu-empty__title">{% trans "No data found" %}</h3>
+                            <p class="zu-empty__text">{% trans "Try adjusting your search or filters." %}</p>
                         </div>
                     </td>
                 </tr>
@@ -224,17 +219,17 @@
 
     <!-- Pagination -->
     {% if page_obj %}
-    <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-primary); background: var(--bg-secondary); display: flex; align-items: center; justify-content: space-between;">
-        <p style="font-size: 0.875rem; color: var(--text-tertiary); margin: 0;">
+    <div class="zu-table__pagination">
+        <p class="zu-table__pagination-info">
             {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
             Showing {{ start }} to {{ end }} of {{ total }} results
             {% endblocktrans %}
         </p>
-        <nav style="display: flex; gap: 0.25rem;">
+        <nav class="zu-pagination">
             {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}"
-               class="zumodra-btn zumodra-btn--ghost zumodra-btn--sm">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+               class="zu-pagination__btn">
+                <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                 </svg>
             </a>
@@ -242,16 +237,16 @@
 
             {% for num in page_obj.paginator.page_range %}
             {% if num == page_obj.number %}
-            <span class="zumodra-btn zumodra-btn--primary zumodra-btn--sm" style="pointer-events: none;">{{ num }}</span>
+            <span class="zu-pagination__btn zu-pagination__btn--active">{{ num }}</span>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}" class="zumodra-btn zumodra-btn--ghost zumodra-btn--sm">{{ num }}</a>
+            <a href="?page={{ num }}" class="zu-pagination__btn">{{ num }}</a>
             {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}"
-               class="zumodra-btn zumodra-btn--ghost zumodra-btn--sm">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+               class="zu-pagination__btn">
+                <svg class="zu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </a>

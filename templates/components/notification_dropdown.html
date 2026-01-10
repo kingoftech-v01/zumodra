@@ -1,5 +1,12 @@
 {% load static i18n %}
 
+{# ============================================================================
+   ZUMODRA NOTIFICATION DROPDOWN COMPONENT
+   ============================================================================
+   Premium notifications dropdown with real-time WebSocket updates,
+   glassmorphism styling, and smooth animations.
+   ============================================================================ #}
+
 <!-- Notifications Dropdown -->
 <div class="relative" x-data="{ open: false, notifications: [], unreadCount: {{ unread_notifications_count|default:0 }} }"
      hx-get="{% url 'notifications:list' %}"
@@ -10,70 +17,66 @@
     <!-- Notification Bell Button -->
     <button @click="open = !open"
             @click.away="open = false"
-            class="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
-            aria-label="View notifications"
+            class="zu-btn--icon-sm zu-notification-trigger"
+            aria-label="{% trans 'View notifications' %}"
             aria-expanded="false"
             aria-haspopup="true">
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
         </svg>
 
         <!-- Unread Badge -->
         <span x-show="unreadCount > 0"
               x-text="unreadCount > 99 ? '99+' : unreadCount"
-              class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"
+              class="zu-notification-badge"
               x-cloak></span>
     </button>
 
     <!-- Notifications Dropdown Panel -->
     <div x-show="open"
-         x-transition:enter="transition ease-out duration-100"
-         x-transition:enter-start="transform opacity-0 scale-95"
-         x-transition:enter-end="transform opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-75"
-         x-transition:leave-start="transform opacity-100 scale-100"
-         x-transition:leave-end="transform opacity-0 scale-95"
-         class="absolute right-0 mt-2 w-80 sm:w-96 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="zu-dropdown zu-dropdown--right zu-dropdown--notifications"
          role="menu"
          aria-orientation="vertical"
          x-cloak>
 
         <!-- Header -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{% trans "Notifications" %}</h3>
-            <div class="flex items-center space-x-2">
-                <button hx-post="{% url 'notifications:mark_all_read' %}"
-                        hx-swap="none"
-                        @click="unreadCount = 0"
-                        class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
-                    {% trans "Mark all read" %}
-                </button>
-            </div>
+        <div class="zu-dropdown__header">
+            <h3 class="zu-dropdown__title">{% trans "Notifications" %}</h3>
+            <button hx-post="{% url 'notifications:mark_all_read' %}"
+                    hx-swap="none"
+                    @click="unreadCount = 0"
+                    class="zu-link zu-link--sm">
+                {% trans "Mark all read" %}
+            </button>
         </div>
 
         <!-- Notification List -->
-        <div id="notification-list" class="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+        <div id="notification-list" class="zu-notification-list">
             <!-- Loading state -->
-            <div class="htmx-indicator flex items-center justify-center py-8">
-                <svg class="animate-spin h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+            <div class="htmx-indicator zu-notification-loading">
+                <div class="zu-loader">
+                    <div class="zu-loader__spinner"></div>
+                </div>
             </div>
 
             <!-- Empty state (shown when no notifications) -->
-            <div id="no-notifications" class="hidden py-8 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            <div id="no-notifications" class="zu-notification-empty hidden">
+                <svg class="zu-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% trans "No notifications yet" %}</p>
+                <p class="zu-empty__text">{% trans "No notifications yet" %}</p>
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
-            <a href="{% url 'notifications:all' %}"
-               class="block text-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+        <div class="zu-dropdown__footer">
+            <a href="{% url 'notifications:all' %}" class="zu-link zu-link--primary">
                 {% trans "View all notifications" %}
             </a>
         </div>

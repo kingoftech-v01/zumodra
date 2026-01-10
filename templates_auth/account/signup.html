@@ -5,143 +5,158 @@
 {% block head_title %}{% trans "Sign Up" %} - Zumodra{% endblock %}
 
 {% block content %}
-<div class="text-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Create Your Account" %}</h1>
-    <p class="text-gray-600">{% trans "Join Zumodra and unlock verified hiring" %}</p>
+<div class="zu-text-center" style="margin-bottom: var(--zu-space-6);">
+    <h1 style="font-size: var(--zu-text-2xl); font-weight: var(--zu-font-bold); color: var(--zu-text-primary); margin-bottom: var(--zu-space-2);">{% trans "Create Your Account" %}</h1>
+    <p style="color: var(--zu-text-secondary);">{% trans "Join Zumodra and unlock verified hiring" %}</p>
 </div>
 
 {% get_providers as socialaccount_providers %}
 
 {% comment %} Social Signup Buttons {% endcomment %}
 {% if socialaccount_providers %}
-<div class="space-y-3 mb-6">
+<div style="display: flex; flex-direction: column; gap: var(--zu-space-3); margin-bottom: var(--zu-space-6);">
     {% for provider in socialaccount_providers %}
     <a href="{% provider_login_url provider.id process='login' %}"
-       class="flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+       class="zu-btn zu-btn--secondary zu-btn--full" style="justify-content: center; gap: var(--zu-space-3);">
         {% if provider.id == 'google' %}
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
+        <svg class="zu-icon" viewBox="0 0 24 24" style="width: 1.25rem; height: 1.25rem;" stroke-width="1.5">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        <span class="text-gray-700 font-medium">{% trans "Sign up with Google" %}</span>
+        <span>{% trans "Sign up with Google" %}</span>
         {% elif provider.id == 'linkedin' or provider.id == 'linkedin_oauth2' %}
-        <svg class="w-5 h-5 text-[#0A66C2]" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="zu-icon" style="width: 1.25rem; height: 1.25rem; color: #0A66C2;" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
         </svg>
-        <span class="text-gray-700 font-medium">{% trans "Sign up with LinkedIn" %}</span>
+        <span>{% trans "Sign up with LinkedIn" %}</span>
         {% else %}
-        <span class="ph-bold ph-user text-gray-500"></span>
-        <span class="text-gray-700 font-medium">{% blocktrans with name=provider.name %}Sign up with {{ name }}{% endblocktrans %}</span>
+        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <span>{% blocktrans with name=provider.name %}Sign up with {{ name }}{% endblocktrans %}</span>
         {% endif %}
     </a>
     {% endfor %}
 </div>
 
 {% comment %} Divider {% endcomment %}
-<div class="relative my-6">
-    <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-200"></div>
+<div style="position: relative; margin: var(--zu-space-6) 0;">
+    <div style="position: absolute; inset: 0; display: flex; align-items: center;">
+        <div style="width: 100%; border-top: 1px solid var(--zu-border-light);"></div>
     </div>
-    <div class="relative flex justify-center text-sm">
-        <span class="px-4 bg-white text-gray-500">{% trans "or sign up with email" %}</span>
+    <div style="position: relative; display: flex; justify-content: center;">
+        <span style="padding: 0 var(--zu-space-4); background: var(--zu-bg-base); color: var(--zu-text-muted); font-size: var(--zu-text-sm);">{% trans "or sign up with email" %}</span>
     </div>
 </div>
 {% endif %}
 
 {% comment %} Signup Form {% endcomment %}
-<form id="signup_form" method="POST" action="{% url 'account_signup' %}" class="space-y-4">
+<form id="signup_form" method="POST" action="{% url 'account_signup' %}" style="display: flex; flex-direction: column; gap: var(--zu-space-4);">
     {% csrf_token %}
 
     {% comment %} Email Field {% endcomment %}
-    <div>
-        <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">
-            {% trans "Email address" %} <span class="text-red-500">*</span>
+    <div class="zu-form-group">
+        <label for="id_email" class="zu-label">
+            {% trans "Email address" %} <span style="color: var(--zu-error-500);">*</span>
         </label>
-        <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <span class="ph-bold ph-envelope text-lg"></span>
-            </span>
+        <div class="zu-input-icon-wrapper" style="position: relative;">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position: absolute; left: var(--zu-space-3); top: 50%; transform: translateY(-50%); color: var(--zu-text-muted); width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
             <input type="email"
                    name="email"
                    id="id_email"
-                   class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors {% if form.email.errors %}border-red-500{% endif %}"
+                   class="zu-input {% if form.email.errors %}zu-input--error{% endif %}"
+                   style="padding-left: var(--zu-space-10);"
                    placeholder="{% trans 'you@example.com' %}"
                    autocomplete="email"
                    value="{{ form.email.value|default:'' }}"
                    required>
         </div>
         {% if form.email.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+        <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-sm); color: var(--zu-error-600);">{{ form.email.errors.0 }}</p>
         {% endif %}
     </div>
 
     {% comment %} Password Fields {% endcomment %}
-    <div>
-        <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-1">
-            {% trans "Password" %} <span class="text-red-500">*</span>
+    <div class="zu-form-group">
+        <label for="id_password1" class="zu-label">
+            {% trans "Password" %} <span style="color: var(--zu-error-500);">*</span>
         </label>
-        <div class="relative" x-data="{ showPassword: false }">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <span class="ph-bold ph-lock text-lg"></span>
-            </span>
+        <div class="zu-input-icon-wrapper" x-data="{ showPassword: false }" style="position: relative;">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position: absolute; left: var(--zu-space-3); top: 50%; transform: translateY(-50%); color: var(--zu-text-muted); width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
             <input :type="showPassword ? 'text' : 'password'"
                    name="password1"
                    id="id_password1"
-                   class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors {% if form.password1.errors %}border-red-500{% endif %}"
+                   class="zu-input {% if form.password1.errors %}zu-input--error{% endif %}"
+                   style="padding-left: var(--zu-space-10); padding-right: var(--zu-space-12);"
                    placeholder="{% trans 'Create a strong password' %}"
                    autocomplete="new-password"
                    required>
             <button type="button"
                     @click="showPassword = !showPassword"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <span class="ph-bold ph-eye text-lg" x-show="!showPassword"></span>
-                <span class="ph-bold ph-eye-slash text-lg" x-show="showPassword" x-cloak></span>
+                    style="position: absolute; right: var(--zu-space-3); top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--zu-text-muted); padding: 0;">
+                <svg x-show="!showPassword" class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg x-show="showPassword" x-cloak class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
             </button>
         </div>
         {% if form.password1.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+        <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-sm); color: var(--zu-error-600);">{{ form.password1.errors.0 }}</p>
         {% endif %}
-        <p class="mt-1 text-xs text-gray-500">{% trans "Must be at least 8 characters with letters and numbers" %}</p>
+        <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-xs); color: var(--zu-text-muted);">{% trans "Must be at least 8 characters with letters and numbers" %}</p>
     </div>
 
-    <div>
-        <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-1">
-            {% trans "Confirm Password" %} <span class="text-red-500">*</span>
+    <div class="zu-form-group">
+        <label for="id_password2" class="zu-label">
+            {% trans "Confirm Password" %} <span style="color: var(--zu-error-500);">*</span>
         </label>
-        <div class="relative" x-data="{ showPassword: false }">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <span class="ph-bold ph-lock-key text-lg"></span>
-            </span>
+        <div class="zu-input-icon-wrapper" x-data="{ showPassword: false }" style="position: relative;">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position: absolute; left: var(--zu-space-3); top: 50%; transform: translateY(-50%); color: var(--zu-text-muted); width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+            </svg>
             <input :type="showPassword ? 'text' : 'password'"
                    name="password2"
                    id="id_password2"
-                   class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors {% if form.password2.errors %}border-red-500{% endif %}"
+                   class="zu-input {% if form.password2.errors %}zu-input--error{% endif %}"
+                   style="padding-left: var(--zu-space-10); padding-right: var(--zu-space-12);"
                    placeholder="{% trans 'Confirm your password' %}"
                    autocomplete="new-password"
                    required>
             <button type="button"
                     @click="showPassword = !showPassword"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <span class="ph-bold ph-eye text-lg" x-show="!showPassword"></span>
-                <span class="ph-bold ph-eye-slash text-lg" x-show="showPassword" x-cloak></span>
+                    style="position: absolute; right: var(--zu-space-3); top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--zu-text-muted); padding: 0;">
+                <svg x-show="!showPassword" class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg x-show="showPassword" x-cloak class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
             </button>
         </div>
         {% if form.password2.errors %}
-        <p class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+        <p style="margin-top: var(--zu-space-1); font-size: var(--zu-text-sm); color: var(--zu-error-600);">{{ form.password2.errors.0 }}</p>
         {% endif %}
     </div>
 
     {% comment %} Terms Agreement {% endcomment %}
-    <div class="flex items-start">
+    <div style="display: flex; align-items: flex-start;">
         <input type="checkbox"
                name="terms"
                id="id_terms"
-               class="w-4 h-4 mt-0.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+               style="width: 1rem; height: 1rem; margin-top: 0.125rem; border-radius: var(--zu-radius-sm); border: 1px solid var(--zu-border-default); accent-color: var(--zu-teal-600);"
                required>
-        <label for="id_terms" class="ml-2 text-sm text-gray-600">
-            {% trans "I agree to the" %} <a href="{% url 'term_of_use' %}" class="text-blue-600 hover:underline">{% trans "Terms of Service" %}</a> {% trans "and" %} <a href="{% url 'privacy_policy' %}" class="text-blue-600 hover:underline">{% trans "Privacy Policy" %}</a>
+        <label for="id_terms" style="margin-left: var(--zu-space-2); font-size: var(--zu-text-sm); color: var(--zu-text-secondary);">
+            {% trans "I agree to the" %} <a href="{% url 'term_of_use' %}" style="color: var(--zu-text-link); text-decoration: none;">{% trans "Terms of Service" %}</a> {% trans "and" %} <a href="{% url 'privacy_policy' %}" style="color: var(--zu-text-link); text-decoration: none;">{% trans "Privacy Policy" %}</a>
         </label>
     </div>
 
@@ -150,48 +165,55 @@
     {% endif %}
 
     {% comment %} Submit Button {% endcomment %}
-    <button type="submit"
-            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200">
-        <span class="ph-bold ph-user-plus text-lg"></span>
+    <button type="submit" class="zu-btn zu-btn--primary zu-btn--full" style="gap: var(--zu-space-2);">
+        <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1.25rem; height: 1.25rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+        </svg>
         {% trans "Create Account" %}
     </button>
 </form>
 
 {% comment %} Form Errors {% endcomment %}
 {% if form.non_field_errors %}
-<div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
-    <div class="flex items-start">
-        <span class="ph-bold ph-warning-circle text-red-500 text-lg mr-2 flex-shrink-0"></span>
-        <div class="text-sm text-red-700">
-            {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-            {% endfor %}
-        </div>
+<div class="zu-alert zu-alert--error" style="margin-top: var(--zu-space-4);">
+    <svg class="zu-icon zu-alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+    </svg>
+    <div class="zu-alert__content">
+        {% for error in form.non_field_errors %}
+        <p class="zu-alert__message">{{ error }}</p>
+        {% endfor %}
     </div>
 </div>
 {% endif %}
 
 {% comment %} Sign In Link {% endcomment %}
-<p class="mt-6 text-center text-gray-600">
+<p style="margin-top: var(--zu-space-6); text-align: center; color: var(--zu-text-secondary);">
     {% trans "Already have an account?" %}
-    <a href="{% url 'account_login' %}" class="text-blue-600 font-semibold hover:underline">
+    <a href="{% url 'account_login' %}" style="color: var(--zu-text-link); font-weight: var(--zu-font-semibold); text-decoration: none;">
         {% trans "Sign in" %}
     </a>
 </p>
 
 {% comment %} Trust Indicators {% endcomment %}
-<div class="mt-8 pt-6 border-t border-gray-200">
-    <div class="flex items-center justify-center gap-6 text-gray-500 text-sm">
-        <div class="flex items-center gap-1">
-            <span class="ph-bold ph-shield-check text-green-500"></span>
+<div style="margin-top: var(--zu-space-8); padding-top: var(--zu-space-6); border-top: 1px solid var(--zu-border-light);">
+    <div style="display: flex; align-items: center; justify-content: center; gap: var(--zu-space-6); color: var(--zu-text-muted); font-size: var(--zu-text-sm);">
+        <div style="display: flex; align-items: center; gap: var(--zu-space-1);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem; color: var(--zu-success-500);">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
             <span>{% trans "SSL Secure" %}</span>
         </div>
-        <div class="flex items-center gap-1">
-            <span class="ph-bold ph-lock text-green-500"></span>
+        <div style="display: flex; align-items: center; gap: var(--zu-space-1);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem; color: var(--zu-success-500);">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
             <span>{% trans "GDPR Compliant" %}</span>
         </div>
-        <div class="flex items-center gap-1">
-            <span class="ph-bold ph-check-circle text-green-500"></span>
+        <div style="display: flex; align-items: center; gap: var(--zu-space-1);">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 1rem; height: 1rem; color: var(--zu-success-500);">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <span>{% trans "Verified Platform" %}</span>
         </div>
     </div>

@@ -5,24 +5,24 @@
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
     <a href="{% url 'services:my_contracts' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
         {% trans "My Contracts" %}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
     <a href="{% url 'services:view_contract' contract.id %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
         {{ contract.title|truncatewords:3 }}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
     <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Write Review" %}</span>
 </li>
@@ -43,53 +43,55 @@
 {% block content %}
 <div class="max-w-3xl mx-auto" x-data="contractReviewForm()">
     <!-- Contract Summary -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
-        <div class="flex items-start justify-between">
-            <div class="flex items-start gap-4">
-                <!-- Partner Avatar -->
-                <div class="flex-shrink-0">
-                    {% if partner_photo %}
-                    <img src="{{ partner_photo }}" alt="{{ partner_name }}"
-                         class="w-14 h-14 rounded-full object-cover">
-                    {% else %}
-                    <div class="w-14 h-14 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                        <span class="text-xl font-medium text-primary-600 dark:text-primary-400">
-                            {{ partner_name|slice:":1"|upper }}
-                        </span>
+    <div class="zu-card mb-6">
+        <div class="zu-card__body">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start gap-4">
+                    <!-- Partner Avatar -->
+                    <div class="flex-shrink-0">
+                        {% if partner_photo %}
+                        <img src="{{ partner_photo }}" alt="{{ partner_name }}"
+                             class="w-14 h-14 rounded-full object-cover">
+                        {% else %}
+                        <div class="w-14 h-14 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                            <span class="text-xl font-medium text-primary-600 dark:text-primary-400">
+                                {{ partner_name|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ partner_name }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                            {% if is_client %}{% trans "Freelancer" %}{% else %}{% trans "Client" %}{% endif %}
+                        </p>
+                        {% if partner_trust_score %}
+                        <div class="mt-2">
+                            {% include "components/trust_badge.html" with trust_score=partner_trust_score size="sm" %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ partner_name }}</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        {% if is_client %}{% trans "Freelancer" %}{% else %}{% trans "Client" %}{% endif %}
-                    </p>
-                    {% if partner_trust_score %}
-                    <div class="mt-2">
-                        {% include "components/trust_badge.html" with trust_score=partner_trust_score size="sm" %}
-                    </div>
-                    {% endif %}
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Contract Value" %}</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white">${{ contract.agreed_rate|floatformat:2 }}</p>
                 </div>
             </div>
-            <div class="text-right">
-                <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Contract Value" %}</p>
-                <p class="text-lg font-bold text-gray-900 dark:text-white">${{ contract.agreed_rate|floatformat:2 }}</p>
-            </div>
-        </div>
 
-        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ contract.title }}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {% trans "Completed on" %} {{ contract.completed_at|date:"F d, Y" }}
-            </p>
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ contract.title }}</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {% trans "Completed on" %} {{ contract.completed_at|date:"F d, Y" }}
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Review Form -->
-    <form method="post" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+    <form method="post" class="zu-card">
         {% csrf_token %}
 
-        <div class="p-6 space-y-8">
+        <div class="zu-card__body space-y-8">
             <!-- Overall Rating -->
             <div class="text-center pb-6 border-b border-gray-200 dark:border-gray-700">
                 <label class="block text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -135,7 +137,7 @@
                         <div class="flex items-center gap-1">
                             <template x-for="star in 5" :key="'comm_' + star">
                                 <button type="button" @click="communication_rating = star" class="focus:outline-none">
-                                    <svg class="w-5 h-5 transition-colors cursor-pointer"
+                                    <svg class="zu-icon--sm transition-colors cursor-pointer"
                                          :class="communication_rating >= star ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
                                          fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -152,7 +154,7 @@
                         <div class="flex items-center gap-1">
                             <template x-for="star in 5" :key="'prof_' + star">
                                 <button type="button" @click="professionalism_rating = star" class="focus:outline-none">
-                                    <svg class="w-5 h-5 transition-colors cursor-pointer"
+                                    <svg class="zu-icon--sm transition-colors cursor-pointer"
                                          :class="professionalism_rating >= star ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
                                          fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -171,7 +173,7 @@
                         <div class="flex items-center gap-1">
                             <template x-for="star in 5" :key="'qual_' + star">
                                 <button type="button" @click="quality_rating = star" class="focus:outline-none">
-                                    <svg class="w-5 h-5 transition-colors cursor-pointer"
+                                    <svg class="zu-icon--sm transition-colors cursor-pointer"
                                          :class="quality_rating >= star ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
                                          fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -188,7 +190,7 @@
                         <div class="flex items-center gap-1">
                             <template x-for="star in 5" :key="'time_' + star">
                                 <button type="button" @click="timeliness_rating = star" class="focus:outline-none">
-                                    <svg class="w-5 h-5 transition-colors cursor-pointer"
+                                    <svg class="zu-icon--sm transition-colors cursor-pointer"
                                          :class="timeliness_rating >= star ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
                                          fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -220,12 +222,12 @@
                     <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Would you recommend?" %}</span>
                     <div class="flex items-center gap-2">
                         <button type="button" @click="would_recommend = true"
-                                :class="would_recommend === true ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 ring-2 ring-green-500' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                :class="would_recommend === true ? 'zu-badge zu-badge--success ring-2 ring-green-500' : 'zu-badge zu-badge--neutral'"
                                 class="px-3 py-1.5 text-sm font-medium rounded-full transition-all">
                             {% trans "Yes" %}
                         </button>
                         <button type="button" @click="would_recommend = false"
-                                :class="would_recommend === false ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 ring-2 ring-red-500' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                :class="would_recommend === false ? 'zu-badge zu-badge--danger ring-2 ring-red-500' : 'zu-badge zu-badge--neutral'"
                                 class="px-3 py-1.5 text-sm font-medium rounded-full transition-all">
                             {% trans "No" %}
                         </button>
@@ -236,12 +238,12 @@
                     <span class="text-sm text-gray-600 dark:text-gray-400">{% trans "Work again?" %}</span>
                     <div class="flex items-center gap-2">
                         <button type="button" @click="would_work_again = true"
-                                :class="would_work_again === true ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 ring-2 ring-green-500' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                :class="would_work_again === true ? 'zu-badge zu-badge--success ring-2 ring-green-500' : 'zu-badge zu-badge--neutral'"
                                 class="px-3 py-1.5 text-sm font-medium rounded-full transition-all">
                             {% trans "Yes" %}
                         </button>
                         <button type="button" @click="would_work_again = false"
-                                :class="would_work_again === false ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 ring-2 ring-red-500' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                :class="would_work_again === false ? 'zu-badge zu-badge--danger ring-2 ring-red-500' : 'zu-badge zu-badge--neutral'"
                                 class="px-3 py-1.5 text-sm font-medium rounded-full transition-all">
                             {% trans "No" %}
                         </button>
@@ -254,8 +256,8 @@
             <div x-show="overall_rating && overall_rating <= 2" x-transition
                  class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                 <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    <svg class="zu-icon--sm text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
                     <div>
                         <h4 class="text-sm font-medium text-amber-800 dark:text-amber-200">{% trans "Negative Review Process" %}</h4>
@@ -268,15 +270,15 @@
         </div>
 
         <!-- Actions -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-3">
+        <div class="zu-card__footer flex items-center justify-end gap-3">
             <a href="{% url 'services:view_contract' contract.id %}"
-               class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+               class="zu-btn zu-btn--secondary">
                 {% trans "Cancel" %}
             </a>
             <button type="submit"
                     :disabled="!overall_rating"
-                    :class="overall_rating ? 'bg-primary-600 hover:bg-primary-700' : 'bg-gray-400 cursor-not-allowed'"
-                    class="px-6 py-2.5 text-sm font-medium text-white rounded-lg transition-colors">
+                    :class="overall_rating ? 'zu-btn zu-btn--primary' : 'zu-btn zu-btn--secondary opacity-50 cursor-not-allowed'"
+                    class="transition-colors">
                 {% trans "Submit Review" %}
             </button>
         </div>

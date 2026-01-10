@@ -1,96 +1,107 @@
 {% load static i18n %}
 
-<!-- Sidebar with Glassmorphism -->
-<aside class="zu-sidebar flex flex-col w-64 transition-all duration-300"
+{# ============================================================================
+   ZUMODRA PREMIUM SIDEBAR
+   ============================================================================
+   Features:
+   - Glassmorphism with atmospheric depth
+   - Collapsible with smooth animations
+   - Premium navigation links with hover states
+   - Unified icon system (1.5 stroke width)
+   - Active state indicators
+   ============================================================================ #}
+
+<!-- Sidebar with Premium Glassmorphism -->
+<aside class="zu-sidebar flex flex-col transition-all duration-300"
        :class="{ 'sidebar-collapsed': !sidebarOpen }"
        x-data="{
            activeSection: '{{ active_section|default:"dashboard" }}',
            expandedMenus: { 'ats': false, 'hr': false, 'settings': false }
        }">
 
-    <!-- Logo Area -->
-    <div class="zu-sidebar__header flex items-center justify-between h-16 px-4">
-        <a href="{% url 'dashboard:index' %}" class="flex items-center space-x-2">
-            <div class="zu-logo w-8 h-8 rounded-lg flex items-center justify-center">
+    <!-- Logo Area with Brand Identity -->
+    <div class="zu-sidebar__header">
+        <a href="{% url 'dashboard:index' %}" class="flex items-center gap-3 group">
+            <div class="zu-logo w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
                 <span class="text-white font-bold text-lg">Z</span>
             </div>
-            <span class="sidebar-text zu-sidebar__brand text-xl font-bold" x-show="sidebarOpen">Zumodra</span>
+            <span class="sidebar-text zu-sidebar__brand" x-show="sidebarOpen" x-transition>Zumodra</span>
         </a>
         <button @click="sidebarOpen = !sidebarOpen"
-                class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none hidden lg:block"
+                class="zu-btn--icon-sm hidden lg:flex"
                 aria-label="Toggle sidebar">
-            <svg class="w-5 h-5 transform transition-transform" :class="{ 'rotate-180': !sidebarOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            <svg class="w-5 h-5 transform transition-transform duration-200" :class="{ 'rotate-180': !sidebarOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
             </svg>
         </button>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+    <!-- Navigation with Premium Links -->
+    <nav class="zu-sidebar__nav flex-1 overflow-y-auto">
         <!-- Dashboard -->
         <a href="{% url 'dashboard:index' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'dashboard' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+           class="zu-nav-link"
+           :class="activeSection === 'dashboard' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Dashboard" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Dashboard" %}</span>
         </a>
 
         <!-- ATS Section (COMPANY TENANTS ONLY) -->
         {% if request.tenant.tenant_type == 'company' %}
-        <div x-data="{ open: expandedMenus.ats || activeSection.startsWith('ats') }">
+        <div class="zu-nav-section" x-data="{ open: expandedMenus.ats || activeSection.startsWith('ats') }">
             <button @click="open = !open; expandedMenus.ats = open"
-                    class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    class="zu-nav-link zu-nav-link--expandable w-full">
+                <div class="flex items-center gap-3 flex-1">
+                    <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
-                    <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Recruiting" %}</span>
+                    <span class="sidebar-text" x-show="sidebarOpen">{% trans "Recruiting" %}</span>
                 </div>
-                <svg class="sidebar-text w-4 h-4 transform transition-transform" :class="{ 'rotate-90': open }" x-show="sidebarOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                <svg class="sidebar-text zu-nav-chevron" :class="{ 'rotate-90': open }" x-show="sidebarOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
-            <div x-show="open && sidebarOpen" x-collapse class="mt-1 space-y-1 pl-10">
+            <div x-show="open && sidebarOpen" x-collapse class="zu-nav-submenu">
                 <a href="{% url 'frontend:ats:job_list' %}"
                    hx-get="{% url 'frontend:ats:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                   :class="activeSection === 'ats-jobs' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
+                   class="zu-nav-sublink"
+                   :class="activeSection === 'ats-jobs' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Jobs" %}
                 </a>
                 <a href="{% url 'frontend:ats:candidate_list' %}"
                    hx-get="{% url 'frontend:ats:candidate_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                   :class="activeSection === 'ats-candidates' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
+                   class="zu-nav-sublink"
+                   :class="activeSection === 'ats-candidates' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Candidates" %}
                 </a>
                 <a href="{% url 'frontend:ats:pipeline_board' %}"
                    hx-get="{% url 'frontend:ats:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                   :class="activeSection === 'ats-applications' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
+                   class="zu-nav-sublink"
+                   :class="activeSection === 'ats-applications' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Applications" %}
                 </a>
                 <a href="{% url 'frontend:ats:pipeline_board' %}"
                    hx-get="{% url 'frontend:ats:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                   :class="activeSection === 'ats-pipeline' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
+                   class="zu-nav-sublink"
+                   :class="activeSection === 'ats-pipeline' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Pipeline" %}
                 </a>
                 <a href="{% url 'frontend:ats:job_list' %}"
                    hx-get="{% url 'frontend:ats:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                   :class="activeSection === 'ats-interviews' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : ''">
+                   class="zu-nav-sublink"
+                   :class="activeSection === 'ats-interviews' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Interviews" %}
                 </a>
             </div>
@@ -99,46 +110,46 @@
 
         <!-- HR Section (COMPANY TENANTS ONLY) -->
         {% if request.tenant.tenant_type == 'company' %}
-        <div x-data="{ open: expandedMenus.hr || activeSection.startsWith('hr') }">
+        <div class="zu-nav-section" x-data="{ open: expandedMenus.hr || activeSection.startsWith('hr') }">
             <button @click="open = !open; expandedMenus.hr = open"
-                    class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    class="zu-nav-link zu-nav-link--expandable w-full">
+                <div class="flex items-center gap-3 flex-1">
+                    <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "HR" %}</span>
+                    <span class="sidebar-text" x-show="sidebarOpen">{% trans "HR" %}</span>
                 </div>
-                <svg class="sidebar-text w-4 h-4 transform transition-transform" :class="{ 'rotate-90': open }" x-show="sidebarOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                <svg class="sidebar-text zu-nav-chevron" :class="{ 'rotate-90': open }" x-show="sidebarOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
-            <div x-show="open && sidebarOpen" x-collapse class="mt-1 space-y-1 pl-10">
+            <div x-show="open && sidebarOpen" x-collapse class="zu-nav-submenu">
                 <a href="{% url 'frontend:hr:employee-directory' %}"
                    hx-get="{% url 'frontend:hr:employee-directory' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Employees" %}
                 </a>
                 <a href="{% url 'frontend:hr:time-off-calendar' %}"
                    hx-get="{% url 'frontend:hr:time-off-calendar' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Time Off" %}
                 </a>
                 <a href="{% url 'frontend:hr:org-chart' %}"
                    hx-get="{% url 'frontend:hr:org-chart' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Org Chart" %}
                 </a>
                 <a href="{% url 'frontend:hr:onboarding-dashboard' %}"
                    hx-get="{% url 'frontend:hr:onboarding-dashboard' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Onboarding" %}
                 </a>
             </div>
@@ -150,44 +161,44 @@
            hx-get="{% url 'analytics:dashboard' %}"
            hx-target="#main-content"
            hx-push-url="true"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'analytics' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'analytics' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Analytics" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Analytics" %}</span>
         </a>
 
         <!-- Services Marketplace -->
         <a href="/services/"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'services' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+           class="zu-nav-link"
+           :class="activeSection === 'services' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Marketplace" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Marketplace" %}</span>
         </a>
 
         <!-- Finance -->
         <a href="{% url 'finance:dashboard' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'finance' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'finance' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Finance" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Finance" %}</span>
         </a>
 
         <!-- Messages -->
         <a href="{% url 'messages_sys:index' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'messages' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'messages' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Messages" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Messages" %}</span>
             {% if unread_messages_count %}
-            <span class="sidebar-text ml-auto bg-red-500 text-white text-xs font-medium px-2 py-0.5 rounded-full" x-show="sidebarOpen">
+            <span class="sidebar-text zu-badge zu-badge--accent ml-auto" x-show="sidebarOpen">
                 {{ unread_messages_count }}
             </span>
             {% endif %}
@@ -195,14 +206,14 @@
 
         <!-- Notifications -->
         <a href="{% url 'notifications:notification_list' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'notifications' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+           class="zu-nav-link"
+           :class="activeSection === 'notifications' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Notifications" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Notifications" %}</span>
             {% if unread_notifications_count %}
-            <span class="sidebar-text ml-auto bg-red-500 text-white text-xs font-medium px-2 py-0.5 rounded-full" x-show="sidebarOpen">
+            <span class="sidebar-text zu-badge zu-badge--accent ml-auto" x-show="sidebarOpen">
                 {{ unread_notifications_count }}
             </span>
             {% endif %}
@@ -210,106 +221,109 @@
 
         <!-- Appointments -->
         <a href="{% url 'appointment:get_user_appointments' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'appointments' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'appointments' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Appointments" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Appointments" %}</span>
         </a>
 
         <!-- Verification & Trust -->
         <a href="{% url 'frontend:accounts:verification-dashboard' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'verification' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'verification' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Verification" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Verification" %}</span>
         </a>
 
         <!-- Careers (Public Job Board) - COMPANY TENANTS ONLY -->
         {% if request.tenant.tenant_type == 'company' %}
         <a href="{% url 'careers_public:template:home' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'careers' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'careers' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Careers" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Careers" %}</span>
         </a>
         {% endif %}
 
         <!-- Blog -->
         <a href="{% url 'blog:search' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'blog' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'blog' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Blog" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Blog" %}</span>
         </a>
 
         <!-- Newsletter -->
         <a href="{% url 'newsletter:newsletter_list' %}"
-           class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-           :class="activeSection === 'newsletter' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+           class="zu-nav-link"
+           :class="activeSection === 'newsletter' ? 'zu-nav-link--active' : ''">
+            <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
-            <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Newsletter" %}</span>
+            <span class="sidebar-text" x-show="sidebarOpen">{% trans "Newsletter" %}</span>
         </a>
 
         <!-- Divider -->
-        <div class="my-4 border-t border-gray-200 dark:border-gray-700"></div>
+        <div class="zu-nav-divider"></div>
 
         <!-- Settings Section -->
-        <div x-data="{ open: expandedMenus.settings || activeSection.startsWith('settings') }">
+        <div class="zu-nav-section" x-data="{ open: expandedMenus.settings || activeSection.startsWith('settings') }">
             <button @click="open = !open; expandedMenus.settings = open"
-                    class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    class="zu-nav-link zu-nav-link--expandable w-full">
+                <div class="flex items-center gap-3 flex-1">
+                    <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                    <span class="sidebar-text ml-3" x-show="sidebarOpen">{% trans "Settings" %}</span>
+                    <span class="sidebar-text" x-show="sidebarOpen">{% trans "Settings" %}</span>
                 </div>
-                <svg class="sidebar-text w-4 h-4 transform transition-transform" :class="{ 'rotate-90': open }" x-show="sidebarOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                <svg class="sidebar-text zu-nav-chevron" :class="{ 'rotate-90': open }" x-show="sidebarOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
-            <div x-show="open && sidebarOpen" x-collapse class="mt-1 space-y-1 pl-10">
+            <div x-show="open && sidebarOpen" x-collapse class="zu-nav-submenu">
                 <a href="{% url 'account_email' %}"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Profile" %}
                 </a>
                 <a href="{% url 'account_change_password' %}"
-                   class="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                   class="zu-nav-sublink">
                     {% trans "Security" %}
                 </a>
             </div>
         </div>
     </nav>
 
-    <!-- User Info at Bottom -->
-    <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
+    <!-- User Info at Bottom - Premium Footer -->
+    <div class="zu-sidebar__footer">
+        <div class="zu-user-card">
+            <div class="zu-user-card__avatar">
                 {% if user.profile_picture %}
-                <img class="h-9 w-9 rounded-full object-cover" src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="zu-avatar zu-avatar--md">
                 {% else %}
-                <div class="h-9 w-9 rounded-full bg-primary-600 flex items-center justify-center">
-                    <span class="text-white font-medium text-sm">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</span>
+                <div class="zu-avatar zu-avatar--md zu-avatar--initials">
+                    <span>{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</span>
                 </div>
                 {% endif %}
             </div>
-            <div class="sidebar-text ml-3 flex-1 min-w-0" x-show="sidebarOpen">
-                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ user.get_full_name|default:user.email }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ user.email }}</p>
+            <div class="sidebar-text zu-user-card__info" x-show="sidebarOpen">
+                <p class="zu-user-card__name">{{ user.get_full_name|default:user.email }}</p>
+                <p class="zu-user-card__email">{{ user.email }}</p>
             </div>
-            <a href="{% url 'account_logout' %}" class="sidebar-text ml-3 p-1.5 rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" x-show="sidebarOpen" title="{% trans 'Sign Out' %}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            <a href="{% url 'account_logout' %}"
+               class="sidebar-text zu-btn--icon-sm zu-btn--ghost"
+               x-show="sidebarOpen"
+               title="{% trans 'Sign Out' %}">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
             </a>
         </div>
@@ -325,5 +339,5 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      @click="mobileMenuOpen = false"
-     class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+     class="fixed inset-0 z-40 bg-gray-900/60 backdrop-blur-sm lg:hidden"
      x-cloak></div>

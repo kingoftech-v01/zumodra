@@ -11,22 +11,37 @@
 
     <div class="row">
         <div class="col-md-3 mb-4">
-            <div class="card shadow-sm">
+            <div class="zu-card shadow-sm">
                 <div class="list-group list-group-flush">
                     <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                        <i class="bi bi-building me-2"></i> General
+                        <svg class="w-4 h-4 me-2 inline" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/>
+                        </svg>
+                        General
                     </a>
                     <a href="#branding" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-palette me-2"></i> Branding
+                        <svg class="w-4 h-4 me-2 inline" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/>
+                        </svg>
+                        Branding
                     </a>
                     <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-shield-lock me-2"></i> Security
+                        <svg class="w-4 h-4 me-2 inline" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                        </svg>
+                        Security
                     </a>
                     <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-bell me-2"></i> Notifications
+                        <svg class="w-4 h-4 me-2 inline" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                        </svg>
+                        Notifications
                     </a>
                     <a href="#integrations" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                        <i class="bi bi-plug me-2"></i> Integrations
+                        <svg class="w-4 h-4 me-2 inline" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/>
+                        </svg>
+                        Integrations
                     </a>
                 </div>
             </div>
@@ -36,25 +51,25 @@
             <div class="tab-content">
                 <!-- General Settings -->
                 <div class="tab-pane fade show active" id="general">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
+                    <div class="zu-card shadow-sm">
+                        <div class="zu-card__header">
                             <h5 class="mb-0">General Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="zu-card__body">
                             <form method="post" action="{% url 'tenants:update_settings' %}">
                                 {% csrf_token %}
-                                <div class="mb-3">
-                                    <label class="form-label">Organization Name</label>
-                                    <input type="text" name="name" class="form-control" value="{{ tenant.name }}" required>
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Organization Name</label>
+                                    <input type="text" name="name" class="zu-input" value="{{ tenant.name }}" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Organization Slug</label>
-                                    <input type="text" class="form-control" value="{{ tenant.slug }}" disabled>
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Organization Slug</label>
+                                    <input type="text" class="zu-input" value="{{ tenant.slug }}" disabled>
                                     <small class="text-muted">Contact support to change your slug</small>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Industry</label>
-                                    <select name="industry" class="form-select">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Industry</label>
+                                    <select name="industry" class="zu-input">
                                         <option value="">Select industry</option>
                                         <option value="technology" {% if tenant.industry == 'technology' %}selected{% endif %}>Technology</option>
                                         <option value="healthcare" {% if tenant.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
@@ -64,9 +79,9 @@
                                         <option value="other" {% if tenant.industry == 'other' %}selected{% endif %}>Other</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Company Size</label>
-                                    <select name="company_size" class="form-select">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Company Size</label>
+                                    <select name="company_size" class="zu-input">
                                         <option value="1-10" {% if tenant.company_size == '1-10' %}selected{% endif %}>1-10</option>
                                         <option value="11-50" {% if tenant.company_size == '11-50' %}selected{% endif %}>11-50</option>
                                         <option value="51-200" {% if tenant.company_size == '51-200' %}selected{% endif %}>51-200</option>
@@ -74,15 +89,15 @@
                                         <option value="500+" {% if tenant.company_size == '500+' %}selected{% endif %}>500+</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Timezone</label>
-                                    <select name="timezone" class="form-select">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Timezone</label>
+                                    <select name="timezone" class="zu-input">
                                         {% for tz in timezones %}
                                         <option value="{{ tz }}" {% if tenant.timezone == tz %}selected{% endif %}>{{ tz }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="submit" class="zu-btn zu-btn--primary">Save Changes</button>
                             </form>
                         </div>
                     </div>
@@ -90,33 +105,33 @@
 
                 <!-- Branding Settings -->
                 <div class="tab-pane fade" id="branding">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
+                    <div class="zu-card shadow-sm">
+                        <div class="zu-card__header">
                             <h5 class="mb-0">Branding</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="zu-card__body">
                             <form method="post" action="{% url 'tenants:update_branding' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <div class="mb-3">
-                                    <label class="form-label">Logo</label>
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Logo</label>
                                     {% if tenant.logo %}
                                     <div class="mb-2">
                                         <img src="{{ tenant.logo.url }}" alt="Logo" style="max-height: 60px;">
                                     </div>
                                     {% endif %}
-                                    <input type="file" name="logo" class="form-control" accept="image/*">
+                                    <input type="file" name="logo" class="zu-input" accept="image/*">
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Primary Color</label>
-                                    <input type="color" name="primary_color" class="form-control form-control-color"
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Primary Color</label>
+                                    <input type="color" name="primary_color" class="zu-input zu-input--color"
                                            value="{{ tenant.primary_color|default:'#0d6efd' }}">
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Secondary Color</label>
-                                    <input type="color" name="secondary_color" class="form-control form-control-color"
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Secondary Color</label>
+                                    <input type="color" name="secondary_color" class="zu-input zu-input--color"
                                            value="{{ tenant.secondary_color|default:'#6c757d' }}">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Save Branding</button>
+                                <button type="submit" class="zu-btn zu-btn--primary">Save Branding</button>
                             </form>
                         </div>
                     </div>
@@ -124,32 +139,32 @@
 
                 <!-- Security Settings -->
                 <div class="tab-pane fade" id="security">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
+                    <div class="zu-card shadow-sm">
+                        <div class="zu-card__header">
                             <h5 class="mb-0">Security Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="zu-card__body">
                             <form method="post" action="{% url 'tenants:update_security' %}">
                                 {% csrf_token %}
-                                <div class="mb-3">
+                                <div class="zu-form-group">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" name="require_2fa" class="form-check-input" id="require2fa"
                                                {% if tenant.require_2fa %}checked{% endif %}>
-                                        <label class="form-check-label" for="require2fa">Require 2FA for all users</label>
+                                        <label class="zu-label form-check-label" for="require2fa">Require 2FA for all users</label>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Session Timeout (minutes)</label>
-                                    <input type="number" name="session_timeout" class="form-control"
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Session Timeout (minutes)</label>
+                                    <input type="number" name="session_timeout" class="zu-input"
                                            value="{{ tenant.session_timeout|default:60 }}" min="5" max="480">
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">IP Whitelist (one per line)</label>
-                                    <textarea name="ip_whitelist" class="form-control" rows="4"
+                                <div class="zu-form-group">
+                                    <label class="zu-label">IP Whitelist (one per line)</label>
+                                    <textarea name="ip_whitelist" class="zu-input" rows="4"
                                               placeholder="192.168.1.0/24&#10;10.0.0.1">{{ tenant.ip_whitelist }}</textarea>
                                     <small class="text-muted">Leave empty to allow all IPs</small>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Save Security Settings</button>
+                                <button type="submit" class="zu-btn zu-btn--primary">Save Security Settings</button>
                             </form>
                         </div>
                     </div>
@@ -157,33 +172,33 @@
 
                 <!-- Notification Settings -->
                 <div class="tab-pane fade" id="notifications">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
+                    <div class="zu-card shadow-sm">
+                        <div class="zu-card__header">
                             <h5 class="mb-0">Notification Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="zu-card__body">
                             <form method="post" action="{% url 'tenants:update_notifications' %}">
                                 {% csrf_token %}
-                                <div class="mb-3">
+                                <div class="zu-form-group">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" name="email_notifications" class="form-check-input"
                                                {% if tenant.email_notifications %}checked{% endif %}>
-                                        <label class="form-check-label">Email Notifications</label>
+                                        <label class="zu-label form-check-label">Email Notifications</label>
                                     </div>
                                 </div>
-                                <div class="mb-3">
+                                <div class="zu-form-group">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" name="slack_notifications" class="form-check-input"
                                                {% if tenant.slack_notifications %}checked{% endif %}>
-                                        <label class="form-check-label">Slack Notifications</label>
+                                        <label class="zu-label form-check-label">Slack Notifications</label>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Notification Email</label>
-                                    <input type="email" name="notification_email" class="form-control"
+                                <div class="zu-form-group">
+                                    <label class="zu-label">Notification Email</label>
+                                    <input type="email" name="notification_email" class="zu-input"
                                            value="{{ tenant.notification_email }}">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+                                <button type="submit" class="zu-btn zu-btn--primary">Save Notification Settings</button>
                             </form>
                         </div>
                     </div>
@@ -191,32 +206,32 @@
 
                 <!-- Integrations -->
                 <div class="tab-pane fade" id="integrations">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
+                    <div class="zu-card shadow-sm">
+                        <div class="zu-card__header">
                             <h5 class="mb-0">Integrations</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="zu-card__body">
                             <div class="list-group">
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="mb-1">Slack</h6>
                                         <small class="text-muted">Connect with Slack for notifications</small>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                    <button class="zu-btn zu-btn--outline zu-btn--sm">Connect</button>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="mb-1">Google Workspace</h6>
                                         <small class="text-muted">Sync with Google Calendar and Meet</small>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                    <button class="zu-btn zu-btn--outline zu-btn--sm">Connect</button>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="mb-1">Microsoft 365</h6>
                                         <small class="text-muted">Sync with Outlook and Teams</small>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary">Connect</button>
+                                    <button class="zu-btn zu-btn--outline zu-btn--sm">Connect</button>
                                 </div>
                             </div>
                         </div>

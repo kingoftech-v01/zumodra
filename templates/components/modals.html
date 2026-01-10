@@ -1,9 +1,13 @@
 {% comment %}
-Zumodra Modal Component Templates
+================================================================================
+ZUMODRA MODAL COMPONENT TEMPLATES
+================================================================================
 Usage: {% include "components/modals.html" with variant="default" id="my-modal" title="Modal Title" %}
 
-Available variants: default, confirm, alert, form, fullscreen
-Sizes: sm, (default), lg, xl, full
+Available variants: default, confirm, alert, form, fullscreen, drawer, media
+Sizes: sm, md (default), lg, xl, full
+
+Design System: Uses zu-* prefixed classes from zumodra-design-system.css
 {% endcomment %}
 
 {% comment %}
@@ -15,42 +19,60 @@ Usage: {% include "components/modals.html" with variant="default" id="modal-exam
 
 {% if variant == "default" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
     {% if aria_describedby %}aria-describedby="{{ aria_describedby }}"{% endif %}
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
+    x-cloak
 >
-    <div class="modal{% if size %} modal-{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
-        <div class="modal-header">
-            <h2 class="modal-title" id="{{ id }}-title">{{ title }}</h2>
+    <div class="zu-modal{% if size %} zu-modal--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        <div class="zu-modal__header">
+            <h2 class="zu-modal__title" id="{{ id }}-title">{{ title }}</h2>
             <button
                 type="button"
-                class="modal-close"
+                class="zu-modal__close"
                 aria-label="{% if close_label %}{{ close_label }}{% else %}Close modal{% endif %}"
-                data-modal-close="{{ id }}"
+                @click="open = false"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
 
-        <div class="modal-body">
+        <div class="zu-modal__body">
             {% if body %}{{ body|safe }}{% endif %}
             {% if content %}{{ content|safe }}{% endif %}
         </div>
 
         {% if footer %}
-        <div class="modal-footer{% if footer_split %} modal-footer-split{% endif %}">
+        <div class="zu-modal__footer{% if footer_split %} zu-modal__footer--split{% endif %}">
             {{ footer|safe }}
         </div>
         {% elif show_default_footer %}
-        <div class="modal-footer">
-            <button type="button" class="btn btn-ghost" data-modal-close="{{ id }}">Cancel</button>
-            <button type="button" class="btn btn-primary" data-modal-confirm="{{ id }}">Confirm</button>
+        <div class="zu-modal__footer">
+            <button type="button" class="zu-btn zu-btn--secondary" @click="open = false">Cancel</button>
+            <button type="button" class="zu-btn zu-btn--primary" data-modal-confirm="{{ id }}">Confirm</button>
         </div>
         {% endif %}
     </div>
@@ -66,49 +88,62 @@ Usage: {% include "components/modals.html" with variant="confirm" id="confirm-de
 
 {% if variant == "confirm" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="alertdialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
     aria-describedby="{{ id }}-desc"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
+    x-cloak
 >
-    <div class="modal modal-sm{% if extra_class %} {{ extra_class }}{% endif %}">
-        <div class="modal-header">
-            <h2 class="modal-title" id="{{ id }}-title">{{ title }}</h2>
-            <button
-                type="button"
-                class="modal-close"
-                aria-label="Close"
-                data-modal-close="{{ id }}"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="zu-modal zu-modal--sm{% if extra_class %} {{ extra_class }}{% endif %}"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        <div class="zu-modal__header">
+            <h2 class="zu-modal__title" id="{{ id }}-title">{{ title }}</h2>
+            <button type="button" class="zu-modal__close" aria-label="Close" @click="open = false">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
 
-        <div class="modal-body">
+        <div class="zu-modal__body zu-text-center">
             {% if icon %}
-            <div style="display: flex; justify-content: center; margin-bottom: var(--spacing-4);">
-                <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background-color: var(--color-{{ icon_color|default:'warning' }}-light); display: flex; align-items: center; justify-content: center; color: var(--color-{{ icon_color|default:'warning' }});">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-flex zu-justify-center" style="margin-bottom: var(--zu-space-4);">
+                <div class="zu-modal__icon zu-modal__icon--{{ icon_color|default:'warning' }}">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         {{ icon|safe }}
                     </svg>
                 </div>
             </div>
             {% endif %}
-            <p id="{{ id }}-desc" style="text-align: center; color: var(--color-text-secondary); margin: 0;">
+            <p id="{{ id }}-desc" style="color: var(--zu-text-secondary); margin: 0;">
                 {{ message }}
             </p>
         </div>
 
-        <div class="modal-footer" style="justify-content: center;">
-            <button type="button" class="btn btn-ghost" data-modal-close="{{ id }}">
+        <div class="zu-modal__footer zu-justify-center">
+            <button type="button" class="zu-btn zu-btn--secondary" @click="open = false">
                 {{ cancel_text|default:"Cancel" }}
             </button>
-            <button type="button" class="btn btn-{{ confirm_style|default:'primary' }}" data-modal-confirm="{{ id }}">
+            <button type="button" class="zu-btn zu-btn--{{ confirm_style|default:'primary' }}" data-modal-confirm="{{ id }}">
                 {{ confirm_text|default:"Confirm" }}
             </button>
         </div>
@@ -125,40 +160,58 @@ Usage: {% include "components/modals.html" with variant="alert" id="alert-succes
 
 {% if variant == "alert" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="alertdialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
     aria-describedby="{{ id }}-desc"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
+    x-cloak
 >
-    <div class="modal modal-sm{% if extra_class %} {{ extra_class }}{% endif %}">
-        <div class="modal-body" style="text-align: center; padding: var(--spacing-8);">
+    <div class="zu-modal zu-modal--sm{% if extra_class %} {{ extra_class }}{% endif %}"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        <div class="zu-modal__body zu-text-center" style="padding: var(--zu-space-8);">
             {% if alert_type == "success" %}
-            <div style="width: 64px; height: 64px; margin: 0 auto var(--spacing-4); border-radius: var(--radius-full); background-color: var(--color-success-light); display: flex; align-items: center; justify-content: center; color: var(--color-success);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-modal__icon zu-modal__icon--success">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
             </div>
             {% elif alert_type == "error" %}
-            <div style="width: 64px; height: 64px; margin: 0 auto var(--spacing-4); border-radius: var(--radius-full); background-color: var(--color-error-light); display: flex; align-items: center; justify-content: center; color: var(--color-error);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-modal__icon zu-modal__icon--error">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="15" y1="9" x2="9" y2="15"></line>
                     <line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
             </div>
             {% elif alert_type == "warning" %}
-            <div style="width: 64px; height: 64px; margin: 0 auto var(--spacing-4); border-radius: var(--radius-full); background-color: var(--color-warning-light); display: flex; align-items: center; justify-content: center; color: var(--color-warning);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-modal__icon zu-modal__icon--warning">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                     <line x1="12" y1="9" x2="12" y2="13"></line>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>
             </div>
             {% else %}
-            <div style="width: 64px; height: 64px; margin: 0 auto var(--spacing-4); border-radius: var(--radius-full); background-color: var(--color-primary-light); display: flex; align-items: center; justify-content: center; color: var(--color-primary);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-modal__icon zu-modal__icon--info">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -166,14 +219,14 @@ Usage: {% include "components/modals.html" with variant="alert" id="alert-succes
             </div>
             {% endif %}
 
-            <h2 class="modal-title" id="{{ id }}-title" style="margin-bottom: var(--spacing-2);">{{ title }}</h2>
-            <p id="{{ id }}-desc" style="color: var(--color-text-secondary); margin: 0;">
+            <h2 class="zu-modal__title" id="{{ id }}-title" style="margin-bottom: var(--zu-space-2);">{{ title }}</h2>
+            <p id="{{ id }}-desc" style="color: var(--zu-text-secondary); margin: 0;">
                 {{ message }}
             </p>
         </div>
 
-        <div class="modal-footer" style="justify-content: center; border-top: none; background: transparent;">
-            <button type="button" class="btn btn-primary" data-modal-close="{{ id }}">
+        <div class="zu-modal__footer zu-justify-center" style="border-top: none; background: transparent;">
+            <button type="button" class="zu-btn zu-btn--primary" @click="open = false">
                 {{ button_text|default:"OK" }}
             </button>
         </div>
@@ -190,42 +243,55 @@ Usage: {% include "components/modals.html" with variant="form" id="form-modal" t
 
 {% if variant == "form" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
+    x-cloak
 >
-    <div class="modal{% if size %} modal-{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+    <div class="zu-modal{% if size %} zu-modal--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
         <form id="{{ form_id|default:id }}-form" method="{{ form_method|default:'post' }}"{% if form_action %} action="{{ form_action }}"{% endif %}{% if form_enctype %} enctype="{{ form_enctype }}"{% endif %}>
             {% csrf_token %}
 
-            <div class="modal-header">
-                <h2 class="modal-title" id="{{ id }}-title">{{ title }}</h2>
-                <button
-                    type="button"
-                    class="modal-close"
-                    aria-label="Close"
-                    data-modal-close="{{ id }}"
-                >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="zu-modal__header">
+                <h2 class="zu-modal__title" id="{{ id }}-title">{{ title }}</h2>
+                <button type="button" class="zu-modal__close" aria-label="Close" @click="open = false">
+                    <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
 
-            <div class="modal-body">
+            <div class="zu-modal__body">
                 {% if body %}{{ body|safe }}{% endif %}
                 {% if content %}{{ content|safe }}{% endif %}
                 {% if form_fields %}{{ form_fields|safe }}{% endif %}
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-ghost" data-modal-close="{{ id }}">
+            <div class="zu-modal__footer">
+                <button type="button" class="zu-btn zu-btn--secondary" @click="open = false">
                     {{ cancel_text|default:"Cancel" }}
                 </button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="zu-btn zu-btn--primary">
                     {{ submit_text|default:"Save" }}
                 </button>
             </div>
@@ -243,36 +309,46 @@ Usage: {% include "components/modals.html" with variant="fullscreen" id="fullscr
 
 {% if variant == "fullscreen" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @keydown.escape.window="open = false"
     style="padding: 0;"
+    x-cloak
 >
-    <div class="modal modal-full{% if extra_class %} {{ extra_class }}{% endif %}" style="max-width: 100vw; max-height: 100vh; border-radius: 0;">
-        <div class="modal-header" style="position: sticky; top: 0; z-index: 10; background: var(--color-bg-elevated);">
-            <h2 class="modal-title" id="{{ id }}-title">{{ title }}</h2>
-            <button
-                type="button"
-                class="modal-close"
-                aria-label="Close"
-                data-modal-close="{{ id }}"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="zu-modal zu-modal--full{% if extra_class %} {{ extra_class }}{% endif %}"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         style="max-width: 100vw; max-height: 100vh; border-radius: 0;">
+        <div class="zu-modal__header" style="position: sticky; top: 0; z-index: 10; background: var(--zu-bg-elevated);">
+            <h2 class="zu-modal__title" id="{{ id }}-title">{{ title }}</h2>
+            <button type="button" class="zu-modal__close" aria-label="Close" @click="open = false">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
 
-        <div class="modal-body" style="flex: 1; overflow-y: auto;">
+        <div class="zu-modal__body" style="flex: 1; overflow-y: auto;">
             {% if body %}{{ body|safe }}{% endif %}
             {% if content %}{{ content|safe }}{% endif %}
         </div>
 
         {% if footer %}
-        <div class="modal-footer" style="position: sticky; bottom: 0; z-index: 10; background: var(--color-bg-secondary);">
+        <div class="zu-modal__footer" style="position: sticky; bottom: 0; z-index: 10; background: var(--zu-bg-alt);">
             {{ footer|safe }}
         </div>
         {% endif %}
@@ -289,39 +365,52 @@ Usage: {% include "components/modals.html" with variant="drawer" id="drawer-menu
 
 {% if variant == "drawer" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ id }}-title"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
     style="justify-content: {% if position == 'left' %}flex-start{% else %}flex-end{% endif %}; padding: 0;"
+    x-cloak
 >
     <div
-        class="modal{% if extra_class %} {{ extra_class }}{% endif %}"
+        class="zu-modal{% if extra_class %} {{ extra_class }}{% endif %}"
+        x-show="open"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="{% if position == 'left' %}-translate-x-full{% else %}translate-x-full{% endif %}"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="{% if position == 'left' %}-translate-x-full{% else %}translate-x-full{% endif %}"
         style="height: 100vh; max-height: 100vh; border-radius: 0; width: {{ width|default:'320px' }}; max-width: 100vw;"
     >
-        <div class="modal-header">
-            <h2 class="modal-title" id="{{ id }}-title">{{ title }}</h2>
-            <button
-                type="button"
-                class="modal-close"
-                aria-label="Close"
-                data-modal-close="{{ id }}"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="zu-modal__header">
+            <h2 class="zu-modal__title" id="{{ id }}-title">{{ title }}</h2>
+            <button type="button" class="zu-modal__close" aria-label="Close" @click="open = false">
+                <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
 
-        <div class="modal-body" style="flex: 1; overflow-y: auto;">
+        <div class="zu-modal__body" style="flex: 1; overflow-y: auto;">
             {% if body %}{{ body|safe }}{% endif %}
             {% if content %}{{ content|safe }}{% endif %}
         </div>
 
         {% if footer %}
-        <div class="modal-footer">
+        <div class="zu-modal__footer">
             {{ footer|safe }}
         </div>
         {% endif %}
@@ -338,27 +427,42 @@ Usage: {% include "components/modals.html" with variant="media" id="media-viewer
 
 {% if variant == "media" %}
 <div
-    class="modal-overlay{% if active %} active{% endif %}"
+    class="zu-modal-backdrop{% if active %} active{% endif %}"
     id="{{ id }}"
     role="dialog"
     aria-modal="true"
     aria-label="{{ image_alt|default:'Media viewer' }}"
+    x-data="{ open: {{ active|yesno:'true,false' }} }"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="open = false"
+    @keydown.escape.window="open = false"
     style="background-color: rgba(0, 0, 0, 0.9);"
+    x-cloak
 >
     <button
         type="button"
-        class="modal-close"
+        class="zu-modal__close"
         aria-label="Close"
-        data-modal-close="{{ id }}"
-        style="position: absolute; top: var(--spacing-4); right: var(--spacing-4); color: white; z-index: 10;"
+        @click="open = false"
+        style="position: absolute; top: var(--zu-space-4); right: var(--zu-space-4); color: white; z-index: 10;"
     >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="zu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
     </button>
 
-    <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+    <div class="zu-flex zu-items-center zu-justify-center" style="width: 100%; height: 100%;"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
         {% if video_src %}
         <video
             src="{{ video_src }}"
@@ -378,7 +482,7 @@ Usage: {% include "components/modals.html" with variant="media" id="media-viewer
     </div>
 
     {% if caption %}
-    <div style="position: absolute; bottom: var(--spacing-4); left: 50%; transform: translateX(-50%); color: white; text-align: center; padding: var(--spacing-2) var(--spacing-4); background-color: rgba(0, 0, 0, 0.5); border-radius: var(--radius-md);">
+    <div style="position: absolute; bottom: var(--zu-space-4); left: 50%; transform: translateX(-50%); color: white; text-align: center; padding: var(--zu-space-2) var(--zu-space-4); background-color: rgba(0, 0, 0, 0.5); border-radius: var(--zu-radius-md);">
         {{ caption }}
     </div>
     {% endif %}
@@ -387,125 +491,41 @@ Usage: {% include "components/modals.html" with variant="media" id="media-viewer
 
 {% comment %}
 ==============================================================================
-MODAL JAVASCRIPT HELPER
-Include this once in your base template to enable modal functionality
+MODAL CSS ADDITIONS (to be added to zumodra-design-system.css if not present)
 ==============================================================================
 {% endcomment %}
 
-{% if variant == "script" %}
-<script>
-(function() {
-    'use strict';
+{% if variant == "styles" %}
+<style>
+/* Modal Icon Styles */
+.zu-modal__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--zu-space-4);
+    border-radius: var(--zu-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    // Modal Manager
-    const ModalManager = {
-        openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
+.zu-modal__icon--success {
+    background-color: var(--zu-success-100);
+    color: var(--zu-success-600);
+}
 
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+.zu-modal__icon--error {
+    background-color: var(--zu-error-100);
+    color: var(--zu-error-600);
+}
 
-            // Focus first focusable element
-            const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            if (focusable.length) focusable[0].focus();
+.zu-modal__icon--warning {
+    background-color: var(--zu-warning-100);
+    color: var(--zu-warning-600);
+}
 
-            // Trap focus
-            modal.addEventListener('keydown', this.trapFocus);
-        },
-
-        closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
-
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-            modal.removeEventListener('keydown', this.trapFocus);
-        },
-
-        trapFocus(e) {
-            if (e.key !== 'Tab') return;
-
-            const focusable = e.currentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
-        }
-    };
-
-    // Event delegation for modal controls
-    document.addEventListener('click', function(e) {
-        // Open modal
-        const openTrigger = e.target.closest('[data-modal-open]');
-        if (openTrigger) {
-            e.preventDefault();
-            ModalManager.openModal(openTrigger.dataset.modalOpen);
-        }
-
-        // Close modal
-        const closeTrigger = e.target.closest('[data-modal-close]');
-        if (closeTrigger) {
-            e.preventDefault();
-            ModalManager.closeModal(closeTrigger.dataset.modalClose);
-        }
-
-        // Close on overlay click
-        if (e.target.classList.contains('modal-overlay')) {
-            const modalId = e.target.id;
-            if (modalId) ModalManager.closeModal(modalId);
-        }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            const activeModal = document.querySelector('.modal-overlay.active');
-            if (activeModal) ModalManager.closeModal(activeModal.id);
-        }
-    });
-
-    // Expose globally
-    window.ModalManager = ModalManager;
-})();
-</script>
+.zu-modal__icon--info {
+    background-color: var(--zu-info-100);
+    color: var(--zu-info-600);
+}
+</style>
 {% endif %}
-
-{% comment %}
-==============================================================================
-MODAL EXAMPLES - For reference/documentation
-==============================================================================
-
-{# Basic modal with trigger button #}
-<button class="btn btn-primary" data-modal-open="example-modal">Open Modal</button>
-{% include "components/modals.html" with variant="default" id="example-modal" title="Example Modal" body="<p>Modal content here</p>" show_default_footer=True %}
-
-{# Confirm delete modal #}
-<button class="btn btn-danger" data-modal-open="delete-modal">Delete</button>
-{% include "components/modals.html" with variant="confirm" id="delete-modal" title="Delete Item?" message="Are you sure you want to delete this item? This action cannot be undone." confirm_text="Delete" confirm_style="danger" icon="<path d='M3 6h18'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'/><path d='M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/>" icon_color="error" %}
-
-{# Success alert modal #}
-{% include "components/modals.html" with variant="alert" id="success-modal" title="Success!" message="Your changes have been saved successfully." alert_type="success" active=True %}
-
-{# Form modal #}
-{% include "components/modals.html" with variant="form" id="edit-modal" title="Edit Profile" form_id="edit-form" body="<div class='form-group'><label class='form-label'>Name</label><input type='text' class='form-input' name='name'></div>" submit_text="Save Changes" %}
-
-{# Large modal #}
-{% include "components/modals.html" with variant="default" id="large-modal" title="Large Modal" size="lg" body="<p>Lots of content...</p>" %}
-
-{# Drawer modal (slide from right) #}
-{% include "components/modals.html" with variant="drawer" id="menu-drawer" title="Menu" position="right" %}
-
-{# Media viewer modal #}
-{% include "components/modals.html" with variant="media" id="image-viewer" image_src="/path/to/large-image.jpg" image_alt="Product photo" caption="Product photo - Click outside to close" %}
-
-{# Include modal script once in base template #}
-{% include "components/modals.html" with variant="script" %}
-
-{% endcomment %}
