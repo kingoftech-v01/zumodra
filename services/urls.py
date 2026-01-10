@@ -5,7 +5,7 @@ app_name = 'services'
 
 urlpatterns = [
     # ==================== SERVICE BROWSING ====================
-    path('', browse_services, name='browse_services'),
+    path('', browse_services, name='service_list'),  # Main service listing page
     path('service/<uuid:service_uuid>/', service_detail, name='service_detail'),
     path('service/<uuid:service_uuid>/like/', like_service, name='like_service'),
     path('nearby/', browse_nearby_services, name='browse_nearby_services'),

@@ -200,14 +200,14 @@ def browse_nearby_services(request):
                 lng = provider.location_lng
         else:
             messages.warning(request, 'Please provide your location')
-            return redirect('browse_services')
+            return redirect('service_list')
 
     try:
         user_lat = float(lat)
         user_lng = float(lng)
     except (ValueError, TypeError):
         messages.error(request, 'Invalid location coordinates')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     user_location = Point(user_lng, user_lat, srid=4326)
     within_area = int(request.GET.get('within_area', 10))  # Default 10km
@@ -393,7 +393,7 @@ def provider_profile_view(request, provider_uuid):
     # Don't show private profiles
     if provider.is_private:
         messages.error(request, 'This profile is private')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     # Get provider's services
     services = provider.services.all()
@@ -600,7 +600,7 @@ def view_request(request, request_uuid):
 
     if not (is_owner or has_provider_profile):
         messages.error(request, 'You do not have permission to view this request')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     proposals = client_request.proposals.all().order_by('-created_at')
 
@@ -672,7 +672,7 @@ def accept_proposal(request, proposal_id):
             f"proposal={proposal_id} owned by user={proposal.client_request.client.id}"
         )
         messages.error(request, 'You do not have permission to accept this proposal')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     if request.method == 'POST':
         # Mark proposal as accepted
@@ -737,7 +737,7 @@ def view_contract(request, contract_id):
 
     if not (is_client or is_provider):
         messages.error(request, 'You do not have permission to view this contract')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     # Get contract messages
     contract_messages = contract.messages.all().order_by('created_at')
@@ -805,7 +805,7 @@ def update_contract_status(request, contract_id):
             f"contract={contract_id} where they are not a participant"
         )
         messages.error(request, 'You do not have permission to update this contract')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -961,7 +961,7 @@ def create_dispute(request, contract_id):
             f"contract={contract_id} where they are not a participant"
         )
         messages.error(request, 'You do not have permission to dispute this contract')
-        return redirect('browse_services')
+        return redirect('service_list')
 
     # Check if contract can be disputed
     disputable_statuses = [
