@@ -48,7 +48,7 @@
         <!-- Header -->
         <div class="zu-dropdown__header">
             <h3 class="zu-dropdown__title">{% trans "Notifications" %}</h3>
-            <button hx-post="{% url 'frontend:notifications:mark_all_read' %}"
+            <button hx-post="{% url 'frontend:notifications:mark-all-read' %}"
                     hx-swap="none"
                     @click="unreadCount = 0"
                     class="zu-link zu-link--sm">
