@@ -8,7 +8,7 @@
     <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'hr:employee-directory' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+    <a href="{% url 'frontend:hr:employee-directory' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
         {% trans "Employees" %}
     </a>
 </li>
@@ -16,7 +16,7 @@
     <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'hr:employee-detail' employee.pk %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+    <a href="{% url 'frontend:hr:employee-detail' employee.pk %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
         {{ employee.full_name }}
     </a>
 </li>
@@ -221,7 +221,7 @@
 
         {% comment %} Form Actions {% endcomment %}
         <div class="flex items-center justify-end space-x-4">
-            <a href="{% url 'hr:employee-detail' employee.pk %}" class="zu-btn zu-btn--secondary">
+            <a href="{% url 'frontend:hr:employee-detail' employee.pk %}" class="zu-btn zu-btn--secondary">
                 {% trans "Cancel" %}
             </a>
             <button type="submit" class="zu-btn zu-btn--primary">

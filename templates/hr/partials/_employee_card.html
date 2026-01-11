@@ -92,7 +92,7 @@
                 </svg>
             </a>
             {% endif %}
-            <a href="{% url 'hr:employee-detail' employee.pk %}"
+            <a href="{% url 'frontend:hr:employee-detail' employee.pk %}"
                class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                title="{% trans 'View Profile' %}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +105,7 @@
 
     {% comment %} View Profile Link {% endcomment %}
     <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 text-center border-t border-gray-100 dark:border-gray-700">
-        <a href="{% url 'hr:employee-detail' employee.pk %}"
+        <a href="{% url 'frontend:hr:employee-detail' employee.pk %}"
            class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors">
             {% trans "View Profile" %}
             <span class="ml-1">&rarr;</span>

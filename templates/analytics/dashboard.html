@@ -24,7 +24,7 @@
 <!-- Date Range Selector -->
 <div class="flex items-center space-x-3">
     <select id="date-range"
-            hx-get="{% url 'analytics:dashboard' %}"
+            hx-get="{% url 'frontend:analytics:dashboard' %}"
             hx-trigger="change"
             hx-target="#analytics-content"
             hx-swap="innerHTML"
@@ -37,7 +37,7 @@
         <option value="custom">{% trans "Custom range" %}</option>
     </select>
 
-    <button hx-get="{% url 'analytics:export' %}"
+    <button hx-get="{% url 'frontend:analytics:export' %}"
             hx-swap="none"
             class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,7 +127,7 @@
                     <li class="px-6 py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
-                                <a href="{% url 'ats:job_detail' job.id %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 truncate block">
+                                <a href="{% url 'frontend:ats:job_detail' job.id %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 truncate block">
                                     {{ job.title }}
                                 </a>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ job.applications_count }} {% trans "applications" %}</p>

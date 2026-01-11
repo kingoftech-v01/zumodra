@@ -131,7 +131,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {% if request.status == 'pending' %}
                         <div class="flex items-center justify-end space-x-2">
-                            <button hx-post="{% url 'hr:timeoff-approve' request.pk %}"
+                            <button hx-post="{% url 'frontend:hr:timeoff-approve' request.pk %}"
                                     hx-vals='{"action": "approve"}'
                                     hx-target="#timeoff-row-{{ request.pk }}"
                                     hx-swap="outerHTML"
@@ -142,7 +142,7 @@
                                 </svg>
                                 {% trans "Approve" %}
                             </button>
-                            <button hx-get="{% url 'hr:timeoff-reject-modal' request.pk %}"
+                            <button hx-get="{% url 'frontend:hr:timeoff-reject-modal' request.pk %}"
                                     hx-target="#modal-container"
                                     hx-swap="innerHTML"
                                     class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">

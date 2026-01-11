@@ -36,7 +36,7 @@
 
 {% block page_actions %}
 <div class="flex items-center space-x-3">
-    <button hx-get="{% url 'hr:onboarding-start' %}"
+    <button hx-get="{% url 'frontend:hr:onboarding-start' %}"
             hx-target="#modal-container"
             hx-swap="innerHTML"
             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
@@ -167,7 +167,7 @@
                             </div>
                             {% endif %}
                             <div class="ml-4">
-                                <a href="{% url 'hr:onboarding-detail' onboarding.pk %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                                <a href="{% url 'frontend:hr:onboarding-detail' onboarding.pk %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                     {{ onboarding.employee.full_name }}
                                 </a>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -204,7 +204,7 @@
                             </span>
                             {% endif %}
                         </div>
-                        <a href="{% url 'hr:onboarding-detail' onboarding.pk %}"
+                        <a href="{% url 'frontend:hr:onboarding-detail' onboarding.pk %}"
                            class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
                             {% trans "View Details" %} &rarr;
                         </a>
@@ -217,7 +217,7 @@
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No active onboardings" %}</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Start a new onboarding to begin tracking progress." %}</p>
-                    <button hx-get="{% url 'hr:onboarding-start' %}"
+                    <button hx-get="{% url 'frontend:hr:onboarding-start' %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
@@ -270,7 +270,7 @@
                                 {{ onboarding.completed_at|timesince:onboarding.start_date }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{% url 'hr:onboarding-detail' onboarding.pk %}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                                <a href="{% url 'frontend:hr:onboarding-detail' onboarding.pk %}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">
                                     {% trans "View" %}
                                 </a>
                             </td>
@@ -315,7 +315,7 @@
 
                     <div class="mt-4 flex items-center justify-between">
                         <span class="text-xs text-gray-400 dark:text-gray-500">{{ checklist.tasks.count }} {% trans "tasks" %}</span>
-                        <a href="{% url 'hr:checklist-edit' checklist.pk %}"
+                        <a href="{% url 'frontend:hr:checklist-edit' checklist.pk %}"
                            class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
                             {% trans "Edit" %}
                         </a>
@@ -328,7 +328,7 @@
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No templates" %}</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Create an onboarding checklist template to get started." %}</p>
-                    <a href="{% url 'hr:checklist-create' %}"
+                    <a href="{% url 'frontend:hr:checklist-create' %}"
                        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
                         {% trans "Create Template" %}
                     </a>
@@ -338,7 +338,7 @@
 
             {% if checklists %}
             <div class="mt-6 text-center">
-                <a href="{% url 'hr:checklist-create' %}"
+                <a href="{% url 'frontend:hr:checklist-create' %}"
                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>

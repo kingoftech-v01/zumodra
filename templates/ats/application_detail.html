@@ -8,7 +8,7 @@
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'ats:pipeline_board' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Pipeline" %}</a>
+    <a href="{% url 'frontend:ats:pipeline_board' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Pipeline" %}</a>
 </li>
 <li class="flex items-center">
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -89,7 +89,7 @@
 
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                             {% trans "Applying for" %}
-                            <a href="{% url 'ats:job_detail' application.job.id %}" class="text-primary-600 dark:text-primary-400 hover:underline">
+                            <a href="{% url 'frontend:ats:job_detail' application.job.id %}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                 {{ application.job.title }}
                             </a>
                         </p>
@@ -134,7 +134,7 @@
                              class="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
                             <div class="py-1">
                                 {% for stage in pipeline_stages %}
-                                <button hx-post="{% url 'ats:application_move' application.id %}"
+                                <button hx-post="{% url 'frontend:ats:application_move' application.id %}"
                                         hx-vals='{"stage_id": "{{ stage.id }}"}'
                                         hx-swap="none"
                                         @click="open = false"
@@ -153,7 +153,7 @@
                     </div>
                     {% endif %}
 
-                    <button hx-get="{% url 'ats:interview_schedule' application.id %}"
+                    <button hx-get="{% url 'frontend:ats:interview_schedule' application.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
@@ -174,7 +174,7 @@
                         <div x-show="open" @click.away="open = false" x-transition
                              class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
                             <div class="py-1">
-                                <a href="{% url 'ats:candidate_detail' application.candidate.id %}"
+                                <a href="{% url 'frontend:ats:candidate_detail' application.candidate.id %}"
                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     {% trans "View Candidate Profile" %}
                                 </a>
@@ -185,7 +185,7 @@
                                 </a>
                                 {% endif %}
                                 <hr class="my-1 border-gray-200 dark:border-gray-700">
-                                <button hx-post="{% url 'ats:application_reject' application.id %}"
+                                <button hx-post="{% url 'frontend:ats:application_reject' application.id %}"
                                         hx-confirm="{% trans 'Are you sure you want to reject this application?' %}"
                                         class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                                     {% trans "Reject Application" %}
@@ -237,7 +237,7 @@
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Interviews" %}</h2>
-                    <button hx-get="{% url 'ats:interview_schedule' application.id %}"
+                    <button hx-get="{% url 'frontend:ats:interview_schedule' application.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800">
@@ -266,7 +266,7 @@
                                     {% trans "Completed" %}
                                 </span>
                                 {% endif %}
-                                <button hx-get="{% url 'ats:interview_feedback' interview.id %}"
+                                <button hx-get="{% url 'frontend:ats:interview_feedback' interview.id %}"
                                         hx-target="#modal-container"
                                         hx-swap="innerHTML"
                                         class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
@@ -347,7 +347,7 @@
                     <h2 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Notes" %}</h2>
                 </div>
                 <div class="px-6 py-4">
-                    <form hx-post="{% url 'ats:application_note' application.id %}"
+                    <form hx-post="{% url 'frontend:ats:application_note' application.id %}"
                           hx-target="#notes-list"
                           hx-swap="afterbegin"
                           hx-on::after-request="this.reset()">

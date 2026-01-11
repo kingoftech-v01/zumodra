@@ -146,12 +146,12 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end space-x-2">
-                                <a href="{% url 'hr:employee-detail' employee.pk %}"
+                                <a href="{% url 'frontend:hr:employee-detail' employee.pk %}"
                                    class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                                     {% trans "View" %}
                                 </a>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <a href="{% url 'hr:employee-edit' employee.pk %}"
+                                <a href="{% url 'frontend:hr:employee-edit' employee.pk %}"
                                    class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
                                     {% trans "Edit" %}
                                 </a>

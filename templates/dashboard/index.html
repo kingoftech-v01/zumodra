@@ -43,7 +43,7 @@
 {% block page_actions %}
 <button type="button"
         class="zu-btn zu-btn--secondary"
-        hx-get="{% url 'dashboard:htmx-quick-stats' %}"
+        hx-get="{% url 'frontend:dashboard:htmx-quick-stats' %}"
         hx-target="#quick-stats-container"
         hx-swap="innerHTML"
         hx-indicator="#refresh-indicator">
@@ -93,7 +93,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
         </div>
 
         <div id="quick-stats-container"
-             hx-get="{% url 'dashboard:htmx-quick-stats' %}"
+             hx-get="{% url 'frontend:dashboard:htmx-quick-stats' %}"
              hx-trigger="refresh"
              hx-swap="innerHTML">
             <!-- Quick Stats Grid -->
@@ -130,7 +130,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                     <button type="button"
                             class="zu-btn zu-btn--ghost"
                             style="padding: 0.5rem;"
-                            hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
+                            hx-get="{% url 'frontend:dashboard:htmx-upcoming-interviews' %}"
                             hx-target="#upcoming-interviews-container"
                             hx-swap="innerHTML"
                             hx-indicator="#interviews-indicator">
@@ -146,7 +146,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                     </button>
                 </div>
                 <div class="zu-card__body" id="upcoming-interviews-container"
-                     hx-get="{% url 'dashboard:htmx-upcoming-interviews' %}"
+                     hx-get="{% url 'frontend:dashboard:htmx-upcoming-interviews' %}"
                      hx-trigger="load delay:100ms"
                      hx-swap="innerHTML">
                     {% if upcoming_interviews %}
@@ -193,7 +193,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                     <button type="button"
                             class="zu-btn zu-btn--ghost"
                             style="padding: 0.5rem;"
-                            hx-get="{% url 'dashboard:htmx-recent-activity' %}"
+                            hx-get="{% url 'frontend:dashboard:htmx-recent-activity' %}"
                             hx-target="#recent-activity-container"
                             hx-swap="innerHTML"
                             hx-indicator="#activity-indicator">
@@ -209,7 +209,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
                     </button>
                 </div>
                 <div class="zu-card__body" id="recent-activity-container"
-                     hx-get="{% url 'dashboard:htmx-recent-activity' %}"
+                     hx-get="{% url 'frontend:dashboard:htmx-recent-activity' %}"
                      hx-trigger="load delay:200ms"
                      hx-swap="innerHTML"
                      style="max-height: 24rem; overflow-y: auto;">
@@ -261,7 +261,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             {% comment %} Post New Job {% endcomment %}
-            <a href="{% url 'ats:job_create' %}" class="zu-action-card">
+            <a href="{% url 'frontend:ats:job_create' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--accent-coral-light); color: var(--accent-coral);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -271,7 +271,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
             </a>
 
             {% comment %} View Candidates {% endcomment %}
-            <a href="{% url 'ats:candidates' %}" class="zu-action-card">
+            <a href="{% url 'frontend:ats:candidates' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--success-light); color: var(--success);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -281,7 +281,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
             </a>
 
             {% comment %} Applications {% endcomment %}
-            <a href="{% url 'ats:applications' %}" class="zu-action-card">
+            <a href="{% url 'frontend:ats:applications' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--warning-light); color: var(--warning);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -291,7 +291,7 @@ x-on:beforeunload.window="stopAutoRefresh()">
             </a>
 
             {% comment %} Employee Directory {% endcomment %}
-            <a href="{% url 'hr:employees' %}" class="zu-action-card">
+            <a href="{% url 'frontend:hr:employees' %}" class="zu-action-card">
                 <div class="zu-action-card__icon" style="background: var(--info-light); color: var(--info);">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>

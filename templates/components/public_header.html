@@ -209,7 +209,7 @@
                 {% comment %} Auth Buttons {% endcomment %}
                 <div class="hidden lg:flex items-center gap-2">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard:index' %}"
+                        <a href="{% url 'frontend:dashboard:index' %}"
                            class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 {% if transparent %}text-white border-white/30 hover:bg-white hover:text-gray-900{% else %}text-gray-700 border-gray-300 hover:bg-gray-100{% endif %}"
                            :class="{ 'text-gray-700 border-gray-300 hover:bg-gray-100': scrolled }">
                             <span class="ph-bold ph-squares-four text-lg"></span>
@@ -418,7 +418,7 @@
             </div>
             {% else %}
             <div class="mt-6 space-y-3">
-                <a href="{% url 'dashboard:index' %}"
+                <a href="{% url 'frontend:dashboard:index' %}"
                    class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition-all"
                    @click="mobileMenuOpen = false">
                     <span class="ph-bold ph-squares-four text-lg"></span>

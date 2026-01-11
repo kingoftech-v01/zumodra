@@ -57,7 +57,7 @@
                 <ul class="zu-search-results__list">
                     {% for job in jobs %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'ats:job_detail' job.uuid %}"
+                        <a href="{% url 'frontend:ats:job_detail' job.uuid %}"
                            data-index="{{ forloop.counter0 }}"
                            class="zu-search-results__link"
                            :class="{ 'zu-search-results__link--active': activeIndex === {{ forloop.counter0 }} }">
@@ -87,7 +87,7 @@
                 <ul class="zu-search-results__list">
                     {% for candidate in candidates %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'ats:candidate_detail' candidate.uuid %}"
+                        <a href="{% url 'frontend:ats:candidate_detail' candidate.uuid %}"
                            data-index="{{ forloop.counter0|add:jobs|length }}"
                            class="zu-search-results__link">
                             <div class="zu-avatar zu-avatar--sm zu-avatar--neutral">
@@ -122,7 +122,7 @@
                 <ul class="zu-search-results__list">
                     {% for employee in employees %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'hr:employee_detail' employee.uuid %}"
+                        <a href="{% url 'frontend:hr:employee_detail' employee.uuid %}"
                            class="zu-search-results__link">
                             <div class="zu-avatar zu-avatar--sm zu-avatar--primary">
                                 <span class="zu-avatar__initials">
@@ -155,7 +155,7 @@
                 <ul class="zu-search-results__list">
                     {% for application in applications %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'ats:application_detail' application.uuid %}"
+                        <a href="{% url 'frontend:ats:application_detail' application.uuid %}"
                            class="zu-search-results__link">
                             <div class="zu-search-results__item-content">
                                 <p class="zu-search-results__item-title">{{ application.candidate_name }}</p>
@@ -177,7 +177,7 @@
 
             {% comment %} View All Results Link {% endcomment %}
             <div class="zu-search-results__footer">
-                <a href="{% url 'dashboard:global-search' %}?q={{ query }}" class="zu-btn zu-btn--ghost">
+                <a href="{% url 'frontend:dashboard:global-search' %}?q={{ query }}" class="zu-btn zu-btn--ghost">
                     {% trans "View all results" %}
                     <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>

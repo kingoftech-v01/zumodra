@@ -3,7 +3,7 @@
 
 {% block modal_body %}
 <form id="feedback-form"
-      hx-post="{% url 'ats:interview_feedback_submit' interview.id %}"
+      hx-post="{% url 'frontend:ats:interview_feedback_submit' interview.id %}"
       hx-target="#modal-container"
       hx-swap="innerHTML"
       class="space-y-6">

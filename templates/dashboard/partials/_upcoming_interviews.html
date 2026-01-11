@@ -113,7 +113,7 @@
                         </svg>
                     </a>
                     {% endif %}
-                    <a href="{% url 'ats:interview_detail' interview.uuid %}"
+                    <a href="{% url 'frontend:ats:interview_detail' interview.uuid %}"
                        class="zu-btn zu-btn--ghost zu-btn--sm zu-btn--icon"
                        title="{% trans 'View Details' %}">
                         <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -138,7 +138,7 @@
 
         {% comment %} View All Link {% endcomment %}
         <div class="zu-interview-list__footer">
-            <a href="{% url 'ats:interviews' %}" class="zu-btn zu-btn--ghost">
+            <a href="{% url 'frontend:ats:interviews' %}" class="zu-btn zu-btn--ghost">
                 {% trans "View all interviews" %}
                 <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -155,7 +155,7 @@
             <h3 class="zu-empty__title">{% trans "No upcoming interviews" %}</h3>
             <p class="zu-empty__text">{% trans "Interviews scheduled for the next 7 days will appear here." %}</p>
             <div class="zu-empty__actions">
-                <a href="{% url 'ats:applications' %}" class="zu-btn zu-btn--primary">
+                <a href="{% url 'frontend:ats:applications' %}" class="zu-btn zu-btn--primary">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>

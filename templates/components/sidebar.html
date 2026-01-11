@@ -21,7 +21,7 @@
 
     <!-- Logo Area with Brand Identity -->
     <div class="zu-sidebar__header">
-        <a href="{% url 'dashboard:index' %}" class="flex items-center gap-3 group">
+        <a href="{% url 'frontend:dashboard:index' %}" class="flex items-center gap-3 group">
             <div class="zu-logo w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
                 <span class="text-white font-bold text-lg">Z</span>
             </div>
@@ -39,7 +39,7 @@
     <!-- Navigation with Premium Links -->
     <nav class="zu-sidebar__nav flex-1 overflow-y-auto">
         <!-- Dashboard -->
-        <a href="{% url 'dashboard:index' %}"
+        <a href="{% url 'frontend:dashboard:index' %}"
            class="zu-nav-link"
            :class="activeSection === 'dashboard' ? 'zu-nav-link--active' : ''">
             <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -157,8 +157,8 @@
         {% endif %}
 
         <!-- Analytics -->
-        <a href="{% url 'analytics:dashboard' %}"
-           hx-get="{% url 'analytics:dashboard' %}"
+        <a href="{% url 'frontend:analytics:dashboard' %}"
+           hx-get="{% url 'frontend:analytics:dashboard' %}"
            hx-target="#main-content"
            hx-push-url="true"
            class="zu-nav-link"
@@ -180,7 +180,7 @@
         </a>
 
         <!-- Finance -->
-        <a href="{% url 'finance:dashboard' %}"
+        <a href="{% url 'frontend:finance:dashboard' %}"
            class="zu-nav-link"
            :class="activeSection === 'finance' ? 'zu-nav-link--active' : ''">
             <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -205,7 +205,7 @@
         </a>
 
         <!-- Notifications -->
-        <a href="{% url 'notifications:notification_list' %}"
+        <a href="{% url 'frontend:notifications:notification_list' %}"
            class="zu-nav-link"
            :class="activeSection === 'notifications' ? 'zu-nav-link--active' : ''">
             <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

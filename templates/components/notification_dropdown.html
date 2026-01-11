@@ -9,7 +9,7 @@
 
 <!-- Notifications Dropdown -->
 <div class="relative" x-data="{ open: false, notifications: [], unreadCount: {{ unread_notifications_count|default:0 }} }"
-     hx-get="{% url 'notifications:list' %}"
+     hx-get="{% url 'frontend:notifications:list' %}"
      hx-trigger="load, every 30s"
      hx-target="#notification-list"
      hx-swap="innerHTML">
@@ -48,7 +48,7 @@
         <!-- Header -->
         <div class="zu-dropdown__header">
             <h3 class="zu-dropdown__title">{% trans "Notifications" %}</h3>
-            <button hx-post="{% url 'notifications:mark_all_read' %}"
+            <button hx-post="{% url 'frontend:notifications:mark_all_read' %}"
                     hx-swap="none"
                     @click="unreadCount = 0"
                     class="zu-link zu-link--sm">
@@ -76,7 +76,7 @@
 
         <!-- Footer -->
         <div class="zu-dropdown__footer">
-            <a href="{% url 'notifications:all' %}" class="zu-link zu-link--primary">
+            <a href="{% url 'frontend:notifications:all' %}" class="zu-link zu-link--primary">
                 {% trans "View all notifications" %}
             </a>
         </div>

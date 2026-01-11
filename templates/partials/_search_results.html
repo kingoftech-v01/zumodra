@@ -14,7 +14,7 @@
         <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Jobs" %}</h4>
     </div>
     {% for job in results.jobs|slice:":3" %}
-    <a href="{% url 'ats:job_detail' job.id %}"
+    <a href="{% url 'frontend:ats:job_detail' job.id %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <div class="zu-avatar zu-avatar--sm bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
             <svg class="zu-icon--sm text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -35,7 +35,7 @@
         <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Candidates" %}</h4>
     </div>
     {% for candidate in results.candidates|slice:":3" %}
-    <a href="{% url 'ats:candidate_detail' candidate.id %}"
+    <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         {% if candidate.photo %}
         <img class="zu-avatar zu-avatar--sm" src="{{ candidate.photo.url }}" alt="">
@@ -58,7 +58,7 @@
         <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Employees" %}</h4>
     </div>
     {% for employee in results.employees|slice:":3" %}
-    <a href="{% url 'hr:employee_detail' employee.id %}"
+    <a href="{% url 'frontend:hr:employee_detail' employee.id %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         {% if employee.user.profile_picture %}
         <img class="zu-avatar zu-avatar--sm" src="{{ employee.user.profile_picture.url }}" alt="">
@@ -77,7 +77,7 @@
 
     <!-- View All Results -->
     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-        <a href="{% url 'dashboard:search' %}?q={{ query }}"
+        <a href="{% url 'frontend:dashboard:search' %}?q={{ query }}"
            class="zu-btn zu-btn--sm text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
             {% trans "View all results" %} &rarr;
         </a>
@@ -100,21 +100,21 @@
     <div class="px-4 py-2">
         <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Quick Actions" %}</h4>
     </div>
-    <a href="{% url 'ats:job_create' %}"
+    <a href="{% url 'frontend:ats:job_create' %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <svg class="zu-icon--sm text-gray-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "Post a new job" %}</span>
     </a>
-    <a href="{% url 'ats:candidate_create' %}"
+    <a href="{% url 'frontend:ats:candidate_create' %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <svg class="zu-icon--sm text-gray-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
         </svg>
         <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "Add a candidate" %}</span>
     </a>
-    <a href="{% url 'analytics:dashboard' %}"
+    <a href="{% url 'frontend:analytics:dashboard' %}"
        class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <svg class="zu-icon--sm text-gray-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>

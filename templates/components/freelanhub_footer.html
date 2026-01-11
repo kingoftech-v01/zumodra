@@ -44,7 +44,7 @@
                     <strong class="nav_heading text-button-sm text-white">{% trans "For Candidates" %}</strong>
                     <ul class="list_nav flex flex-col gap-3 mt-4">
                         {% if user.is_authenticated %}
-                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'dashboard:index' %}">{% trans "My Dashboard" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'frontend:dashboard:index' %}">{% trans "My Dashboard" %}</a></li>
                         {% endif %}
                         <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}">{% trans "Browse Jobs" %}</a></li>
                         <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans "Browse Employers" %}</a></li>
@@ -55,7 +55,7 @@
                     <strong class="nav_heading text-button-sm text-white">{% trans "For Employers" %}</strong>
                     <ul class="list_nav flex flex-col gap-3 mt-4">
                         {% if user.is_authenticated %}
-                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'dashboard:index' %}">{% trans "Employer Dashboard" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'frontend:dashboard:index' %}">{% trans "Employer Dashboard" %}</a></li>
                         {% endif %}
                         <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans "Browse Freelancers" %}</a></li>
                         <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}">{% trans "Browse Services" %}</a></li>

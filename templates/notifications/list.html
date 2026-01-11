@@ -13,7 +13,7 @@
 <div class="flex items-center space-x-3">
     <span class="text-sm text-gray-500 dark:text-gray-400">{{ stats.unread }} unread</span>
     {% if stats.unread > 0 %}
-    <button hx-post="{% url 'notifications:mark-all-read' %}"
+    <button hx-post="{% url 'frontend:notifications:mark-all-read' %}"
             hx-swap="outerHTML"
             class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
         Mark all as read
@@ -26,7 +26,7 @@
 <div class="space-y-6">
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <form id="notification-filters" hx-get="{% url 'notifications:list' %}" hx-target="#notification-list-container" hx-trigger="change" hx-push-url="true">
+        <form id="notification-filters" hx-get="{% url 'frontend:notifications:list' %}" hx-target="#notification-list-container" hx-trigger="change" hx-push-url="true">
             <div class="flex flex-wrap gap-4 items-end">
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
@@ -99,7 +99,7 @@
                             <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ notification.message }}</p>
                             {% if notification.action_url %}
                             <a href="{{ notification.action_url }}"
-                               hx-post="{% url 'notifications:mark-read' pk=notification.pk %}"
+                               hx-post="{% url 'frontend:notifications:mark-read' pk=notification.pk %}"
                                hx-swap="none"
                                class="mt-2 inline-flex items-center text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
                                 View details
@@ -113,7 +113,7 @@
                         <!-- Actions -->
                         <div class="ml-4 flex-shrink-0">
                             {% if not notification.is_read %}
-                            <button hx-post="{% url 'notifications:mark-read' pk=notification.pk %}"
+                            <button hx-post="{% url 'frontend:notifications:mark-read' pk=notification.pk %}"
                                     hx-target="#notification-{{ notification.pk }}"
                                     hx-swap="outerHTML"
                                     class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"

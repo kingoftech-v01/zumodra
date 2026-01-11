@@ -25,7 +25,7 @@
             </div>
             {% endif %}
             <div class="ml-3 min-w-0">
-                <a href="{% url 'ats:application_detail' application.id %}"
+                <a href="{% url 'frontend:ats:application_detail' application.id %}"
                    class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 truncate block">
                     {{ application.candidate.full_name }}
                 </a>
@@ -53,7 +53,7 @@
                  x-transition:leave-end="transform opacity-0 scale-95"
                  class="absolute right-0 mt-1 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20">
                 <div class="py-1">
-                    <a href="{% url 'ats:application_detail' application.id %}"
+                    <a href="{% url 'frontend:ats:application_detail' application.id %}"
                        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -61,14 +61,14 @@
                         </svg>
                         {% trans "View Details" %}
                     </a>
-                    <a href="{% url 'ats:candidate_detail' application.candidate.id %}"
+                    <a href="{% url 'frontend:ats:candidate_detail' application.candidate.id %}"
                        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                         {% trans "View Candidate" %}
                     </a>
-                    <button hx-get="{% url 'ats:interview_schedule' application.id %}"
+                    <button hx-get="{% url 'frontend:ats:interview_schedule' application.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -77,7 +77,7 @@
                         </svg>
                         {% trans "Schedule Interview" %}
                     </button>
-                    <button hx-get="{% url 'ats:application_add_note' application.id %}"
+                    <button hx-get="{% url 'frontend:ats:application_add_note' application.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -94,7 +94,7 @@
                         {% trans "Send Email" %}
                     </a>
                     <hr class="my-1 border-gray-200 dark:border-gray-700">
-                    <button hx-post="{% url 'ats:application_reject' application.id %}"
+                    <button hx-post="{% url 'frontend:ats:application_reject' application.id %}"
                             hx-target="#application-card-{{ application.id }}"
                             hx-swap="outerHTML"
                             hx-confirm="{% trans 'Are you sure you want to reject this candidate?' %}"
@@ -112,7 +112,7 @@
     <!-- Job Applied For -->
     {% if application.job %}
     <div class="mt-2">
-        <a href="{% url 'ats:job_detail' application.job.id %}"
+        <a href="{% url 'frontend:ats:job_detail' application.job.id %}"
            class="inline-flex items-center text-xs text-primary-600 dark:text-primary-400 hover:underline">
             <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>

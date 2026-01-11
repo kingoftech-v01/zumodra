@@ -8,7 +8,7 @@
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'accounts:cv_list' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <a href="{% url 'frontend:accounts:cv_list' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
         {% trans "My CVs" %}
     </a>
 </li>
@@ -16,7 +16,7 @@
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'accounts:cv_detail' cv.uuid %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <a href="{% url 'frontend:accounts:cv_detail' cv.uuid %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
         {{ cv.name|truncatewords:3 }}
     </a>
 </li>
@@ -50,7 +50,7 @@
                             {% trans "Last analyzed" %}: {{ cv.last_analyzed_at|naturaltime|default:"Never" }}
                         </p>
                     </div>
-                    <button hx-post="{% url 'accounts:cv_analyze' cv.uuid %}"
+                    <button hx-post="{% url 'frontend:accounts:cv_analyze' cv.uuid %}"
                             hx-swap="none"
                             hx-on::after-request="location.reload()"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
@@ -274,14 +274,14 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Actions" %}</h3>
             <div class="space-y-3">
-                <a href="{% url 'accounts:cv_edit' cv.uuid %}"
+                <a href="{% url 'frontend:accounts:cv_edit' cv.uuid %}"
                    class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                     <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "Edit CV" %}</span>
                 </a>
-                <a href="{% url 'accounts:cv_preview' cv.uuid %}"
+                <a href="{% url 'frontend:accounts:cv_preview' cv.uuid %}"
                    class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -289,7 +289,7 @@
                     </svg>
                     <span class="text-sm text-gray-700 dark:text-gray-300">{% trans "Preview CV" %}</span>
                 </a>
-                <a href="{% url 'accounts:cv_download' cv.uuid %}"
+                <a href="{% url 'frontend:accounts:cv_download' cv.uuid %}"
                    class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>

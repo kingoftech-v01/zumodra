@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'ats:job_create' %}" class="zu-btn zu-btn--primary">
+<a href="{% url 'frontend:ats:job_create' %}" class="zu-btn zu-btn--primary">
     <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
     </svg>
@@ -64,7 +64,7 @@
         <div class="border-b border-gray-200 dark:border-gray-700">
             <nav class="flex -mb-px" aria-label="Tabs">
                 <a href="?status=all"
-                   hx-get="{% url 'ats:job_list' %}?status=all"
+                   hx-get="{% url 'frontend:ats:job_list' %}?status=all"
                    hx-target="#jobs-table-body"
                    hx-swap="innerHTML"
                    class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
@@ -73,7 +73,7 @@
                     <span class="zu-badge zu-badge--gray ml-2">{{ all_jobs_count }}</span>
                 </a>
                 <a href="?status=published"
-                   hx-get="{% url 'ats:job_list' %}?status=published"
+                   hx-get="{% url 'frontend:ats:job_list' %}?status=published"
                    hx-target="#jobs-table-body"
                    hx-swap="innerHTML"
                    class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
@@ -82,7 +82,7 @@
                     <span class="zu-badge zu-badge--green ml-2">{{ published_count }}</span>
                 </a>
                 <a href="?status=draft"
-                   hx-get="{% url 'ats:job_list' %}?status=draft"
+                   hx-get="{% url 'frontend:ats:job_list' %}?status=draft"
                    hx-target="#jobs-table-body"
                    hx-swap="innerHTML"
                    class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
@@ -91,7 +91,7 @@
                     <span class="zu-badge zu-badge--yellow ml-2">{{ draft_count }}</span>
                 </a>
                 <a href="?status=closed"
-                   hx-get="{% url 'ats:job_list' %}?status=closed"
+                   hx-get="{% url 'frontend:ats:job_list' %}?status=closed"
                    hx-target="#jobs-table-body"
                    hx-swap="innerHTML"
                    class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
@@ -109,7 +109,7 @@
                 <div class="relative flex-1 max-w-md">
                     <input type="text"
                            name="search"
-                           hx-get="{% url 'ats:job_list' %}"
+                           hx-get="{% url 'frontend:ats:job_list' %}"
                            hx-trigger="keyup changed delay:300ms"
                            hx-target="#jobs-table-body"
                            hx-swap="innerHTML"
@@ -126,7 +126,7 @@
                 <!-- Filters -->
                 <div class="flex items-center gap-3">
                     <select name="department"
-                            hx-get="{% url 'ats:job_list' %}"
+                            hx-get="{% url 'frontend:ats:job_list' %}"
                             hx-trigger="change"
                             hx-target="#jobs-table-body"
                             hx-swap="innerHTML"
@@ -138,7 +138,7 @@
                     </select>
 
                     <select name="location"
-                            hx-get="{% url 'ats:job_list' %}"
+                            hx-get="{% url 'frontend:ats:job_list' %}"
                             hx-trigger="change"
                             hx-target="#jobs-table-body"
                             hx-swap="innerHTML"
@@ -193,7 +193,7 @@
                                 <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No jobs found" %}</h3>
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Get started by posting a new job." %}</p>
                                 <div class="mt-6">
-                                    <a href="{% url 'ats:job_create' %}" class="zu-btn zu-btn--primary">
+                                    <a href="{% url 'frontend:ats:job_create' %}" class="zu-btn zu-btn--primary">
                                         <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                         </svg>

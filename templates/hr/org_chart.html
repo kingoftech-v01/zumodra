@@ -135,7 +135,7 @@
 
     {% comment %} Department Filter {% endcomment %}
     <select id="department-filter"
-            hx-get="{% url 'hr:org-chart' %}"
+            hx-get="{% url 'frontend:hr:org-chart' %}"
             hx-trigger="change"
             hx-target="#org-chart-container"
             hx-swap="innerHTML"

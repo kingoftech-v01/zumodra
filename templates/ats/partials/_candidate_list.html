@@ -62,7 +62,7 @@
                         </div>
                         {% endif %}
                         <div class="ml-4">
-                            <a href="{% url 'ats:candidate_detail' candidate.id %}"
+                            <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}"
                                class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                 {{ candidate.full_name }}
                             </a>
@@ -118,7 +118,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex items-center justify-end space-x-2">
-                        <a href="{% url 'ats:candidate_detail' candidate.id %}"
+                        <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}"
                            class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                            title="{% trans 'View Profile' %}">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +126,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
                         </a>
-                        <button hx-get="{% url 'ats:candidate_add_to_job' candidate.id %}"
+                        <button hx-get="{% url 'frontend:ats:candidate_add_to_job' candidate.id %}"
                                 hx-target="#modal-container"
                                 hx-swap="innerHTML"
                                 class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"

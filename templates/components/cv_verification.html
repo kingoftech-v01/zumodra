@@ -23,7 +23,7 @@
 
     {% else %}
         <!-- Unverified State - Show Upload Form -->
-        <form hx-post="{% url 'accounts:upload_cv' %}"
+        <form hx-post="{% url 'frontend:accounts:upload_cv' %}"
               hx-encoding="multipart/form-data"
               hx-target="#cv-upload-result"
               hx-indicator="#cv-loading"

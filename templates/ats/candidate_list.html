@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block page_actions %}
-<button hx-get="{% url 'ats:candidate_import' %}"
+<button hx-get="{% url 'frontend:ats:candidate_import' %}"
         hx-target="#modal-container"
         hx-swap="innerHTML"
         class="zu-btn zu-btn--secondary">
@@ -30,7 +30,7 @@
     </svg>
     {% trans "Import" %}
 </button>
-<a href="{% url 'ats:candidate_create' %}" class="zu-btn zu-btn--primary">
+<a href="{% url 'frontend:ats:candidate_create' %}" class="zu-btn zu-btn--primary">
     <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
     </svg>
@@ -65,7 +65,7 @@
         <div class="relative flex-1 max-w-md">
             <input type="text"
                    name="search"
-                   hx-get="{% url 'ats:candidate_list' %}"
+                   hx-get="{% url 'frontend:ats:candidate_list' %}"
                    hx-trigger="keyup changed delay:300ms"
                    hx-target="#candidates-container"
                    hx-swap="innerHTML"
@@ -99,7 +99,7 @@
 
             <!-- Filters -->
             <select name="source"
-                    hx-get="{% url 'ats:candidate_list' %}"
+                    hx-get="{% url 'frontend:ats:candidate_list' %}"
                     hx-trigger="change"
                     hx-target="#candidates-container"
                     hx-swap="innerHTML"
@@ -112,7 +112,7 @@
             </select>
 
             <select name="tags"
-                    hx-get="{% url 'ats:candidate_list' %}"
+                    hx-get="{% url 'frontend:ats:candidate_list' %}"
                     hx-trigger="change"
                     hx-target="#candidates-container"
                     hx-swap="innerHTML"
@@ -225,10 +225,10 @@
                 </div>
 
                 <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between">
-                    <a href="{% url 'ats:candidate_detail' candidate.id %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                    <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
                         {% trans "View Profile" %}
                     </a>
-                    <button hx-get="{% url 'ats:candidate_add_to_job' candidate.id %}"
+                    <button hx-get="{% url 'frontend:ats:candidate_add_to_job' candidate.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">

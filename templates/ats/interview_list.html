@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block page_actions %}
-<button hx-get="{% url 'ats:interview_schedule' %}"
+<button hx-get="{% url 'frontend:ats:interview_schedule' %}"
         hx-target="#modal-container"
         hx-swap="innerHTML"
         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
@@ -119,7 +119,7 @@
             <button @click="dateFilter = 'upcoming'"
                     :class="dateFilter === 'upcoming' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
                     class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'ats:interview_list' %}?filter=upcoming"
+                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=upcoming"
                     hx-target="#interviews-container"
                     hx-swap="innerHTML">
                 {% trans "Upcoming" %}
@@ -127,7 +127,7 @@
             <button @click="dateFilter = 'today'"
                     :class="dateFilter === 'today' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
                     class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'ats:interview_list' %}?filter=today"
+                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=today"
                     hx-target="#interviews-container"
                     hx-swap="innerHTML">
                 {% trans "Today" %}
@@ -135,7 +135,7 @@
             <button @click="dateFilter = 'past'"
                     :class="dateFilter === 'past' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
                     class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'ats:interview_list' %}?filter=past"
+                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=past"
                     hx-target="#interviews-container"
                     hx-swap="innerHTML">
                 {% trans "Past" %}
@@ -143,7 +143,7 @@
             <button @click="dateFilter = 'all'"
                     :class="dateFilter === 'all' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
                     class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'ats:interview_list' %}?filter=all"
+                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=all"
                     hx-target="#interviews-container"
                     hx-swap="innerHTML">
                 {% trans "All" %}
@@ -155,7 +155,7 @@
             <div class="relative">
                 <input type="text"
                        name="search"
-                       hx-get="{% url 'ats:interview_list' %}"
+                       hx-get="{% url 'frontend:ats:interview_list' %}"
                        hx-trigger="keyup changed delay:300ms"
                        hx-target="#interviews-container"
                        hx-swap="innerHTML"
@@ -170,7 +170,7 @@
 
             <!-- Interview Type Filter -->
             <select name="type"
-                    hx-get="{% url 'ats:interview_list' %}"
+                    hx-get="{% url 'frontend:ats:interview_list' %}"
                     hx-trigger="change"
                     hx-target="#interviews-container"
                     hx-swap="innerHTML"
@@ -249,7 +249,7 @@
                                     </div>
                                     {% endif %}
                                     <div class="ml-4">
-                                        <a href="{% url 'ats:candidate_detail' interview.application.candidate.id %}"
+                                        <a href="{% url 'frontend:ats:candidate_detail' interview.application.candidate.id %}"
                                            class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                             {{ interview.application.candidate.full_name }}
                                         </a>
@@ -260,7 +260,7 @@
 
                             <!-- Job -->
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="{% url 'ats:job_detail' interview.application.job.id %}"
+                                <a href="{% url 'frontend:ats:job_detail' interview.application.job.id %}"
                                    class="text-sm text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                                     {{ interview.application.job.title|truncatechars:30 }}
                                 </a>
@@ -386,7 +386,7 @@
                                     {% endif %}
 
                                     {% if interview.status == 'completed' %}
-                                    <button hx-get="{% url 'ats:interview_feedback' interview.id %}"
+                                    <button hx-get="{% url 'frontend:ats:interview_feedback' interview.id %}"
                                             hx-target="#modal-container"
                                             hx-swap="innerHTML"
                                             class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
@@ -406,11 +406,11 @@
                                         <div x-show="open" @click.away="open = false" x-transition
                                              class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
                                             <div class="py-1">
-                                                <a href="{% url 'ats:application_detail' interview.application.id %}"
+                                                <a href="{% url 'frontend:ats:application_detail' interview.application.id %}"
                                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     {% trans "View Application" %}
                                                 </a>
-                                                <button hx-get="{% url 'ats:interview_reschedule' interview.id %}"
+                                                <button hx-get="{% url 'frontend:ats:interview_reschedule' interview.id %}"
                                                         hx-target="#modal-container"
                                                         hx-swap="innerHTML"
                                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -418,7 +418,7 @@
                                                 </button>
                                                 {% if interview.status != 'cancelled' %}
                                                 <hr class="my-1 border-gray-200 dark:border-gray-700">
-                                                <button hx-post="{% url 'ats:interview_cancel' interview.id %}"
+                                                <button hx-post="{% url 'frontend:ats:interview_cancel' interview.id %}"
                                                         hx-confirm="{% trans 'Are you sure you want to cancel this interview?' %}"
                                                         class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                                                     {% trans "Cancel Interview" %}
@@ -440,7 +440,7 @@
                                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No interviews found" %}</h3>
                                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Schedule an interview to get started." %}</p>
                                     <div class="mt-6">
-                                        <button hx-get="{% url 'ats:interview_schedule' %}"
+                                        <button hx-get="{% url 'frontend:ats:interview_schedule' %}"
                                                 hx-target="#modal-container"
                                                 hx-swap="innerHTML"
                                                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">

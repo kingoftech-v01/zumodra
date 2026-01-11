@@ -8,7 +8,7 @@
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <a href="{% url 'analytics:dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Analytics" %}</a>
+    <a href="{% url 'frontend:analytics:dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">{% trans "Analytics" %}</a>
 </li>
 <li class="flex items-center">
     <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -27,7 +27,7 @@
 {% endblock %}
 
 {% block page_actions %}
-<button hx-get="{% url 'analytics:report_create' %}"
+<button hx-get="{% url 'frontend:analytics:report_create' %}"
         hx-target="#modal-container"
         hx-swap="innerHTML"
         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
@@ -65,7 +65,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Recruiting Summary -->
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer"
-                 hx-get="{% url 'analytics:report_generate' %}?type=recruiting_summary"
+                 hx-get="{% url 'frontend:analytics:report_generate' %}?type=recruiting_summary"
                  hx-target="#modal-container"
                  hx-swap="innerHTML">
                 <div class="flex items-center">
@@ -83,7 +83,7 @@
 
             <!-- Pipeline Report -->
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer"
-                 hx-get="{% url 'analytics:report_generate' %}?type=pipeline"
+                 hx-get="{% url 'frontend:analytics:report_generate' %}?type=pipeline"
                  hx-target="#modal-container"
                  hx-swap="innerHTML">
                 <div class="flex items-center">
@@ -101,7 +101,7 @@
 
             <!-- Source Effectiveness -->
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer"
-                 hx-get="{% url 'analytics:report_generate' %}?type=source_effectiveness"
+                 hx-get="{% url 'frontend:analytics:report_generate' %}?type=source_effectiveness"
                  hx-target="#modal-container"
                  hx-swap="innerHTML">
                 <div class="flex items-center">
@@ -120,7 +120,7 @@
 
             <!-- Time Metrics -->
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer"
-                 hx-get="{% url 'analytics:report_generate' %}?type=time_metrics"
+                 hx-get="{% url 'frontend:analytics:report_generate' %}?type=time_metrics"
                  hx-target="#modal-container"
                  hx-swap="innerHTML">
                 <div class="flex items-center">
@@ -183,7 +183,7 @@
                                 </svg>
                             </a>
                             {% endif %}
-                            <button hx-delete="{% url 'analytics:report_delete' report.id %}"
+                            <button hx-delete="{% url 'frontend:analytics:report_delete' report.id %}"
                                     hx-confirm="{% trans 'Are you sure you want to delete this report?' %}"
                                     hx-swap="outerHTML swap:1s"
                                     class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">

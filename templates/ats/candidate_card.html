@@ -19,7 +19,7 @@
             </div>
             {% endif %}
             <div class="ml-3 min-w-0">
-                <a href="{% url 'ats:application_detail' application.id %}"
+                <a href="{% url 'frontend:ats:application_detail' application.id %}"
                    class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 truncate block">
                     {{ application.candidate.full_name }}
                 </a>
@@ -40,24 +40,24 @@
                  x-transition
                  class="absolute right-0 mt-1 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
                 <div class="py-1">
-                    <a href="{% url 'ats:application_detail' application.id %}"
+                    <a href="{% url 'frontend:ats:application_detail' application.id %}"
                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         {% trans "View Application" %}
                     </a>
-                    <button hx-get="{% url 'ats:interview_schedule' application.id %}"
+                    <button hx-get="{% url 'frontend:ats:interview_schedule' application.id %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         {% trans "Schedule Interview" %}
                     </button>
-                    <button hx-get="{% url 'ats:email_compose' %}?to={{ application.candidate.email }}"
+                    <button hx-get="{% url 'frontend:ats:email_compose' %}?to={{ application.candidate.email }}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
                             class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                         {% trans "Send Email" %}
                     </button>
                     <hr class="my-1 border-gray-200 dark:border-gray-700">
-                    <button hx-post="{% url 'ats:application_reject' application.id %}"
+                    <button hx-post="{% url 'frontend:ats:application_reject' application.id %}"
                             hx-confirm="{% trans 'Are you sure you want to reject this candidate?' %}"
                             class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                         {% trans "Reject" %}
@@ -69,7 +69,7 @@
 
     <!-- Job Applied For -->
     <div class="mt-2">
-        <a href="{% url 'ats:job_detail' application.job.id %}"
+        <a href="{% url 'frontend:ats:job_detail' application.job.id %}"
            class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
             {{ application.job.title }}
         </a>

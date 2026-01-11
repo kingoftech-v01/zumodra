@@ -107,7 +107,7 @@
                 <h3 class="text-xl font-bold">{{ active_term.job_title }}</h3>
                 <p class="text-primary-100 mt-1">{{ active_term.employer_name }}</p>
             </div>
-            <a href="{% url 'accounts:coop_term_detail' active_term.uuid %}"
+            <a href="{% url 'frontend:accounts:coop_term_detail' active_term.uuid %}"
                class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors">
                 {% trans "View Details" %}
             </a>
@@ -155,7 +155,7 @@
                         {% trans "Search Jobs" %}
                     </a>
                     {% else %}
-                    <a href="{% url 'accounts:coop_term_detail' upcoming_term.uuid %}"
+                    <a href="{% url 'frontend:accounts:coop_term_detail' upcoming_term.uuid %}"
                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg border border-blue-300 transition-colors">
                         {% trans "View Details" %}
                     </a>
@@ -184,7 +184,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Work Term History" %}</h3>
-                    <a href="{% url 'accounts:coop_terms_list' %}"
+                    <a href="{% url 'frontend:accounts:coop_terms_list' %}"
                        class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
                         {% trans "View All" %}
                     </a>
@@ -273,7 +273,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Quick Actions" %}</h3>
                 <div class="space-y-3">
-                    <a href="{% url 'accounts:cv_list' %}"
+                    <a href="{% url 'frontend:accounts:cv_list' %}"
                        class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
                             <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -285,7 +285,7 @@
                             <p class="text-xs text-gray-500">{% trans "Update your resumes" %}</p>
                         </div>
                     </a>
-                    <a href="{% url 'accounts:student_profile_edit' %}"
+                    <a href="{% url 'frontend:accounts:student_profile_edit' %}"
                        class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                             <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,7 +297,7 @@
                             <p class="text-xs text-gray-500">{% trans "Update your info" %}</p>
                         </div>
                     </a>
-                    <a href="{% url 'accounts:verification-dashboard' %}"
+                    <a href="{% url 'frontend:accounts:verification-dashboard' %}"
                        class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                             <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
