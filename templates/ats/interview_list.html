@@ -1,479 +1,280 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
-
-{% block title %}{% trans "Interviews" %} - Zumodra{% endblock %}
-
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Interviews" %}</span>
-</li>
-{% endblock %}
 
 {% block page_title %}{% trans "Interviews" %}{% endblock %}
 
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Schedule, manage, and track all candidate interviews." %}
-</p>
-{% endblock %}
-
-{% block page_actions %}
-<button hx-get="{% url 'frontend:ats:interview_schedule' %}"
-        hx-target="#modal-container"
-        hx-swap="innerHTML"
-        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
-    {% trans "Schedule Interview" %}
-</button>
-{% endblock %}
-
-{% block content %}
-{% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
-    <div class="flex">
-        <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-        </div>
-        <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                {% trans "ATS features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
-                    {% trans "Switch to company account" %}
-                </a>
-            </p>
-        </div>
+{% block dashboard_content %}
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h4 class="heading4 max-lg:mt-3">{% trans "Video Meetings & Interviews" %}</h4>
+        <button hx-get="{% url 'frontend:ats:interview_create' %}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML"
+                class="button-main">
+            <span class="ph ph-plus text-xl mr-2"></span>
+            {% trans "Schedule Interview" %}
+        </button>
     </div>
-</div>
-{% else %}
-<div id="main-content" x-data="{ viewMode: 'list', dateFilter: 'upcoming' }">
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.today|default:0 }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Today" %}</p>
-                </div>
-            </div>
-        </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.this_week|default:0 }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "This Week" %}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
-                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.pending_feedback|default:0 }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Pending Feedback" %}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.completed_this_month|default:0 }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Completed (Month)" %}</p>
-                </div>
+    {% if request.tenant.tenant_type != 'company' %}
+    <div class="mt-5 rounded-lg bg-yellow-50 p-4 border-l-4 border-yellow-400">
+        <div class="flex">
+            <span class="ph ph-warning text-yellow-600 text-2xl mr-3"></span>
+            <div>
+                <p class="text-sm text-yellow-700">
+                    {% trans "ATS features are only available for company tenants." %}
+                    <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600">
+                        {% trans "Switch to company account" %}
+                    </a>
+                </p>
             </div>
         </div>
     </div>
+    {% else %}
 
-    <!-- Filters and View Controls -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <!-- Date Filter Tabs -->
-        <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-            <button @click="dateFilter = 'upcoming'"
-                    :class="dateFilter === 'upcoming' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
-                    class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=upcoming"
-                    hx-target="#interviews-container"
-                    hx-swap="innerHTML">
-                {% trans "Upcoming" %}
-            </button>
-            <button @click="dateFilter = 'today'"
-                    :class="dateFilter === 'today' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
-                    class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=today"
-                    hx-target="#interviews-container"
-                    hx-swap="innerHTML">
-                {% trans "Today" %}
-            </button>
-            <button @click="dateFilter = 'past'"
-                    :class="dateFilter === 'past' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
-                    class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=past"
-                    hx-target="#interviews-container"
-                    hx-swap="innerHTML">
-                {% trans "Past" %}
-            </button>
-            <button @click="dateFilter = 'all'"
-                    :class="dateFilter === 'all' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
-                    class="px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    hx-get="{% url 'frontend:ats:interview_list' %}?filter=all"
-                    hx-target="#interviews-container"
-                    hx-swap="innerHTML">
-                {% trans "All" %}
-            </button>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <!-- Search -->
-            <div class="relative">
-                <input type="text"
-                       name="search"
-                       hx-get="{% url 'frontend:ats:interview_list' %}"
-                       hx-trigger="keyup changed delay:300ms"
-                       hx-target="#interviews-container"
-                       hx-swap="innerHTML"
-                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-                       placeholder="{% trans 'Search interviews...' %}">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Interview Type Filter -->
-            <select name="type"
-                    hx-get="{% url 'frontend:ats:interview_list' %}"
-                    hx-trigger="change"
-                    hx-target="#interviews-container"
-                    hx-swap="innerHTML"
-                    class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <option value="">{% trans "All Types" %}</option>
-                <option value="phone">{% trans "Phone Screen" %}</option>
-                <option value="video">{% trans "Video" %}</option>
-                <option value="onsite">{% trans "On-site" %}</option>
-                <option value="technical">{% trans "Technical" %}</option>
-                <option value="cultural">{% trans "Cultural Fit" %}</option>
-                <option value="final">{% trans "Final Round" %}</option>
-            </select>
-
-            <!-- View Toggle -->
-            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                <button @click="viewMode = 'list'"
-                        :class="viewMode === 'list' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                    </svg>
+    <!-- Filters -->
+    <div class="meeting_filters mt-7.5 rounded-lg bg-white p-5">
+        <div class="flex flex-wrap items-center gap-4">
+            <form class="relative w-[340px] h-12" method="get" action="">
+                <input type="text" name="search" value="{{ search_query|default:'' }}"
+                       class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden"
+                       placeholder="{% trans 'Search interviews...' %}" />
+                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                    <span class="ph ph-magnifying-glass text-xl block"></span>
                 </button>
-                <button @click="viewMode = 'calendar'"
-                        :class="viewMode === 'calendar' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </button>
+            </form>
+            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                <select name="status"
+                        hx-get="{% url 'frontend:ats:interview_list' %}"
+                        hx-trigger="change"
+                        hx-target="#interviews-container"
+                        hx-swap="innerHTML"
+                        class="border-0 outline-none">
+                    <option value="">{% trans "All Interviews" %}</option>
+                    <option value="scheduled" {% if status == 'scheduled' %}selected{% endif %}>{% trans "Scheduled" %}</option>
+                    <option value="completed" {% if status == 'completed' %}selected{% endif %}>{% trans "Completed" %}</option>
+                    <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>{% trans "Cancelled" %}</option>
+                </select>
+                <span class="icon_down ph ph-caret-down right-3"></span>
+            </div>
+            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                <select name="interview_type"
+                        hx-get="{% url 'frontend:ats:interview_list' %}"
+                        hx-trigger="change"
+                        hx-target="#interviews-container"
+                        hx-swap="innerHTML"
+                        class="border-0 outline-none">
+                    <option value="">{% trans "All Types" %}</option>
+                    <option value="video" {% if interview_type == 'video' %}selected{% endif %}>{% trans "Video" %}</option>
+                    <option value="phone" {% if interview_type == 'phone' %}selected{% endif %}>{% trans "Phone" %}</option>
+                    <option value="in_person" {% if interview_type == 'in_person' %}selected{% endif %}>{% trans "In-Person" %}</option>
+                </select>
+                <span class="icon_down ph ph-caret-down right-3"></span>
             </div>
         </div>
     </div>
 
-    <!-- Interviews Container -->
-    <div id="interviews-container">
-        <!-- List View -->
-        <div x-show="viewMode === 'list'" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700/50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Candidate" %}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Job" %}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Type" %}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Date & Time" %}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Interviewers" %}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                {% trans "Status" %}
-                            </th>
-                            <th scope="col" class="relative px-6 py-3">
-                                <span class="sr-only">{% trans "Actions" %}</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {% for interview in interviews %}
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <!-- Candidate -->
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    {% if interview.application.candidate.photo %}
-                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ interview.application.candidate.photo.url }}" alt="">
-                                    {% else %}
-                                    <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
-                                        <span class="text-white font-medium text-sm">{{ interview.application.candidate.first_name|slice:":1" }}{{ interview.application.candidate.last_name|slice:":1" }}</span>
-                                    </div>
-                                    {% endif %}
-                                    <div class="ml-4">
-                                        <a href="{% url 'frontend:ats:candidate_detail' interview.application.candidate.id %}"
-                                           class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
-                                            {{ interview.application.candidate.full_name }}
-                                        </a>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ interview.application.candidate.email }}</p>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Job -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="{% url 'frontend:ats:job_detail' interview.application.job.id %}"
-                                   class="text-sm text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
-                                    {{ interview.application.job.title|truncatechars:30 }}
+    <!-- Interviews List -->
+    <div id="interviews-container" class="meeting_block p-6 mt-7 rounded-lg bg-white">
+        {% if interviews %}
+        <ul class="list_meeting">
+            {% for interview in interviews %}
+            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 {% if not forloop.last %}border-b border-line{% endif %} rounded-lg duration-300 hover:bg-background">
+                <div class="left flex items-center gap-10 flex-1">
+                    <div class="calendar_block overflow-hidden w-[76px] rounded flex-shrink-0">
+                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">
+                            {{ interview.scheduled_start|date:"D"|slice:":3" }}
+                        </div>
+                        <div class="days heading4 py-1 bg-surface text-center">
+                            {{ interview.scheduled_start|date:"d" }}
+                        </div>
+                    </div>
+                    <div class="info flex-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <strong class="title -style-1 heading6 hover:underline">
+                                <a href="{% url 'frontend:ats:interview_detail' interview.id %}">
+                                    {{ interview.application.job.title }}
                                 </a>
-                            </td>
-
-                            <!-- Type -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {% if interview.interview_type == 'phone' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                                    </svg>
-                                    {% trans "Phone" %}
-                                </span>
-                                {% elif interview.interview_type == 'video' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                    </svg>
-                                    {% trans "Video" %}
-                                </span>
-                                {% elif interview.interview_type == 'onsite' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                    </svg>
-                                    {% trans "On-site" %}
-                                </span>
-                                {% elif interview.interview_type == 'technical' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                    </svg>
-                                    {% trans "Technical" %}
-                                </span>
-                                {% elif interview.interview_type == 'cultural' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
-                                    {% trans "Cultural" %}
-                                </span>
-                                {% elif interview.interview_type == 'final' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                                    </svg>
-                                    {% trans "Final" %}
-                                </span>
+                            </strong>
+                            {% if interview.status == 'scheduled' %}
+                            <span class="tag bg-blue-100 text-blue-800 caption1">{% trans "Scheduled" %}</span>
+                            {% elif interview.status == 'completed' %}
+                            <span class="tag bg-green-100 text-green-800 caption1">{% trans "Completed" %}</span>
+                            {% elif interview.status == 'cancelled' %}
+                            <span class="tag bg-red-100 text-red-800 caption1">{% trans "Cancelled" %}</span>
+                            {% elif interview.status == 'no_show' %}
+                            <span class="tag bg-orange-100 text-orange-800 caption1">{% trans "No Show" %}</span>
+                            {% endif %}
+                        </div>
+                        <p class="caption1 text-secondary mt-1">
+                            {% trans "Meeting with:" %}
+                            <a href="{% url 'frontend:ats:candidate_detail' interview.application.candidate.id %}"
+                               class="name capitalize text-black hover:text-primary">
+                                {{ interview.application.candidate.full_name }}
+                            </a>
+                        </p>
+                        <div class="flex items-center gap-4 mt-2">
+                            <div class="flex items-center gap-1">
+                                <span class="ph ph-clock text-secondary"></span>
+                                <span class="hour caption1">{{ interview.scheduled_start|date:"g:i A" }}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="ph ph-hourglass text-secondary"></span>
+                                <span class="time caption1">{{ interview.duration_minutes }}m</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                {% if interview.interview_type == 'video' %}
+                                <span class="ph ph-video-camera text-secondary"></span>
+                                <span class="caption1">{% trans "Video" %}</span>
+                                {% elif interview.interview_type == 'phone' %}
+                                <span class="ph ph-phone text-secondary"></span>
+                                <span class="caption1">{% trans "Phone" %}</span>
                                 {% else %}
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ interview.get_interview_type_display }}</span>
+                                <span class="ph ph-map-pin text-secondary"></span>
+                                <span class="caption1">{% trans "In-Person" %}</span>
                                 {% endif %}
-                            </td>
-
-                            <!-- Date & Time -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">{{ interview.scheduled_start|date:"M d, Y" }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ interview.scheduled_start|time:"g:i A" }} - {{ interview.scheduled_end|time:"g:i A" }}</div>
-                            </td>
-
-                            <!-- Interviewers -->
-                            <td class="px-6 py-4">
-                                <div class="flex -space-x-2">
-                                    {% for interviewer in interview.interviewers.all|slice:":3" %}
-                                    {% if interviewer.profile_picture %}
-                                    <img class="h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800" src="{{ interviewer.profile_picture.url }}" alt="{{ interviewer.get_full_name }}" title="{{ interviewer.get_full_name }}">
-                                    {% else %}
-                                    <div class="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center ring-2 ring-white dark:ring-gray-800" title="{{ interviewer.get_full_name }}">
-                                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ interviewer.first_name|slice:":1" }}{{ interviewer.last_name|slice:":1" }}</span>
-                                    </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                    {% if interview.interviewers.count > 3 %}
-                                    <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ring-2 ring-white dark:ring-gray-800">
-                                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400">+{{ interview.interviewers.count|add:"-3" }}</span>
-                                    </div>
-                                    {% endif %}
+                            </div>
+                        </div>
+                        {% if interview.interviewers.exists %}
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="caption1 text-secondary">{% trans "Interviewers:" %}</span>
+                            <div class="flex -space-x-2">
+                                {% for interviewer in interview.interviewers.all|slice:":3" %}
+                                {% if interviewer.profile_picture %}
+                                <img src="{{ interviewer.profile_picture.url }}"
+                                     alt="{{ interviewer.get_full_name }}"
+                                     class="w-6 h-6 rounded-full border-2 border-white object-cover"
+                                     title="{{ interviewer.get_full_name }}" />
+                                {% else %}
+                                <div class="w-6 h-6 rounded-full border-2 border-white bg-primary flex items-center justify-center"
+                                     title="{{ interviewer.get_full_name }}">
+                                    <span class="text-white text-xs">{{ interviewer.first_name|slice:":1" }}</span>
                                 </div>
-                            </td>
-
-                            <!-- Status -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {% if interview.status == 'scheduled' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                    {% trans "Scheduled" %}
-                                </span>
-                                {% elif interview.status == 'confirmed' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                    {% trans "Confirmed" %}
-                                </span>
-                                {% elif interview.status == 'completed' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                    {% trans "Completed" %}
-                                </span>
-                                {% elif interview.status == 'cancelled' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                                    {% trans "Cancelled" %}
-                                </span>
-                                {% elif interview.status == 'no_show' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                    {% trans "No Show" %}
-                                </span>
                                 {% endif %}
-
-                                {% if interview.status == 'completed' and not interview.feedback.exists %}
-                                <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                    {% trans "Needs Feedback" %}
-                                </span>
+                                {% endfor %}
+                                {% if interview.interviewers.count > 3 %}
+                                <div class="w-6 h-6 rounded-full border-2 border-white bg-secondary flex items-center justify-center">
+                                    <span class="text-white text-xs">+{{ interview.interviewers.count|add:"-3" }}</span>
+                                </div>
                                 {% endif %}
-                            </td>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="action flex justify-end gap-2">
+                    {% if interview.status == 'scheduled' %}
+                    {% if interview.meeting_link %}
+                    <a href="{{ interview.meeting_link }}"
+                       target="_blank"
+                       class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white"
+                       title="{% trans 'Join Meeting' %}">
+                        <span class="ph ph-video-camera text-xl"></span>
+                    </a>
+                    {% endif %}
+                    <button hx-get="{% url 'frontend:ats:interview_edit' interview.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML"
+                            class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white"
+                            title="{% trans 'Reschedule' %}">
+                        <span class="ph ph-calendar-blank text-xl"></span>
+                    </button>
+                    <button hx-delete="{% url 'frontend:ats:interview_delete' interview.id %}"
+                            hx-confirm="{% trans 'Are you sure you want to cancel this interview?' %}"
+                            hx-swap="none"
+                            hx-on::after-request="htmx.trigger('body', 'refreshInterviews')"
+                            class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-red-500 hover:text-white"
+                            title="{% trans 'Cancel Interview' %}">
+                        <span class="ph ph-x text-xl"></span>
+                    </button>
+                    {% else %}
+                    <a href="{% url 'frontend:ats:interview_detail' interview.id %}"
+                       class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white"
+                       title="{% trans 'View Details' %}">
+                        <span class="ph ph-eye text-xl"></span>
+                    </a>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
 
-                            <!-- Actions -->
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end space-x-2">
-                                    {% if interview.meeting_link %}
-                                    <a href="{{ interview.meeting_link }}" target="_blank"
-                                       class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                                       title="{% trans 'Join Meeting' %}">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </a>
-                                    {% endif %}
-
-                                    {% if interview.status == 'completed' %}
-                                    <button hx-get="{% url 'frontend:ats:interview_feedback' interview.id %}"
-                                            hx-target="#modal-container"
-                                            hx-swap="innerHTML"
-                                            class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
-                                            title="{% trans 'Add Feedback' %}">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </button>
-                                    {% endif %}
-
-                                    <div class="relative" x-data="{ open: false }">
-                                        <button @click="open = !open" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
-                                            </svg>
-                                        </button>
-                                        <div x-show="open" @click.away="open = false" x-transition
-                                             class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
-                                            <div class="py-1">
-                                                <a href="{% url 'frontend:ats:application_detail' interview.application.id %}"
-                                                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                    {% trans "View Application" %}
-                                                </a>
-                                                <button hx-get="{% url 'frontend:ats:interview_reschedule' interview.id %}"
-                                                        hx-target="#modal-container"
-                                                        hx-swap="innerHTML"
-                                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                    {% trans "Reschedule" %}
-                                                </button>
-                                                {% if interview.status != 'cancelled' %}
-                                                <hr class="my-1 border-gray-200 dark:border-gray-700">
-                                                <button hx-post="{% url 'frontend:ats:interview_cancel' interview.id %}"
-                                                        hx-confirm="{% trans 'Are you sure you want to cancel this interview?' %}"
-                                                        class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
-                                                    {% trans "Cancel Interview" %}
-                                                </button>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center">
-                                    <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No interviews found" %}</h3>
-                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Schedule an interview to get started." %}</p>
-                                    <div class="mt-6">
-                                        <button hx-get="{% url 'frontend:ats:interview_schedule' %}"
-                                                hx-target="#modal-container"
-                                                hx-swap="innerHTML"
-                                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
-                                            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            {% trans "Schedule Interview" %}
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            {% if page_obj %}
+        {% if page_obj %}
+        <div class="pagination mt-7.5 flex items-center justify-center">
             {% include "components/pagination.html" %}
-            {% endif %}
         </div>
+        {% endif %}
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-12">
+            <span class="ph ph-calendar-blank text-6xl text-placehover mb-4"></span>
+            <h3 class="heading6 text-title">{% trans "No interviews scheduled" %}</h3>
+            <p class="mt-1 body2 text-secondary">{% trans "Schedule your first interview with a candidate." %}</p>
+            <button hx-get="{% url 'frontend:ats:interview_create' %}"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    class="button-main mt-4">
+                <span class="ph ph-plus text-xl mr-2"></span>
+                {% trans "Schedule Interview" %}
+            </button>
+        </div>
+        {% endif %}
+    </div>
 
-        <!-- Calendar View -->
-        <div x-show="viewMode === 'calendar'" x-cloak class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden p-6">
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">{% trans "Calendar View" %}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Calendar view coming soon. Use list view for now." %}</p>
+    <!-- Upcoming This Week -->
+    {% if upcoming_this_week %}
+    <div class="upcoming_week mt-7 rounded-lg bg-white shadow-md p-6">
+        <h5 class="heading5">{% trans "Upcoming This Week" %}</h5>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+            {% for interview in upcoming_this_week %}
+            <div class="interview_card p-5 rounded-lg border border-line duration-300 hover:shadow-lg">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="tag caption1 bg-primary text-white">
+                        {{ interview.scheduled_start|date:"D, M d" }}
+                    </span>
+                    <span class="caption1 text-secondary">{{ interview.scheduled_start|date:"g:i A" }}</span>
+                </div>
+                <strong class="text-button block mb-1">
+                    <a href="{% url 'frontend:ats:interview_detail' interview.id %}" class="hover:text-primary">
+                        {{ interview.application.job.title }}
+                    </a>
+                </strong>
+                <p class="caption1 text-secondary">
+                    {% trans "with" %}
+                    <a href="{% url 'frontend:ats:candidate_detail' interview.application.candidate.id %}" class="text-black hover:text-primary">
+                        {{ interview.application.candidate.full_name }}
+                    </a>
+                </p>
+                <div class="flex items-center gap-2 mt-3">
+                    <span class="flex items-center gap-1 caption1 text-secondary">
+                        {% if interview.interview_type == 'video' %}
+                        <span class="ph ph-video-camera"></span>
+                        {% trans "Video" %}
+                        {% elif interview.interview_type == 'phone' %}
+                        <span class="ph ph-phone"></span>
+                        {% trans "Phone" %}
+                        {% else %}
+                        <span class="ph ph-map-pin"></span>
+                        {% trans "In-Person" %}
+                        {% endif %}
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-secondary"></span>
+                    <span class="caption1 text-secondary">{{ interview.duration_minutes }}m</span>
+                </div>
             </div>
+            {% endfor %}
         </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.body.addEventListener('refreshInterviews', function() {
+        htmx.ajax('GET', '{% url "frontend:ats:interview_list" %}', {
+            target: '#interviews-container',
+            swap: 'innerHTML'
+        });
+    });
+</script>
 {% endblock %}

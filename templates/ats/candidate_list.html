@@ -1,244 +1,205 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
-
-{% block title %}{% trans "Candidates" %} - Zumodra{% endblock %}
-
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Candidates" %}</span>
-</li>
-{% endblock %}
 
 {% block page_title %}{% trans "Candidates" %}{% endblock %}
 
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Manage your talent pool and track candidate progress." %}
-</p>
-{% endblock %}
-
-{% block page_actions %}
-<button hx-get="{% url 'frontend:ats:candidate_import' %}"
-        hx-target="#modal-container"
-        hx-swap="innerHTML"
-        class="zu-btn zu-btn--secondary">
-    <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-    </svg>
-    {% trans "Import" %}
-</button>
-<a href="{% url 'frontend:ats:candidate_create' %}" class="zu-btn zu-btn--primary">
-    <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-    </svg>
-    {% trans "Add Candidate" %}
-</a>
-{% endblock %}
-
-{% block content %}
-{% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
-    <div class="flex">
-        <div class="flex-shrink-0">
-            <svg class="zu-icon h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-        </div>
-        <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                {% trans "ATS features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
-                    {% trans "Switch to company account" %}
-                </a>
-            </p>
-        </div>
-    </div>
-</div>
-{% else %}
-<div id="main-content" x-data="{ viewMode: 'list' }">
-    <!-- View Toggle & Filters -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <!-- Search -->
-        <div class="relative flex-1 max-w-md">
-            <input type="text"
-                   name="search"
-                   hx-get="{% url 'frontend:ats:candidate_list' %}"
-                   hx-trigger="keyup changed delay:300ms"
-                   hx-target="#candidates-container"
-                   hx-swap="innerHTML"
-                   class="zu-input pl-10"
-                   placeholder="{% trans 'Search candidates...' %}">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="zu-icon h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-            </div>
-        </div>
-
+{% block dashboard_content %}
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h4 class="heading4 max-lg:mt-3">{% trans "Candidates" %}</h4>
         <div class="flex items-center gap-3">
-            <!-- View Toggle -->
-            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                <button @click="viewMode = 'list'"
-                        :class="viewMode === 'list' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                    <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                    </svg>
-                </button>
-                <button @click="viewMode = 'grid'"
-                        :class="viewMode === 'grid' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                    <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Filters -->
-            <select name="source"
-                    hx-get="{% url 'frontend:ats:candidate_list' %}"
-                    hx-trigger="change"
-                    hx-target="#candidates-container"
+            <button hx-get="{% url 'frontend:ats:candidate_import' %}"
+                    hx-target="#modal-container"
                     hx-swap="innerHTML"
-                    class="zu-input">
-                <option value="">{% trans "All Sources" %}</option>
-                <option value="website">{% trans "Website" %}</option>
-                <option value="linkedin">{% trans "LinkedIn" %}</option>
-                <option value="referral">{% trans "Referral" %}</option>
-                <option value="agency">{% trans "Agency" %}</option>
-            </select>
-
-            <select name="tags"
-                    hx-get="{% url 'frontend:ats:candidate_list' %}"
-                    hx-trigger="change"
-                    hx-target="#candidates-container"
-                    hx-swap="innerHTML"
-                    class="zu-input">
-                <option value="">{% trans "All Tags" %}</option>
-                {% for tag in tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
-                {% endfor %}
-            </select>
+                    class="button-main -border">
+                <span class="ph ph-upload text-xl mr-2"></span>
+                {% trans "Import" %}
+            </button>
+            <a href="{% url 'frontend:ats:candidate_create' %}" class="button-main">
+                <span class="ph ph-plus text-xl mr-2"></span>
+                {% trans "Add Candidate" %}
+            </a>
         </div>
     </div>
 
-    <!-- Candidates Container -->
-    <div id="candidates-container">
-        <!-- List View -->
-        <div x-show="viewMode === 'list'" class="zu-card overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
-                    <tr>
-                        <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
-                            <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Candidate" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Current Position" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Skills" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Source" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Added" %}
-                        </th>
-                        <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">{% trans "Actions" %}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for candidate in candidates %}
-                    {% include "partials/_candidate_row.html" %}
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center">
-                                <svg class="zu-icon h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No candidates found" %}</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Start building your talent pool." %}</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            {% if page_obj %}
-            {% include "components/pagination.html" %}
-            {% endif %}
-        </div>
-
-        <!-- Grid View -->
-        <div x-show="viewMode === 'grid'" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {% for candidate in candidates %}
-            <div class="zu-card overflow-hidden hover:shadow-md transition-shadow">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        {% if candidate.photo %}
-                        <img class="h-12 w-12 rounded-full object-cover" src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}">
-                        {% else %}
-                        <div class="h-12 w-12 rounded-full bg-primary-600 flex items-center justify-center">
-                            <span class="text-white font-medium">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="ml-4">
-                            <div class="flex items-center gap-1.5">
-                                <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ candidate.full_name }}</h3>
-                                {% if candidate.user and candidate.user.trust_score %}
-                                {% include "components/trust_badge.html" with trust_score=candidate.user.trust_score size="sm" %}
-                                {% endif %}
-                            </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ candidate.current_title|default:"N/A" }}</p>
-                        </div>
-                    </div>
-
-                    {% if candidate.skills.all %}
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        {% for skill in candidate.skills.all|slice:":3" %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
-                            {{ skill.name }}
-                        </span>
-                        {% endfor %}
-                        {% if candidate.skills.count > 3 %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                            +{{ candidate.skills.count|add:"-3" }}
-                        </span>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span>{{ candidate.source|default:"Direct" }}</span>
-                        <span>{{ candidate.created_at|naturaltime }}</span>
-                    </div>
-                </div>
-
-                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between">
-                    <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
-                        {% trans "View Profile" %}
+    {% if request.tenant.tenant_type != 'company' %}
+    <div class="mt-5 rounded-lg bg-yellow-50 p-4 border-l-4 border-yellow-400">
+        <div class="flex">
+            <span class="ph ph-warning text-yellow-600 text-2xl mr-3"></span>
+            <div>
+                <p class="text-sm text-yellow-700">
+                    {% trans "ATS features are only available for company tenants." %}
+                    <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600">
+                        {% trans "Switch to company account" %}
                     </a>
-                    <button hx-get="{% url 'frontend:ats:candidate_add_to_job' candidate.id %}"
-                            hx-target="#modal-container"
-                            hx-swap="innerHTML"
-                            class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-                        {% trans "Add to Job" %}
-                    </button>
-                </div>
+                </p>
             </div>
-            {% endfor %}
         </div>
     </div>
-</div>
-{% endif %}
+    {% else %}
+
+    <!-- Filters and Content -->
+    <div class="mt-7.5 flex max-lg:flex-col-reverse gap-y-10">
+        <!-- Sidebar Filters -->
+        <div class="sidebar_inner flex-shrink-0 lg:w-[300px] w-full lg:pr-7.5">
+            <form class="filter_form bg-white rounded-lg p-6">
+                <div class="filter_section search">
+                    <strong class="text-button">{% trans "Search" %}</strong>
+                    <div class="form_input relative w-full h-12 mt-2">
+                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                        <input type="text" name="search"
+                               hx-get="{% url 'frontend:ats:candidate_list' %}"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#candidates-container"
+                               hx-swap="innerHTML"
+                               class="w-full h-full pl-10 pr-3 border border-line rounded-lg"
+                               placeholder="{% trans 'Search candidates...' %}" />
+                    </div>
+                </div>
+
+                <div class="filter_section location mt-6">
+                    <strong class="text-button">{% trans "Location" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="{% trans 'All Locations' %}">{% trans "All Locations" %}</span>
+                            <ul class="list_option w-full bg-white">
+                                <li class="capitalize" data-item="{% trans 'All Locations' %}">{% trans "All Locations" %}</li>
+                                <li class="capitalize" data-item="Remote">Remote</li>
+                            </ul>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+
+                <div class="filter_section skills mt-6">
+                    <strong class="text-button">{% trans "Skills" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="{% trans 'All Skills' %}">{% trans "All Skills" %}</span>
+                            <ul class="list_option w-full bg-white">
+                                <li class="capitalize" data-item="{% trans 'All Skills' %}">{% trans "All Skills" %}</li>
+                            </ul>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+
+                <div class="filter_section source mt-6">
+                    <strong class="text-button">{% trans "Source" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <select name="source"
+                                hx-get="{% url 'frontend:ats:candidate_list' %}"
+                                hx-trigger="change"
+                                hx-target="#candidates-container"
+                                hx-swap="innerHTML"
+                                class="w-full h-full border-0 outline-none">
+                            <option value="">{% trans "All Sources" %}</option>
+                            <option value="website">{% trans "Website" %}</option>
+                            <option value="linkedin">{% trans "LinkedIn" %}</option>
+                            <option value="referral">{% trans "Referral" %}</option>
+                            <option value="agency">{% trans "Agency" %}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter_section tags mt-6">
+                    <strong class="text-button">{% trans "Tags" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <select name="tags"
+                                hx-get="{% url 'frontend:ats:candidate_list' %}"
+                                hx-trigger="change"
+                                hx-target="#candidates-container"
+                                hx-swap="innerHTML"
+                                class="w-full h-full border-0 outline-none">
+                            <option value="">{% trans "All Tags" %}</option>
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="candidates_content flex-1">
+            <div id="candidates-container">
+                <ul class="list_layout_cols list_candidates grid xl:grid-cols-3 sm:grid-cols-2 lg:gap-7.5 gap-5 w-full">
+                    {% for candidate in candidates %}
+                    <li class="candidates_item relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
+                        <div class="candidates_innner">
+                            <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}" class="flex flex-col items-center justify-center">
+                                {% if candidate.photo %}
+                                <img src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}" class="w-20 h-20 rounded-full object-cover" />
+                                {% else %}
+                                <div class="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+                                    <span class="text-white text-2xl font-bold">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
+                                </div>
+                                {% endif %}
+                                <strong class="candidates_name -style-1 text-title mt-3 duration-300 hover:text-primary">{{ candidate.full_name }}</strong>
+                                {% if candidate.location %}
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                    <span class="candidates_address -style-1 caption1 text-secondary">{{ candidate.location }}</span>
+                                </div>
+                                {% endif %}
+                                {% if candidate.user and candidate.user.trust_score %}
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="ph-fill ph-star text-yellow"></span>
+                                    <strong class="candidates_rate text-sm font-semibold">{{ candidate.user.trust_score|floatformat:1 }}</strong>
+                                    <span class="candidates_rate_quantity caption1 text-secondary">({% trans "Verified" %})</span>
+                                </div>
+                                {% endif %}
+                            </a>
+                            <div class="list_tag flex items-center justify-center gap-2.5 flex-wrap sm:py-5 py-3 border-b border-line">
+                                {% for skill in candidate.skills.all|slice:":2" %}
+                                <span class="candidates_tag tag bg-surface caption1 hover:text-white hover:bg-primary">{{ skill.name }}</span>
+                                {% empty %}
+                                <span class="candidates_tag tag bg-surface caption1">{{ candidate.current_title|default:"N/A" }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-2 mt-3">
+                                <span class="candidates_projects text-secondary">{{ applications|length }} {% trans "Applications" %}</span>
+                                <div class="candidates_price">
+                                    {% if candidate.expected_salary %}
+                                    <span class="price text-title">${{ candidate.expected_salary|intcomma }}</span>
+                                    {% else %}
+                                    <span class="price text-title">{% trans "Contact" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'frontend:ats:candidate_detail' candidate.id %}" class="candidates_apply_btn button-main text-center -border w-full mt-3">
+                            {% trans "View profile" %}
+                        </a>
+                        <button class="add_wishlist_btn -border"
+                                hx-post="{% url 'frontend:ats:candidate_add_to_job' candidate.id %}"
+                                hx-target="#modal-container"
+                                hx-swap="innerHTML">
+                            <span class="ph ph-briefcase text-xl"></span>
+                        </button>
+                    </li>
+                    {% empty %}
+                    <li class="col-span-full">
+                        <div class="flex flex-col items-center justify-center py-12 bg-white rounded-lg">
+                            <span class="ph ph-users text-6xl text-placehover mb-4"></span>
+                            <h3 class="heading6 text-title">{% trans "No candidates found" %}</h3>
+                            <p class="mt-1 body2 text-secondary">{% trans "Start building your talent pool." %}</p>
+                            <a href="{% url 'frontend:ats:candidate_create' %}" class="button-main mt-4">
+                                <span class="ph ph-plus text-xl mr-2"></span>
+                                {% trans "Add Candidate" %}
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                {% if page_obj %}
+                <div class="pagination mt-7.5 flex items-center justify-center">
+                    {% include "components/pagination.html" %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
