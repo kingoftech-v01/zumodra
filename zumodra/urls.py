@@ -250,7 +250,7 @@ urlpatterns += i18n_patterns(
 
     # Frontend Template Views (HTMX-powered)
     # All frontend views including dashboard, appointments, messages are handled through core.urls_frontend
-    path('app/', include(('core.urls_frontend', 'frontend'))),  # All frontend views with namespace
+    path('app/', include('core.urls_frontend', namespace='frontend')),  # All frontend views with namespace
 
     # Legacy standalone routes (redirects to frontend namespace)
     # Note: Dashboard, appointment, messages are now served via core.urls_frontend
