@@ -29,7 +29,9 @@ from .models import (
     # Multi-CV System
     CandidateCV,
     # Co-op/Student Ecosystem
-    StudentProfile, CoopTerm
+    StudentProfile, CoopTerm,
+    # Profile Sync System
+    TenantProfile
 )
 
 User = get_user_model()
@@ -1213,3 +1215,155 @@ class VerificationStatusSerializer(serializers.Serializer):
     # Optional tenant verification (if user has tenant)
     ein_verified = serializers.BooleanField(required=False)
     ein_verified_at = serializers.DateTimeField(allow_null=True, required=False)
+
+
+# ============================================
+# TENANT PROFILE SERIALIZERS
+# ============================================
+
+class TenantProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for TenantProfile.
+    Combines tenant-specific employment data with synced public profile fields.
+    """
+    sync_status = serializers.ReadOnlyField()
+    full_address = serializers.ReadOnlyField()
+    display_name_or_email = serializers.ReadOnlyField()
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    tenant_name = serializers.CharField(source='tenant.name', read_only=True)
+    department_name = serializers.CharField(source='department.name', read_only=True, allow_null=True)
+
+    class Meta:
+        model = TenantProfile
+        fields = [
+            'uuid',
+            'user_email',
+            'tenant_name',
+            # Employment Details (tenant-specific)
+            'employee_id',
+            'department',
+            'department_name',
+            'job_title',
+            'reports_to',
+            'hire_date',
+            'employment_type',
+            # Personal/Private Data (tenant-specific)
+            'address_line1',
+            'address_line2',
+            'postal_code',
+            'date_of_birth',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            # Synced Fields (from PublicProfile)
+            'full_name',
+            'avatar_url',
+            'bio',
+            'email',
+            'phone',
+            'city',
+            'state',
+            'country',
+            'linkedin_url',
+            'github_url',
+            'portfolio_url',
+            'skills_json',
+            'languages_json',
+            # Sync Metadata
+            'last_synced_at',
+            'synced_fields',
+            # Computed
+            'sync_status',
+            'full_address',
+            'display_name_or_email',
+            # Timestamps
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'uuid',
+            'user_email',
+            'tenant_name',
+            'department_name',
+            # Synced fields (read-only, updated via sync)
+            'full_name',
+            'avatar_url',
+            'bio',
+            'email',
+            'phone',
+            'city',
+            'state',
+            'country',
+            'linkedin_url',
+            'github_url',
+            'portfolio_url',
+            'skills_json',
+            'languages_json',
+            # Sync metadata
+            'last_synced_at',
+            'synced_fields',
+            'sync_status',
+            'full_address',
+            'display_name_or_email',
+            'created_at',
+            'updated_at',
+        ]
+
+
+class TenantProfileUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating tenant-specific fields only.
+    Synced fields from PublicProfile are read-only.
+    """
+    class Meta:
+        model = TenantProfile
+        fields = [
+            # Employment Details
+            'employee_id',
+            'department',
+            'job_title',
+            'reports_to',
+            'hire_date',
+            'employment_type',
+            # Personal/Private Data
+            'address_line1',
+            'address_line2',
+            'postal_code',
+            'date_of_birth',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+        ]
+
+
+class ProfileSyncTriggerSerializer(serializers.Serializer):
+    """
+    Serializer for manual profile sync trigger.
+    Allows optional field overrides for one-time sync.
+    """
+    field_overrides = serializers.DictField(
+        child=serializers.BooleanField(),
+        required=False,
+        allow_null=True,
+        help_text=_('Optional field overrides for this sync only. Example: {"sync_phone": true}')
+    )
+
+    def validate_field_overrides(self, value):
+        """Validate field override keys."""
+        if not value:
+            return value
+
+        allowed_fields = [
+            'sync_display_name', 'sync_avatar', 'sync_bio',
+            'sync_public_email', 'sync_phone',
+            'sync_city', 'sync_state', 'sync_country',
+            'sync_linkedin', 'sync_github', 'sync_portfolio',
+            'sync_skills', 'sync_languages'
+        ]
+
+        invalid_fields = [k for k in value.keys() if k not in allowed_fields]
+        if invalid_fields:
+            raise serializers.ValidationError(
+                f"Invalid field overrides: {', '.join(invalid_fields)}. "
+                f"Allowed fields: {', '.join(allowed_fields)}"
+            )
+
+        return value

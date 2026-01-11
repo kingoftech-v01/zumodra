@@ -1735,3 +1735,177 @@ def get_submitted_documents(request):
         'cv_documents': [],
         'message': _('Document listing feature will be available soon.')
     })
+
+
+# ============================================
+# TENANT PROFILE VIEWSET
+# ============================================
+
+class TenantProfileViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing TenantProfile (tenant-specific employment profiles).
+
+    Endpoints:
+    - GET /api/profile/tenant/me/ - Get own tenant profile
+    - PATCH /api/profile/tenant/me/ - Update own tenant profile
+    - POST /api/profile/tenant/sync/ - Trigger manual profile sync
+    - GET /api/profile/tenant/ - List all profiles (admin only)
+    - GET /api/profile/tenant/{uuid}/ - Get specific profile
+    """
+    from .models import TenantProfile
+    from .serializers import TenantProfileSerializer, TenantProfileUpdateSerializer, ProfileSyncTriggerSerializer
+
+    queryset = TenantProfile.objects.select_related('user', 'tenant', 'department').all()
+    serializer_class = TenantProfileSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'uuid'
+
+    def get_queryset(self):
+        """
+        Filter queryset based on user permissions.
+        Regular users can only see their own profile.
+        Admins can see all profiles in their tenant.
+        """
+        user = self.request.user
+        queryset = super().get_queryset()
+
+        # Get current tenant from request
+        tenant = getattr(self.request, 'tenant', None)
+        if not tenant:
+            # No tenant context, return empty queryset
+            return queryset.none()
+
+        # Filter by tenant
+        queryset = queryset.filter(tenant=tenant)
+
+        # Check if user is admin/HR manager
+        try:
+            from .models import TenantUser
+            tenant_user = TenantUser.objects.get(user=user, tenant=tenant)
+            if tenant_user.role in [TenantUser.UserRole.OWNER, TenantUser.UserRole.ADMIN, TenantUser.UserRole.HR_MANAGER]:
+                # Admin can see all profiles in tenant
+                return queryset
+        except TenantUser.DoesNotExist:
+            pass
+
+        # Regular users can only see their own profile
+        return queryset.filter(user=user)
+
+    def get_serializer_class(self):
+        """
+        Use update serializer for PATCH requests.
+        """
+        if self.action in ['update', 'partial_update']:
+            from .serializers import TenantProfileUpdateSerializer
+            return TenantProfileUpdateSerializer
+        from .serializers import TenantProfileSerializer
+        return TenantProfileSerializer
+
+    def get_object(self):
+        """
+        Override to handle 'me' action.
+        """
+        if self.action == 'me':
+            tenant = getattr(self.request, 'tenant', None)
+            if not tenant:
+                from rest_framework.exceptions import NotFound
+                raise NotFound('No tenant context found.')
+
+            from django.shortcuts import get_object_or_404
+            from .models import TenantProfile
+            return get_object_or_404(TenantProfile, user=self.request.user, tenant=tenant)
+
+        return super().get_object()
+
+    @action(detail=False, methods=['get', 'patch'])
+    def me(self, request):
+        """
+        Get or update current user's tenant profile.
+
+        GET /api/profile/tenant/me/
+        PATCH /api/profile/tenant/me/
+        """
+        profile = self.get_object()
+
+        if request.method == 'GET':
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+
+        elif request.method == 'PATCH':
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            # Return full representation
+            from .serializers import TenantProfileSerializer
+            result_serializer = TenantProfileSerializer(profile)
+            return Response(result_serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def sync(self, request):
+        """
+        Trigger manual profile sync from PublicProfile to TenantProfile.
+
+        POST /api/profile/tenant/sync/
+        Body: {
+            "field_overrides": {
+                "sync_phone": true  // optional
+            }
+        }
+        """
+        from .serializers import ProfileSyncTriggerSerializer
+        from accounts.services import ProfileSyncService
+
+        serializer = ProfileSyncTriggerSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tenant = getattr(request, 'tenant', None)
+        if not tenant:
+            return Response(
+                {'detail': 'No tenant context found.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        field_overrides = serializer.validated_data.get('field_overrides')
+
+        # Trigger sync
+        result = ProfileSyncService.sync_manual_trigger(
+            user=request.user,
+            tenant=tenant,
+            field_overrides=field_overrides
+        )
+
+        if result['success']:
+            return Response({
+                'success': True,
+                'synced_fields': result['synced_fields'],
+                'sync_timestamp': result['sync_timestamp'],
+                'message': f"Successfully synced {len(result['synced_fields'])} fields."
+            })
+        else:
+            return Response(
+                {
+                    'success': False,
+                    'error': result.get('error'),
+                    'message': 'Profile sync failed. Please check your public profile exists.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def create(self, request, *args, **kwargs):
+        """
+        Disable manual creation (created automatically via invitation).
+        """
+        return Response(
+            {'detail': 'Tenant profiles are created automatically when you join a tenant.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Disable deletion (profiles should persist with tenant membership).
+        """
+        return Response(
+            {'detail': 'Tenant profiles cannot be deleted manually.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

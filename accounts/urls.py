@@ -33,6 +33,8 @@ from .views import (
     ReviewViewSet,
     CandidateCVViewSet,
     StudentProfileViewSet,
+    # Profile Sync ViewSet
+    TenantProfileViewSet,
 )
 
 # Create router and register ViewSets
@@ -73,6 +75,9 @@ router.register(r'cvs', CandidateCVViewSet, basename='candidate-cv')
 
 # Student Profiles
 router.register(r'student-profiles', StudentProfileViewSet, basename='student-profile')
+
+# Tenant Profiles (with profile sync)
+router.register(r'profile/tenant', TenantProfileViewSet, basename='tenant-profile')
 
 app_name = 'accounts'
 
