@@ -1,35 +1,31 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "User Sessions" %} - Zumodra{% endblock %}
+{% block title %}{% trans "User Sessions" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'security:dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700">{% trans "Security" %}</a>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <a href="{% url 'security:dashboard' %}" class="ml-2 caption1 text-secondary hover:text-gray-700">{% trans "Security" %}</a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Sessions" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "Sessions" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "User Sessions" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Manage and monitor user sessions." %}
 </p>
 {% endblock %}
 
-{% block content %}
-<div class="space-y-6">
+{% block dashboard_content %}
+<div class="space-y-5">
     {% comment %} Stats Cards {% endcomment %}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-7.5">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
@@ -38,8 +34,8 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Sessions" %}</p>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.total|default:0 }}</p>
+                    <p class="caption1 text-secondary">{% trans "Total Sessions" %}</p>
+                    <p class="text-2xl font-semibold text-on-surface">{{ stats.total|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -47,12 +43,10 @@
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    <i class="ph ph-check-circle text-2xl text-green-600"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Active Sessions" %}</p>
+                    <p class="caption1 text-secondary">{% trans "Active Sessions" %}</p>
                     <p class="text-2xl font-semibold text-green-600 dark:text-green-400">{{ stats.active|default:0 }}</p>
                 </div>
             </div>
@@ -60,14 +54,14 @@
 
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-gray-600 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Inactive Sessions" %}</p>
-                    <p class="text-2xl font-semibold text-gray-600 dark:text-gray-400">{{ stats.inactive|default:0 }}</p>
+                    <p class="caption1 text-secondary">{% trans "Inactive Sessions" %}</p>
+                    <p class="text-2xl font-semibold text-gray-600 ">{{ stats.inactive|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -81,14 +75,14 @@
                 <label for="q" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Search" %}</label>
                 <input type="text" name="q" id="q" value="{{ current_filters.q }}"
                        placeholder="{% trans 'Search by email or IP address...' %}"
-                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                       class="mt-1 block w-full rounded-md border-gray-300  shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
             </div>
 
             {% comment %} Status Filter {% endcomment %}
             <div class="w-40">
                 <label for="active" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Status" %}</label>
                 <select name="active" id="active"
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300  shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="">{% trans "All Status" %}</option>
                     <option value="true" {% if current_filters.active == 'true' %}selected{% endif %}>{% trans "Active" %}</option>
                     <option value="false" {% if current_filters.active == 'false' %}selected{% endif %}>{% trans "Inactive" %}</option>
@@ -97,7 +91,7 @@
 
             {% comment %} Submit {% endcomment %}
             <div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <button type="submit" class="button-main">
                     <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
@@ -107,7 +101,7 @@
 
             {% if current_filters.q or current_filters.active %}
             <div>
-                <a href="{% url 'security:sessions' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <a href="{% url 'security:sessions' %}" class="inline-flex items-center px-4 py-2 border border-gray-300  rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white hover:bg-gray-50 dark:hover:bg-gray-600">
                     {% trans "Clear Filters" %}
                 </a>
             </div>
@@ -118,45 +112,45 @@
     {% comment %} Sessions Table {% endcomment %}
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-surface-light">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "User" %}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "IP Address" %}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "User Agent" %}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Login Time" %}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Last Activity" %}</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{% trans "Status" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "User" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "IP Address" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "User Agent" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "Login Time" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "Last Activity" %}</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium caption2 text-secondary uppercase tracking-wider">{% trans "Status" %}</th>
                         <th scope="col" class="relative px-6 py-3">
                             <span class="sr-only">{% trans "Actions" %}</span>
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                     {% for session in sessions %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <tr class="hover:bg-surface-light">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                <div class="flex-shrink-0 h-8 w-8 rounded-full bg-surface-light flex items-center justify-center">
+                                    <span class="text-xs font-medium text-gray-600 ">
                                         {{ session.user.email|slice:":2"|upper }}
                                     </span>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ session.user.email }}</p>
+                                    <p class="caption1">{{ session.user.email }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <code class="text-sm font-mono text-gray-900 dark:text-white">{{ session.ip_address }}</code>
+                            <code class="text-sm font-mono text-on-surface">{{ session.ip_address }}</code>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" title="{{ session.user_agent }}">
+                        <td class="px-6 py-4 caption2 text-secondary max-w-xs truncate" title="{{ session.user_agent }}">
                             {{ session.user_agent|truncatechars:40 }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-6 py-4 whitespace-nowrap caption2 text-secondary">
                             {{ session.login_time|date:"M d, Y H:i" }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-6 py-4 whitespace-nowrap caption2 text-secondary">
                             {{ session.last_activity|timesince }} ago
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -166,7 +160,7 @@
                                 {% trans "Active" %}
                             </span>
                             {% else %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium tag bg-gray bg-opacity-10 text-secondary">
                                 {% trans "Inactive" %}
                             </span>
                             {% endif %}
@@ -182,18 +176,16 @@
                                 {% trans "Terminate" %}
                             </button>
                             {% else %}
-                            <span class="text-gray-400">-</span>
+                            <span class="text-secondary">-</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="7" class="px-6 py-12 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No sessions found" %}</h3>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            <i class="ph ph-folder text-6xl text-secondary mx-auto block"></i>
+                            <h3 class="heading6 mb-2">{% trans "No sessions found" %}</h3>
+                            <p class="mt-1 caption2 text-secondary">
                                 {% if current_filters.q or current_filters.active %}
                                 {% trans "Try adjusting your filters." %}
                                 {% else %}
@@ -210,7 +202,7 @@
 
     {% comment %} Pagination Note {% endcomment %}
     {% if sessions|length >= 100 %}
-    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+    <div class="bg-yellow bg-opacity-10 border border-yellow border-opacity-20 rounded-lg p-4">
         <div class="flex">
             <svg class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
