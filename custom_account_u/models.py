@@ -30,6 +30,17 @@ class CustomUser(AbstractUser):
     )
     kyc_verified_at = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def profile(self):
+        """
+        Backward compatibility property for templates using user.profile.
+        Returns the user's PublicProfile if it exists, None otherwise.
+        """
+        try:
+            return self.public_profile
+        except PublicProfile.DoesNotExist:
+            return None
+
 
 class PublicProfile(models.Model):
     """
