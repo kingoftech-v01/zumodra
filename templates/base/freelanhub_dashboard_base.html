@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static i18n %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zumodra - Multi-Tenant ATS & Freelance Marketplace">
+    <title>{% block page_title %}Dashboard{% endblock %} | Zumodra</title>
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
+
+    <!-- FreelanHub CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="lg:overflow-hidden">
+    <!-- Header -->
+    <header id="header" class="header -style-white relative">
+        {% include 'components/dashboard/freelanhub_header.html' %}
+    </header>
+
+    <!-- Dashboard Main -->
+    <div class="dashboard_main overflow-hidden lg:w-screen lg:h-screen flex sm:pt-20 pt-16">
+        <!-- Sidebar Menu -->
+        <div class="menu_dashboard overflow-hidden flex-shrink-0 min-[320px]:w-[280px] w-[80vw] h-full bg-white relative z-[2] max-lg:hidden">
+            {% include 'components/dashboard/freelanhub_sidebar.html' %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="content_dashboard scrollbar_custom max-h-full w-full h-fit bg-surface">
+            <div class="container h-full lg:py-15 sm:py-12 py-8">
+                <!-- Mobile Menu Button -->
+                <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                    <span class="ph ph-squares-four text-xl"></span>
+                    <strong class="text-button">Menu</strong>
+                </button>
+
+                <!-- Page Content -->
+                {% block dashboard_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- FreelanHub JavaScript -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/phosphor-icons.js' %}"></script>
+    <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/leaflet.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/apexcharts.js' %}"></script>
+    <script src="{% static 'assets/js/quill.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    <!-- Keep HTMX for Django integration -->
+    <script src="{% static 'assets/js/vendor/htmx.min.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

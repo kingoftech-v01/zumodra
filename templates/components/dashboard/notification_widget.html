@@ -1,0 +1,32 @@
+{% load static i18n %}
+{% comment %}
+Reusable notification widget for dashboard
+
+Usage:
+{% include 'components/dashboard/notification_widget.html' with notifications=recent_notifications %}
+
+Parameters:
+- notifications: Queryset or list of notification objects
+- max_height: Optional max height class (default: max-h-[420px])
+{% endcomment %}
+
+<div class="notification overflow-hidden flex-shrink-0 flex-grow xl:w-[300px] h-full rounded-lg bg-white py-6">
+    <h5 class="heading5 px-6">{% trans "Notifications" %}</h5>
+    <ul class="list_notification scrollbar_custom {{ max_height|default:'max-h-[420px]' }} flex flex-col gap-2.5 px-6 mt-5">
+        {% for notification in notifications %}
+        <li class="item flex gap-2">
+            <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                <span class="ph-fill ph-bell text-lg"></span>
+            </span>
+            <div class="content flex flex-col gap-2">
+                <p class="title text-secondary">{{ notification.message|safe }}</p>
+                <span class="date caption1 text-secondary">{{ notification.created_at|timesince }} ago</span>
+            </div>
+        </li>
+        {% empty %}
+        <li class="item text-center py-8">
+            <p class="text-secondary">{% trans "No new notifications" %}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

@@ -1,0 +1,101 @@
+{% load static i18n %}
+<div class="header_inner absolute flex items-center justify-between top-0 left-0 right-0 z-[1] w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 border-b border-line">
+    <div class="left flex items-center gap-15 h-full max-[1600px]:gap-6">
+        <h1>
+            <a href="{% url 'frontend:dashboard:index' %}">
+                <img src="{% static 'assets/images/logo-white.png' %}" alt="Zumodra Logo" class="logo-white md:h-[42px] h-8 w-auto">
+                <img src="{% static 'assets/images/logo.png' %}" alt="Zumodra Logo" class="logo-black md:h-[42px] h-8 w-auto hidden">
+            </a>
+        </h1>
+    </div>
+
+    <div class="list_action flex items-center gap-5">
+        <!-- Help Block -->
+        <div class="help_block max-sm:hidden">
+            <a href="{% url 'frontend:pages:faqs' %}" class="block">
+                <span class="ph ph-question text-white text-2xl block"></span>
+            </a>
+        </div>
+
+        <!-- Notification Block -->
+        <div class="notification_block relative max-sm:hidden">
+            <button class="relative block">
+                <span class="ph ph-bell text-white text-2xl block"></span>
+                {% if user.unread_notifications_count > 0 %}
+                <span class="absolute -top-0.5 right-0.5 w-2 h-2 bg-primary rounded-full"></span>
+                {% endif %}
+            </button>
+            <div class="notification_submenu absolute w-[400px] p-5 top-[3.25rem] -left-9 bg-white rounded-xl">
+                <h6 class="heading6 pb-3">{% trans "Notifications" %}</h6>
+                <ul class="list_notification w-full">
+                    {% for notification in user.recent_notifications|slice:":5" %}
+                    <li class="notification_item w-full py-3 border-t border-line duration-300 hover:bg-background">
+                        <a href="{{ notification.get_absolute_url }}" class="flex gap-3 w-full">
+                            <span class="ic_noti flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface">
+                                <span class="ph-fill ph-bell text-lg text-secondary"></span>
+                            </span>
+                            <div class="notification_detail">
+                                <p class="notification_desc text-secondary">{{ notification.message|safe }}</p>
+                                <span class="notification_time caption2 text-placehover">{{ notification.created_at|timesince }} ago</span>
+                            </div>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="notification_item w-full py-3 border-t border-line">
+                        <p class="text-secondary text-center">{% trans "No new notifications" %}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if user.unread_notifications_count > 5 %}
+                <a href="{% url 'notifications:notification_list' %}" class="btn btn-secondary w-full mt-3">
+                    {% trans "View all notifications" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Profile Block -->
+        <div class="user_block relative max-sm:hidden">
+            <button class="user_infor flex items-center gap-2 text-white">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full object-cover">
+                {% else %}
+                <img src="{% static 'assets/images/avatar/default-avatar.png' %}" alt="{{ user.get_full_name }}" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full">
+                {% endif %}
+                <strong class="user_name text-title">{{ user.get_full_name|default:user.username }}</strong>
+                <span class="ph ph-caret-down"></span>
+            </button>
+            <ul class="list_action_user absolute w-[240px] p-3 top-14 right-0 bg-white rounded-lg">
+                <li class="action_item">
+                    <a href="{% url 'frontend:dashboard:index' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                        <span class="ph ph-squares-four text-2xl text-secondary"></span>
+                        <strong class="text-title">{% trans "Dashboard" %}</strong>
+                    </a>
+                </li>
+                <li class="action_item">
+                    <a href="{% url 'accounts:profile' user.id %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                        <span class="ph ph-user-circle text-2xl text-secondary"></span>
+                        <strong class="text-title">{% trans "My Profile" %}</strong>
+                    </a>
+                </li>
+                <li class="action_item">
+                    <a href="{% url 'accounts:settings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                        <span class="ph ph-gear text-2xl text-secondary"></span>
+                        <strong class="text-title">{% trans "Settings" %}</strong>
+                    </a>
+                </li>
+                <li class="action_item border-t border-line mt-2 pt-2">
+                    <a href="{% url 'accounts:logout' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                        <span class="ph ph-sign-out text-2xl text-secondary"></span>
+                        <strong class="text-title">{% trans "Log Out" %}</strong>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Mobile Hamburger Menu -->
+        <button class="humburger_btn lg:hidden">
+            <span class="ph-bold ph-list text-white text-2xl block"></span>
+        </button>
+    </div>
+</div>

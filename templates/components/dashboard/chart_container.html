@@ -1,0 +1,29 @@
+{% load static i18n %}
+{% comment %}
+Reusable chart container widget for ApexCharts
+
+Usage:
+{% include 'components/dashboard/chart_container.html' with chart_id="chart-timeline" chart_title="Page Views" show_time_filter=True %}
+
+Parameters:
+- chart_id: Unique ID for the chart element
+- chart_title: Title displayed above the chart
+- show_time_filter: Boolean to show/hide time filter buttons (default: False)
+- container_class: Optional additional CSS classes
+{% endcomment %}
+
+<div class="w-full h-full rounded-lg bg-white {{ container_class|default:'' }}">
+    <div class="flex flex-wrap justify-between gap-6 p-6">
+        <h5 class="heading5">{{ chart_title }}</h5>
+        {% if show_time_filter %}
+        <div class="menu_time flex flex-wrap gap-7.5">
+            <button id="{{ chart_id }}_week" class="button_time line-before line-black line-2px text-button text-secondary">{% trans "Week" %}</button>
+            <button id="{{ chart_id }}_month" class="button_time line-before line-black line-2px text-button text-secondary">{% trans "Month" %}</button>
+            <button id="{{ chart_id }}_year" class="button_time line-before line-black line-2px text-button text-secondary active">{% trans "Year" %}</button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="chart md:px-6 pb-6">
+        <div id="{{ chart_id }}"></div>
+    </div>
+</div>

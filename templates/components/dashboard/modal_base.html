@@ -1,0 +1,44 @@
+{% load static i18n %}
+{% comment %}
+Reusable modal/popup base template
+
+Usage:
+{% include 'components/dashboard/modal_base.html' with modal_id="confirm-delete" modal_title="Confirm Deletion" modal_content=delete_content modal_footer=delete_footer %}
+
+Parameters:
+- modal_id: Unique ID for the modal
+- modal_title: Modal header title
+- modal_content: HTML content for modal body
+- modal_footer: Optional HTML content for modal footer (buttons, etc.)
+- modal_size: Optional size class (default: max-w-2xl)
+{% endcomment %}
+
+<div id="{{ modal_id }}" class="modal fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="{{ modal_id }}-title" role="dialog" aria-modal="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="modal_backdrop fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+
+        <!-- Modal Content -->
+        <div class="modal_content relative {{ modal_size|default:'max-w-2xl' }} w-full rounded-lg bg-white p-6 shadow-xl">
+            <!-- Header -->
+            <div class="modal_header flex items-center justify-between mb-4">
+                <h3 id="{{ modal_id }}-title" class="heading5">{{ modal_title }}</h3>
+                <button type="button" class="modal_close text-secondary hover:text-title duration-300" data-close-modal="{{ modal_id }}">
+                    <span class="ph ph-x text-2xl"></span>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal_body">
+                {{ modal_content|safe }}
+            </div>
+
+            <!-- Footer -->
+            {% if modal_footer %}
+            <div class="modal_footer flex items-center justify-end gap-3 mt-6 pt-4 border-t border-line">
+                {{ modal_footer|safe }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

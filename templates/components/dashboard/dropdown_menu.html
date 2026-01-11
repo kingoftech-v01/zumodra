@@ -1,0 +1,37 @@
+{% load static i18n %}
+{% comment %}
+Reusable dropdown menu widget
+
+Usage:
+{% include 'components/dashboard/dropdown_menu.html' with dropdown_items=actions dropdown_label="Actions" %}
+
+Parameters:
+- dropdown_items: List of menu items with 'label', 'url', 'icon' (optional)
+- dropdown_label: Button label text
+- dropdown_id: Unique ID for dropdown (default: auto-generated)
+- dropdown_class: Optional additional CSS classes
+- button_class: Optional button CSS classes (default: btn-secondary)
+{% endcomment %}
+
+<div class="dropdown relative {{ dropdown_class|default:'' }}">
+    <button type="button" class="dropdown_trigger btn {{ button_class|default:'btn-secondary' }} flex items-center gap-2"
+            data-dropdown-id="{{ dropdown_id|default:'dropdown-menu' }}">
+        <span>{{ dropdown_label }}</span>
+        <span class="ph ph-caret-down text-lg"></span>
+    </button>
+
+    <div id="{{ dropdown_id|default:'dropdown-menu' }}" class="dropdown_menu hidden absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg p-2 z-10">
+        {% for item in dropdown_items %}
+        {% if item.divider %}
+        <div class="border-t border-line my-2"></div>
+        {% else %}
+        <a href="{{ item.url }}" class="dropdown_item flex items-center gap-3 w-full py-2 px-3 rounded-lg duration-300 hover:bg-background {{ item.class|default:'' }}">
+            {% if item.icon %}
+            <span class="ph ph-{{ item.icon }} text-xl text-secondary"></span>
+            {% endif %}
+            <span class="text-button">{{ item.label }}</span>
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>

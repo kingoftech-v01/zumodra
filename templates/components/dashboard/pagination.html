@@ -1,0 +1,41 @@
+{% load static i18n %}
+{% comment %}
+Reusable pagination widget
+
+Usage:
+{% include 'components/dashboard/pagination.html' with page_obj=page_obj %}
+
+Parameters:
+- page_obj: Django paginator page object
+- pagination_class: Optional additional CSS classes
+{% endcomment %}
+
+{% if page_obj.has_other_pages %}
+<div class="pagination flex items-center justify-center gap-2 mt-8 {{ pagination_class|default:'' }}">
+    {% if page_obj.has_previous %}
+    <a href="?page=1" class="page_link flex items-center justify-center w-10 h-10 rounded-lg border border-line duration-300 hover:bg-background">
+        <span class="ph ph-caret-double-left text-lg"></span>
+    </a>
+    <a href="?page={{ page_obj.previous_page_number }}" class="page_link flex items-center justify-center w-10 h-10 rounded-lg border border-line duration-300 hover:bg-background">
+        <span class="ph ph-caret-left text-lg"></span>
+    </a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="page_link active flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-white">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?page={{ num }}" class="page_link flex items-center justify-center w-10 h-10 rounded-lg border border-line duration-300 hover:bg-background">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="page_link flex items-center justify-center w-10 h-10 rounded-lg border border-line duration-300 hover:bg-background">
+        <span class="ph ph-caret-right text-lg"></span>
+    </a>
+    <a href="?page={{ page_obj.paginator.num_pages }}" class="page_link flex items-center justify-center w-10 h-10 rounded-lg border border-line duration-300 hover:bg-background">
+        <span class="ph ph-caret-double-right text-lg"></span>
+    </a>
+    {% endif %}
+</div>
+{% endif %}

@@ -1,0 +1,44 @@
+{% comment %}
+Reusable data table widget
+
+Usage:
+{% include 'components/dashboard/data_table.html' with headers=table_headers rows=table_rows %}
+
+Parameters:
+- headers: List of header names
+- rows: List of row data (each row is a list of cell values)
+- table_class: Optional additional CSS classes
+{% endcomment %}
+
+<div class="overflow-x-auto {{ table_class|default:'' }}">
+    <table class="w-full">
+        <thead class="bg-surface">
+            <tr>
+                {% for header in headers %}
+                <th class="sm:py-4 py-3 sm:px-4 px-2 text-left">
+                    <span class="caption1">{{ header }}</span>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr class="item duration-300 hover:bg-background">
+                {% for cell in row %}
+                <td class="sm:py-4 py-3 sm:px-4 px-2">{{ cell|safe }}</td>
+                {% endfor %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{{ headers|length }}" class="text-center py-8 text-secondary">
+                    {% if empty_message %}
+                        {{ empty_message }}
+                    {% else %}
+                        No data available
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

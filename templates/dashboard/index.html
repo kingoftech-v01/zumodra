@@ -1,329 +1,221 @@
-{% extends "base/dashboard_base.html" %}
-{% comment %} =============================================================================
-   ZUMODRA DASHBOARD INDEX TEMPLATE
-   =============================================================================
-
-   File: templates/dashboard/index.html
-   Purpose: Main dashboard homepage with widgets and metrics
-
-   EXTENDS: base/dashboard_base.html
-
-   CONTEXT VARIABLES (from DashboardView):
-   - stats (dict): Quick stats counts
-     - open_jobs: Number of open job postings
-     - total_candidates: Total candidates in system
-     - new_candidates_week: New candidates this week
-     - active_applications: Applications in progress
-     - pending_interviews: Scheduled interviews
-     - total_employees: Active employee count
-     - pending_time_off: Pending time off requests
-   - upcoming_interviews (queryset): Next 5 interviews
-   - recent_activity (queryset): Recent notifications
-   - unread_notifications (int): Unread notification count
-
-   HTMX ENDPOINTS:
-   - dashboard:htmx-quick-stats: Refresh quick stats
-   - dashboard:htmx-recent-activity: Refresh activity feed
-   - dashboard:htmx-upcoming-interviews: Refresh interviews
-
-   Author: Rhematek Solutions
-   Last Updated: 2025-12-30
-   ============================================================================= {% endcomment %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
 {% block page_title %}{% trans "Dashboard" %}{% endblock %}
 
-{% block page_description %}
-<p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--text-tertiary);">
-    {% trans "Welcome back! Here's an overview of your workspace." %}
-</p>
-{% endblock %}
+{% block dashboard_content %}
+    <h4 class="heading4 max-lg:mt-3">{% trans "Dashboard" %}</h4>
 
-{% block page_actions %}
-<button type="button"
-        class="zu-btn zu-btn--secondary"
-        hx-get="{% url 'frontend:dashboard:htmx-quick-stats' %}"
-        hx-target="#quick-stats-container"
-        hx-swap="innerHTML"
-        hx-indicator="#refresh-indicator">
-    <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-    </svg>
-    {% trans "Refresh" %}
-    <div id="refresh-indicator" class="htmx-indicator" style="margin-left: 0.5rem;">
-        <svg class="zu-icon zu-icon--sm animate-spin" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-    </div>
-</button>
-{% endblock %}
+    <!-- Quick Stats Cards -->
+    <ul class="list_counter grid 2xl:grid-cols-4 grid-cols-2 sm:gap-7.5 gap-5 mt-7.5 w-full">
+        {% include 'components/dashboard/stats_card.html' with label="Open Jobs" value=stats.open_jobs|default:"0" icon="briefcase" item_class="applied_job" %}
+        {% include 'components/dashboard/stats_card.html' with label="Total Candidates" value=stats.total_candidates|default:"0" icon="users-three" item_class="services_offered" %}
+        {% include 'components/dashboard/stats_card.html' with label="Active Applications" value=stats.active_applications|default:"0" icon="notepad" item_class="views_profile" %}
+        {% include 'components/dashboard/stats_card.html' with label="Pending Interviews" value=stats.pending_interviews|default:"0" icon="video-camera" item_class="total_reviews" %}
+    </ul>
 
-{% block content %}
-<div x-data="{
-    showAllStats: false,
-    refreshInterval: null,
-    startAutoRefresh() {
-        this.refreshInterval = setInterval(() => {
-            htmx.trigger('#quick-stats-container', 'refresh');
-        }, 300000); // Refresh every 5 minutes
-    },
-    stopAutoRefresh() {
-        if (this.refreshInterval) {
-            clearInterval(this.refreshInterval);
-        }
-    }
-}"
-x-init="startAutoRefresh()"
-x-on:beforeunload.window="stopAutoRefresh()">
-
-    {% comment %} ===== QUICK STATS SECTION ===== {% endcomment %}
-    <section class="mb-8 animate-on-load" data-animation="fade-up" data-delay="0">
-        <div class="flex items-center justify-between mb-5">
-            <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">
-                {% trans "Quick Stats" %}
-            </h2>
-            <button @click="showAllStats = !showAllStats"
-                    class="zu-btn zu-btn--ghost"
-                    style="font-size: 0.875rem;">
-                <span x-show="!showAllStats">{% trans "Show All" %}</span>
-                <span x-show="showAllStats">{% trans "Show Less" %}</span>
-            </button>
-        </div>
-
-        <div id="quick-stats-container"
-             hx-get="{% url 'frontend:dashboard:htmx-quick-stats' %}"
-             hx-trigger="refresh"
-             hx-swap="innerHTML">
-            <!-- Quick Stats Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {% include "components/stats_card.html" with title="Open Jobs" value=stats.open_jobs|default:"0" icon="jobs" delay="0" %}
-                {% include "components/stats_card.html" with title="Total Candidates" value=stats.total_candidates|default:"0" icon="users" icon_variant="success" delay="50" %}
-                {% include "components/stats_card.html" with title="Active Applications" value=stats.active_applications|default:"0" icon="applications" icon_variant="info" delay="100" %}
-                {% include "components/stats_card.html" with title="Pending Interviews" value=stats.pending_interviews|default:"0" icon="interviews" icon_variant="warning" delay="150" %}
-
-                <!-- Extended Stats (shown when expanded) -->
-                <template x-if="showAllStats">
-                    <div class="contents">
-                        {% include "components/stats_card.html" with title="New This Week" value=stats.new_candidates_week|default:"0" change="+12%" change_type="increase" icon="chart" icon_variant="gold" delay="200" %}
-                        {% include "components/stats_card.html" with title="Total Employees" value=stats.total_employees|default:"0" icon="users" delay="250" %}
-                        {% include "components/stats_card.html" with title="Time Off Requests" value=stats.pending_time_off|default:"0" icon="time" icon_variant="warning" delay="300" %}
-                        {% include "components/stats_card.html" with title="Satisfaction Score" value="92%" icon="star" icon_variant="gold" delay="350" %}
-                    </div>
-                </template>
+    <!-- Chart and Notifications Section -->
+    <div class="chart_overview flex max-xl:flex-col gap-7.5 mt-7.5">
+        <!-- Chart Container -->
+        <div class="w-full h-full rounded-lg bg-white">
+            <div class="flex flex-wrap justify-between gap-6 p-6">
+                <h5 class="heading5">{% trans "Overview" %}</h5>
+                <div class="menu_time flex flex-wrap gap-7.5">
+                    <button id="one_week" class="button_time line-before line-black line-2px text-button text-secondary">{% trans "Week" %}</button>
+                    <button id="one_month" class="button_time line-before line-black line-2px text-button text-secondary">{% trans "Month" %}</button>
+                    <button id="one_year" class="button_time line-before line-black line-2px text-button text-secondary active">{% trans "Year" %}</button>
+                </div>
+            </div>
+            <div class="chart md:px-6 pb-6">
+                <div id="chart-timeline"></div>
             </div>
         </div>
-    </section>
 
-    {% comment %} ===== MAIN DASHBOARD GRID ===== {% endcomment %}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {% comment %} ===== UPCOMING INTERVIEWS WIDGET ===== {% endcomment %}
-        <section class="lg:col-span-2 animate-on-load" data-animation="fade-up" data-delay="200">
-            <div class="zu-card">
-                <div class="zu-card__header">
-                    <div>
-                        <h3 class="zu-card__title">{% trans "Upcoming Interviews" %}</h3>
-                        <p class="zu-card__subtitle">{% trans "Scheduled for the next 7 days" %}</p>
+        <!-- Notification Widget -->
+        <div class="notification overflow-hidden flex-shrink-0 flex-grow xl:w-[300px] h-full rounded-lg bg-white py-6">
+            <h5 class="heading5 px-6">{% trans "Notifications" %}</h5>
+            <ul class="list_notification scrollbar_custom max-h-[420px] flex flex-col gap-2.5 px-6 mt-5">
+                {% for activity in recent_activity %}
+                <li class="item flex gap-2">
+                    <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                        <span class="ph-fill ph-bell text-lg"></span>
+                    </span>
+                    <div class="content flex flex-col gap-2">
+                        <p class="title text-secondary">{{ activity.message|safe }}</p>
+                        <span class="date caption1 text-secondary">{{ activity.created_at|timesince }} {% trans "ago" %}</span>
                     </div>
-                    <button type="button"
-                            class="zu-btn zu-btn--ghost"
-                            style="padding: 0.5rem;"
-                            hx-get="{% url 'frontend:dashboard:htmx-upcoming-interviews' %}"
-                            hx-target="#upcoming-interviews-container"
-                            hx-swap="innerHTML"
-                            hx-indicator="#interviews-indicator">
-                        <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <div id="interviews-indicator" class="htmx-indicator">
-                            <svg class="zu-icon zu-icon--sm animate-spin" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        </div>
-                    </button>
-                </div>
-                <div class="zu-card__body" id="upcoming-interviews-container"
-                     hx-get="{% url 'frontend:dashboard:htmx-upcoming-interviews' %}"
-                     hx-trigger="load delay:100ms"
-                     hx-swap="innerHTML">
-                    {% if upcoming_interviews %}
-                    <div>
+                </li>
+                {% empty %}
+                <li class="item text-center py-8">
+                    <p class="text-secondary">{% trans "No new notifications" %}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Upcoming Interviews Section -->
+    <div class="mt-7.5">
+        <div class="rounded-lg bg-white p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h5 class="heading5">{% trans "Upcoming Interviews" %}</h5>
+                <a href="{% url 'frontend:ats:interview_list' %}" class="text-button text-primary hover:underline">
+                    {% trans "View All" %}
+                </a>
+            </div>
+
+            {% if upcoming_interviews %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-surface">
+                        <tr>
+                            <th class="sm:py-4 py-3 sm:px-4 px-2 text-left">
+                                <span class="caption1">{% trans "Candidate" %}</span>
+                            </th>
+                            <th class="sm:py-4 py-3 sm:px-4 px-2 text-left">
+                                <span class="caption1">{% trans "Job" %}</span>
+                            </th>
+                            <th class="sm:py-4 py-3 sm:px-4 px-2 text-left">
+                                <span class="caption1">{% trans "Date & Time" %}</span>
+                            </th>
+                            <th class="sm:py-4 py-3 sm:px-4 px-2 text-left">
+                                <span class="caption1">{% trans "Type" %}</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for interview in upcoming_interviews %}
-                        <div class="zu-interview-card">
-                            <div class="zu-interview-card__time">
-                                <div class="zu-interview-card__day">{{ interview.scheduled_at|date:"d" }}</div>
-                                <div class="zu-interview-card__month">{{ interview.scheduled_at|date:"M" }}</div>
-                            </div>
-                            <div class="zu-interview-card__details">
-                                <p class="zu-interview-card__title">{{ interview.candidate.full_name }}</p>
-                                <p class="zu-interview-card__meta">{{ interview.job.title }} &bull; {{ interview.scheduled_at|time:"H:i" }}</p>
-                            </div>
-                            <span class="zu-badge {% if interview.interview_type == 'video' %}zu-badge--info{% elif interview.interview_type == 'phone' %}zu-badge--warning{% else %}zu-badge--primary{% endif %}">
-                                {{ interview.get_interview_type_display }}
-                            </span>
-                        </div>
+                        <tr class="item duration-300 hover:bg-background">
+                            <td class="sm:py-4 py-3 sm:px-4 px-2">
+                                <div class="flex items-center gap-3">
+                                    {% if interview.candidate.profile_image %}
+                                    <img src="{{ interview.candidate.profile_image.url }}" alt="{{ interview.candidate.full_name }}" class="w-10 h-10 rounded-full object-cover">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-gradient flex items-center justify-center">
+                                        <span class="text-white text-button">{{ interview.candidate.full_name.0 }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <span class="text-title">{{ interview.candidate.full_name }}</span>
+                                </div>
+                            </td>
+                            <td class="sm:py-4 py-3 sm:px-4 px-2">{{ interview.job.title }}</td>
+                            <td class="sm:py-4 py-3 sm:px-4 px-2">
+                                {{ interview.scheduled_at|date:"M d, Y" }}<br>
+                                <span class="text-secondary caption1">{{ interview.scheduled_at|time:"H:i" }}</span>
+                            </td>
+                            <td class="sm:py-4 py-3 sm:px-4 px-2">
+                                <span class="px-3 py-1 rounded-full text-xs {% if interview.interview_type == 'video' %}bg-blue-100 text-blue-700{% elif interview.interview_type == 'phone' %}bg-yellow-100 text-yellow-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ interview.get_interview_type_display }}
+                                </span>
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="zu-empty">
-                        <svg class="zu-icon zu-icon--xl" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <h3 class="zu-empty__title">{% trans "No upcoming interviews" %}</h3>
-                        <p class="zu-empty__text">{% trans "Schedule interviews from the applications page." %}</p>
-                    </div>
-                    {% endif %}
-                </div>
+                    </tbody>
+                </table>
             </div>
-        </section>
-
-        {% comment %} ===== RECENT ACTIVITY WIDGET ===== {% endcomment %}
-        <section class="lg:col-span-1 animate-on-load" data-animation="fade-up" data-delay="300">
-            <div class="zu-card">
-                <div class="zu-card__header">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <h3 class="zu-card__title">{% trans "Recent Activity" %}</h3>
-                        {% if unread_notifications > 0 %}
-                        <span class="zu-badge zu-badge--primary">{{ unread_notifications }} {% trans "unread" %}</span>
-                        {% endif %}
-                    </div>
-                    <button type="button"
-                            class="zu-btn zu-btn--ghost"
-                            style="padding: 0.5rem;"
-                            hx-get="{% url 'frontend:dashboard:htmx-recent-activity' %}"
-                            hx-target="#recent-activity-container"
-                            hx-swap="innerHTML"
-                            hx-indicator="#activity-indicator">
-                        <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <div id="activity-indicator" class="htmx-indicator">
-                            <svg class="zu-icon zu-icon--sm animate-spin" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        </div>
-                    </button>
-                </div>
-                <div class="zu-card__body" id="recent-activity-container"
-                     hx-get="{% url 'frontend:dashboard:htmx-recent-activity' %}"
-                     hx-trigger="load delay:200ms"
-                     hx-swap="innerHTML"
-                     style="max-height: 24rem; overflow-y: auto;">
-                    {% if recent_activity %}
-                    <ul class="zu-activity-list">
-                        {% for activity in recent_activity %}
-                        <li class="zu-activity-item">
-                            <div class="zu-activity-item__icon">
-                                {% if activity.type == 'application' %}
-                                <svg class="zu-icon zu-icon--sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                {% elif activity.type == 'interview' %}
-                                <svg class="zu-icon zu-icon--sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                {% else %}
-                                <svg class="zu-icon zu-icon--sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                                </svg>
-                                {% endif %}
-                            </div>
-                            <div class="zu-activity-item__content">
-                                <p class="zu-activity-item__title">{{ activity.message }}</p>
-                                <p class="zu-activity-item__meta">{{ activity.created_at|timesince }} ago</p>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="zu-empty">
-                        <svg class="zu-icon zu-icon--xl" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <h3 class="zu-empty__title">{% trans "No recent activity" %}</h3>
-                        <p class="zu-empty__text">{% trans "Your activity will appear here." %}</p>
-                    </div>
-                    {% endif %}
-                </div>
+            {% else %}
+            <div class="text-center py-12">
+                <span class="ph ph-calendar-blank text-6xl text-secondary block mb-4"></span>
+                <h3 class="heading6 mb-2">{% trans "No upcoming interviews" %}</h3>
+                <p class="text-secondary">{% trans "Schedule interviews from the applications page." %}</p>
             </div>
-        </section>
-
+            {% endif %}
+        </div>
     </div>
 
-    {% comment %} ===== QUICK ACTIONS SECTION ===== {% endcomment %}
-    <section class="mt-8 animate-on-load" data-animation="fade-up" data-delay="400">
-        <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0 0 1rem;">
-            {% trans "Quick Actions" %}
-        </h2>
+    <!-- Quick Actions Section -->
+    <div class="mt-7.5">
+        <h5 class="heading5 mb-4">{% trans "Quick Actions" %}</h5>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {% comment %} Post New Job {% endcomment %}
-            <a href="{% url 'frontend:ats:job_create' %}" class="zu-action-card">
-                <div class="zu-action-card__icon" style="background: var(--accent-coral-light); color: var(--accent-coral);">
-                    <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
+            <a href="{% url 'frontend:ats:job_create' %}" class="flex flex-col items-center gap-3 p-6 rounded-lg bg-white duration-300 hover:shadow-lg">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gradient">
+                    <span class="ph-fill ph-plus text-3xl text-white"></span>
                 </div>
-                <span class="zu-action-card__text">{% trans "Post New Job" %}</span>
+                <span class="text-button text-center">{% trans "Post New Job" %}</span>
             </a>
 
-            {% comment %} View Candidates {% endcomment %}
-            <a href="{% url 'frontend:ats:candidate_list' %}" class="zu-action-card">
-                <div class="zu-action-card__icon" style="background: var(--success-light); color: var(--success);">
-                    <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
+            <a href="{% url 'frontend:ats:candidate_list' %}" class="flex flex-col items-center gap-3 p-6 rounded-lg bg-white duration-300 hover:shadow-lg">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gradient">
+                    <span class="ph-fill ph-users-three text-3xl text-white"></span>
                 </div>
-                <span class="zu-action-card__text">{% trans "View Candidates" %}</span>
+                <span class="text-button text-center">{% trans "View Candidates" %}</span>
             </a>
 
-            {% comment %} Pipeline Board {% endcomment %}
-            <a href="{% url 'frontend:ats:pipeline_board' %}" class="zu-action-card">
-                <div class="zu-action-card__icon" style="background: var(--warning-light); color: var(--warning);">
-                    <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+            <a href="{% url 'frontend:ats:pipeline_board' %}" class="flex flex-col items-center gap-3 p-6 rounded-lg bg-white duration-300 hover:shadow-lg">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gradient">
+                    <span class="ph-fill ph-kanban text-3xl text-white"></span>
                 </div>
-                <span class="zu-action-card__text">{% trans "Pipeline" %}</span>
+                <span class="text-button text-center">{% trans "Pipeline" %}</span>
             </a>
 
-            {% comment %} Employee Directory {% endcomment %}
-            <a href="{% url 'frontend:hr:employee-directory' %}" class="zu-action-card">
-                <div class="zu-action-card__icon" style="background: var(--info-light); color: var(--info);">
-                    <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
+            <a href="{% url 'frontend:hr:employee_directory' %}" class="flex flex-col items-center gap-3 p-6 rounded-lg bg-white duration-300 hover:shadow-lg">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gradient">
+                    <span class="ph-fill ph-identification-card text-3xl text-white"></span>
                 </div>
-                <span class="zu-action-card__text">{% trans "Employees" %}</span>
+                <span class="text-button text-center">{% trans "Employees" %}</span>
             </a>
         </div>
-    </section>
-
-</div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
-{{ block.super }}
 <script>
-    // Dashboard-specific functionality
+    // Dashboard chart initialization
     document.addEventListener('DOMContentLoaded', function() {
-        // Listen for HTMX events for analytics/logging
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
-            if (evt.detail.target.id === 'quick-stats-container') {
-                console.log('Quick stats refreshed');
-            }
-        });
+        // Initialize ApexCharts if available
+        if (typeof ApexCharts !== 'undefined') {
+            var options = {
+                series: [{
+                    name: 'Applications',
+                    data: [31, 40, 28, 51, 42, 109, 100, 91, 125, 150, 130, 180]
+                }],
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                },
+                colors: ['#6366f1'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.2,
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " applications"
+                        }
+                    }
+                }
+            };
 
-        // Handle keyboard shortcuts for dashboard
-        document.addEventListener('keydown', function(e) {
-            // R key to refresh stats (when not in input)
-            if (e.key === 'r' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-                e.preventDefault();
-                htmx.trigger('#quick-stats-container', 'refresh');
-            }
-        });
+            var chart = new ApexCharts(document.querySelector("#chart-timeline"), options);
+            chart.render();
+
+            // Handle time filter buttons
+            document.querySelectorAll('.button_time').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.button_time').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    // Here you would update chart data based on selected time period
+                });
+            });
+        }
     });
 </script>
 {% endblock %}

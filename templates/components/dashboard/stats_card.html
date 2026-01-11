@@ -1,0 +1,22 @@
+{% comment %}
+Reusable stats counter card widget
+
+Usage:
+{% include 'components/dashboard/stats_card.html' with label="Applied Jobs" value=5672 icon="briefcase" item_class="applied_job" %}
+
+Parameters:
+- label: Display text label
+- value: Numeric value to display
+- icon: Phosphor icon name (without ph- prefix)
+- item_class: Optional CSS class for styling variant
+{% endcomment %}
+
+<li class="counter_item {{ item_class|default:'' }} flex items-center justify-between sm:gap-4 gap-3 sm:p-6 p-5 rounded-lg bg-white">
+    <div class="counter_content">
+        <span class="text-secondary">{{ label }}</span>
+        <h4 class="number heading4 mt-1">{{ value }}</h4>
+    </div>
+    <div class="counter_icon flex flex-shrink-0 items-center justify-center sm:w-[72px] w-12 sm:h-[72px] h-12 rounded-full bg-gradient">
+        <span class="ph-fill ph-{{ icon }} sm:text-3xl text-2xl text-white"></span>
+    </div>
+</li>
