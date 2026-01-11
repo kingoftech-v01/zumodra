@@ -62,39 +62,52 @@
                         </div>
                     </li>
                     <li class="h-full relative">
-                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
-                            <span class="text-title relative">{% trans "Pages" %}</span>
-                            <span class="ph-bold ph-caret-down"></span>
+                        <a href="{% url 'about' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "About" %}</span>
                         </a>
-                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
-                            <ul>
-                                <li>
-                                    <a href="{% url 'about' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
-                                        {% trans "About Us" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'pricing' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
-                                        {% trans "Pricing" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'contact_us' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
-                                        {% trans "Contact" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'faq' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
-                                        {% trans "FAQs" %}
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'faq' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "FAQ" %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'pricing' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Pricing" %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="{% url 'contact_us' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Contact" %}</span>
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
         <div class="header_right flex items-center gap-3">
+            <!-- Language Switcher -->
+            <div class="lang-switcher relative max-sm:hidden">
+                <button class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-50 duration-300">
+                    <i class="ph ph-globe text-lg"></i>
+                    <span class="text-sm font-medium uppercase">{{ LANGUAGE_CODE|default:'en' }}</span>
+                    <span class="ph-bold ph-caret-down text-xs"></span>
+                </button>
+                <div class="sub_menu absolute right-0 p-2 w-40 bg-white rounded-lg shadow-lg">
+                    <form action="{% url 'set_language' %}" method="post" id="lang-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% for lang_code, lang_name in LANGUAGES %}
+                        <button type="submit" name="language" value="{{ lang_code }}"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 {% if lang_code == LANGUAGE_CODE %}bg-primary/10 text-primary{% endif %}">
+                            {% if lang_code == LANGUAGE_CODE %}<i class="ph ph-check"></i>{% endif %}
+                            {{ lang_name }}
+                        </button>
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
             {% if user.is_authenticated %}
                 <div class="user-menu relative">
                     <button class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-50 duration-300">
@@ -153,7 +166,7 @@
             {% endif %}
 
             <!-- Mobile Menu Toggle -->
-            <div class="menu-mobile-btn min-[1400px]:hidden cursor-pointer w-5 h-4 flex flex-col justify-between">
+            <div class="humburger_btn min-[1400px]:hidden cursor-pointer w-5 h-4 flex flex-col justify-between">
                 <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
                 <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
                 <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
@@ -162,14 +175,14 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="menu-mobile-block fixed top-0 left-0 w-full h-full bg-on-surface/30 z-[2]">
-        <div class="menu-mobile-main bg-white h-full overflow-y-auto w-4/5 max-w-sm absolute right-0 top-0 px-6 py-1 flex flex-col justify-between">
+    <div class="menu_mobile">
+        <div class="menu_mobile_inner bg-white h-full overflow-y-auto w-4/5 max-w-sm absolute right-0 top-0 px-6 py-1 flex flex-col justify-between">
             <div>
                 <div class="heading flex items-center justify-between py-4 border-b border-outline">
                     <div class="flex items-center gap-3">
                         <img src="{% static 'assets/images/logo.png' %}" alt="{% trans 'FreelanHub' %}" class="h-8 w-auto" />
                     </div>
-                    <div class="close-menu-mobile-btn cursor-pointer">
+                    <div class="menu_mobile_close cursor-pointer">
                         <i class="ph-bold ph-x text-xl"></i>
                     </div>
                 </div>
@@ -182,13 +195,37 @@
                             <a href="{% url 'services:service_list' %}" class="text-xl font-semibold">{% trans "Browse Jobs" %}</a>
                         </li>
                         <li class="nav_item py-2">
-                            <a href="{% url 'about' %}" class="text-xl font-semibold">{% trans "About Us" %}</a>
+                            <a href="{% url 'about' %}" class="text-xl font-semibold">{% trans "About" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'faq' %}" class="text-xl font-semibold">{% trans "FAQ" %}</a>
                         </li>
                         <li class="nav_item py-2">
                             <a href="{% url 'pricing' %}" class="text-xl font-semibold">{% trans "Pricing" %}</a>
                         </li>
                         <li class="nav_item py-2">
                             <a href="{% url 'contact_us' %}" class="text-xl font-semibold">{% trans "Contact" %}</a>
+                        </li>
+                        <!-- Mobile Language Switcher -->
+                        <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="ph ph-globe text-lg"></i>
+                                <span class="text-sm font-semibold text-gray-500">{% trans "Language" %}</span>
+                            </div>
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                {% get_current_language as LANGUAGE_CODE %}
+                                {% get_available_languages as LANGUAGES %}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {% for lang_code, lang_name in LANGUAGES %}
+                                    <button type="submit" name="language" value="{{ lang_code }}"
+                                            class="text-left px-3 py-2 text-sm rounded border {% if lang_code == LANGUAGE_CODE %}border-primary bg-primary/10 text-primary{% else %}border-gray-200 hover:bg-gray-50{% endif %} duration-300">
+                                        {{ lang_name }}
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </form>
                         </li>
                         {% if user.is_authenticated %}
                         <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
@@ -211,3 +248,36 @@
         </div>
     </div>
 </header>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuMobile = document.querySelector('.menu_mobile');
+    const humburgerBtn = document.querySelector('.humburger_btn');
+    const menuMobileClose = document.querySelector('.menu_mobile_close');
+
+    if (humburgerBtn && menuMobile) {
+        humburgerBtn.addEventListener('click', function() {
+            menuMobile.classList.add('open');
+            document.body.classList.add('scroll_locked');
+        });
+    }
+
+    if (menuMobileClose && menuMobile) {
+        menuMobileClose.addEventListener('click', function() {
+            menuMobile.classList.remove('open');
+            document.body.classList.remove('scroll_locked');
+        });
+    }
+
+    // Close when clicking outside the menu
+    if (menuMobile) {
+        menuMobile.addEventListener('click', function(e) {
+            if (e.target === menuMobile) {
+                menuMobile.classList.remove('open');
+                document.body.classList.remove('scroll_locked');
+            }
+        });
+    }
+});
+</script>
