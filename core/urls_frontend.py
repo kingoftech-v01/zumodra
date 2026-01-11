@@ -11,11 +11,10 @@ This module provides URL routing for the HTMX-powered frontend views:
 - Accounts (verification, trust score, profile)
 
 All routes are prefixed with 'app/' in the main URL configuration.
+Note: No app_name here to avoid nested namespaces. Each included app has its own namespace.
 """
 
 from django.urls import path, include
-
-app_name = 'frontend'
 
 urlpatterns = [
     # Dashboard Views
