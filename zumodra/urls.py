@@ -270,7 +270,7 @@ urlpatterns += i18n_patterns(
     path('finance/', include('finance.urls', namespace='finance')),
 
     # Newsletter
-    path('newsletter/', include('newsletter.urls')),
+    path('newsletter/', include('newsletter.urls', namespace='newsletter')),
 
     # Configurations (staff dashboard)
     path('configurations/', include('configurations.urls', namespace='configurations')),

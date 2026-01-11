@@ -47,6 +47,9 @@ SHARED_APPS = [
     'security',
     'ai_matching',  # AI matching engine
     'marketing',  # Marketing/tracking
+
+    # Newsletter (shared for public pages footer)
+    'newsletter',
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)

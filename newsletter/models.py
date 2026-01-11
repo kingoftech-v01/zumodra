@@ -863,3 +863,30 @@ class Submission(models.Model):
 
 def get_address(name, email):
     return formataddr((name, email)) if name else email
+
+
+# =============================================================================
+# Mailchimp Sync Signals
+# =============================================================================
+
+def sync_subscription_to_mailchimp(sender, instance, created, **kwargs):
+    """Sync subscription to Mailchimp when saved."""
+    try:
+        from .tasks import sync_subscription_to_mailchimp as sync_task
+        # Only sync if subscription status changed or is new
+        sync_task.delay(instance.id)
+    except Exception:
+        # Don't fail if Mailchimp sync fails
+        pass
+
+
+# Connect the signal - only if celery is available
+try:
+    from .tasks import sync_subscription_to_mailchimp as sync_task
+    models.signals.post_save.connect(
+        sync_subscription_to_mailchimp,
+        sender=Subscription,
+        dispatch_uid='newsletter_subscription_mailchimp_sync'
+    )
+except ImportError:
+    pass

@@ -190,24 +190,20 @@
         </div>
 
         <div class="list grid lg:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
-            {% for freelancer in top_providers %}
+            {% for provider in top_providers %}
             <div class="freelancer_item bg-white rounded-lg p-6 text-center shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: {{ forloop.counter }}">
                 <div class="avatar mx-auto w-20 h-20 rounded-full overflow-hidden mb-4">
-                    {% if freelancer.profile.avatar %}
-                    <img src="{{ freelancer.profile.avatar.url }}" alt="{{ freelancer.get_full_name }}" class="w-full h-full object-cover" />
-                    {% else %}
                     <div class="w-full h-full bg-primary text-white flex items-center justify-center text-2xl font-medium">
-                        {{ freelancer.first_name|first|upper }}
+                        {{ provider.provider_name|first|upper }}
                     </div>
-                    {% endif %}
                 </div>
-                <h6 class="heading6 mb-1">{{ freelancer.get_full_name }}</h6>
-                <p class="text-sm text-secondary mb-3">{{ freelancer.profile.title|default:"Freelancer" }}</p>
+                <h6 class="heading6 mb-1">{{ provider.provider_name }}</h6>
+                <p class="text-sm text-secondary mb-3">{{ provider.tenant__name }}</p>
                 <div class="rating flex items-center justify-center gap-1 mb-4">
                     <span class="ph-fill ph-star text-yellow-500"></span>
-                    <span class="text-sm font-medium">{{ freelancer.rating|default:"5.0" }}</span>
+                    <span class="text-sm font-medium">{{ provider.avg_rating|floatformat:1|default:"5.0" }}</span>
                 </div>
-                <a href="{% url 'accounts:profile_detail' freelancer.uuid %}" class="button-secondary w-full text-center py-2 rounded-lg">
+                <a href="{% url 'services:provider_profile_view' provider_uuid=provider.provider_uuid %}" class="button-secondary w-full text-center py-2 rounded-lg">
                     {% trans "View Profile" %}
                 </a>
             </div>

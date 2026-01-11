@@ -1154,6 +1154,12 @@ AI_MATCHING_FALLBACK_DIMENSION = 384  # MiniLM produces 384-dimensional vectors
 # AI Matching cache settings
 AI_MATCHING_CACHE_TTL = 86400 * 7  # 7 days for embedding cache
 
+# ==================== MAILCHIMP INTEGRATION ====================
+
+MAILCHIMP_API_KEY = env('MAILCHIMP_API_KEY', default='')
+MAILCHIMP_LIST_ID = env('MAILCHIMP_LIST_ID', default='')
+MAILCHIMP_SERVER_PREFIX = env('MAILCHIMP_SERVER_PREFIX', default='us1')
+
 # ==================== LINKEDIN INTEGRATION ====================
 
 LINKEDIN_CLIENT_ID = env('LINKEDIN_CLIENT_ID', default='')

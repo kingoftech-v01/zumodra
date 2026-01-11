@@ -5,12 +5,17 @@ from .views import (
     NewsletterListView, NewsletterDetailView,
     SubmissionArchiveIndexView, SubmissionArchiveDetailView,
     SubscribeRequestView, UnsubscribeRequestView, UpdateRequestView,
-    ActionTemplateView, UpdateSubscriptionView,
+    ActionTemplateView, UpdateSubscriptionView, GeneralSubscribeView,
 )
 
 register_converter(NewsletterActionsConverter, 'actions')
 
+app_name = 'newsletter'
+
 urlpatterns = [
+    # General subscribe (for footer form)
+    path('subscribe/', GeneralSubscribeView.as_view(), name='subscribe'),
+
     # Newsletter list and detail view
     path('', NewsletterListView.as_view(), name='newsletter_list'),
     path(

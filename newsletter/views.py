@@ -50,9 +50,16 @@ def is_authenticated(user):
 
 class NewsletterViewBase:
     """ Base class for newsletter views. """
-    queryset = Newsletter.on_site.filter(visible=True)
-    allow_empty = False
+    allow_empty = True  # Allow empty to handle missing tables gracefully
     slug_url_kwarg = 'newsletter_slug'
+
+    def get_queryset(self):
+        """Get newsletters, handling missing tables gracefully."""
+        try:
+            return Newsletter.on_site.filter(visible=True)
+        except Exception:
+            # Table might not exist in public schema
+            return Newsletter.objects.none()
 
 
 class NewsletterDetailView(NewsletterViewBase, DetailView):
@@ -64,6 +71,20 @@ class NewsletterListView(NewsletterViewBase, ListView):
     List available newsletters and generate a formset for (un)subscription
     for authenticated users.
     """
+
+    def dispatch(self, request, *args, **kwargs):
+        """Handle requests, catching database errors."""
+        from django.db.utils import ProgrammingError
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except (ProgrammingError, Exception) as e:
+            if 'does not exist' in str(e) or 'newsletter' in str(e).lower():
+                # Newsletter tables might not exist - show empty list
+                from django.shortcuts import render
+                logger.warning(f"Newsletter error: {type(e).__name__}: {e}")
+                context = {'object_list': [], 'newsletter_unavailable': True}
+                return render(request, 'newsletter/newsletter_list.html', context)
+            raise
 
     def post(self, request, **kwargs):
         """ Allow post requests. """
@@ -619,3 +640,62 @@ class SubmissionArchiveDetailView(SubmissionViewBase, DateDetailView):
             context=context,
             **response_kwargs
         )
+
+
+class GeneralSubscribeView(FormView):
+    """
+    General subscribe view for footer form.
+    Subscribes the email to the first available newsletter.
+    """
+    form_class = SubscribeRequestForm
+    template_name = "newsletter/subscribe_form.html"
+
+    def get_newsletter(self):
+        """Get the first available newsletter."""
+        try:
+            newsletter = Newsletter.objects.first()
+        except Exception:
+            # Handle case where newsletter table doesn't exist
+            newsletter = None
+        return newsletter
+
+    def dispatch(self, request, *args, **kwargs):
+        """Handle requests, redirecting if no newsletter available."""
+        if not self.get_newsletter():
+            messages.info(
+                request,
+                _("Newsletter subscription is not available yet. Please check back later.")
+            )
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['newsletter'] = self.get_newsletter()
+        if self.request.method in ('POST', 'PUT'):
+            kwargs['ip'] = self.request.META.get('REMOTE_ADDR')
+        return kwargs
+
+    def form_valid(self, form):
+        subscription = form.save()
+
+        # Sync to Mailchimp asynchronously
+        try:
+            from .tasks import sync_subscription_to_mailchimp
+            sync_subscription_to_mailchimp.delay(subscription.id)
+        except Exception as e:
+            # Don't fail if Mailchimp sync fails
+            logger.warning(f"Failed to queue Mailchimp sync: {e}")
+
+        messages.success(
+            self.request,
+            _("Thank you for subscribing! Please check your email to confirm.")
+        )
+        return redirect('home')
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            _("There was an error with your subscription. Please try again.")
+        )
+        return redirect('home')
