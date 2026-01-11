@@ -166,6 +166,10 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('allauth.urls')),
     path('accounts/two-factor/', include('allauth.mfa.urls')),  # Built-in MFA URLs (allauth 65.3.0+)
 
+    # Frontend Template Views (HTMX-powered)
+    # All frontend views including dashboard, appointments, messages
+    path('app/', include('core.urls_frontend', namespace='frontend')),
+
     # Newsletter
     path('newsletter/', include('newsletter.urls')),
 
