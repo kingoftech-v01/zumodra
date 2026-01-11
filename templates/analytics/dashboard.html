@@ -1,66 +1,19 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
 {% block title %}{% trans "Analytics" %} - Zumodra{% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Analytics" %}</span>
-</li>
-{% endblock %}
-
 {% block page_title %}{% trans "Analytics Dashboard" %}{% endblock %}
 
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Track your recruiting and HR metrics in real-time." %}
-</p>
-{% endblock %}
-
-{% block page_actions %}
-<!-- Date Range Selector -->
-<div class="flex items-center space-x-3">
-    <select id="date-range"
-            hx-get="{% url 'frontend:analytics:dashboard' %}"
-            hx-trigger="change"
-            hx-target="#analytics-content"
-            hx-swap="innerHTML"
-            name="range"
-            class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <option value="7d" {% if range == '7d' %}selected{% endif %}>{% trans "Last 7 days" %}</option>
-        <option value="30d" {% if range == '30d' %}selected{% endif %}>{% trans "Last 30 days" %}</option>
-        <option value="90d" {% if range == '90d' %}selected{% endif %}>{% trans "Last 90 days" %}</option>
-        <option value="1y" {% if range == '1y' %}selected{% endif %}>{% trans "Last year" %}</option>
-        <option value="custom">{% trans "Custom range" %}</option>
-    </select>
-
-    <button hx-get="{% url 'frontend:analytics:export' %}"
-            hx-swap="none"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-        </svg>
-        {% trans "Export Report" %}
-    </button>
-</div>
-{% endblock %}
-
-{% block content %}
+{% block dashboard_content %}
 {% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
-    <div class="flex">
-        <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-        </div>
-        <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+<div class="p-4 rounded-lg bg-yellow bg-opacity-10 border border-yellow">
+    <div class="flex items-start gap-3">
+        <i class="ph ph-warning text-yellow text-xl"></i>
+        <div>
+            <p class="caption1 text-title">
                 {% trans "Analytics features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
+                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:opacity-80">
                     {% trans "Switch to company account" %}
                 </a>
             </p>
@@ -68,23 +21,58 @@
     </div>
 </div>
 {% else %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <span class="text-title caption1">{% trans "Analytics" %}</span>
+</div>
+
+<!-- Page Header -->
+<div class="heading flex items-center justify-between mb-6">
+    <div>
+        <h3 class="heading3 text-title">{% trans "Analytics Dashboard" %}</h3>
+        <p class="caption1 text-secondary mt-2">
+            {% trans "Track your recruiting and HR metrics in real-time." %}
+        </p>
+    </div>
+    <div class="flex items-center gap-3">
+        <select id="date-range"
+                hx-get="{% url 'frontend:analytics:dashboard' %}"
+                hx-trigger="change"
+                hx-target="#analytics-content"
+                hx-swap="innerHTML"
+                name="range"
+                class="block pl-3 pr-10 py-2 caption1 border border-gray-300 rounded-lg bg-white focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+            <option value="7d" {% if range == '7d' %}selected{% endif %}>{% trans "Last 7 days" %}</option>
+            <option value="30d" {% if range == '30d' %}selected{% endif %}>{% trans "Last 30 days" %}</option>
+            <option value="90d" {% if range == '90d' %}selected{% endif %}>{% trans "Last 90 days" %}</option>
+            <option value="1y" {% if range == '1y' %}selected{% endif %}>{% trans "Last year" %}</option>
+            <option value="custom">{% trans "Custom range" %}</option>
+        </select>
+
+        <button hx-get="{% url 'frontend:analytics:export' %}"
+                hx-swap="none"
+                class="button-main -border flex items-center gap-2">
+            <i class="ph ph-download-simple"></i>
+            {% trans "Export Report" %}
+        </button>
+    </div>
+</div>
+
 <div id="main-content">
     <div id="analytics-content">
         <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-7.5">
             {% include "components/stats_card.html" with title="Total Applications" value=total_applications change=applications_change change_type=applications_trend icon="applications" icon_color="blue" %}
             {% include "components/stats_card.html" with title="Active Jobs" value=active_jobs change=jobs_change change_type=jobs_trend icon="jobs" icon_color="green" %}
             {% include "components/stats_card.html" with title="Interviews Scheduled" value=interviews_scheduled change=interviews_change change_type=interviews_trend icon="interviews" icon_color="purple" %}
             {% include "components/stats_card.html" with title="Offers Made" value=offers_made change=offers_change change_type=offers_trend icon="currency" icon_color="orange" %}
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-7.5 mb-7.5">
             <!-- Recruiting Funnel -->
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recruiting Funnel" %}</h3>
-                </div>
-                <div class="p-6">
+            <div class="p-8 rounded-lg bg-white">
+                <h4 class="heading5 text-title mb-6">{% trans "Recruiting Funnel" %}</h4>
+                <div>
                     {% include "analytics/charts/funnel.html" %}
                 </div>
             </div>
@@ -93,24 +81,22 @@
             {% include "components/chart_container.html" with chart_id="time-to-hire-chart" chart_type="line" title="Time to Hire" subtitle="Average days from application to offer" period_selector=True data_url=time_to_hire_url height=300 %}
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5 mb-7.5">
             <!-- Applications by Source -->
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Applications by Source" %}</h3>
-                </div>
-                <div class="p-6">
+            <div class="p-8 rounded-lg bg-white">
+                <h4 class="heading5 text-title mb-6">{% trans "Applications by Source" %}</h4>
+                <div>
                     <canvas id="source-chart" style="height: 250px;"></canvas>
                 </div>
-                <div class="px-6 pb-4">
+                <div class="mt-6">
                     <div class="grid grid-cols-2 gap-4">
                         {% for source in top_sources %}
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ source.color }};"></span>
-                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ source.name }}</span>
+                                <span class="caption1 text-secondary">{{ source.name }}</span>
                             </div>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ source.percentage }}%</span>
+                            <span class="caption1 font-medium text-title">{{ source.percentage }}%</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -118,29 +104,27 @@
             </div>
 
             <!-- Top Performing Jobs -->
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Top Performing Jobs" %}</h3>
-                </div>
-                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="p-8 rounded-lg bg-white">
+                <h4 class="heading5 text-title mb-6">{% trans "Top Performing Jobs" %}</h4>
+                <ul class="divide-y divide-gray-200">
                     {% for job in top_jobs %}
-                    <li class="px-6 py-4">
+                    <li class="py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
-                                <a href="{% url 'frontend:ats:job_detail' job.id %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 truncate block">
+                                <a href="{% url 'frontend:ats:job_detail' job.id %}" class="caption1 font-medium text-title hover:text-primary truncate block">
                                     {{ job.title }}
                                 </a>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ job.applications_count }} {% trans "applications" %}</p>
+                                <p class="caption2 text-secondary">{{ job.applications_count }} {% trans "applications" %}</p>
                             </div>
                             <div class="ml-4 flex items-center">
-                                <span class="text-sm font-semibold {% if job.conversion_rate >= 20 %}text-green-600 dark:text-green-400{% elif job.conversion_rate >= 10 %}text-yellow-600 dark:text-yellow-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                                <span class="caption1 font-semibold {% if job.conversion_rate >= 20 %}text-green{% elif job.conversion_rate >= 10 %}text-yellow{% else %}text-red{% endif %}">
                                     {{ job.conversion_rate }}%
                                 </span>
                             </div>
                         </div>
                     </li>
                     {% empty %}
-                    <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <li class="py-8 text-center caption1 text-secondary">
                         {% trans "No data available" %}
                     </li>
                     {% endfor %}
@@ -148,38 +132,30 @@
             </div>
 
             <!-- Recent Activity -->
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recent Activity" %}</h3>
-                </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+            <div class="p-8 rounded-lg bg-white">
+                <h4 class="heading5 text-title mb-6">{% trans "Recent Activity" %}</h4>
+                <div class="divide-y divide-gray-200 max-h-80 overflow-y-auto">
                     {% for activity in recent_activities %}
-                    <div class="px-6 py-4 flex items-start space-x-3">
+                    <div class="py-4 flex items-start gap-3">
                         <div class="flex-shrink-0">
                             <span class="w-8 h-8 rounded-full flex items-center justify-center
-                                  {% if activity.type == 'application' %}bg-blue-100 dark:bg-blue-900/30{% elif activity.type == 'interview' %}bg-purple-100 dark:bg-purple-900/30{% elif activity.type == 'offer' %}bg-green-100 dark:bg-green-900/30{% else %}bg-gray-100 dark:bg-gray-700{% endif %}">
+                                  {% if activity.type == 'application' %}bg-blue bg-opacity-10{% elif activity.type == 'interview' %}bg-purple bg-opacity-10{% elif activity.type == 'offer' %}bg-green bg-opacity-10{% else %}bg-gray-100{% endif %}">
                                 {% if activity.type == 'application' %}
-                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
+                                <i class="ph ph-file-text text-blue"></i>
                                 {% elif activity.type == 'interview' %}
-                                <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
+                                <i class="ph ph-calendar text-purple"></i>
                                 {% elif activity.type == 'offer' %}
-                                <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                                <i class="ph ph-check-circle text-green"></i>
                                 {% endif %}
                             </span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-900 dark:text-white">{{ activity.description }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ activity.timestamp|naturaltime }}</p>
+                            <p class="caption1 text-title">{{ activity.description }}</p>
+                            <p class="caption2 text-secondary">{{ activity.timestamp|naturaltime }}</p>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="py-8 text-center caption1 text-secondary">
                         {% trans "No recent activity" %}
                     </div>
                     {% endfor %}
@@ -191,20 +167,20 @@
         {% include "components/chart_container.html" with chart_id="applications-trend-chart" chart_type="bar" title="Applications Over Time" period_selector=True data_url=applications_trend_url height=300 %}
 
         <!-- Pipeline Metrics -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="mt-7.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for stage in pipeline_stages %}
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+            <div class="p-6 rounded-lg bg-white">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ stage.name }}</p>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">{{ stage.count }}</p>
+                        <p class="caption1 text-secondary">{{ stage.name }}</p>
+                        <p class="heading3 font-semibold text-title mt-1">{{ stage.count }}</p>
                     </div>
                     <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: {{ stage.color|default:'#3b82f6' }}20;">
-                        <span class="text-lg font-bold" style="color: {{ stage.color|default:'#3b82f6' }};">{{ stage.percentage }}%</span>
+                        <span class="heading6 font-bold" style="color: {{ stage.color|default:'#3b82f6' }};">{{ stage.percentage }}%</span>
                     </div>
                 </div>
                 <div class="mt-3">
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
                         <div class="h-2 rounded-full" style="width: {{ stage.percentage }}%; background-color: {{ stage.color|default:'#3b82f6' }};"></div>
                     </div>
                 </div>
@@ -213,7 +189,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
@@ -246,5 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+{% endblock %}
 {% endif %}
 {% endblock %}

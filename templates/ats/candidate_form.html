@@ -1,4 +1,4 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n widget_tweaks %}
 
 {% block page_title %}
@@ -9,239 +9,235 @@
 {% endif %}
 {% endblock %}
 
-{% block page_subtitle %}
-<p class="text-gray-600 dark:text-gray-400 mt-2">
-    {% if is_create %}
-        {% trans "Add a new candidate to your talent pool" %}
-    {% else %}
-        {% trans "Update candidate information" %}
-    {% endif %}
-</p>
-{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:ats:candidate_list' %}" class="text-secondary hover:text-primary caption1">{% trans "Candidates" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">
+        {% if is_create %}{% trans "Add Candidate" %}{% else %}{% trans "Edit Candidate" %}{% endif %}
+    </span>
+</div>
 
-{% block content %}
-<div class="zu-container max-w-4xl">
+<!-- Page Header -->
+<div class="mb-6">
+    <h3 class="heading3 text-title">
+        {% if is_create %}
+            {% trans "Add New Candidate" %}
+        {% else %}
+            {% trans "Edit Candidate" %}
+        {% endif %}
+    </h3>
+    <p class="caption1 text-secondary mt-2">
+        {% if is_create %}
+            {% trans "Add a new candidate to your talent pool" %}
+        {% else %}
+            {% trans "Update candidate information" %}
+        {% endif %}
+    </p>
+</div>
 
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
+<div class="max-w-4xl">
+    <form method="post" enctype="multipart/form-data" class="space-y-7.5">
         {% csrf_token %}
 
-        {% comment %} Basic Information Card {% endcomment %}
-        <div class="zu-card">
-            <div class="zu-card__header">
-                <h3 class="zu-card__title">{% trans "Basic Information" %}</h3>
-            </div>
-            <div class="zu-card__body">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% comment %} First Name {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="first_name" class="zu-label zu-label--required">
-                            {% trans "First Name" %}
-                        </label>
-                        <input type="text"
-                               id="first_name"
-                               name="first_name"
-                               value="{{ candidate.first_name|default:'' }}"
-                               class="zu-input"
-                               required>
-                    </div>
-
-                    {% comment %} Last Name {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="last_name" class="zu-label zu-label--required">
-                            {% trans "Last Name" %}
-                        </label>
-                        <input type="text"
-                               id="last_name"
-                               name="last_name"
-                               value="{{ candidate.last_name|default:'' }}"
-                               class="zu-input"
-                               required>
-                    </div>
-
-                    {% comment %} Email {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="email" class="zu-label zu-label--required">
-                            {% trans "Email Address" %}
-                        </label>
-                        <input type="email"
-                               id="email"
-                               name="email"
-                               value="{{ candidate.email|default:'' }}"
-                               class="zu-input"
-                               required>
-                    </div>
-
-                    {% comment %} Phone {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="phone" class="zu-label">
-                            {% trans "Phone Number" %}
-                        </label>
-                        <input type="tel"
-                               id="phone"
-                               name="phone"
-                               value="{{ candidate.phone|default:'' }}"
-                               class="zu-input"
-                               placeholder="+1 (555) 123-4567">
-                    </div>
-
-                    {% comment %} LinkedIn {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="linkedin_url" class="zu-label">
-                            {% trans "LinkedIn Profile" %}
-                        </label>
-                        <div class="zu-input-group">
-                            <span class="zu-input-group__addon">
-                                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                                </svg>
-                            </span>
-                            <input type="url"
-                                   id="linkedin_url"
-                                   name="linkedin_url"
-                                   value="{{ candidate.linkedin_url|default:'' }}"
-                                   class="zu-input"
-                                   placeholder="https://linkedin.com/in/username">
-                        </div>
-                    </div>
-
-                    {% comment %} Location {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="location" class="zu-label">
-                            {% trans "Location" %}
-                        </label>
-                        <input type="text"
-                               id="location"
-                               name="location"
-                               value="{{ candidate.location|default:'' }}"
-                               class="zu-input"
-                               placeholder="City, Country">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% comment %} Professional Information Card {% endcomment %}
-        <div class="zu-card">
-            <div class="zu-card__header">
-                <h3 class="zu-card__title">{% trans "Professional Information" %}</h3>
-            </div>
-            <div class="zu-card__body">
-                <div class="space-y-6">
-                    {% comment %} Current Title {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="current_title" class="zu-label">
-                            {% trans "Current Title" %}
-                        </label>
-                        <input type="text"
-                               id="current_title"
-                               name="current_title"
-                               value="{{ candidate.current_title|default:'' }}"
-                               class="zu-input"
-                               placeholder="e.g., Senior Software Engineer">
-                    </div>
-
-                    {% comment %} Current Company {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="current_company" class="zu-label">
-                            {% trans "Current Company" %}
-                        </label>
-                        <input type="text"
-                               id="current_company"
-                               name="current_company"
-                               value="{{ candidate.current_company|default:'' }}"
-                               class="zu-input"
-                               placeholder="e.g., Tech Corp">
-                    </div>
-
-                    {% comment %} Years of Experience {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="years_of_experience" class="zu-label">
-                            {% trans "Years of Experience" %}
-                        </label>
-                        <input type="number"
-                               id="years_of_experience"
-                               name="years_of_experience"
-                               value="{{ candidate.years_of_experience|default:'' }}"
-                               class="zu-input"
-                               min="0"
-                               max="50"
-                               step="0.5">
-                    </div>
-
-                    {% comment %} Skills {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="skills" class="zu-label">
-                            {% trans "Skills" %}
-                        </label>
-                        <textarea id="skills"
-                                  name="skills"
-                                  rows="3"
-                                  class="zu-textarea"
-                                  placeholder="Enter skills, separated by commas (e.g., Python, Django, React)">{{ candidate.skills|default:'' }}</textarea>
-                        <p class="zu-form-help">{% trans "Separate skills with commas" %}</p>
-                    </div>
-
-                    {% comment %} Bio/Summary {% endcomment %}
-                    <div class="zu-form-group">
-                        <label for="bio" class="zu-label">
-                            {% trans "Professional Summary" %}
-                        </label>
-                        <textarea id="bio"
-                                  name="bio"
-                                  rows="5"
-                                  class="zu-textarea"
-                                  placeholder="Brief professional summary...">{{ candidate.bio|default:'' }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% comment %} Resume Upload Card {% endcomment %}
-        <div class="zu-card">
-            <div class="zu-card__header">
-                <h3 class="zu-card__title">{% trans "Resume/CV" %}</h3>
-            </div>
-            <div class="zu-card__body">
-                <div class="zu-form-group">
-                    <label for="resume" class="zu-label">
-                        {% trans "Upload Resume" %}
+        <!-- Basic Information Card -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 text-title mb-6">{% trans "Basic Information" %}</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- First Name -->
+                <div>
+                    <label for="first_name" class="block caption1 font-medium text-title mb-2">
+                        {% trans "First Name" %} <span class="text-red">*</span>
                     </label>
-                    <input type="file"
-                           id="resume"
-                           name="resume"
-                           class="zu-input"
-                           accept=".pdf,.doc,.docx">
-                    <p class="zu-form-help">{% trans "Accepted formats: PDF, DOC, DOCX (Max 5MB)" %}</p>
-                    {% if candidate.resume %}
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                        {% trans "Current file:" %} <a href="{{ candidate.resume.url }}" target="_blank" class="text-primary-600 hover:underline">{% trans "View Resume" %}</a>
-                    </p>
-                    {% endif %}
+                    <input type="text"
+                           id="first_name"
+                           name="first_name"
+                           value="{{ candidate.first_name|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           required>
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Last Name" %} <span class="text-red">*</span>
+                    </label>
+                    <input type="text"
+                           id="last_name"
+                           name="last_name"
+                           value="{{ candidate.last_name|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           required>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Email Address" %} <span class="text-red">*</span>
+                    </label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           value="{{ candidate.email|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           required>
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Phone Number" %}
+                    </label>
+                    <input type="tel"
+                           id="phone"
+                           name="phone"
+                           value="{{ candidate.phone|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           placeholder="+1 (555) 123-4567">
+                </div>
+
+                <!-- LinkedIn -->
+                <div>
+                    <label for="linkedin_url" class="block caption1 font-medium text-title mb-2">
+                        {% trans "LinkedIn Profile" %}
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-linkedin-logo text-secondary"></i>
+                        </div>
+                        <input type="url"
+                               id="linkedin_url"
+                               name="linkedin_url"
+                               value="{{ candidate.linkedin_url|default:'' }}"
+                               class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                               placeholder="https://linkedin.com/in/username">
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <label for="location" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Location" %}
+                    </label>
+                    <input type="text"
+                           id="location"
+                           name="location"
+                           value="{{ candidate.location|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           placeholder="City, Country">
                 </div>
             </div>
         </div>
 
-        {% comment %} Form Actions {% endcomment %}
-        <div class="flex items-center justify-end space-x-4">
-            <a href="{% url 'frontend:ats:candidate_list' %}" class="zu-btn zu-btn--ghost">
+        <!-- Professional Information Card -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 text-title mb-6">{% trans "Professional Information" %}</h4>
+            <div class="space-y-6">
+                <!-- Current Title -->
+                <div>
+                    <label for="current_title" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Current Title" %}
+                    </label>
+                    <input type="text"
+                           id="current_title"
+                           name="current_title"
+                           value="{{ candidate.current_title|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           placeholder="e.g., Senior Software Engineer">
+                </div>
+
+                <!-- Current Company -->
+                <div>
+                    <label for="current_company" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Current Company" %}
+                    </label>
+                    <input type="text"
+                           id="current_company"
+                           name="current_company"
+                           value="{{ candidate.current_company|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           placeholder="e.g., Tech Corp">
+                </div>
+
+                <!-- Years of Experience -->
+                <div>
+                    <label for="years_of_experience" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Years of Experience" %}
+                    </label>
+                    <input type="number"
+                           id="years_of_experience"
+                           name="years_of_experience"
+                           value="{{ candidate.years_of_experience|default:'' }}"
+                           class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                           min="0"
+                           max="50"
+                           step="0.5">
+                </div>
+
+                <!-- Skills -->
+                <div>
+                    <label for="skills" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Skills" %}
+                    </label>
+                    <textarea id="skills"
+                              name="skills"
+                              rows="3"
+                              class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                              placeholder="Enter skills, separated by commas (e.g., Python, Django, React)">{{ candidate.skills|default:'' }}</textarea>
+                    <p class="caption2 text-secondary mt-2">{% trans "Separate skills with commas" %}</p>
+                </div>
+
+                <!-- Bio/Summary -->
+                <div>
+                    <label for="bio" class="block caption1 font-medium text-title mb-2">
+                        {% trans "Professional Summary" %}
+                    </label>
+                    <textarea id="bio"
+                              name="bio"
+                              rows="5"
+                              class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                              placeholder="Brief professional summary...">{{ candidate.bio|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Upload Card -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 text-title mb-6">{% trans "Resume/CV" %}</h4>
+            <div>
+                <label for="resume" class="block caption1 font-medium text-title mb-2">
+                    {% trans "Upload Resume" %}
+                </label>
+                <input type="file"
+                       id="resume"
+                       name="resume"
+                       class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 caption1"
+                       accept=".pdf,.doc,.docx">
+                <p class="caption2 text-secondary mt-2">{% trans "Accepted formats: PDF, DOC, DOCX (Max 5MB)" %}</p>
+                {% if candidate.resume %}
+                <p class="caption1 text-secondary mt-2">
+                    {% trans "Current file:" %} <a href="{{ candidate.resume.url }}" target="_blank" class="text-primary hover:underline">{% trans "View Resume" %}</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-end gap-3">
+            <a href="{% url 'frontend:ats:candidate_list' %}" class="button-main -border">
                 {% trans "Cancel" %}
             </a>
-            <button type="submit" class="zu-btn zu-btn--primary">
+            <button type="submit" class="button-main flex items-center gap-2">
                 {% if is_create %}
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
+                    <i class="ph ph-plus"></i>
                     {% trans "Add Candidate" %}
                 {% else %}
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
+                    <i class="ph ph-check"></i>
                     {% trans "Save Changes" %}
                 {% endif %}
             </button>
         </div>
-
     </form>
-
 </div>
 {% endblock %}
