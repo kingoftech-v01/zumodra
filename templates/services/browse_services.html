@@ -1,14 +1,11 @@
-{% extends "base/public_base.html" %}
+{% extends "base.html" %}
 {% load static i18n humanize %}
 
 {% block title %}{% trans "Browse Services" %} - Zumodra{% endblock %}
 
 {% block meta_description %}{% trans "Discover professional services from verified providers. Find the perfect freelancer for your project." %}{% endblock %}
 
-{% block extra_css %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% block extra_head %}
 
 <style>
     :root {

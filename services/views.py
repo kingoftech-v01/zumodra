@@ -118,17 +118,14 @@ def browse_services(request):
 
     except Exception as e:
         # Handle case where tables don't exist yet (during migrations)
-        import logging
-        logger = logging.getLogger(__name__)
         logger.warning(f"Error loading services: {e}")
 
         # Return empty context to display "no services" message
-        from django.core.paginator import Paginator, EmptyPage
-        empty_list = []
-        paginator = Paginator(empty_list, 12)
+        # Note: Paginator is already imported at the module level
+        empty_paginator = Paginator([], 12)
 
         context = {
-            'services': paginator.get_page(1),
+            'services': empty_paginator.get_page(1),
             'categories': [],
             'popular_tags': [],
             'search': request.GET.get('search', ''),

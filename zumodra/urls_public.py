@@ -29,6 +29,9 @@ from .views import (
     become_buyer_view,
 )
 
+# Public careers landing view (for public schema where careers tables don't exist)
+from main.views import public_careers_landing
+
 
 # ==================== Health Check Endpoint ====================
 
@@ -144,8 +147,14 @@ urlpatterns += i18n_patterns(
     # Services Marketplace (included with namespace for template compatibility)
     path('services/', include('services.urls', namespace='services')),
 
-    # Careers (public job listings)
-    path('careers/', include('careers.urls', namespace='careers')),
+    # Careers - Public Landing Page
+    # Note: The careers app is in TENANT_APPS, so its database tables only exist
+    # in tenant schemas. On the public schema, we show a landing page instead.
+    # Tenant-specific career pages are accessed via tenant subdomains.
+    path('careers/', include(([
+        path('', public_careers_landing, name='home'),
+        path('jobs/', public_careers_landing, name='job_list'),
+    ], 'careers'), namespace='careers')),
 
     # Blog (Wagtail CMS)
     path('blog/', include('blog.urls')),

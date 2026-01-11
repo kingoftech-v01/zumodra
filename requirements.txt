@@ -80,9 +80,9 @@ filetype==1.2.0
 # -----------------------------------------------------------------------------
 nh3>=0.2.14  # Rust-based HTML sanitizer (XSS prevention)
 bleach>=6.0.0  # Python HTML sanitizer (fallback)
-cryptography>=41.0.0
+cryptography>=41.0.0,<45.0.0  # Must be <45 for fido2 1.x compatibility
 PyNaCl==1.6.0
-pyOpenSSL==25.3.0
+pyOpenSSL>=24.0.0,<25.0.0  # Must be <25 for cryptography <45 compatibility with fido2
 pycparser==2.23
 cffi==2.0.0
 django-cryptography==1.1
@@ -141,6 +141,7 @@ freezegun>=1.2.2  # Time-based testing utilities
 # Authentication & 2FA
 # -----------------------------------------------------------------------------
 django-allauth==65.3.0  # Latest version with built-in MFA support
+fido2>=1.1.0,<2.0.0  # WebAuthn/FIDO2 support for allauth MFA (v2 has incompatible API)
 django-otp==1.6.3
 django-two-factor-auth==1.18.1
 oauthlib==3.3.1

@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% comment %}
+=============================================================================
+   ZUMODRA PUBLIC CAREERS LANDING PAGE
+   =============================================================================
+
+   File: templates/careers/public_landing.html
+   Purpose: Public-facing careers landing page when accessing from public schema
+
+   This page is shown when users access /careers/ on the main site where
+   tenant-specific career tables don't exist. It explains the careers feature
+   and guides users to company-specific career pages.
+
+   Author: Rhematek Solutions
+   Last Updated: 2026-01-10
+   =============================================================================
+{% endcomment %}
+{% load static i18n %}
+
+{% block title %}{% trans "Career Opportunities" %} - Zumodra{% endblock %}
+
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+
+{% comment %} HERO SECTION {% endcomment %}
+<section class="slider">
+    <div class="slider_inner relative lg:h-[500px] sm:pt-20 pt-16 overflow-hidden">
+        <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]">
+            <img src="{% static 'assets/images/components/banner11-1.png' %}" alt="{% trans 'Career Opportunities' %}" class="w-full h-full object-cover" />
+            <div class="hero-gradient-overlay-buyer"></div>
+        </div>
+        <div class="container h-full relative z-10">
+            <div class="slider_content flex flex-col items-center justify-center text-center w-full h-full max-lg:py-16">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 animate animate_top" style="--i: 0">
+                    <span class="ph-fill ph-briefcase"></span>
+                    {% trans "Career Portal" %}
+                </span>
+                <h1 class="heading2 text-white drop-shadow-lg animate animate_top max-w-3xl" style="--i: 1">{% trans "Find Your Next Career Opportunity" %}</h1>
+                <p class="body2 text-white/95 mt-4 drop-shadow-md animate animate_top max-w-2xl" style="--i: 2">{% trans "Discover jobs at verified companies on Zumodra. Each employer is KYC-verified, ensuring you're applying to legitimate opportunities." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% comment %} HOW IT WORKS SECTION {% endcomment %}
+<section class="process lg:py-20 sm:py-14 py-10 bg-surface">
+    <div class="container">
+        <h2 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "How Zumodra Careers Work" %}</h2>
+        <p class="body2 text-secondary text-center mt-3 max-w-2xl mx-auto animate animate_top" style="--i: 2">{% trans "Every company on Zumodra has their own dedicated career page with verified job listings." %}</p>
+
+        <div class="grid lg:grid-cols-3 gap-8 md:mt-10 mt-7">
+            <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center animate animate_top" style="--i: 3">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center">
+                    <span class="ph-duotone ph-buildings text-3xl text-blue-600"></span>
+                </div>
+                <h3 class="heading6 mb-2">{% trans "Verified Companies" %}</h3>
+                <p class="text-secondary text-sm">{% trans "All employers complete our KYC verification process before posting jobs, ensuring legitimate opportunities." %}</p>
+            </div>
+
+            <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center animate animate_top" style="--i: 4">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-50 to-cyan-50 flex items-center justify-center">
+                    <span class="ph-duotone ph-briefcase text-3xl text-teal-600"></span>
+                </div>
+                <h3 class="heading6 mb-2">{% trans "Dedicated Career Pages" %}</h3>
+                <p class="text-secondary text-sm">{% trans "Each company has their own branded career page with all their open positions, culture info, and benefits." %}</p>
+            </div>
+
+            <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center animate animate_top" style="--i: 5">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+                    <span class="ph-duotone ph-shield-check text-3xl text-amber-600"></span>
+                </div>
+                <h3 class="heading6 mb-2">{% trans "Secure Applications" %}</h3>
+                <p class="text-secondary text-sm">{% trans "Your application data is protected with enterprise-grade security and GDPR-compliant data handling." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% comment %} FOR JOB SEEKERS SECTION {% endcomment %}
+<section class="lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="flex max-lg:flex-col items-center gap-12">
+            <div class="lg:w-1/2">
+                <span class="inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium mb-4">
+                    <span class="ph-fill ph-user"></span>
+                    {% trans "For Job Seekers" %}
+                </span>
+                <h2 class="heading3">{% trans "Looking for Your Next Role?" %}</h2>
+                <p class="body2 text-secondary mt-4">{% trans "Browse verified companies and apply to positions that match your skills. Each company has their own career page where you can:" %}</p>
+
+                <ul class="mt-6 space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="ph-fill ph-check-circle text-teal-600 text-xl mt-0.5"></span>
+                        <span>{% trans "View all open positions and job details" %}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="ph-fill ph-check-circle text-teal-600 text-xl mt-0.5"></span>
+                        <span>{% trans "Learn about company culture and benefits" %}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="ph-fill ph-check-circle text-teal-600 text-xl mt-0.5"></span>
+                        <span>{% trans "Apply directly with your resume" %}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="ph-fill ph-check-circle text-teal-600 text-xl mt-0.5"></span>
+                        <span>{% trans "Set up job alerts for new opportunities" %}</span>
+                    </li>
+                </ul>
+
+                <div class="mt-8">
+                    <a href="{% url 'account_signup' %}" class="button-main bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all">{% trans "Create Your Profile" %}</a>
+                </div>
+            </div>
+
+            <div class="lg:w-1/2">
+                <div class="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-8 border border-teal-100">
+                    <h3 class="heading5 text-teal-900 mb-4">{% trans "Why Apply Through Zumodra?" %}</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                                <span class="ph-duotone ph-shield-check text-teal-600 text-xl"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-teal-900">{% trans "Verified Employers" %}</h4>
+                                <p class="text-sm text-teal-700">{% trans "Every company is identity-verified, so you know you're applying to real opportunities." %}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                                <span class="ph-duotone ph-lock text-teal-600 text-xl"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-teal-900">{% trans "Data Privacy" %}</h4>
+                                <p class="text-sm text-teal-700">{% trans "Your personal information is protected and only shared with companies you apply to." %}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                                <span class="ph-duotone ph-chart-line-up text-teal-600 text-xl"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-teal-900">{% trans "Track Your Applications" %}</h4>
+                                <p class="text-sm text-teal-700">{% trans "Monitor the status of all your applications in one place." %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% comment %} FOR EMPLOYERS SECTION {% endcomment %}
+<section class="lg:py-20 sm:py-14 py-10 bg-gradient-to-br from-slate-800 to-blue-900">
+    <div class="container">
+        <div class="flex max-lg:flex-col-reverse items-center gap-12">
+            <div class="lg:w-1/2">
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                    <h3 class="heading5 text-white mb-4">{% trans "Zumodra Career Pages Include:" %}</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "Custom branded career page" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "Unlimited job postings" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "Application tracking system (ATS)" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "Candidate pipeline management" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "SEO-optimized job listings" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "Job alert subscriptions" %}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/90">
+                            <span class="ph-fill ph-check text-cyan-400"></span>
+                            <span>{% trans "AI-powered candidate matching" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-1/2">
+                <span class="inline-flex items-center gap-2 px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium mb-4">
+                    <span class="ph-fill ph-buildings"></span>
+                    {% trans "For Employers" %}
+                </span>
+                <h2 class="heading3 text-white">{% trans "Build Your Company Career Page" %}</h2>
+                <p class="body2 text-white/80 mt-4">{% trans "Create a professional career page that showcases your company culture and attracts top talent. Zumodra's integrated ATS helps you manage the entire hiring process." %}</p>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="{% url 'become_buyer' %}" class="button-main bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all">{% trans "Start Hiring" %}</a>
+                    <a href="{% url 'pricing' %}" class="button-main -border border-white text-white hover:bg-white hover:text-blue-700 transition-all">{% trans "View Pricing" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% comment %} CTA SECTION {% endcomment %}
+<section class="lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-12 text-center border border-slate-100">
+            <h2 class="heading4 text-slate-900">{% trans "Ready to Get Started?" %}</h2>
+            <p class="body2 text-slate-600 mt-3 max-w-xl mx-auto">{% trans "Whether you're looking for your next opportunity or searching for top talent, Zumodra is here to help." %}</p>
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <a href="{% url 'account_signup' %}" class="button-main bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all">{% trans "Create Account" %}</a>
+                <a href="{% url 'contact_us' %}" class="button-main -border border-slate-300 text-slate-700 hover:bg-slate-100 transition-all">{% trans "Contact Us" %}</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

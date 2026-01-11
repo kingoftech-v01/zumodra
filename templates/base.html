@@ -66,8 +66,11 @@
     {% comment %} Zumodra Design System {% endcomment %}
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}" />
 
-    {% comment %} Animation Fixes {% endcomment %}
+    {% comment %} Animation Fixes and Alpine.js Cloak {% endcomment %}
     <style>
+        /* Alpine.js cloak - hide elements until Alpine initializes */
+        [x-cloak] { display: none !important; }
+
         .animate { opacity: 1 !important; transform: none !important; }
         html, body { overflow-x: hidden; }
         html { overflow-y: auto; }

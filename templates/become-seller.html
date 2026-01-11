@@ -29,19 +29,23 @@
 
 {% block content %}
 
-{% comment %} HERO SECTION {% endcomment %}
+{% comment %} HERO SECTION - Seller specific with Teal gradient {% endcomment %}
 <section class="slider">
     <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden">
         <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]">
-            <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Become a seller' %}" class="w-full h-full object-cover" />
-            <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+            <img src="{% static 'assets/images/components/banner8.png' %}" alt="{% trans 'Become a seller' %}" class="w-full h-full object-cover" />
+            <div class="hero-gradient-overlay-seller"></div>
         </div>
-        <div class="container h-full">
+        <div class="container h-full relative z-10">
             <div class="slider_content flex flex-col items-start justify-center xl:w-[600px] lg:w-[548px] md:w-5/6 w-full h-full max-lg:py-16">
-                <h2 class="heading2 text-white animate animate_top" style="--i: 1">{% trans "Turn Your Skills Into Income" %}</h2>
-                <p class="body2 text-white mt-3 animate animate_top" style="--i: 2">{% trans "Join thousands of verified freelancers earning on Zumodra. Get matched with quality clients, receive secure payments, and build your reputation." %}</p>
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 animate animate_top" style="--i: 0">
+                    <span class="ph-fill ph-briefcase"></span>
+                    {% trans "For Freelancers" %}
+                </span>
+                <h2 class="heading2 text-white drop-shadow-lg animate animate_top" style="--i: 1">{% trans "Turn Your Skills Into Income" %}</h2>
+                <p class="body2 text-white/95 mt-3 drop-shadow-md animate animate_top" style="--i: 2">{% trans "Join thousands of verified freelancers earning on Zumodra. Get matched with quality clients, receive secure payments, and build your reputation." %}</p>
                 <div class="mt-7.5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-white">{% trans "Start Selling Today" %}</a>
+                    <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-white text-teal-700 hover:bg-teal-50 shadow-lg hover:shadow-xl transition-all">{% trans "Start Selling Today" %}</a>
                 </div>
             </div>
         </div>
@@ -197,40 +201,40 @@
     </div>
 </section>
 
-{% comment %} STATS SECTION {% endcomment %}
-<section class="counter lg:py-15 sm:py-12 py-8 bg-primary">
+{% comment %} STATS SECTION - Teal gradient for sellers {% endcomment %}
+<section class="counter lg:py-15 sm:py-12 py-8 bg-gradient-to-r from-teal-600 to-cyan-600">
     <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-            <h2 class="heading2 pb-1 text-center text-white">2.5M+</h2>
-            <span class="body1 text-center text-white/80">{% trans "Active Freelancers" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">2.5M+</h2>
+            <span class="body1 text-center text-white/90">{% trans "Active Freelancers" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-            <h2 class="heading2 pb-1 text-center text-white">€50M+</h2>
-            <span class="body1 text-center text-white/80">{% trans "Paid to Freelancers" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">€50M+</h2>
+            <span class="body1 text-center text-white/90">{% trans "Paid to Freelancers" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-            <h2 class="heading2 pb-1 text-center text-white">98%</h2>
-            <span class="body1 text-center text-white/80">{% trans "Payment Success Rate" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">98%</h2>
+            <span class="body1 text-center text-white/90">{% trans "Payment Success Rate" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-            <h2 class="heading2 pb-1 text-center text-white">4.8/5</h2>
-            <span class="body1 text-center text-white/80">{% trans "Average Rating" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">4.8/5</h2>
+            <span class="body1 text-center text-white/90">{% trans "Average Rating" %}</span>
         </div>
     </div>
 </section>
 
-{% comment %} CTA SECTION {% endcomment %}
+{% comment %} CTA SECTION - Teal themed {% endcomment %}
 <section class="cta lg:py-20 sm:py-14 py-10">
     <div class="container">
-        <div class="cta_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl text-center bg-surface">
-            <h4 class="heading4">{% trans "Ready to Start Earning?" %}</h4>
-            <p class="desc mt-2 text-secondary max-w-2xl mx-auto">{% trans "Join Zumodra today and connect with clients looking for your skills. It's free to create your profile." %}</p>
+        <div class="cta_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl text-center bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100">
+            <h4 class="heading4 text-teal-900">{% trans "Ready to Start Earning?" %}</h4>
+            <p class="desc mt-2 text-teal-700 max-w-2xl mx-auto">{% trans "Join Zumodra today and connect with clients looking for your skills. It's free to create your profile." %}</p>
             <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'account_signup' %}?type=freelancer" class="button-main">{% trans "Create Free Account" %}</a>
-                <a href="{% url 'about' %}" class="button-main -border">{% trans "Learn More" %}</a>
+                <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all">{% trans "Create Free Account" %}</a>
+                <a href="{% url 'about' %}" class="button-main -border border-teal-600 text-teal-700 hover:bg-teal-600 hover:text-white transition-all">{% trans "Learn More" %}</a>
             </div>
         </div>
     </div>

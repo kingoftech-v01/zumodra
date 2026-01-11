@@ -81,7 +81,7 @@ SHARED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.linkedin',
+    'allauth.socialaccount.providers.linkedin_oauth2',
 
     # Two-Factor Authentication - SHARED (tied to user accounts)
     'django_otp',
@@ -460,11 +460,10 @@ SOCIALACCOUNT_PROVIDERS = {
         'INIT_PARAMS': {'cookie': True},
         'VERIFIED_EMAIL': False,
     },
-    'linkedin': {
-        'SCOPE': ['r_liteprofile', 'r_emailaddress'],
+    'linkedin_oauth2': {
+        'SCOPE': ['openid', 'profile', 'email'],
         'PROFILE_FIELDS': [
-            'id', 'firstName', 'lastName', 'profilePicture(displayImage~:playableStreams)',
-            'emailAddress'
+            'id', 'firstName', 'lastName', 'profilePicture', 'emailAddress'
         ],
     },
 }

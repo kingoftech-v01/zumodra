@@ -287,12 +287,12 @@
     <div class="container">
         <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-3xl animate animateZoomOutUp shadow-2xl" style="--i: 5">
             <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                <div class="hero-gradient-overlay opacity-80"></div>
                 <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Join our community' %}" class="w-full h-full object-cover" />
+                <div class="hero-gradient-overlay-dark"></div>
             </div>
             <div class="banner_content relative z-10">
-                <h4 class="heading-4 text-white animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
-                <p class="body-large mt-4 text-white opacity-95 animate animate_top max-w-2xl" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
+                <h4 class="heading-4 text-white drop-shadow-lg animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
+                <p class="body-large mt-4 text-white drop-shadow-md animate animate_top max-w-2xl" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
                 <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
                     <a href="{% url 'become_seller' %}" class="btn-primary bg-white text-gray-900 hover:bg-gray-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">{% trans "Become A Seller" %}</a>
                 </div>

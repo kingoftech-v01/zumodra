@@ -30,19 +30,23 @@
 {% block content %}
 {% url 'services:service_list' as browse_services_url %}
 
-{% comment %} HERO SECTION {% endcomment %}
+{% comment %} HERO SECTION - Buyer specific with Navy/Blue gradient {% endcomment %}
 <section class="slider">
     <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden">
         <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]">
-            <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Hire talent' %}" class="w-full h-full object-cover" />
-            <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+            <img src="{% static 'assets/images/components/banner11-1.png' %}" alt="{% trans 'Hire talent' %}" class="w-full h-full object-cover" />
+            <div class="hero-gradient-overlay-buyer"></div>
         </div>
-        <div class="container h-full">
+        <div class="container h-full relative z-10">
             <div class="slider_content flex flex-col items-start justify-center xl:w-[600px] lg:w-[548px] md:w-5/6 w-full h-full max-lg:py-16">
-                <h2 class="heading2 text-white animate animate_top" style="--i: 1">{% trans "Hire Verified Talent, Risk-Free" %}</h2>
-                <p class="body2 text-white mt-3 animate animate_top" style="--i: 2">{% trans "Access a global pool of KYC-verified freelancers. Our bidirectional verification ensures you're hiring real professionals with confirmed credentials." %}</p>
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 animate animate_top" style="--i: 0">
+                    <span class="ph-fill ph-buildings"></span>
+                    {% trans "For Employers" %}
+                </span>
+                <h2 class="heading2 text-white drop-shadow-lg animate animate_top" style="--i: 1">{% trans "Hire Verified Talent, Risk-Free" %}</h2>
+                <p class="body2 text-white/95 mt-3 drop-shadow-md animate animate_top" style="--i: 2">{% trans "Access a global pool of KYC-verified freelancers. Our bidirectional verification ensures you're hiring real professionals with confirmed credentials." %}</p>
                 <div class="mt-7.5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white">{% trans "Start Hiring Today" %}</a>
+                    <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all">{% trans "Start Hiring Today" %}</a>
                 </div>
             </div>
         </div>
@@ -206,56 +210,58 @@
     </div>
 </section>
 
-{% comment %} STATS SECTION {% endcomment %}
-<section class="counter lg:py-15 sm:py-12 py-8 bg-primary">
+{% comment %} STATS SECTION - Navy/Blue gradient for employers {% endcomment %}
+<section class="counter lg:py-15 sm:py-12 py-8 bg-gradient-to-r from-slate-800 to-blue-800">
     <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-            <h2 class="heading2 pb-1 text-center text-white">298k+</h2>
-            <span class="body1 text-center text-white/80">{% trans "Companies Hiring" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">298k+</h2>
+            <span class="body1 text-center text-white/90">{% trans "Companies Hiring" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-            <h2 class="heading2 pb-1 text-center text-white">2.5M+</h2>
-            <span class="body1 text-center text-white/80">{% trans "Verified Freelancers" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">2.5M+</h2>
+            <span class="body1 text-center text-white/90">{% trans "Verified Freelancers" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-            <h2 class="heading2 pb-1 text-center text-white">95%</h2>
-            <span class="body1 text-center text-white/80">{% trans "Client Satisfaction" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">95%</h2>
+            <span class="body1 text-center text-white/90">{% trans "Client Satisfaction" %}</span>
         </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
+        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
         <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-            <h2 class="heading2 pb-1 text-center text-white">48h</h2>
-            <span class="body1 text-center text-white/80">{% trans "Avg. Time to Hire" %}</span>
+            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">48h</h2>
+            <span class="body1 text-center text-white/90">{% trans "Avg. Time to Hire" %}</span>
         </div>
     </div>
 </section>
 
-{% comment %} PRICING TEASER {% endcomment %}
-<section class="pricing_teaser lg:py-20 sm:py-14 py-10 bg-surface">
+{% comment %} PRICING TEASER - Blue themed {% endcomment %}
+<section class="pricing_teaser lg:py-20 sm:py-14 py-10 bg-gradient-to-br from-slate-50 to-blue-50">
     <div class="container text-center">
-        <h3 class="heading3 animate animate_top" style="--i: 1">{% trans "Flexible Pricing for Every Business" %}</h3>
-        <p class="body2 text-secondary mt-3 max-w-2xl mx-auto animate animate_top" style="--i: 2">{% trans "From startups to enterprises, we have a plan that fits your hiring needs. All plans include KYC verification, escrow payments, and core ATS features." %}</p>
+        <h3 class="heading3 text-slate-900 animate animate_top" style="--i: 1">{% trans "Flexible Pricing for Every Business" %}</h3>
+        <p class="body2 text-slate-600 mt-3 max-w-2xl mx-auto animate animate_top" style="--i: 2">{% trans "From startups to enterprises, we have a plan that fits your hiring needs. All plans include KYC verification, escrow payments, and core ATS features." %}</p>
         <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5 animate animate_top" style="--i: 3">
-            <a href="{% url 'pricing' %}" class="button-main">{% trans "View Pricing Plans" %}</a>
-            <a href="{% url 'contact_us' %}" class="button-main -border">{% trans "Contact Sales" %}</a>
+            <a href="{% url 'pricing' %}" class="button-main bg-gradient-to-r from-slate-800 to-blue-700 hover:from-slate-900 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all">{% trans "View Pricing Plans" %}</a>
+            <a href="{% url 'contact_us' %}" class="button-main -border border-blue-600 text-blue-700 hover:bg-blue-600 hover:text-white transition-all">{% trans "Contact Sales" %}</a>
         </div>
     </div>
 </section>
 
-{% comment %} CTA SECTION {% endcomment %}
+{% comment %} CTA SECTION - Navy/Blue themed {% endcomment %}
 <section class="cta lg:py-20 sm:py-14 py-10">
     <div class="container">
         <div class="cta_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl text-center">
             <div class="cta_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                <div style="background-color: #000000; opacity: 0.5; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
-                <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Get started' %}" class="w-full h-full object-cover" />
+                <img src="{% static 'assets/images/components/banner11-2.png' %}" alt="{% trans 'Get started' %}" class="w-full h-full object-cover" />
+                <div class="hero-gradient-overlay-buyer"></div>
             </div>
-            <h4 class="heading4 text-white">{% trans "Ready to Find Your Next Great Hire?" %}</h4>
-            <p class="desc mt-2 text-white max-w-2xl mx-auto">{% trans "Post your first job for free and connect with verified talent today." %}</p>
-            <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white">{% trans "Post a Job Free" %}</a>
-                <a href="{% url 'contact_us' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
+            <div class="relative z-10">
+                <h4 class="heading4 text-white drop-shadow-lg">{% trans "Ready to Find Your Next Great Hire?" %}</h4>
+                <p class="desc mt-2 text-white/95 drop-shadow-md max-w-2xl mx-auto">{% trans "Post your first job for free and connect with verified talent today." %}</p>
+                <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
+                    <a href="{% url 'account_signup' %}?type=employer" class="button-main bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all">{% trans "Post a Job Free" %}</a>
+                    <a href="{% url 'contact_us' %}" class="button-main -border border-white text-white hover:bg-white hover:text-blue-700 transition-all">{% trans "Schedule Demo" %}</a>
+                </div>
             </div>
         </div>
     </div>
