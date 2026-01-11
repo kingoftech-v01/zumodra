@@ -19,13 +19,13 @@
 
         <!-- Notification Block -->
         <div class="notification_block relative max-sm:hidden">
-            <button class="relative block">
+            <button class="notification_btn relative block">
                 <span class="ph ph-bell text-white text-2xl block"></span>
                 {% if user.unread_notifications_count > 0 %}
                 <span class="absolute -top-0.5 right-0.5 w-2 h-2 bg-primary rounded-full"></span>
                 {% endif %}
             </button>
-            <div class="notification_submenu absolute w-[400px] p-5 top-[3.25rem] -left-9 bg-white rounded-xl">
+            <div class="notification_submenu hidden absolute w-[400px] p-5 top-[3.25rem] -left-9 bg-white rounded-xl shadow-lg">
                 <h6 class="heading6 pb-3">{% trans "Notifications" %}</h6>
                 <ul class="list_notification w-full">
                     {% for notification in user.recent_notifications|slice:":5" %}
@@ -56,7 +56,7 @@
 
         <!-- User Profile Block -->
         <div class="user_block relative max-sm:hidden">
-            <button class="user_infor flex items-center gap-2 text-white">
+            <button class="user_infor_btn flex items-center gap-2 text-white">
                 {% if user.profile_image %}
                 <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full object-cover">
                 {% else %}
@@ -65,7 +65,7 @@
                 <strong class="user_name text-title">{{ user.get_full_name|default:user.username }}</strong>
                 <span class="ph ph-caret-down"></span>
             </button>
-            <ul class="list_action_user absolute w-[240px] p-3 top-14 right-0 bg-white rounded-lg">
+            <ul class="list_action_user hidden absolute w-[240px] p-3 top-14 right-0 bg-white rounded-lg shadow-lg">
                 <li class="action_item">
                     <a href="{% url 'frontend:dashboard:index' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                         <span class="ph ph-squares-four text-2xl text-secondary"></span>
@@ -73,19 +73,19 @@
                     </a>
                 </li>
                 <li class="action_item">
-                    <a href="{% url 'accounts:profile' user.id %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                    <a href="{% url 'custom_account_u:public_profile' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                         <span class="ph ph-user-circle text-2xl text-secondary"></span>
                         <strong class="text-title">{% trans "My Profile" %}</strong>
                     </a>
                 </li>
                 <li class="action_item">
-                    <a href="{% url 'accounts:settings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                    <a href="{% url 'frontend:dashboard:account-settings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                         <span class="ph ph-gear text-2xl text-secondary"></span>
                         <strong class="text-title">{% trans "Settings" %}</strong>
                     </a>
                 </li>
                 <li class="action_item border-t border-line mt-2 pt-2">
-                    <a href="{% url 'accounts:logout' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                    <a href="{% url 'account_logout' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                         <span class="ph ph-sign-out text-2xl text-secondary"></span>
                         <strong class="text-title">{% trans "Log Out" %}</strong>
                     </a>
@@ -99,3 +99,62 @@
         </button>
     </div>
 </div>
+
+<!-- Dropdown Toggle Script -->
+<script>
+(function() {
+    'use strict';
+
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificationBtn = document.querySelector('.notification_btn');
+        const notificationMenu = document.querySelector('.notification_submenu');
+        const userBtn = document.querySelector('.user_infor_btn');
+        const userMenu = document.querySelector('.list_action_user');
+
+        // Close all dropdowns
+        function closeAllDropdowns() {
+            if (notificationMenu) notificationMenu.classList.add('hidden');
+            if (userMenu) userMenu.classList.add('hidden');
+        }
+
+        // Toggle notification dropdown
+        if (notificationBtn && notificationMenu) {
+            notificationBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = notificationMenu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isHidden) {
+                    notificationMenu.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Toggle user dropdown
+        if (userBtn && userMenu) {
+            userBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = userMenu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isHidden) {
+                    userMenu.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.notification_block') && !e.target.closest('.user_block')) {
+                closeAllDropdowns();
+            }
+        });
+
+        // Close dropdowns on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+            }
+        });
+    });
+})();
+</script>
