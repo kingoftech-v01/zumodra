@@ -1,157 +1,203 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
 {% block title %}{% trans "Offers" %} - ATS - Zumodra{% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Offers" %}</span>
-</li>
-{% endblock %}
+{% block dashboard_content %}
+<div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+        <span class="ph ph-squares-four text-xl"></span>
+        <strong class="text-button">{% trans "Menu" %}</strong>
+    </button>
 
-{% block page_title %}{% trans "Offers" %}{% endblock %}
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h4 class="heading4 max-lg:mt-3">{% trans "Job Offers" %}</h4>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'frontend:ats:offer_create' %}" class="button-main gap-2">
+                <span class="ph ph-plus"></span>
+                {% trans "New Offer" %}
+            </a>
+        </div>
+    </div>
 
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Manage job offers sent to candidates." %}
-</p>
-{% endblock %}
-
-{% block content %}
-<div id="main-content">
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        {% include "components/stats_card.html" with title="Total Offers" value=total_offers icon="offers" icon_color="blue" %}
-        {% include "components/stats_card.html" with title="Pending" value=pending_offers icon="pending" icon_color="yellow" %}
-        {% include "components/stats_card.html" with title="Accepted" value=accepted_offers icon="accepted" icon_color="green" %}
-        {% include "components/stats_card.html" with title="Declined" value=declined_offers icon="declined" icon_color="red" %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7.5">
+        <div class="bg-white rounded-lg p-5 border border-line">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-secondary caption1">{% trans "Total Offers" %}</div>
+                    <div class="heading4 mt-1">{{ total_offers|default:0 }}</div>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-blue/10 flex items-center justify-center">
+                    <span class="ph-fill ph-file-text text-2xl text-blue"></span>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg p-5 border border-line">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-secondary caption1">{% trans "Pending" %}</div>
+                    <div class="heading4 mt-1">{{ pending_offers|default:0 }}</div>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-yellow/10 flex items-center justify-center">
+                    <span class="ph-fill ph-clock text-2xl text-yellow"></span>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg p-5 border border-line">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-secondary caption1">{% trans "Accepted" %}</div>
+                    <div class="heading4 mt-1">{{ accepted_offers|default:0 }}</div>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
+                    <span class="ph-fill ph-check-circle text-2xl text-success"></span>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg p-5 border border-line">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-secondary caption1">{% trans "Declined" %}</div>
+                    <div class="heading4 mt-1">{{ declined_offers|default:0 }}</div>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-red/10 flex items-center justify-center">
+                    <span class="ph-fill ph-x-circle text-2xl text-red"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Offers Table -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-        <!-- Filter Tabs -->
-        <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="flex -mb-px" aria-label="Tabs">
-                <a href="?status=all"
-                   hx-get="{% url 'frontend:ats:offer_list' %}?status=all"
-                   hx-target="#offers-table-body"
-                   hx-swap="innerHTML"
-                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                          {% if status == 'all' or not status %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
-                    {% trans "All Offers" %}
-                </a>
-                <a href="?status=pending"
-                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                          {% if status == 'pending' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
-                    {% trans "Pending" %}
-                </a>
-                <a href="?status=accepted"
-                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                          {% if status == 'accepted' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
-                    {% trans "Accepted" %}
-                </a>
-                <a href="?status=declined"
-                   class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                          {% if status == 'declined' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300{% endif %}">
-                    {% trans "Declined" %}
-                </a>
-            </nav>
+    <div class="mt-7.5 rounded-lg bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-5 pt-5 px-6">
+            <form class="relative w-[340px] h-12" method="get">
+                <input type="text"
+                       name="search"
+                       value="{{ request.GET.search }}"
+                       class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden"
+                       placeholder="{% trans 'Search by candidate or job' %}" />
+                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                    <span class="ph ph-magnifying-glass text-xl block"></span>
+                </button>
+            </form>
+            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                <div class="select">
+                    <span class="selected caption1 capitalize" data-title="{% trans 'all status' %}">{% trans "all status" %}</span>
+                    <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                        <li class="capitalize" data-item="all"><a href="?status=all">{% trans "All Offers" %}</a></li>
+                        <li class="capitalize" data-item="pending"><a href="?status=pending">{% trans "Pending" %}</a></li>
+                        <li class="capitalize" data-item="accepted"><a href="?status=accepted">{% trans "Accepted" %}</a></li>
+                        <li class="capitalize" data-item="declined"><a href="?status=declined">{% trans "Declined" %}</a></li>
+                        <li class="capitalize" data-item="withdrawn"><a href="?status=withdrawn">{% trans "Withdrawn" %}</a></li>
+                    </ul>
+                </div>
+                <span class="icon_down ph ph-caret-down right-3"></span>
+            </div>
         </div>
 
-        <!-- Offers List -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
+        <div class="list overflow-x-auto w-full p-5 rounded-xl">
+            <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                <thead class="border-b border-line">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Candidate" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Position" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Salary" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Status" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Sent" %}
-                        </th>
-                        <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">{% trans "Actions" %}</span>
-                        </th>
+                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Candidate" %}</th>
+                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Position" %}</th>
+                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Salary" %}</th>
+                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Sent Date" %}</th>
+                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Status" %}</th>
+                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">{% trans "Action" %}</th>
                     </tr>
                 </thead>
-                <tbody id="offers-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody>
                     {% for offer in offers %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <div class="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                                        <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
-                                            {{ offer.application.candidate.full_name|slice:":1"|upper }}
-                                        </span>
+                    <tr class="item duration-300 hover:bg-background">
+                        <th scope="row" class="p-5 text-left">
+                            <div class="info flex items-center gap-3">
+                                <a href="{% url 'frontend:ats:application_detail' offer.application.pk %}" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
+                                    {% if offer.application.candidate.photo %}
+                                    <img src="{{ offer.application.candidate.photo.url }}" alt="{{ offer.application.candidate.full_name }}" class="w-full h-full object-cover" />
+                                    {% else %}
+                                    <span class="text-lg font-semibold text-primary">{{ offer.application.candidate.full_name|slice:":1"|upper }}</span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'frontend:ats:application_detail' offer.application.pk %}" class="block">
+                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">{{ offer.application.candidate.full_name }}</strong>
+                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                        <span class="ph ph-envelope text-xl"></span>
+                                        <span class="font-normal caption1">{{ offer.application.candidate.email }}</span>
                                     </div>
-                                </div>
-                                <div class="ml-4">
-                                    <a href="{% url 'frontend:ats:application_detail' offer.application.pk %}"
-                                       class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
-                                        {{ offer.application.candidate.full_name }}
-                                    </a>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ offer.application.candidate.email }}</p>
-                                </div>
+                                </a>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'frontend:ats:job_detail' offer.application.job.pk %}"
-                               class="text-sm text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                        </th>
+                        <td class="p-5 heading6 max-w-60">
+                            <a href="{% url 'frontend:ats:job_detail' offer.application.job.pk %}" class="job_name -style-1 duration-300 hover:text-primary">
                                 {{ offer.application.job.title }}
                             </a>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                ${{ offer.salary|intcomma }}
-                            </span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">/ {% trans "year" %}</span>
+                        <td class="p-5 whitespace-nowrap">
+                            <span class="heading6">${{ offer.salary|intcomma }}</span>
+                            <span class="text-secondary caption1">/ {% trans "year" %}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {% if offer.status == 'pending' or offer.status == 'sent' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                {% elif offer.status == 'accepted' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                {% elif offer.status == 'declined' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
-                                {% elif offer.status == 'withdrawn' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
-                                {% else %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300{% endif %}">
-                                {{ offer.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td class="p-5 whitespace-nowrap">
                             {% if offer.sent_at %}
                             {{ offer.sent_at|date:"M d, Y" }}
                             {% else %}
-                            <span class="text-gray-400">{% trans "Not sent" %}</span>
+                            <span class="text-secondary">{% trans "Not sent" %}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'frontend:ats:offer_detail' offer.pk %}"
-                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
-                                {% trans "View" %}
-                            </a>
+                        <td class="p-5">
+                            {% if offer.status == 'pending' or offer.status == 'sent' %}
+                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">{{ offer.get_status_display }}</span>
+                            {% elif offer.status == 'accepted' %}
+                            <span class="tag bg-opacity-10 bg-success text-success text-button">{{ offer.get_status_display }}</span>
+                            {% elif offer.status == 'declined' %}
+                            <span class="tag bg-opacity-10 bg-red text-red text-button">{{ offer.get_status_display }}</span>
+                            {% elif offer.status == 'withdrawn' %}
+                            <span class="tag bg-opacity-10 bg-secondary text-secondary text-button">{{ offer.get_status_display }}</span>
+                            {% else %}
+                            <span class="tag bg-opacity-10 bg-features text-features text-button">{{ offer.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-5">
+                            <div class="flex justify-end gap-2">
+                                <a href="{% url 'frontend:ats:offer_detail' offer.pk %}"
+                                   class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                    <span class="ph ph-eye text-xl"></span>
+                                    <span class="flag absolute -top-10 left-1/2 -translate-x-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">{% trans "View" %}</span>
+                                </a>
+                                {% if offer.status == 'pending' or offer.status == 'sent' %}
+                                <button hx-post="{% url 'frontend:ats:offer_resend' offer.pk %}"
+                                        hx-swap="none"
+                                        class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                    <span class="ph ph-paper-plane-tilt text-xl"></span>
+                                    <span class="flag absolute -top-10 left-1/2 -translate-x-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">{% trans "Resend" %}</span>
+                                </button>
+                                <button hx-post="{% url 'frontend:ats:offer_withdraw' offer.pk %}"
+                                        hx-confirm="{% trans 'Are you sure you want to withdraw this offer?' %}"
+                                        hx-swap="none"
+                                        class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-red hover:text-white">
+                                    <span class="ph ph-x text-xl"></span>
+                                    <span class="flag absolute -top-10 left-1/2 -translate-x-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">{% trans "Withdraw" %}</span>
+                                </button>
+                                {% endif %}
+                                <button hx-delete="{% url 'frontend:ats:offer_delete' offer.pk %}"
+                                        hx-confirm="{% trans 'Are you sure you want to delete this offer?' %}"
+                                        hx-target="closest tr"
+                                        hx-swap="outerHTML swap:1s"
+                                        class="btn_action flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-red hover:text-white">
+                                    <span class="ph ph-trash text-xl"></span>
+                                    <span class="flag absolute -top-10 left-1/2 -translate-x-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">{% trans "Delete" %}</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
+                        <td colspan="6" class="p-12 text-center">
                             <div class="flex flex-col items-center">
-                                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No offers yet" %}</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                <span class="ph ph-file-text text-6xl text-secondary mb-4"></span>
+                                <h3 class="heading6 text-title mb-1">{% trans "No offers yet" %}</h3>
+                                <p class="caption1 text-secondary">
                                     {% trans "Create offers from the application pipeline." %}
                                 </p>
                             </div>
@@ -163,8 +209,38 @@
         </div>
 
         <!-- Pagination -->
-        {% if page_obj %}
-        {% include "components/pagination.html" %}
+        {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-between px-6 pb-5">
+            <div class="text-secondary caption1">
+                {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
+                Showing {{ start }} to {{ end }} of {{ total }} results
+                {% endblocktrans %}
+            </div>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+                   class="w-10 h-10 flex items-center justify-center rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                    <span class="ph ph-caret-left"></span>
+                </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="w-10 h-10 flex items-center justify-center rounded bg-primary text-white">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+                   class="w-10 h-10 flex items-center justify-center rounded border border-line duration-300 hover:bg-primary hover:text-white">{{ num }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+                   class="w-10 h-10 flex items-center justify-center rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                    <span class="ph ph-caret-right"></span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
     </div>
 </div>
