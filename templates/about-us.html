@@ -1,615 +1,150 @@
-{% extends "base.html" %}
-{% comment %}
-=============================================================================
-   ZUMODRA ABOUT US PAGE
-   =============================================================================
-
-   File: templates/about-us.html
-   Purpose: About page introducing Zumodra's mission and values
-
-   Extends: base.html (canonical public base template)
-
-   Features:
-   - Hero section with mission statement
-   - About section with company overview
-   - Statistics counter
-   - Testimonials carousel
-   - Team section
-   - How it works process
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-   =============================================================================
-{% endcomment %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "About Us" %} - Zumodra{% endblock %}
+{% block title %}{% trans "About Us" %} - FreelanHub{% endblock %}
 
-{% block meta_description %}{% trans "Learn about Zumodra's mission to revolutionize recruitment through verified talent and secure hiring. Discover how we're building trust in the freelance marketplace." %}{% endblock %}
+{% block meta_description %}{% trans "Learn about FreelanHub's mission to revolutionize how businesses connect with top freelancers and talent worldwide.\" %}{% endblock %}
 
 {% block content %}
 
-{% comment %} HERO SECTION {% endcomment %}
-<section class="hero-animated relative">
-    <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50">
-        {% comment %} Decorative gradient background {% endcomment %}
-        <div class="absolute inset-0 pointer-events-none opacity-30">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-teal-400 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400 rounded-full blur-3xl"></div>
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+            <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="{% trans 'About Us' %}" class="w-full h-full object-cover" />
         </div>
-
-        <div class="container flex items-center justify-between h-full max-lg:py-16 relative z-10">
-            <div class="slider_content lg:w-[430px] w-full">
-                <h2 class="heading-2 animate animate_top" style="--i: 1">{% trans "Welcome to Zumodra" %}</h2>
-                <p class="body-large mt-3 text-gray-700 animate animate_top" style="--i: 2">{% trans "Unlock the power of verified talent to meet your business needs and propel your company forward with confidence." %}</p>
-                <a href="{% url 'contact_us' %}" class="btn-primary mt-7 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">{% trans "Home" %}</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">{% trans "About Us" %}</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "About Us" %}</h3>
             </div>
-            <ul class="slider_bg grid grid-cols-3 gap-4 w-7/12 h-full max-lg:hidden">
-                <li class="h-full overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                    <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="avatar/about1" class="w-full h-full object-cover" />
-                </li>
-                <li class="h-full overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                    <img src="{% static 'assets/images/avatar/about2.webp' %}" alt="avatar/about2" class="w-full h-full object-cover" />
-                </li>
-                <li class="h-full overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                    <img src="{% static 'assets/images/avatar/about3.webp' %}" alt="avatar/about3" class="w-full h-full object-cover" />
-                </li>
-            </ul>
         </div>
     </div>
 </section>
 
-{% comment %} ABOUT SECTION {% endcomment %}
+<!-- About -->
 <div class="about lg:py-20 sm:py-14 py-10">
     <div class="container flex flex-col items-center">
         <h3 class="heading3 text-center animate animate_top" style="--i: 1">
             {% trans "We are revolutionizing how businesses" %}<br class="max-lg:hidden" />
-            {% trans "connect with verified talent" %}
+            {% trans "connect with top freelancers" %}
         </h3>
         <p class="body2 text-center mt-3 animate animate_top" style="--i: 2">
-            {% trans "With a vision to revolutionize the way freelancers and employers connect, Zumodra serves as a dynamic hub for talent discovery and collaboration. We believe in empowering individuals and businesses to thrive in the digital economy through bidirectional KYC verification, secure escrow payments, and meaningful connections that facilitate seamless workflows." %}
+            {% trans "With a vision to revolutionize the way freelancers and employers connect, our platform serves as a dynamic hub for talent discovery and collaboration. At FreelanHub, we believe in empowering individuals and businesses to thrive in the digital economy by fostering meaningful connections and facilitating seamless workflows." %}
         </p>
         <a href="{% url 'contact_us' %}" class="button-main mt-4 animate animate_top" style="--i: 3">{% trans "Contact Us" %}</a>
-                <ul class="list_img grid sm:grid-cols-3 xl:gap-15 lg:gap-8 gap-5 w-full md:mt-10 mt-7">
-                    <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 4">
-                        <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="avatar/about1" class="w-full h-full object-cover" />
-                    </li>
-                    <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 5">
-                        <img src="{% static 'assets/images/avatar/about2.webp' %}" alt="avatar/about2" class="w-full h-full object-cover" />
-                    </li>
-                    <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 6">
-                        <img src="{% static 'assets/images/avatar/about3.webp' %}" alt="avatar/about3" class="w-full h-full object-cover" />
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-{% comment %} STATISTICS COUNTER SECTION {% endcomment %}
-<section class="counter lg:py-15 sm:py-12 py-8 relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);">
-    {% comment %} Decorative gradient background {% endcomment %}
-    <div class="absolute inset-0 pointer-events-none opacity-20">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500 rounded-full blur-3xl"></div>
-    </div>
-
-    <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8 relative z-10">
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-            <h2 class="text-5xl font-bold pb-1 text-center bg-gradient-to-br from-teal-400 to-cyan-400 bg-clip-text text-transparent">2.5M+</h2>
-            <span class="text-lg text-white/80 text-center">{% trans "Jobs Available" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-            <h2 class="text-5xl font-bold pb-1 text-center bg-gradient-to-br from-teal-400 to-cyan-400 bg-clip-text text-transparent">177k+</h2>
-            <span class="text-lg text-white/80 text-center">{% trans "New Jobs This Week" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-            <h2 class="text-5xl font-bold pb-1 text-center bg-gradient-to-br from-teal-400 to-cyan-400 bg-clip-text text-transparent">298k+</h2>
-            <span class="text-lg text-white/80 text-center">{% trans "Companies Hiring" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/20 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-            <h2 class="text-5xl font-bold pb-1 text-center bg-gradient-to-br from-teal-400 to-cyan-400 bg-clip-text text-transparent">5M+</h2>
-            <span class="text-lg text-white/80 text-center">{% trans "Verified Freelancers" %}</span>
-        </div>
-    </div>
-</section>
-
-{% comment %} TESTIMONIALS SECTION {% endcomment %}
-<section class="testimonials lg:py-20 sm:py-14 py-10">
-    <div class="container">
-        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Testimonials" %}</h3>
-        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover exceptional experiences through testimonials from our satisfied customers." %}</p>
-                <div class="swiper -section swiper-list-testimonials style-3 md:pt-10 pt-7">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 1">
-                                <strong class="text-title">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</strong>
-                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="IMG-1" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Liam Anderson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 2">
-                                <strong class="text-title">I'm truly impressed by the results delivered by FreelanHub. Their team's professionalism and dedication shine through in every project in your eyes.</strong>
-                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="IMG-2" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 3">
-                                <strong class="text-title">I'm truly impressed by the results delivered by fivero. Their team's professionalism and dedication shine through in every project and conversions.</strong>
-                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="IMG-3" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Alexander Peter</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 4">
-                                <strong class="text-title">Working with fivero has been an absolute game-changer for our online presence. Their innovative strategies and creative approach have taken our brand!</strong>
-                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-4.webp' %}" alt="IMG-4" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Benefit -->
-        <section class="benefit">
-            <div class="container">
-                <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-10 p-10 rounded-xl bg-[#FAF7F1]">
-                    <li class="item animate animate_top" style="--i: 1">
-                        <span class="ph ph-codesandbox-logo text-5xl text-primary"></span>
-                        <h6 class="heading6 mt-4">Partner Programs</h6>
-                        <p class="mt-2">You've got access to audiences who can benefit from us services. So pretty much any audience.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 2">
-                        <span class="ph ph-book text-5xl text-primary"></span>
-                        <h6 class="heading6 mt-4">Branded Catalogs</h6>
-                        <p class="mt-2">You want to enhance your product by integrating FreelanHub solutions that complement your offering.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 3">
-                        <span class="ph ph-desktop-tower text-5xl text-primary"></span>
-                        <h6 class="heading6 mt-4">Solution Marketplace</h6>
-                        <p class="mt-2">You wish to introduce our community of freelancer businesses to a relevant service or solution.</p>
-                    </li>
-                    <li class="item animate animate_top" style="--i: 4">
-                        <span class="ph ph-users-four text-5xl text-primary"></span>
-                        <h6 class="heading6 mt-4">Brand partnership</h6>
-                        <p class="mt-2">You're up for exploring what happens when two celebrated brands combine resources to fuel powerful.</p>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Meet Our Teams -->
-        <section class="our_team lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Meet Our Teams</h3>
-                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">We're here to assist you every step of the way. Let's make your goals a reality.</p>
-                <ul class="grid lg:grid-cols-4 sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
-                    <li>
-                        <a href="https://www.facebook.com/" target="_blank" class="block animate animate_top" style="--i: 1">
-                            <img src="{% static 'assets/images/avatar/IMG-5.webp' %}" alt="avatar/IMG-5" class="w-full h-full object-cover rounded-20" />
-                            <div class="flex items-center justify-between mt-5">
-                                <div class="flex flex-col gap-1">
-                                    <strong class="heading6 duration-300 hover:text-primary">Annette Black</strong>
-                                    <span class="caption1 text-secondary">Graphic Designer</span>
-                                </div>
-                                <span class="flex flex-shrink-0 items-center justify-center w-12 h-12 border border-line rounded-full duration-300 hover:bg-primary hover:text-white">
-                                    <span class="icon-facebook text-black text-xl"></span>
-                                </span>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://www.facebook.com/" target="_blank" class="block animate animate_top" style="--i: 1">
-                            <img src="{% static 'assets/images/avatar/IMG-6.webp' %}" alt="avatar/IMG-6" class="w-full h-full object-cover rounded-20" />
-                            <div class="flex items-center justify-between mt-5">
-                                <div class="flex flex-col gap-1">
-                                    <strong class="heading6 duration-300 hover:text-primary">Jane Cooper</strong>
-                                    <span class="caption1 text-secondary">CEM - digiNova</span>
-                                </div>
-                                <span class="flex flex-shrink-0 items-center justify-center w-12 h-12 border border-line rounded-full duration-300 hover:bg-primary hover:text-white">
-                                    <span class="icon-facebook text-black text-xl"></span>
-                                </span>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://www.facebook.com/" target="_blank" class="block animate animate_top" style="--i: 2">
-                            <img src="{% static 'assets/images/avatar/IMG-7.webp' %}" alt="avatar/IMG-7" class="w-full h-full object-cover rounded-20" />
-                            <div class="flex items-center justify-between mt-5">
-                                <div class="flex flex-col gap-1">
-                                    <strong class="heading6 duration-300 hover:text-primary">Brooklyn Simmons</strong>
-                                    <span class="caption1 text-secondary">Photographer</span>
-                                </div>
-                                <span class="flex flex-shrink-0 items-center justify-center w-12 h-12 border border-line rounded-full duration-300 hover:bg-primary hover:text-white">
-                                    <span class="icon-facebook text-black text-xl"></span>
-                                </span>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://www.facebook.com/" target="_blank" class="block animate animate_top" style="--i: 3">
-                            <img src="{% static 'assets/images/avatar/IMG-9.webp' %}" alt="avatar/IMG-9" class="w-full h-full object-cover rounded-20" />
-                            <div class="flex items-center justify-between mt-5">
-                                <div class="flex flex-col gap-1">
-                                    <strong class="heading6 duration-300 hover:text-primary">Theresa Webb</strong>
-                                    <span class="caption1 text-secondary">CEM - digiNova</span>
-                                </div>
-                                <span class="flex flex-shrink-0 items-center justify-center w-12 h-12 border border-line rounded-full duration-300 hover:bg-primary hover:text-white">
-                                    <span class="icon-facebook text-black text-xl"></span>
-                                </span>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Banner -->
-        <section class="banner">
-            <div class="container">
-                <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-3xl shadow-2xl">
-                    <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                        <div class="hero-gradient-overlay opacity-80"></div>
-                        <img src="{% static 'assets/images/components/banner1.webp' %}" alt="banner1" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="banner_content relative z-10">
-                        <h4 class="heading-4 text-white animate animate_top" style="--i: 1">Embrace Independence <br class="max-sm:hidden" />Start Your Freelance Journey Now</h4>
-                        <p class="body-large mt-4 text-white opacity-95 animate animate_top max-w-2xl" style="--i: 2">Connect with verified clients and get paid securely</p>
-                        <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
-                            <a href="{% url 'become_seller' %}" class="btn-primary bg-white text-gray-900 hover:bg-gray-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">Become A Seller</a>
-                        </div>
-                    </div>
-
-                    {% comment %} Decorative gradient orbs {% endcomment %}
-                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-cyan-400 rounded-full opacity-20 blur-3xl"></div>
-                    <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-teal-400 rounded-full opacity-20 blur-3xl"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Us -->
-        <section class="contact lg:py-20 sm:py-14 py-10">
-            <div class="container flex max-lg:flex-col lg:items-center justify-between gap-20 gap-y-8">
-                <div class="content animate animate_right" style="--i: 1">
-                    <div class="heading">
-                        <h3 class="heading3">Contact Us</h3>
-                        <p class="body2 text-secondary mt-3">We're here to assist you every step of the way. Let's make your goals a reality.</p>
-                    </div>
-                    <ul class="list grid xl:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6 sm:mt-8 mt-6">
-                        <li class="flex flex-col gap-2">
-                            <strong class="text-title">Address:</strong>
-                            <p class="desc body2 text-secondary">101 E 129th St, Chicago, IN 46312, US</p>
-                        </li>
-                        <li class="flex flex-col gap-2">
-                            <strong class="text-title">Opentime:</strong>
-                            <p class="desc body2 text-secondary">
-                                Mon- Fri: 08:00 - 20:00<br />
-                                Sat- Sun: 10:00 - 18:00
-                            </p>
-                        </li>
-                        <li class="flex flex-col gap-2">
-                            <strong class="text-title">Infomation:</strong>
-                            <p class="desc body2 text-secondary">hi.avitex@gmail.com</p>
-                        </li>
-                        <li class="flex flex-col gap-2">
-                            <strong class="text-title">Our social media:</strong>
-                            <ul class="list flex flex-wrap items-center gap-2.5">
-                                <li>
-                                    <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
-                                        <span class="icon-facebook text-black duration-300"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
-                                        <span class="icon-instagram text-black duration-300"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
-                                        <span class="icon-twitter text-black duration-300"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
-                                        <span class="icon-youtube text-black duration-300"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.pinterest.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
-                                        <span class="icon-pinterest text-black duration-300"></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <ul class="list_img grid grid-cols-2 sm:gap-7.5 gap-5 flex-shrink-0 xl:w-[690px] lg:w-3/5 w-full">
-                    <li class="w-full aspect-[3/4] rounded-lg overflow-hidden animate animate_left" style="--i: 1">
-                        <img src="{% static 'assets/images/blog/9.webp' %}" alt="IMG-10" class="w-full h-full object-cover" />
-                    </li>
-                    <li class="w-full aspect-[3/4] rounded-lg overflow-hidden animate animate_left" style="--i: 2">
-                        <img src="{% static 'assets/images/blog/4.webp' %}" alt="IMG-11" class="w-full h-full object-cover" />
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-
-        <!-- About -->
-        <section class="about lg:pt-20 sm:pt-14 pt-10">
-            <div class="container grid lg:grid-cols-2 gap-15 gap-y-8">
-                <div class="bg_img overflow-hidden h-fit rounded-lg">
-                    <img src="{% static 'assets/images/blog/3.webp' %}" alt="blog/3" class="w-full h-full object-cover" />
-                </div>
-                <div class="overflow-hidden">
-                    <h3 class="heading3">FreelanHub – Find Jobs / Hire Creatives</h3>
-                    <div class="content mt-5 border-b border-line">
-                        <div class="menu_tab">
-                            <ul class="menu flex gap-7" role="tablist">
-                                <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300 active" id="about_tab01" role="tab" aria-controls="about_01" aria-selected="true">Graphic & Design</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="about_tab02" role="tab" aria-controls="about_02" aria-selected="false">Digital Marketing</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="about_tab03" role="tab" aria-controls="about_03" aria-selected="false">Development</button>
-                                </li>
-                                <li class="tab_item" role="presentation">
-                                    <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="about_tab04" role="tab" aria-controls="about_04" aria-selected="false">UI/UX Design</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="list_desc">
-                        <div id="about_01" class="tab_list mt-4 active" role="tabpanel" aria-labelledby="about_tab01" aria-hidden="false">
-                            <p class="text-secondary">
-                                At FreelanHub, we are dedicated to revolutionizing the way people connect with their dream careers. Our mission is to empower job seekers, freelancers and employers alike by providing a user-friendly and efficient platform for job searching and talent acquisition. With our innovative approach, we aim to bridge the gap between employers and job seekers, making the hiring process more straightforward, transparent, and rewarding for everyone involved.
-                            </p>
-                        </div>
-                        <div id="about_02" class="tab_list mt-4" role="tabpanel" aria-labelledby="about_tab02" aria-hidden="true">
-                            <p class="text-secondary">
-                                At FreelanHub, our vision is to revolutionize the freelance marketplace by creating a seamless, efficient, and trustworthy platform where talent meets opportunity. We aim to empower creatives by providing them with the resources and connections they need to thrive in their careers. By fostering a vibrant community of skilled professionals and forward-thinking companies, we envision a world where creativity and innovation are celebrated and rewarded.
-                            </p>
-                        </div>
-                        <div id="about_03" class="tab_list mt-4" role="tabpanel" aria-labelledby="about_tab03" aria-hidden="true">
-                            <p class="text-secondary">What makes FreelanHub stand out in a crowded marketplace? Our commitment to excellence, innovation, and user satisfaction. Here’s what sets us apart:</p>
-                            <ul class="flex flex-col gap-2 mt-3">
-                                <li class="text-secondary">Curated Talent Pool: We rigorously vet our freelancers to ensure only the best and most reliable professionals are available for hire.</li>
-                                <li class="text-secondary">User-Friendly Platform: Our intuitive interface makes it easy for both freelancers and employers to navigate, connect, and collaborate.</li>
-                            </ul>
-                        </div>
-                        <div id="about_04" class="tab_list mt-4" role="tabpanel" aria-labelledby="about_tab04" aria-hidden="true">
-                            <p class="text-secondary">At FreelanHub, we are committed to fostering a supportive for both freelancers and employers. Here’s how we demonstrate our commitment:</p>
-                            <ul class="flex flex-col gap-2 mt-3">
-                                <li class="text-secondary">Empowering Freelancers: We provide resources, tools, and support to help freelancers build their portfolios, enhance their skills, and grow their careers.</li>
-                                <li class="text-secondary">Supporting Employers: We offer personalized assistance to employers, helping them find the perfect match for their projects quickly and efficiently.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <a href="about2.html" class="button-main mt-7">Read More</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- FreelanHub features -->
-        <section class="features lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <h3 class="heading3 text-center animate animate_top" style="--i: 1">FreelanHub features</h3>
-                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Pellentesque quis lectus sagittis, gravida erat id, placerat tellus.</p>
-                <ul class="grid lg:grid-cols-3 gap-7.5 md:mt-10 mt-7">
-                    <li>
-                        <a href="login.html" class="flex flex-col items-center h-full p-10 bg-white border-2 border-transparent rounded-xl duration-500 shadow-md hover:border-primary animate animate_top" style="--i: 1">
-                            <span class="ph ph-envelope text-5xl"></span>
-                            <strong class="heading5 mt-5">Simply Log in with Email</strong>
-                            <p class="desc text-center text-secondary mt-2">Streamline your login process by using your email or social media account</p>
-                            <strong class="inline-flex items-center gap-2 mt-5">
-                                <strong class="text-button line-before line-black line-2px">Start Now</strong>
-                                <span class="ph-bold ph-arrow-right"></span>
-                            </strong>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="login.html" class="flex flex-col items-center h-full p-10 bg-white border-2 border-transparent rounded-xl duration-500 shadow-md hover:border-primary animate animate_top" style="--i: 2">
-                            <span class="ph ph-user text-5xl"></span>
-                            <strong class="heading5 mt-5">Register / Signup</strong>
-                            <p class="desc text-center text-secondary mt-2">Sign up with ease to access our platform's full range of features and opportunities</p>
-                            <strong class="inline-flex items-center gap-2 mt-5">
-                                <strong class="text-button line-before line-black line-2px">Start Now</strong>
-                                <span class="ph-bold ph-arrow-right"></span>
-                            </strong>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="login.html" class="flex flex-col items-center h-full p-10 bg-white border-2 border-transparent rounded-xl duration-500 shadow-md hover:border-primary animate animate_top" style="--i: 3">
-                            <span class="ph ph-info text-5xl"></span>
-                            <strong class="heading5 mt-5">Subscribe & Apply Jobs</strong>
-                            <p class="desc text-center text-secondary mt-2">Seize Opportunities: Start applying for your desired jobs with just a few clicks.</p>
-                            <strong class="inline-flex items-center gap-2 mt-5">
-                                <strong class="text-button line-before line-black line-2px">Start Now</strong>
-                                <span class="ph-bold ph-arrow-right"></span>
-                            </strong>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Testimonials -->
-        <section class="testimonials lg:py-20 sm:py-14 py-10 bg-surface">
-            <div class="container">
-                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Testimonials</h3>
-                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Discover exceptional experiences through testimonials from our satisfied customers.</p>
-                <div class="swiper -section swiper-list-testimonials style-3 md:pt-10 pt-7">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="testimonials_item h-full p-7.5 bg-white rounded-lg duration-300 shadow-md animate animate_top" style="--i: 1">
-                                <span class="ph-fill ph-quotes text-4xl text-primary"></span>
-                                <p class="text-title mt-3">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic.</p>
-                                <div class="testimonials_info flex items-center gap-5 mt-5">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="IMG-1" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Liam Anderson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item h-full p-7.5 bg-white rounded-lg duration-300 shadow-md animate animate_top" style="--i: 2">
-                                <span class="ph-fill ph-quotes text-4xl text-primary"></span>
-                                <p class="text-title mt-3">I'm truly impressed by the results delivered by FreelanHub. Their team's professionalism and dedication shine through in every project in your eyes.</p>
-                                <div class="testimonials_info flex items-center gap-5 mt-5">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="IMG-2" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item h-full p-7.5 bg-white rounded-lg duration-300 shadow-md animate animate_top" style="--i: 3">
-                                <span class="ph-fill ph-quotes text-4xl text-primary"></span>
-                                <p class="text-title mt-3">I'm truly impressed by the results delivered by fivero. Their team's professionalism and dedication shine through in every project and conversions.</p>
-                                <div class="testimonials_info flex items-center gap-5 mt-5">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="IMG-3" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Alexander Peter</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="testimonials_item h-full p-7.5 bg-white rounded-lg duration-300 shadow-md animate animate_top" style="--i: 4">
-                                <span class="ph-fill ph-quotes text-4xl text-primary"></span>
-                                <p class="text-title mt-3">Working with fivero has been an absolute game-changer for our online presence. Their innovative strategies and creative approach have taken our brand!</p>
-                                <div class="testimonials_info flex items-center gap-5 mt-5">
-                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
-                                        <img src="{% static 'assets/images/avatar/IMG-4.webp' %}" alt="IMG-4" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="testimonials_user">
-                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
-                                        <span class="caption1 text-secondary">Head of Recruitment</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Explore -->
-        <section class="explore lg:py-20 sm:py-14 py-10">
-            <div class="container">
-                <div class="explore_inner flex max-lg:flex-col-reverse items-center justify-between gap-y-8">
-                    <div class="explore_content xl:w-[430px] lg:w-5/12 w-full">
-                        <h3 class="heading3 animate animate_top" style="--i: 1">Explore our global network of freelancers</h3>
-                        <p class="body2 text-secondary mt-3 animate animate_top" style="--i: 2">Tap into a diverse pool of freelance talent spanning the globe.</p>
-                        <div class="lg:mt-8 mt-5 animate animate_top" style="--i: 3">
-                            <a href="become-buyer.html" class="button-main">Join Us Now</a>
-                        </div>
-                    </div>
-                    <div class="benefit_bg relative xl:w-[776px] lg:w-[55%] sm:w-[75%] w-full">
-                        <img src="{% static 'assets/images/components/graphic8.png' %}" alt="graphic8" class="w-full" />
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Banner -->
-        <section class="banner">
-            <div class="container">
-                <div class="banner_inner relative lg:p-20 sm:p-14 p-10 rounded-lg bg-[#F7F2EE]">
-                    <div class="benefit_bg absolute top-0 right-0 bottom-0 max-sm:hidden">
-                        <img src="{% static 'assets/images/components/banner8.png' %}" alt="banner8" class="h-full w-auto object-cover" />
-                    </div>
-                    <div class="banner_content xl:w-[544px] md:w-8/12 w-full">
-                        <h3 class="heading3 animate animate_top" style="--i: 1">Download our freelancer & employer app now!</h3>
-                        <p class="body2 text-secondary mt-2 animate animate_top" style="--i: 2">Seamlessly connect to endless job opportunities and talent pool, anywhere, anytime.</p>
-                        <div class="list_download flex flex-wrap items-center gap-4 lg:mt-8 mt-5 animate animate_top" style="--i: 3">
-                            <a href="https://play.google.com/" target="_blank">
-                                <img src="{% static 'assets/images/download/gg_play.png' %}" alt="gg_play" class="bg-feature rounded" />
-                            </a>
-                            <a href="https://www.apple.com/app-store/" target="_blank">
-                                <img src="{% static 'assets/images/download/app_store.png' %}" alt="app_store" class="bg-feature rounded" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-{% comment %} HOW IT WORKS SECTION {% endcomment %}
-<section class="benefit lg:py-20 sm:py-14 py-10">
-    <div class="container">
-        <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5">
-            <li class="item animate animate_top" style="--i: 1">
-                <span class="ph-duotone ph-wallet text-4xl text-primary"></span>
-                <h6 class="heading6 mt-3">{% trans "Post Your Job" %}</h6>
-                <p class="mt-1">{% trans "Create a job listing with details like requirements and budget." %}</p>
+        <ul class="list_img grid sm:grid-cols-3 xl:gap-15 lg:gap-8 gap-5 w-full md:mt-10 mt-7">
+            <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 4">
+                <img src="{% static 'assets/images/avatar/about1.webp' %}" alt="{% trans 'About FreelanHub' %}" class="w-full h-full object-cover" />
             </li>
-            <li class="item animate animate_top" style="--i: 2">
-                <span class="ph-duotone ph-shield-check text-4xl text-primary"></span>
-                <h6 class="heading6 mt-3">{% trans "Review Verified Applicants" %}</h6>
-                <p class="mt-1">{% trans "Receive and evaluate applications from KYC-verified freelancers." %}</p>
+            <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 5">
+                <img src="{% static 'assets/images/avatar/about2.webp' %}" alt="{% trans 'Our Team' %}" class="w-full h-full object-cover" />
             </li>
-            <li class="item animate animate_top" style="--i: 3">
-                <span class="ph-duotone ph-certificate text-4xl text-primary"></span>
-                <h6 class="heading6 mt-3">{% trans "Choose a Freelancer" %}</h6>
-                <p class="mt-1">{% trans "Conduct interviews or discussions to choose the best candidate." %}</p>
-            </li>
-            <li class="item animate animate_top" style="--i: 4">
-                <span class="ph-duotone ph-phone-call text-4xl text-primary"></span>
-                <h6 class="heading6 mt-3">{% trans "Secure Payment & Delivery" %}</h6>
-                <p class="mt-1">{% trans "Collaborate with escrow-protected payments until project completion." %}</p>
+            <li class="w-full h-full rounded-xl overflow-hidden animate animate_top" style="--i: 6">
+                <img src="{% static 'assets/images/avatar/about3.webp' %}" alt="{% trans 'Our Mission' %}" class="w-full h-full object-cover" />
             </li>
         </ul>
     </div>
+</div>
+
+<!-- Counter / Statistics -->
+<section class="counter lg:py-15 sm:py-12 py-8 bg-[#FAF7F1]">
+    <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
+            <h2 class="heading2 pb-1 text-center">2.5M+</h2>
+            <span class="body1 text-center">{% trans "Jobs Available" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
+            <h2 class="heading2 pb-1 text-center">177k+</h2>
+            <span class="body1 text-center">{% trans "New Jobs This Week" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
+            <h2 class="heading2 pb-1 text-center">298k+</h2>
+            <span class="body1 text-center">{% trans "Companies Hiring" %}</span>
+        </div>
+        <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
+            <h2 class="heading2 pb-1 text-center">5M+</h2>
+            <span class="body1 text-center">{% trans "Total Freelancers" %}</span>
+        </div>
+    </div>
 </section>
 
-{% endblock content %}
+<!-- Testimonials -->
+<section class="testimonials lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Testimonials" %}</h3>
+        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">
+            {% trans "Discover exceptional experiences through testimonials from our satisfied customers." %}
+        </p>
+        <div class="swiper -section swiper-list-testimonials style-3 md:pt-10 pt-7">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 1">
+                        <strong class="text-title">{% trans "Choosing FreelanHub was the best decision we made for our business. Their expertise in connecting us with top talent has significantly boosted our productivity." %}</strong>
+                        <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                            <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="Liam Anderson" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="testimonials_user">
+                                <h6 class="testimonials_name heading6">Liam Anderson</h6>
+                                <span class="caption1 text-secondary">{% trans "Head of Recruitment" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 2">
+                        <strong class="text-title">{% trans "I'm truly impressed by the results delivered by FreelanHub. The platform's professionalism and dedication shine through in every project." %}</strong>
+                        <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                            <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="Sarah Chen" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="testimonials_user">
+                                <h6 class="testimonials_name heading6">Sarah Chen</h6>
+                                <span class="caption1 text-secondary">{% trans "Project Manager" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 3">
+                        <strong class="text-title">{% trans "FreelanHub has transformed how we find and hire freelancers. The quality of talent on the platform is exceptional." %}</strong>
+                        <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                            <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="Michael Torres" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="testimonials_user">
+                                <h6 class="testimonials_name heading6">Michael Torres</h6>
+                                <span class="caption1 text-secondary">{% trans "CEO" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="banner">
+    <div class="banner_inner bg-primary">
+        <div class="container flex items-center justify-center py-12">
+            <div class="banner_content text-center">
+                <h3 class="heading3 text-white">{% trans "Ready to get started?" %}</h3>
+                <p class="body2 text-white/90 mt-3 mb-6">
+                    {% trans "Join thousands of freelancers and employers who trust FreelanHub" %}
+                </p>
+                <a href="{% url 'account_signup' %}" class="button-main bg-white">{% trans "Join Now" %}</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
