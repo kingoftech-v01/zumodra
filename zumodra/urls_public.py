@@ -170,6 +170,10 @@ urlpatterns += i18n_patterns(
     # All frontend views including dashboard, appointments, messages
     path('app/', include('core.urls_frontend', namespace='frontend')),
 
+    # Custom Account & User Management
+    # Public profile, KYC, and profile sync settings
+    path('user/', include('custom_account_u.urls', namespace='custom_account_u')),
+
     # Newsletter
     path('newsletter/', include('newsletter.urls')),
 

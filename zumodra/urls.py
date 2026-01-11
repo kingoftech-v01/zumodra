@@ -252,6 +252,10 @@ urlpatterns += i18n_patterns(
     # All frontend views including dashboard, appointments, messages are handled through core.urls_frontend
     path('app/', include('core.urls_frontend', namespace='frontend')),  # All frontend views with namespace
 
+    # Custom Account & User Management
+    # Public profile, KYC, and profile sync settings
+    path('user/', include('custom_account_u.urls', namespace='custom_account_u')),
+
     # Legacy standalone routes (redirects to frontend namespace)
     # Note: Dashboard, appointment, messages are now served via core.urls_frontend
     # Keep these only if you need backward-compatible URLs
