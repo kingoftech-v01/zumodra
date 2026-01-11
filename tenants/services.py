@@ -471,6 +471,27 @@ class InvitationService:
             }
         )
 
+        # Initial profile sync from PublicProfile to TenantProfile
+        try:
+            from accounts.services import ProfileSyncService
+            sync_result = ProfileSyncService.sync_on_invitation_acceptance(
+                user=user,
+                tenant=invitation.tenant
+            )
+            logger.info(
+                f"Profile sync on invitation: {user.email} → {invitation.tenant.name}, "
+                f"Result: {sync_result.get('success')}, "
+                f"Synced fields: {sync_result.get('synced_fields', [])}"
+            )
+        except Exception as e:
+            # Don't fail the invitation if sync fails
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(
+                f"Profile sync failed on invitation acceptance: {user.email} → {invitation.tenant.name}: {e}",
+                exc_info=True
+            )
+
         # Update tenant's user count in usage tracking
         try:
             usage = TenantUsage.objects.filter(tenant=invitation.tenant).first()
