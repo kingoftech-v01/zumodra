@@ -53,14 +53,10 @@ def home_view(request):
         ).select_related('tenant').order_by('-rating_avg', '-published_at')[:6]
 
         # Service categories (aggregated from catalog)
-        from django.db.models import F
         context['categories'] = (
             PublicServiceCatalog.objects
             .filter(is_active=True)
-            .values(
-                name=F('category_name'),
-                slug=F('category_slug')
-            )
+            .values('category_name', 'category_slug')
             .annotate(service_count=Count('id'))
             .order_by('-service_count')[:8]
         )
