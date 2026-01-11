@@ -166,11 +166,24 @@ def service_detail(request, service_uuid):
             return redirect('home')
 
     # We're in a tenant schema - proceed with normal logic
-    service = get_object_or_404(
-        Service.objects.select_related('provider__user', 'category')
-        .prefetch_related('images', 'tags', 'reviews__reviewer'),
-        uuid=service_uuid
-    )
+    # However, catch ProgrammingError in case table doesn't exist (edge case)
+    from django.db import ProgrammingError
+    try:
+        service = get_object_or_404(
+            Service.objects.select_related('provider__user', 'category')
+            .prefetch_related('images', 'tags', 'reviews__reviewer'),
+            uuid=service_uuid
+        )
+    except ProgrammingError as e:
+        # Table doesn't exist - we're likely in public schema but the check above failed
+        logger.error(
+            f"Service table not found when accessing service {service_uuid}. "
+            f"Tenant: {getattr(request, 'tenant', None)}, "
+            f"Schema: {getattr(getattr(request, 'tenant', None), 'schema_name', 'unknown')}. "
+            f"Error: {e}"
+        )
+        messages.error(request, 'Service temporarily unavailable. Please try again later.')
+        return redirect('home')
 
     # Get reviews
     reviews = service.reviews.all().order_by('-created_at')
@@ -458,10 +471,23 @@ def provider_profile_view(request, provider_uuid):
             return redirect('home')
 
     # We're in a tenant schema - proceed with normal logic
-    provider = get_object_or_404(
-        ServiceProvider.objects.prefetch_related('services'),
-        uuid=provider_uuid
-    )
+    # However, catch ProgrammingError in case table doesn't exist (edge case)
+    from django.db import ProgrammingError
+    try:
+        provider = get_object_or_404(
+            ServiceProvider.objects.prefetch_related('services'),
+            uuid=provider_uuid
+        )
+    except ProgrammingError as e:
+        # Table doesn't exist - we're likely in public schema but the check above failed
+        logger.error(
+            f"ServiceProvider table not found when accessing provider {provider_uuid}. "
+            f"Tenant: {getattr(request, 'tenant', None)}, "
+            f"Schema: {getattr(getattr(request, 'tenant', None), 'schema_name', 'unknown')}. "
+            f"Error: {e}"
+        )
+        messages.error(request, 'Service temporarily unavailable. Please try again later.')
+        return redirect('home')
 
     # Don't show private profiles
     if provider.is_private:
