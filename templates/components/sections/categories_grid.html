@@ -8,7 +8,7 @@
             {% trans "Explore a wide range of services organized by category" %}
         </p>
         <div class="list grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
-            {% for category in categories|default:default_categories %}
+            {% for category in categories %}
             <a href="{% url 'services:service_list' %}?category={{ category.slug }}"
                class="category_item flex flex-col items-center sm:p-7.5 p-5 rounded-20 bg-white shadow-md duration-300 hover:shadow-xl animate animate_top"
                style="--i: {{ forloop.counter }}">
