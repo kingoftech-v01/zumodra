@@ -37,7 +37,7 @@
                            @focus="searchOpen = true"
                            @blur="setTimeout(() => searchOpen = false, 200)"
                            @keyup.escape="searchOpen = false"
-                           hx-get="{% url 'frontend:dashboard:search' %}"
+                           hx-get="{% url 'frontend:dashboard:global-search' %}"
                            hx-trigger="keyup changed delay:300ms"
                            hx-target="#search-results"
                            hx-vals='js:{q: document.getElementById("global-search").value}'
