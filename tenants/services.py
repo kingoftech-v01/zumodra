@@ -270,14 +270,16 @@ The Zumodra Team
             User = get_user_model()
             usage.user_count = User.objects.count()
 
-            # Count jobs (from ATS app - to be implemented)
-            # usage.active_job_count = JobPosting.objects.filter(status='open').count()
+            # Count jobs (from ATS app)
+            from ats.models import JobPosting
+            usage.active_job_count = JobPosting.objects.filter(status='open').count()
 
             # Count candidates this month
-            # month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
-            # usage.candidate_count_this_month = Application.objects.filter(
-            #     created_at__gte=month_start
-            # ).count()
+            from ats.models import Application
+            month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
+            usage.candidate_count_this_month = Application.objects.filter(
+                created_at__gte=month_start
+            ).count()
 
         usage.last_calculated_at = timezone.now()
         usage.save()
