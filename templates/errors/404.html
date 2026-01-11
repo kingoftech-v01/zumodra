@@ -1,149 +1,25 @@
-{% extends "base/base.html" %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
-{% url 'services:service_list' as careers_url %}
 
-{% block title %}{% trans "Page Not Found" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Page Not Found" %} - FreelanHub{% endblock %}
+
 {% block meta_description %}{% trans "The page you are looking for could not be found." %}{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/zumodra-design-system.css' %}">
-<style>
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-10px) rotate(2deg); }
-    }
-    .zu-float { animation: float 4s ease-in-out infinite; }
-</style>
-{% endblock %}
+{% block content %}
 
-{% block body %}
-<div class="min-h-screen flex flex-col" style="background: var(--zu-bg-canvas);">
-    <!-- Header with Logo -->
-    <header class="p-6 flex justify-between items-center">
-        <a href="/" class="inline-flex items-center">
-            <span class="text-2xl font-bold" style="color: var(--zu-teal-600);">Zumodra</span>
-        </a>
-        <!-- Dark Mode Toggle -->
-        <button @click="darkMode = !darkMode"
-                class="zu-btn zu-btn--ghost zu-btn--icon">
-            <svg x-show="!darkMode" class="zu-icon zu-icon--lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-            </svg>
-            <svg x-show="darkMode" x-cloak class="zu-icon zu-icon--lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
-            </svg>
-        </button>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl w-full text-center">
-            <!-- Illustration - Lost in Space -->
-            <div class="mb-8 zu-float">
-                <svg class="mx-auto h-52 w-52" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Stars background -->
-                    <circle cx="30" cy="40" r="2" fill="#D4A853" opacity="0.6"/>
-                    <circle cx="170" cy="30" r="1.5" fill="#D4A853" opacity="0.4"/>
-                    <circle cx="160" cy="80" r="2" fill="#E8705C" opacity="0.5"/>
-                    <circle cx="40" cy="160" r="1.5" fill="#0D5C63" opacity="0.5"/>
-                    <circle cx="175" cy="150" r="2" fill="#D4A853" opacity="0.5"/>
-                    <circle cx="25" cy="100" r="1.5" fill="#E8705C" opacity="0.4"/>
-                    <!-- Planet -->
-                    <circle cx="100" cy="100" r="55" fill="#0D5C63" fill-opacity="0.1" stroke="#0D5C63" stroke-width="2"/>
-                    <ellipse cx="100" cy="100" rx="55" ry="20" stroke="#0D5C63" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.5"/>
-                    <!-- Crater details -->
-                    <circle cx="85" cy="85" r="12" fill="#0D5C63" fill-opacity="0.15"/>
-                    <circle cx="115" cy="110" r="8" fill="#0D5C63" fill-opacity="0.1"/>
-                    <circle cx="90" cy="115" r="6" fill="#0D5C63" fill-opacity="0.1"/>
-                    <!-- Lost flag -->
-                    <line x1="120" y1="70" x2="120" y2="45" stroke="#E8705C" stroke-width="2"/>
-                    <path d="M120 45L145 52L120 60Z" fill="#E8705C"/>
-                    <text x="133" y="55" fill="white" font-size="6" font-weight="bold">404</text>
-                    <!-- Question mark floating -->
-                    <g transform="translate(55, 50)">
-                        <circle cx="0" cy="0" r="15" fill="#D4A853" fill-opacity="0.2"/>
-                        <text x="0" y="6" text-anchor="middle" fill="#D4A853" font-size="18" font-weight="bold">?</text>
-                    </g>
-                    <!-- Orbit ring -->
-                    <ellipse cx="100" cy="100" rx="80" ry="30" stroke="#E8705C" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" transform="rotate(-20, 100, 100)"/>
-                </svg>
-            </div>
-
-            <!-- Error Message -->
-            <h1 class="text-4xl sm:text-5xl font-extrabold mb-4" style="color: var(--zu-text-primary);">
-                {% trans "Page Not Found" %}
-            </h1>
-            <p class="text-lg mb-8" style="color: var(--zu-text-secondary);">
-                {% trans "Oops! The page you're looking for seems to have wandered off. It might have been moved, deleted, or never existed in the first place." %}
+<div class="error flex items-center justify-center w-full min-h-screen py-20">
+    <div class="container flex max-xl:flex-col items-center justify-between gap-y-8">
+        <img src="{% static 'assets/images/components/error.png' %}" alt="{% trans 'Error' %}" class="flex-shrink-0 xl:w-[55%] max-xl:max-h-[40vh] w-auto" />
+        <div class="content w-fit">
+            <h1 class="md:text-9xl text-7xl font-bold">{% trans "Oops!" %}</h1>
+            <h2 class="heading2 mt-6">{% trans "Something is Missing." %}</h2>
+            <p class="body1 text-secondary mt-3">
+                {% trans "The page you are looking for cannot be found." %}<br class="max-sm:hidden" />
+                {% trans "Take a break before trying again" %}
             </p>
-
-            <!-- Search Bar Card -->
-            <div class="zu-card zu-card--glass mb-8">
-                <div class="zu-card__body">
-                    <form action="{% url 'home' %}" method="get" class="relative">
-                        <input type="text"
-                               name="q"
-                               placeholder="{% trans 'Search for something...' %}"
-                               class="w-full px-4 py-3 pl-12 rounded-xl border transition-all"
-                               style="background: var(--zu-bg-base); border-color: var(--zu-border-default); color: var(--zu-text-primary);">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                            <svg class="zu-icon" style="color: var(--zu-text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-                            </svg>
-                        </div>
-                        <button type="submit" class="absolute inset-y-0 right-0 flex items-center pr-4" style="color: var(--zu-text-brand);">
-                            <span class="sr-only">{% trans "Search" %}</span>
-                            <svg class="zu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Primary Action -->
-            <div class="mb-8">
-                <a href="/" class="zu-btn zu-btn--primary zu-btn--lg">
-                    <svg class="zu-btn__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
-                    </svg>
-                    {% trans "Go Back Home" %}
-                </a>
-            </div>
-
-            <!-- Popular Links -->
-            <div class="pt-8" style="border-top: 1px solid var(--zu-border-light);">
-                <h2 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color: var(--zu-text-muted);">
-                    {% trans "Popular Pages" %}
-                </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <a href="{% url 'home' %}" class="zu-btn zu-btn--secondary zu-btn--sm">
-                        {% trans "Home" %}
-                    </a>
-                    {% if careers_url %}
-                    <a href="{{ careers_url }}" class="zu-btn zu-btn--secondary zu-btn--sm">
-                        {% trans "Careers" %}
-                    </a>
-                    {% endif %}
-                    <a href="{% url 'about' %}" class="zu-btn zu-btn--secondary zu-btn--sm">
-                        {% trans "About Us" %}
-                    </a>
-                    <a href="{% url 'account_login' %}" class="zu-btn zu-btn--secondary zu-btn--sm">
-                        {% trans "Sign In" %}
-                    </a>
-                </div>
-            </div>
+            <a href="{% url 'home' %}" class="button-main mt-6">{% trans "Back To Homepage" %}</a>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="p-6 text-center">
-        <p class="text-sm" style="color: var(--zu-text-muted);">
-            {% blocktrans %}Need help? Contact us at{% endblocktrans %}
-            <a href="mailto:support@rhematek-solutions.com" style="color: var(--zu-text-brand);">
-                support@rhematek-solutions.com
-            </a>
-        </p>
-    </footer>
+    </div>
 </div>
+
 {% endblock %}
