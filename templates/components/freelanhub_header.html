@@ -98,13 +98,9 @@
             {% if user.is_authenticated %}
                 <div class="user-menu relative">
                     <button class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-50 duration-300">
-                        {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}" class="w-8 h-8 rounded-full object-cover">
-                        {% else %}
                         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
                             {{ user.first_name|first|upper|default:user.email|first|upper }}
                         </div>
-                        {% endif %}
                         <span class="text-sm font-medium max-[640px]:hidden">{{ user.get_full_name|default:user.email }}</span>
                         <span class="ph-bold ph-caret-down text-sm"></span>
                     </button>
