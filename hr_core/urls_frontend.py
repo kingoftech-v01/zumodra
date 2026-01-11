@@ -33,6 +33,7 @@ app_name = 'hr'
 urlpatterns = [
     # ===== EMPLOYEE ROUTES =====
     path('employees/', EmployeeDirectoryView.as_view(), name='employee-directory'),
+    path('employees/create/', EmployeeEditView.as_view(), name='employee-create'),
     path('employees/<uuid:pk>/', EmployeeDetailView.as_view(), name='employee-detail'),
     path('employees/<uuid:pk>/edit/', EmployeeEditView.as_view(), name='employee-edit'),
 

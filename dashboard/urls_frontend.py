@@ -12,6 +12,8 @@ from .template_views import (
     QuickStatsView,
     RecentActivityView,
     UpcomingInterviewsView,
+    AccountSettingsView,
+    HelpView,
 )
 
 app_name = 'dashboard'
@@ -27,4 +29,8 @@ urlpatterns = [
     path('htmx/quick-stats/', QuickStatsView.as_view(), name='htmx-quick-stats'),
     path('htmx/recent-activity/', RecentActivityView.as_view(), name='htmx-recent-activity'),
     path('htmx/upcoming-interviews/', UpcomingInterviewsView.as_view(), name='htmx-upcoming-interviews'),
+
+    # User account management
+    path('account-settings/', AccountSettingsView.as_view(), name='account-settings'),
+    path('help/', HelpView.as_view(), name='help'),
 ]

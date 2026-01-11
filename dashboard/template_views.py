@@ -366,3 +366,17 @@ class UpcomingInterviewsView(LoginRequiredMixin, TenantViewMixin, View):
         return render(request, 'dashboard/partials/_upcoming_interviews.html', {
             'upcoming_interviews': interviews
         })
+
+
+class AccountSettingsView(View):
+    """Account settings placeholder view."""
+    
+    def get(self, request, *args, **kwargs):
+        from django.shortcuts import redirect
+        # Redirect to allauth account settings for now
+        return redirect('account_email')
+
+
+class HelpView(TemplateView):
+    """Help and support view."""
+    template_name = 'dashboard/help.html'
