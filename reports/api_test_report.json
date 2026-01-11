@@ -1,0 +1,317 @@
+{
+  "passed": [
+    {
+      "category": "Health",
+      "endpoint": "/health/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 200,
+      "timestamp": "2026-01-11T18:21:16.302208",
+      "response_snippet": "{'status': 'healthy', 'timestamp': 1768173676.297244, 'version': '1.0.0', 'database': 'connected', 'cache': 'connected'}",
+      "error": null
+    },
+    {
+      "category": "Health",
+      "endpoint": "/health/ready/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 200,
+      "timestamp": "2026-01-11T18:21:16.322856",
+      "response_snippet": "{'ready': True}",
+      "error": null
+    },
+    {
+      "category": "Health",
+      "endpoint": "/health/live/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 200,
+      "timestamp": "2026-01-11T18:21:16.340985",
+      "response_snippet": "{'alive': True}",
+      "error": null
+    },
+    {
+      "category": "Auth",
+      "endpoint": "/ats/jobs/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.376025",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Auth",
+      "endpoint": "/hr/employees/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.400703",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/jobs/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.422362",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/jobs/",
+      "method": "POST",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.445735",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/candidates/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.472443",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/applications/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.495680",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/interviews/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.521754",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/offers/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.548754",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "ATS",
+      "endpoint": "/ats/pipelines/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.573331",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "HR",
+      "endpoint": "/hr/employees/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.596801",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "HR",
+      "endpoint": "/hr/time-off-requests/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:16.622552",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "HR",
+      "endpoint": "/hr/performance-reviews/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.132309",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Services",
+      "endpoint": "/services/services/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.172242",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Services",
+      "endpoint": "/services/providers/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.215713",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Services",
+      "endpoint": "/services/contracts/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.242364",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Services",
+      "endpoint": "/services/reviews/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.292887",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Finance",
+      "endpoint": "/finance/subscriptions/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.453517",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Finance",
+      "endpoint": "/finance/invoices/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.502163",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Messages",
+      "endpoint": "/messages/conversations/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.529292",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    },
+    {
+      "category": "Messages",
+      "endpoint": "/messages/messages/",
+      "method": "GET",
+      "status_code": 401,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.553369",
+      "response_snippet": "{'detail': 'Authentication credentials were not provided.'}",
+      "error": null
+    }
+  ],
+  "failed": [
+    {
+      "category": "HR",
+      "endpoint": "/hr/documents/",
+      "method": "GET",
+      "status_code": 404,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.111569",
+      "response_snippet": "{'raw': '<!DOCTYPE html>\\n<html lang=\"en\">\\n<head>\\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\\n  <title>Page not found at /en-us/api/v1/hr/documents/</title>\\n  <meta name=",
+      "error": null
+    },
+    {
+      "category": "Finance",
+      "endpoint": "/finance/transactions/",
+      "method": "GET",
+      "status_code": 404,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.424646",
+      "response_snippet": "{'raw': '<!DOCTYPE html>\\n<html lang=\"en\">\\n<head>\\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\\n  <title>Page not found at /en-us/api/v1/finance/transactions/</title>\\n  <me",
+      "error": null
+    },
+    {
+      "category": "Notifications",
+      "endpoint": "/notifications/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.823014",
+      "response_snippet": "{'raw': '\\n<!DOCTYPE html>\\n<html lang=\"en-us\">\\n<head>\\n    <meta charset=\"UTF-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\\n    <meta name=\"csrf-token\" content=\"8M",
+      "error": null
+    },
+    {
+      "category": "Notifications",
+      "endpoint": "/notifications/preferences/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:17.947952",
+      "response_snippet": "{'raw': '\\n<!DOCTYPE html>\\n<html lang=\"en-us\">\\n<head>\\n    <meta charset=\"UTF-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\\n    <meta name=\"csrf-token\" content=\"zz",
+      "error": null
+    },
+    {
+      "category": "Careers",
+      "endpoint": "/careers/jobs/",
+      "method": "GET",
+      "status_code": 500,
+      "expected": 200,
+      "timestamp": "2026-01-11T18:21:18.124009",
+      "response_snippet": "{'raw': '<!DOCTYPE html>\\n<html lang=\"en\">\\n<head>\\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\\n  <meta name=\"robots\" content=\"NONE,NOARCHIVE\">\\n  <title>ProgrammingError\\n ",
+      "error": null
+    },
+    {
+      "category": "Careers",
+      "endpoint": "/careers/applications/",
+      "method": "GET",
+      "status_code": 404,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:18.399693",
+      "response_snippet": "{'raw': '<!DOCTYPE html>\\n<html lang=\"en\">\\n<head>\\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\\n  <title>Page not found at /en-us/api/v1/careers/applications/</title>\\n  <me",
+      "error": null
+    },
+    {
+      "category": "Analytics",
+      "endpoint": "/analytics/dashboard/",
+      "method": "GET",
+      "status_code": 200,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:18.540114",
+      "response_snippet": "{'raw': '\\n<!DOCTYPE html>\\n<html lang=\"en-us\">\\n<head>\\n    <meta charset=\"UTF-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\\n    <meta name=\"csrf-token\" content=\"5S",
+      "error": null
+    },
+    {
+      "category": "Analytics",
+      "endpoint": "/analytics/reports/",
+      "method": "GET",
+      "status_code": 404,
+      "expected": 401,
+      "timestamp": "2026-01-11T18:21:18.643065",
+      "response_snippet": "{'raw': '<!DOCTYPE html>\\n<html lang=\"en\">\\n<head>\\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\\n  <title>Page not found at /en-us/api/v1/analytics/reports/</title>\\n  <meta ",
+      "error": null
+    }
+  ],
+  "errors": []
+}
