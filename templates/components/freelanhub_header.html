@@ -111,13 +111,13 @@
                     <div class="sub_menu absolute right-0 p-3 w-48 bg-white rounded-lg shadow-lg">
                         <ul>
                             <li>
-                                <a href="{% url 'dashboard:index' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                <a href="{% url 'frontend:dashboard:index' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
                                     <i class="ph ph-house mr-2"></i>
                                     {% trans "Dashboard" %}
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'accounts:profile_detail' user.uuid %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                <a href="{% url 'frontend:accounts:verification-dashboard' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
                                     <i class="ph ph-user mr-2"></i>
                                     {% trans "Profile" %}
                                 </a>
