@@ -11,19 +11,19 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'messages_sys:conversation_list' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:messages:index' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-chats text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Messages" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'appointment:dashboard' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:appointment:get_user_appointments' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-chalkboard-teacher text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Meetings" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'notifications:notification_list' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:notifications:list' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-bell text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Notifications" %}</strong>
                 </a>
@@ -109,25 +109,25 @@
         <span class="px-6 text-xs font-semibold text-secondary uppercase">{% trans "Services" %}</span>
         <ul class="list_link flex flex-col gap-2 mt-2">
             <li>
-                <a href="{% url 'frontend:services:my_services' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'services:provider_dashboard' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-stack text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "My Services" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:services:my_proposals' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'services:my_requests' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-gavel text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "My Proposals" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:services:my_contracts' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'services:my_contracts' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-file-text text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Contracts" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:services:browse_services' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'services:service_list' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-magnifying-glass text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Browse Services" %}</strong>
                 </a>
@@ -141,27 +141,27 @@
         <span class="px-6 text-xs font-semibold text-secondary uppercase">{% trans "Finance" %}</span>
         <ul class="list_link flex flex-col gap-2 mt-2">
             <li>
-                <a href="{% url 'frontend:finance:earnings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:finance:dashboard' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-hand-coins text-2xl text-secondary"></span>
-                    <strong class="text-title">{% trans "Earnings" %}</strong>
+                    <strong class="text-title">{% trans "Finance" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:finance:payouts' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:finance:payment-history' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-credit-card text-2xl text-secondary"></span>
-                    <strong class="text-title">{% trans "Payouts" %}</strong>
+                    <strong class="text-title">{% trans "Payments" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:finance:billings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:finance:invoice-list' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-receipt text-2xl text-secondary"></span>
-                    <strong class="text-title">{% trans "Billing" %}</strong>
+                    <strong class="text-title">{% trans "Invoices" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'frontend:finance:packages' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:finance:subscription' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-currency-circle-dollar text-2xl text-secondary"></span>
-                    <strong class="text-title">{% trans "Packages" %}</strong>
+                    <strong class="text-title">{% trans "Subscription" %}</strong>
                 </a>
             </li>
         </ul>
@@ -187,25 +187,25 @@
         <span class="px-6 text-xs font-semibold text-secondary uppercase">{% trans "User" %}</span>
         <ul class="list_link flex flex-col gap-2 mt-2">
             <li>
-                <a href="{% url 'accounts:profile' user.id %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'custom_account_u:public_profile' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-user-circle text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "My Profile" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'accounts:settings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'frontend:dashboard:account-settings' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-gear text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Settings" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'accounts:change_password' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'account_change_password' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-lock-key-open text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Change Password" %}</strong>
                 </a>
             </li>
             <li>
-                <a href="{% url 'accounts:logout' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                <a href="{% url 'account_logout' %}" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
                     <span class="ph-duotone ph-sign-out text-2xl text-secondary"></span>
                     <strong class="text-title">{% trans "Log Out" %}</strong>
                 </a>
