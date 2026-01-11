@@ -1,21 +1,21 @@
-{% extends "base/freelanhub_dashboard_base.html" %}
+{% extends "base/dashboard_base.html" %}
 {% load static %}
 
 {% block title %}My Public Profile - Zumodra{% endblock %}
 
-{% block dashboard_content %}
+{% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-title mb-2">Public Marketplace Profile</h1>
-            <p class="text-title">Manage your public profile visible to potential employers and clients</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Public Marketplace Profile</h1>
+            <p class="text-gray-600">Manage your public profile visible to potential employers and clients</p>
 
             <!-- Profile Completion -->
             <div class="mt-4">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="caption1 font-medium text-title">Profile Completion</span>
-                    <span class="caption1 font-semibold text-primary">{{ completion_percentage }}%</span>
+                    <span class="text-sm font-medium text-gray-700">Profile Completion</span>
+                    <span class="text-sm font-semibold text-primary">{{ completion_percentage }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
                     <div class="bg-primary h-2 rounded-full" style="width: {{ completion_percentage }}%"></div>
@@ -27,14 +27,14 @@
             <div class="mt-4 flex gap-2">
                 {% for badge in verification_badges %}
                     {% if badge.type == 'cv' %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full caption1 font-medium tag bg-green bg-opacity-10 text-green">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         CV Verified
                     </span>
                     {% elif badge.type == 'kyc' %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full caption1 font-medium tag bg-blue bg-opacity-10 text-blue">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
@@ -47,81 +47,81 @@
         </div>
 
         <!-- Profile Form -->
-        <form method="post" enctype="multipart/form-data" class="bg-white shadow-sm rounded-lg p-8">
+        <form method="post" enctype="multipart/form-data" class="bg-white shadow-sm rounded-lg p-6">
             {% csrf_token %}
 
             <!-- Basic Information -->
             <div class="mb-8">
-                <h2 class="heading4 font-semibold text-title mb-4">Basic Information</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-7.5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
-                        <label for="display_name" class="block caption1 font-medium text-title mb-2">Display Name *</label>
+                        <label for="display_name" class="block text-sm font-medium text-gray-700 mb-2">Display Name *</label>
                         <input type="text" name="display_name" id="display_name" value="{{ profile.display_name }}" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="professional_title" class="block caption1 font-medium text-title mb-2">Professional Title</label>
+                        <label for="professional_title" class="block text-sm font-medium text-gray-700 mb-2">Professional Title</label>
                         <input type="text" name="professional_title" id="professional_title" value="{{ profile.professional_title }}"
                             placeholder="e.g., Senior Software Engineer"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="bio" class="block caption1 font-medium text-title mb-2">Bio</label>
+                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
                         <textarea name="bio" id="bio" rows="4"
                             placeholder="Tell potential employers and clients about yourself..."
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">{{ profile.bio }}</textarea>
-                        <p class="mt-1 caption1 text-secondary">Maximum 2000 characters</p>
+                        <p class="mt-1 text-sm text-gray-500">Maximum 2000 characters</p>
                     </div>
 
                     <div>
-                        <label for="avatar" class="block caption1 font-medium text-title mb-2">Profile Picture</label>
+                        <label for="avatar" class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
                         {% if profile.avatar %}
                         <div class="mb-2">
                             <img src="{{ profile.avatar.url }}" alt="Current avatar" class="w-20 h-20 rounded-full object-cover">
                         </div>
                         {% endif %}
                         <input type="file" name="avatar" id="avatar" accept="image/*"
-                            class="w-full caption1 text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:caption1 file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
+                            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
                     </div>
 
                     <div>
-                        <label for="cv_file" class="block caption1 font-medium text-title mb-2">CV/Resume</label>
+                        <label for="cv_file" class="block text-sm font-medium text-gray-700 mb-2">CV/Resume</label>
                         {% if profile.cv_file %}
                         <div class="mb-2">
-                            <a href="{{ profile.cv_file.url }}" target="_blank" class="text-primary hover:underline caption1">
+                            <a href="{{ profile.cv_file.url }}" target="_blank" class="text-primary hover:underline text-sm">
                                 View current CV
                             </a>
                             {% if profile.cv_last_updated %}
-                            <span class="caption2 text-secondary">(Updated: {{ profile.cv_last_updated|date:"M d, Y" }})</span>
+                            <span class="text-xs text-gray-500">(Updated: {{ profile.cv_last_updated|date:"M d, Y" }})</span>
                             {% endif %}
                         </div>
                         {% endif %}
                         <input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx"
-                            class="w-full caption1 text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:caption1 file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
+                            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
                     </div>
                 </div>
             </div>
 
             <!-- Contact Information -->
             <div class="mb-8">
-                <h2 class="heading4 font-semibold text-title mb-2">Contact Information</h2>
-                <p class="caption1 text-title mb-4">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Contact Information</h2>
+                <p class="text-sm text-gray-600 mb-4">
                     <span class="text-yellow-600">⚠️ Privacy:</span> Email and phone are private by default and won't sync to organizations unless you enable it.
                 </p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-7.5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="public_email" class="block caption1 font-medium text-title mb-2">Public Email</label>
+                        <label for="public_email" class="block text-sm font-medium text-gray-700 mb-2">Public Email</label>
                         <input type="email" name="public_email" id="public_email" value="{{ profile.public_email }}"
                             placeholder="your.email@example.com"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="phone" class="block caption1 font-medium text-title mb-2">Phone</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                         <input type="tel" name="phone" id="phone" value="{{ profile.phone }}"
                             placeholder="+1 (555) 123-4567"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
@@ -131,23 +131,23 @@
 
             <!-- Location -->
             <div class="mb-8">
-                <h2 class="heading4 font-semibold text-title mb-4">Location</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Location</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-7.5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label for="city" class="block caption1 font-medium text-title mb-2">City</label>
+                        <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
                         <input type="text" name="city" id="city" value="{{ profile.city }}"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="state" class="block caption1 font-medium text-title mb-2">State/Province</label>
+                        <label for="state" class="block text-sm font-medium text-gray-700 mb-2">State/Province</label>
                         <input type="text" name="state" id="state" value="{{ profile.state }}"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="country" class="block caption1 font-medium text-title mb-2">Country</label>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-2">Country</label>
                         <input type="text" name="country" id="country" value="{{ profile.country }}"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
@@ -156,32 +156,32 @@
 
             <!-- Professional Links -->
             <div class="mb-8">
-                <h2 class="heading4 font-semibold text-title mb-4">Professional Links</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Professional Links</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-7.5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="linkedin_url" class="block caption1 font-medium text-title mb-2">LinkedIn Profile</label>
+                        <label for="linkedin_url" class="block text-sm font-medium text-gray-700 mb-2">LinkedIn Profile</label>
                         <input type="url" name="linkedin_url" id="linkedin_url" value="{{ profile.linkedin_url }}"
                             placeholder="https://linkedin.com/in/yourprofile"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="github_url" class="block caption1 font-medium text-title mb-2">GitHub Profile</label>
+                        <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">GitHub Profile</label>
                         <input type="url" name="github_url" id="github_url" value="{{ profile.github_url }}"
                             placeholder="https://github.com/yourusername"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="portfolio_url" class="block caption1 font-medium text-title mb-2">Portfolio URL</label>
+                        <label for="portfolio_url" class="block text-sm font-medium text-gray-700 mb-2">Portfolio URL</label>
                         <input type="url" name="portfolio_url" id="portfolio_url" value="{{ profile.portfolio_url }}"
                             placeholder="https://yourportfolio.com"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
                     <div>
-                        <label for="personal_website" class="block caption1 font-medium text-title mb-2">Personal Website</label>
+                        <label for="personal_website" class="block text-sm font-medium text-gray-700 mb-2">Personal Website</label>
                         <input type="url" name="personal_website" id="personal_website" value="{{ profile.personal_website }}"
                             placeholder="https://yourwebsite.com"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
@@ -191,21 +191,21 @@
 
             <!-- Marketplace Settings -->
             <div class="mb-8">
-                <h2 class="heading4 font-semibold text-title mb-4">Marketplace Settings</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Marketplace Settings</h2>
 
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <input type="checkbox" name="available_for_work" id="available_for_work"
                             {% if profile.available_for_work %}checked{% endif %}
                             class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                        <label for="available_for_work" class="ml-2 caption1 font-medium text-title">
+                        <label for="available_for_work" class="ml-2 text-sm font-medium text-gray-700">
                             I'm available for freelance work
                         </label>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="hourly_rate_min" class="block caption1 font-medium text-title mb-2">Min Hourly Rate</label>
+                            <label for="hourly_rate_min" class="block text-sm font-medium text-gray-700 mb-2">Min Hourly Rate</label>
                             <input type="number" step="0.01" name="hourly_rate_min" id="hourly_rate_min"
                                 value="{{ profile.hourly_rate_min }}"
                                 placeholder="100.00"
@@ -213,7 +213,7 @@
                         </div>
 
                         <div>
-                            <label for="hourly_rate_max" class="block caption1 font-medium text-title mb-2">Max Hourly Rate</label>
+                            <label for="hourly_rate_max" class="block text-sm font-medium text-gray-700 mb-2">Max Hourly Rate</label>
                             <input type="number" step="0.01" name="hourly_rate_max" id="hourly_rate_max"
                                 value="{{ profile.hourly_rate_max }}"
                                 placeholder="150.00"
@@ -221,7 +221,7 @@
                         </div>
 
                         <div>
-                            <label for="currency" class="block caption1 font-medium text-title mb-2">Currency</label>
+                            <label for="currency" class="block text-sm font-medium text-gray-700 mb-2">Currency</label>
                             <select name="currency" id="currency"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                                 <option value="CAD" {% if profile.currency == 'CAD' %}selected{% endif %}>CAD</option>
@@ -233,7 +233,7 @@
                     </div>
 
                     <div>
-                        <label for="profile_visibility" class="block caption1 font-medium text-title mb-2">Profile Visibility</label>
+                        <label for="profile_visibility" class="block text-sm font-medium text-gray-700 mb-2">Profile Visibility</label>
                         <select name="profile_visibility" id="profile_visibility"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                             {% for value, label in visibility_choices %}
@@ -242,7 +242,7 @@
                             </option>
                             {% endfor %}
                         </select>
-                        <p class="mt-1 caption1 text-secondary">Control who can view your public profile</p>
+                        <p class="mt-1 text-sm text-gray-500">Control who can view your public profile</p>
                     </div>
                 </div>
             </div>
@@ -250,7 +250,7 @@
             <!-- Form Actions -->
             <div class="flex items-center justify-between pt-6 border-t">
                 <a href="{% url 'custom_account_u:sync_settings_list' %}"
-                   class="text-primary hover:underline caption1 font-medium">
+                   class="text-primary hover:underline text-sm font-medium">
                     Manage Privacy & Sync Settings →
                 </a>
                 <button type="submit"

@@ -1,24 +1,26 @@
-{% extends "base/freelanhub_dashboard_base.html" %}
+{% extends "base/dashboard_base.html" %}
 {% load static %}
 
 {% block title %}Privacy & Sync Settings - Zumodra{% endblock %}
 
-{% block dashboard_content %}
+{% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-title mb-2">Privacy & Sync Settings</h1>
-            <p class="text-title">Control which profile fields sync to each organization you've joined</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Privacy & Sync Settings</h1>
+            <p class="text-gray-600">Control which profile fields sync to each organization you've joined</p>
         </div>
 
         <!-- Info Box -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-7.5">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div class="flex">
-                <i class="ph ph-info text-blue heading4"></i>
+                <svg class="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
                 <div>
-                    <p class="caption1 text-blue-800 font-medium">Privacy-First Design</p>
-                    <p class="caption1 text-blue-700 mt-1">
+                    <p class="text-sm text-blue-800 font-medium">Privacy-First Design</p>
+                    <p class="text-sm text-blue-700 mt-1">
                         Sensitive fields (email, phone) are <strong>OFF by default</strong>. You control what each organization sees.
                     </p>
                 </div>
@@ -29,28 +31,28 @@
         <div class="space-y-4">
             {% for setting in sync_settings %}
             {% with tenant=tenant_map|get_item:setting.tenant_uuid %}
-            <div class="bg-white shadow-sm rounded-lg p-8 hover:shadow-md transition-shadow">
+            <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
-                        <h3 class="heading5 font-semibold text-title">
+                        <h3 class="text-lg font-semibold text-gray-900">
                             {{ tenant.name|default:"Unknown Organization" }}
                         </h3>
-                        <p class="caption1 text-secondary mt-1">
+                        <p class="text-sm text-gray-500 mt-1">
                             Syncing {{ setting.get_enabled_fields|length }} of 13 fields
                         </p>
-                        <p class="caption2 text-secondary mt-2">
+                        <p class="text-xs text-gray-400 mt-2">
                             Last updated: {{ setting.updated_at|date:"M d, Y" }}
                         </p>
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         <a href="{% url 'custom_account_u:sync_settings_edit' setting.tenant_uuid %}"
-                           class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark caption1 font-medium">
+                           class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm font-medium">
                             Edit Settings
                         </a>
                         <form method="post" action="{% url 'custom_account_u:trigger_sync' setting.tenant_uuid %}" class="inline">
                             {% csrf_token %}
                             <button type="submit"
-                                class="px-4 py-2 bg-gray-100 text-title rounded-lg hover:bg-gray-200 caption1 font-medium">
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium">
                                 Sync Now
                             </button>
                         </form>
@@ -60,7 +62,7 @@
                 <!-- Enabled Fields Preview -->
                 <div class="mt-4 flex flex-wrap gap-2">
                     {% for field in setting.get_enabled_fields %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-md caption2 font-medium tag bg-green bg-opacity-10 text-green">
+                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800">
                         {{ field|title }}
                     </span>
                     {% endfor %}
@@ -71,19 +73,19 @@
         </div>
         {% else %}
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <svg class="w-16 h-16 text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
             </svg>
-            <h3 class="heading5 font-medium text-title mb-2">No Organizations Yet</h3>
-            <p class="text-title">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Organizations Yet</h3>
+            <p class="text-gray-600">
                 You haven't joined any organizations. Sync settings will appear here when you accept an invitation.
             </p>
         </div>
         {% endif %}
 
-        <div class="mt-7.5">
+        <div class="mt-6">
             <a href="{% url 'custom_account_u:public_profile' %}"
-               class="text-primary hover:underline caption1 font-medium">
+               class="text-primary hover:underline text-sm font-medium">
                 ← Back to Public Profile
             </a>
         </div>
