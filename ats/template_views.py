@@ -1322,3 +1322,555 @@ class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
             return response
 
         return redirect('ats:job-detail', pk=pk)
+
+
+# =============================================================================
+# INTERVIEW MANAGEMENT VIEWS
+# =============================================================================
+
+class InterviewListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
+    """
+    Interview list view with filtering capabilities.
+    """
+    model = Interview
+    template_name = 'ats/interview_list.html'
+    context_object_name = 'interviews'
+    paginate_by = 20
+
+    def get_queryset(self):
+        """Get filtered interviews."""
+        qs = Interview.objects.select_related(
+            'application__candidate',
+            'application__job_posting',
+            'interviewer'
+        ).filter(
+            application__job_posting__tenant=self.request.tenant
+        )
+
+        # Filter by status
+        filter_param = self.request.GET.get('filter', 'upcoming')
+        now = timezone.now()
+
+        if filter_param == 'upcoming':
+            qs = qs.filter(
+                scheduled_start__gte=now,
+                status__in=['scheduled', 'confirmed']
+            )
+        elif filter_param == 'today':
+            today_start = now.replace(hour=0, minute=0, second=0)
+            today_end = today_start + timedelta(days=1)
+            qs = qs.filter(
+                scheduled_start__gte=today_start,
+                scheduled_start__lt=today_end
+            )
+        elif filter_param == 'past':
+            qs = qs.filter(scheduled_start__lt=now)
+        elif filter_param == 'completed':
+            qs = qs.filter(status='completed')
+        elif filter_param == 'cancelled':
+            qs = qs.filter(status='cancelled')
+
+        return qs.order_by('-scheduled_start')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_filter'] = self.request.GET.get('filter', 'upcoming')
+        return context
+
+
+class InterviewDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
+    """
+    Interview detail view showing full interview information.
+    """
+    model = Interview
+    template_name = 'ats/interview_detail.html'
+    context_object_name = 'interview'
+    pk_url_kwarg = 'pk'
+
+    def get_queryset(self):
+        """Ensure interview belongs to tenant."""
+        return Interview.objects.select_related(
+            'application__candidate',
+            'application__job_posting',
+            'interviewer'
+        ).prefetch_related(
+            'feedback_set'
+        ).filter(
+            application__job_posting__tenant=self.request.tenant
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        interview = self.object
+
+        # Get feedback
+        context['feedback_list'] = interview.feedback_set.all()
+        context['can_provide_feedback'] = (
+            self.request.user == interview.interviewer or
+            self.request.user.is_staff
+        )
+
+        return context
+
+
+class InterviewRescheduleView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Reschedule an interview.
+    """
+
+    def get(self, request, pk):
+        """Show reschedule form."""
+        interview = get_object_or_404(
+            Interview.objects.filter(
+                application__job_posting__tenant=request.tenant
+            ),
+            pk=pk
+        )
+
+        # Get available slots
+        slots = InterviewSlot.objects.filter(
+            interviewer=interview.interviewer,
+            is_available=True,
+            start_time__gte=timezone.now()
+        ).order_by('start_time')[:20]
+
+        context = {
+            'interview': interview,
+            'available_slots': slots,
+        }
+
+        return render(request, 'ats/partials/_interview_reschedule_form.html', context)
+
+    def post(self, request, pk):
+        """Process reschedule."""
+        interview = get_object_or_404(
+            Interview.objects.filter(
+                application__job_posting__tenant=request.tenant
+            ),
+            pk=pk
+        )
+
+        new_start = request.POST.get('scheduled_start')
+        new_end = request.POST.get('scheduled_end')
+
+        if new_start and new_end:
+            interview.scheduled_start = new_start
+            interview.scheduled_end = new_end
+            interview.status = 'rescheduled'
+            interview.save()
+
+            messages.success(request, f'Interview rescheduled successfully.')
+
+            response = HttpResponse(status=200)
+            response['HX-Trigger'] = 'interviewRescheduled'
+            return response
+
+        messages.error(request, 'Invalid date/time provided.')
+        return HttpResponse(status=400)
+
+
+class InterviewCancelView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Cancel an interview.
+    """
+
+    def post(self, request, pk):
+        """Cancel the interview."""
+        interview = get_object_or_404(
+            Interview.objects.filter(
+                application__job_posting__tenant=request.tenant
+            ),
+            pk=pk
+        )
+
+        cancellation_reason = request.POST.get('reason', '')
+
+        interview.status = 'cancelled'
+        interview.cancellation_reason = cancellation_reason
+        interview.save()
+
+        messages.success(request, f'Interview cancelled.')
+
+        response = HttpResponse(status=200)
+        response['HX-Trigger'] = 'interviewCancelled'
+        return response
+
+
+# =============================================================================
+# APPLICATION ACTIONS
+# =============================================================================
+
+class EmailComposeView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Email composition view for contacting candidates.
+    """
+
+    def get(self, request):
+        """Show email compose form."""
+        recipient = request.GET.get('to', '')
+        application_id = request.GET.get('application_id', '')
+
+        context = {
+            'recipient': recipient,
+            'application_id': application_id,
+        }
+
+        return render(request, 'ats/partials/_email_compose.html', context)
+
+    def post(self, request):
+        """Send email."""
+        from django.core.mail import send_mail
+        from django.conf import settings
+
+        recipient = request.POST.get('to')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+
+        if recipient and subject and message:
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[recipient],
+                    fail_silently=False,
+                )
+
+                messages.success(request, f'Email sent to {recipient}')
+                response = HttpResponse(status=200)
+                response['HX-Trigger'] = 'emailSent'
+                return response
+            except Exception as e:
+                logger.error(f'Failed to send email: {e}')
+                messages.error(request, 'Failed to send email. Please try again.')
+                return HttpResponse(status=500)
+
+        messages.error(request, 'Please fill in all fields.')
+        return HttpResponse(status=400)
+
+
+class ApplicationRejectView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Reject an application.
+    """
+
+    def post(self, request, pk):
+        """Mark application as rejected."""
+        application = get_object_or_404(
+            Application.objects.filter(
+                job_posting__tenant=request.tenant
+            ),
+            pk=pk
+        )
+
+        rejection_reason = request.POST.get('reason', '')
+        send_email = request.POST.get('send_email') == 'true'
+
+        # Move to rejected stage
+        rejected_stage = PipelineStage.objects.filter(
+            pipeline=application.pipeline,
+            stage_type='rejected'
+        ).first()
+
+        if rejected_stage:
+            application.current_stage = rejected_stage
+            application.status = 'rejected'
+            application.save()
+
+            # Log activity
+            ApplicationActivity.objects.create(
+                application=application,
+                activity_type='status_change',
+                description=f'Application rejected. Reason: {rejection_reason}',
+                performed_by=request.user
+            )
+
+            # Send rejection email if requested
+            if send_email and application.candidate.email:
+                from django.core.mail import send_mail
+                from django.conf import settings
+
+                try:
+                    send_mail(
+                        subject=f'Application Update - {application.job_posting.title}',
+                        message=f'Thank you for your interest in {application.job_posting.title}. After careful consideration, we have decided to move forward with other candidates.',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[application.candidate.email],
+                        fail_silently=True,
+                    )
+                except Exception as e:
+                    logger.error(f'Failed to send rejection email: {e}')
+
+            messages.success(request, 'Application rejected.')
+            response = HttpResponse(status=200)
+            response['HX-Trigger'] = 'applicationRejected'
+            return response
+
+        messages.error(request, 'Could not find rejected stage.')
+        return HttpResponse(status=400)
+
+
+# =============================================================================
+# JOB MANAGEMENT VIEWS
+# =============================================================================
+
+class JobEditView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
+    """
+    Edit existing job posting.
+    """
+
+    def get(self, request, pk):
+        """Show job edit form."""
+        job = get_object_or_404(
+            JobPosting.objects.filter(tenant=request.tenant),
+            pk=pk
+        )
+
+        categories = JobCategory.objects.filter(tenant=request.tenant)
+
+        context = {
+            'job': job,
+            'categories': categories,
+            'is_edit': True,
+        }
+
+        return render(request, 'ats/job_form.html', context)
+
+    def post(self, request, pk):
+        """Update job posting."""
+        job = get_object_or_404(
+            JobPosting.objects.filter(tenant=request.tenant),
+            pk=pk
+        )
+
+        # Update job fields
+        job.title = request.POST.get('title')
+        job.description = request.POST.get('description')
+        job.department = request.POST.get('department')
+        job.location = request.POST.get('location')
+        job.job_type = request.POST.get('job_type')
+        job.experience_level = request.POST.get('experience_level')
+        job.remote_policy = request.POST.get('remote_policy')
+
+        # Update salary if provided
+        min_salary = request.POST.get('min_salary')
+        max_salary = request.POST.get('max_salary')
+        if min_salary:
+            job.min_salary = min_salary
+        if max_salary:
+            job.max_salary = max_salary
+
+        job.save()
+
+        messages.success(request, f'Job "{job.title}" updated successfully.')
+        return redirect('frontend:ats:job_detail', pk=job.pk)
+
+
+class JobDuplicateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
+    """
+    Duplicate a job posting.
+    """
+
+    def post(self, request, pk):
+        """Create duplicate of job."""
+        original_job = get_object_or_404(
+            JobPosting.objects.filter(tenant=request.tenant),
+            pk=pk
+        )
+
+        # Create duplicate
+        duplicate = JobPosting.objects.create(
+            tenant=request.tenant,
+            title=f'{original_job.title} (Copy)',
+            description=original_job.description,
+            department=original_job.department,
+            location=original_job.location,
+            job_type=original_job.job_type,
+            experience_level=original_job.experience_level,
+            remote_policy=original_job.remote_policy,
+            min_salary=original_job.min_salary,
+            max_salary=original_job.max_salary,
+            status='draft',
+            created_by=request.user,
+        )
+
+        messages.success(request, f'Job duplicated as "{duplicate.title}"')
+        return redirect('frontend:ats:job_detail', pk=duplicate.pk)
+
+
+class JobDeleteView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
+    """
+    Delete a job posting.
+    """
+
+    def delete(self, request, pk):
+        """Soft delete job posting."""
+        job = get_object_or_404(
+            JobPosting.objects.filter(tenant=request.tenant),
+            pk=pk
+        )
+
+        # Soft delete
+        job.is_deleted = True
+        job.deleted_at = timezone.now()
+        job.save()
+
+        messages.success(request, f'Job "{job.title}" deleted.')
+
+        response = HttpResponse(status=200)
+        response['HX-Trigger'] = 'jobDeleted'
+        return response
+
+
+# =============================================================================
+# CANDIDATE MANAGEMENT VIEWS
+# =============================================================================
+
+class CandidateCreateView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Create new candidate.
+    """
+
+    def get(self, request):
+        """Show candidate creation form."""
+        return render(request, 'ats/candidate_form.html', {'is_create': True})
+
+    def post(self, request):
+        """Create new candidate."""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        phone = request.POST.get('phone')
+
+        if not (email and first_name and last_name):
+            messages.error(request, 'Please provide email, first name, and last name.')
+            return redirect('frontend:ats:candidate_create')
+
+        # Check if candidate already exists
+        if Candidate.objects.filter(email=email).exists():
+            messages.error(request, f'Candidate with email {email} already exists.')
+            return redirect('frontend:ats:candidate_create')
+
+        # Create candidate
+        candidate = Candidate.objects.create(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            phone=phone,
+            source='manual',
+        )
+
+        messages.success(request, f'Candidate "{candidate.full_name}" created successfully.')
+        return redirect('frontend:ats:candidate_detail', pk=candidate.pk)
+
+
+class CandidateAddToJobView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Add candidate to a job posting.
+    """
+
+    def get(self, request, pk):
+        """Show job selection form."""
+        candidate = get_object_or_404(Candidate, pk=pk)
+
+        # Get active jobs
+        jobs = JobPosting.objects.filter(
+            tenant=request.tenant,
+            status='open'
+        ).order_by('-created_at')[:20]
+
+        context = {
+            'candidate': candidate,
+            'jobs': jobs,
+        }
+
+        return render(request, 'ats/partials/_candidate_add_to_job.html', context)
+
+    def post(self, request, pk):
+        """Create application for candidate."""
+        candidate = get_object_or_404(Candidate, pk=pk)
+        job_id = request.POST.get('job_id')
+
+        if not job_id:
+            messages.error(request, 'Please select a job.')
+            return HttpResponse(status=400)
+
+        job = get_object_or_404(
+            JobPosting.objects.filter(tenant=request.tenant),
+            pk=job_id
+        )
+
+        # Check if application already exists
+        if Application.objects.filter(candidate=candidate, job_posting=job).exists():
+            messages.error(request, 'Candidate already applied to this job.')
+            return HttpResponse(status=400)
+
+        # Create application
+        pipeline = job.pipeline if hasattr(job, 'pipeline') else Pipeline.objects.filter(
+            tenant=request.tenant,
+            is_default=True
+        ).first()
+
+        if pipeline:
+            initial_stage = pipeline.stages.filter(stage_type='new').first()
+
+            application = Application.objects.create(
+                candidate=candidate,
+                job_posting=job,
+                pipeline=pipeline,
+                current_stage=initial_stage,
+                status='new',
+                source='manual',
+            )
+
+            messages.success(request, f'Candidate added to "{job.title}"')
+            response = HttpResponse(status=200)
+            response['HX-Trigger'] = 'candidateAddedToJob'
+            return response
+
+        messages.error(request, 'Could not find pipeline for job.')
+        return HttpResponse(status=400)
+
+
+# =============================================================================
+# UTILITY VIEWS
+# =============================================================================
+
+class TeamMemberSearchView(LoginRequiredMixin, TenantViewMixin, View):
+    """
+    Search team members for assigning to jobs.
+    """
+
+    def get(self, request):
+        """Search team members."""
+        from accounts.models import TenantUser
+
+        query = request.GET.get('q', '').strip()
+
+        if len(query) < 2:
+            return JsonResponse({'results': []})
+
+        # Search tenant users
+        users = TenantUser.objects.filter(
+            tenant=request.tenant,
+            is_active=True
+        ).filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(user__email__icontains=query)
+        ).select_related('user')[:10]
+
+        results = [
+            {
+                'id': str(tu.user.id),
+                'name': tu.user.get_full_name() or tu.user.email,
+                'email': tu.user.email,
+                'role': tu.get_role_display() if tu.role else '',
+            }
+            for tu in users
+        ]
+
+        return JsonResponse({'results': results})

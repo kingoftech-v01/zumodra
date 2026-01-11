@@ -11,12 +11,17 @@ from .template_views import (
     JobListView,
     JobDetailView,
     JobCreateView,
+    JobEditView,
     JobPublishView,
     JobCloseView,
+    JobDuplicateView,
+    JobDeleteView,
 
     # Candidate views
     CandidateListView,
     CandidateDetailView,
+    CandidateCreateView,
+    CandidateAddToJobView,
 
     # Pipeline views
     PipelineBoardView,
@@ -26,16 +31,25 @@ from .template_views import (
     # Application views
     ApplicationDetailView,
     ApplicationNoteView,
+    ApplicationRejectView,
+    EmailComposeView,
 
     # Interview views
+    InterviewListView,
+    InterviewDetailView,
     InterviewScheduleView,
     InterviewFeedbackView,
+    InterviewRescheduleView,
+    InterviewCancelView,
 
     # Offer views (Step 5)
     OfferListView,
     OfferDetailView,
     OfferCreateView,
     OfferActionView,
+
+    # Utility views
+    TeamMemberSearchView,
 )
 
 app_name = 'ats'
@@ -45,12 +59,17 @@ urlpatterns = [
     path('jobs/', JobListView.as_view(), name='job_list'),
     path('jobs/create/', JobCreateView.as_view(), name='job_create'),
     path('jobs/<uuid:pk>/', JobDetailView.as_view(), name='job_detail'),
+    path('jobs/<uuid:pk>/edit/', JobEditView.as_view(), name='job_edit'),
     path('jobs/<uuid:pk>/publish/', JobPublishView.as_view(), name='job_publish'),
     path('jobs/<uuid:pk>/close/', JobCloseView.as_view(), name='job_close'),
+    path('jobs/<uuid:pk>/duplicate/', JobDuplicateView.as_view(), name='job_duplicate'),
+    path('jobs/<uuid:pk>/delete/', JobDeleteView.as_view(), name='job_delete'),
 
     # ===== CANDIDATE ROUTES =====
     path('candidates/', CandidateListView.as_view(), name='candidate_list'),
+    path('candidates/create/', CandidateCreateView.as_view(), name='candidate_create'),
     path('candidates/<uuid:pk>/', CandidateDetailView.as_view(), name='candidate_detail'),
+    path('candidates/<uuid:pk>/add-to-job/', CandidateAddToJobView.as_view(), name='candidate_add_to_job'),
 
     # ===== PIPELINE ROUTES =====
     path('pipeline/', PipelineBoardView.as_view(), name='pipeline_board'),
@@ -58,6 +77,13 @@ urlpatterns = [
     # ===== APPLICATION ROUTES =====
     path('applications/<uuid:pk>/', ApplicationDetailView.as_view(), name='application_detail'),
     path('applications/<uuid:application_pk>/note/', ApplicationNoteView.as_view(), name='application_add_note'),
+    path('applications/<uuid:pk>/reject/', ApplicationRejectView.as_view(), name='application_reject'),
+
+    # ===== INTERVIEW ROUTES =====
+    path('interviews/', InterviewListView.as_view(), name='interview_list'),
+    path('interviews/<uuid:pk>/', InterviewDetailView.as_view(), name='interview_detail'),
+    path('interviews/<uuid:pk>/reschedule/', InterviewRescheduleView.as_view(), name='interview_reschedule'),
+    path('interviews/<uuid:pk>/cancel/', InterviewCancelView.as_view(), name='interview_cancel'),
 
     # ===== OFFER ROUTES (Step 5 - End-to-End Hiring) =====
     path('offers/', OfferListView.as_view(), name='offer_list'),
@@ -66,6 +92,9 @@ urlpatterns = [
     path('offers/<uuid:pk>/<str:action>/', OfferActionView.as_view(), name='offer_action'),
 
     # ===== HTMX ENDPOINTS =====
+    # Email composition
+    path('htmx/email/compose/', EmailComposeView.as_view(), name='email_compose'),
+
     # Application drag-and-drop
     path('htmx/applications/<uuid:pk>/move/', ApplicationMoveView.as_view(), name='application_move'),
 
@@ -78,4 +107,7 @@ urlpatterns = [
 
     # Interview feedback
     path('htmx/interviews/<uuid:interview_pk>/feedback/', InterviewFeedbackView.as_view(), name='interview_feedback'),
+
+    # Team member search
+    path('htmx/team-members/search/', TeamMemberSearchView.as_view(), name='team_member_search'),
 ]
