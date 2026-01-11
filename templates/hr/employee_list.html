@@ -1,265 +1,279 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "Employees" %} - Zumodra{% endblock %}
+{% block page_title %}{% trans "Employees" %}{% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Employees" %}</span>
-</li>
-{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:dashboard:index' %}" class="caption1 text-secondary hover:text-primary">
+        <span class="ph ph-house"></span>
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="caption1 text-title">{% trans "Employees" %}</span>
+</div>
 
-{% block page_title %}{% trans "Employee Directory" %}{% endblock %}
-
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Manage your team members and their information." %}
-</p>
-{% endblock %}
-
-{% block page_actions %}
-<a href="{% url 'frontend:hr:employee-create' %}" class="zu-btn zu-btn--primary">
-    <svg class="zu-icon w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-    </svg>
-    {% trans "Add Employee" %}
-</a>
-{% endblock %}
-
-{% block content %}
 {% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
-    <div class="flex">
-        <div class="flex-shrink-0">
-            <svg class="zu-icon h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-        </div>
-        <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                {% trans "HR features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
-                    {% trans "Switch to company account" %}
-                </a>
-            </p>
-        </div>
+<div class="p-6 rounded-lg bg-yellow-500 bg-opacity-10 border border-yellow-500">
+    <div class="flex items-center gap-3">
+        <span class="ph ph-warning text-xl text-yellow-500"></span>
+        <p class="caption1 text-yellow-700">
+            {% trans "HR features are only available for company tenants." %}
+            <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-900">
+                {% trans "Switch to company account" %}
+            </a>
+        </p>
     </div>
 </div>
 {% else %}
-<div id="main-content" x-data="{ viewMode: 'grid' }">
-    <!-- Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        {% include "components/stats_card.html" with title="Total Employees" value=total_employees icon="users" icon_color="blue" %}
-        {% include "components/stats_card.html" with title="Active Today" value=active_today icon="chart" icon_color="green" %}
-        {% include "components/stats_card.html" with title="On Leave" value=on_leave icon="time" icon_color="yellow" %}
-        {% include "components/stats_card.html" with title="New This Month" value=new_this_month icon="users" icon_color="purple" %}
+
+<!-- Page Header -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-7.5">
+    <h4 class="heading4">{% trans "Employee Directory" %}</h4>
+    <a href="{% url 'frontend:hr:employee-create' %}" class="button-main">
+        <span class="ph ph-user-plus text-xl mr-2"></span>
+        {% trans "Add Employee" %}
+    </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-7.5" x-data="{ viewMode: 'grid' }">
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-500 bg-opacity-10 flex items-center justify-center">
+                <span class="ph ph-users text-2xl text-blue-500"></span>
+            </div>
+            <div>
+                <p class="caption2 text-secondary">{% trans "Total Employees" %}</p>
+                <p class="heading5 mt-1">{{ total_employees }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-green-500 bg-opacity-10 flex items-center justify-center">
+                <span class="ph ph-chart-line text-2xl text-green-500"></span>
+            </div>
+            <div>
+                <p class="caption2 text-secondary">{% trans "Active Today" %}</p>
+                <p class="heading5 mt-1">{{ active_today }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-yellow-500 bg-opacity-10 flex items-center justify-center">
+                <span class="ph ph-clock text-2xl text-yellow-500"></span>
+            </div>
+            <div>
+                <p class="caption2 text-secondary">{% trans "On Leave" %}</p>
+                <p class="heading5 mt-1">{{ on_leave }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-purple-500 bg-opacity-10 flex items-center justify-center">
+                <span class="ph ph-user-circle-plus text-2xl text-purple-500"></span>
+            </div>
+            <div>
+                <p class="caption2 text-secondary">{% trans "New This Month" %}</p>
+                <p class="heading5 mt-1">{{ new_this_month }}</p>
+            </div>
+        </div>
     </div>
 
-    <!-- Filters and Search -->
-    <div class="zu-card mb-6">
-        <div class="zu-card__body">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <!-- Search -->
-                <div class="relative flex-1 max-w-md">
-                    <input type="text"
-                           name="search"
-                           hx-get="{% url 'frontend:hr:employee-directory' %}"
-                           hx-trigger="keyup changed delay:300ms"
-                           hx-target="#employees-container"
-                           hx-swap="innerHTML"
-                           class="zu-input pl-10"
-                           placeholder="{% trans 'Search employees...' %}">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="zu-icon h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
+    <!-- Search and Filters -->
+    <div class="col-span-full p-6 rounded-lg bg-white">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <!-- Search -->
+            <div class="relative flex-1 max-w-md">
+                <input type="text"
+                       name="search"
+                       hx-get="{% url 'frontend:hr:employee-directory' %}"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#employees-container"
+                       hx-swap="innerHTML"
+                       class="w-full h-12 pl-12 pr-4 border border-line rounded-lg"
+                       placeholder="{% trans 'Search employees...' %}">
+                <span class="ph ph-magnifying-glass text-xl absolute top-1/2 -translate-y-1/2 left-4 text-secondary"></span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Department Filter -->
+                <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                    <div class="select">
+                        <span class="selected caption1" data-title="all departments">{% trans "All Departments" %}</span>
+                        <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                            <li class="caption1" data-item="all">{% trans "All Departments" %}</li>
+                            {% for dept in departments %}
+                            <li class="caption1" data-item="{{ dept.id }}">{{ dept.name }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
+                    <span class="icon_down ph ph-caret-down right-3"></span>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <!-- Department Filter -->
-                    <select name="department"
-                            hx-get="{% url 'frontend:hr:employee-directory' %}"
-                            hx-trigger="change"
-                            hx-target="#employees-container"
-                            hx-swap="innerHTML"
-                            class="zu-select">
-                        <option value="">{% trans "All Departments" %}</option>
-                        {% for dept in departments %}
-                        <option value="{{ dept.id }}">{{ dept.name }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <!-- Status Filter -->
-                    <select name="status"
-                            hx-get="{% url 'frontend:hr:employee-directory' %}"
-                            hx-trigger="change"
-                            hx-target="#employees-container"
-                            hx-swap="innerHTML"
-                            class="zu-select">
-                        <option value="">{% trans "All Status" %}</option>
-                        <option value="active">{% trans "Active" %}</option>
-                        <option value="on_leave">{% trans "On Leave" %}</option>
-                        <option value="inactive">{% trans "Inactive" %}</option>
-                    </select>
-
-                    <!-- View Toggle -->
-                    <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                        <button @click="viewMode = 'grid'"
-                                :class="viewMode === 'grid' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                            <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                            </svg>
-                        </button>
-                        <button @click="viewMode = 'list'"
-                                :class="viewMode === 'list' ? 'bg-white dark:bg-gray-600 shadow-sm' : ''"
-                                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors">
-                            <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                            </svg>
-                        </button>
+                <!-- Status Filter -->
+                <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                    <div class="select">
+                        <span class="selected caption1" data-title="all status">{% trans "All Status" %}</span>
+                        <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                            <li class="caption1" data-item="all">{% trans "All Status" %}</li>
+                            <li class="caption1" data-item="active">{% trans "Active" %}</li>
+                            <li class="caption1" data-item="on_leave">{% trans "On Leave" %}</li>
+                            <li class="caption1" data-item="inactive">{% trans "Inactive" %}</li>
+                        </ul>
                     </div>
+                    <span class="icon_down ph ph-caret-down right-3"></span>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="flex items-center gap-2 p-1 bg-surface rounded-lg">
+                    <button @click="viewMode = 'grid'"
+                            :class="viewMode === 'grid' ? 'bg-white shadow-sm' : ''"
+                            class="p-2 rounded-md transition-all">
+                        <span class="ph ph-squares-four text-xl text-secondary"></span>
+                    </button>
+                    <button @click="viewMode = 'list'"
+                            :class="viewMode === 'list' ? 'bg-white shadow-sm' : ''"
+                            class="p-2 rounded-md transition-all">
+                        <span class="ph ph-list text-xl text-secondary"></span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Employees Container -->
-    <div id="employees-container">
+    <div id="employees-container" class="col-span-full">
         <!-- Grid View -->
         <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {% for employee in employees %}
-            <div class="zu-card hover:shadow-md transition-shadow">
-                <div class="zu-card__body text-center">
+            <div class="p-6 rounded-lg bg-white hover:shadow-lg transition-all">
+                <div class="text-center">
                     {% if employee.user.profile_picture %}
                     <img class="mx-auto h-24 w-24 rounded-full object-cover" src="{{ employee.user.profile_picture.url }}" alt="{{ employee.user.get_full_name }}">
                     {% else %}
-                    <div class="mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                    <div class="mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
                         <span class="text-white text-2xl font-medium">{{ employee.user.first_name|slice:":1" }}{{ employee.user.last_name|slice:":1" }}</span>
                     </div>
                     {% endif %}
 
-                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">{{ employee.user.get_full_name }}</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ employee.job_title|default:"N/A" }}</p>
-                    <p class="text-sm text-primary-600 dark:text-primary-400">{{ employee.department.name|default:"N/A" }}</p>
+                    <h3 class="mt-4 heading6">{{ employee.user.get_full_name }}</h3>
+                    <p class="caption1 text-secondary mt-1">{{ employee.job_title|default:"N/A" }}</p>
+                    <p class="caption2 text-primary mt-1">{{ employee.department.name|default:"N/A" }}</p>
 
                     <!-- Status Badge -->
                     <div class="mt-3">
                         {% if employee.status == 'active' %}
-                        <span class="zu-badge zu-badge--success">
+                        <span class="tag bg-green-500 bg-opacity-10 text-green-500">
                             <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-green-500"></span>
                             {% trans "Active" %}
                         </span>
                         {% elif employee.status == 'on_leave' %}
-                        <span class="zu-badge zu-badge--warning">
+                        <span class="tag bg-yellow-500 bg-opacity-10 text-yellow-500">
                             <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-yellow-500"></span>
                             {% trans "On Leave" %}
                         </span>
                         {% else %}
-                        <span class="zu-badge zu-badge--neutral">
+                        <span class="tag bg-secondary bg-opacity-10 text-secondary">
                             {% trans "Inactive" %}
                         </span>
                         {% endif %}
                     </div>
 
-                    <!-- Contact Info -->
-                    <div class="mt-4 flex justify-center space-x-3">
-                        <a href="mailto:{{ employee.user.email }}" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" title="{% trans 'Email' %}">
-                            <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
+                    <!-- Contact Icons -->
+                    <div class="mt-4 flex justify-center gap-3">
+                        <a href="mailto:{{ employee.user.email }}" class="text-secondary hover:text-primary" title="{% trans 'Email' %}">
+                            <span class="ph ph-envelope text-xl"></span>
                         </a>
                         {% if employee.phone %}
-                        <a href="tel:{{ employee.phone }}" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" title="{% trans 'Call' %}">
-                            <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                            </svg>
+                        <a href="tel:{{ employee.phone }}" class="text-secondary hover:text-primary" title="{% trans 'Call' %}">
+                            <span class="ph ph-phone text-xl"></span>
                         </a>
                         {% endif %}
-                        <a href="{% url 'frontend:messages:compose' %}?to={{ employee.user.id }}" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" title="{% trans 'Message' %}">
-                            <svg class="zu-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
+                        <a href="{% url 'frontend:messages:compose' %}?to={{ employee.user.id }}" class="text-secondary hover:text-primary" title="{% trans 'Message' %}">
+                            <span class="ph ph-chat-circle-text text-xl"></span>
                         </a>
                     </div>
                 </div>
 
-                <div class="zu-card__footer text-center">
-                    <a href="{% url 'frontend:hr:employee-detail' employee.id %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800">
-                        {% trans "View Profile" %}
+                <div class="mt-6 pt-4 border-t border-line text-center">
+                    <a href="{% url 'frontend:hr:employee-detail' employee.id %}" class="caption1 text-primary hover:underline font-medium">
+                        {% trans "View Profile" %} <span class="ph ph-arrow-right"></span>
                     </a>
                 </div>
             </div>
             {% empty %}
             <div class="col-span-full py-12 text-center">
-                <svg class="zu-icon mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No employees found" %}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Get started by adding your first employee." %}</p>
+                <span class="ph ph-users text-6xl text-secondary"></span>
+                <h3 class="mt-4 heading6">{% trans "No employees found" %}</h3>
+                <p class="caption1 text-secondary mt-2">{% trans "Get started by adding your first employee." %}</p>
             </div>
             {% endfor %}
         </div>
 
         <!-- List View -->
-        <div x-show="viewMode === 'list'" x-cloak class="zu-card">
-            <table class="zu-table">
-                <thead>
-                    <tr>
-                        <th class="zu-table__th">{% trans "Employee" %}</th>
-                        <th class="zu-table__th">{% trans "Department" %}</th>
-                        <th class="zu-table__th">{% trans "Role" %}</th>
-                        <th class="zu-table__th">{% trans "Status" %}</th>
-                        <th class="zu-table__th">{% trans "Start Date" %}</th>
-                        <th class="zu-table__th"><span class="sr-only">{% trans "Actions" %}</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for employee in employees %}
-                    <tr class="zu-table__row">
-                        <td class="zu-table__td">
-                            <div class="flex items-center">
-                                {% if employee.user.profile_picture %}
-                                <img class="h-10 w-10 rounded-full object-cover" src="{{ employee.user.profile_picture.url }}" alt="">
+        <div x-show="viewMode === 'list'" x-cloak class="rounded-lg bg-white overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="border-b border-line">
+                        <tr>
+                            <th class="px-6 py-4 text-left caption1 font-bold text-secondary uppercase">{% trans "Employee" %}</th>
+                            <th class="px-6 py-4 text-left caption1 font-bold text-secondary uppercase">{% trans "Department" %}</th>
+                            <th class="px-6 py-4 text-left caption1 font-bold text-secondary uppercase">{% trans "Role" %}</th>
+                            <th class="px-6 py-4 text-left caption1 font-bold text-secondary uppercase">{% trans "Status" %}</th>
+                            <th class="px-6 py-4 text-left caption1 font-bold text-secondary uppercase">{% trans "Start Date" %}</th>
+                            <th class="px-6 py-4 text-right caption1 font-bold text-secondary uppercase">{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr class="border-b border-line hover:bg-surface transition-all">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    {% if employee.user.profile_picture %}
+                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ employee.user.profile_picture.url }}" alt="">
+                                    {% else %}
+                                    <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                                        <span class="text-white caption1 font-medium">{{ employee.user.first_name|slice:":1" }}{{ employee.user.last_name|slice:":1" }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="caption1 font-medium text-title">{{ employee.user.get_full_name }}</div>
+                                        <div class="caption2 text-secondary">{{ employee.user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 caption1 text-title">{{ employee.department.name|default:"N/A" }}</td>
+                            <td class="px-6 py-4 caption1 text-secondary">{{ employee.job_title|default:"N/A" }}</td>
+                            <td class="px-6 py-4">
+                                {% if employee.status == 'active' %}
+                                <span class="tag bg-green-500 bg-opacity-10 text-green-500">{% trans "Active" %}</span>
+                                {% elif employee.status == 'on_leave' %}
+                                <span class="tag bg-yellow-500 bg-opacity-10 text-yellow-500">{% trans "On Leave" %}</span>
                                 {% else %}
-                                <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
-                                    <span class="text-white font-medium text-sm">{{ employee.user.first_name|slice:":1" }}{{ employee.user.last_name|slice:":1" }}</span>
-                                </div>
+                                <span class="tag bg-secondary bg-opacity-10 text-secondary">{% trans "Inactive" %}</span>
                                 {% endif %}
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ employee.user.get_full_name }}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ employee.user.email }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="zu-table__td">{{ employee.department.name|default:"N/A" }}</td>
-                        <td class="zu-table__td text-gray-500 dark:text-gray-400">{{ employee.job_title|default:"N/A" }}</td>
-                        <td class="zu-table__td">
-                            {% if employee.status == 'active' %}
-                            <span class="zu-badge zu-badge--success">{% trans "Active" %}</span>
-                            {% elif employee.status == 'on_leave' %}
-                            <span class="zu-badge zu-badge--warning">{% trans "On Leave" %}</span>
-                            {% else %}
-                            <span class="zu-badge zu-badge--neutral">{% trans "Inactive" %}</span>
-                            {% endif %}
-                        </td>
-                        <td class="zu-table__td text-gray-500 dark:text-gray-400">{{ employee.start_date|date:"M d, Y"|default:"N/A" }}</td>
-                        <td class="zu-table__td text-right">
-                            <a href="{% url 'frontend:hr:employee-detail' employee.id %}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">{% trans "View" %}</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td class="px-6 py-4 caption1 text-secondary">{{ employee.start_date|date:"M d, Y"|default:"N/A" }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{% url 'frontend:hr:employee-detail' employee.id %}" class="caption1 text-primary hover:underline font-medium">{% trans "View" %}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     {% if page_obj %}
-    {% include "components/pagination.html" %}
+    <!-- Pagination -->
+    <div class="col-span-full mt-6">
+        {% include "components/pagination.html" %}
+    </div>
     {% endif %}
 </div>
 {% endif %}
