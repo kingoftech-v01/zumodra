@@ -249,19 +249,30 @@ class Subscription(models.Model):
         self.unsubscribed = True
         self.unsubscribe_date = now()
 
+    def clean(self):
+        """
+        Validate the Subscription instance.
+        """
+        from django.core.exceptions import ValidationError
+
+        # Ensure either user or email_field is set (but not both)
+        if not (self.user or self.email_field):
+            raise ValidationError(
+                _('Neither an email nor a username is set. This asks for inconsistency!')
+            )
+
+        if self.user and self.email_field:
+            raise ValidationError(
+                _('If user is set, email must be null and vice versa.')
+            )
+
     def save(self, *args, **kwargs):
         """
-        Perform some basic validation and state maintenance of Subscription.
-        TODO: Move this code to a more suitable place (i.e. `clean()`) and
-        cleanup the code. Refer to comment below and
-        https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean
+        Perform state maintenance of Subscription.
+        Validation is handled in clean() method.
         """
-        assert self.user or self.email_field, \
-            _('Neither an email nor a username is set. This asks for '
-              'inconsistency!')
-        assert ((self.user and not self.email_field) or
-                (self.email_field and not self.user)), \
-            _('If user is set, email must be null and vice versa.')
+        # Call clean() to validate before saving
+        self.clean()
 
         # This is a lame way to find out if we have changed but using Django
         # API internals is bad practice. This is necessary to discriminate
@@ -440,8 +451,7 @@ class Article(models.Model):
     image_below_text = models.BooleanField(default=False)
 
     # Message this article is associated with
-    # TODO: Refactor post to message (post is legacy notation).
-    post = models.ForeignKey(
+    message = models.ForeignKey(
         'Message', verbose_name=_('message'), related_name='articles',
         on_delete=models.CASCADE
     )
@@ -450,7 +460,7 @@ class Article(models.Model):
         ordering = ('sortorder',)
         verbose_name = _('article')
         verbose_name_plural = _('articles')
-        unique_together = ('post', 'sortorder')
+        unique_together = ('message', 'sortorder')
 
     def __str__(self):
         return self.title
@@ -466,7 +476,7 @@ class Article(models.Model):
         if self.sortorder is None:
             # If saving a new object get the next available Article ordering
             # as to assure uniqueness.
-            self.sortorder = self.post.get_next_article_sortorder()
+            self.sortorder = self.message.get_next_article_sortorder()
 
         super().save()
 
