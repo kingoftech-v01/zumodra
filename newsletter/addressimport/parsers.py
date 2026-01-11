@@ -88,10 +88,11 @@ def subscription_exists(newsletter, email, name=None):
 
 def check_email(email, ignore_errors=False):
     """
-    Check (length of) email address.
+    Check and validate email address.
 
-    TODO: Update this to perform full validation on email.
+    Performs full validation including format and length checks.
     """
+    from django.core.validators import validate_email as django_validate_email
 
     logger.debug("Checking e-mail address %s", email)
 
@@ -100,6 +101,16 @@ def check_email(email, ignore_errors=False):
     # Get rid of leading/trailing spaces
     email = email.strip()
 
+    # Perform full email validation
+    if not ignore_errors:
+        try:
+            django_validate_email(email)
+        except forms.ValidationError:
+            raise forms.ValidationError(
+                _("Invalid e-mail address: %(email)s") % {"email": email}
+            )
+
+    # Check length
     if len(email) <= email_length or ignore_errors:
         return email[:email_length]
     else:
@@ -116,10 +127,12 @@ def check_email(email, ignore_errors=False):
 
 def check_name(name, ignore_errors=False):
     """
-    Check (length of) name.
+    Check and validate name.
 
-    TODO: Update this to perform full validation on name.
+    Performs full validation including format and length checks.
     """
+    import re
+
     logger.debug("Checking name: %s", name)
 
     name_length = Subscription._meta.get_field('name_field').max_length
@@ -127,6 +140,19 @@ def check_name(name, ignore_errors=False):
     # Get rid of leading/trailing spaces
     name = name.strip()
 
+    # Perform full name validation
+    if not ignore_errors:
+        # Check if name is empty
+        if not name:
+            raise forms.ValidationError(_("Name cannot be empty."))
+
+        # Check for invalid characters (allow letters, spaces, hyphens, apostrophes, periods)
+        if not re.match(r"^[A-Za-zÀ-ÿ\s\-'.]+$", name):
+            raise forms.ValidationError(
+                _("Name contains invalid characters. Only letters, spaces, hyphens, apostrophes, and periods are allowed.")
+            )
+
+    # Check length
     if len(name) <= name_length or ignore_errors:
         return name[:name_length]
     else:

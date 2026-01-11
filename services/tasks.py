@@ -711,36 +711,61 @@ def notify_cross_tenant_request(self, target_schema, request_uuid, requesting_te
         # Switch to target tenant schema and create notification
         with schema_context(target_schema):
             # Import here to avoid circular imports
-            from notifications.models import Notification
+            from notifications.models import Notification, NotificationChannel
+            from accounts.models import TenantUser
+            from django.contrib.auth import get_user_model
 
-            # Create notification for provider
-            notification = Notification.objects.create(
-                notification_type='cross_tenant_request',
-                title=f"New service request from {requesting_tenant.name}",
-                message=(
-                    f"You have received a service request from {requesting_tenant.name}. "
-                    f"Request ID: {request_uuid}. "
-                    f"Please review and respond to this cross-organization request."
-                ),
-                metadata={
-                    'request_uuid': request_uuid,
-                    'requesting_tenant_schema': requesting_tenant_schema,
-                    'requesting_company_name': requesting_tenant.name,
-                    'type': 'cross_tenant_service_request',
-                },
-                # TODO: Send to all admins/managers in target tenant
-                # For now, notification goes to general notification stream
-                # recipient logic depends on your notification system
+            User = get_user_model()
+
+            # Get all admins and managers in the target tenant
+            admin_roles = ['owner', 'manager', 'hr_manager']
+            admin_users = TenantUser.objects.filter(
+                tenant=target_tenant,
+                role__in=admin_roles,
+                is_active=True
+            ).select_related('user')
+
+            # Get or create a default notification channel
+            channel, _ = NotificationChannel.objects.get_or_create(
+                name='System',
+                defaults={'slug': 'system', 'description': 'System notifications'}
             )
 
+            notification_title = f"New service request from {requesting_tenant.name}"
+            notification_message = (
+                f"You have received a service request from {requesting_tenant.name}. "
+                f"Request ID: {request_uuid}. "
+                f"Please review and respond to this cross-organization request."
+            )
+            notification_metadata = {
+                'request_uuid': request_uuid,
+                'requesting_tenant_schema': requesting_tenant_schema,
+                'requesting_company_name': requesting_tenant.name,
+                'type': 'cross_tenant_service_request',
+            }
+
+            # Create notification for each admin/manager
+            notifications_created = []
+            for tenant_user in admin_users:
+                notification = Notification.objects.create(
+                    recipient=tenant_user.user,
+                    channel=channel,
+                    notification_type='cross_tenant_request',
+                    title=notification_title,
+                    message=notification_message,
+                    metadata=notification_metadata,
+                )
+                notifications_created.append(notification.id)
+
             logger.info(
-                f"Created notification {notification.id} in {target_schema} "
-                f"for cross-tenant request {request_uuid}"
+                f"Created {len(notifications_created)} notifications in {target_schema} "
+                f"for cross-tenant request {request_uuid} (sent to all admins/managers)"
             )
 
             return {
                 'status': 'success',
-                'notification_id': notification.id,
+                'notification_ids': notifications_created,
+                'notification_count': len(notifications_created),
                 'target_tenant': target_schema,
                 'request_uuid': request_uuid
             }

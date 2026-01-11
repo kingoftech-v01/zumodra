@@ -55,11 +55,15 @@ def get_user_appointments(request, response_type='html'):
         'appointments': json.dumps(appointments_json),
     }
     context = get_generic_context_with_extra(request=request, extra=extra_context)
-    # if appointment is empty and user doesn't have a staff-member instance, put a message
-    # TODO: Refactor this logic, it's not clean
-    if not appointments and not StaffMember.objects.filter(
-            user=request.user).exists() and not request.user.is_superuser:
+
+    # Check if user needs a staff member instance
+    user_has_no_appointments = not appointments
+    user_has_no_staff_member = not StaffMember.objects.filter(user=request.user).exists()
+    user_is_not_admin = not request.user.is_superuser
+
+    if user_has_no_appointments and user_has_no_staff_member and user_is_not_admin:
         messages.error(request, _("User doesn't have a staff member instance. Please contact the administrator."))
+
     return render(request, 'administration/staff_index.html', context)
 
 
@@ -227,44 +231,85 @@ def add_or_update_staff_info(request, user_id=None):
     return render(request, 'administration/manage_staff_member.html', context)
 
 
-# TODO: Refactor this function, handle the different cases better.
 @require_user_authenticated
 @require_staff_or_superuser
 def fetch_service_list_for_staff(request):
+    """
+    Fetch services for staff member in different modes:
+    - Edit mode: appointment_id provided
+    - Staff selection mode: staff_id provided
+    - Create mode: neither provided
+    """
     appointment_id = request.GET.get('appointmentId')
     staff_id = request.GET.get('staff_member')
-    if appointment_id:
-        # Fetch services for a specific appointment (edit mode)
-        if request.user.is_superuser:
-            appointment = Appointment.objects.get(id=appointment_id)
-            staff_member = appointment.get_staff_member()
-        else:
-            staff_member = StaffMember.objects.get(user=request.user)
-            # Ensure the staff member is associated with this appointment
-            if not Appointment.objects.filter(id=appointment_id,
-                                              appointment_request__staff_member=staff_member).exists():
-                return json_response(_("You do not have permission to access this appointment."), status_code=403)
-        services = list(staff_member.get_services_offered().values('id', 'name'))
-    elif staff_id:
-        # Fetch services for the specified staff member (new mode based on staff member selection)
-        staff_member = get_object_or_404(StaffMember, id=staff_id)
-        services = list(staff_member.get_services_offered().values('id', 'name'))
-    else:
-        # Fetch all services for the staff member (create mode)
-        try:
-            staff_member = StaffMember.objects.get(user=request.user)
-            services = list(staff_member.get_services_offered().values('id', 'name'))
-        except StaffMember.DoesNotExist:
-            if not request.user.is_superuser:
-                return json_response(_("You're not a staff member. Can't perform this action !"), status=400,
-                                     success=False)
-            else:
-                services = list(Service.objects.all().values('id', 'name'))
 
-    if len(services) == 0:
-        return json_response(_("No services offered by this staff member."), status=404, success=False,
-                             error_code=ErrorCode.SERVICE_NOT_FOUND)
+    # Helper function to get services for a staff member
+    def get_staff_services(staff_member):
+        return list(staff_member.get_services_offered().values('id', 'name'))
+
+    # Case 1: Edit mode - fetch services for appointment's staff member
+    if appointment_id:
+        staff_member = _get_staff_for_appointment(request, appointment_id)
+        if isinstance(staff_member, dict):  # Error response
+            return staff_member
+        services = get_staff_services(staff_member)
+
+    # Case 2: Staff selection mode - fetch services for specified staff
+    elif staff_id:
+        staff_member = get_object_or_404(StaffMember, id=staff_id)
+        services = get_staff_services(staff_member)
+
+    # Case 3: Create mode - fetch services for current user's staff member
+    else:
+        services = _get_services_for_current_user(request)
+        if isinstance(services, dict):  # Error response
+            return services
+
+    # Validate services exist
+    if not services:
+        return json_response(
+            _("No services offered by this staff member."),
+            status=404,
+            success=False,
+            error_code=ErrorCode.SERVICE_NOT_FOUND
+        )
+
     return json_response(_("Successfully fetched services."), custom_data={'services_offered': services})
+
+
+def _get_staff_for_appointment(request, appointment_id):
+    """Get staff member for a specific appointment with permission checks."""
+    if request.user.is_superuser:
+        appointment = Appointment.objects.get(id=appointment_id)
+        return appointment.get_staff_member()
+    else:
+        staff_member = StaffMember.objects.get(user=request.user)
+        # Ensure the staff member is associated with this appointment
+        if not Appointment.objects.filter(
+            id=appointment_id,
+            appointment_request__staff_member=staff_member
+        ).exists():
+            return json_response(
+                _("You do not have permission to access this appointment."),
+                status_code=403
+            )
+        return staff_member
+
+
+def _get_services_for_current_user(request):
+    """Get services for the current user's staff member or all services for superusers."""
+    try:
+        staff_member = StaffMember.objects.get(user=request.user)
+        return list(staff_member.get_services_offered().values('id', 'name'))
+    except StaffMember.DoesNotExist:
+        if not request.user.is_superuser:
+            return json_response(
+                _("You're not a staff member. Can't perform this action!"),
+                status=400,
+                success=False
+            )
+        else:
+            return list(Service.objects.all().values('id', 'name'))
 
 
 @require_user_authenticated

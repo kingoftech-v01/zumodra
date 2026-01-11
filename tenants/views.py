@@ -1320,6 +1320,59 @@ class FeatureFlagView(views.APIView):
 
 # ==================== EIN VERIFICATION API ENDPOINTS ====================
 
+def _verify_ein_with_external_service(ein_number):
+    """
+    Verify EIN with external service (IRS or third-party provider).
+
+    This function is a placeholder for actual API integration.
+    When an external EIN verification API becomes available, implement the
+    API call here.
+
+    Args:
+        ein_number: EIN in format XX-XXXXXXX
+
+    Returns:
+        dict: {
+            'status': 'verified' | 'pending' | 'invalid',
+            'message': str,
+            'details': dict (optional)
+        }
+    """
+    # TODO: Implement actual API call when service becomes available
+    # Example implementation:
+    #
+    # import requests
+    # API_KEY = settings.EIN_VERIFICATION_API_KEY
+    # API_URL = settings.EIN_VERIFICATION_API_URL
+    #
+    # try:
+    #     response = requests.post(
+    #         f"{API_URL}/verify",
+    #         json={'ein': ein_number},
+    #         headers={'Authorization': f'Bearer {API_KEY}'},
+    #         timeout=10
+    #     )
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         return {
+    #             'status': 'verified' if data['valid'] else 'invalid',
+    #             'message': data.get('message', 'EIN verified'),
+    #             'details': data
+    #         }
+    # except Exception as e:
+    #     logger.error(f"EIN verification API error: {e}")
+    #     return {
+    #         'status': 'pending',
+    #         'message': 'EIN verification is pending. We will notify you once complete.'
+    #     }
+
+    # For now, return pending status
+    return {
+        'status': 'pending',
+        'message': _('EIN submitted for verification. We will verify and notify you once complete.')
+    }
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def submit_ein_verification(request):
@@ -1350,14 +1403,22 @@ def submit_ein_verification(request):
         # Update tenant with EIN
         tenant = request.tenant
         tenant.ein_number = ein_number
-        tenant.save(update_fields=['ein_number'])
 
-        # TODO: Call external API to verify EIN (implement when API is available)
-        # For now, mark as pending
+        # Verify EIN through external service
+        verification_result = _verify_ein_with_external_service(ein_number)
+
+        # Update tenant verification status based on result
+        if verification_result['status'] == 'verified':
+            tenant.ein_verified = True
+            tenant.ein_verified_at = timezone.now()
+        elif verification_result['status'] == 'pending':
+            tenant.ein_verified = False
+
+        tenant.save(update_fields=['ein_number', 'ein_verified', 'ein_verified_at'])
 
         return Response({
-            'status': 'submitted',
-            'message': _('EIN submitted for verification.'),
+            'status': verification_result['status'],
+            'message': verification_result['message'],
             'ein_number': ein_number,
         }, status=status.HTTP_201_CREATED)
 

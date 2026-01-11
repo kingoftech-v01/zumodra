@@ -318,6 +318,15 @@ class KYCVerification(models.Model):
     )
     document_country = models.CharField(max_length=100, blank=True)
     document_expiry = models.DateField(null=True, blank=True)
+    document_file = models.FileField(
+        upload_to='kyc_documents/',
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])
+        ],
+        help_text=_('Uploaded KYC document (ID, passport, etc.)')
+    )
 
     # Verification Results
     confidence_score = models.DecimalField(

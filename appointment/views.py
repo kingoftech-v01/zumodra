@@ -116,7 +116,6 @@ def get_available_slots_ajax(request):
     return json_response(message='Successfully retrieved available slots', custom_data=custom_data, success=True)
 
 
-# TODO: service id and staff id are not checked
 @require_ajax
 def get_next_available_date_ajax(request, service_id):
     """This view function handles AJAX requests to get the next available date for a service.
@@ -125,12 +124,14 @@ def get_next_available_date_ajax(request, service_id):
     :param service_id: The ID of the service.
     :return: A JSON response containing the next available date.
     """
+    # Validate service_id first
+    service = get_object_or_404(Service, pk=service_id)
+
     staff_id = request.GET.get('staff_member')
 
     # If staff_id is not provided, you should handle it accordingly.
     if staff_id and staff_id != 'none':
         staff_member = get_object_or_404(StaffMember, pk=staff_id)
-        service = get_object_or_404(Service, pk=service_id)
 
         # Fetch the days off for the staff
         days_off = DayOff.objects.filter(staff_member=staff_member).filter(

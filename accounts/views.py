@@ -1638,17 +1638,32 @@ def submit_kyc_verification(request):
     serializer = KYCVerificationSerializer(data=request.data)
 
     if serializer.is_valid():
+        from .models import KYCVerification
+        from hashlib import sha256
+
         document_file = serializer.validated_data['document_file']
         document_type = serializer.validated_data['document_type']
         document_number = serializer.validated_data['document_number']
 
-        # TODO: Save to KYCDocument model (implement when model is created)
-        # For now, just acknowledge submission
+        # Hash the document number for security
+        document_number_hash = sha256(document_number.encode()).hexdigest()
+
+        # Create KYC verification record
+        kyc = KYCVerification.objects.create(
+            user=request.user,
+            verification_type=KYCVerification.VerificationType.IDENTITY,
+            status=KYCVerification.VerificationStatus.PENDING,
+            document_type=document_type,
+            document_number_hash=document_number_hash,
+            document_file=document_file,
+            submitted_at=timezone.now()
+        )
 
         return Response({
             'status': 'submitted',
             'message': _('KYC documents submitted for review.'),
             'document_type': document_type,
+            'verification_id': str(kyc.uuid),
         }, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1670,14 +1685,29 @@ def submit_cv_verification(request):
     serializer = CVVerificationSerializer(data=request.data)
 
     if serializer.is_valid():
+        from .models import CandidateCV
+        from django.utils.text import slugify
+
         cv_file = serializer.validated_data['cv_file']
 
-        # TODO: Save to UserCV model (implement when model is created)
-        # For now, just acknowledge submission
+        # Create CV record
+        cv = CandidateCV.objects.create(
+            user=request.user,
+            name=f"CV - {timezone.now().strftime('%Y-%m-%d')}",
+            slug=slugify(f"cv-{request.user.id}-{timezone.now().strftime('%Y%m%d-%H%M%S')}"),
+            cv_file=cv_file,
+            status=CandidateCV.CVStatus.ACTIVE
+        )
+
+        # Set as primary if user has no other CVs
+        if not CandidateCV.objects.filter(user=request.user, is_primary=True).exists():
+            cv.is_primary = True
+            cv.save()
 
         return Response({
             'status': 'submitted',
             'message': _('CV submitted for verification.'),
+            'cv_id': str(cv.uuid),
         }, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1729,11 +1759,38 @@ def get_submitted_documents(request):
 
     Returns list of KYC documents and CV documents.
     """
-    # TODO: Implement when KYCDocument and UserCV models are created
+    from .models import KYCVerification, CandidateCV
+
+    # Get KYC documents
+    kyc_verifications = KYCVerification.objects.filter(user=request.user).order_by('-created_at')
+    kyc_documents = []
+    for kyc in kyc_verifications:
+        kyc_documents.append({
+            'id': str(kyc.uuid),
+            'document_type': kyc.document_type,
+            'verification_type': kyc.get_verification_type_display(),
+            'status': kyc.get_status_display(),
+            'submitted_at': kyc.submitted_at,
+            'verified_at': kyc.verified_at,
+            'has_file': bool(kyc.document_file),
+        })
+
+    # Get CV documents
+    cvs = CandidateCV.objects.filter(user=request.user).order_by('-created_at')
+    cv_documents = []
+    for cv in cvs:
+        cv_documents.append({
+            'id': str(cv.uuid),
+            'name': cv.name,
+            'status': cv.get_status_display(),
+            'is_primary': cv.is_primary,
+            'created_at': cv.created_at,
+            'has_file': bool(cv.cv_file),
+        })
+
     return Response({
-        'kyc_documents': [],
-        'cv_documents': [],
-        'message': _('Document listing feature will be available soon.')
+        'kyc_documents': kyc_documents,
+        'cv_documents': cv_documents,
     })
 
 
