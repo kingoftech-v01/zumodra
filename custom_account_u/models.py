@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from phonenumber_field.modelfields import PhoneNumberField
 import random
 import string
 import uuid
@@ -28,6 +29,304 @@ class CustomUser(AbstractUser):
         help_text=_('User identity (KYC) verified')
     )
     kyc_verified_at = models.DateTimeField(null=True, blank=True)
+
+
+class PublicProfile(models.Model):
+    """
+    Global public profile for marketplace/freelance activities.
+    Lives in PUBLIC schema (shared across all tenants).
+    Used for portfolio, CV, skills, and public marketplace identity.
+    """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='public_profile'
+    )
+
+    # Identity
+    display_name = models.CharField(
+        max_length=100,
+        help_text=_('Public display name for marketplace')
+    )
+    professional_title = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text=_('Professional title or headline')
+    )
+    avatar = models.ImageField(
+        upload_to='public_avatars/',
+        blank=True,
+        null=True,
+        help_text=_('Profile picture')
+    )
+    bio = models.TextField(
+        max_length=2000,
+        blank=True,
+        help_text=_('Professional bio or summary')
+    )
+
+    # Contact (privacy-controlled)
+    public_email = models.EmailField(
+        blank=True,
+        help_text=_('Public contact email (can be different from login email)')
+    )
+    phone = PhoneNumberField(
+        blank=True,
+        null=True,
+        help_text=_('Contact phone number')
+    )
+
+    # Location
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True, default='CA')
+    timezone = models.CharField(max_length=50, default='America/Toronto')
+
+    # Professional Links
+    linkedin_url = models.URLField(blank=True, help_text=_('LinkedIn profile URL'))
+    github_url = models.URLField(blank=True, help_text=_('GitHub profile URL'))
+    portfolio_url = models.URLField(blank=True, help_text=_('Portfolio website URL'))
+    personal_website = models.URLField(blank=True, help_text=_('Personal website URL'))
+
+    # CV/Resume
+    cv_file = models.FileField(
+        upload_to='cvs/',
+        blank=True,
+        null=True,
+        help_text=_('Latest CV/resume file')
+    )
+    cv_last_updated = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_('When CV was last updated')
+    )
+
+    # Skills & Certifications (JSON)
+    skills = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of skills as JSON array')
+    )
+    languages = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of languages as JSON array')
+    )
+    certifications = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of certifications as JSON array')
+    )
+
+    # Marketplace
+    available_for_work = models.BooleanField(
+        default=False,
+        help_text=_('Available for freelance work')
+    )
+    hourly_rate_min = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Minimum hourly rate')
+    )
+    hourly_rate_max = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Maximum hourly rate')
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Privacy
+    VISIBILITY_PUBLIC = 'public'
+    VISIBILITY_TENANTS_ONLY = 'tenants_only'
+    VISIBILITY_PRIVATE = 'private'
+
+    VISIBILITY_CHOICES = [
+        (VISIBILITY_PUBLIC, _('Public - Anyone can view')),
+        (VISIBILITY_TENANTS_ONLY, _('Tenants Only - Only orgs I joined')),
+        (VISIBILITY_PRIVATE, _('Private - Hidden')),
+    ]
+
+    profile_visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default=VISIBILITY_TENANTS_ONLY,
+        help_text=_('Who can view this profile')
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Public Profile')
+        verbose_name_plural = _('Public Profiles')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"PublicProfile: {self.display_name} ({self.user.email})"
+
+    @property
+    def completion_percentage(self):
+        """Calculate profile completion percentage."""
+        fields_to_check = [
+            'display_name', 'professional_title', 'avatar', 'bio',
+            'city', 'country', 'linkedin_url', 'github_url',
+            'cv_file', 'skills', 'languages'
+        ]
+
+        filled_fields = sum(
+            1 for field in fields_to_check
+            if getattr(self, field, None) and (
+                not isinstance(getattr(self, field), list) or len(getattr(self, field)) > 0
+            )
+        )
+
+        return int((filled_fields / len(fields_to_check)) * 100)
+
+    @property
+    def verification_badges(self):
+        """Get verification badges from CustomUser."""
+        badges = []
+        if self.user.cv_verified:
+            badges.append({'type': 'cv', 'verified_at': self.user.cv_verified_at})
+        if self.user.kyc_verified:
+            badges.append({'type': 'kyc', 'verified_at': self.user.kyc_verified_at})
+        return badges
+
+
+class ProfileFieldSync(models.Model):
+    """
+    Per-user, per-tenant privacy controls for field-level synchronization.
+    Lives in PUBLIC schema. Controls which PublicProfile fields sync to TenantProfile.
+    """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='profile_sync_settings'
+    )
+    tenant_uuid = models.UUIDField(
+        help_text=_('UUID of tenant (not FK to avoid cross-schema issues)'),
+        db_index=True
+    )
+
+    # Per-field sync toggles (privacy controls)
+    sync_display_name = models.BooleanField(
+        default=True,
+        help_text=_('Sync display name to tenant profile')
+    )
+    sync_avatar = models.BooleanField(
+        default=True,
+        help_text=_('Sync avatar to tenant profile')
+    )
+    sync_bio = models.BooleanField(
+        default=True,
+        help_text=_('Sync bio to tenant profile')
+    )
+    sync_public_email = models.BooleanField(
+        default=False,  # Privacy: OFF by default
+        help_text=_('Sync public email to tenant profile')
+    )
+    sync_phone = models.BooleanField(
+        default=False,  # Privacy: OFF by default
+        help_text=_('Sync phone to tenant profile')
+    )
+    sync_city = models.BooleanField(
+        default=True,
+        help_text=_('Sync city to tenant profile')
+    )
+    sync_state = models.BooleanField(
+        default=True,
+        help_text=_('Sync state/province to tenant profile')
+    )
+    sync_country = models.BooleanField(
+        default=True,
+        help_text=_('Sync country to tenant profile')
+    )
+    sync_linkedin = models.BooleanField(
+        default=True,
+        help_text=_('Sync LinkedIn URL to tenant profile')
+    )
+    sync_github = models.BooleanField(
+        default=True,
+        help_text=_('Sync GitHub URL to tenant profile')
+    )
+    sync_portfolio = models.BooleanField(
+        default=True,
+        help_text=_('Sync portfolio URL to tenant profile')
+    )
+    sync_skills = models.BooleanField(
+        default=True,
+        help_text=_('Sync skills to tenant profile')
+    )
+    sync_languages = models.BooleanField(
+        default=True,
+        help_text=_('Sync languages to tenant profile')
+    )
+
+    # Auto-sync disabled (manual only)
+    auto_sync = models.BooleanField(
+        default=False,
+        help_text=_('Automatically sync when public profile changes (NOT recommended)')
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Profile Field Sync Settings')
+        verbose_name_plural = _('Profile Field Sync Settings')
+        unique_together = ['user', 'tenant_uuid']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Sync settings: {self.user.email} → Tenant {self.tenant_uuid}"
+
+    def get_enabled_fields(self):
+        """Returns list of enabled field names for sync."""
+        enabled_fields = []
+        sync_fields = [
+            'display_name', 'avatar', 'bio', 'public_email', 'phone',
+            'city', 'state', 'country', 'linkedin', 'github', 'portfolio',
+            'skills', 'languages'
+        ]
+
+        for field in sync_fields:
+            if getattr(self, f'sync_{field}', False):
+                enabled_fields.append(field)
+
+        return enabled_fields
+
+    @classmethod
+    def get_or_create_defaults(cls, user, tenant_uuid):
+        """Get or create ProfileFieldSync with privacy-friendly defaults."""
+        sync_settings, created = cls.objects.get_or_create(
+            user=user,
+            tenant_uuid=tenant_uuid,
+            defaults={
+                'sync_display_name': True,
+                'sync_avatar': True,
+                'sync_bio': True,
+                'sync_public_email': False,  # Privacy: OFF
+                'sync_phone': False,  # Privacy: OFF
+                'sync_city': True,
+                'sync_state': True,
+                'sync_country': True,
+                'sync_linkedin': True,
+                'sync_github': True,
+                'sync_portfolio': True,
+                'sync_skills': True,
+                'sync_languages': True,
+                'auto_sync': False,  # Manual only
+            }
+        )
+        return sync_settings, created
 
 
 # # Common Profile Information shared by all users

@@ -1928,3 +1928,188 @@ class CoopTerm(models.Model):
 
     def __str__(self):
         return f"{self.student.user.email}: Term {self.term_number} - {self.employer_name or 'Searching'}"
+
+
+class TenantProfile(models.Model):
+    """
+    Tenant-specific employment profile with synced data from PublicProfile.
+    Lives in TENANT schema (isolated per company).
+    Combines employment data with synced public marketplace data.
+    """
+
+    class EmploymentType(models.TextChoices):
+        FULL_TIME = 'full_time', _('Full Time')
+        PART_TIME = 'part_time', _('Part Time')
+        CONTRACT = 'contract', _('Contract')
+        TEMPORARY = 'temporary', _('Temporary')
+        INTERN = 'intern', _('Intern/Co-op')
+        FREELANCE = 'freelance', _('Freelance')
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tenant_profiles'
+    )
+    tenant = models.ForeignKey(
+        'tenants.Tenant',
+        on_delete=models.CASCADE,
+        related_name='profiles'
+    )
+
+    # ========================================
+    # TENANT-SPECIFIC FIELDS (NOT synced)
+    # ========================================
+
+    # Employment Details
+    employee_id = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text=_('Company employee ID number')
+    )
+    department = models.ForeignKey(
+        'configurations.Department',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='profiles'
+    )
+    job_title = models.CharField(max_length=100)
+    reports_to = models.ForeignKey(
+        TenantUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subordinate_profiles'
+    )
+    hire_date = models.DateField(null=True, blank=True)
+    employment_type = models.CharField(
+        max_length=20,
+        choices=EmploymentType.choices,
+        default=EmploymentType.FULL_TIME
+    )
+
+    # Personal/Private Data (NOT synced)
+    address_line1 = models.CharField(max_length=255, blank=True)
+    address_line2 = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    emergency_contact_name = models.CharField(max_length=100, blank=True)
+    emergency_contact_phone = PhoneNumberField(blank=True, null=True)
+
+    # ========================================
+    # SYNCED FIELDS (from PublicProfile)
+    # ========================================
+
+    # Identity (synced)
+    full_name = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text=_('Synced from PublicProfile.display_name')
+    )
+    avatar_url = models.URLField(
+        blank=True,
+        help_text=_('Synced from PublicProfile.avatar (ImageField → URL)')
+    )
+    bio = models.TextField(blank=True, help_text=_('Synced from PublicProfile.bio'))
+
+    # Contact (synced - privacy controlled)
+    email = models.EmailField(
+        blank=True,
+        help_text=_('Synced from PublicProfile.public_email')
+    )
+    phone = models.CharField(
+        max_length=30,
+        blank=True,
+        help_text=_('Synced from PublicProfile.phone')
+    )
+
+    # Location (synced)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+
+    # Professional Links (synced)
+    linkedin_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+
+    # Skills & Languages (synced as JSON)
+    skills_json = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('Synced from PublicProfile.skills')
+    )
+    languages_json = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('Synced from PublicProfile.languages')
+    )
+
+    # ========================================
+    # SYNC METADATA
+    # ========================================
+
+    last_synced_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_('When profile was last synced from PublicProfile')
+    )
+    synced_fields = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of field names that were synced')
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Tenant Profile')
+        verbose_name_plural = _('Tenant Profiles')
+        unique_together = ['user', 'tenant']
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'tenant']),
+            models.Index(fields=['tenant', 'job_title']),
+            models.Index(fields=['department']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} @ {self.tenant.name}: {self.job_title}"
+
+    @property
+    def sync_status(self):
+        """
+        Returns current sync status.
+        Possible values: 'never_synced', 'synced', 'out_of_sync', 'no_public_profile'
+        """
+        if not hasattr(self.user, 'public_profile'):
+            return 'no_public_profile'
+
+        if not self.last_synced_at:
+            return 'never_synced'
+
+        public_profile = self.user.public_profile
+        if public_profile.updated_at > self.last_synced_at:
+            return 'out_of_sync'
+
+        return 'synced'
+
+    @property
+    def full_address(self):
+        """Get full formatted address."""
+        parts = [
+            self.address_line1,
+            self.address_line2,
+            self.city,
+            f"{self.state} {self.postal_code}",
+            self.country
+        ]
+        return ', '.join(filter(None, parts))
+
+    @property
+    def display_name_or_email(self):
+        """Get display name or fallback to email."""
+        return self.full_name or self.user.email
