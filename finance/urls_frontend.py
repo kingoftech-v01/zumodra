@@ -67,7 +67,7 @@ from .template_views import (
     FinanceChartDataView,
 )
 
-app_name = 'finance-frontend'
+app_name = 'finance'
 
 urlpatterns = [
     # ==========================================================================
