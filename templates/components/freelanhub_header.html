@@ -229,7 +229,7 @@
                         </li>
                         {% if user.is_authenticated %}
                         <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
-                            <a href="{% url 'dashboard:index' %}" class="text-xl font-semibold">{% trans "Dashboard" %}</a>
+                            <a href="{% url 'frontend:dashboard:index' %}" class="text-xl font-semibold">{% trans "Dashboard" %}</a>
                         </li>
                         <li class="nav_item py-2">
                             <a href="{% url 'account_logout' %}" class="text-xl font-semibold text-red-600">{% trans "Logout" %}</a>
