@@ -138,7 +138,34 @@ def browse_services(request):
 def service_detail(request, service_uuid):
     """
     View detailed information about a specific service.
+
+    If accessed from public schema, redirects to the service's tenant subdomain.
+    If accessed from tenant schema, displays the service detail.
     """
+    from django_tenants.utils import get_public_schema_name
+    from tenants.models import PublicServiceCatalog
+    from core.domain import get_tenant_url
+
+    # Check if we're in the public schema
+    if hasattr(request, 'tenant') and request.tenant.schema_name == get_public_schema_name():
+        # Look up the service in PublicServiceCatalog to find its tenant
+        catalog_entry = PublicServiceCatalog.objects.filter(
+            uuid=service_uuid
+        ).select_related('tenant').first()
+
+        if catalog_entry:
+            # Redirect to the tenant subdomain
+            tenant_url = get_tenant_url(
+                catalog_entry.tenant.slug,
+                request.path  # Keep the same path
+            )
+            return redirect(tenant_url)
+        else:
+            # Service not found in public catalog
+            messages.error(request, 'Service not found')
+            return redirect('home')
+
+    # We're in a tenant schema - proceed with normal logic
     service = get_object_or_404(
         Service.objects.select_related('provider__user', 'category')
         .prefetch_related('images', 'tags', 'reviews__reviewer'),
@@ -403,7 +430,34 @@ def edit_provider_profile(request):
 def provider_profile_view(request, provider_uuid):
     """
     Public view of a provider's profile.
+
+    If accessed from public schema, redirects to the provider's tenant subdomain.
+    If accessed from tenant schema, displays the provider profile.
     """
+    from django_tenants.utils import get_public_schema_name
+    from tenants.models import PublicServiceCatalog
+    from core.domain import get_tenant_url
+
+    # Check if we're in the public schema
+    if hasattr(request, 'tenant') and request.tenant.schema_name == get_public_schema_name():
+        # Look up the provider in PublicServiceCatalog to find their tenant
+        catalog_entry = PublicServiceCatalog.objects.filter(
+            provider_uuid=provider_uuid
+        ).select_related('tenant').first()
+
+        if catalog_entry:
+            # Redirect to the tenant subdomain
+            tenant_url = get_tenant_url(
+                catalog_entry.tenant.slug,
+                request.path  # Keep the same path
+            )
+            return redirect(tenant_url)
+        else:
+            # Provider not found in public catalog
+            messages.error(request, 'Provider not found')
+            return redirect('home')
+
+    # We're in a tenant schema - proceed with normal logic
     provider = get_object_or_404(
         ServiceProvider.objects.prefetch_related('services'),
         uuid=provider_uuid
