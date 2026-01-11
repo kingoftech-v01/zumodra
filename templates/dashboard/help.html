@@ -1,70 +1,71 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block page_title %}{% trans "Help & Support" %}{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:dashboard' %}" class="caption1 text-secondary hover:text-primary">
+        <span class="ph ph-house"></span>
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="caption1 text-title">{% trans "Help & Support" %}</span>
+</div>
 
-{% block page_subtitle %}
-<p class="text-gray-600 dark:text-gray-400 mt-2">
-    {% trans "Get help and support for using the platform." %}
-</p>
-{% endblock %}
+<!-- Header -->
+<div class="mb-8">
+    <h3 class="heading3 mb-2">{% trans "Help & Support" %}</h3>
+    <p class="caption1 text-secondary">{% trans "Get help and support for using the platform." %}</p>
+</div>
 
-{% block content %}
-<div class="zu-card">
-    <div class="zu-card__body">
-        <h2 class="text-xl font-semibold mb-4">{% trans "Need Help?" %}</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
-            {% trans "We're here to help you get the most out of our platform." %}
-        </p>
+<!-- Main Card -->
+<div class="p-7.5 rounded-2xl bg-white">
+    <h4 class="heading4 mb-4">{% trans "Need Help?" %}</h4>
+    <p class="caption1 text-secondary mb-8">
+        {% trans "We're here to help you get the most out of our platform." %}
+    </p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Documentation -->
-            <div class="zu-card border">
-                <div class="zu-card__body">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold mb-2">{% trans "Documentation" %}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        {% trans "Browse our comprehensive guides and tutorials." %}
-                    </p>
-                    <a href="#" class="zu-btn zu-btn--sm zu-btn--outline">{% trans "View Docs" %}</a>
+    <!-- Help Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Documentation -->
+        <div class="p-6 rounded-xl border border-line hover:border-primary transition-colors">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <span class="ph ph-book text-2xl text-purple-600"></span>
                 </div>
             </div>
+            <h5 class="heading6 mb-2">{% trans "Documentation" %}</h5>
+            <p class="caption1 text-secondary mb-4">
+                {% trans "Browse our comprehensive guides and tutorials." %}
+            </p>
+            <a href="#" class="button-main -outline -small">{% trans "View Docs" %}</a>
+        </div>
 
-            <!-- Contact Support -->
-            <div class="zu-card border">
-                <div class="zu-card__body">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold mb-2">{% trans "Contact Support" %}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        {% trans "Get in touch with our support team." %}
-                    </p>
-                    <a href="mailto:support@zumodra.com" class="zu-btn zu-btn--sm zu-btn--outline">{% trans "Email Us" %}</a>
+        <!-- Contact Support -->
+        <div class="p-6 rounded-xl border border-line hover:border-primary transition-colors">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <span class="ph ph-envelope text-2xl text-blue-600"></span>
                 </div>
             </div>
+            <h5 class="heading6 mb-2">{% trans "Contact Support" %}</h5>
+            <p class="caption1 text-secondary mb-4">
+                {% trans "Get in touch with our support team." %}
+            </p>
+            <a href="mailto:support@zumodra.com" class="button-main -outline -small">{% trans "Email Us" %}</a>
+        </div>
 
-            <!-- FAQ -->
-            <div class="zu-card border">
-                <div class="zu-card__body">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold mb-2">{% trans "FAQ" %}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        {% trans "Find answers to frequently asked questions." %}
-                    </p>
-                    <a href="{% url 'faq' %}" class="zu-btn zu-btn--sm zu-btn--outline">{% trans "View FAQ" %}</a>
+        <!-- FAQ -->
+        <div class="p-6 rounded-xl border border-line hover:border-primary transition-colors">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
+                    <span class="ph ph-question text-2xl text-yellow-600"></span>
                 </div>
             </div>
+            <h5 class="heading6 mb-2">{% trans "FAQ" %}</h5>
+            <p class="caption1 text-secondary mb-4">
+                {% trans "Find answers to frequently asked questions." %}
+            </p>
+            <a href="{% url 'faq' %}" class="button-main -outline -small">{% trans "View FAQ" %}</a>
         </div>
     </div>
 </div>

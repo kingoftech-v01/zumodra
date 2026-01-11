@@ -1,184 +1,207 @@
-{% extends 'base/dashboard_base.html' %}
-{% load static %}
+{% extends 'base/freelanhub_dashboard_base.html' %}
+{% load static i18n %}
 
-{% block title %}Chat - {{ conversation.title|default:"Messages" }}{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:dashboard' %}" class="caption1 text-secondary hover:text-primary">
+        <span class="ph ph-house"></span>
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <a href="{% url 'frontend:messages:conversations' %}" class="caption1 text-secondary hover:text-primary">
+        {% trans "Messages" %}
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="caption1 text-title">{{ conversation.title|default:"Chat"|truncatewords:3 }}</span>
+</div>
 
-{% block content %}
 <!-- Tenant Type Badge -->
 {% if request.tenant %}
     {% if request.tenant.tenant_type == 'company' %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"/>
-            </svg>
+        <span class="tag bg-blue text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-2 mb-6">
+            <span class="ph ph-buildings"></span>
             {% trans "Company" %}
         </span>
     {% else %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-            </svg>
+        <span class="tag bg-green text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-2 mb-6">
+            <span class="ph ph-user-circle"></span>
             {% trans "Freelancer" %}
         </span>
     {% endif %}
 {% endif %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <!-- Conversations sidebar -->
-        <div class="col-md-4 col-lg-3">
-            <div class="zu-card shadow-sm">
-                <div class="zu-card__header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 text-gray-900 dark:text-white">Conversations</h5>
-                    <button class="zu-btn zu-btn--primary zu-btn--sm" data-bs-toggle="modal" data-bs-target="#newConversationModal">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="list-group list-group-flush" id="conversationsList" style="max-height: 600px; overflow-y: auto;">
-                    {% for conv in conversations %}
-                    <a href="{% url 'frontend:messages:chat' conv.uuid %}"
-                       class="list-group-item list-group-item-action {% if conv == conversation %}active{% endif %} dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1 dark:text-white">{{ conv.title|default:"Conversation" }}</h6>
-                            <small class="dark:text-gray-400">{{ conv.updated_at|timesince }}</small>
-                        </div>
-                        <p class="mb-1 text-truncate dark:text-gray-300">{{ conv.last_message.content|default:"No messages yet" }}</p>
-                        {% if conv.unread_count %}
-                        <span class="badge bg-primary rounded-pill">{{ conv.unread_count }}</span>
-                        {% endif %}
-                    </a>
-                    {% empty %}
-                    <div class="list-group-item text-center text-muted py-4 dark:bg-gray-800 dark:text-gray-400">
-                        <svg class="w-12 h-12 mx-auto mb-2 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
-                        </svg>
-                        No conversations yet
+
+<!-- Messages Container with Split View -->
+<div class="flex gap-6 h-[calc(100vh-250px)]">
+    <!-- Conversations List Sidebar -->
+    <div class="w-[320px] flex-shrink-0 p-6 rounded-2xl bg-white">
+        <div class="flex items-center justify-between mb-6">
+            <h4 class="heading5">{% trans "Messages" %}</h4>
+            <button class="button-main -icon -small" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                <span class="ph ph-pencil-simple"></span>
+            </button>
+        </div>
+
+        <!-- Search (Optional) -->
+        <div class="mb-4">
+            <div class="relative">
+                <input type="text" placeholder="{% trans 'Search...' %}" class="w-full h-10 pl-10 pr-3 border border-line rounded-lg caption1">
+                <span class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-secondary"></span>
+            </div>
+        </div>
+
+        <!-- Conversation Items -->
+        <div class="space-y-2 overflow-y-auto" style="max-height: calc(100% - 150px);">
+            {% for conv in conversations %}
+            <a href="{% url 'frontend:messages:chat' conv.uuid %}"
+               class="flex items-start gap-3 p-3 rounded-lg transition-colors {% if conv == conversation %}bg-surface{% else %}hover:bg-surface{% endif %}">
+                <div class="relative flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
+                        <span class="ph ph-user text-xl text-secondary"></span>
                     </div>
-                    {% endfor %}
+                    {% if conv.unread_count %}
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-green rounded-full border-2 border-white"></span>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-button text-title">{{ conv.title|default:"Conversation"|truncatewords:3 }}</span>
+                        <span class="caption2 text-secondary">{{ conv.updated_at|timesince|truncatewords:1 }}</span>
+                    </div>
+                    <p class="caption1 text-secondary truncate">{{ conv.last_message.content|default:"No messages yet" }}</p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="text-center py-8">
+                <span class="ph ph-chat-circle text-[40px] text-secondary mb-2 block"></span>
+                <p class="caption2 text-secondary">{% trans "No conversations yet" %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Chat View -->
+    {% if conversation %}
+    <div class="flex-1 p-8 rounded-2xl bg-white flex flex-col">
+        <!-- Chat Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-line mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
+                    <span class="ph ph-user text-xl text-secondary"></span>
+                </div>
+                <div>
+                    <h5 class="heading6">{{ conversation.title|default:"Conversation" }}</h5>
+                    <div class="caption2 text-secondary">
+                        {% for participant in conversation.participants.all %}
+                        {{ participant.get_full_name|default:participant.email }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="button-main -icon -outline">
+                    <span class="ph ph-dots-three-vertical"></span>
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition
+                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-line z-10">
+                    <a href="#" id="archiveConversation" class="block px-4 py-2 caption1 text-secondary hover:bg-surface">
+                        {% trans "Archive" %}
+                    </a>
+                    <a href="#" id="deleteConversation" class="block px-4 py-2 caption1 text-red hover:bg-surface">
+                        {% trans "Delete" %}
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Chat area -->
-        <div class="col-md-8 col-lg-9">
-            {% if conversation %}
-            <div class="zu-card shadow-sm">
-                <div class="zu-card__header d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0 text-gray-900 dark:text-white">{{ conversation.title|default:"Conversation" }}</h5>
-                        <small class="text-muted dark:text-gray-400">
-                            {% for participant in conversation.participants.all %}
-                            {{ participant.get_full_name|default:participant.email }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </small>
+        <!-- Messages -->
+        <div id="messagesContainer" class="flex-1 overflow-y-auto space-y-4 mb-6">
+            {% for message in messages %}
+            <div class="flex {% if message.sender == request.user %}justify-end{% endif %}">
+                <div class="max-w-[70%] p-4 rounded-lg {% if message.sender == request.user %}bg-primary text-white{% else %}bg-surface{% endif %}">
+                    <p class="caption1">{{ message.content }}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="caption2 {% if message.sender == request.user %}text-white opacity-70{% else %}text-secondary{% endif %}">
+                            {{ message.sender.get_full_name|default:message.sender.email }} &middot; {{ message.created_at|time:"g:i A" }}
+                        </span>
+                        {% if message.is_read and message.sender == request.user %}
+                        <span class="ph ph-checks {% if message.sender == request.user %}text-white{% endif %}"></span>
+                        {% endif %}
                     </div>
-                    <div class="dropdown">
-                        <button class="zu-btn zu-btn--outline" data-bs-toggle="dropdown">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/>
-                            </svg>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end dark:bg-gray-800">
-                            <li><a class="dropdown-item dark:text-gray-200 dark:hover:bg-gray-700" href="#" id="archiveConversation">Archive</a></li>
-                            <li><a class="dropdown-item text-danger dark:text-red-400" href="#" id="deleteConversation">Delete</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="zu-card__body" id="messagesContainer" style="height: 500px; overflow-y: auto;">
-                    {% for message in messages %}
-                    <div class="message mb-3 {% if message.sender == request.user %}text-end{% endif %}">
-                        <div class="d-inline-block p-3 rounded {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light dark:bg-gray-700 dark:text-gray-200{% endif %}"
-                             style="max-width: 70%;">
-                            <p class="mb-1">{{ message.content }}</p>
-                            <small class="opacity-75">
-                                {{ message.sender.get_full_name|default:message.sender.email }} - {{ message.created_at|time:"H:i" }}
-                                {% if message.is_read and message.sender == request.user %}
-                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                                </svg>
-                                {% endif %}
-                            </small>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="text-center text-muted py-5 dark:text-gray-400">
-                        <svg class="w-12 h-12 mx-auto mb-2 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
-                        </svg>
-                        No messages yet. Start the conversation!
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="zu-card__footer border-t dark:border-gray-700">
-                    <form id="messageForm" method="post" action="{% url 'frontend:messages:send_message' conversation.uuid %}">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <input type="text" name="content" class="zu-input flex-1"
-                                   placeholder="Type your message..." autocomplete="off" required>
-                            <button type="button" class="zu-btn zu-btn--outline" id="attachmentBtn">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/>
-                                </svg>
-                            </button>
-                            <button type="submit" class="zu-btn zu-btn--primary">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
-            {% else %}
-            <div class="zu-card shadow-sm">
-                <div class="zu-card__body text-center py-5">
-                    <svg class="w-16 h-16 mx-auto mb-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
-                    </svg>
-                    <h5 class="text-gray-900 dark:text-white">Select a conversation</h5>
-                    <p class="text-muted dark:text-gray-400">Choose a conversation from the sidebar or start a new one</p>
-                    <button class="zu-btn zu-btn--primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
-                        Start New Conversation
-                    </button>
-                </div>
+            {% empty %}
+            <div class="text-center py-16">
+                <span class="ph ph-chat-circle-text text-[80px] text-secondary mb-4 block"></span>
+                <h5 class="heading5 mb-2">{% trans "No messages yet" %}</h5>
+                <p class="caption1 text-secondary">{% trans "Start the conversation!" %}</p>
             </div>
-            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Message Input -->
+        <form id="messageForm" method="post" action="{% url 'frontend:messages:send_message' conversation.uuid %}" class="flex items-center gap-3">
+            {% csrf_token %}
+            <input type="text" name="content" placeholder="{% trans 'Type a message...' %}" autocomplete="off" required
+                   class="flex-1 h-12 px-4 border border-line rounded-lg caption1">
+            <button type="button" id="attachmentBtn" class="button-main -icon -outline">
+                <span class="ph ph-paperclip"></span>
+            </button>
+            <button type="submit" class="button-main">
+                <span class="ph ph-paper-plane-right"></span>
+                {% trans "Send" %}
+            </button>
+        </form>
+    </div>
+    {% else %}
+    <!-- No Conversation Selected -->
+    <div class="flex-1 p-8 rounded-2xl bg-white flex items-center justify-center">
+        <div class="text-center">
+            <span class="ph ph-chat-circle-text text-[120px] text-secondary mb-6 block"></span>
+            <h5 class="heading4 mb-2">{% trans "Select a conversation" %}</h5>
+            <p class="caption1 text-secondary mb-6">{% trans "Choose a conversation from the sidebar or start a new one" %}</p>
+            <button class="button-main" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                <span class="ph ph-pencil-simple"></span>
+                {% trans "Start New Conversation" %}
+            </button>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <!-- New Conversation Modal -->
 <div class="zu-modal fade" id="newConversationModal" tabindex="-1">
     <div class="zu-modal__dialog">
-        <div class="zu-modal__content dark:bg-gray-800">
-            <div class="zu-modal__header border-b dark:border-gray-700">
-                <h5 class="zu-modal__title text-gray-900 dark:text-white">New Conversation</h5>
-                <button type="button" class="btn-close dark:invert" data-bs-dismiss="modal"></button>
+        <div class="zu-modal__content">
+            <div class="zu-modal__header border-b border-line">
+                <h5 class="zu-modal__title heading5">{% trans "New Conversation" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="{% url 'frontend:messages:new_conversation' %}">
                 {% csrf_token %}
                 <div class="zu-modal__body">
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">Recipients</label>
-                        <select name="recipients" class="zu-input" multiple required>
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "Recipients" %}</label>
+                        <select name="recipients" class="w-full h-12 px-4 border border-line rounded-lg" multiple required>
                             {% for contact in contacts %}
                             <option value="{{ contact.id }}">{{ contact.get_full_name|default:contact.email }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">Subject (optional)</label>
-                        <input type="text" name="title" class="zu-input">
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "Subject (optional)" %}</label>
+                        <input type="text" name="title" class="w-full h-12 px-4 border border-line rounded-lg">
                     </div>
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">Message</label>
-                        <textarea name="content" class="zu-input" rows="3" required></textarea>
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "Message" %}</label>
+                        <textarea name="content" class="w-full px-4 py-3 border border-line rounded-lg" rows="3" required></textarea>
                     </div>
                 </div>
-                <div class="zu-modal__footer border-t dark:border-gray-700">
-                    <button type="button" class="zu-btn zu-btn--secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="zu-btn zu-btn--primary">Start Conversation</button>
+                <div class="zu-modal__footer border-t border-line">
+                    <button type="button" class="button-main -outline" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                    <button type="submit" class="button-main">
+                        <span class="ph ph-paper-plane-right"></span>
+                        {% trans "Start Conversation" %}
+                    </button>
                 </div>
             </form>
         </div>
@@ -201,12 +224,16 @@ const ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws/chat/{{ conv
 
 ws.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    // Handle incoming message
-    location.reload(); // Simple refresh for now
+    // Handle incoming message - reload for now (can be improved with dynamic insertion)
+    location.reload();
 };
 
 ws.onclose = function(event) {
     console.log('WebSocket closed');
+};
+
+ws.onerror = function(error) {
+    console.error('WebSocket error:', error);
 };
 {% endif %}
 </script>

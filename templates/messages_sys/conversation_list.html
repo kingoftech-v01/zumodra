@@ -1,159 +1,166 @@
-{% extends 'base/dashboard_base.html' %}
-{% load static %}
+{% extends 'base/freelanhub_dashboard_base.html' %}
+{% load static i18n %}
 
-{% block title %}Messages{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:dashboard' %}" class="caption1 text-secondary hover:text-primary">
+        <span class="ph ph-house"></span>
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="caption1 text-title">{% trans "Messages" %}</span>
+</div>
 
-{% block content %}
 <!-- Tenant Type Badge -->
 {% if request.tenant %}
     {% if request.tenant.tenant_type == 'company' %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"/>
-            </svg>
+        <span class="tag bg-blue text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-2 mb-6">
+            <span class="ph ph-buildings"></span>
             {% trans "Company" %}
         </span>
     {% else %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-            </svg>
+        <span class="tag bg-green text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-2 mb-6">
+            <span class="ph ph-user-circle"></span>
             {% trans "Freelancer" %}
         </span>
     {% endif %}
 {% endif %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-gray-900 dark:text-white">Messages</h2>
-        <button class="zu-btn zu-btn--primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
-            <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-            New Message
-        </button>
+
+<!-- Header -->
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h3 class="heading3 mb-2">{% trans "Messages" %}</h3>
+        <p class="caption1 text-secondary">{% trans "Manage your conversations" %}</p>
+    </div>
+    <button class="button-main" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+        <span class="ph ph-pencil-simple"></span>
+        {% trans "New Message" %}
+    </button>
+</div>
+
+<!-- Messages Container -->
+<div class="p-7.5 rounded-2xl bg-white">
+    <!-- Tabs -->
+    <div class="flex items-center gap-4 border-b border-line pb-4 mb-6">
+        <a href="{% url 'frontend:messages:conversations' %}"
+           class="text-button {% if not filter %}text-primary{% else %}text-secondary hover:text-title{% endif %}">
+            {% trans "All" %} <span class="tag -small bg-surface text-secondary ml-2">{{ total_count }}</span>
+        </a>
+        <a href="?filter=unread"
+           class="text-button {% if filter == 'unread' %}text-primary{% else %}text-secondary hover:text-title{% endif %}">
+            {% trans "Unread" %} <span class="tag -small bg-primary text-white ml-2">{{ unread_count }}</span>
+        </a>
+        <a href="?filter=archived"
+           class="text-button {% if filter == 'archived' %}text-primary{% else %}text-secondary hover:text-title{% endif %}">
+            {% trans "Archived" %}
+        </a>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="zu-card shadow-sm">
-                <div class="zu-card__header">
-                    <ul class="nav nav-tabs card-header-tabs">
-                        <li class="nav-item">
-                            <a class="nav-link {% if not filter %}active{% endif %} dark:text-gray-300" href="{% url 'frontend:messages:conversations' %}">
-                                All <span class="badge bg-secondary">{{ total_count }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if filter == 'unread' %}active{% endif %} dark:text-gray-300" href="?filter=unread">
-                                Unread <span class="badge bg-primary">{{ unread_count }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if filter == 'archived' %}active{% endif %} dark:text-gray-300" href="?filter=archived">
-                                Archived
-                            </a>
-                        </li>
-                    </ul>
+    <!-- Conversations List -->
+    <div class="space-y-3">
+        {% for conversation in conversations %}
+        <a href="{% url 'frontend:messages:chat' conversation.uuid %}"
+           class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface transition-colors">
+            <div class="relative flex-shrink-0">
+                <div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center">
+                    <span class="ph ph-user text-2xl text-secondary"></span>
                 </div>
-                <div class="list-group list-group-flush">
-                    {% for conversation in conversations %}
-                    <a href="{% url 'frontend:messages:chat' conversation.uuid %}" class="list-group-item list-group-item-action dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">
-                        <div class="d-flex w-100 justify-content-between align-items-start">
-                            <div class="d-flex align-items-center">
-                                {% if conversation.unread_count %}
-                                <span class="badge bg-primary rounded-pill me-2">{{ conversation.unread_count }}</span>
-                                {% endif %}
-                                <div>
-                                    <h6 class="mb-1 {% if conversation.unread_count %}fw-bold{% endif %} text-gray-900 dark:text-white">
-                                        {{ conversation.title|default:"Conversation" }}
-                                    </h6>
-                                    <p class="mb-1 text-muted text-truncate dark:text-gray-400" style="max-width: 400px;">
-                                        {{ conversation.last_message.content|default:"No messages" }}
-                                    </p>
-                                    <small class="text-muted dark:text-gray-500">
-                                        {% for p in conversation.participants.all|slice:":3" %}
-                                        {{ p.get_full_name|default:p.email }}{% if not forloop.last %}, {% endif %}
-                                        {% endfor %}
-                                        {% if conversation.participants.count > 3 %}
-                                        and {{ conversation.participants.count|add:"-3" }} more
-                                        {% endif %}
-                                    </small>
-                                </div>
-                            </div>
-                            <small class="text-muted dark:text-gray-500">{{ conversation.updated_at|timesince }} ago</small>
-                        </div>
-                    </a>
-                    {% empty %}
-                    <div class="list-group-item text-center py-5 dark:bg-gray-800">
-                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z"/>
-                        </svg>
-                        <h5 class="text-gray-900 dark:text-white">No conversations</h5>
-                        <p class="text-muted mb-3 dark:text-gray-400">Start a new conversation to get started</p>
-                        <button class="zu-btn zu-btn--primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
-                            New Message
-                        </button>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% if conversations.has_other_pages %}
-                <div class="zu-card__footer">
-                    <nav>
-                        <ul class="pagination justify-content-center mb-0">
-                            {% if conversations.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" href="?page={{ conversations.previous_page_number }}">Previous</a>
-                            </li>
-                            {% endif %}
-                            <li class="page-item disabled">
-                                <span class="page-link dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">Page {{ conversations.number }} of {{ conversations.paginator.num_pages }}</span>
-                            </li>
-                            {% if conversations.has_next %}
-                            <li class="page-item">
-                                <a class="page-link dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" href="?page={{ conversations.next_page_number }}">Next</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </div>
+                {% if conversation.unread_count %}
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red rounded-full flex items-center justify-center caption2 text-white">
+                    {{ conversation.unread_count }}
+                </span>
                 {% endif %}
             </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                    <h6 class="text-button text-title {% if conversation.unread_count %}font-bold{% endif %}">
+                        {{ conversation.title|default:"Conversation" }}
+                    </h6>
+                    <span class="caption2 text-secondary">{{ conversation.updated_at|timesince }} {% trans "ago" %}</span>
+                </div>
+                <p class="caption1 text-secondary truncate">
+                    {{ conversation.last_message.content|default:"No messages" }}
+                </p>
+                <div class="caption2 text-secondary mt-1">
+                    {% for p in conversation.participants.all|slice:":3" %}
+                    {{ p.get_full_name|default:p.email }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if conversation.participants.count > 3 %}
+                    {% trans "and" %} {{ conversation.participants.count|add:"-3" }} {% trans "more" %}
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center py-16">
+            <span class="ph ph-chat-circle text-[80px] text-secondary mb-4 block"></span>
+            <h5 class="heading5 mb-2">{% trans "No conversations" %}</h5>
+            <p class="caption1 text-secondary mb-6">{% trans "Start a new conversation to get started" %}</p>
+            <button class="button-main" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                <span class="ph ph-pencil-simple"></span>
+                {% trans "New Message" %}
+            </button>
         </div>
+        {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if conversations.has_other_pages %}
+    <div class="flex items-center justify-center gap-3 mt-8 pt-6 border-t border-line">
+        {% if conversations.has_previous %}
+        <a href="?page={{ conversations.previous_page_number }}" class="button-main -outline -small">
+            <span class="ph ph-caret-left"></span>
+            {% trans "Previous" %}
+        </a>
+        {% endif %}
+        <span class="caption1 text-secondary">
+            {% trans "Page" %} {{ conversations.number }} {% trans "of" %} {{ conversations.paginator.num_pages }}
+        </span>
+        {% if conversations.has_next %}
+        <a href="?page={{ conversations.next_page_number }}" class="button-main -outline -small">
+            {% trans "Next" %}
+            <span class="ph ph-caret-right"></span>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 
 <!-- New Conversation Modal -->
 <div class="zu-modal fade" id="newConversationModal" tabindex="-1">
     <div class="zu-modal__dialog">
-        <div class="zu-modal__content dark:bg-gray-800">
-            <div class="zu-modal__header border-b dark:border-gray-700">
-                <h5 class="zu-modal__title text-gray-900 dark:text-white">New Conversation</h5>
-                <button type="button" class="btn-close dark:invert" data-bs-dismiss="modal"></button>
+        <div class="zu-modal__content">
+            <div class="zu-modal__header border-b border-line">
+                <h5 class="zu-modal__title heading5">{% trans "New Conversation" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="{% url 'frontend:messages:new_conversation' %}">
                 {% csrf_token %}
                 <div class="zu-modal__body">
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">To</label>
-                        <select name="recipients" class="zu-input" multiple required>
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "To" %}</label>
+                        <select name="recipients" class="w-full h-12 px-4 border border-line rounded-lg" multiple required>
                             {% for contact in contacts %}
                             <option value="{{ contact.id }}">{{ contact.get_full_name|default:contact.email }}</option>
                             {% endfor %}
                         </select>
-                        <small class="text-muted dark:text-gray-400">Hold Ctrl/Cmd to select multiple recipients</small>
+                        <span class="caption2 text-secondary mt-1 block">{% trans "Hold Ctrl/Cmd to select multiple recipients" %}</span>
                     </div>
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">Subject</label>
-                        <input type="text" name="title" class="zu-input" placeholder="Optional">
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "Subject" %}</label>
+                        <input type="text" name="title" class="w-full h-12 px-4 border border-line rounded-lg" placeholder="{% trans 'Optional' %}">
                     </div>
-                    <div class="zu-form-group mb-3">
-                        <label class="zu-label">Message</label>
-                        <textarea name="content" class="zu-input" rows="4" required></textarea>
+                    <div class="zu-form-group mb-4">
+                        <label class="caption1 text-title mb-2 block">{% trans "Message" %}</label>
+                        <textarea name="content" class="w-full px-4 py-3 border border-line rounded-lg" rows="4" required></textarea>
                     </div>
                 </div>
-                <div class="zu-modal__footer border-t dark:border-gray-700">
-                    <button type="button" class="zu-btn zu-btn--secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="zu-btn zu-btn--primary">Send</button>
+                <div class="zu-modal__footer border-t border-line">
+                    <button type="button" class="button-main -outline" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                    <button type="submit" class="button-main">
+                        <span class="ph ph-paper-plane-right"></span>
+                        {% trans "Send" %}
+                    </button>
                 </div>
             </form>
         </div>
