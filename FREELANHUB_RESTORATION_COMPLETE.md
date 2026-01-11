@@ -214,6 +214,54 @@ templates/
 - ✅ All Alpine.js components functional
 - ✅ All forms and CSRF tokens preserved
 
+## ⚠️ DEPLOYMENT REQUIREMENTS
+
+### Critical: Run Database Migrations
+
+Before deploying, you MUST run database migrations to create the `accounts_trustscore` table:
+
+```bash
+# For multi-tenant setup:
+docker compose exec web python manage.py migrate_schemas --shared
+docker compose exec web python manage.py migrate_schemas --tenant
+
+# OR for standard Django:
+docker compose exec web python manage.py migrate
+```
+
+### Deployment Sequence:
+
+```bash
+# 1. Pull latest code
+git pull origin main
+
+# 2. Build and start services
+docker compose up -d --build
+
+# 3. Run migrations (CRITICAL!)
+docker compose exec web python manage.py migrate_schemas --shared
+docker compose exec web python manage.py migrate_schemas --tenant
+
+# 4. Collect static files
+docker compose exec web python manage.py collectstatic --noinput
+
+# 5. Restart services
+docker compose restart web channels
+
+# 6. Check health
+docker compose exec web python manage.py health_check --full
+```
+
+### Verification:
+
+Test these critical endpoints after deployment:
+- Dashboard: `/dashboard/`
+- ATS: `/ats/jobs/`
+- Services: `/services/`
+- Finance: `/finance/`
+- HR: `/hr/employees/`
+- Messages: `/messages/`
+
 ## 🔄 Next Steps (Optional Enhancements)
 
 While the restoration is complete, optional future enhancements could include:
