@@ -113,9 +113,10 @@
                         </svg>
                     </a>
                     {% endif %}
-                    <a href="{% url 'frontend:ats:interview_detail' interview.uuid %}"
+                    {% comment %} Interview detail view - to be implemented {% endcomment %}
+                    <a href="{% url 'frontend:ats:pipeline_board' %}"
                        class="zu-btn zu-btn--ghost zu-btn--sm zu-btn--icon"
-                       title="{% trans 'View Details' %}">
+                       title="{% trans 'View Pipeline' %}">
                         <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -138,7 +139,7 @@
 
         {% comment %} View All Link {% endcomment %}
         <div class="zu-interview-list__footer">
-            <a href="{% url 'frontend:ats:interviews' %}" class="zu-btn zu-btn--ghost">
+            <a href="{% url 'frontend:ats:pipeline_board' %}" class="zu-btn zu-btn--ghost">
                 {% trans "View all interviews" %}
                 <svg class="zu-icon zu-icon--sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -155,7 +156,7 @@
             <h3 class="zu-empty__title">{% trans "No upcoming interviews" %}</h3>
             <p class="zu-empty__text">{% trans "Interviews scheduled for the next 7 days will appear here." %}</p>
             <div class="zu-empty__actions">
-                <a href="{% url 'frontend:ats:applications' %}" class="zu-btn zu-btn--primary">
+                <a href="{% url 'frontend:ats:pipeline_board' %}" class="zu-btn zu-btn--primary">
                     <svg class="zu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>

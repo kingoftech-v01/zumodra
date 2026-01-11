@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:ats:jobs' %}" class="zu-stats-card__link">
+            <a href="{% url 'frontend:ats:job_list' %}" class="zu-stats-card__link">
                 {% trans "View all" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
@@ -73,7 +73,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:ats:candidates' %}" class="zu-stats-card__link zu-stats-card__link--success">
+            <a href="{% url 'frontend:ats:candidate_list' %}" class="zu-stats-card__link zu-stats-card__link--success">
                 {% trans "View all" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
@@ -94,7 +94,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:ats:applications' %}" class="zu-stats-card__link zu-stats-card__link--warning">
+            <a href="{% url 'frontend:ats:pipeline_board' %}" class="zu-stats-card__link zu-stats-card__link--warning">
                 {% trans "View all" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
@@ -115,7 +115,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:ats:interviews' %}" class="zu-stats-card__link zu-stats-card__link--info">
+            <a href="{% url 'frontend:ats:pipeline_board' %}" class="zu-stats-card__link zu-stats-card__link--info">
                 {% trans "View schedule" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
@@ -149,7 +149,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:hr:employees' %}" class="zu-stats-card__link">
+            <a href="{% url 'frontend:hr:employee-directory' %}" class="zu-stats-card__link">
                 {% trans "View directory" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
@@ -201,7 +201,7 @@
             </div>
         </div>
         <div class="zu-stats-card__footer">
-            <a href="{% url 'frontend:ats:candidates' %}?filter=new" class="zu-stats-card__link zu-stats-card__link--success">
+            <a href="{% url 'frontend:ats:candidate_list' %}?filter=new" class="zu-stats-card__link zu-stats-card__link--success">
                 {% trans "View new" %}
                 <span aria-hidden="true"> &rarr;</span>
             </a>
