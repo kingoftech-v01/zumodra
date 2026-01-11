@@ -1,118 +1,18 @@
 {% comment %}
 =============================================================================
-   ZUMODRA PUBLIC BASE TEMPLATE
-   =============================================================================
+   MAIN BASE TEMPLATE - Now extends FreelanHub Base
+=============================================================================
 
-   File: templates/base.html
-   Purpose: Canonical base template for all public-facing pages
+   This template extends the FreelanHub base template to ensure all pages
+   use the FreelanHub design system.
 
-   NO CDN DEPENDENCIES - All assets served locally
+   Previous custom Zumodra design has been replaced with original FreelanHub
+   template design per project requirements.
 
-   BLOCKS AVAILABLE:
-   - title: Page title (appears in browser tab)
-   - meta_description: Page meta description
-   - extra_head: Additional <head> content (CSS, meta tags)
-   - header_class: Additional classes for header element
-   - content: Main page content
-   - extra_js: Additional JavaScript before closing </body>
+   For the complete base template structure, see:
+   templates/base/freelanhub_base.html
 
-   USAGE:
-   {% extends "base.html" %}
-   {% load i18n static %}
-
-   {% block title %}{% trans "Page Title" %} - Zumodra{% endblock %}
-   {% block content %}
-       ...page content...
-   {% endblock %}
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-   =============================================================================
+=============================================================================
 {% endcomment %}
 
-{% load static i18n %}
-
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'en' }}">
-<head>
-    {% comment %} META TAGS {% endcomment %}
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="{% block meta_description %}{% trans 'Zumodra - Verify. Recruit. Hire. Risk-Free. The trusted platform for verified freelancers and employers.' %}{% endblock %}" />
-    <meta name="csrf-token" content="{{ csrf_token }}">
-
-    {% comment %} PAGE TITLE {% endcomment %}
-    <title>{% block title %}Zumodra{% endblock %}</title>
-
-    {% comment %} FAVICON {% endcomment %}
-    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon" />
-
-    {% comment %} LOCAL CSS - NO CDN {% endcomment %}
-    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}" />
-    <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}" />
-
-    {% comment %} Component CSS {% endcomment %}
-    <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
-
-    {% comment %} Icon Fonts (Local) {% endcomment %}
-    <link rel="stylesheet" href="{% static 'assets/css/icomoon/style.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/phosphor/phosphor.css' %}" />
-
-    {% comment %} Additional CSS {% endcomment %}
-    <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
-
-    {% comment %} Zumodra Design System {% endcomment %}
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}" />
-
-    {% comment %} Animation Fixes and Alpine.js Cloak {% endcomment %}
-    <style>
-        /* Alpine.js cloak - hide elements until Alpine initializes */
-        [x-cloak] { display: none !important; }
-
-        .animate { opacity: 1 !important; transform: none !important; }
-        html, body { overflow-x: hidden; }
-        html { overflow-y: auto; }
-        body { overflow-y: visible; }
-    </style>
-    <noscript>
-        <style>.animate { opacity: 1 !important; transform: none !important; }</style>
-    </noscript>
-
-    {% comment %} Additional Head Content {% endcomment %}
-    {% block extra_head %}{% endblock %}
-</head>
-
-<body class="flex flex-col min-h-screen">
-
-    {% comment %} HEADER {% endcomment %}
-    {% include "components/public_header.html" %}
-
-    {% comment %} MOBILE MENU {% endcomment %}
-    {% include "components/marketplace/layout/mobile_menu.html" %}
-
-    {% comment %} MAIN CONTENT {% endcomment %}
-    <main class="flex-grow">
-        {% block content %}{% endblock %}
-    </main>
-
-    {% comment %} FOOTER {% endcomment %}
-    {% include "components/public_footer.html" %}
-
-    {% comment %} SCROLL TO TOP {% endcomment %}
-    {% include "components/marketplace/common/scroll_to_top.html" %}
-
-    {% comment %} LOCAL JAVASCRIPT - NO CDN {% endcomment %}
-    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
-    <script src="{% static 'assets/js/slick.min.js' %}"></script>
-    <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
-    <script src="{% static 'assets/js/main.js' %}"></script>
-
-    {% comment %} Alpine.js for interactive components {% endcomment %}
-    <script defer src="{% static 'assets/js/vendor/alpine.min.js' %}"></script>
-
-    {% comment %} Additional Page Scripts {% endcomment %}
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+{% extends "base/freelanhub_base.html" %}

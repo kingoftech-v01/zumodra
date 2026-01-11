@@ -1,307 +1,243 @@
-{% extends "base.html" %}
-{% comment %}
-=============================================================================
-   ZUMODRA HOME PAGE
-=============================================================================
-
-   File: templates/index.html
-   Purpose: Main homepage for the Zumodra platform
-
-   Extends: base.html (canonical public base template)
-
-   Features:
-   - Hero slider with search functionality
-   - Trusted brands carousel
-   - Category listings
-   - Featured services
-   - Top freelancers showcase
-   - CTA banner
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-=============================================================================
-{% endcomment %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Home" %} - Zumodra{% endblock %}
+{% block title %}FreelanHub - Job Board & Freelance Marketplace{% endblock %}
 
-{% block meta_description %}{% trans "Zumodra - Verify. Recruit. Hire. Risk-Free. The trusted platform for verified freelancers and employers. Find top talent or your next opportunity today." %}{% endblock %}
+{% block meta_description %}FreelanHub - Discover your next freelance solution today. Find work or find talent on the leading freelance marketplace.{% endblock %}
 
 {% block content %}
-<!-- Platform Stats -->
-{% if stats %}
-<div class="text-sm text-gray-600 dark:text-gray-400">
-    <span>{{ stats.total_companies }} {% trans "Companies" %}</span>
-    <span class="mx-2">•</span>
-    <span>{{ stats.total_freelancers }} {% trans "Freelancers" %}</span>
-</div>
-{% endif %}
 
-{% comment %} HERO SLIDER SECTION {% endcomment %}
-<section class="hero-animated">
-    <div class="slider_inner relative md:h-[700px] max-md:py-28 overflow-hidden">
-        <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]" aria-hidden="true">
-            <img src="{% static 'assets/images/slider/index.jpg' %}" alt="{% trans 'Hero background' %}" class="w-full h-full object-cover" />
-            <div class="hero-gradient-overlay"></div>
+<!-- Slider / Hero Section -->
+<section class="slider">
+    <div class="slider_inner relative md:h-[780px] overflow-hidden sm:mt-20 mt-16">
+        <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]">
+            <img src="{% static 'assets/images/slider/slider2.webp' %}" alt="{% trans 'Hero background' %}" class="w-full h-full object-cover" />
         </div>
-        <div class="container h-full relative z-10">
-            <div class="slider_content flex flex-col items-start justify-center sm:pt-20 pt-16 md:w-[720px] w-full h-full">
-                <h2 class="heading-1 text-white animate animate_top" style="--i: 1">{% trans "Verify. Recruit. Hire. Risk-Free." %}</h2>
-                <p class="body-large text-white mt-5 animate animate_top opacity-90" style="--i: 2">{% trans "Find verified freelancers and top talent for any project. Build trust with bidirectional KYC verification." %}</p>
-                {% url 'services:service_list' as job_search_url %}
-                <div class="form_search z-[1] w-full md:mt-10 mt-7 animate animate_top" style="--i: 3">
-                    <form class="glass-card-hover flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-xl" action="{{ job_search_url|default:'#' }}" method="get">
-                        <div class="form_input relative w-full">
-                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl text-gray-500"></span>
-                            <input type="text" name="q" class="input-glass w-full h-full pl-10 border-0 focus:ring-2 focus:ring-cyan-400" placeholder="{% trans 'Job title, keywords, or company' %}" />
-                        </div>
-                        <div class="select_block flex-shrink-0 sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-gray-200">
-                            <div class="select">
-                                <span class="selected font-medium" data-title="{% trans 'All Categories' %}">{% trans "All Categories" %}</span>
-                                <ul class="list_option bg-white shadow-xl rounded-xl border border-gray-100">
-                                    <li data-item="{% trans 'Graphic & Design' %}">{% trans "Graphic & Design" %}</li>
-                                    <li data-item="{% trans 'Writing & Translation' %}">{% trans "Writing & Translation" %}</li>
-                                    <li data-item="{% trans 'Video & Animation' %}">{% trans "Video & Animation" %}</li>
-                                    <li data-item="{% trans 'Digital Marketing' %}">{% trans "Digital Marketing" %}</li>
-                                    <li data-item="{% trans 'Programming & Tech' %}">{% trans "Programming & Tech" %}</li>
-                                </ul>
-                            </div>
-                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl right-0 text-gray-500"></span>
-                        </div>
-                        <button type="submit" class="btn-primary max-sm:w-1/3 text-center flex-shrink-0">{% trans "Search" %}</button>
-                    </form>
-                </div>
-                <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
-                    <strong class="text-button-sm text-white font-semibold">{% trans "Popular:" %}</strong>
-                    <a href="{{ job_search_url|default:'#' }}?category=graphics" class="badge-glass text-button-sm">{% trans "Graphics" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=web" class="badge-glass text-button-sm">{% trans "Website" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=logo" class="badge-glass text-button-sm">{% trans "Logo" %}</a>
-                    <a href="{{ job_search_url|default:'#' }}?category=dev" class="badge-glass text-button-sm">{% trans "Development" %}</a>
+        <div class="container h-full">
+            <div class="slider_top relative">
+                <ul class="list_category flex items-center justify-between max-xl:gap-5 absolute top-4 left-0 w-full max-xl:whitespace-nowrap max-xl:max-w-max max-xl:overflow-x-auto">
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=graphics-design" class="category_link text-button text-white line-before line-white">{% trans "Graphic & Design" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=digital-marketing" class="category_link text-button text-white line-before line-white">{% trans "Digital Marketing" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=programming-tech" class="category_link text-button text-white line-before line-white">{% trans "Programming & Tech" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=writing-translation" class="category_link text-button text-white line-before line-white">{% trans "Writing & Translation" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=video-animation" class="category_link text-button text-white line-before line-white">{% trans "Videos & Animation" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=music-audio" class="category_link text-button text-white line-before line-white">{% trans "Music & Audio" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=ai-services" class="category_link text-button text-white line-before line-white">{% trans "AI Services" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=consulting" class="category_link text-button text-white line-before line-white">{% trans "Consulting" %}</a>
+                    </li>
+                    <li class="category_item">
+                        <a href="{% url 'services:service_list' %}?category=photography" class="category_link text-button text-white line-before line-white">{% trans "Photography" %}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="slider_content flex flex-col items-start justify-center md:w-[637px] w-full h-full max-md:py-28">
+                <h2 class="heading1 text-white animate animate_top" style="--i: 1">{% trans "Discover your next freelance solution today" %}</h2>
+                <p class="body2 text-white mt-5 animate animate_top" style="--i: 2">{% trans "Effortlessly Discover Your Next Freelance Solution Today and Enhance Your Workflow Efficiency" %}</p>
+                <div class="group_btn flex gap-5 md:mt-10 mt-7 animate animate_top" style="--i: 3">
+                    <a href="{% url 'services:service_list' %}" class="button-main">{% trans "Find Work" %}</a>
+                    <a href="#" class="button-main bg-white">{% trans "Find Talent" %}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% comment %} TRUSTED BRANDS SECTION {% endcomment %}
-<section class="brand bg-surface py-7">
+<!-- Brand / Trusted Companies Section -->
+<section class="brand">
     <div class="container">
-        <h6 class="heading6 text-center">{% trans "Trusted by leading enterprise organizations and freelancers globally" %}</h6>
-                <div class="swiper swiper-list-brand mt-6">
-                    <div class="swiper-wrapper">
+        <div class="brand_inner border-b border-line py-10">
+            <h6 class="heading6 text-center">{% trans "Trusted by leading enterprise organizations and freelancers globally" %}</h6>
+            <div class="swiper swiper-list-brand mt-6">
+                <div class="swiper-wrapper">
+                    {% if trusted_brands %}
+                        {% for brand in trusted_brands %}
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/1.png' %}" alt="1" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="h-full w-auto duration-500 relative object-cover" />
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        {# Default brands if none provided #}
+                        <div class="swiper-slide flex items-center justify-center">
+                            <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
+                                <img src="{% static 'assets/images/brand/1.png' %}" alt="Brand 1" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/2.png' %}" alt="2" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/2.png' %}" alt="Brand 2" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/3.png' %}" alt="3" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/3.png' %}" alt="Brand 3" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/4.png' %}" alt="4" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/4.png' %}" alt="Brand 4" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/5.png' %}" alt="5" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/5.png' %}" alt="Brand 5" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/6.png' %}" alt="6" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/6.png' %}" alt="Brand 6" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
                         </div>
                         <div class="swiper-slide flex items-center justify-center">
                             <div class="brand-item relative flex items-center justify-center sm:h-8 h-7.5 flex-shrink-0">
-                                <img src="{% static 'assets/images/brand/7.png' %}" alt="7" class="h-full w-auto duration-500 relative object-cover" />
+                                <img src="{% static 'assets/images/brand/7.png' %}" alt="Brand 7" class="h-full w-auto duration-500 relative object-cover" />
                             </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Browse by Category - Using Reusable Component -->
+{% include 'components/sections/categories_grid.html' with categories=service_categories %}
+
+<!-- Feature Services Section -->
+<section class="feature_services lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="heading flex flex-col items-center">
+            <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Feature services" %}</h3>
+            <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">
+                {% trans "Discover our featured services designed to elevate your experience" %}
+            </p>
+        </div>
+
+        <div class="list grid lg:grid-cols-3 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
+            {% for service in featured_services %}
+            <a href="{% url 'services:service_detail' service.uuid %}" class="service_item block bg-white rounded-lg overflow-hidden shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: {{ forloop.counter }}">
+                <div class="service_img relative w-full aspect-[4/3] overflow-hidden">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.title }}" class="w-full h-full object-cover" />
+                    {% else %}
+                    <img src="{% static 'assets/images/service/placeholder.webp' %}" alt="{{ service.title }}" class="w-full h-full object-cover" />
+                    {% endif %}
+                </div>
+                <div class="service_infor p-5">
+                    <div class="provider flex items-center gap-2 mb-3">
+                        {% if service.provider.profile.avatar %}
+                        <img src="{{ service.provider.profile.avatar.url }}" alt="{{ service.provider.get_full_name }}" class="w-8 h-8 rounded-full object-cover" />
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
+                            {{ service.provider.first_name|first|upper }}
+                        </div>
+                        {% endif %}
+                        <span class="text-sm text-secondary">{{ service.provider.get_full_name|truncatechars:20 }}</span>
+                    </div>
+                    <h5 class="heading5 line-clamp-2 mb-3">{{ service.title }}</h5>
+                    <div class="flex items-center justify-between">
+                        <div class="rating flex items-center gap-1">
+                            <span class="ph-fill ph-star text-yellow-500"></span>
+                            <span class="text-sm font-medium">{{ service.rating|default:"5.0" }}</span>
+                            <span class="text-sm text-secondary">({{ service.reviews_count|default:"0" }})</span>
+                        </div>
+                        <div class="price">
+                            <span class="text-sm text-secondary">{% trans "From" %}</span>
+                            <strong class="heading6">${{ service.price }}</strong>
                         </div>
                     </div>
                 </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-10">
+                <p class="body2 text-secondary">{% trans "No featured services available at the moment." %}</p>
             </div>
-        </section>
-
-{% comment %} TOP CATEGORIES SECTION {% endcomment %}
-<section class="top_categories lg:pt-20 sm:pt-14 pt-10 bg-gradient-to-b from-white to-gray-50">
-    <div class="container">
-        <div class="heading flex items-end justify-between flex-wrap gap-4">
-            <div class="left animate animate_top" style="--i: 1">
-                <h3 class="heading-3">{% trans "Top Categories" %}</h3>
-                <p class="body-large text-secondary mt-3">{% trans "Explore a wide range of services organized by category" %}</p>
-            </div>
-            <a href="{% url 'services:service_list' %}" class="text-button pb-0.5 border-b-2 border-teal-600 text-teal-600 duration-300 hover:text-teal-700 hover:border-teal-700 animate animate_top" style="--i: 2">{% trans "All Categories" %}</a>
+            {% endfor %}
         </div>
-        <div class="list grid xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
-            {% if categories %}
-                {% for category in categories %}
-                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: {{ forloop.counter }}">
-                    <div class="icon pb-4 w-fit relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
-                        <span class="{{ category.icon|default:'ph ph-squares-four' }} text-5xl text-gradient-primary relative z-10" {% if category.color %}style="background: linear-gradient(135deg, {{ category.color }}, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"{% endif %}></span>
-                    </div>
-                    <h6 class="heading-6 mt-5">{{ category.name }}</h6>
-                    <p class="text-secondary text-sm mt-2 opacity-80">{{ category.description|truncatechars:80 }}</p>
-                    <div class="mt-3">
-                        <span class="badge-primary text-sm font-medium">{{ category.service_count }} {% trans "services" %}</span>
-                    </div>
-                    {% if category.subcategories.exists %}
-                    <div class="list_category flex flex-col gap-2.5 mt-3">
-                        {% for subcategory in category.subcategories.all|slice:":5" %}
-                        <a href="{% url 'services:service_list' %}?category={{ subcategory.id }}" class="inline-block w-fit text-sm text-secondary hover:text-teal-600 transition-colors duration-200 relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:bg-teal-500 before:rounded-full before:-ml-3">{{ subcategory.name }}</a>
-                        {% endfor %}
+
+        <div class="view_all md:mt-10 mt-7 text-center">
+            <a href="{% url 'services:service_list' %}" class="text-button pb-0.5 border-b-2 border-primary duration-300 hover:text-primary animate animate_top" style="--i: 2">
+                {% trans "View All Services" %}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Top Freelancers Section -->
+<section class="top_freelancers lg:py-20 sm:py-14 py-10 bg-surface">
+    <div class="container">
+        <div class="heading flex flex-col items-center">
+            <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Top Rated Freelancers" %}</h3>
+            <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">
+                {% trans "Connect with our highly rated freelance professionals" %}
+            </p>
+        </div>
+
+        <div class="list grid lg:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
+            {% for freelancer in top_providers %}
+            <div class="freelancer_item bg-white rounded-lg p-6 text-center shadow-md duration-300 hover:shadow-xl animate animate_top" style="--i: {{ forloop.counter }}">
+                <div class="avatar mx-auto w-20 h-20 rounded-full overflow-hidden mb-4">
+                    {% if freelancer.profile.avatar %}
+                    <img src="{{ freelancer.profile.avatar.url }}" alt="{{ freelancer.get_full_name }}" class="w-full h-full object-cover" />
+                    {% else %}
+                    <div class="w-full h-full bg-primary text-white flex items-center justify-center text-2xl font-medium">
+                        {{ freelancer.first_name|first|upper }}
                     </div>
                     {% endif %}
                 </div>
-                {% endfor %}
-            {% else %}
-                {% comment %} Fallback static categories when database is empty {% endcomment %}
-                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 1">
-                    <div class="icon pb-4 w-fit relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
-                        <span class="ph ph-paint-brush text-5xl text-gradient-primary relative z-10"></span>
-                    </div>
-                    <h6 class="heading-6 mt-5">{% trans "Graphic & Design" %}</h6>
-                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Logo design, branding, illustrations and more" %}</p>
+                <h6 class="heading6 mb-1">{{ freelancer.get_full_name }}</h6>
+                <p class="text-sm text-secondary mb-3">{{ freelancer.profile.title|default:"Freelancer" }}</p>
+                <div class="rating flex items-center justify-center gap-1 mb-4">
+                    <span class="ph-fill ph-star text-yellow-500"></span>
+                    <span class="text-sm font-medium">{{ freelancer.rating|default:"5.0" }}</span>
                 </div>
-                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 2">
-                    <div class="icon pb-4 w-fit relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
-                        <span class="ph ph-code text-5xl text-gradient-primary relative z-10"></span>
-                    </div>
-                    <h6 class="heading-6 mt-5">{% trans "Development" %}</h6>
-                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Web, mobile, and software development" %}</p>
-                </div>
-                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 3">
-                    <div class="icon pb-4 w-fit relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
-                        <span class="ph ph-megaphone text-5xl text-gradient-primary relative z-10"></span>
-                    </div>
-                    <h6 class="heading-6 mt-5">{% trans "Digital Marketing" %}</h6>
-                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "SEO, social media, and advertising" %}</p>
-                </div>
-                <div class="glass-card-hover p-7.5 rounded-20 duration-300 hover:scale-105 animate animate_top" style="--i: 4">
-                    <div class="icon pb-4 w-fit relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-400 opacity-10 rounded-full blur-xl"></div>
-                        <span class="ph ph-pencil-line text-5xl text-gradient-primary relative z-10"></span>
-                    </div>
-                    <h6 class="heading-6 mt-5">{% trans "Writing & Translation" %}</h6>
-                    <p class="text-secondary text-sm mt-2 opacity-80">{% trans "Content writing, copywriting, and translation" %}</p>
-                </div>
-            {% endif %}
+                <a href="{% url 'accounts:profile_detail' freelancer.uuid %}" class="button-secondary w-full text-center py-2 rounded-lg">
+                    {% trans "View Profile" %}
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-10">
+                <p class="body2 text-secondary">{% trans "No top-rated freelancers available at the moment." %}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
 
-{% comment %} FEATURED SERVICES SECTION - DYNAMIC DATA {% endcomment %}
-<section class="feature_services lg:py-20 sm:py-14 py-10 bg-white">
+<!-- CTA Section -->
+<section class="cta_section lg:py-20 sm:py-14 py-10">
     <div class="container">
-        <div class="heading flex flex-col items-center">
-            <h3 class="heading-3 text-center animate animate_top" style="--i: 1">{% trans "Featured Services" %}</h3>
-            <p class="body-large text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Discover our featured services from verified providers" %}</p>
-        </div>
-
-        {% if featured_services %}
-            {% comment %} Dynamic Services from Database {% endcomment %}
-            <ul class="list grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
-                {% for service in featured_services %}
-                <li class="item animate animate_top" style="--i: {{ forloop.counter }}; animation-delay: {{ forloop.counter|add:'0' }}00ms;">
-                    <div class="service-card-hover overflow-hidden relative rounded-20 bg-white shadow-lg duration-300 hover:shadow-2xl hover:scale-105">
-                        <button class="add_wishlist_btn absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white transition-all duration-200">
-                            <span class="ph ph-heart text-xl text-gray-600 hover:text-red-500"></span>
-                            <span class="blind">button add to wishlist</span>
-                        </button>
-                        {% url 'services:service_detail' service.uuid as service_url %}
-                        <a href="{{ service_url|default:'#' }}" class="service_thumb block overflow-hidden">
-                            {% if service.avatar %}
-                            <img src="{{ service.avatar.url }}" alt="{{ service.name }}" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" />
-                            {% else %}
-                            <img src="{% static 'assets/images/service/placeholder.webp' %}" alt="{{ service.name }}" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" onerror="this.src='{% static 'assets/images/service/1.webp' %}';" />
-                            {% endif %}
-                        </a>
-                        <div class="service_info py-5 px-4">
-                            <div class="flex items-center justify-between">
-                                {% if service.category_name %}
-                                <a href="{% url 'services:service_list' %}?category={{ service.category_slug }}" class="badge-secondary text-xs">{{ service.category_name }}</a>
-                                {% else %}
-                                <span class="badge-secondary text-xs">{% trans "Service" %}</span>
-                                {% endif %}
-                                <div class="rating-display text-sm">
-                                    <span class="ph-fill ph-star text-amber-400"></span>
-                                    <strong class="font-semibold">{{ service.rating_avg|default:0.0|floatformat:1 }}</strong>
-                                    <span class="text-gray-500">({{ service.total_reviews|default:0 }})</span>
-                                </div>
-                            </div>
-                            <a href="{{ service_url|default:'#' }}" class="service_title block text-lg font-semibold pt-2 duration-300 hover:text-teal-600 line-clamp-2">{{ service.name|truncatewords:10 }}</a>
-                            <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-gray-100">
-                                <a href="#" class="service_author flex items-center gap-2 group">
-                                    {% if service.provider_avatar %}
-                                    <img src="{{ service.provider_avatar }}" alt="{{ service.provider_name }}" class="avatar-sm" />
-                                    {% else %}
-                                    <div class="avatar-gradient-sm">
-                                        <span class="text-sm font-bold">{{ service.provider_name|slice:":1"|upper }}</span>
-                                    </div>
-                                    {% endif %}
-                                    <span class="text-sm text-gray-600 group-hover:text-teal-600 transition-colors">{{ service.provider_name|truncatewords:2 }}</span>
-                                </a>
-                                <div class="price-display-secondary">
-                                    <span class="text-gray-500 text-xs">{% trans "From" %}</span>
-                                    <span class="price-gradient-text font-bold">${{ service.price|default:0|floatformat:0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-
-            {% comment %} View All Services Button {% endcomment %}
-            <div class="flex items-center justify-center md:mt-10 mt-7">
-                <a href="{% url 'services:service_list' %}" class="btn-primary">{% trans "View All Services" %}</a>
+        <div class="cta_inner bg-primary rounded-xl sm:p-10 p-7 text-center">
+            <h3 class="heading3 text-white mb-4">{% trans "Ready to get started?" %}</h3>
+            <p class="body2 text-white/90 mb-7 max-w-2xl mx-auto">
+                {% trans "Join thousands of freelancers and employers who trust FreelanHub for their professional needs" %}
+            </p>
+            <div class="group_btn flex items-center justify-center gap-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:index' %}" class="button-main bg-white">{% trans "Go to Dashboard" %}</a>
+                {% else %}
+                    <a href="{% url 'account_signup' %}" class="button-main bg-white">{% trans "Sign Up Now" %}</a>
+                    <a href="{% url 'account_login' %}" class="button-secondary border-white text-white hover:bg-white hover:text-primary">{% trans "Sign In" %}</a>
+                {% endif %}
             </div>
-        {% else %}
-            {% comment %} Empty State - No Services Available {% endcomment %}
-            <div class="empty-state text-center py-16">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-50 to-cyan-50 mb-6">
-                    <span class="ph ph-briefcase text-5xl text-gradient-primary"></span>
-                </div>
-                <h4 class="heading-5 text-secondary">{% trans "No Featured Services Yet" %}</h4>
-                <p class="body-large text-secondary mt-3 max-w-md mx-auto opacity-80">{% trans "Services will appear here once providers start offering them. Be the first to join our marketplace!" %}</p>
-                <div class="flex items-center justify-center gap-4 mt-8">
-                    <a href="{% url 'become_seller' %}" class="btn-primary">{% trans "Become a Service Provider" %}</a>
-                    <a href="{% url 'services:service_list' %}" class="btn-secondary">{% trans "Browse All Services" %}</a>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</section>
-{% comment %} CTA BANNER SECTION {% endcomment %}
-<section class="banner lg:pb-20 sm:pb-14 pb-10 bg-gradient-to-b from-white to-gray-50">
-    <div class="container">
-        <div class="banner_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-3xl animate animateZoomOutUp shadow-2xl" style="--i: 5">
-            <div class="banner_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Join our community' %}" class="w-full h-full object-cover" />
-                <div class="hero-gradient-overlay-dark"></div>
-            </div>
-            <div class="banner_content relative z-10">
-                <h4 class="heading-4 text-white drop-shadow-lg animate animate_top" style="--i: 1">{% trans "Embrace Independence" %} <br class="max-sm:hidden" />{% trans "Start Your Freelance Journey Now" %}</h4>
-                <p class="body-large mt-4 text-white drop-shadow-md animate animate_top max-w-2xl" style="--i: 2">{% trans "Connect with verified clients and get paid securely" %}</p>
-                <div class="md:mt-7 mt-5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'become_seller' %}" class="btn-primary bg-white text-gray-900 hover:bg-gray-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">{% trans "Become A Seller" %}</a>
-                </div>
-            </div>
-
-            {% comment %} Decorative gradient orbs {% endcomment %}
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-cyan-400 rounded-full opacity-20 blur-3xl"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-teal-400 rounded-full opacity-20 blur-3xl"></div>
         </div>
     </div>
 </section>
-{% endblock content %}
+
+{% endblock %}
