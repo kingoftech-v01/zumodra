@@ -1,54 +1,29 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Edit Employee" %} - {{ employee.full_name }} - Zumodra{% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'frontend:hr:employee-directory' %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-        {% trans "Employees" %}
-    </a>
-</li>
-<li class="flex items-center">
-    <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'frontend:hr:employee-detail' employee.pk %}" class="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-        {{ employee.full_name }}
-    </a>
-</li>
-<li class="flex items-center">
-    <svg class="zu-icon flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Edit" %}</span>
-</li>
-{% endblock %}
+
 
 {% block page_title %}{% trans "Edit Employee Profile" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption1 text-secondary ">
     {% trans "Update employee information and settings." %}
 </p>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 {% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
+<div class="bg-yellow-50  border-l-4 border-yellow-400  p-4 rounded-lg">
     <div class="flex">
         <div class="flex-shrink-0">
-            <svg class="zu-icon h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" stroke-width="1.5" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
+            <i class="ph ph-warning text-yellow heading4"></i>
         </div>
         <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+            <p class="caption1 text-yellow-700 ">
                 {% trans "HR features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
+                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 ">
                     {% trans "Switch to company account" %}
                 </a>
             </p>
@@ -65,20 +40,20 @@
             <div class="zu-card__body">
                 <div class="flex items-center">
                     {% if employee.user.profile_picture %}
-                    <img class="h-16 w-16 rounded-full object-cover ring-2 ring-white dark:ring-gray-700"
+                    <img class="h-16 w-16 rounded-full object-cover ring-2 ring-white "
                          src="{{ employee.user.profile_picture.url }}"
                          alt="{{ employee.full_name }}">
                     {% else %}
-                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center ring-2 ring-white dark:ring-gray-700">
-                        <span class="text-white text-xl font-semibold">
+                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center ring-2 ring-white ">
+                        <span class="text-white heading4 font-semibold">
                             {{ employee.user.first_name|slice:":1"|upper }}{{ employee.user.last_name|slice:":1"|upper }}
                         </span>
                     </div>
                     {% endif %}
                     <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ employee.full_name }}</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ employee.user.email }}</p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">{% trans "Employee ID:" %} {{ employee.employee_id }}</p>
+                        <h2 class="heading5 font-semibold text-title ">{{ employee.full_name }}</h2>
+                        <p class="caption1 text-secondary ">{{ employee.user.email }}</p>
+                        <p class="caption2 text-secondary ">{% trans "Employee ID:" %} {{ employee.employee_id }}</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +62,7 @@
         {% comment %} Employment Information {% endcomment %}
         <div class="zu-card">
             <div class="zu-card__header">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Employment Information" %}</h3>
+                <h3 class="heading5 font-medium text-title ">{% trans "Employment Information" %}</h3>
             </div>
             <div class="zu-card__body space-y-6">
                 {% comment %} Job Title {% endcomment %}
@@ -101,12 +76,12 @@
                            value="{{ form.job_title.value|default:'' }}"
                            class="zu-input">
                     {% if form.job_title.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.job_title.errors.0 }}</p>
+                    <p class="mt-1 caption1 text-red-600 ">{{ form.job_title.errors.0 }}</p>
                     {% endif %}
                 </div>
 
                 {% comment %} Department & Manager {% endcomment %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-7.5">
                     <div>
                         <label for="id_department" class="zu-label">
                             {% trans "Department" %}
@@ -146,7 +121,7 @@
                 </div>
 
                 {% comment %} Work Location & Employment Type {% endcomment %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-7.5">
                     <div>
                         <label for="id_work_location" class="zu-label">
                             {% trans "Work Location" %}
@@ -176,11 +151,11 @@
         {% comment %} Emergency Contact {% endcomment %}
         <div class="zu-card">
             <div class="zu-card__header">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Emergency Contact" %}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Person to contact in case of emergency." %}</p>
+                <h3 class="heading5 font-medium text-title ">{% trans "Emergency Contact" %}</h3>
+                <p class="mt-1 caption1 text-secondary ">{% trans "Person to contact in case of emergency." %}</p>
             </div>
             <div class="zu-card__body space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-7.5">
                     <div>
                         <label for="id_emergency_contact_name" class="zu-label">
                             {% trans "Contact Name" %}

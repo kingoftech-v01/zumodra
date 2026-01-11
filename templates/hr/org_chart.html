@@ -1,4 +1,4 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Organization Chart" %} - Zumodra{% endblock %}
@@ -101,19 +101,12 @@
 </style>
 {% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Org Chart" %}</span>
-</li>
-{% endblock %}
+
 
 {% block page_title %}{% trans "Organization Chart" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption1 text-secondary ">
     {% trans "Visualize your company's organizational structure." %}
 </p>
 {% endblock %}
@@ -125,9 +118,9 @@
         <input type="text"
                id="org-search"
                placeholder="{% trans 'Search employee...' %}"
-               class="block w-48 pl-10 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+               class="block w-48 pl-10 pr-3 py-2 caption1 border border-gray-300  rounded-lg bg-white  text-title  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
         </div>
@@ -141,7 +134,7 @@
             hx-swap="innerHTML"
             hx-push-url="true"
             name="department"
-            class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+            class="block pl-3 pr-10 py-2 caption1 border border-gray-300  rounded-lg bg-white  text-title  focus:outline-none focus:ring-2 focus:ring-primary-500">
         <option value="">{% trans "All Departments" %}</option>
         {% for dept in departments %}
         <option value="{{ dept.id }}" {% if request.GET.department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
@@ -149,16 +142,16 @@
     </select>
 
     {% comment %} View Toggle {% endcomment %}
-    <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
+    <div class="flex items-center bg-white  border border-gray-300  rounded-lg p-1">
         <button id="view-tree"
-                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors bg-gray-100 dark:bg-gray-600"
+                class="p-2 rounded-md text-secondary  transition-colors bg-gray-100 "
                 title="{% trans 'Tree View' %}">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
         </button>
         <button id="view-list"
-                class="p-2 rounded-md text-gray-500 dark:text-gray-400 transition-colors"
+                class="p-2 rounded-md text-secondary  transition-colors"
                 title="{% trans 'List View' %}">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
@@ -167,15 +160,15 @@
     </div>
 
     {% comment %} Zoom Controls {% endcomment %}
-    <div class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
-        <button id="zoom-out" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-l-lg" title="{% trans 'Zoom Out' %}">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="flex items-center bg-white  border border-gray-300  rounded-lg">
+        <button id="zoom-out" class="p-2 hover:bg-gray-100  rounded-l-lg" title="{% trans 'Zoom Out' %}">
+            <svg class="w-4 h-4 text-secondary " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
             </svg>
         </button>
-        <span id="zoom-level" class="px-2 text-sm text-gray-700 dark:text-gray-300 min-w-[48px] text-center">100%</span>
-        <button id="zoom-in" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-r-lg" title="{% trans 'Zoom In' %}">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <span id="zoom-level" class="px-2 caption1 text-title  min-w-[48px] text-center">100%</span>
+        <button id="zoom-in" class="p-2 hover:bg-gray-100  rounded-r-lg" title="{% trans 'Zoom In' %}">
+            <svg class="w-4 h-4 text-secondary " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
         </button>
@@ -183,7 +176,7 @@
 
     {% comment %} Expand/Collapse All {% endcomment %}
     <button id="expand-all"
-            class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+            class="inline-flex items-center px-3 py-2 border border-gray-300  caption1 font-medium rounded-lg text-title  bg-white  hover:bg-gray-50  transition-colors">
         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
         </svg>
@@ -192,7 +185,7 @@
 
     {% comment %} Export {% endcomment %}
     <button id="export-org-chart"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+            class="inline-flex items-center px-4 py-2 border border-gray-300  shadow-sm caption1 font-medium rounded-lg text-title  bg-white  hover:bg-gray-50  transition-colors">
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
         </svg>
@@ -201,19 +194,17 @@
 </div>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 {% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
+<div class="bg-yellow-50  border-l-4 border-yellow-400  p-4 rounded-lg">
     <div class="flex">
         <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
+            <i class="ph ph-warning text-yellow heading4"></i>
         </div>
         <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+            <p class="caption1 text-yellow-700 ">
                 {% trans "HR features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
+                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 ">
                     {% trans "Switch to company account" %}
                 </a>
             </p>
@@ -223,7 +214,7 @@
 {% else %}
 <div id="main-content">
     <!-- Org Chart Container -->
-    <div id="org-chart-container" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-8 overflow-x-auto">
+    <div id="org-chart-container" class="bg-white  shadow-sm rounded-lg p-8 overflow-x-auto">
         <div id="org-chart" class="org-tree min-w-max" style="transform-origin: top center;">
             <!-- CEO / Top Level -->
             {% if root_employee %}
@@ -253,25 +244,25 @@
             {% else %}
             <!-- Empty State -->
             <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="mx-auto h-12 w-12 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No organization structure" %}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Set up reporting relationships in employee profiles." %}</p>
+                <h3 class="mt-2 caption1 font-medium text-title ">{% trans "No organization structure" %}</h3>
+                <p class="mt-1 caption1 text-secondary ">{% trans "Set up reporting relationships in employee profiles." %}</p>
             </div>
             {% endif %}
         </div>
     </div>
 
     <!-- Department Summary -->
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="mt-7.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7.5">
         {% for dept in departments %}
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+        <div class="bg-white  shadow-sm rounded-lg p-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ dept.name }}</h3>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">{{ dept.employee_count }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "employees" %}</p>
+                    <h3 class="caption1 font-medium text-title ">{{ dept.name }}</h3>
+                    <p class="heading3 font-semibold text-title  mt-1">{{ dept.employee_count }}</p>
+                    <p class="caption1 text-secondary ">{% trans "employees" %}</p>
                 </div>
                 <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: {{ dept.color|default:'#3b82f6' }}20;">
                     <svg class="w-6 h-6" style="color: {{ dept.color|default:'#3b82f6' }};" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -349,15 +340,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // View toggle
     if (viewTree && viewList) {
         viewTree.addEventListener('click', function() {
-            viewTree.classList.add('bg-gray-100', 'dark:bg-gray-600');
-            viewList.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+            viewTree.classList.add('bg-gray-100', '
+            viewList.classList.remove('bg-gray-100', '
             document.querySelector('.org-tree-view')?.classList.remove('hidden');
             document.querySelector('.org-list-view')?.classList.add('hidden');
         });
 
         viewList.addEventListener('click', function() {
-            viewList.classList.add('bg-gray-100', 'dark:bg-gray-600');
-            viewTree.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+            viewList.classList.add('bg-gray-100', '
+            viewTree.classList.remove('bg-gray-100', '
             document.querySelector('.org-tree-view')?.classList.add('hidden');
             document.querySelector('.org-list-view')?.classList.remove('hidden');
         });
