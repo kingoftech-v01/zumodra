@@ -218,16 +218,26 @@ templates/
 
 ### Critical: Run Database Migrations
 
-Before deploying, you MUST run database migrations to create the `accounts_trustscore` table:
+Before deploying, you MUST run database migrations to create missing tables:
+
+**Missing Tables Identified:**
+
+- `accounts_trustscore` (accounts app)
+- `messages_sys_userstatus` (messages_sys app)
+- Potentially other new migrations
+
+**Migration Commands:**
 
 ```bash
-# For multi-tenant setup:
+# For multi-tenant setup (REQUIRED for this project):
 docker compose exec web python manage.py migrate_schemas --shared
 docker compose exec web python manage.py migrate_schemas --tenant
 
-# OR for standard Django:
+# OR for standard Django (if not using django-tenants):
 docker compose exec web python manage.py migrate
 ```
+
+**Important:** These migrations must be run BEFORE accessing the application, or you will see "relation does not exist" errors.
 
 ### Deployment Sequence:
 
