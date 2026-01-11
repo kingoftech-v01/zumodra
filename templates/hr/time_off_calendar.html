@@ -31,7 +31,7 @@
 {% block page_title %}{% trans "Time Off Calendar" %}{% endblock %}
 
 {% block page_actions %}
-<button hx-get="{% url 'frontend:hr:time_off_request_create' %}"
+<button hx-get="{% url 'frontend:hr:time-off-request_create' %}"
         hx-target="#modal-container"
         hx-swap="innerHTML"
         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
@@ -133,7 +133,7 @@
                         {{ current_month|date:"F Y" }}
                     </h2>
                     <div class="flex items-center space-x-2">
-                        <button hx-get="{% url 'frontend:hr:time_off_calendar' %}?month={{ prev_month }}"
+                        <button hx-get="{% url 'frontend:hr:time-off-calendar' %}?month={{ prev_month }}"
                                 hx-target="#calendar-grid"
                                 hx-swap="innerHTML"
                                 class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
@@ -141,13 +141,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                         </button>
-                        <button hx-get="{% url 'frontend:hr:time_off_calendar' %}?month={{ today_month }}"
+                        <button hx-get="{% url 'frontend:hr:time-off-calendar' %}?month={{ today_month }}"
                                 hx-target="#calendar-grid"
                                 hx-swap="innerHTML"
                                 class="px-3 py-1 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
                             {% trans "Today" %}
                         </button>
-                        <button hx-get="{% url 'frontend:hr:time_off_calendar' %}?month={{ next_month }}"
+                        <button hx-get="{% url 'frontend:hr:time-off-calendar' %}?month={{ next_month }}"
                                 hx-target="#calendar-grid"
                                 hx-swap="innerHTML"
                                 class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
@@ -160,7 +160,7 @@
 
                 <!-- Department Filter -->
                 <select name="department"
-                        hx-get="{% url 'frontend:hr:time_off_calendar' %}"
+                        hx-get="{% url 'frontend:hr:time-off-calendar' %}"
                         hx-trigger="change"
                         hx-target="#calendar-grid"
                         hx-swap="innerHTML"
@@ -263,12 +263,12 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button hx-post="{% url 'frontend:hr:time_off_approve' request.id %}"
+                        <button hx-post="{% url 'frontend:hr:time-off-approval' request.id %}"
                                 hx-swap="outerHTML"
                                 class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                             {% trans "Approve" %}
                         </button>
-                        <button hx-post="{% url 'frontend:hr:time_off_reject' request.id %}"
+                        <button hx-post="{% url 'frontend:hr:time-off-approval' request.id %}"
                                 hx-swap="outerHTML"
                                 class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                             {% trans "Reject" %}

@@ -5,7 +5,7 @@
     Usage: {% include "hr/_org_card.html" with employee=employee compact=False %} {% endcomment %}
 
 <div class="{% if compact %}w-48{% else %}w-64{% endif %} bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-     hx-get="{% url 'frontend:hr:employee_detail' employee.id %}"
+     hx-get="{% url 'frontend:hr:employee-detail' employee.id %}"
      hx-target="#modal-container"
      hx-swap="innerHTML">
     <div class="{% if compact %}p-3{% else %}p-4{% endif %} text-center">
