@@ -1,62 +1,35 @@
-{% extends "base.html" %}
-{% comment %}
-=============================================================================
-   ZUMODRA BECOME A SELLER PAGE
-   =============================================================================
-
-   File: templates/become-seller.html
-   Purpose: Landing page for freelancers/sellers to join the platform
-
-   Extends: base.html (canonical public base template)
-
-   Features:
-   - Hero section with CTA
-   - Freelance community showcase
-   - How it works process
-   - Benefits section
-   - Testimonials
-   - CTA banner
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-   =============================================================================
-{% endcomment %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Become a Seller" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Become a Seller" %} - FreelanHub{% endblock %}
 
-{% block meta_description %}{% trans "Join Zumodra as a verified freelancer. Get access to quality clients, secure escrow payments, and grow your career with our trusted platform." %}{% endblock %}
+{% block meta_description %}{% trans "Join FreelanHub as a verified freelancer. Get access to quality clients, secure escrow payments, and grow your career with our trusted platform." %}{% endblock %}
 
 {% block content %}
 
-{% comment %} HERO SECTION - Seller specific with Teal gradient {% endcomment %}
+<!-- Hero Section -->
 <section class="slider">
-    <div class="slider_inner relative lg:h-[580px] sm:pt-20 pt-16 overflow-hidden">
-        <div class="slider_bg absolute top-0 left-0 w-full h-full z-[-1]">
-            <img src="{% static 'assets/images/components/banner8.png' %}" alt="{% trans 'Become a seller' %}" class="w-full h-full object-cover" />
-            <div class="hero-gradient-overlay-seller"></div>
+    <div class="slider_inner relative sm:mt-20 mt-16 md:py-20 py-14">
+        <div class="slider_bg absolute top-0 left-0 w-full h-full">
+            <img src="{% static 'assets/images/components/breadcrumb_project.webp' %}" alt="{% trans 'Become a seller' %}" class="w-full h-full object-cover" />
         </div>
-        <div class="container h-full relative z-10">
-            <div class="slider_content flex flex-col items-start justify-center xl:w-[600px] lg:w-[548px] md:w-5/6 w-full h-full max-lg:py-16">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 animate animate_top" style="--i: 0">
-                    <span class="ph-fill ph-briefcase"></span>
-                    {% trans "For Freelancers" %}
-                </span>
-                <h2 class="heading2 text-white drop-shadow-lg animate animate_top" style="--i: 1">{% trans "Turn Your Skills Into Income" %}</h2>
-                <p class="body2 text-white/95 mt-3 drop-shadow-md animate animate_top" style="--i: 2">{% trans "Join thousands of verified freelancers earning on Zumodra. Get matched with quality clients, receive secure payments, and build your reputation." %}</p>
+        <div class="container relative h-full">
+            <div class="slider_content flex flex-col items-start justify-center xl:w-[600px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 1">{% trans "Unlock your access to top talent" %}</h3>
+                <p class="desc body2 text-white mt-3 animate animate_top" style="--i: 2">{% trans "Unlock Your Access to Top Talent and Elevate Your Projects with the Best Professionals." %}</p>
                 <div class="mt-7.5 animate animate_top" style="--i: 3">
-                    <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-white text-teal-700 hover:bg-teal-50 shadow-lg hover:shadow-xl transition-all">{% trans "Start Selling Today" %}</a>
+                    <a href="{% url 'account_signup' %}" class="button-main bg-white">{% trans "Become A Seller" %}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% comment %} JOIN COMMUNITY SECTION {% endcomment %}
+<!-- Join Our Freelance Community -->
 <section class="join_us lg:py-20 sm:py-14 py-10">
     <div class="container">
-        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Join Our Freelance Community" %}</h3>
-        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Freelancers across industries are earning and growing with Zumodra" %}</p>
+        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Join Our Freelance community" %}</h3>
+        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Explore a wide range of services organized by category" %}</p>
         <ul class="list_jobs grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 sm:gap-7.5 gap-4 md:mt-10 mt-7">
             <li class="item animate animate_top" style="--i: 1">
                 <div>
@@ -69,9 +42,9 @@
             <li class="item animate animate_top" style="--i: 2">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/2.webp' %}" alt="{% trans 'Digital Marketer' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/2.webp' %}" alt="{% trans 'Media Marketer' %}" class="w-full h-full object-cover" />
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "Digital Marketer" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Media Marketer" %}</strong>
                 </div>
             </li>
             <li class="item animate animate_top" style="--i: 3">
@@ -85,159 +58,133 @@
             <li class="item animate animate_top" style="--i: 4">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/4.webp' %}" alt="{% trans 'Content Writer' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/4.webp' %}" alt="{% trans 'Musician' %}" class="w-full h-full object-cover" />
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "Content Writer" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Musician" %}</strong>
                 </div>
             </li>
             <li class="item animate animate_top" style="--i: 5">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/5.webp' %}" alt="{% trans 'Software Developer' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/5.webp' %}" alt="{% trans 'Content Creater' %}" class="w-full h-full object-cover" />
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "Software Developer" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Content Creater" %}</strong>
                 </div>
             </li>
             <li class="item animate animate_top" style="--i: 6">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/6.webp' %}" alt="{% trans 'Video Editor' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/6.webp' %}" alt="{% trans 'Content Writer' %}" class="w-full h-full object-cover" />
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "Video Editor" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Content Writer" %}</strong>
                 </div>
             </li>
             <li class="item animate animate_top" style="--i: 7">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/7.webp' %}" alt="{% trans 'Translator' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/7.webp' %}" alt="{% trans 'Developer' %}" class="w-full h-full object-cover" />
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "Translator" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Developer" %}</strong>
                 </div>
             </li>
             <li class="item animate animate_top" style="--i: 8">
                 <div>
                     <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
-                        <img src="{% static 'assets/images/blog/8.webp' %}" alt="{% trans 'UI/UX Designer' %}" class="w-full h-full object-cover" />
+                        <img src="{% static 'assets/images/blog/8.webp' %}" alt="{% trans 'Video Editor' %}" class="w-full h-full object-cover" %}"/>
                     </div>
-                    <strong class="block mt-3 heading6">{% trans "UI/UX Designer" %}</strong>
+                    <strong class="block mt-3 heading6">{% trans "Video Editor" %}</strong>
                 </div>
             </li>
         </ul>
     </div>
 </section>
 
-{% comment %} HOW IT WORKS SECTION {% endcomment %}
+<!-- How it Work -->
 <section class="process lg:py-20 sm:py-14 py-10 bg-surface">
     <div class="container">
-        <h3 class="heading3 animate animate_top" style="--i: 1">{% trans "How It Works" %}</h3>
-        <p class="body2 text-secondary mt-3 animate animate_top" style="--i: 2">{% trans "Start earning in just a few simple steps" %}</p>
+        <h3 class="heading3 animate animate_top" style="--i: 1">{% trans "How It Work" %}</h3>
+        <p class="body2 text-secondary mt-3 animate animate_top" style="--i: 2">{% trans "Start selling in 4 easy steps" %}</p>
         <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
             <li class="item animate animate_top" style="--i: 1">
-                <span class="ph-duotone ph-user-circle text-4xl text-primary"></span>
+                <span class="icon-job text-4xl"></span>
                 <h6 class="heading6 mt-4">{% trans "Create Your Profile" %}</h6>
-                <p class="mt-1">{% trans "Sign up and complete your profile with your skills, portfolio, and experience." %}</p>
+                <p class="mt-1">{% trans "Set up your professional profile with your skills and experience." %}</p>
             </li>
             <li class="item animate animate_top" style="--i: 2">
-                <span class="ph-duotone ph-shield-check text-4xl text-primary"></span>
-                <h6 class="heading6 mt-4">{% trans "Get Verified" %}</h6>
-                <p class="mt-1">{% trans "Complete our KYC verification to earn trust badges and stand out to clients." %}</p>
+                <span class="icon-applicant text-4xl"></span>
+                <h6 class="heading6 mt-4">{% trans "List Your Services" %}</h6>
+                <p class="mt-1">{% trans "Create service listings with details like pricing and delivery time." %}</p>
             </li>
             <li class="item animate animate_top" style="--i: 3">
-                <span class="ph-duotone ph-briefcase text-4xl text-primary"></span>
-                <h6 class="heading6 mt-4">{% trans "Find Projects" %}</h6>
-                <p class="mt-1">{% trans "Browse job listings, submit proposals, or get matched with clients automatically." %}</p>
+                <span class="icon-choose text-4xl"></span>
+                <h6 class="heading6 mt-4">{% trans "Get Hired" %}</h6>
+                <p class="mt-1">{% trans "Receive orders from clients looking for your expertise." %}</p>
             </li>
             <li class="item animate animate_top" style="--i: 4">
-                <span class="ph-duotone ph-wallet text-4xl text-primary"></span>
+                <span class="icon-manage text-4xl"></span>
                 <h6 class="heading6 mt-4">{% trans "Get Paid Securely" %}</h6>
-                <p class="mt-1">{% trans "Deliver your work and receive payment through our escrow-protected system." %}</p>
+                <p class="mt-1">{% trans "Complete projects and receive secure payments through our escrow system." %}</p>
             </li>
         </ul>
     </div>
 </section>
 
-{% comment %} BENEFITS SECTION {% endcomment %}
-<section class="benefit lg:py-20 sm:py-14 py-10">
+<!-- Benefits -->
+<section class="benefit">
     <div class="container">
-        <div class="benefit_inner flex max-lg:flex-col-reverse items-center justify-between gap-y-8">
+        <div class="benefit_inner flex max-lg:flex-col-reverse items-center justify-between gap-y-8 lg:py-20 sm:py-14 py-10 border-b border-line">
             <div class="benefit_content xl:w-[570px] lg:w-5/12 w-full">
-                <h3 class="heading3 animate animate_top" style="--i: 1">{% trans "Why Sell on Zumodra?" %}</h3>
-                <p class="body2 mt-3 animate animate_top" style="--i: 2">{% trans "Join the trusted platform where verification matters" %}</p>
+                <h3 class="heading3 animate animate_top" style="--i: 1">{% trans "FreelanHub! The best choice?" %}</h3>
+                <p class="body2 mt-3 animate animate_top" style="--i: 2">{% trans "Join thousands of freelancers earning on our platform" %}</p>
                 <ul class="list_benefit flex flex-col gap-6 mt-8">
                     <li class="benefit_item flex gap-4 animate animate_top" style="--i: 3">
-                        <span class="ph ph-shield-check flex-shrink-0 text-4xl text-primary"></span>
+                        <span class="ph ph-wallet flex-shrink-0 text-4xl text-primary"></span>
                         <div class="benefit_info">
-                            <h6 class="title heading6">{% trans "Verified Clients" %}</h6>
-                            <p class="desc mt-1">{% trans "Work with employers who have completed our KYC verification, ensuring legitimate opportunities." %}</p>
+                            <h6 class="title heading6">{% trans "Flexible Pricing" %}</h6>
+                            <p class="desc mt-1">{% trans "Set your own rates and work on projects that match your budget and skills." %}</p>
                         </div>
                     </li>
                     <li class="benefit_item flex gap-4 animate animate_top" style="--i: 4">
-                        <span class="ph ph-lock flex-shrink-0 text-4xl text-primary"></span>
+                        <span class="ph ph-certificate flex-shrink-0 text-4xl text-primary"></span>
                         <div class="benefit_info">
-                            <h6 class="title heading6">{% trans "Secure Escrow Payments" %}</h6>
-                            <p class="desc mt-1">{% trans "Client funds are held in escrow until you deliver, guaranteeing you get paid for your work." %}</p>
+                            <h6 class="title heading6">{% trans "Verified Clients" %}</h6>
+                            <p class="desc mt-1">{% trans "Work with verified clients and build long-lasting professional relationships." %}</p>
                         </div>
                     </li>
                     <li class="benefit_item flex gap-4 animate animate_top" style="--i: 5">
-                        <span class="ph ph-trend-up flex-shrink-0 text-4xl text-primary"></span>
+                        <span class="ph ph-phone-call flex-shrink-0 text-4xl text-primary"></span>
                         <div class="benefit_info">
-                            <h6 class="title heading6">{% trans "Build Your Reputation" %}</h6>
-                            <p class="desc mt-1">{% trans "Earn trust badges, collect reviews, and build a verified career history that follows you." %}</p>
+                            <h6 class="title heading6">{% trans "Support On 24/7" %}</h6>
+                            <p class="desc mt-1">{% trans "Our dedicated support team is available around the clock to help you succeed." %}</p>
                         </div>
                     </li>
                     <li class="benefit_item flex gap-4 animate animate_top" style="--i: 6">
-                        <span class="ph ph-headset flex-shrink-0 text-4xl text-primary"></span>
+                        <span class="ph ph-shield-check flex-shrink-0 text-4xl text-primary"></span>
                         <div class="benefit_info">
-                            <h6 class="title heading6">{% trans "24/7 Support" %}</h6>
-                            <p class="desc mt-1">{% trans "Our support team is here to help with disputes, questions, and guidance anytime." %}</p>
+                            <h6 class="title heading6">{% trans "Secure Payments" %}</h6>
+                            <p class="desc mt-1">{% trans "Get paid on time with our secure escrow payment system protecting your earnings." %}</p>
                         </div>
                     </li>
                 </ul>
             </div>
-            <div class="benefit_bg relative lg:w-5/12 sm:w-[45%] w-[85%]">
-                <img src="{% static 'assets/images/components/benefit1.webp' %}" alt="{% trans 'Benefits of selling' %}" class="w-full rounded-20" />
+            <div class="benefit_image xl:w-[570px] lg:w-6/12 w-full">
+                <img src="{% static 'assets/images/components/freelan-15.webp' %}" alt="{% trans 'Benefits' %}" class="w-full rounded-xl animate animate_right" style="--i: 1" />
             </div>
         </div>
     </div>
 </section>
 
-{% comment %} STATS SECTION - Teal gradient for sellers {% endcomment %}
-<section class="counter lg:py-15 sm:py-12 py-8 bg-gradient-to-r from-teal-600 to-cyan-600">
-    <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
-            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">2.5M+</h2>
-            <span class="body1 text-center text-white/90">{% trans "Active Freelancers" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
-            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">€50M+</h2>
-            <span class="body1 text-center text-white/90">{% trans "Paid to Freelancers" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
-            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">98%</h2>
-            <span class="body1 text-center text-white/90">{% trans "Payment Success Rate" %}</span>
-        </div>
-        <div class="line flex-shrink-0 w-px h-20 bg-white/30 max-lg:hidden"></div>
-        <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
-            <h2 class="heading2 pb-1 text-center text-white drop-shadow-md">4.8/5</h2>
-            <span class="body1 text-center text-white/90">{% trans "Average Rating" %}</span>
-        </div>
-    </div>
-</section>
-
-{% comment %} CTA SECTION - Teal themed {% endcomment %}
-<section class="cta lg:py-20 sm:py-14 py-10">
+<!-- CTA Section -->
+<section class="banner lg:py-20 sm:py-14 py-10">
     <div class="container">
-        <div class="cta_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl text-center bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100">
-            <h4 class="heading4 text-teal-900">{% trans "Ready to Start Earning?" %}</h4>
-            <p class="desc mt-2 text-teal-700 max-w-2xl mx-auto">{% trans "Join Zumodra today and connect with clients looking for your skills. It's free to create your profile." %}</p>
-            <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'account_signup' %}?type=freelancer" class="button-main bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all">{% trans "Create Free Account" %}</a>
-                <a href="{% url 'about' %}" class="button-main -border border-teal-600 text-teal-700 hover:bg-teal-600 hover:text-white transition-all">{% trans "Learn More" %}</a>
-            </div>
+        <div class="banner_inner bg-primary rounded-xl p-10 text-center">
+            <h3 class="heading3 text-white">{% trans "Ready to start earning?" %}</h3>
+            <p class="body2 text-white/90 mt-3 mb-6">
+                {% trans "Join thousands of freelancers already making money on FreelanHub" %}
+            </p>
+            <a href="{% url 'account_signup' %}" class="button-main bg-white">{% trans "Get Started Today" %}</a>
         </div>
     </div>
 </section>
 
-{% endblock content %}
+{% endblock %}
