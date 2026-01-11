@@ -1,159 +1,154 @@
-{% extends "base.html" %}
-{% comment %}
-=============================================================================
-   ZUMODRA PRICING PAGE
-   =============================================================================
-
-   File: templates/pricing.html
-   Purpose: Subscription pricing plans page
-
-   Extends: base.html (canonical public base template)
-
-   Features:
-   - Hero section with pricing overview
-   - Pricing plans comparison
-   - Feature highlights
-   - Testimonials section
-   - FAQ section
-
-   Plans based on CLAUDE.md:
-   - Starter: €15/user - 3 pipelines, basic ATS, email only
-   - Pro: €25/user - Unlimited pipelines, CV parsing, SMS
-   - Business: €35/user - Multi-circuits, e-signature, analytics
-   - Enterprise: Custom - SSO, API, dedicated support
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-   =============================================================================
-{% endcomment %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Pricing" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Pricing" %} - FreelanHub{% endblock %}
 
-{% block meta_description %}{% trans "Choose the right Zumodra plan for your business. From Starter to Enterprise, find the perfect fit for your recruitment and freelance marketplace needs." %}{% endblock %}
+{% block meta_description %}{% trans "Choose the right FreelanHub plan for your business. From Free to Enterprise, find the perfect fit for your freelance marketplace needs.\" %}{% endblock %}
 
 {% block content %}
 
-{% comment %} HERO SECTION {% endcomment %}
-<section class="slider">
-    <div class="slider_inner relative lg:h-[400px] sm:pt-20 pt-16 overflow-hidden bg-[#F1F6F2]">
-        <div class="container flex flex-col items-center justify-center h-full max-lg:py-16 text-center">
-            <h2 class="heading2 animate animate_top" style="--i: 1">{% trans "Simple, Transparent Pricing" %}</h2>
-            <p class="body2 mt-3 max-w-2xl animate animate_top" style="--i: 2">{% trans "Choose the plan that fits your needs. All plans include our core verification features to help you hire with confidence." %}</p>
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full bg-primary"></div>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">{% trans "Home" %}</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">{% trans "Pricing" %}</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "Choose The Plans & Pricing" %}</h3>
+            </div>
         </div>
     </div>
 </section>
 
-{% comment %} PRICING SECTION {% endcomment %}
+<!-- Pricing Section -->
 <section class="pricing lg:py-20 sm:py-14 py-10">
     <div class="container">
-        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Choose Your Plan" %}</h3>
-        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "We offer flexible pricing packages designed to meet the unique needs of businesses of all sizes." %}</p>
-
-        {% comment %} Pricing Toggle - Monthly/Annual {% endcomment %}
-        <div class="flex justify-center items-center gap-4 mt-8" x-data="{ annual: true }">
-            <span class="text-title" :class="{ 'text-secondary': annual }">{% trans "Monthly" %}</span>
-            <button type="button"
-                    @click="annual = !annual"
-                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                    :class="annual ? 'bg-primary' : 'bg-gray-300'">
-                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                      :class="annual ? 'translate-x-6' : 'translate-x-1'"></span>
-            </button>
-            <span class="text-title" :class="{ 'text-secondary': !annual }">{% trans "Annual" %} <span class="text-primary text-sm">({% trans "Save 20%" %})</span></span>
-        </div>
+        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Choose The Plans & Pricing" %}</h3>
+        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">
+            {% trans "We offer a variety of pricing packages to meet the unique needs of our freelancers." %}
+        </p>
 
         <ul class="list_pricing grid xl:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
-            {% comment %} Starter Plan {% endcomment %}
+            <!-- Free Plan -->
             <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:shadow-2xl animate animate_top" style="--i: 1">
-                <span class="pricing_type text-title text-secondary">{% trans "Starter" %}</span>
-                <h3 class="heading3 mt-2">€15<span class="text-base text-secondary">/{% trans "user/month" %}</span></h3>
-                <p class="caption1 text-secondary mt-2">{% trans "Perfect for small teams getting started" %}</p>
+                <span class="pricing_type text-title text-secondary">{% trans "Basic Plan" %}</span>
+                <h3 class="heading3 mt-2">{% trans "Free" %}</h3>
                 <ul class="list_feature mt-3">
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Up to 3 hiring pipelines" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Up to 5 Services" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Basic ATS features" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Apply 20 Jobs" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Email notifications" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Basic Profile" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Candidate verification" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Job posting" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Expiry 7 days" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
-                        <strong class="pricing_feature text-title text-placehover">{% trans "CV parsing" %}</strong>
+                        <strong class="pricing_feature text-title text-placehover">{% trans "Featured Profile" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
-                        <strong class="pricing_feature text-title text-placehover">{% trans "SMS notifications" %}</strong>
+                        <strong class="pricing_feature text-title text-placehover">{% trans "Messenger Services" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
-                        <strong class="pricing_feature text-title text-placehover">{% trans "Analytics dashboard" %}</strong>
+                        <strong class="pricing_feature text-title text-placehover">{% trans "Priority Support" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}?plan=starter">{% trans "Get Started" %}</a>
+                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}">{% trans "Get Started" %}</a>
             </li>
 
-            {% comment %} Pro Plan {% endcomment %}
+            <!-- Starter Plan -->
             <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:shadow-2xl animate animate_top" style="--i: 2">
-                <span class="pricing_type text-title text-secondary">{% trans "Pro" %}</span>
-                <h3 class="heading3 mt-2">€25<span class="text-base text-secondary">/{% trans "user/month" %}</span></h3>
-                <p class="caption1 text-secondary mt-2">{% trans "For growing teams with advanced needs" %}</p>
+                <span class="pricing_type text-title text-secondary">{% trans "Starter" %}</span>
+                <h3 class="heading3 mt-2">$15.00</h3>
                 <ul class="list_feature mt-3">
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Unlimited pipelines" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Up to 15 Services" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "CV parsing & matching" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Apply 50 Jobs" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "SMS & email notifications" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Featured Profile" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Candidate & employer KYC" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Expiry 1 month" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Interview scheduling" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Basic analytics" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Messenger Services" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
-                        <strong class="pricing_feature text-title text-placehover">{% trans "E-signatures" %}</strong>
+                        <strong class="pricing_feature text-title text-placehover">{% trans "Priority Support" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
-                        <strong class="pricing_feature text-title text-placehover">{% trans "Multi-circuit talent" %}</strong>
+                        <strong class="pricing_feature text-title text-placehover">{% trans "Live Chatbot" %}</strong>
                     </li>
                 </ul>
-                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}?plan=pro">{% trans "Get Started" %}</a>
+                <a class="button-main -border w-full text-center mt-5" href="{% url 'account_signup' %}">{% trans "Choose The Package" %}</a>
             </li>
 
-            {% comment %} Business Plan - Most Popular {% endcomment %}
-            <li class="pricing_item relative p-6 border border-primary rounded-xl bg-white duration-300 shadow-lg hover:shadow-2xl animate animate_top" style="--i: 3">
-                <span class="flag absolute top-0 left-1/2 -translate-x-1/2 text-label py-1 px-2.5 rounded-b-lg bg-primary text-white">{% trans "MOST POPULAR" %}</span>
-                <span class="pricing_type text-title text-secondary">{% trans "Business" %}</span>
-                <h3 class="heading3 mt-2">€35<span class="text-base text-secondary">/{% trans "user/month" %}</span></h3>
-                <p class="caption1 text-secondary mt-2">{% trans "Complete solution for serious recruiters" %}</p>
+            <!-- Professional Plan (Most Popular) -->
+            <li class="pricing_item relative p-6 border border-line rounded-xl bg-white duration-300 shadow-lg hover:shadow-2xl animate animate_top" style="--i: 3">
+                <span class="flag absolute top-0 left-1/2 -translate-x-1/2 text-label py-1 px-2.5 rounded-b-lg bg-red text-white">{% trans "MOST POPULAR" %}</span>
+                <span class="pricing_type text-title text-secondary">{% trans "Professional" %}</span>
+                <h3 class="heading3 mt-2">$25.00</h3>
+                <ul class="list_feature mt-3">
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Unlimited Services" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Apply Unlimited Jobs" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Featured Profile" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Expiry 3 months" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Messenger Services" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Priority Support" %}</strong>
+                    </li>
+                    <li class="feature_item flex items-start gap-2 py-2">
+                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                        <strong class="pricing_feature text-title">{% trans "Live Chatbot" %}</strong>
+                    </li>
+                </ul>
+                <a class="button-main w-full text-center mt-5" href="{% url 'account_signup' %}">{% trans "Choose The Package" %}</a>
+            </li>
+
+            <!-- Enterprise Plan -->
+            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:shadow-2xl animate animate_top" style="--i: 4">
+                <span class="pricing_type text-title text-secondary">{% trans "Enterprise" %}</span>
+                <h3 class="heading3 mt-2">{% trans "Custom" %}</h3>
                 <ul class="list_feature mt-3">
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
@@ -161,73 +156,27 @@
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Multi-circuit talent management" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Custom Integration" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "DocuSign e-signatures" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Dedicated Account Manager" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Advanced analytics & reports" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "API Access" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Escrow payments" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Advanced Analytics" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Diversity & compliance tracking" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "24/7 Support" %}</strong>
                     </li>
                     <li class="feature_item flex items-start gap-2 py-2">
                         <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Internal mobility circuit" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Priority support" %}</strong>
-                    </li>
-                </ul>
-                <a class="button-main w-full text-center mt-5" href="{% url 'account_signup' %}?plan=business">{% trans "Get Started" %}</a>
-            </li>
-
-            {% comment %} Enterprise Plan {% endcomment %}
-            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:shadow-2xl animate animate_top" style="--i: 4">
-                <span class="pricing_type text-title text-secondary">{% trans "Enterprise" %}</span>
-                <h3 class="heading3 mt-2">{% trans "Custom" %}</h3>
-                <p class="caption1 text-secondary mt-2">{% trans "Tailored solutions for large organizations" %}</p>
-                <ul class="list_feature mt-3">
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Everything in Business" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "SSO integration" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Custom API access" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Dedicated account manager" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "Custom integrations" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "SLA guarantee" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "On-premise deployment option" %}</strong>
-                    </li>
-                    <li class="feature_item flex items-start gap-2 py-2">
-                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
-                        <strong class="pricing_feature text-title">{% trans "24/7 premium support" %}</strong>
+                        <strong class="pricing_feature text-title">{% trans "Custom SLA" %}</strong>
                     </li>
                 </ul>
                 <a class="button-main -border w-full text-center mt-5" href="{% url 'contact_us' %}">{% trans "Contact Sales" %}</a>
@@ -236,109 +185,17 @@
     </div>
 </section>
 
-{% comment %} FEATURE COMPARISON SECTION {% endcomment %}
-<section class="features bg-surface lg:py-20 sm:py-14 py-10">
+<!-- CTA Section -->
+<section class="banner lg:py-20 sm:py-14 py-10 bg-surface">
     <div class="container">
-        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "All Plans Include" %}</h3>
-        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Core features available across all pricing tiers" %}</p>
-        <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
-            <li class="item flex items-start gap-4 animate animate_top" style="--i: 1">
-                <span class="ph-duotone ph-shield-check text-4xl text-primary flex-shrink-0"></span>
-                <div>
-                    <h6 class="heading6">{% trans "KYC Verification" %}</h6>
-                    <p class="mt-1 text-secondary">{% trans "Bidirectional verification of candidates and employers for trust." %}</p>
-                </div>
-            </li>
-            <li class="item flex items-start gap-4 animate animate_top" style="--i: 2">
-                <span class="ph-duotone ph-lock text-4xl text-primary flex-shrink-0"></span>
-                <div>
-                    <h6 class="heading6">{% trans "Secure Payments" %}</h6>
-                    <p class="mt-1 text-secondary">{% trans "Escrow-protected payments with Stripe Connect integration." %}</p>
-                </div>
-            </li>
-            <li class="item flex items-start gap-4 animate animate_top" style="--i: 3">
-                <span class="ph-duotone ph-users text-4xl text-primary flex-shrink-0"></span>
-                <div>
-                    <h6 class="heading6">{% trans "Multi-Tenant" %}</h6>
-                    <p class="mt-1 text-secondary">{% trans "Isolated data per organization with custom branding options." %}</p>
-                </div>
-            </li>
-            <li class="item flex items-start gap-4 animate animate_top" style="--i: 4">
-                <span class="ph-duotone ph-headset text-4xl text-primary flex-shrink-0"></span>
-                <div>
-                    <h6 class="heading6">{% trans "Support" %}</h6>
-                    <p class="mt-1 text-secondary">{% trans "Email support included, with upgrade options for priority assistance." %}</p>
-                </div>
-            </li>
-        </ul>
-    </div>
-</section>
-
-{% comment %} CTA SECTION {% endcomment %}
-<section class="cta lg:py-20 sm:py-14 py-10">
-    <div class="container">
-        <div class="cta_inner relative sm:px-16 px-8 py-16 overflow-hidden rounded-xl text-center">
-            <div class="cta_bg absolute top-0 left-0 w-full h-full z-[-1]">
-                <div style="background-color: #000000; opacity: 0.4; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
-                <img src="{% static 'assets/images/components/banner1.jpg' %}" alt="{% trans 'Contact our team' %}" class="w-full h-full object-cover" />
-            </div>
-            <h4 class="heading4 text-white">{% trans "Not Sure Which Plan Is Right for You?" %}</h4>
-            <p class="desc mt-2 text-white max-w-2xl mx-auto">{% trans "Our team is here to help you find the perfect solution. Schedule a demo or chat with our sales team." %}</p>
-            <div class="flex flex-wrap justify-center gap-4 md:mt-7 mt-5">
-                <a href="{% url 'contact_us' %}" class="button-main bg-white">{% trans "Talk to Sales" %}</a>
-                <a href="{% url 'contact_us' %}" class="button-main -border border-white text-white hover:bg-white hover:text-black">{% trans "Schedule Demo" %}</a>
-            </div>
+        <div class="banner_inner bg-primary rounded-xl p-10 text-center">
+            <h3 class="heading3 text-white">{% trans "Need help choosing a plan?" %}</h3>
+            <p class="body2 text-white/90 mt-3 mb-6">
+                {% trans "Our team is here to help you find the perfect plan for your needs" %}
+            </p>
+            <a href="{% url 'contact_us' %}" class="button-main bg-white">{% trans "Contact Us" %}</a>
         </div>
     </div>
 </section>
 
-{% comment %} FAQ SECTION {% endcomment %}
-<section class="faq lg:py-20 sm:py-14 py-10 bg-surface">
-    <div class="container">
-        <h3 class="heading3 text-center animate animate_top" style="--i: 1">{% trans "Frequently Asked Questions" %}</h3>
-        <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">{% trans "Find answers to common questions about our pricing and plans." %}</p>
-        <div class="max-w-3xl mx-auto md:mt-10 mt-7" x-data="{ open: 1 }">
-            <div class="faq_item border-b border-line py-4 animate animate_top" style="--i: 1">
-                <button @click="open = open === 1 ? null : 1" class="flex items-center justify-between w-full text-left">
-                    <h6 class="heading6">{% trans "Can I change plans at any time?" %}</h6>
-                    <span class="ph-bold ph-caret-down text-xl transition-transform" :class="{ 'rotate-180': open === 1 }"></span>
-                </button>
-                <div x-show="open === 1" x-collapse class="mt-3 text-secondary">
-                    {% trans "Yes! You can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle. When upgrading, you'll get immediate access to new features." %}
-                </div>
-            </div>
-            <div class="faq_item border-b border-line py-4 animate animate_top" style="--i: 2">
-                <button @click="open = open === 2 ? null : 2" class="flex items-center justify-between w-full text-left">
-                    <h6 class="heading6">{% trans "Is there a free trial available?" %}</h6>
-                    <span class="ph-bold ph-caret-down text-xl transition-transform" :class="{ 'rotate-180': open === 2 }"></span>
-                </button>
-                <div x-show="open === 2" x-collapse class="mt-3 text-secondary">
-                    {% trans "Yes, we offer a 14-day free trial on all plans. No credit card required to start. You'll have full access to all features in your chosen plan tier." %}
-                </div>
-            </div>
-            <div class="faq_item border-b border-line py-4 animate animate_top" style="--i: 3">
-                <button @click="open = open === 3 ? null : 3" class="flex items-center justify-between w-full text-left">
-                    <h6 class="heading6">{% trans "What payment methods do you accept?" %}</h6>
-                    <span class="ph-bold ph-caret-down text-xl transition-transform" :class="{ 'rotate-180': open === 3 }"></span>
-                </button>
-                <div x-show="open === 3" x-collapse class="mt-3 text-secondary">
-                    {% trans "We accept all major credit cards (Visa, Mastercard, American Express), bank transfers, and SEPA direct debit for European customers. Enterprise customers can arrange custom payment terms." %}
-                </div>
-            </div>
-            <div class="faq_item border-b border-line py-4 animate animate_top" style="--i: 4">
-                <button @click="open = open === 4 ? null : 4" class="flex items-center justify-between w-full text-left">
-                    <h6 class="heading6">{% trans "Do you offer discounts for non-profits?" %}</h6>
-                    <span class="ph-bold ph-caret-down text-xl transition-transform" :class="{ 'rotate-180': open === 4 }"></span>
-                </button>
-                <div x-show="open === 4" x-collapse class="mt-3 text-secondary">
-                    {% trans "Yes! We offer special pricing for non-profit organizations, educational institutions, and startups. Contact our sales team to learn more about our discount programs." %}
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-8">
-            <a href="{% url 'faq' %}" class="text-button text-primary hover:underline">{% trans "View All FAQs" %} →</a>
-        </div>
-    </div>
-</section>
-
-{% endblock content %}
+{% endblock %}
