@@ -1,28 +1,28 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Create Provider Profile" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Create Provider Profile" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg class="zu-icon--sm text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Create Provider Profile" %}</span>
+    <span class="ml-2 caption1 text-secondary">{% trans "Create Provider Profile" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Create Provider Profile" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Set up your provider profile to start offering services." %}
 </p>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div class="max-w-3xl">
-    <form method="post" enctype="multipart/form-data" class="space-y-8">
+    <form method="post" enctype="multipart/form-data" class="space-y-7.5">
         {% csrf_token %}
 
         <!-- Profile Photo -->
@@ -31,10 +31,10 @@
                 <h3 class="zu-card__title">{% trans "Profile Photo" %}</h3>
             </div>
             <div class="zu-card__body">
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-7.5">
                     <div class="flex-shrink-0">
-                        <div id="preview-container" class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                            <svg class="zu-icon w-12 h-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <div id="preview-container" class="w-24 h-24 rounded-full bg-surface-light flex items-center justify-center overflow-hidden">
+                            <svg class="zu-icon w-12 h-12 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
@@ -47,7 +47,7 @@
                             {% trans "Upload Photo" %}
                         </label>
                         <input type="file" name="image" id="image" accept="image/*" class="hidden" onchange="previewImage(this)">
-                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{% trans "JPG, PNG or GIF. Max 5MB." %}</p>
+                        <p class="mt-2 caption2 text-secondary">{% trans "JPG, PNG or GIF. Max 5MB." %}</p>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                 <h3 class="zu-card__title">{% trans "Basic Information" %}</h3>
             </div>
             <div class="zu-card__body">
-                <div class="space-y-6">
+                <div class="space-y-5">
                     <div class="zu-form-group">
                         <label for="bio" class="zu-label zu-label--required">
                             {% trans "Bio" %}
@@ -70,10 +70,10 @@
                                   required
                                   class="zu-input zu-textarea"
                                   placeholder="{% trans 'Tell clients about yourself, your experience, and what makes you unique...' %}"></textarea>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Minimum 100 characters recommended." %}</p>
+                        <p class="mt-1 caption2 text-secondary">{% trans "Minimum 100 characters recommended." %}</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-7.5">
                         <div class="zu-form-group">
                             <label for="hourly_rate" class="zu-label">
                                 {% trans "Hourly Rate" %} ($)
@@ -118,7 +118,7 @@
                 <h3 class="zu-card__title">{% trans "Location" %}</h3>
             </div>
             <div class="zu-card__body">
-                <div class="space-y-6">
+                <div class="space-y-5">
                     <div class="zu-form-group">
                         <label for="address" class="zu-label">
                             {% trans "Street Address" %}
@@ -130,7 +130,7 @@
                                placeholder="{% trans '123 Main Street' %}">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-7.5">
                         <div class="zu-form-group">
                             <label for="city" class="zu-label">
                                 {% trans "City" %}
@@ -174,15 +174,15 @@
                 <h3 class="zu-card__title">{% trans "Service Categories" %}</h3>
             </div>
             <div class="zu-card__body">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{% trans "Select the categories that best describe your services." %}</p>
+                <p class="caption2 text-secondary mb-4">{% trans "Select the categories that best describe your services." %}</p>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {% for category in categories %}
-                    <label class="zu-checkbox flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
+                    <label class="zu-checkbox flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
                         <input type="checkbox" name="categories" value="{{ category.id }}" class="zu-checkbox__input">
                         <span class="zu-checkbox__label">{{ category.name }}</span>
                     </label>
                     {% empty %}
-                    <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{% trans "No categories available." %}</p>
+                    <p class="col-span-full caption2 text-secondary">{% trans "No categories available." %}</p>
                     {% endfor %}
                 </div>
             </div>

@@ -1,172 +1,150 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "Provider Dashboard" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Provider Dashboard" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Provider Dashboard" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "Provider Dashboard" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Provider Dashboard" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Manage your services, proposals, and contracts." %}
 </p>
 {% endblock %}
 
 {% block page_actions %}
 <a href="{% url 'create_service' %}"
-   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
+   class="button-main">
+    <i class="ph ph-plus text-lg"></i>
     {% trans "Add New Service" %}
 </a>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div id="main-content">
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7.5 mb-7.5">
         <!-- Total Services -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="p-8 bg-white rounded-lg">
             <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg">
+                    <i class="ph ph-briefcase text-2xl text-blue-600"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Services" %}</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_services }}</p>
+                    <p class="caption2 text-secondary">{% trans "Total Services" %}</p>
+                    <p class="heading4">{{ total_services }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Total Contracts -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="p-8 bg-white rounded-lg">
             <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-green-50 rounded-lg">
+                    <i class="ph ph-check-circle text-2xl text-green-600"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Contracts" %}</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_contracts }}</p>
+                    <p class="caption2 text-secondary">{% trans "Total Contracts" %}</p>
+                    <p class="heading4">{{ total_contracts }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Average Rating -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="p-8 bg-white rounded-lg">
             <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-yellow-50 rounded-lg">
+                    <i class="ph ph-star text-2xl text-yellow-600"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Average Rating" %}</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ avg_rating }}/5</p>
+                    <p class="caption2 text-secondary">{% trans "Average Rating" %}</p>
+                    <p class="heading4">{{ avg_rating }}/5</p>
                 </div>
             </div>
         </div>
 
         <!-- Pending Proposals -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="p-8 bg-white rounded-lg">
             <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-purple-50 rounded-lg">
+                    <i class="ph ph-file-text text-2xl text-purple-600"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Pending Proposals" %}</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ pending_proposals.count }}</p>
+                    <p class="caption2 text-secondary">{% trans "Pending Proposals" %}</p>
+                    <p class="heading4">{{ pending_proposals.count }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5">
         <!-- Main Content - 2 columns -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-7.5">
             <!-- My Services -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "My Services" %}</h2>
-                    <a href="{% url 'create_service' %}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+            <div class="p-8 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-7.5">
+                    <h2 class="heading5">{% trans "My Services" %}</h2>
+                    <a href="{% url 'create_service' %}" class="caption1 text-primary hover:text-primary-dark">
                         {% trans "Add New" %}
                     </a>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="divide-y divide-gray-200">
                     {% for service in services %}
-                    <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div class="p-6 hover:bg-surface-light transition-colors">
                         <div class="flex items-start gap-4">
                             <!-- Thumbnail -->
-                            <div class="flex-shrink-0 w-20 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                            <div class="flex-shrink-0 w-20 h-16 bg-surface-light rounded-lg overflow-hidden">
                                 {% if service.thumbnail %}
                                 <img src="{{ service.thumbnail.url }}" alt="{{ service.name }}" class="w-full h-full object-cover">
                                 {% else %}
                                 <div class="w-full h-full flex items-center justify-center">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
+                                    <i class="ph ph-image text-2xl text-secondary"></i>
                                 </div>
                                 {% endif %}
                             </div>
 
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate">
+                                    <h3 class="text-title truncate">
                                         {{ service.name }}
                                     </h3>
                                     <div class="flex items-center gap-2">
                                         <a href="{% url 'edit_service' service.uuid %}"
-                                           class="p-2 text-gray-400 hover:text-primary-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
+                                           class="p-2 text-secondary hover:text-primary rounded-lg hover:bg-surface-light">
+                                            <i class="ph ph-pencil-simple text-lg"></i>
                                         </a>
                                         <a href="{% url 'delete_service' service.uuid %}"
-                                           class="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
+                                           class="p-2 text-secondary hover:text-red-600 rounded-lg hover:bg-surface-light">
+                                            <i class="ph ph-trash text-lg"></i>
                                         </a>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                <p class="caption2 text-secondary mt-1">
                                     {{ service.category.name|default:"Uncategorized" }}
                                 </p>
                                 <div class="flex items-center gap-4 mt-2 text-sm">
-                                    <span class="font-semibold text-gray-900 dark:text-white">${{ service.price|intcomma }}</span>
-                                    <span class="text-gray-500 dark:text-gray-400">{{ service.order_count }} {% trans "orders" %}</span>
-                                    <span class="text-gray-500 dark:text-gray-400">{{ service.view_count }} {% trans "views" %}</span>
+                                    <span class="text-title">${{ service.price|intcomma }}</span>
+                                    <span class="caption2 text-secondary ">{{ service.order_count }} {% trans "orders" %}</span>
+                                    <span class="caption2 text-secondary ">{{ service.view_count }} {% trans "views" %}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {% empty %}
                     <div class="p-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No services yet" %}</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Start by creating your first service." %}</p>
-                        <div class="mt-6">
+                        <i class="ph ph-folder text-6xl text-secondary mx-auto block"></i>
+                        <h3 class="heading6 mb-2">{% trans "No services yet" %}</h3>
+                        <p class="mt-1 caption2 text-secondary">{% trans "Start by creating your first service." %}</p>
+                        <div class="mt-7.5">
                             <a href="{% url 'create_service' %}"
-                               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
+                               class="button-main">
+                                <i class="ph ph-plus text-lg"></i>
                                 {% trans "Add Service" %}
                             </a>
                         </div>
@@ -176,41 +154,41 @@
             </div>
 
             <!-- Active Contracts -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Active Contracts" %}</h2>
-                    <a href="{% url 'my_contracts' %}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+            <div class="p-8 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-7.5">
+                    <h2 class="heading5">{% trans "Active Contracts" %}</h2>
+                    <a href="{% url 'my_contracts' %}" class="caption1 text-primary hover:text-primary-dark">
                         {% trans "View All" %}
                     </a>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="divide-y divide-gray-200">
                     {% for contract in active_contracts %}
                     <div class="p-6">
                         <div class="flex items-start justify-between">
                             <div>
-                                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                                <h3 class="text-title">
                                     {{ contract.title|default:contract.request.title }}
                                 </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                <p class="caption2 text-secondary mt-1">
                                     {% trans "Client:" %} {{ contract.client.get_full_name|default:contract.client.email }}
                                 </p>
                                 <div class="flex items-center gap-4 mt-2 text-sm">
-                                    <span class="font-semibold text-gray-900 dark:text-white">${{ contract.agreed_rate|intcomma }}</span>
+                                    <span class="text-title">${{ contract.agreed_rate|intcomma }}</span>
                                     {% if contract.agreed_deadline %}
-                                    <span class="text-gray-500 dark:text-gray-400">
+                                    <span class="caption2 text-secondary ">
                                         {% trans "Due:" %} {{ contract.agreed_deadline|date:"M d, Y" }}
                                     </span>
                                     {% endif %}
                                 </div>
                             </div>
                             <a href="{% url 'view_contract' contract.id %}"
-                               class="px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors">
+                               class="px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary hover:bg-opacity-10 rounded-lg transition-colors">
                                 {% trans "View" %}
                             </a>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="p-8 text-center caption2 text-secondary">
                         {% trans "No active contracts at the moment." %}
                     </div>
                     {% endfor %}
@@ -219,62 +197,60 @@
         </div>
 
         <!-- Sidebar - 1 column -->
-        <div class="space-y-8">
+        <div class="space-y-7.5">
             <!-- Profile Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                <div class="text-center mb-6">
+            <div class="p-8 bg-white rounded-lg">
+                <div class="text-center mb-7.5">
                     {% if provider.avatar %}
                     <img src="{{ provider.avatar.url }}"
                          alt="{{ provider.display_name }}"
                          class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
                     {% else %}
-                    <div class="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4">
+                    <div class="w-20 h-20 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mx-auto mb-4">
                         <span class="text-2xl font-medium text-primary-600 dark:text-primary-400">
                             {{ provider.display_name|slice:":1"|upper }}
                         </span>
                     </div>
                     {% endif %}
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 class="heading5">
                         {{ provider.display_name }}
                         {% if provider.is_verified %}
-                        <svg class="inline w-5 h-5 text-blue-500 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
+                        <i class="ph ph-check-circle text-xl text-blue-600"></i>
                         {% endif %}
                     </h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ provider.tagline }}</p>
+                    <p class="caption2 text-secondary">{{ provider.tagline }}</p>
 
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-3
-                        {% if provider.availability_status == 'available' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                        {% elif provider.availability_status == 'busy' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                        {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                        {% if provider.availability_status == 'available' %}tag bg-green bg-opacity-10 text-green
+                        {% elif provider.availability_status == 'busy' %}tag bg-yellow bg-opacity-10 text-yellow
+                       {% else %}tag bg-gray bg-opacity-10 text-secondary{% endif %}">
                         {{ provider.get_availability_status_display }}
                     </span>
                 </div>
 
                 <a href="{% url 'edit_provider_profile' %}"
-                   class="block w-full py-2 px-4 text-center text-sm font-medium text-primary-600 border border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors">
+                   class="block w-full py-2 px-4 text-center button-main -border">
                     {% trans "Edit Profile" %}
                 </a>
             </div>
 
             <!-- Pending Proposals -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Pending Proposals" %}</h2>
+            <div class="p-8 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-7.5">
+                    <h2 class="heading5">{% trans "Pending Proposals" %}</h2>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="divide-y divide-gray-200">
                     {% for proposal in pending_proposals %}
                     <div class="p-4">
-                        <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <h4 class="caption1 truncate">
                             {{ proposal.request.title }}
                         </h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <p class="caption2 text-secondary mt-1">
                             ${{ proposal.proposed_rate|intcomma }} - {{ proposal.submitted_at|timesince }} {% trans "ago" %}
                         </p>
                     </div>
                     {% empty %}
-                    <div class="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="p-6 text-center caption2 text-secondary">
                         {% trans "No pending proposals." %}
                     </div>
                     {% endfor %}
@@ -282,27 +258,25 @@
             </div>
 
             <!-- Recent Reviews -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Recent Reviews" %}</h2>
+            <div class="p-8 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-7.5">
+                    <h2 class="heading5">{% trans "Recent Reviews" %}</h2>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="divide-y divide-gray-200">
                     {% for comment in recent_comments %}
                     <div class="p-4">
                         <div class="flex items-center gap-1 mb-1">
                             {% for i in "12345" %}
-                            <svg class="w-4 h-4 {% if forloop.counter <= comment.rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
+                            <i class="ph ph-star-fill text-base text-yellow"></i>
                             {% endfor %}
                         </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{{ comment.content }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <p class="text-sm text-secondary line-clamp-2">{{ comment.content }}</p>
+                        <p class="caption2 text-secondary mt-1">
                             {{ comment.reviewer.get_full_name|default:comment.reviewer.email }} - {{ comment.created_at|timesince }} {% trans "ago" %}
                         </p>
                     </div>
                     {% empty %}
-                    <div class="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="p-6 text-center caption2 text-secondary">
                         {% trans "No reviews yet." %}
                     </div>
                     {% endfor %}

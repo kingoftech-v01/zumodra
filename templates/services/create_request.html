@@ -1,38 +1,38 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Post a Request" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Post a Request" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg class="zu-icon--sm text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
-    <a href="{% url 'my_requests' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <a href="{% url 'my_requests' %}" class="ml-2 caption1 text-secondary hover:text-primary">
         {% trans "My Requests" %}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg class="zu-icon--sm text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Post a Request" %}</span>
+    <span class="ml-2 caption1 text-secondary">{% trans "Post a Request" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Post a Service Request" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Describe what you need and receive proposals from providers." %}
 </p>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <!-- Hiring Context Selector -->
 {% include 'components/hiring_context_selector.html' with hiring_context=hiring_context %}
 <div class="max-w-3xl">
-    <form method="post" class="space-y-8">
+    <form method="post" class="space-y-7.5">
         {% csrf_token %}
 
         <!-- Request Details -->
@@ -41,7 +41,7 @@
                 <h3 class="zu-card__title">{% trans "Request Details" %}</h3>
             </div>
             <div class="zu-card__body">
-                <div class="space-y-6">
+                <div class="space-y-5">
                     <div class="zu-form-group">
                         <label for="title" class="zu-label zu-label--required">
                             {% trans "Title" %}
@@ -69,7 +69,7 @@
 
                     <div class="zu-form-group">
                         <label for="company" class="zu-label">
-                            {% trans "Company" %} <span class="text-gray-400">({% trans "optional" %})</span>
+                            {% trans "Company" %} <span class="text-secondary">({% trans "optional" %})</span>
                         </label>
                         <select name="company"
                                 id="company"
@@ -90,8 +90,8 @@
                 <h3 class="zu-card__title">{% trans "Budget & Timeline" %}</h3>
             </div>
             <div class="zu-card__body">
-                <div class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-7.5">
                         <div class="zu-form-group">
                             <label for="budget_min" class="zu-label">
                                 {% trans "Minimum Budget" %} ($)
@@ -127,7 +127,7 @@
                                name="deadline"
                                id="deadline"
                                class="zu-input">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "When do you need this completed?" %}</p>
+                        <p class="mt-1 caption2 text-secondary">{% trans "When do you need this completed?" %}</p>
                     </div>
                 </div>
             </div>
@@ -139,15 +139,15 @@
                 <h3 class="zu-card__title">{% trans "Required Skills" %}</h3>
             </div>
             <div class="zu-card__body">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{% trans "Select the skills needed for this project." %}</p>
+                <p class="caption2 text-secondary mb-4">{% trans "Select the skills needed for this project." %}</p>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {% for skill in skills %}
-                    <label class="zu-checkbox flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
+                    <label class="zu-checkbox flex items-center p-3 border border-gray-200 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
                         <input type="checkbox" name="skills" value="{{ skill.id }}" class="zu-checkbox__input">
                         <span class="zu-checkbox__label">{{ skill.name }}</span>
                     </label>
                     {% empty %}
-                    <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{% trans "No skills available." %}</p>
+                    <p class="col-span-full caption2 text-secondary">{% trans "No skills available." %}</p>
                     {% endfor %}
                 </div>
             </div>

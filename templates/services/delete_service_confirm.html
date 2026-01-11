@@ -1,49 +1,43 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Delete Service" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Delete Service" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'provider_dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <a href="{% url 'provider_dashboard' %}" class="ml-2 caption1 text-secondary hover:text-primary">
         {% trans "Provider Dashboard" %}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Delete Service" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "Delete Service" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Delete Service" %}{% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div class="max-w-lg mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-8 bg-white rounded-lg">
         <!-- Warning Icon -->
         <div class="p-6 text-center">
-            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
-                <svg class="h-8 w-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-4">
+                <i class="ph ph-warning text-3xl text-red-600"></i>
             </div>
 
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 class="text-lg font-semibold text-on-surface mb-2">
                 {% trans "Delete this service?" %}
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <p class="caption2 text-secondary mb-7.5">
                 {% blocktrans with name=service.name %}
                 Are you sure you want to delete "{{ name }}"? This action cannot be undone.
                 {% endblocktrans %}
             </p>
 
             <!-- Service Preview -->
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6 text-left">
+            <div class="bg-surface-light rounded-lg p-4 mb-7.5 text-left">
                 <div class="flex items-center gap-4">
                     {% if service.thumbnail %}
                     <div class="flex-shrink-0 w-16 h-12 rounded overflow-hidden">
@@ -51,23 +45,23 @@
                     </div>
                     {% endif %}
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ service.name }}</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">${{ service.price }}</p>
+                        <h4 class="caption1 truncate">{{ service.name }}</h4>
+                        <p class="caption2 text-secondary">${{ service.price }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 flex items-center justify-end gap-4">
+        <div class="bg-surface-light px-6 py-4 flex items-center justify-end gap-4">
             <a href="{% url 'provider_dashboard' %}"
-               class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+               class="px-4 py-2 button-main -border">
                 {% trans "Cancel" %}
             </a>
             <form method="post" class="inline">
                 {% csrf_token %}
                 <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                        class="px-4 py-2 text-sm font-medium button-main bg-red-600 hover:bg-red-700">
                     {% trans "Yes, Delete" %}
                 </button>
             </form>

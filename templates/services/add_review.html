@@ -1,45 +1,39 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Write a Review" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Write a Review" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'browse_services' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <a href="{% url 'browse_services' %}" class="ml-2 caption1 text-secondary hover:text-primary">
         {% trans "Services" %}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'service_detail' service.uuid %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <a href="{% url 'service_detail' service.uuid %}" class="ml-2 caption1 text-secondary hover:text-primary">
         {{ service.name|truncatewords:3 }}
     </a>
 </li>
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Write Review" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "Write Review" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Write a Review" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Share your experience with this service." %}
 </p>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div class="max-w-2xl mx-auto">
     <!-- Service Info -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-7.5">
         <div class="flex items-center gap-4">
             {% if service.thumbnail %}
             <div class="flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden">
@@ -47,18 +41,18 @@
             </div>
             {% endif %}
             <div>
-                <h3 class="font-semibold text-gray-900 dark:text-white">{{ service.name }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "by" %} {{ service.provider.display_name }}</p>
+                <h3 class="text-title">{{ service.name }}</h3>
+                <p class="caption2 text-secondary">{% trans "by" %} {{ service.provider.display_name }}</p>
             </div>
         </div>
     </div>
 
     <!-- Review Form -->
-    <form method="post" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+    <form method="post" class="p-8 bg-white rounded-lg">
         {% csrf_token %}
 
         <!-- Star Rating -->
-        <div class="mb-6">
+        <div class="mb-7.5">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {% trans "Your Rating" %} <span class="text-red-500">*</span>
             </label>
@@ -77,45 +71,39 @@
                 </button>
                 {% endfor %}
                 <input type="hidden" name="rating" x-model="rating" required>
-                <span class="ml-3 text-sm text-gray-500 dark:text-gray-400" x-show="rating">
+                <span class="ml-3 caption2 text-secondary" x-show="rating">
                     <span x-text="rating"></span>/5
                 </span>
             </div>
         </div>
 
         <!-- Review Content -->
-        <div class="mb-6">
+        <div class="mb-7.5">
             <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {% trans "Your Review" %}
             </label>
             <textarea name="content"
                       id="content"
                       rows="6"
-                      class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-on-surface placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       placeholder="{% trans 'Share your experience with this service. What did you like? Was the provider responsive and professional?' %}"></textarea>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Help others by being specific about your experience." %}</p>
+            <p class="mt-1 caption2 text-secondary">{% trans "Help others by being specific about your experience." %}</p>
         </div>
 
         <!-- Review Tips -->
-        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
-            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{% trans "Tips for a helpful review" %}</h4>
-            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+        <div class="bg-surface-light rounded-lg p-4 mb-7.5">
+            <h4 class="caption1 mb-2">{% trans "Tips for a helpful review" %}</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
                 <li class="flex items-start gap-2">
-                    <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
+                    <i class="ph ph-check-circle text-base text-green"></i>
                     {% trans "Be specific about what you liked or disliked" %}
                 </li>
                 <li class="flex items-start gap-2">
-                    <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
+                    <i class="ph ph-check-circle text-base text-green"></i>
                     {% trans "Mention the provider's communication and professionalism" %}
                 </li>
                 <li class="flex items-start gap-2">
-                    <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
+                    <i class="ph ph-check-circle text-base text-green"></i>
                     {% trans "Comment on the quality of the work delivered" %}
                 </li>
             </ul>
@@ -124,11 +112,11 @@
         <!-- Submit -->
         <div class="flex items-center justify-end gap-4">
             <a href="{% url 'service_detail' service.uuid %}"
-               class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+               class="px-6 py-3 button-main -border">
                 {% trans "Cancel" %}
             </a>
             <button type="submit"
-                    class="px-6 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                    class="button-main">
                 {% trans "Submit Review" %}
             </button>
         </div>

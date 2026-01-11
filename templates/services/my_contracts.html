@@ -1,27 +1,27 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "My Contracts" %} - Zumodra{% endblock %}
+{% block title %}{% trans "My Contracts" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg class="zu-icon--sm text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
     </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "My Contracts" %}</span>
+    <span class="ml-2 caption1 text-secondary">{% trans "My Contracts" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "My Contracts" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "View and manage all your contracts." %}
 </p>
 {% endblock %}
 
-{% block content %}
-<div class="space-y-8">
+{% block dashboard_content %}
+<div class="space-y-7.5">
     <!-- Contracts as Client -->
     <div class="zu-card">
         <div class="zu-card__header">
@@ -59,7 +59,7 @@
                         {% for contract in client_contracts %}
                         <tr class="zu-table__row">
                             <td class="zu-table__td zu-table__td--primary">
-                                <a href="{% url 'view_contract' contract.id %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600">
+                                <a href="{% url 'view_contract' contract.id %}" class="caption1 hover:text-primary">
                                     {{ contract.title|truncatewords:5 }}
                                 </a>
                             </td>
@@ -68,15 +68,15 @@
                                     {% if contract.provider.avatar %}
                                     <img src="{{ contract.provider.avatar.url }}" alt="" class="w-8 h-8 rounded-full object-cover mr-3">
                                     {% else %}
-                                    <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mr-3">
+                                    <div class="w-8 h-8 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-3">
                                         <span class="text-xs font-medium text-primary-600 dark:text-primary-400">{{ contract.provider.display_name|slice:":1"|upper }}</span>
                                     </div>
                                     {% endif %}
-                                    <span class="text-sm text-gray-900 dark:text-white">{{ contract.provider.display_name }}</span>
+                                    <span class="text-sm text-on-surface">{{ contract.provider.display_name }}</span>
                                 </div>
                             </td>
                             <td class="zu-table__td">
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">${{ contract.agreed_rate|intcomma }}</span>
+                                <span class="caption1">${{ contract.agreed_rate|intcomma }}</span>
                             </td>
                             <td class="zu-table__td">
                                 <span class="zu-badge
@@ -84,12 +84,12 @@
                                     {% elif contract.status == 'active' or contract.status == 'in_progress' %}zu-badge--info
                                     {% elif contract.status == 'completed' %}zu-badge--success
                                     {% elif contract.status == 'cancelled' %}zu-badge--danger
-                                    {% else %}zu-badge--neutral{% endif %}">
+                                   {% else %}zu-badge--neutral{% endif %}">
                                     {{ contract.get_status_display }}
                                 </span>
                             </td>
                             <td class="zu-table__td">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ contract.created_at|date:"M d, Y" }}</span>
+                                <span class="caption2 text-secondary">{{ contract.created_at|date:"M d, Y" }}</span>
                             </td>
                             <td class="zu-table__td zu-table__td--actions">
                                 <a href="{% url 'view_contract' contract.id %}" class="zu-btn zu-btn--ghost zu-btn--sm">{% trans "View" %}</a>
@@ -99,10 +99,10 @@
                         <tr>
                             <td colspan="6" class="zu-table__td">
                                 <div class="zu-empty py-12">
-                                    <svg class="zu-icon zu-empty__icon mx-auto h-12 w-12 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <svg class="zu-icon zu-empty__icon mx-auto h-12 w-12 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% trans "No contracts as client." %}</p>
+                                    <p class="mt-2 caption2 text-secondary">{% trans "No contracts as client." %}</p>
                                 </div>
                             </td>
                         </tr>
@@ -151,15 +151,15 @@
                         {% for contract in provider_contracts %}
                         <tr class="zu-table__row">
                             <td class="zu-table__td zu-table__td--primary">
-                                <a href="{% url 'view_contract' contract.id %}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600">
+                                <a href="{% url 'view_contract' contract.id %}" class="caption1 hover:text-primary">
                                     {{ contract.title|truncatewords:5 }}
                                 </a>
                             </td>
                             <td class="zu-table__td">
-                                <span class="text-sm text-gray-900 dark:text-white">{{ contract.client.get_full_name|default:contract.client.email }}</span>
+                                <span class="text-sm text-on-surface">{{ contract.client.get_full_name|default:contract.client.email }}</span>
                             </td>
                             <td class="zu-table__td">
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">${{ contract.agreed_rate|intcomma }}</span>
+                                <span class="caption1">${{ contract.agreed_rate|intcomma }}</span>
                             </td>
                             <td class="zu-table__td">
                                 <span class="zu-badge
@@ -167,12 +167,12 @@
                                     {% elif contract.status == 'active' or contract.status == 'in_progress' %}zu-badge--info
                                     {% elif contract.status == 'completed' %}zu-badge--success
                                     {% elif contract.status == 'cancelled' %}zu-badge--danger
-                                    {% else %}zu-badge--neutral{% endif %}">
+                                   {% else %}zu-badge--neutral{% endif %}">
                                     {{ contract.get_status_display }}
                                 </span>
                             </td>
                             <td class="zu-table__td">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ contract.created_at|date:"M d, Y" }}</span>
+                                <span class="caption2 text-secondary">{{ contract.created_at|date:"M d, Y" }}</span>
                             </td>
                             <td class="zu-table__td zu-table__td--actions">
                                 <a href="{% url 'view_contract' contract.id %}" class="zu-btn zu-btn--ghost zu-btn--sm">{% trans "View" %}</a>

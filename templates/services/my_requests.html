@@ -1,87 +1,83 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "My Requests" %} - Zumodra{% endblock %}
+{% block title %}{% trans "My Requests" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "My Requests" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "My Requests" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "My Requests" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Manage your service requests and review proposals." %}
 </p>
 {% endblock %}
 
 {% block page_actions %}
 <a href="{% url 'create_service_request' %}"
-   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
+   class="button-main">
+    <i class="ph ph-plus text-lg"></i>
     {% trans "Post New Request" %}
 </a>
 {% endblock %}
 
-{% block content %}
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+{% block dashboard_content %}
+<div class="p-8 bg-white rounded-lg">
     <!-- Filter Tabs -->
-    <div class="border-b border-gray-200 dark:border-gray-700">
+    <div class="border-b border-gray-200">
         <nav class="flex -mb-px" aria-label="Tabs">
             <a href="?status=all"
                class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                      {% if not request.GET.status or request.GET.status == 'all' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400{% endif %}">
+                     {% if not request.GET.status or request.GET.status == 'all' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent caption2 text-secondary hover:text-gray-700 hover:border-gray-300 {% endif %}">
                 {% trans "All" %}
             </a>
             <a href="?status=open"
                class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                      {% if request.GET.status == 'open' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400{% endif %}">
+                     {% if request.GET.status == 'open' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent caption2 text-secondary hover:text-gray-700 hover:border-gray-300 {% endif %}">
                 {% trans "Open" %}
             </a>
             <a href="?status=in_progress"
                class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                      {% if request.GET.status == 'in_progress' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400{% endif %}">
+                     {% if request.GET.status == 'in_progress' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent caption2 text-secondary hover:text-gray-700 hover:border-gray-300 {% endif %}">
                 {% trans "In Progress" %}
             </a>
             <a href="?status=closed"
                class="whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                      {% if request.GET.status == 'closed' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400{% endif %}">
+                     {% if request.GET.status == 'closed' %}border-primary-500 text-primary-600 dark:text-primary-400{% else %}border-transparent caption2 text-secondary hover:text-gray-700 hover:border-gray-300 {% endif %}">
                 {% trans "Closed" %}
             </a>
         </nav>
     </div>
 
     <!-- Requests List -->
-    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+    <div class="divide-y divide-gray-200">
         {% for req in requests %}
-        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+        <div class="p-6 hover:bg-surface-light transition-colors">
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-3 mb-2">
-                        <a href="{% url 'view_request' req.uuid %}" class="text-lg font-semibold text-gray-900 dark:text-white hover:text-primary-600">
+                        <a href="{% url 'view_request' req.uuid %}" class="text-lg font-semibold text-on-surface hover:text-primary">
                             {{ req.title }}
                         </a>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            {% if req.status == 'open' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                            {% elif req.status == 'in_progress' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
-                            {% elif req.status == 'closed' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
-                            {% else %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300{% endif %}">
+                            {% if req.status == 'open' %}tag bg-green bg-opacity-10 text-green
+                            {% elif req.status == 'in_progress' %}tag bg-blue bg-opacity-10 text-blue
+                            {% elif req.status == 'closed' %}tag bg-gray bg-opacity-10 text-secondary
+                           {% else %}tag bg-red bg-opacity-10 text-red{% endif %}">
                             {{ req.get_status_display }}
                         </span>
                     </div>
 
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">
                         {{ req.description }}
                     </p>
 
-                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex flex-wrap items-center gap-4 caption2 text-secondary">
                         {% if req.budget_min or req.budget_max %}
                         <span class="flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,24 +119,20 @@
                 </div>
 
                 <a href="{% url 'view_request' req.uuid %}"
-                   class="ml-4 flex-shrink-0 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors">
+                   class="ml-4 flex-shrink-0 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary hover:bg-opacity-10 rounded-lg transition-colors">
                     {% trans "View" %}
                 </a>
             </div>
         </div>
         {% empty %}
         <div class="p-12 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No requests yet" %}</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Post a request to find the right service provider." %}</p>
-            <div class="mt-6">
+            <i class="ph ph-folder text-6xl text-secondary mx-auto block"></i>
+            <h3 class="heading6 mb-2">{% trans "No requests yet" %}</h3>
+            <p class="mt-1 caption2 text-secondary">{% trans "Post a request to find the right service provider." %}</p>
+            <div class="mt-7.5">
                 <a href="{% url 'create_service_request' %}"
-                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
-                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
+                   class="button-main">
+                    <i class="ph ph-plus text-lg"></i>
                     {% trans "Post a Request" %}
                 </a>
             </div>
