@@ -31,9 +31,22 @@ SHARED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
+    'drf_spectacular',  # API documentation
+    'user_agents',  # User agent parsing
+    'analytical',  # Analytics tracking
+    'django_celery_beat',  # Scheduled tasks
 
     # Custom user model (shared across tenants)
     'custom_account_u',
+
+    # Integrations (shared - webhooks dispatched from public schema)
+    'integrations',
+
+    # Core utilities (shared)
+    'core',
+    'security',
+    'ai_matching',  # AI matching engine
+    'marketing',  # Marketing/tracking
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)

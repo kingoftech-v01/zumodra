@@ -324,7 +324,7 @@ fix_migration_permissions() {
     log_info "Ensuring migration directories have correct permissions..."
 
     # List of core apps that need migration directories
-    local apps=("tenants" "accounts" "custom_account_u" "ats" "hr_core" "services" "finance" "notifications" "messages_sys")
+    local apps=("tenants" "accounts" "custom_account_u" "ats" "hr_core" "services" "finance" "notifications" "messages_sys" "integrations" "core" "security" "ai_matching" "marketing")
 
     for app in "${apps[@]}"; do
         local migration_dir="${app}/migrations"
