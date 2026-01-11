@@ -1,67 +1,53 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
-
-{% block title %}{% trans "Update Contract Status" %} - Zumodra{% endblock %}
-
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'my_contracts' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
-        {% trans "My Contracts" %}
-    </a>
-</li>
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{% url 'view_contract' contract.id %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
-        {{ contract.title|truncatewords:3 }}
-    </a>
-</li>
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Update Status" %}</span>
-</li>
-{% endblock %}
 
 {% block page_title %}{% trans "Update Contract Status" %}{% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'my_contracts' %}" class="text-secondary hover:text-primary caption1">{% trans "My Contracts" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <a href="{% url 'view_contract' contract.id %}" class="text-secondary hover:text-primary caption1">{{ contract.title|truncatewords:3 }}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">{% trans "Update Status" %}</span>
+</div>
+
+<!-- Page Header -->
+<div class="heading mb-6">
+    <h3 class="heading3">{% trans "Update Contract Status" %}</h3>
+</div>
 <div class="max-w-lg mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-8 rounded-lg bg-white">
         <!-- Current Status -->
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{% trans "Current Status" %}</h3>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                {% if contract.status == 'pending' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                {% elif contract.status == 'active' or contract.status == 'in_progress' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
-                {% elif contract.status == 'completed' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                {% elif contract.status == 'cancelled' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
-                {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+        <div class="pb-6 border-b border-line">
+            <h3 class="caption1 text-secondary mb-3">{% trans "Current Status" %}</h3>
+            <span class="tag
+                {% if contract.status == 'pending' %}bg-yellow bg-opacity-10 text-yellow
+                {% elif contract.status == 'active' or contract.status == 'in_progress' %}bg-blue bg-opacity-10 text-blue
+                {% elif contract.status == 'completed' %}bg-green bg-opacity-10 text-green
+                {% elif contract.status == 'cancelled' %}bg-red bg-opacity-10 text-red
+                {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
                 {{ contract.get_status_display }}
             </span>
         </div>
 
         <!-- Available Actions -->
-        <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{% trans "Available Actions" %}</h3>
+        <div class="pt-6">
+            <h3 class="heading5 mb-6">{% trans "Available Actions" %}</h3>
 
-            <div class="space-y-4">
+            <div class="space-y-5">
                 {% if contract.status == 'pending' %}
                 <!-- Start Contract -->
-                <form method="post" class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <form method="post" class="p-6 rounded-lg bg-blue bg-opacity-10">
                     {% csrf_token %}
                     <input type="hidden" name="status" value="active">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-medium text-blue-900 dark:text-blue-200">{% trans "Start Contract" %}</h4>
-                            <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">{% trans "Begin working on this contract." %}</p>
+                        <div class="flex-1">
+                            <h4 class="heading6 text-blue mb-1">{% trans "Start Contract" %}</h4>
+                            <p class="caption1 text-blue">{% trans "Begin working on this contract." %}</p>
                         </div>
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                        <button type="submit" class="button-main">
                             {% trans "Start" %}
                         </button>
                     </div>
@@ -70,15 +56,15 @@
 
                 {% if contract.status == 'active' %}
                 <!-- Mark as Completed (Provider only) -->
-                <form method="post" class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                <form method="post" class="p-6 rounded-lg bg-green bg-opacity-10">
                     {% csrf_token %}
                     <input type="hidden" name="status" value="completed">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-medium text-green-900 dark:text-green-200">{% trans "Mark as Completed" %}</h4>
-                            <p class="text-sm text-green-700 dark:text-green-300 mt-1">{% trans "Mark this contract as completed." %}</p>
+                        <div class="flex-1">
+                            <h4 class="heading6 text-green mb-1">{% trans "Mark as Completed" %}</h4>
+                            <p class="caption1 text-green">{% trans "Mark this contract as completed." %}</p>
                         </div>
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
+                        <button type="submit" class="button-main">
                             {% trans "Complete" %}
                         </button>
                     </div>
@@ -87,15 +73,15 @@
 
                 {% if contract.status != 'completed' and contract.status != 'cancelled' %}
                 <!-- Cancel Contract -->
-                <form method="post" class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                <form method="post" class="p-6 rounded-lg bg-red bg-opacity-10">
                     {% csrf_token %}
                     <input type="hidden" name="status" value="cancelled">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-medium text-red-900 dark:text-red-200">{% trans "Cancel Contract" %}</h4>
-                            <p class="text-sm text-red-700 dark:text-red-300 mt-1">{% trans "Cancel this contract. This action cannot be undone." %}</p>
+                        <div class="flex-1">
+                            <h4 class="heading6 text-red mb-1">{% trans "Cancel Contract" %}</h4>
+                            <p class="caption1 text-red">{% trans "Cancel this contract. This action cannot be undone." %}</p>
                         </div>
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                        <button type="submit" class="button-main">
                             {% trans "Cancel" %}
                         </button>
                     </div>
@@ -103,11 +89,9 @@
                 {% endif %}
 
                 {% if contract.status == 'completed' or contract.status == 'cancelled' %}
-                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <div class="p-8 rounded-lg bg-surface text-center">
+                    <span class="ph ph-check-circle text-6xl text-secondary opacity-30 block mb-4"></span>
+                    <p class="caption1 text-secondary">
                         {% trans "This contract has been finalized. No further status changes are available." %}
                     </p>
                 </div>
@@ -116,12 +100,10 @@
         </div>
 
         <!-- Back Link -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
+        <div class="pt-6 mt-6 border-t border-line">
             <a href="{% url 'view_contract' contract.id %}"
-               class="text-sm font-medium text-primary-600 hover:text-primary-700">
-                <svg class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
+               class="caption1 text-primary hover:text-primary inline-flex items-center gap-1">
+                <span class="ph ph-arrow-left"></span>
                 {% trans "Back to Contract" %}
             </a>
         </div>

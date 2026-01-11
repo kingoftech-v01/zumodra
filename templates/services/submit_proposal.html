@@ -1,115 +1,94 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
-
-{% block title %}{% trans "Submit Proposal" %} - Zumodra{% endblock %}
-
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-    </svg>
-    <a href="{% url 'provider_dashboard' %}" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary-600">
-        {% trans "Provider Dashboard" %}
-    </a>
-</li>
-<li class="flex items-center">
-    <svg class="zu-icon--sm text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Submit Proposal" %}</span>
-</li>
-{% endblock %}
 
 {% block page_title %}{% trans "Submit Proposal" %}{% endblock %}
 
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Submit your proposal for this service request." %}
-</p>
-{% endblock %}
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'provider_dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Provider Dashboard" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">{% trans "Submit Proposal" %}</span>
+</div>
 
-{% block content %}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Page Header -->
+<div class="heading mb-6">
+    <h3 class="heading3">{% trans "Submit Proposal" %}</h3>
+    <p class="caption1 text-secondary mt-2">
+        {% trans "Submit your proposal for this service request." %}
+    </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5">
     <!-- Proposal Form -->
     <div class="lg:col-span-2">
-        <form method="post" class="space-y-8">
+        <form method="post" class="space-y-7.5">
             {% csrf_token %}
 
             <!-- Cover Letter -->
-            <div class="zu-card">
-                <div class="zu-card__header">
-                    <h3 class="zu-card__title">{% trans "Your Proposal" %}</h3>
-                </div>
-                <div class="zu-card__body">
-                    <div class="space-y-6">
-                        <div class="zu-form-group">
-                            <label for="message" class="zu-label zu-label--required">
-                                {% trans "Cover Letter" %}
-                            </label>
-                            <textarea name="message"
-                                      id="message"
-                                      rows="8"
-                                      required
-                                      class="zu-input zu-textarea"
-                                      placeholder="{% trans 'Introduce yourself, explain why you are the best fit for this project, and describe your approach to completing it...' %}"></textarea>
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{% trans "Make your proposal stand out by being specific and addressing the client's needs." %}</p>
-                        </div>
+            <div class="p-8 rounded-lg bg-white">
+                <h3 class="heading5 mb-6">{% trans "Your Proposal" %}</h3>
+                <div class="space-y-6">
+                    <div class="zu-form-group">
+                        <label for="message" class="zu-label zu-label--required">
+                            {% trans "Cover Letter" %}
+                        </label>
+                        <textarea name="message"
+                                  id="message"
+                                  rows="8"
+                                  required
+                                  class="zu-input zu-textarea"
+                                  placeholder="{% trans 'Introduce yourself, explain why you are the best fit for this project, and describe your approach to completing it...' %}"></textarea>
+                        <p class="mt-1 caption2 text-secondary">{% trans "Make your proposal stand out by being specific and addressing the client's needs." %}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Pricing -->
-            <div class="zu-card">
-                <div class="zu-card__header">
-                    <h3 class="zu-card__title">{% trans "Your Rate" %}</h3>
-                </div>
-                <div class="zu-card__body">
-                    <div class="space-y-6">
-                        <div class="zu-form-group">
-                            <label for="proposed_rate" class="zu-label zu-label--required">
-                                {% trans "Proposed Rate" %} ($)
-                            </label>
-                            <input type="number"
-                                   name="proposed_rate"
-                                   id="proposed_rate"
-                                   required
-                                   min="1"
-                                   step="0.01"
-                                   class="zu-input"
-                                   placeholder="{% trans 'Enter your rate for this project' %}">
-                            {% if request.budget_min or request.budget_max %}
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                {% trans "Client's budget:" %}
-                                {% if request.budget_min and request.budget_max %}
-                                ${{ request.budget_min|intcomma }} - ${{ request.budget_max|intcomma }}
-                                {% elif request.budget_min %}
-                                {% trans "From" %} ${{ request.budget_min|intcomma }}
-                                {% else %}
-                                {% trans "Up to" %} ${{ request.budget_max|intcomma }}
-                                {% endif %}
-                            </p>
+            <div class="p-8 rounded-lg bg-white">
+                <h3 class="heading5 mb-6">{% trans "Your Rate" %}</h3>
+                <div class="space-y-6">
+                    <div class="zu-form-group">
+                        <label for="proposed_rate" class="zu-label zu-label--required">
+                            {% trans "Proposed Rate" %} ($)
+                        </label>
+                        <input type="number"
+                               name="proposed_rate"
+                               id="proposed_rate"
+                               required
+                               min="1"
+                               step="0.01"
+                               class="zu-input"
+                               placeholder="{% trans 'Enter your rate for this project' %}">
+                        {% if request.budget_min or request.budget_max %}
+                        <p class="mt-1 caption2 text-secondary">
+                            {% trans "Client's budget:" %}
+                            {% if request.budget_min and request.budget_max %}
+                            ${{ request.budget_min|intcomma }} - ${{ request.budget_max|intcomma }}
+                            {% elif request.budget_min %}
+                            {% trans "From" %} ${{ request.budget_min|intcomma }}
+                            {% else %}
+                            {% trans "Up to" %} ${{ request.budget_max|intcomma }}
                             {% endif %}
-                        </div>
+                        </p>
+                        {% endif %}
+                    </div>
 
-                        <!-- Platform Fee Notice -->
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                <svg class="zu-icon inline w-4 h-4 mr-1 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                {% trans "A 10% platform fee will be deducted from your earnings when the contract is completed." %}
-                            </p>
-                        </div>
+                    <!-- Platform Fee Notice -->
+                    <div class="p-4 rounded-lg bg-surface">
+                        <p class="caption1 text-secondary">
+                            <span class="ph ph-info inline-block text-lg mr-1 align-middle"></span>
+                            {% trans "A 10% platform fee will be deducted from your earnings when the contract is completed." %}
+                        </p>
                     </div>
                 </div>
             </div>
 
             <!-- Submit -->
             <div class="flex items-center justify-end gap-4">
-                <a href="{% url 'view_request' request.uuid %}" class="zu-btn zu-btn--secondary">
+                <a href="{% url 'view_request' request.uuid %}" class="button-main -border">
                     {% trans "Cancel" %}
                 </a>
-                <button type="submit" class="zu-btn zu-btn--primary">
+                <button type="submit" class="button-main">
                     {% trans "Submit Proposal" %}
                 </button>
             </div>
@@ -119,58 +98,54 @@
     <!-- Request Summary Sidebar -->
     <div class="lg:col-span-1">
         <div class="sticky top-24">
-            <div class="zu-card">
-                <div class="zu-card__header">
-                    <h3 class="zu-card__title">{% trans "Request Summary" %}</h3>
+            <div class="p-8 rounded-lg bg-white">
+                <h3 class="heading5 mb-6">{% trans "Request Summary" %}</h3>
+                <div class="mb-6">
+                    <h4 class="heading6 text-title mb-2">{{ request.title }}</h4>
+                    <p class="caption1 text-secondary line-clamp-4">{{ request.description }}</p>
                 </div>
-                <div class="zu-card__body">
-                    <div class="mb-4">
-                        <h4 class="font-medium text-gray-900 dark:text-white">{{ request.title }}</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-4">{{ request.description }}</p>
-                    </div>
 
-                    <dl class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        {% if request.budget_min or request.budget_max %}
-                        <div class="flex justify-between">
-                            <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Budget" %}</dt>
-                            <dd class="text-sm font-medium text-gray-900 dark:text-white">
-                                {% if request.budget_min and request.budget_max %}
-                                ${{ request.budget_min|intcomma }} - ${{ request.budget_max|intcomma }}
-                                {% elif request.budget_min %}
-                                {% trans "From" %} ${{ request.budget_min|intcomma }}
-                                {% else %}
-                                {% trans "Up to" %} ${{ request.budget_max|intcomma }}
-                                {% endif %}
-                            </dd>
-                        </div>
-                        {% endif %}
-
-                        {% if request.deadline %}
-                        <div class="flex justify-between">
-                            <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Deadline" %}</dt>
-                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ request.deadline|date:"M d, Y" }}</dd>
-                        </div>
-                        {% endif %}
-
-                        <div class="flex justify-between">
-                            <dt class="text-sm text-gray-500 dark:text-gray-400">{% trans "Posted" %}</dt>
-                            <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ request.created_at|timesince }} {% trans "ago" %}</dd>
-                        </div>
-                    </dl>
-
-                    {% if request.required_skills.exists %}
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{% trans "Required Skills" %}</p>
-                        <div class="flex flex-wrap gap-1">
-                            {% for skill in request.required_skills.all %}
-                            <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
-                                {{ skill.name }}
-                            </span>
-                            {% endfor %}
-                        </div>
+                <dl class="space-y-4 pt-6 border-t border-line">
+                    {% if request.budget_min or request.budget_max %}
+                    <div class="flex justify-between">
+                        <dt class="caption1 text-secondary">{% trans "Budget" %}</dt>
+                        <dd class="caption1 font-medium text-title">
+                            {% if request.budget_min and request.budget_max %}
+                            ${{ request.budget_min|intcomma }} - ${{ request.budget_max|intcomma }}
+                            {% elif request.budget_min %}
+                            {% trans "From" %} ${{ request.budget_min|intcomma }}
+                            {% else %}
+                            {% trans "Up to" %} ${{ request.budget_max|intcomma }}
+                            {% endif %}
+                        </dd>
                     </div>
                     {% endif %}
+
+                    {% if request.deadline %}
+                    <div class="flex justify-between">
+                        <dt class="caption1 text-secondary">{% trans "Deadline" %}</dt>
+                        <dd class="caption1 font-medium text-title">{{ request.deadline|date:"M d, Y" }}</dd>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex justify-between">
+                        <dt class="caption1 text-secondary">{% trans "Posted" %}</dt>
+                        <dd class="caption1 font-medium text-title">{{ request.created_at|timesince }} {% trans "ago" %}</dd>
+                    </div>
+                </dl>
+
+                {% if request.required_skills.exists %}
+                <div class="mt-6 pt-6 border-t border-line">
+                    <p class="caption1 text-secondary mb-3">{% trans "Required Skills" %}</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for skill in request.required_skills.all %}
+                        <span class="tag bg-surface text-secondary">
+                            {{ skill.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
