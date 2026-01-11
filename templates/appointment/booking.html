@@ -12,7 +12,7 @@
                     <h4 class="mb-0">Book an Appointment</h4>
                 </div>
                 <div class="zu-card__body">
-                    <form method="post" action="{% url 'appointment:book' %}" id="bookingForm">
+                    <form method="post" action="{% url 'frontend:appointment:book' %}" id="bookingForm">
                         {% csrf_token %}
 
                         <!-- Step 1: Select Service -->
@@ -230,7 +230,7 @@ function loadTimeSlots(date) {
     const serviceId = document.getElementById('selectedService').value;
     const staffId = document.getElementById('selectedStaff').value;
 
-    fetch(`{% url 'appointment:available_slots' %}?date=${date}&service=${serviceId}&staff=${staffId}`)
+    fetch(`{% url 'frontend:appointment:available_slots' %}?date=${date}&service=${serviceId}&staff=${staffId}`)
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('timeSlotsContainer');

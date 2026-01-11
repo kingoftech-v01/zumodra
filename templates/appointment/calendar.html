@@ -33,7 +33,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Appointments Calendar</h2>
         <div>
-            <a href="{% url 'appointment:list' %}" class="zu-btn zu-btn--outline me-2">
+            <a href="{% url 'frontend:appointment:list' %}" class="zu-btn zu-btn--outline me-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                 List View
             </a>
@@ -156,7 +156,7 @@
                 <h5 class="zu-modal__title">New Appointment</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'appointment:create' %}">
+            <form method="post" action="{% url 'frontend:appointment:create' %}">
                 {% csrf_token %}
                 <div class="zu-modal__body">
                     <div class="zu-form-group mb-3">
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showAppointmentDetails(appointmentId) {
-    fetch(`{% url 'appointment:api_detail' 0 %}`.replace('0', appointmentId))
+    fetch(`{% url 'frontend:appointment:api_detail' 0 %}`.replace('0', appointmentId))
         .then(response => response.json())
         .then(data => {
             document.getElementById('appointmentDetails').innerHTML = `

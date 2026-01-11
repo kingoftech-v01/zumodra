@@ -10,6 +10,7 @@ This module provides URL routing for the HTMX-powered frontend views:
 - Notifications (list, actions, preferences)
 - Accounts (verification, trust score, profile)
 - Messages (real-time messaging, conversations)
+- Appointments (scheduling, booking, calendar)
 
 All routes are prefixed with 'app/' in the main URL configuration.
 """
@@ -50,4 +51,8 @@ urlpatterns = [
     # Messages Views (Real-time Messaging)
     # URL: /app/messages/
     path('messages/', include('messages_sys.urls_frontend')),
+
+    # Appointments Views (Scheduling, Booking, Calendar)
+    # URL: /app/appointments/
+    path('appointments/', include('appointment.urls_frontend')),
 ]
