@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="FreelanHub - Job Board & Freelance Marketplace" />
+        <title>FreelanHub - Job Board & Freelance Marketplace</title>
+        <link rel="shortcut icon" href="./assets/images/fav.png" type="image/x-icon" />
+        <link rel="stylesheet" href="./assets/css/swiper-bundle.min.css" />
+        <link rel="stylesheet" href="./assets/css/leaflet.css" />
+        <link rel="stylesheet" href="./assets/css/slick.css" />
+        <link rel="stylesheet" href="./assets/css/style.css" />
+        <link rel="stylesheet" href="./dist/output-tailwind.css" />
+        <link rel="stylesheet" href="./dist/output-scss.css" />
+    </head>
+
+    <body>
+        <!-- Header -->
+        <header id="header" class="header -style-white -style-map relative">
+            <div class="header_inner absolute flex items-center justify-between top-0 left-0 right-0 z-[1] w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 border-b border-light">
+                <div class="left flex items-center gap-15 h-full max-[1600px]:gap-6">
+                    <h1>
+                        <a href="index.html">
+                            <img src="./assets/images/logo-white.png" alt="logo-white" class="logo-white md:h-[42px] h-8 w-auto" />
+                            <img src="./assets/images/logo.png" alt="logo" class="logo-black md:h-[42px] h-8 w-auto hidden" />
+                        </a>
+                    </h1>
+                    <div class="category_block flex items-center relative h-full">
+                        <button class="category_btn max-2xl:hidden flex items-center gap-1 px-3 py-2 rounded-lg bg-light text-white duration-300">
+                            <span class="ph ph-stack text-2xl text-primary"></span>
+                            <span>Categories</span>
+                        </button>
+                        <div class="category_nav flex">
+                            <ul class="category_list flex-shrink-0 w-[300px] h-full py-5 border-r border-line" role="tablist">
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300 active" id="category_tab01" role="tab" aria-controls="category_01" aria-selected="true">
+                                        <span class="ph-fill ph-desktop text-2xl"></span>
+                                        <strong class="category_name text-title">Graphic & Design</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab02" role="tab" aria-controls="category_02" aria-selected="false">
+                                        <span class="ph-fill ph-megaphone-simple text-2xl"></span>
+                                        <strong class="category_name text-title">Digital Marketing</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab03" role="tab" aria-controls="category_03" aria-selected="false">
+                                        <span class="ph-fill ph-brackets-angle text-2xl"></span>
+                                        <strong class="category_name text-title">Programming & Tech</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab04" role="tab" aria-controls="category_04" aria-selected="false">
+                                        <span class="ph-fill ph-pencil-simple-line text-2xl"></span>
+                                        <strong class="category_name text-title">Wrting & Translation</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab05" role="tab" aria-controls="category_05" aria-selected="false">
+                                        <span class="ph-fill ph-video text-2xl"></span>
+                                        <strong class="category_name text-title">Videos & Animation</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab06" role="tab" aria-controls="category_06" aria-selected="false">
+                                        <span class="ph-fill ph-music-notes text-2xl"></span>
+                                        <strong class="category_name text-title">Mussic & Audio</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab07" role="tab" aria-controls="category_07" aria-selected="false">
+                                        <span class="ph-fill ph-head-circuit text-2xl"></span>
+                                        <strong class="category_name text-title">AI Services</strong>
+                                    </button>
+                                </li>
+                                <li class="category_item w-full">
+                                    <button class="category_link tab_btn flex items-center gap-3 w-full px-7 py-4 duration-300" id="category_tab08" role="tab" aria-controls="category_08" aria-selected="false">
+                                        <span class="ph-fill ph-camera text-2xl"></span>
+                                        <strong class="category_name text-title">Photography</strong>
+                                    </button>
+                                </li>
+                            </ul>
+                            <div id="category_01" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10 active" role="tabpanel" aria-labelledby="category_tab01" aria-hidden="false">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Websites</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Maintenance</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">WordPress</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Shopify</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Application</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Web Applications</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Game Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Chatbot Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Desktop Applications</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Software</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Software Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">APIs & Integrations</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">AI Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Plugins Development</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Mobile Apps</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Mobile App Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cross-platform Apps</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Android App Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">IOS App Development</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Website Platforms</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Wix</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Webflow</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">GoDaddy</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">WooCommerce</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">cybersecurity</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Support & IT</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cloud Computing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">DevOps Engineering</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cybersecurity</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Miscellaneous</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Blockchain & Solutions</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cryptocurrencies</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Electronics Engineering</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Online Coding Lessons</a>
+                                </div>
+                            </div>
+                            <div id="category_02" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab02" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">SEO</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">On-Page SEO</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Off-Page SEO</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Technical SEO</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Local SEO</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Content Marketing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Content Strategy</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Blog Writing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Video Content</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Infographic Design</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Social Media Marketing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Facebook Marketing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Instagram Marketing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">LinkedIn Marketing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Twitter Marketing</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Email Marketing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Email Campaigns</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Newsletter Design</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Automation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Drip Campaigns</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Paid Advertising</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Google Ads</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Facebook Ads</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Instagram Ads</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">LinkedIn Ads</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Analytics</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Google Analytics</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Conversion Tracking</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Data Analysis</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Reporting</a>
+                                </div>
+                            </div>
+                            <div id="category_03" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab03" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Web Development</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Maintenance</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">WordPress</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Shopify</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Mobile Development</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Mobile App Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cross-platform Apps</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Android App Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">iOS App Development</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Software Development</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Software Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">APIs & Integrations</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">AI Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Plugins Development</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Game Development</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Game Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Game Design</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">AR/VR Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Mobile Game Development</a>
+                                </div>
+                            </div>
+                            <div id="category_04" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab04" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Articles & Blog Posts</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">SEO Writing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Blog Posts</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Content</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Article Writing</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Technical Writing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">User Manuals</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Technical Documentation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Research Papers</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">White Papers</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Translation Services</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Document Translation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Website Translation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Legal Translation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Medical Translation</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Creative Writing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Scriptwriting</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Storytelling</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Poetry</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Ghostwriting</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Editing & Proofreading</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Proofreading</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Copy Editing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Content Editing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Editorial Feedback</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Business Writing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Business Plans</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Proposals</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Reports</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Presentations</a>
+                                </div>
+                            </div>
+                            <div id="category_05" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab05" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Video Editing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Post-Production</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Color Correction</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Video Stitching</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Sound Design</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Animation</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">2D Animation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">3D Animation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Motion Graphics</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Stop Motion</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Video Production</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Filming</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Directing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Scriptwriting</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Storyboarding</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Music Videos</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Concept Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Filming & Editing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Special Effects</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Color Grading</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Intros & Outros</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">YouTube Intros</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Logo Animation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">End Screens</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Channel Trailers</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Live Action</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Explainer Videos</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Commercials</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Product Demos</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Corporate Videos</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Visual Effects</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Compositing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Green Screen</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Rotoscoping</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">3D Tracking</a>
+                                </div>
+                            </div>
+                            <div id="category_06" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab06" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Music Production</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Beat Making</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Remixing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Songwriting</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Jingles & Intros</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Audio Engineering</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Mixing & Mastering</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Sound Design</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Audio Editing</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Restoration & Repair</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Voice Over</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Narration</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Character Voices</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Podcast Intros</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Commercials</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Music Lessons</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Instrumental Lessons</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Vocal Coaching</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Music Theory</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Songwriting Lessons</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Jingles & Drops</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Radio Jingles</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">DJ Drops</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Podcast Intros</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">TV & Film Jingles</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Sound Effects</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Custom Sound Effects</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Foley</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Game Sound Effects</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Podcast Sound Effects</a>
+                                </div>
+                            </div>
+                            <div id="category_07" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab07" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Machine Learning</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Model Training</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Data Analysis</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Predictive Analytics</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Natural Language Processing</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">AI Development</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Chatbot Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">AI Solutions</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Custom AI Applications</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Machine Learning Algorithms</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Data Science</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Data Visualization</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Data Engineering</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Big Data Solutions</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Data Mining</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Automation</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Process Automation</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">RPA Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Automation Tools</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Workflow Automation</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Computer Vision</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Image Recognition</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Object Detection</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Facial Recognition</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Video Analysis</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Speech Recognition</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Voice Assistants</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Speech to Text</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Text to Speech</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Voice Command Systems</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">AI Consulting</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Strategy Development</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Implementation Guidance</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">AI Roadmaps</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Technical Support</a>
+                                </div>
+                            </div>
+                            <div id="category_08" class="category_list_detail tab_list grid grid-cols-4 gap-y-10 w-full h-fit py-8 px-10" role="tabpanel" aria-labelledby="category_tab08" aria-hidden="true">
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Portrait Photography</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Headshots</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Family Portraits</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Event Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Fashion Photography</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Commercial Photography</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Product Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Food Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Real Estate Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Advertising Photography</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Travel Photography</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Landscape Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Cityscape Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Street Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Adventure Photography</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Aerial Photography</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Drone Photography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Aerial Videography</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Real Estate Aerials</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Event Aerials</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Wedding Photography</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Engagement Photos</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Wedding Day Photos</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Bridal Portraits</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Reception Photos</a>
+                                </div>
+                                <div class="item flex flex-col gap-2.5">
+                                    <strong class="text-button">Photo Editing</strong>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Retouching</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Color Correction</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Photo Restoration</a>
+                                    <a href="jobs-default.html" class="w-fit caption1 line-before line-black">Background Removal</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="navigator h-full max-[1400px]:hidden">
+                    <ul class="list flex items-center gap-5 h-full">
+                        <li class="h-full relative">
+                            <a href="#!" class="flex items-center gap-1 h-full text-white duration-300">
+                                <span class="text-title relative">Homepages</span>
+                                <span class="ph-bold ph-caret-down"></span>
+                            </a>
+                            <div class="sub_menu sub_menu_home overflow-x-hidden fixed w-full left-0 top-20 py-10 bg-white rounded-lg">
+                                <ul class="container grid grid-cols-5 gap-5">
+                                    <li>
+                                        <a href="index.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home1.webp" alt="home1" class="w-full rounded" />
+                                            <span>Home Freelancer 01</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer2.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home2.webp" alt="home2" class="w-full rounded" />
+                                            <span>Home Freelancer 02</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer3.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home3.webp" alt="home3" class="w-full rounded" />
+                                            <span>Home Freelancer 03</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer4.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home4.webp" alt="home4" class="w-full rounded" />
+                                            <span>Home Freelancer 04</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer5.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home5.webp" alt="home5" class="w-full rounded" />
+                                            <span>Home Freelancer 05</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer6.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home6.webp" alt="home6" class="w-full rounded" />
+                                            <span>Home Freelancer 06</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer7.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home7.webp" alt="home7" class="w-full rounded" />
+                                            <span>Home Freelancer 07</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="freelancer8.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home8.webp" alt="home8" class="w-full rounded" />
+                                            <span>Home Freelancer 08</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="jobs9.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home9.webp" alt="home9" class="w-full rounded" />
+                                            <span>Home Jobs 09</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="jobs10.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home10.webp" alt="home10" class="w-full rounded" />
+                                            <span>Home Jobs 10</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="jobs11.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home11.webp" alt="home11" class="w-full rounded" />
+                                            <span>Home Jobs 11</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="jobs12.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home12.webp" alt="home12" class="w-full rounded" />
+                                            <span>Home Jobs 12</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="rtl13.html" class="link flex flex-col items-center gap-2 text-button p-2 rounded-lg bg-white duration-300 shadow-md">
+                                            <img src="./assets/images/components/home13.webp" alt="home13" class="w-full rounded" />
+                                            <span>Home RTL 13</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="h-full relative">
+                            <a href="#!" class="flex items-center gap-1 h-full text-white duration-300">
+                                <span class="text-title relative">For Candidates</span>
+                                <span class="ph-bold ph-caret-down"></span>
+                            </a>
+                            <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg">
+                                <ul>
+                                    <li>
+                                        <a href="#!" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300">
+                                            Browse jobs
+                                            <span class="ph-bold ph-caret-right"></span>
+                                        </a>
+                                        <div class="sub_menu_two absolute p-3 top-0 left-full z-[1] w-max bg-white rounded-lg">
+                                            <ul>
+                                                <li>
+                                                    <a href="jobs-default.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs default </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-top-map.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs top map </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-half-map-grid1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs half map grid 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-half-map-grid2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs half map grid 2 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-fullwidth.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs fullwidth </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-detail1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs detail 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="jobs-detail2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> jobs detail 2 </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300">
+                                            Browse Projects
+                                            <span class="ph-bold ph-caret-right"></span>
+                                        </a>
+                                        <div class="sub_menu_two absolute p-3 top-0 left-full z-[1] w-max bg-white rounded-lg">
+                                            <ul>
+                                                <li>
+                                                    <a href="project-default.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project default </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-grid-3col.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project grid 3 columns </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-top-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project top map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-top-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project top map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-half-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project half map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-half-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project half map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-fullwidth.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project fullwidth </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-detail1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project detail 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-detail2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project detail 2 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="project-detail3.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> project detail 3 </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300">
+                                            Browse Employer
+                                            <span class="ph-bold ph-caret-right"></span>
+                                        </a>
+                                        <div class="sub_menu_two absolute p-3 top-0 left-full z-[1] w-max bg-white rounded-lg">
+                                            <ul>
+                                                <li>
+                                                    <a href="employers-default.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers default </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-sidebar-grid-3cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers sidebar grid 3 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-sidebar-grid-2cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers sidebar grid 2 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-sidebar-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers sidebar list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-top-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers top map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-top-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers top map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-half-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers half map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-half-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers half map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-fullwidth.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers fullwidth </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-detail1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers detail 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="employers-detail2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> employers detail 2 </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="become-seller.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Become a seller </a>
+                                    </li>
+                                    <li>
+                                        <a href="candidates-dashboard.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Candidates Dashboard </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="h-full relative">
+                            <a href="#!" class="flex items-center gap-1 h-full text-white duration-300 active">
+                                <span class="text-title relative">For Employers</span>
+                                <span class="ph-bold ph-caret-down"></span>
+                            </a>
+                            <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg">
+                                <ul>
+                                    <li>
+                                        <a href="#!" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300">
+                                            Browse Services
+                                            <span class="ph-bold ph-caret-right"></span>
+                                        </a>
+                                        <div class="sub_menu_two absolute p-3 top-0 left-full z-[1] w-max bg-white rounded-lg">
+                                            <ul>
+                                                <li>
+                                                    <a href="services-default.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services default </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-sidebar-grid-3cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services sidebar grid 3 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-sidebar-grid-2cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services sidebar grid 2 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-sidebar-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services sidebar list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-fullwidth-grid-5cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services fullwidth grid 5 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-fullwidth-grid-4cols.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services fullwidth grid 4 cols </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-fullwidth-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services fullwidth list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-detail1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services detail 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="services-detail2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> services detail 2 </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300">
+                                            Browse Candidates
+                                            <span class="ph-bold ph-caret-right"></span>
+                                        </a>
+                                        <div class="sub_menu_two absolute p-3 top-0 left-full z-[1] w-max bg-white rounded-lg">
+                                            <ul>
+                                                <li>
+                                                    <a href="candidates-default.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates default </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-sidebar-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates sidebar grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-sidebar-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates sidebar list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-top-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates top map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-top-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 active"> candidates top map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-half-map-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates half map grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-half-map-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates half map list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-fullwidth-grid.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates fullwidth grid </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-fullwidth-list.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates fullwidth list </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-detail1.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates detail 1 </a>
+                                                </li>
+                                                <li>
+                                                    <a href="candidates-detail2.html" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300"> candidates detail 2 </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="become-buyer.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Become a buyer </a>
+                                    </li>
+                                    <li>
+                                        <a href="employers-dashboard.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Employer Dashboard </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="h-full relative">
+                            <a href="#!" class="flex items-center gap-1 h-full text-white duration-300">
+                                <span class="text-title relative">Blogs</span>
+                                <span class="ph-bold ph-caret-down"></span>
+                            </a>
+                            <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg">
+                                <ul>
+                                    <li>
+                                        <a href="blog-default.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Blog default </a>
+                                    </li>
+                                    <li>
+                                        <a href="blog-grid.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Blog grid </a>
+                                    </li>
+                                    <li>
+                                        <a href="blog-list.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Blog list </a>
+                                    </li>
+                                    <li>
+                                        <a href="blog-detail1.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Blog detail 1 </a>
+                                    </li>
+                                    <li>
+                                        <a href="blog-detail2.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Blog detail 2 </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="h-full relative">
+                            <a href="#!" class="flex items-center gap-1 h-full text-white duration-300">
+                                <span class="text-title relative">Pages</span>
+                                <span class="ph-bold ph-caret-down"></span>
+                            </a>
+                            <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg">
+                                <ul>
+                                    <li>
+                                        <a href="about1.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> About Us 1 </a>
+                                    </li>
+                                    <li>
+                                        <a href="about2.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> About Us 2 </a>
+                                    </li>
+                                    <li>
+                                        <a href="pricing.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Pricing Plan </a>
+                                    </li>
+                                    <li>
+                                        <a href="contact1.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Contact Us 1 </a>
+                                    </li>
+                                    <li>
+                                        <a href="contact2.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Contact Us 2 </a>
+                                    </li>
+                                    <li>
+                                        <a href="faqs.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Faqs </a>
+                                    </li>
+                                    <li>
+                                        <a href="term-of-use.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Terms of use </a>
+                                    </li>
+                                    <li>
+                                        <a href="error-404.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Error 404 </a>
+                                    </li>
+                                    <li>
+                                        <a href="login.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Login </a>
+                                    </li>
+                                    <li>
+                                        <a href="register.html" class="link flex items-center justify-between gap-2 w-full text-button py-[11px] px-6 rounded duration-300"> Register </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="list_action flex items-center gap-5">
+                    <div class="help_block max-sm:hidden">
+                        <a href="term-of-use.html" class="block">
+                            <span class="ph ph-question text-white text-2xl block"></span>
+                        </a>
+                    </div>
+                    <div class="notification_block relative max-sm:hidden">
+                        <button class="relative block">
+                            <span class="ph ph-bell text-white text-2xl block"></span>
+                            <span class="absolute -top-0.5 right-0.5 w-2 h-2 bg-primary rounded-full"></span>
+                        </button>
+                        <div class="notification_submenu absolute w-[400px] p-5 top-[3.25rem] -left-9 bg-white rounded-xl">
+                            <h6 class="heading6 pb-3">Notifications</h6>
+                            <ul class="list_notification w-full">
+                                <li class="notification_item w-full py-3 border-t border-line duration-300 hover:bg-background">
+                                    <a href="#!" class="flex gap-3 w-full">
+                                        <span class="ic_noti flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface">
+                                            <span class="ph-fill ph-bell text-lg text-secondary"></span>
+                                        </span>
+                                        <div class="notification_detail">
+                                            <p class="notification_desc text-secondary">The application is rejected on your job <span class="text-black">UI Designer</span> by <span class="text-black">Employer</span>.</p>
+                                            <span class="notification_time caption2 text-placehover">25 mins ago</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="notification_item w-full py-3 border-t border-line duration-300 hover:bg-background">
+                                    <a href="#!" class="flex gap-3 w-full">
+                                        <span class="ic_noti flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface">
+                                            <span class="ph-fill ph-bell text-lg text-secondary"></span>
+                                        </span>
+                                        <div class="notification_detail">
+                                            <p class="notification_desc text-secondary">The application is rejected on your job <span class="text-black">Internet Security</span> by <span class="text-black">Employer</span>.</p>
+                                            <span class="notification_time caption2 text-placehover">1 hours ago</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="notification_item w-full py-3 border-t border-line duration-300 hover:bg-background">
+                                    <a href="#!" class="flex gap-3 w-full">
+                                        <span class="ic_noti flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface">
+                                            <span class="ph-fill ph-bell text-lg text-secondary"></span>
+                                        </span>
+                                        <div class="notification_detail">
+                                            <p class="notification_desc text-secondary">The application is rejected on your job <span class="text-black">Social Media Marketing</span> by <span class="text-black">Employer</span>.</p>
+                                            <span class="notification_time caption2 text-placehover">5 hours ago</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="notification_item w-full py-3 border-t border-line duration-300 hover:bg-background">
+                                    <a href="#!" class="flex gap-3 w-full">
+                                        <span class="ic_noti flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface">
+                                            <span class="ph-fill ph-bell text-lg text-secondary"></span>
+                                        </span>
+                                        <div class="notification_detail">
+                                            <p class="notification_desc text-secondary">The application is rejected on your job <span class="text-black">Social Media Marketing</span> by <span class="text-black">Employer</span>.</p>
+                                            <span class="notification_time caption2 text-placehover">12 hours ago</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="become-seller.html" class="button-main bg-white text-black max-sm:hidden">Become A Seller</a>
+                    <div class="user_block relative max-sm:hidden">
+                        <button class="user_infor flex items-center gap-2 text-white">
+                            <img src="./assets/images/avatar/IMG-7.webp" alt="IMG-7" class="user_avatar flex-shrink-0 w-9 h-9 rounded-full" />
+                            <strong class="user_name text-title">Employer</strong>
+                            <span class="ph ph-caret-down"></span>
+                        </button>
+                        <ul class="list_action_user absolute w-[240px] p-3 top-14 right-0 bg-white rounded-lg">
+                            <li class="action_item">
+                                <a href="employers-dashboard.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                                    <span class="ph ph-squares-four text-2xl text-secondary"></span>
+                                    <strong class="text-title">Dashboard</strong>
+                                </a>
+                            </li>
+                            <li class="action_item">
+                                <a href="employers-profile.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                                    <span class="ph ph-user-circle text-2xl text-secondary"></span>
+                                    <strong class="text-title">My Profile</strong>
+                                </a>
+                            </li>
+                            <li class="action_item">
+                                <a href="login.html" class="link flex items-center gap-3 w-full py-3 px-6 rounded-lg duration-300 hover:bg-background">
+                                    <span class="ph ph-sign-out text-2xl text-secondary"></span>
+                                    <strong class="text-title">Log Out</strong>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="humburger_btn min-[1400px]:hidden">
+                        <span class="ph-bold ph-list text-white text-2xl block"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Slider -->
+        <section class="slider relative lg:h-[700px] md:h-[600px] sm:h-[500px] h-[400px]">
+            <div class="slider_bg w-full h-full sm:pt-20 pt-16">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+        </section>
+
+        <!-- List candidates -->
+        <div class="candidates lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col-reverse gap-y-10">
+                <div class="sidebar_inner -relative full-height flex-shrink-0 lg:w-[300px] w-full">
+                    <form>
+                        <div class="filter_section search">
+                            <strong class="text-button">search</strong>
+                            <div class="form_input relative w-full h-12 mt-2">
+                                <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                                <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Job title, key words or company" />
+                            </div>
+                        </div>
+                        <div class="filter_section location mt-6">
+                            <strong class="text-button">Location</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select location">Select location</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find location..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Africa">Africa</li>
+                                            <li class="capitalize" data-item="Americas">Americas</li>
+                                            <li class="capitalize" data-item="Antarctica">Antarctica</li>
+                                            <li class="capitalize" data-item="Asia">Asia</li>
+                                            <li class="capitalize" data-item="Europe">Europe</li>
+                                            <li class="capitalize" data-item="Oceania">Oceania</li>
+                                            <li class="capitalize" data-item="Australia and New Zealand">Australia and New Zealand</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section category relative mt-6">
+                            <strong class="text-button">category</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select category">Select category</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find category..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Accounting & Consulting">Accounting & Consulting</li>
+                                            <li class="capitalize" data-item="Admin Support">Admin Support</li>
+                                            <li class="capitalize" data-item="Customer Service">Customer Service</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Data Science & Analytics">Data Science & Analytics</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Engineering & Architecture">Engineering & Architecture</li>
+                                            <li class="capitalize" data-item="IT & Networking">IT & Networking</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section job_types mt-6">
+                            <strong class="text-button">Job types</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select Job types">Select Job types</span>
+                                    <ul class="list_option w-full bg-white">
+                                        <li class="capitalize" data-item="Remote">Remote</li>
+                                        <li class="capitalize" data-item="On-site">On-site</li>
+                                        <li class="capitalize" data-item="Parttime">Parttime</li>
+                                        <li class="capitalize" data-item="Fulltime">Fulltime</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section gender mt-6">
+                            <strong class="text-button">gender</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select gender">Select gender</span>
+                                    <ul class="list_option w-full bg-white">
+                                        <li class="capitalize" data-item="Male">Male</li>
+                                        <li class="capitalize" data-item="Female">Female</li>
+                                        <li class="capitalize" data-item="Other">Other</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section filter_age mt-6">
+                            <strong class="text-button text-primary">
+                                <span class="text-black">Age: </span>
+                                <span class="age_min">0</span>
+                                <span> - </span>
+                                <span class="age_max">60</span>
+                                <span>years old</span>
+                            </strong>
+                            <div class="tow_bar_block mt-5">
+                                <div class="progress"></div>
+                            </div>
+                            <div class="range_input">
+                                <input class="input range_min" type="range" min="0" max="60" value="0" />
+                                <input class="input range_max" type="range" min="0" max="60" value="60" />
+                            </div>
+                        </div>
+                        <div class="filter_section filter_price mt-6">
+                            <strong class="text-button">Filter by salary</strong>
+                            <div class="tow_bar_block mt-5">
+                                <div class="progress"></div>
+                            </div>
+                            <div class="range_input">
+                                <input class="input range_min" type="range" min="0" max="3000" value="0" />
+                                <input class="input range_max" type="range" min="0" max="3000" value="3000" />
+                            </div>
+                            <div class="price_block flex items-center justify-between mt-4">
+                                <div class="price_min flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="0" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                                </div>
+                                <span class="ph-bold ph-minus text-xl"></span>
+                                <div class="price_max flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="3000" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter_section hourly mt-6">
+                            <strong class="text-button">Filter by Hourly</strong>
+                            <div class="hour_block flex items-center justify-between mt-2">
+                                <div class="min flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                                </div>
+                                <span class="ph-bold ph-minus text-xl"></span>
+                                <div class="max flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter_section experience mt-6">
+                            <strong class="text-button">experience</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select experience">Select experience</span>
+                                    <ul class="list_option -top w-full bg-white">
+                                        <li class="capitalize" data-item="< 1 year experience">< 1 year experience</li>
+                                        <li class="capitalize" data-item="1-2 year experience">1-2 year experience</li>
+                                        <li class="capitalize" data-item="2-3 year experience">2-3 year experience</li>
+                                        <li class="capitalize" data-item="3-4 year experience">3-4 year experience</li>
+                                        <li class="capitalize" data-item="> 4 year experience">> 4 year experience</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section qualification mt-6">
+                            <strong class="text-button">qualification</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select qualification">Select qualification</span>
+                                    <ul class="list_option -top w-full bg-white">
+                                        <li class="capitalize" data-item="IELTS">IELTS</li>
+                                        <li class="capitalize" data-item="TOEIC">TOEIC</li>
+                                        <li class="capitalize" data-item="AWS">AWS</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <button class="button-main w-full mt-6 text-center">Find Candidates</button>
+                    </form>
+                </div>
+                <div class="right w-full lg:pl-7.5">
+                    <div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full">
+                        <ul class="list_layout flex items-center gap-1">
+                            <li class="max-xl:hidden">
+                                <button class="layout_btn cols_2 active"></button>
+                            </li>
+                            <li class="max-xl:hidden">
+                                <button class="layout_btn cols_1 list"></button>
+                            </li>
+                            <li class="xl:hidden">
+                                <a href="candidates-top-map-grid.html" class="layout_link cols_2"></a>
+                            </li>
+                            <li class="xl:hidden">
+                                <a href="#!" class="layout_link list active"></a>
+                            </li>
+                        </ul>
+                        <div class="select_filter flex items-center gap-3">
+                            <span class="caption1">Sort by:</span>
+                            <div class="select_block sm:pr-16 pr-10 pl-3 py-1 border border-line rounded">
+                                <div class="select">
+                                    <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                                    <ul class="list_option p-0 bg-white">
+                                        <li class="capitalize" data-item="default">sort by (default)</li>
+                                        <li class="capitalize" data-item="newest">newest</li>
+                                        <li class="capitalize" data-item="oldest">oldest</li>
+                                        <li class="capitalize" data-item="random">random</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+                        <span class="quantity pr-3 border-r border-line">1,200+ Results</span>
+                        <div class="list flex flex-wrap items-center gap-3"></div>
+                        <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+                            <span class="ph ph-x text-sm"></span>
+                            <span class="caption1">Clear All</span>
+                        </button>
+                    </div>
+                    <ul class="list_layout_cols list_candidates grid md:grid-cols-2 lg:gap-7.5 gap-5 w-full md:mt-10 mt-7">
+                        <li class="candidates_item is_top_rate px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-13.webp" alt="IMG-13" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Devon Lane</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Las Vegas, USA</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$22</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-12.webp" alt="IMG-12" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Guy Hawkins</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Cape Town, South Africa</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$23</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item is_top_rate px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-11.webp" alt="IMG-11" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Kristin Watson</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Rio de Janeiro, Brazil</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$32</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-10.webp" alt="IMG-10" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Robert Fox</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Sydney, Australia</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$18</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item is_top_rate px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-9.webp" alt="IMG-9" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Dianne Russell</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Tokyo, Japan</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$22</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-8.webp" alt="IMG-8" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Theresa Webb</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Paris, France</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$23</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-7.webp" alt="IMG-7" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Marvin McKinney</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Cape Town, South Africa</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$32</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-6.webp" alt="IMG-6" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Arlene McCoy</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Las Vegas, USA</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$18</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item is_top_rate px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-5.webp" alt="IMG-5" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Courtney Henry</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Rio de Janeiro, Brazil</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$22</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="candidates_item is_top_rate px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <div class="candidates_info flex gap-4 relative w-full pb-4 border-b border-line">
+                                <a href="candidates-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-full">
+                                    <img src="./assets/images/avatar/IMG-4.webp" alt="IMG-4" class="candidates_avatar w-full h-full object-cover" />
+                                </a>
+                                <div class="candidates_content w-full">
+                                    <a href="candidates-detail1.html" class="candidates_detail flex flex-col gap-1 mr-14 duration-300 hover:text-primary">
+                                        <strong class="candidates_name -style-1 w-fit text-title">Kristin Watson</strong>
+                                        <span class="flex items-center text-secondary">
+                                            <span class="ph ph-map-pin text-lg"></span>
+                                            <span class="candidates_address -style-1 caption1 pl-1">Cape Town, South Africa</span>
+                                        </span>
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            <strong class="candidates_status tag caption2 bg-background text-primary">Available now</strong>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph-fill ph-star text-yellow text-sm"></span>
+                                                <strong class="candidates_rate text-sm font-semibold">4.9</strong>
+                                                <span class="candidates_rate_quantity caption1 text-secondary">(482 review)</span>
+                                            </div>
+                                        </div>
+                                        <a href="candidates-detail1.html" class="button-main -border">View Profile</a>
+                                    </div>
+                                </div>
+                                <button class="add_wishlist_btn absolute top-0 right-0 -border">
+                                    <span class="ph ph-heart text-xl"></span>
+                                    <span class="ph-fill ph-heart text-xl"></span>
+                                </button>
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Full-Time</a>
+                                    <a href="candidates-default.html" class="candidates_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                </div>
+                                <div class="candidates_price">
+                                    <span class="price text-title">$23</span>
+                                    <span class="text-secondary">/Hours</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll to top -->
+        <button class="scroll-to-top-btn"><span class="ph-bold ph-caret-up"></span></button>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer_inner bg-feature">
+                <div class="container">
+                    <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light">
+                        <a href="index.html" class="footer_logo">
+                            <img src="./assets/images/logo-white.png" alt="logo-white" class="h-[42px] w-auto" />
+                        </a>
+                        <div class="list_social flex flex-wrap items-center gap-4">
+                            <span class="text-subtitle text-white">Follow Us:</span>
+                            <div class="list flex flex-wrap items-center gap-3">
+                                <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-facebook text-lg"></span>
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-linkedin text-lg"></span>
+                                </a>
+                                <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-twitter text-lg"></span>
+                                </a>
+                                <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-instagram text-lg"></span>
+                                </a>
+                                <a href="https://www.pinterest.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-pinterest text-lg"></span>
+                                </a>
+                                <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                    <span class="icon-youtube text-lg"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer_content flex max-xl:flex-wrap items-start justify-between gap-y-8 md:py-10 py-7">
+                        <div class="footer_nav max-md:w-1/2">
+                            <strong class="nav_heading text-button-sm text-white">Categories</strong>
+                            <ul class="list_nav flex flex-col gap-3 mt-4">
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Graphics & Design</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Digital Marketing</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Writing & Translation</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Video & Animation</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Music & Audio</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Programming & Tech</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer_nav max-md:w-1/2">
+                            <strong class="nav_heading text-button-sm text-white">For Candidates</strong>
+                            <ul class="list_nav flex flex-col gap-3 mt-4">
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="candidates-dashboard.html">Candidate Dashboard</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="jobs-default.html">Browse jobs</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="employers-default.html">Browse employers</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="candidates-proposals.html">My Proposals</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="candidates-my-services.html">My Services</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="candidates-jobs-alerts.html">Job Alerts</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer_nav max-md:w-1/2">
+                            <strong class="nav_heading text-button-sm text-white">For Employer</strong>
+                            <ul class="list_nav flex flex-col gap-3 mt-4">
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="employers-dashboard.html">Employer Dashboard</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="candidates-default.html">Browse Candidates</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="services-default.html">Browse services</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="employers-submit-jobs.html">Submit jobs</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="employers-jobs.html">My Jobs</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="employers-applicants-jobs.html">Applicants jobs</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer_nav max-md:w-1/2">
+                            <strong class="nav_heading text-button-sm text-white">Support</strong>
+                            <ul class="list_nav flex flex-col gap-3 mt-4">
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="term-of-use.html">Help & Support</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="become-seller.html">Selling On FreelanHub</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="become-buyer.html">Buying On FreelanHub</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="about1.html">Services</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="faqs.html">FAQs</a></li>
+                                <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="contact1.html">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="flex-shrink-0 max-xl:w-full">
+                            <div class="company-contact sm:w-[340px]">
+                                <strong class="heading block text-button-sm text-white">Subscribe</strong>
+                                <form class="send-block mt-4 flex items-center h-[46px] rounded-lg overflow-hidden">
+                                    <input class="caption1 text-secondary h-full w-full pr-4 pl-3" type="email" placeholder="Your email address" required />
+                                    <button class="flex items-center justify-center w-[46px] h-[46px] bg-primary flex-shrink-0">
+                                        <span class="ph ph-paper-plane-tilt text-white"></span>
+                                    </button>
+                                </form>
+                                <strong class="heading block text-button-sm text-white mt-5">Download App</strong>
+                                <div class="list-download flex items-start gap-3 mt-4">
+                                    <a href="https://play.google.com/" target="_blank">
+                                        <img src="./assets/images/download/gg_play.png" alt="gg_play" />
+                                    </a>
+                                    <a href="https://www.apple.com/app-store/" target="_blank">
+                                        <img src="./assets/images/download/app_store.png" alt="app_store" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-2 border-t border-light">
+                        <div class="left-block flex items-center">
+                            <div class="copyright text-placehover caption1">©2024 FreelanHub. All Rights Reserved.</div>
+                        </div>
+                        <div class="nav-link flex items-center gap-2.5">
+                            <a class="text-placehover caption1 hover-underline" href="term-of-use.html">Terms Of Services</a>
+                            <span class="text-placehover caption1">|</span>
+                            <a class="text-placehover caption1 hover-underline" href="term-of-use.html">Privacy Policy</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Toastify -->
+        <div class="toastify">
+            <div class="toastify_inner flex items-center gap-3 relative max-w-[90vw] p-3 rounded-l-lg bg-white">
+                <div class="toastify_logo flex-shrink-0 w-15 h-15">
+                    <img src="./assets/images/company/13.png" alt="company/13" class="w-full h-full object-cover" />
+                </div>
+                <div class="toastify_message pr-11">
+                    <h6 class="text-title">Tony Nguyen found a job on the map</h6>
+                    <a href="jobs-top-map.html" class="inline-block mt-1 text-sm font-bold uppercase text-primary line-before">Click here to find jobs by MAP</a>
+                </div>
+            </div>
+            <button class="toastify_close_btn flex items-center justify-center absolute top-3 right-3 w-6 h-6 rounded-full bg-surface duration-300 hover:bg-black hover:text-white">
+                <span class="ph-bold ph-x"></span>
+            </button>
+        </div>
+
+        <!-- Menu mobile -->
+        <div class="menu_mobile">
+            <button class="menu_mobile_close flex items-center justify-center absolute top-5 left-5 w-8 h-8 rounded-full bg-surface">
+                <span class="ph-bold ph-x"></span>
+            </button>
+            <div class="heading flex items-center justify-center mt-5">
+                <a href="index.html" class="logo">
+                    <img src="./assets/images/logo.png" alt="logo" class="h-8" />
+                </a>
+            </div>
+            <form class="form-search relative mt-4 mx-5">
+                <button class="absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                    <i class="ph ph-magnifying-glass text-xl block"></i>
+                </button>
+                <input type="text" placeholder="What are you looking for?" class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" required />
+            </form>
+            <div class="mt-4">
+                <ul class="nav_mobile">
+                    <li class="nav_item py-2">
+                        <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                            Homepages
+                            <span class="text-right">
+                                <i class="ph ph-caret-right text-xl"></i>
+                            </span>
+                        </a>
+                        <div class="sub_nav_mobile">
+                            <button class="back_btn flex items-center gap-3">
+                                <i class="ph ph-caret-left text-xl"></i>
+                                Back
+                            </button>
+                            <div class="list-nav-item w-full pt-2 pb-6">
+                                <ul>
+                                    <li class="nav_item">
+                                        <a href="index.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 01 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer2.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 02 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer3.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 03 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer4.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 04 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer5.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 05 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer6.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 06 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer7.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 07 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="freelancer8.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Freelancer 08 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="jobs9.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Jobs 09 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="jobs10.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Jobs 10 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="jobs11.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Jobs 11 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="jobs12.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home Jobs 12 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="rtl13.html" class="inline-block text-xl font-semibold py-2 capitalize"> Home RTL 13 </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav_item py-2">
+                        <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                            For Candidates
+                            <span class="text-right">
+                                <i class="ph ph-caret-right text-xl"></i>
+                            </span>
+                        </a>
+                        <div class="sub_nav_mobile">
+                            <button class="back_btn flex items-center gap-3">
+                                <i class="ph ph-caret-left text-xl"></i>
+                                Back
+                            </button>
+                            <div class="list-nav-item w-full pt-2 pb-6">
+                                <ul>
+                                    <li class="nav_item">
+                                        <a href="#!" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize">
+                                            Browse jobs
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub_nav_mobile2">
+                                            <button class="back_btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </button>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs default </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-top-map.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs top map </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-half-map-grid1.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs half map grid 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-half-map-grid2.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs half map grid 2 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-fullwidth.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs fullwidth </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs detail 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="jobs-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> jobs detail 2 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="#!" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize">
+                                            Browse Projects
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub_nav_mobile2">
+                                            <button class="back_btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </button>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul>
+                                                    <li class="nav_item">
+                                                        <a href="project-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> project default </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-grid-3col.html" class="inline-block text-xl font-semibold py-2 capitalize"> project grid 3 columns </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> project list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-top-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> project top map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-top-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> project top map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-half-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> project half map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-half-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> project half map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-fullwidth.html" class="inline-block text-xl font-semibold py-2 capitalize"> project fullwidth </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> project detail 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> project detail 2 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="project-detail3.html" class="inline-block text-xl font-semibold py-2 capitalize"> project detail 3 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="#!" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize">
+                                            Browse Employer
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub_nav_mobile2">
+                                            <button class="back_btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </button>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul>
+                                                    <li class="nav_item">
+                                                        <a href="employers-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers default </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-sidebar-grid-3cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers sidebar grid 3 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-sidebar-grid-2cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers sidebar grid 2 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-sidebar-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers sidebar list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-top-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers top map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-top-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers top map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-half-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers half map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-half-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers half map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-fullwidth.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers fullwidth </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers detail 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="employers-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> employers detail 2 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="become-seller.html" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize"> Become a seller </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="candidates-dashboard.html" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize"> Candidates Dashboard </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav_item py-2">
+                        <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                            For Employers
+                            <span class="text-right">
+                                <i class="ph ph-caret-right text-xl"></i>
+                            </span>
+                        </a>
+                        <div class="sub_nav_mobile">
+                            <button class="back_btn flex items-center gap-3">
+                                <i class="ph ph-caret-left text-xl"></i>
+                                Back
+                            </button>
+                            <div class="list-nav-item w-full pt-2 pb-6">
+                                <ul>
+                                    <li class="nav_item">
+                                        <a href="#!" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize">
+                                            Browse services
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub_nav_mobile2">
+                                            <button class="back_btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </button>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul>
+                                                    <li class="nav_item">
+                                                        <a href="services-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> services default </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> services grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> services list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-sidebar-grid-3cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> services sidebar grid 3 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-sidebar-grid-2cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> services sidebar grid 2 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-sidebar-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> services sidebar list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-fullwidth-grid-5cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> services fullwidth grid 5 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-fullwidth-grid-4cols.html" class="inline-block text-xl font-semibold py-2 capitalize"> services fullwidth grid 4 cols </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-fullwidth-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> services fullwidth list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> services detail 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="services-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> services detail 2 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="#!" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize">
+                                            Browse candidates
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub_nav_mobile2">
+                                            <button class="back_btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </button>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates default </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-sidebar-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates sidebar grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-sidebar-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates sidebar list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-top-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates top map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-top-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize active"> candidates top map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-half-map-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates half map grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-half-map-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates half map list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-fullwidth-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates fullwidth grid </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-fullwidth-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates fullwidth list </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates detail 1 </a>
+                                                    </li>
+                                                    <li class="nav_item">
+                                                        <a href="candidates-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> candidates detail 2 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="become-buyer.html" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize"> Become a buyer </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="employers-dashboard.html" class="link flex items-center justify-between w-full py-2 text-xl font-semibold capitalize"> employer Dashboard </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav_item py-2">
+                        <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                            Blogs
+                            <span class="text-right">
+                                <i class="ph ph-caret-right text-xl"></i>
+                            </span>
+                        </a>
+                        <div class="sub_nav_mobile">
+                            <button class="back_btn flex items-center gap-3">
+                                <i class="ph ph-caret-left text-xl"></i>
+                                Back
+                            </button>
+                            <div class="list-nav-item w-full pt-2 pb-6">
+                                <ul>
+                                    <li class="nav_item">
+                                        <a href="blog-default.html" class="inline-block text-xl font-semibold py-2 capitalize"> Blog default </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="blog-grid.html" class="inline-block text-xl font-semibold py-2 capitalize"> Blog grid </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="blog-list.html" class="inline-block text-xl font-semibold py-2 capitalize"> Blog list </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="blog-detail1.html" class="inline-block text-xl font-semibold py-2 capitalize"> Blog detail 1 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="blog-detail2.html" class="inline-block text-xl font-semibold py-2 capitalize"> Blog detail 2 </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav_item py-2">
+                        <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                            Pages
+                            <span class="text-right">
+                                <i class="ph ph-caret-right text-xl"></i>
+                            </span>
+                        </a>
+                        <div class="sub_nav_mobile">
+                            <button class="back_btn flex items-center gap-3">
+                                <i class="ph ph-caret-left text-xl"></i>
+                                Back
+                            </button>
+                            <div class="list-nav-item w-full pt-2 pb-6">
+                                <ul>
+                                    <li class="nav_item">
+                                        <a href="about1.html" class="inline-block text-xl font-semibold py-2 capitalize"> About Us 1 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="about2.html" class="inline-block text-xl font-semibold py-2 capitalize"> About Us 2 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="pricing.html" class="inline-block text-xl font-semibold py-2 capitalize"> Pricing Plan </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="contact1.html" class="inline-block text-xl font-semibold py-2 capitalize"> Contact Us 1 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="contact2.html" class="inline-block text-xl font-semibold py-2 capitalize"> Contact Us 2 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="faqs.html" class="inline-block text-xl font-semibold py-2 capitalize"> Faqs </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="term-of-use.html" class="inline-block text-xl font-semibold py-2 capitalize"> Terms of use </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="error-404.html" class="inline-block text-xl font-semibold py-2 capitalize"> Error 404 </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="login.html" class="inline-block text-xl font-semibold py-2 capitalize"> Login </a>
+                                    </li>
+                                    <li class="nav_item">
+                                        <a href="register.html" class="inline-block text-xl font-semibold py-2 capitalize"> Register </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <script src="./assets/js/jquery.min.js"></script>
+        <script src="./assets/js/phosphor-icons.js"></script>
+        <script src="./assets/js/slick.min.js"></script>
+        <script src="./assets/js/leaflet.js"></script>
+        <script src="./assets/js/swiper-bundle.min.js"></script>
+        <script src="./assets/js/main.js"></script>
+    </body>
+</html>

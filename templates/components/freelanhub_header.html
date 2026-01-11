@@ -1,0 +1,201 @@
+{% load static i18n %}
+
+<!-- Header -->
+<header id="header" class="header relative">
+    <div class="header_inner absolute flex items-center justify-between top-0 left-0 right-0 z-[1] w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 bg-white">
+        <div class="header_left flex items-center gap-10 h-full">
+            <h1>
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'assets/images/logo.png' %}" alt="{% trans 'FreelanHub' %}" class="md:h-[42px] h-8 w-auto" />
+                </a>
+            </h1>
+            <div class="navigator h-full max-[1400px]:hidden">
+                <ul class="list flex items-center gap-5 h-full">
+                    <li class="h-full relative">
+                        <a href="{% url 'home' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Home" %}</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Find Work" %}</span>
+                            <span class="ph-bold ph-caret-down"></span>
+                        </a>
+                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
+                            <ul>
+                                <li>
+                                    <a href="{% url 'services:service_list' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Browse Jobs" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'services:service_list' %}?type=project" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Browse Projects" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'services:service_list' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Browse Services" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Find Talent" %}</span>
+                            <span class="ph-bold ph-caret-down"></span>
+                        </a>
+                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
+                            <ul>
+                                <li>
+                                    <a href="#" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Browse Freelancers" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Browse Companies" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">{% trans "Pages" %}</span>
+                            <span class="ph-bold ph-caret-down"></span>
+                        </a>
+                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
+                            <ul>
+                                <li>
+                                    <a href="{% url 'about_us' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "About Us" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'pricing' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Pricing" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'contact_us' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "Contact" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'faq' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        {% trans "FAQs" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="header_right flex items-center gap-3">
+            {% if user.is_authenticated %}
+                <div class="user-menu relative">
+                    <button class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-50 duration-300">
+                        {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}" class="w-8 h-8 rounded-full object-cover">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
+                            {{ user.first_name|first|upper|default:user.email|first|upper }}
+                        </div>
+                        {% endif %}
+                        <span class="text-sm font-medium max-[640px]:hidden">{{ user.get_full_name|default:user.email }}</span>
+                        <span class="ph-bold ph-caret-down text-sm"></span>
+                    </button>
+                    <div class="sub_menu absolute right-0 p-3 w-48 bg-white rounded-lg shadow-lg">
+                        <ul>
+                            <li>
+                                <a href="{% url 'dashboard:index' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                    <i class="ph ph-house mr-2"></i>
+                                    {% trans "Dashboard" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'accounts:profile_detail' user.uuid %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                    <i class="ph ph-user mr-2"></i>
+                                    {% trans "Profile" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'account_logout' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50 text-red-600">
+                                    <i class="ph ph-sign-out mr-2"></i>
+                                    {% trans "Logout" %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'account_login' %}" class="max-sm:hidden button-secondary py-2 px-6 rounded-full text-button capitalize duration-300">
+                    {% trans "Login" %}
+                </a>
+                <a href="{% url 'account_signup' %}" class="button-primary py-2 px-6 rounded-full text-white text-button capitalize duration-300">
+                    {% trans "Sign Up" %}
+                </a>
+            {% endif %}
+
+            <!-- Mobile Menu Toggle -->
+            <div class="menu-mobile-btn min-[1400px]:hidden cursor-pointer w-5 h-4 flex flex-col justify-between">
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="menu-mobile-block fixed top-0 left-0 w-full h-full bg-on-surface/30 z-[2]">
+        <div class="menu-mobile-main bg-white h-full overflow-y-auto w-4/5 max-w-sm absolute right-0 top-0 px-6 py-1 flex flex-col justify-between">
+            <div>
+                <div class="heading flex items-center justify-between py-4 border-b border-outline">
+                    <div class="flex items-center gap-3">
+                        <img src="{% static 'assets/images/logo.png' %}" alt="{% trans 'FreelanHub' %}" class="h-8 w-auto" />
+                    </div>
+                    <div class="close-menu-mobile-btn cursor-pointer">
+                        <i class="ph-bold ph-x text-xl"></i>
+                    </div>
+                </div>
+                <div class="list-nav mt-3">
+                    <ul>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'home' %}" class="text-xl font-semibold">{% trans "Home" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'services:service_list' %}" class="text-xl font-semibold">{% trans "Browse Jobs" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'about_us' %}" class="text-xl font-semibold">{% trans "About Us" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'pricing' %}" class="text-xl font-semibold">{% trans "Pricing" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'contact_us' %}" class="text-xl font-semibold">{% trans "Contact" %}</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
+                            <a href="{% url 'dashboard:index' %}" class="text-xl font-semibold">{% trans "Dashboard" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'account_logout' %}" class="text-xl font-semibold text-red-600">{% trans "Logout" %}</a>
+                        </li>
+                        {% else %}
+                        <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
+                            <a href="{% url 'account_login' %}" class="text-xl font-semibold">{% trans "Login" %}</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="{% url 'account_signup' %}" class="text-xl font-semibold text-primary">{% trans "Sign Up" %}</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

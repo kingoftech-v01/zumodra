@@ -1,0 +1,108 @@
+{% load static i18n %}
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer_inner bg-feature">
+        <div class="container">
+            <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light">
+                <a href="{% url 'home' %}" class="footer_logo">
+                    <img src="{% static 'assets/images/logo-white.png' %}" alt="{% trans 'FreelanHub' %}" class="h-[42px] w-auto" />
+                </a>
+                <div class="list_social flex flex-wrap items-center gap-4">
+                    <span class="text-subtitle text-white">{% trans "Follow Us:" %}</span>
+                    <div class="list flex flex-wrap items-center gap-3">
+                        <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-facebook text-lg"></span>
+                        </a>
+                        <a href="https://www.linkedin.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-linkedin text-lg"></span>
+                        </a>
+                        <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-twitter text-lg"></span>
+                        </a>
+                        <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-instagram text-lg"></span>
+                        </a>
+                        <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-youtube text-lg"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer_content flex max-xl:flex-wrap items-start justify-between gap-y-8 md:py-10 py-7">
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">{% trans "Categories" %}</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}?category=graphics-design">{% trans "Graphics & Design" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}?category=digital-marketing">{% trans "Digital Marketing" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}?category=writing-translation">{% trans "Writing & Translation" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}?category=video-animation">{% trans "Video & Animation" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}?category=programming-tech">{% trans "Programming & Tech" %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">{% trans "For Candidates" %}</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        {% if user.is_authenticated %}
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'dashboard:index' %}">{% trans "My Dashboard" %}</a></li>
+                        {% endif %}
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}">{% trans "Browse Jobs" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans "Browse Employers" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'become_seller' %}">{% trans "Become a Seller" %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">{% trans "For Employers" %}</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        {% if user.is_authenticated %}
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'dashboard:index' %}">{% trans "Employer Dashboard" %}</a></li>
+                        {% endif %}
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">{% trans "Browse Freelancers" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'services:service_list' %}">{% trans "Browse Services" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'become_buyer' %}">{% trans "Become a Buyer" %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">{% trans "Support" %}</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'about_us' %}">{% trans "About Us" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'faq' %}">{% trans "FAQs" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'contact_us' %}">{% trans "Contact Us" %}</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="{% url 'pricing' %}">{% trans "Pricing" %}</a></li>
+                    </ul>
+                </div>
+                <div class="flex-shrink-0 max-xl:w-full">
+                    <div class="company-contact sm:w-[340px]">
+                        <strong class="heading block text-button-sm text-white">{% trans "Subscribe" %}</strong>
+                        <form method="post" action="{% url 'newsletter:subscribe' %}" class="send-block mt-4 flex items-center h-[46px] rounded-lg overflow-hidden">
+                            {% csrf_token %}
+                            <input class="caption1 text-secondary h-full w-full pr-4 pl-3" type="email" name="email" placeholder="{% trans 'Your email address' %}" required />
+                            <button type="submit" class="flex items-center justify-center w-[46px] h-[46px] bg-primary flex-shrink-0">
+                                <span class="ph ph-paper-plane-tilt text-white"></span>
+                            </button>
+                        </form>
+                        <strong class="heading block text-button-sm text-white mt-5">{% trans "Download App" %}</strong>
+                        <div class="list-download flex items-start gap-3 mt-4">
+                            <a href="https://play.google.com/" target="_blank">
+                                <img src="{% static 'assets/images/download/gg_play.png' %}" alt="{% trans 'Google Play' %}" />
+                            </a>
+                            <a href="https://www.apple.com/app-store/" target="_blank">
+                                <img src="{% static 'assets/images/download/app_store.png' %}" alt="{% trans 'App Store' %}" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-2 border-t border-light">
+                <div class="left-block flex items-center">
+                    <div class="copyright text-placehover caption1">{% now "Y" %} FreelanHub. {% trans "All Rights Reserved." %}</div>
+                </div>
+                <div class="nav-link flex items-center gap-2.5">
+                    <a class="text-placehover caption1 hover-underline" href="{% url 'term_of_use' %}">{% trans "Terms Of Services" %}</a>
+                    <span class="text-placehover caption1">|</span>
+                    <a class="text-placehover caption1 hover-underline" href="{% url 'privacy_policy' %}">{% trans "Privacy Policy" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
