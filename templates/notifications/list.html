@@ -1,44 +1,41 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n %}
 
-{% block breadcrumb %}
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><span class="text-gray-900 dark:text-gray-100 font-medium">Notifications</span></li>
-{% endblock %}
+
 
 {% block page_title %}Notifications{% endblock %}
 {% block page_description %}View and manage your notifications{% endblock %}
 
 {% block page_actions %}
 <div class="flex items-center space-x-3">
-    <span class="text-sm text-gray-500 dark:text-gray-400">{{ stats.unread }} unread</span>
+    <span class="caption1 text-secondary ">{{ stats.unread }} unread</span>
     {% if stats.unread > 0 %}
     <button hx-post="{% url 'frontend:notifications:mark-all-read' %}"
             hx-swap="outerHTML"
-            class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            class="inline-flex items-center px-3 py-2 border border-gray-300  rounded-md caption1 font-medium text-title  bg-white  hover:bg-gray-50 ">
         Mark all as read
     </button>
     {% endif %}
 </div>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div class="space-y-6">
     <!-- Filters -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+    <div class="bg-white  rounded-lg shadow p-4">
         <form id="notification-filters" hx-get="{% url 'frontend:notifications:list' %}" hx-target="#notification-list-container" hx-trigger="change" hx-push-url="true">
-            <div class="flex flex-wrap gap-4 items-end">
+            <div class="flex flex-wrap gap-5 items-end">
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <label for="status" class="block caption1 font-medium text-title ">Status</label>
+                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300    shadow-sm focus:border-primary-500 focus:ring-primary-500">
                         <option value="">All</option>
                         <option value="unread" {% if current_filters.status == 'unread' %}selected{% endif %}>Unread</option>
                         <option value="read" {% if current_filters.status == 'read' %}selected{% endif %}>Read</option>
                     </select>
                 </div>
                 <div>
-                    <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
-                    <select id="type" name="type" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <label for="type" class="block caption1 font-medium text-title ">Type</label>
+                    <select id="type" name="type" class="mt-1 block w-full rounded-md border-gray-300    shadow-sm focus:border-primary-500 focus:ring-primary-500">
                         <option value="">All Types</option>
                         {% for type, label in notification_types %}
                         <option value="{{ type }}" {% if current_filters.type == type %}selected{% endif %}>{{ label }}</option>
@@ -46,7 +43,7 @@
                     </select>
                 </div>
                 <button type="button" onclick="document.getElementById('notification-filters').reset(); htmx.trigger('#notification-filters', 'change');"
-                        class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        class="px-4 py-2 caption1 text-title  hover:text-title ">
                     Clear
                 </button>
             </div>
@@ -54,36 +51,32 @@
     </div>
 
     <!-- Notification List -->
-    <div id="notification-list-container" class="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+    <div id="notification-list-container" class="bg-white  rounded-lg shadow">
+        <ul class="divide-y divide-gray-200 ">
             {% for notification in notifications %}
             <li id="notification-{{ notification.pk }}"
-                class="{% if not notification.is_read %}bg-blue-50 dark:bg-blue-900/20{% endif %}">
-                <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                class="{% if not notification.is_read %}bg-blue-50  endif %}">
+                <div class="px-6 py-4 hover:bg-gray-50 ">
                     <div class="flex items-start">
                         <!-- Icon -->
                         <div class="flex-shrink-0">
                             {% if notification.notification_type == 'message' %}
-                            <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
-                                <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                                </svg>
+                            <div class="p-2 bg-blue-100  rounded-full">
+                                <i class="ph ph-info text-blue heading4"></i>
                             </div>
                             {% elif notification.notification_type == 'alert' %}
-                            <div class="p-2 bg-red-100 dark:bg-red-900 rounded-full">
-                                <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="p-2 bg-red-100  rounded-full">
+                                <svg class="h-5 w-5 text-red-600 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
                             </div>
                             {% elif notification.notification_type == 'success' %}
-                            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                                <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                            <div class="p-2 bg-green-100  rounded-full">
+                                <i class="ph ph-check-circle text-green heading4"></i>
                             </div>
                             {% else %}
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full">
-                                <svg class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="p-2 bg-gray-100  rounded-full">
+                                <svg class="h-5 w-5 text-title " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                             </div>
@@ -93,15 +86,15 @@
                         <!-- Content -->
                         <div class="ml-4 flex-1">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ notification.title }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ notification.created_at|timesince }} ago</p>
+                                <p class="caption1 font-medium text-title ">{{ notification.title }}</p>
+                                <p class="caption2 text-secondary ">{{ notification.created_at|timesince }} ago</p>
                             </div>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ notification.message }}</p>
+                            <p class="mt-1 caption1 text-title ">{{ notification.message }}</p>
                             {% if notification.action_url %}
                             <a href="{{ notification.action_url }}"
                                hx-post="{% url 'frontend:notifications:mark-read' pk=notification.pk %}"
                                hx-swap="none"
-                               class="mt-2 inline-flex items-center text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
+                               class="mt-2 inline-flex items-center caption1 text-primary-600 hover:text-primary-700 ">
                                 View details
                                 <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -116,7 +109,7 @@
                             <button hx-post="{% url 'frontend:notifications:mark-read' pk=notification.pk %}"
                                     hx-target="#notification-{{ notification.pk }}"
                                     hx-swap="outerHTML"
-                                    class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                                    class="text-secondary hover:text-secondary "
                                     title="Mark as read">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -129,30 +122,30 @@
             </li>
             {% empty %}
             <li class="px-6 py-12 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="mx-auto h-12 w-12 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No notifications</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">You're all caught up!</p>
+                <h3 class="mt-2 caption1 font-medium text-title ">No notifications</h3>
+                <p class="mt-1 caption1 text-secondary ">You're all caught up!</p>
             </li>
             {% endfor %}
         </ul>
 
         <!-- Pagination -->
         {% if is_paginated %}
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="px-6 py-4 border-t border-gray-200 ">
             <nav class="flex items-center justify-between">
                 <div class="flex-1 flex justify-between sm:hidden">
                     {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 caption1 font-medium rounded-md text-title bg-white hover:bg-gray-50">Previous</a>
                     {% endif %}
                     {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                    <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 caption1 font-medium rounded-md text-title bg-white hover:bg-gray-50">Next</a>
                     {% endif %}
                 </div>
                 <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                     <div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <p class="caption1 text-title ">
                             Showing <span class="font-medium">{{ page_obj.start_index }}</span> to
                             <span class="font-medium">{{ page_obj.end_index }}</span> of
                             <span class="font-medium">{{ page_obj.paginator.count }}</span> notifications
@@ -161,12 +154,12 @@
                     <div>
                         <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                             {% if page_obj.has_previous %}
-                            <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300  bg-white  caption1 font-medium text-secondary  hover:bg-gray-50 ">
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                             </a>
                             {% endif %}
                             {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300  bg-white  caption1 font-medium text-secondary  hover:bg-gray-50 ">
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
                             </a>
                             {% endif %}

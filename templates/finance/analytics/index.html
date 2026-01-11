@@ -1,28 +1,23 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block breadcrumb %}
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><span class="text-gray-900 dark:text-gray-100 font-medium">Analytics</span></li>
-{% endblock %}
+
 
 {% block page_title %}Financial Analytics{% endblock %}
 {% block page_description %}Insights into your financial activities{% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <!-- Tenant Type Badge -->
 {% if request.tenant %}
     {% if request.tenant.tenant_type == 'company' %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full caption2 font-medium tag bg-blue bg-opacity-10 text-blue  ">
             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
             </svg>
             {% trans "Company" %}
         </span>
     {% else %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full caption2 font-medium tag bg-green bg-opacity-10 text-green  ">
             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
             </svg>
@@ -34,7 +29,7 @@
     <!-- Period Selector -->
     <div class="flex justify-end">
         <select id="period-selector"
-                class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                class="rounded-md border-gray-300    shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 hx-trigger="change"
                 hx-get="{% url 'finance-frontend:chart-data' %}"
                 hx-include="[name='chart_type']"
@@ -47,8 +42,8 @@
     </div>
 
     <!-- Payment Trends Chart -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Payment Trends</h3>
+    <div class="bg-white  rounded-lg shadow p-8">
+        <h3 class="heading5 font-medium text-title  mb-4">Payment Trends</h3>
         <div id="chart-container" class="h-64">
             <canvas id="payments-chart"></canvas>
         </div>
@@ -56,112 +51,112 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7.5">
         <!-- 7 Day Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Last 7 Days</h4>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h4 class="caption1 font-medium text-secondary  mb-2">Last 7 Days</h4>
+            <p class="heading3 font-semibold text-title ">
                 ${{ payment_trends.7d.total|floatformat:2|intcomma|default:"0.00" }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="caption1 text-secondary ">
                 {{ payment_trends.7d.count|default:0 }} transactions
             </p>
         </div>
 
         <!-- 30 Day Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Last 30 Days</h4>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h4 class="caption1 font-medium text-secondary  mb-2">Last 30 Days</h4>
+            <p class="heading3 font-semibold text-title ">
                 ${{ payment_trends.30d.total|floatformat:2|intcomma|default:"0.00" }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="caption1 text-secondary ">
                 {{ payment_trends.30d.count|default:0 }} transactions
             </p>
         </div>
 
         <!-- 90 Day Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Last 90 Days</h4>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h4 class="caption1 font-medium text-secondary  mb-2">Last 90 Days</h4>
+            <p class="heading3 font-semibold text-title ">
                 ${{ payment_trends.90d.total|floatformat:2|intcomma|default:"0.00" }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="caption1 text-secondary ">
                 {{ payment_trends.90d.count|default:0 }} transactions
             </p>
         </div>
 
         <!-- Year Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Last Year</h4>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h4 class="caption1 font-medium text-secondary  mb-2">Last Year</h4>
+            <p class="heading3 font-semibold text-title ">
                 ${{ payment_trends.365d.total|floatformat:2|intcomma|default:"0.00" }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="caption1 text-secondary ">
                 {{ payment_trends.365d.count|default:0 }} transactions
             </p>
         </div>
     </div>
 
     <!-- Invoice & Escrow Stats -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-7.5">
         <!-- Invoice Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Invoice Summary</h3>
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h3 class="heading5 font-medium text-title  mb-4">Invoice Summary</h3>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Total Invoices</span>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ invoice_stats.total }}</span>
+                    <span class="caption1 text-secondary ">Total Invoices</span>
+                    <span class="caption1 font-medium text-title ">{{ invoice_stats.total }}</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Paid</span>
-                    <span class="text-sm font-medium text-green-600 dark:text-green-400">{{ invoice_stats.paid }}</span>
+                    <span class="caption1 text-secondary ">Paid</span>
+                    <span class="caption1 font-medium text-green-600 ">{{ invoice_stats.paid }}</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Unpaid</span>
-                    <span class="text-sm font-medium text-yellow-600 dark:text-yellow-400">{{ invoice_stats.unpaid }}</span>
+                    <span class="caption1 text-secondary ">Unpaid</span>
+                    <span class="caption1 font-medium text-yellow-600 ">{{ invoice_stats.unpaid }}</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Overdue</span>
-                    <span class="text-sm font-medium text-red-600 dark:text-red-400">{{ invoice_stats.overdue }}</span>
+                    <span class="caption1 text-secondary ">Overdue</span>
+                    <span class="caption1 font-medium text-red-600 ">{{ invoice_stats.overdue }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Escrow Stats -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Escrow Summary</h3>
-            <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white  rounded-lg shadow p-8">
+            <h3 class="heading5 font-medium text-title  mb-4">Escrow Summary</h3>
+            <div class="grid grid-cols-2 gap-5">
                 <div>
-                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">As Buyer</h4>
+                    <h4 class="caption1 font-medium text-secondary  mb-2">As Buyer</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Total</span>
-                            <span class="text-xs font-medium text-gray-900 dark:text-white">{{ escrow_stats.as_buyer.total }}</span>
+                            <span class="caption2 text-secondary ">Total</span>
+                            <span class="caption2 font-medium text-title ">{{ escrow_stats.as_buyer.total }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Completed</span>
-                            <span class="text-xs font-medium text-green-600">{{ escrow_stats.as_buyer.completed }}</span>
+                            <span class="caption2 text-secondary ">Completed</span>
+                            <span class="caption2 font-medium text-green-600">{{ escrow_stats.as_buyer.completed }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Amount</span>
-                            <span class="text-xs font-medium text-gray-900 dark:text-white">${{ escrow_stats.as_buyer.amount|floatformat:2|intcomma }}</span>
+                            <span class="caption2 text-secondary ">Amount</span>
+                            <span class="caption2 font-medium text-title ">${{ escrow_stats.as_buyer.amount|floatformat:2|intcomma }}</span>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">As Seller</h4>
+                    <h4 class="caption1 font-medium text-secondary  mb-2">As Seller</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Total</span>
-                            <span class="text-xs font-medium text-gray-900 dark:text-white">{{ escrow_stats.as_seller.total }}</span>
+                            <span class="caption2 text-secondary ">Total</span>
+                            <span class="caption2 font-medium text-title ">{{ escrow_stats.as_seller.total }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Completed</span>
-                            <span class="text-xs font-medium text-green-600">{{ escrow_stats.as_seller.completed }}</span>
+                            <span class="caption2 text-secondary ">Completed</span>
+                            <span class="caption2 font-medium text-green-600">{{ escrow_stats.as_seller.completed }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Received</span>
-                            <span class="text-xs font-medium text-gray-900 dark:text-white">${{ escrow_stats.as_seller.amount|floatformat:2|intcomma }}</span>
+                            <span class="caption2 text-secondary ">Received</span>
+                            <span class="caption2 font-medium text-title ">${{ escrow_stats.as_seller.amount|floatformat:2|intcomma }}</span>
                         </div>
                     </div>
                 </div>
