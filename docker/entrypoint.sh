@@ -384,7 +384,7 @@ run_migrations() {
 
     # Step 3: Create demo tenants if configured
     if [ "$CREATE_DEMO_TENANT" = "true" ]; then
-        log_info "Step 3/4: Creating demo tenants..."
+        log_info "Step 3/5: Creating demo tenants..."
         if python manage.py bootstrap_demo_tenants; then
             log_info "✓ Demo tenants created successfully!"
         else
@@ -392,16 +392,25 @@ run_migrations() {
         fi
 
         # Step 4: Run tenant migrations again for newly created demo tenants
-        log_info "Step 4/4: Migrating newly created demo tenant schemas..."
+        log_info "Step 4/5: Migrating newly created demo tenant schemas..."
         if python manage.py migrate_schemas --tenant --noinput; then
             log_info "✓ Demo tenant schema migrations completed successfully!"
         else
             log_error "Demo tenant schema migration failed!"
             return 1
         fi
+
+        # Step 5: Backfill TenantProfiles for existing users
+        log_info "Step 5/5: Backfilling TenantProfiles for existing users..."
+        if python manage.py create_tenant_profiles; then
+            log_info "✓ TenantProfiles backfilled successfully!"
+        else
+            log_warn "TenantProfile backfill had issues (may be no users yet)"
+        fi
     else
-        log_info "Step 3/4: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
-        log_info "Step 4/4: No new tenants to migrate"
+        log_info "Step 3/5: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
+        log_info "Step 4/5: No new tenants to migrate"
+        log_info "Step 5/5: Skipping TenantProfile backfill (no demo tenants)"
     fi
 }
 

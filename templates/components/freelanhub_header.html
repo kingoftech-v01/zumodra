@@ -119,6 +119,18 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{% url 'custom_account_u:public_profile' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                    <i class="ph ph-globe mr-2"></i>
+                                    {% trans "Public Profile" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'custom_account_u:sync_settings_list' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50">
+                                    <i class="ph ph-lock mr-2"></i>
+                                    {% trans "Privacy & Sync" %}
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{% url 'account_logout' %}" class="link block text-button py-[11px] px-4 rounded duration-300 hover:bg-gray-50 text-red-600">
                                     <i class="ph ph-sign-out mr-2"></i>
                                     {% trans "Logout" %}
