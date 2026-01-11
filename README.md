@@ -423,16 +423,25 @@ python manage.py check --deploy
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
-| [FEATURES.md](docs/FEATURES.md) | Complete platform features and specifications |
-| [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | Complete API reference |
-| [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Production deployment guide |
-| [SECURITY.md](docs/SECURITY.md) | Security policy and practices |
-| [QA_SCENARIOS.md](docs/QA_SCENARIOS.md) | End-to-end test scenarios |
-| [TENANT_ONBOARDING.md](docs/TENANT_ONBOARDING.md) | New tenant setup guide |
-| [domain_model.md](docs/domain_model.md) | Domain model documentation |
+**📖 [Complete Documentation](docs/README.md)** - Full documentation index
+
+### Quick Links
+
+| Category | Documents |
+| -------- | --------- |
+| **Getting Started** | [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines |
+| | [CLAUDE.md](CLAUDE.md) - Claude Code instructions |
+| **Deployment** | [Deployment Summary](docs/deployment/DEPLOYMENT_SUMMARY.md) - Latest fixes & deployment |
+| | [Migration Fix Guide](docs/deployment/MIGRATION_FIX_README.md) - Migration troubleshooting |
+| | [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - General deployment |
+| **Architecture** | [Multi-Tenancy Logic](docs/architecture/SAAS_MULTI_TENANCY_LOGIC.md) - Tenant architecture |
+| | [Domain Model](docs/domain_model.md) - Data model |
+| | [Features](docs/FEATURES.md) - Platform features |
+| **Security** | [Security Policy](docs/SECURITY.md) - Security documentation |
+| **API** | [API Documentation](docs/API_DOCUMENTATION.md) - REST API reference |
+| **Operations** | [Tenant Onboarding](docs/TENANT_ONBOARDING.md) - New tenant setup |
+| | [QA Scenarios](docs/QA_SCENARIOS.md) - Test scenarios |
+| | [Server Updates](docs/SERVER_UPDATE_GUIDE.md) - Update procedures |
 
 ---
 
