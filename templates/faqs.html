@@ -1,237 +1,201 @@
-{% extends "base.html" %}
-{% comment %}
-=============================================================================
-   ZUMODRA FAQ PAGE
-   =============================================================================
-
-   File: templates/faqs.html
-   Purpose: Frequently Asked Questions page
-
-   Extends: base.html (canonical public base template)
-
-   Features:
-   - Hero section
-   - FAQ sections by category (Support, Services, Payments, Verification)
-   - Alpine.js accordion functionality
-   - Contact CTA section
-
-   Author: Rhematek Solutions
-   Last Updated: 2026-01-03
-   =============================================================================
-{% endcomment %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "FAQs" %} - Zumodra{% endblock %}
+{% block title %}{% trans "FAQs" %} - FreelanHub{% endblock %}
 
-{% block meta_description %}{% trans "Find answers to frequently asked questions about Zumodra's recruitment platform, freelance marketplace, verification process, and payment system." %}{% endblock %}
+{% block meta_description %}{% trans "Find answers to frequently asked questions about FreelanHub's freelance marketplace platform, services, payments, and verification process.\" %}{% endblock %}
 
 {% block content %}
 
-{% comment %} HERO SECTION {% endcomment %}
-<section class="slider">
-    <div class="slider_inner relative lg:h-[400px] sm:pt-20 pt-16 overflow-hidden bg-[#F1F6F2]">
-        <div class="container flex flex-col items-center justify-center h-full max-lg:py-16 text-center">
-            <h2 class="heading2 animate animate_top" style="--i: 1">{% trans "Frequently Asked Questions" %}</h2>
-            <p class="body2 mt-3 max-w-2xl animate animate_top" style="--i: 2">{% trans "Find answers to common questions about our platform, services, and features." %}</p>
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full bg-primary"></div>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">{% trans "Home" %}</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">{% trans "FAQs" %}</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "Frequently Asked Questions" %}</h3>
+            </div>
         </div>
     </div>
 </section>
 
-{% comment %} FAQ SECTION {% endcomment %}
+<!-- FAQs Section -->
 <section class="faqs lg:py-20 sm:py-14 py-10">
     <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
         <div class="content w-full">
-
-            {% comment %} Getting Started Questions {% endcomment %}
-            <div class="faqs_section" x-data="{ open: null }">
-                <h4 class="heading4">{% trans "Getting Started" %}</h4>
+            <!-- Support Questions -->
+            <div class="faqs_section">
+                <h4 class="heading4">{% trans "Support Questions" %}</h4>
                 <div class="list_faqs flex flex-col w-full mt-5">
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 1 ? null : 1">
-                            <strong class="title text-title">{% trans "How do I create an account on Zumodra?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 1 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 1" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Creating an account is simple. Click 'Sign Up' on the homepage, choose whether you're a job seeker, freelancer, or employer, and complete the registration form. You'll receive a verification email to confirm your account. After verification, you can complete your profile and start using the platform." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 2 ? null : 2">
-                            <strong class="title text-title">{% trans "What is KYC verification and why is it required?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 2 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 2" x-collapse>
-                            <p class="body2 text-secondary">{% trans "KYC (Know Your Customer) verification is our identity verification process that ensures all users on the platform are who they claim to be. This bidirectional verification applies to both job seekers/freelancers AND employers, creating a trusted environment for everyone. It involves ID verification, selfie matching, and liveness detection." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 3 ? null : 3">
+                        <div class="heading flex items-center justify-between gap-2">
                             <strong class="title text-title">{% trans "How do I post a job or find a freelancer?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 3 }"></span>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 3" x-collapse>
-                            <p class="body2 text-secondary">{% trans "To post a job, navigate to your dashboard and click 'Post a Job'. Fill in the job details, requirements, and budget. Your posting will be visible to verified candidates. To find freelancers, use our search filters to browse profiles by skills, experience, location, and ratings. You can then invite freelancers to apply or message them directly." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly." %}</p>
                         </div>
                     </div>
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 4 ? null : 4">
-                            <strong class="title text-title">{% trans "Is Zumodra free to use?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 4 }"></span>
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "Is there a fee for using your services?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 4" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Zumodra offers multiple pricing tiers to suit different needs. Job seekers and freelancers can create profiles and apply to jobs for free. Employers can choose from our Starter (€15/user), Pro (€25/user), Business (€35/user), or Enterprise plans. Each tier offers different features and capabilities. Visit our Pricing page for details." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "FreelanHub charges a service fee for completed projects. Freelancers pay a commission on earnings, while clients may have subscription options. Check our pricing page for detailed information." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "Can I request advice or support from your team?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Absolutely! Our support team is available to help you navigate the platform, answer questions, and resolve any issues. Contact us through our support portal or email." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "How do I pay for the freelancers or businesses I hire?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "FreelanHub offers secure escrow payment services. Deposit funds when hiring, and we release payment to the freelancer upon project completion and your approval." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "How can I ensure that I receive quality services?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Review freelancer profiles, ratings, reviews, and portfolios before hiring. Our verification system helps ensure quality, and you can communicate directly to clarify project requirements." %}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {% comment %} Verification Questions {% endcomment %}
-            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8" x-data="{ open: null }">
-                <h4 class="heading4">{% trans "Verification & Trust" %}</h4>
+            <!-- Services Questions -->
+            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8">
+                <h4 class="heading4">{% trans "Services Questions" %}</h4>
                 <div class="list_faqs flex flex-col w-full mt-5">
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 1 ? null : 1">
-                            <strong class="title text-title">{% trans "What documents are required for verification?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 1 }"></span>
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "What types of services are offered on FreelanHub?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 1" x-collapse>
-                            <p class="body2 text-secondary">{% trans "For Level 1 (KYC) verification, you'll need a valid government-issued ID (passport, driver's license, or national ID) and a selfie for liveness detection. For Level 2 (Career) verification, we verify your employment history through automated emails to previous employers and educational credentials through school verification." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 2 ? null : 2">
-                            <strong class="title text-title">{% trans "How long does verification take?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 2 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 2" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Level 1 KYC verification is typically completed within minutes using our automated system. Level 2 Career verification may take 2-5 business days depending on response times from employers and educational institutions. You'll receive email updates on your verification status throughout the process." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "FreelanHub offers a wide range of services including graphic design, web development, content writing, digital marketing, video editing, programming, and much more across various industries." %}</p>
                         </div>
                     </div>
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 3 ? null : 3">
-                            <strong class="title text-title">{% trans "What are Trust Badges and how do I earn them?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 3 }"></span>
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "How do I know which freelancer is right for my project?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 3" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Trust Badges are visual indicators of your verification status. You can earn 'ID Verified' by completing KYC, 'Career Verified' by completing employment/education verification, and 'High Trust' by maintaining excellent ratings and completing multiple successful projects. These badges increase your visibility and credibility on the platform." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Review freelancer profiles carefully, including their ratings, reviews from previous clients, portfolio samples, skills, and experience. You can also interview candidates before making a decision." %}</p>
                         </div>
                     </div>
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 4 ? null : 4">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "Can I hire multiple freelancers for the same project?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Yes! You can hire multiple freelancers for different aspects of your project or create a team. FreelanHub supports collaboration and team management features." %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Questions -->
+            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8">
+                <h4 class="heading4">{% trans "Payment Questions" %}</h4>
+                <div class="list_faqs flex flex-col w-full mt-5">
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "What payment methods do you accept?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "We accept major credit cards, debit cards, PayPal, and bank transfers. All transactions are secured with industry-standard encryption." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "How does the escrow system work?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "When you hire a freelancer, funds are held securely in escrow. Once the work is delivered and approved, payment is released to the freelancer. This protects both parties." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "When will I receive my payment as a freelancer?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Freelancers receive payment once the client approves the delivered work. Funds are typically available for withdrawal within 24-48 hours after approval." %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account & Security -->
+            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8">
+                <h4 class="heading4">{% trans "Account & Security" %}</h4>
+                <div class="list_faqs flex flex-col w-full mt-5">
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "How do I create an account?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Click 'Sign Up' and provide your email, create a password, and complete your profile. You can also sign up using Google or other social accounts for faster registration." %}</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-5 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
                             <strong class="title text-title">{% trans "Is my personal information secure?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 4 }"></span>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 4" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Absolutely. We use AES-256 encryption for sensitive data, progressive data revelation (meaning employers only see information relevant to each hiring stage), and we comply with GDPR and other privacy regulations. Your ID documents are verified and then securely stored with access controls. We never share your sensitive information without your consent." %}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {% comment %} Payment Questions {% endcomment %}
-            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8" x-data="{ open: null }">
-                <h4 class="heading4">{% trans "Payments & Escrow" %}</h4>
-                <div class="list_faqs flex flex-col w-full mt-5">
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 1 ? null : 1">
-                            <strong class="title text-title">{% trans "How does the escrow payment system work?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 1 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 1" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Our escrow system protects both parties. When a client hires a freelancer, funds are deposited into escrow via Stripe Connect. The freelancer completes the work and submits deliverables. Once the client approves the work, funds are released to the freelancer. If there's a dispute, our resolution team reviews the case and decides based on evidence from both parties." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Yes! We use advanced encryption and security measures to protect your data. We never share your personal information with third parties without your consent." %}</p>
                         </div>
                     </div>
                     <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 2 ? null : 2">
-                            <strong class="title text-title">{% trans "What payment methods are accepted?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 2 }"></span>
+                        <div class="heading flex items-center justify-between gap-2">
+                            <strong class="title text-title">{% trans "Can I enable two-factor authentication (2FA)?" %}</strong>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
                         </div>
-                        <div class="answer mt-3" x-show="open === 2" x-collapse>
-                            <p class="body2 text-secondary">{% trans "We accept all major credit cards (Visa, Mastercard, American Express), bank transfers, and SEPA direct debit for European customers. Freelancers can receive payouts to their bank account or Stripe account. Enterprise customers can arrange custom payment terms and invoicing." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 3 ? null : 3">
-                            <strong class="title text-title">{% trans "What is the refund policy?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 3 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 3" x-collapse>
-                            <p class="body2 text-secondary">{% trans "If work hasn't started, clients can cancel and receive a full refund. Once work begins, refunds are handled through our dispute resolution process. For subscription plans, you can cancel anytime and continue using the service until the end of your billing period. We don't offer partial refunds for subscription cancellations." %}</p>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">{% trans "Absolutely! We strongly recommend enabling 2FA for additional account security. You can set this up in your account security settings using an authenticator app." %}</p>
                         </div>
                     </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 4 ? null : 4">
-                            <strong class="title text-title">{% trans "When do freelancers receive their payments?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 4 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 4" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Payments are released from escrow once the client approves the deliverables. After release, funds typically arrive in your connected bank account within 2-5 business days depending on your bank. You can track all your earnings and pending payments in your dashboard." %}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {% comment %} Platform Features Questions {% endcomment %}
-            <div class="faqs_section lg:mt-15 sm:mt-12 mt-8" x-data="{ open: null }">
-                <h4 class="heading4">{% trans "Platform Features" %}</h4>
-                <div class="list_faqs flex flex-col w-full mt-5">
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 1 ? null : 1">
-                            <strong class="title text-title">{% trans "What is Progressive Data Revelation?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 1 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 1" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Progressive Data Revelation is our privacy feature that controls what information is visible at each stage of the hiring process. Initially, employers see basic profile info. After expressing interest, they see contact details. Post-interview, they access references. Only after an offer is accepted do they receive sensitive documents like tax IDs. This protects candidate privacy while still enabling effective hiring." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 2 ? null : 2">
-                            <strong class="title text-title">{% trans "How does the AI-powered matching work?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 2 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 2" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Our hybrid ranking engine combines rule-based matching with AI-powered semantic analysis. It considers skills, experience, verification status, trust scores, and job requirements to calculate a match score. Employers can configure the weights given to different factors. The system learns from successful hires to improve recommendations over time." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 3 ? null : 3">
-                            <strong class="title text-title">{% trans "Can I use Zumodra for internal hiring?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 3 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 3" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Yes! Business and Enterprise plans include our Multi-Circuit Talent Management feature. This allows you to manage internal mobility (current employees), external recruitment, your talent pool/alumni, and freelancers/contractors all in one platform. Each circuit can have different workflows and approval processes." %}</p>
-                        </div>
-                    </div>
-                    <div class="faq_item py-5 border-b border-line cursor-pointer">
-                        <div class="heading flex items-center justify-between gap-2" @click="open = open === 4 ? null : 4">
-                            <strong class="title text-title">{% trans "Do you offer e-signature capabilities?" %}</strong>
-                            <span class="ph-bold ph-caret-down text-2xl duration-300 transition-transform" :class="{ 'rotate-180': open === 4 }"></span>
-                        </div>
-                        <div class="answer mt-3" x-show="open === 4" x-collapse>
-                            <p class="body2 text-secondary">{% trans "Yes, Business and Enterprise plans include DocuSign integration for legally binding e-signatures. You can send offer letters, contracts, NDAs, and other documents for digital signature directly through the platform. All signed documents are securely stored and accessible from your dashboard." %}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        {% comment %} Sidebar - Contact CTA {% endcomment %}
-        <div class="sidebar flex-shrink-0 lg:w-[350px]">
-            <div class="sticky top-24">
-                <div class="bg-surface p-6 rounded-xl">
-                    <h5 class="heading5">{% trans "Still have questions?" %}</h5>
-                    <p class="body2 text-secondary mt-2">{% trans "Can't find the answer you're looking for? Our support team is here to help." %}</p>
-                    <a href="{% url 'contact_us' %}" class="button-main w-full text-center mt-4">{% trans "Contact Support" %}</a>
-                </div>
-                <div class="bg-surface p-6 rounded-xl mt-6">
-                    <h5 class="heading5">{% trans "Ready to get started?" %}</h5>
-                    <p class="body2 text-secondary mt-2">{% trans "Join thousands of businesses and freelancers already using Zumodra." %}</p>
-                    <a href="{% url 'account_signup' %}" class="button-main -border w-full text-center mt-4">{% trans "Create Free Account" %}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% endblock content %}
+<!-- CTA Section -->
+<section class="banner lg:py-20 sm:py-14 py-10 bg-surface">
+    <div class="container">
+        <div class="banner_inner bg-primary rounded-xl p-10 text-center">
+            <h3 class="heading3 text-white">{% trans "Still have questions?" %}</h3>
+            <p class="body2 text-white/90 mt-3 mb-6">
+                {% trans "Our support team is here to help you. Contact us anytime!" %}
+            </p>
+            <a href="{% url 'contact_us' %}" class="button-main bg-white">{% trans "Contact Support" %}</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
