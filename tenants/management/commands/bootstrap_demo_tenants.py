@@ -277,7 +277,8 @@ class Command(BaseCommand):
 
     def _create_users(self, tenant, user_configs):
         """Create users for a tenant."""
-        from accounts.models import TenantUser, UserProfile
+        from accounts.models import TenantUser, TenantProfile
+        from custom_account_u.models import PublicProfile
 
         users = {}
 
@@ -298,6 +299,37 @@ class Command(BaseCommand):
                 user.set_password(config['password'])
                 user.save()
 
+            # PublicProfile is auto-created by signal, but let's populate it with demo data
+            if created or not hasattr(user, 'public_profile'):
+                # Temporarily switch to public schema to update PublicProfile
+                current_schema = connection.schema_name
+                connection.set_schema_to_public()
+
+                try:
+                    public_profile = PublicProfile.objects.get(user=user)
+                    public_profile.phone = f'+1555{random.randint(1000000, 9999999)}'
+                    public_profile.bio = f'Demo {config["role"].lower().replace("_", " ")} user for {tenant.name}.'
+                    public_profile.professional_title = config["role"].replace("_", " ").title()
+                    public_profile.city = 'Montreal'
+                    public_profile.country = 'CA'
+                    public_profile.available_for_work = True
+                    public_profile.save()
+                except PublicProfile.DoesNotExist:
+                    # Create if signal didn't fire
+                    PublicProfile.objects.create(
+                        user=user,
+                        display_name=f'{user.first_name} {user.last_name}',
+                        phone=f'+1555{random.randint(1000000, 9999999)}',
+                        bio=f'Demo {config["role"].lower().replace("_", " ")} user for {tenant.name}.',
+                        professional_title=config["role"].replace("_", " ").title(),
+                        city='Montreal',
+                        country='CA',
+                        available_for_work=True,
+                    )
+                finally:
+                    # Switch back to tenant schema
+                    connection.set_schema(current_schema)
+
             # Create TenantUser
             TenantUser.objects.get_or_create(
                 user=user,
@@ -309,17 +341,15 @@ class Command(BaseCommand):
                 }
             )
 
-            # Create profile
-            try:
-                UserProfile.objects.get_or_create(
-                    user=user,
-                    defaults={
-                        'phone': f'+1555{random.randint(1000000, 9999999)}',
-                        'bio': f'Demo {config["role"].lower().replace("_", " ")} user.',
-                    }
-                )
-            except Exception:
-                pass
+            # Create TenantProfile (in tenant schema)
+            TenantProfile.objects.get_or_create(
+                user=user,
+                tenant=tenant,
+                defaults={
+                    'job_title': config["role"].replace("_", " ").title(),
+                    'full_name': f'{user.first_name} {user.last_name}',
+                }
+            )
 
             users[key] = user
 
