@@ -1,21 +1,19 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "Marketing Dashboard" %} - Zumodra{% endblock %}
+{% block title %}{% trans "Marketing Dashboard" %} - FreelanHub{% endblock %}
 
 {% block breadcrumb %}
 <li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Marketing" %}</span>
+    <i class="ph ph-caret-right text-base text-secondary"></i>
+    <span class="ml-2 caption1 text-secondary">{% trans "Marketing" %}</span>
 </li>
 {% endblock %}
 
 {% block page_title %}{% trans "Marketing Dashboard" %}{% endblock %}
 
 {% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+<p class="mt-1 caption2 text-secondary">
     {% trans "Track traffic, leads, and conversions." %}
 </p>
 {% endblock %}
@@ -23,7 +21,7 @@
 {% block page_actions %}
 <div class="flex items-center space-x-3">
     <select onchange="window.location.href='?days=' + this.value"
-            class="block pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            class="block pl-3 pr-10 py-2 text-sm border border-gray-300  rounded-lg bg-white text-on-surface">
         <option value="7" {% if period_days == 7 %}selected{% endif %}>{% trans "Last 7 days" %}</option>
         <option value="30" {% if period_days == 30 %}selected{% endif %}>{% trans "Last 30 days" %}</option>
         <option value="90" {% if period_days == 90 %}selected{% endif %}>{% trans "Last 90 days" %}</option>
@@ -31,35 +29,31 @@
 </div>
 {% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <!-- Tenant Type Badge -->
 {% if request.tenant %}
     {% if request.tenant.tenant_type == 'company' %}
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
-            </svg>
+            <i class="ph ph-buildings text-sm mr-1"></i>
             {% trans "Company" %}
         </span>
     {% else %}
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-            </svg>
+            <i class="ph ph-user text-sm mr-1"></i>
             {% trans "Freelancer" %}
         </span>
     {% endif %}
 {% endif %}
-<div class="space-y-6">
+<div class="space-y-5">
     {% comment %} Key Metrics {% endcomment %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7.5">
         {% comment %} Traffic {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Visits" %}</p>
-                    <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{{ traffic_stats.total_visits|intcomma }}</p>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="caption1 text-secondary">{% trans "Total Visits" %}</p>
+                    <p class="mt-1 text-3xl font-semibold text-on-surface">{{ traffic_stats.total_visits|intcomma }}</p>
+                    <p class="mt-1 caption2 text-secondary">
                         {{ traffic_stats.unique_visitors|intcomma }} {% trans "unique" %}
                     </p>
                 </div>
@@ -76,8 +70,8 @@
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Prospects" %}</p>
-                    <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{{ prospect_stats.total|intcomma }}</p>
+                    <p class="caption1 text-secondary">{% trans "Prospects" %}</p>
+                    <p class="mt-1 text-3xl font-semibold text-on-surface">{{ prospect_stats.total|intcomma }}</p>
                     <p class="mt-1 text-sm text-green-600 dark:text-green-400">
                         +{{ prospect_stats.new }} {% trans "new" %}
                     </p>
@@ -94,9 +88,9 @@
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Conversion Rate" %}</p>
-                    <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{{ conversion_rate }}%</p>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="caption1 text-secondary">{% trans "Conversion Rate" %}</p>
+                    <p class="mt-1 text-3xl font-semibold text-on-surface">{{ conversion_rate }}%</p>
+                    <p class="mt-1 caption2 text-secondary">
                         {{ conversion_stats.total_purchases }} {% trans "purchases" %}
                     </p>
                 </div>
@@ -112,13 +106,13 @@
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Revenue" %}</p>
-                    <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">${{ conversion_stats.total_revenue|intcomma }}</p>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="caption1 text-secondary">{% trans "Revenue" %}</p>
+                    <p class="mt-1 text-3xl font-semibold text-on-surface">${{ conversion_stats.total_revenue|intcomma }}</p>
+                    <p class="mt-1 caption2 text-secondary">
                         {{ conversion_stats.total_conversions }} {% trans "conversions" %}
                     </p>
                 </div>
-                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
+                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
                     <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -128,11 +122,11 @@
     </div>
 
     {% comment %} Traffic Sources and Newsletter {% endcomment %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-7.5">
         {% comment %} Traffic by Source {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Traffic by Source" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Traffic by Source" %}</h3>
             </div>
             <div class="p-6">
                 {% if traffic_by_source %}
@@ -141,9 +135,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm text-gray-700 dark:text-gray-300">{{ source.utm_source|default:"Direct" }}</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ source.count|intcomma }}</span>
+                            <span class="caption1">{{ source.count|intcomma }}</span>
                         </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="w-full bg-surface-light rounded-full h-2">
                             {% widthratio source.count traffic_stats.total_visits 100 as percentage %}
                             <div class="bg-primary-600 h-2 rounded-full" style="width: {{ percentage }}%;"></div>
                         </div>
@@ -151,25 +145,25 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No traffic data yet." %}</p>
+                <p class="caption2 text-secondary text-center py-4">{% trans "No traffic data yet." %}</p>
                 {% endif %}
             </div>
         </div>
 
         {% comment %} Newsletter Stats {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Newsletter" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Newsletter" %}</h3>
             </div>
             <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ newsletter_stats.active_subscribers|intcomma }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Active Subscribers" %}</p>
+                <div class="grid grid-cols-2 gap-4 mb-7.5">
+                    <div class="text-center p-4 bg-surface-light rounded-lg">
+                        <p class="heading4">{{ newsletter_stats.active_subscribers|intcomma }}</p>
+                        <p class="caption2 text-secondary">{% trans "Active Subscribers" %}</p>
                     </div>
-                    <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ newsletter_stats.campaigns_sent }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "Campaigns Sent" %}</p>
+                    <div class="text-center p-4 bg-surface-light rounded-lg">
+                        <p class="heading4">{{ newsletter_stats.campaigns_sent }}</p>
+                        <p class="caption2 text-secondary">{% trans "Campaigns Sent" %}</p>
                     </div>
                 </div>
 
@@ -177,10 +171,10 @@
                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{% trans "Recent Campaigns" %}</h4>
                 <div class="space-y-3">
                     {% for item in recent_campaigns %}
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div class="flex items-center justify-between p-3 bg-surface-light rounded-lg">
                         <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.campaign.title|truncatechars:30 }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ item.sent }} {% trans "sent" %}</p>
+                            <p class="caption1">{{ item.campaign.title|truncatechars:30 }}</p>
+                            <p class="caption2 text-secondary">{{ item.sent }} {% trans "sent" %}</p>
                         </div>
                         <div class="flex items-center space-x-4 text-sm">
                             <span class="text-green-600 dark:text-green-400">{{ item.open_rate }}% {% trans "open" %}</span>
@@ -190,43 +184,43 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No campaigns sent yet." %}</p>
+                <p class="caption2 text-secondary text-center py-4">{% trans "No campaigns sent yet." %}</p>
                 {% endif %}
             </div>
         </div>
     </div>
 
     {% comment %} Recent Prospects and Conversions {% endcomment %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-7.5">
         {% comment %} Recent Prospects {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Recent Prospects" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Recent Prospects" %}</h3>
                 <a href="{% url 'marketing:prospects' %}" class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">{% trans "View All" %}</a>
             </div>
-            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            <ul class="divide-y divide-gray-200">
                 {% for prospect in recent_prospects %}
                 <li class="px-6 py-4 flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        <p class="caption1">
                             {% if prospect.first_name or prospect.last_name %}
                             {{ prospect.first_name }} {{ prospect.last_name }}
                             {% else %}
                             {{ prospect.email }}
                             {% endif %}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ prospect.company|default:prospect.email }}</p>
+                        <p class="caption2 text-secondary">{{ prospect.company|default:prospect.email }}</p>
                     </div>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                         {% if prospect.status == 'new' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
                         {% elif prospect.status == 'qualified' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
                         {% elif prospect.status == 'converted' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400
-                        {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400{% endif %}">
+                        {% else %}bg-gray-100 text-gray-800 {% endif %}">
                         {{ prospect.get_status_display }}
                     </span>
                 </li>
                 {% empty %}
-                <li class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <li class="px-6 py-8 text-center caption2 text-secondary">
                     {% trans "No prospects yet." %}
                 </li>
                 {% endfor %}
@@ -235,17 +229,17 @@
 
         {% comment %} Conversions by Type {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Conversions by Type" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Conversions by Type" %}</h3>
             </div>
             <div class="p-6">
                 {% if conversions_by_type %}
                 <div class="space-y-4">
                     {% for conv in conversions_by_type %}
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div class="flex items-center justify-between p-3 bg-surface-light rounded-lg">
                         <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ conv.event_name|title }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ conv.count }} {% trans "events" %}</p>
+                            <p class="caption1">{{ conv.event_name|title }}</p>
+                            <p class="caption2 text-secondary">{{ conv.count }} {% trans "events" %}</p>
                         </div>
                         {% if conv.value %}
                         <span class="text-sm font-medium text-green-600 dark:text-green-400">${{ conv.value|floatformat:2|intcomma }}</span>
@@ -254,18 +248,18 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No conversions yet." %}</p>
+                <p class="caption2 text-secondary text-center py-4">{% trans "No conversions yet." %}</p>
                 {% endif %}
             </div>
         </div>
     </div>
 
     {% comment %} Traffic by Device and Country {% endcomment %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-7.5">
         {% comment %} Traffic by Device {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Traffic by Device" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Traffic by Device" %}</h3>
             </div>
             <div class="p-6">
                 {% if traffic_by_device %}
@@ -274,34 +268,34 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             {% if device.device_type == 'mobile' %}
-                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-5 h-5 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                             </svg>
                             {% elif device.device_type == 'tablet' %}
-                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-5 h-5 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                             </svg>
                             {% else %}
-                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-5 h-5 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
                             {% endif %}
                             <span class="text-sm text-gray-700 dark:text-gray-300">{{ device.device_type|title }}</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ device.count|intcomma }}</span>
+                        <span class="caption1">{{ device.count|intcomma }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No device data yet." %}</p>
+                <p class="caption2 text-secondary text-center py-4">{% trans "No device data yet." %}</p>
                 {% endif %}
             </div>
         </div>
 
         {% comment %} Traffic by Country {% endcomment %}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans "Top Countries" %}</h3>
+            <div class="mb-7.5">
+                <h3 class="text-lg font-medium text-on-surface">{% trans "Top Countries" %}</h3>
             </div>
             <div class="p-6">
                 {% if traffic_by_country %}
@@ -309,12 +303,12 @@
                     {% for country in traffic_by_country %}
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ country.country }}</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ country.count|intcomma }}</span>
+                        <span class="caption1">{{ country.count|intcomma }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{% trans "No country data yet." %}</p>
+                <p class="caption2 text-secondary text-center py-4">{% trans "No country data yet." %}</p>
                 {% endif %}
             </div>
         </div>
