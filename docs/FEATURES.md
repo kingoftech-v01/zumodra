@@ -171,17 +171,27 @@ Zumodra positions itself as the only ATS/HRIS that guarantees verified candidate
 
 | Module | Features |
 |--------|----------|
+| **ATS (Applicant Tracking)** | Complete recruitment pipeline: job postings, candidate management, applications, interviews, offers |
+| **Interview Management** | Full CRUD: scheduling, rescheduling, cancellation, feedback collection |
+| **Job Management** | Complete job lifecycle: create, edit, duplicate, delete, publish, close, career pages |
+| **Candidate Management** | Candidate profiles, CV uploads, job assignment, application tracking |
+| **Application Workflows** | Email composition, rejection workflows, pipeline stage management, bulk actions |
 | **Appointment Booking** | Full scheduling system with calendar integration |
 | **Stripe Finance** | Subscriptions, escrow payments, refunds |
 | **Real-time Messages** | WebSocket-based messaging with typing indicators |
 | **Newsletters** | Email marketing campaigns |
 | **Security Auditing** | Complete audit logging system |
+| **HR Core** | Employee directory, time-off management, onboarding workflows |
+| **Multi-Tenancy** | Full schema-based tenant isolation with role-based access control |
 
 ### 5.2 Partial Features (In Development)
 
+- Advanced ATS filters and Boolean search
+- CV parsing and AI matching
 - Services marketplace
 - Wagtail blog
 - Dashboard analytics
+- KYC verification integration
 
 ### 5.3 Roadmap Features
 

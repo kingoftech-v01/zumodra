@@ -165,16 +165,16 @@ celery -A zumodra beat --loglevel=info
 
 | Module | Status | Description |
 |--------|--------|-------------|
-| **ATS** | Production | Job postings, pipelines, interviews, offers |
+| **ATS** | Production | Complete recruitment: jobs (create/edit/duplicate), candidates, interviews (schedule/reschedule/cancel), offers, pipelines |
 | **Marketplace** | Production | Services, proposals, contracts, escrow |
 | **HR Core** | Production | Employees, time-off, onboarding |
 | **Finance** | Production | Stripe payments, escrow, subscriptions |
 | **Messaging** | Production | Real-time WebSocket chat |
 | **Notifications** | Production | Multi-channel notifications |
-| **KYC/Verification** | Production | Identity and career verification |
-| **Trust Scores** | Production | Multi-dimensional trust scoring |
-| **Co-op Management** | Production | Student/employer/coordinator UIs |
-| **Multi-CV** | Production | CV management with AI scoring |
+| **KYC/Verification** | Beta | Identity and career verification |
+| **Trust Scores** | Beta | Multi-dimensional trust scoring |
+| **Co-op Management** | Beta | Student/employer/coordinator UIs |
+| **Multi-CV** | Beta | CV management with AI scoring |
 
 ### Security Features
 

@@ -67,12 +67,39 @@ python manage.py setup_demo_data --num-jobs 20 --num-candidates 100
 
 ### Core Apps
 - `accounts/` - Users, KYC, trust scores, authentication
-- `ats/` - Jobs, pipelines, interviews, offers
+- `ats/` - **Complete ATS**: jobs (create/edit/duplicate/delete), candidates (profiles/CVs), interviews (schedule/reschedule/cancel/feedback), offers, pipelines, application workflows
 - `services/` - Marketplace listings, proposals, contracts, escrow
-- `hr_core/` - Employees, time-off, onboarding
+- `hr_core/` - Employees, time-off, onboarding, org charts
 - `finance/` - Payments, subscriptions (Stripe)
 - `messages_sys/` - WebSocket real-time chat
 - `tenants/` - Tenant management and isolation
+- `dashboard/` - Main dashboard, quick stats, recent activity
+- `notifications/` - Multi-channel notification system
+
+### URL Namespaces
+
+All URLs use nested namespaces for organization:
+
+- `frontend:ats:*` - ATS frontend views (job_list, candidate_list, pipeline_board, interview_detail, etc.)
+- `frontend:hr:*` - HR frontend views (employee-directory, time-off-calendar, etc.)
+- `frontend:dashboard:*` - Dashboard views (index, global-search, htmx-quick-stats, etc.)
+- `api:v1:ats:*` - ATS API endpoints
+- `api:v1:hr:*` - HR API endpoints
+
+**Example URL patterns:**
+
+```python
+# Frontend URLs (template_views.py)
+{% url 'frontend:ats:job_list' %}
+{% url 'frontend:ats:candidate_detail' candidate.pk %}
+{% url 'frontend:ats:interview_reschedule' interview.pk %}
+{% url 'frontend:hr:employee-directory' %}
+
+# API URLs
+/api/v1/ats/jobs/
+/api/v1/ats/interviews/
+/api/v1/hr/employees/
+```
 
 ### REST API
 - DRF ViewSets in each app's `api/` subdirectory
