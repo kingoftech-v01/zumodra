@@ -1,48 +1,30 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{% trans "Co-op & Internship Program" %} - Zumodra{% endblock %}
+{% block page_title %}Co-op & Internship Program{% endblock %}
 
-{% block breadcrumb %}
-<li class="flex items-center">
-    <svg class="flex-shrink-0 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Co-op Program" %}</span>
-</li>
-{% endblock %}
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="heading flex items-center justify-between mb-7.5">
+    <div>
+        <h3 class="heading3">{% trans "Co-op & Internship Program" %}</h3>
+        <p class="caption1 text-secondary mt-1">{% trans "Manage your co-op postings, view student applicants, and track placements." %}</p>
+    </div>
+    <a href="{% url 'hr_core:coop_posting_create' %}"
+       class="button-main flex items-center gap-2">
+        <span class="ph ph-plus text-lg"></span>
+        {% trans "Create Posting" %}
+    </a>
+</div>
 
-{% block page_title %}{% trans "Co-op & Internship Program" %}{% endblock %}
-
-{% block page_description %}
-<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-    {% trans "Manage your co-op postings, view student applicants, and track placements." %}
-</p>
-{% endblock %}
-
-{% block page_actions %}
-<a href="{% url 'hr_core:coop_posting_create' %}"
-   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
-    {% trans "Create Posting" %}
-</a>
-{% endblock %}
-
-{% block content %}
 {% if request.tenant.tenant_type != 'company' %}
-<div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
-    <div class="flex">
-        <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-        </div>
-        <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+<div class="p-6 rounded-lg bg-yellow bg-opacity-10 border border-yellow mb-7.5">
+    <div class="flex gap-3">
+        <span class="ph ph-warning text-yellow text-2xl"></span>
+        <div>
+            <p class="caption1 text-yellow">
                 {% trans "HR features are only available for company tenants." %}
-                <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-100">
+                <a href="{% url 'tenants:tenant_settings' %}" class="font-semibold underline hover:opacity-80">
                     {% trans "Switch to company account" %}
                 </a>
             </p>
@@ -50,235 +32,251 @@
     </div>
 </div>
 {% else %}
-<div class="space-y-6">
-    <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {% include "components/stats_card.html" with title="Active Postings" value=active_postings_count icon="jobs" icon_color="blue" %}
-        {% include "components/stats_card.html" with title="Total Applicants" value=total_applicants_count icon="applications" icon_color="green" %}
-        {% include "components/stats_card.html" with title="Current Students" value=current_students_count icon="users" icon_color="purple" %}
-        {% include "components/stats_card.html" with title="Completed Terms" value=completed_terms_count icon="check" icon_color="emerald" %}
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7.5 mb-7.5">
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="caption1 text-secondary mb-1">{% trans "Active Postings" %}</p>
+                <p class="heading4 text-blue">{{ active_postings_count }}</p>
+            </div>
+            <span class="ph ph-briefcase text-blue text-4xl"></span>
+        </div>
     </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="caption1 text-secondary mb-1">{% trans "Total Applicants" %}</p>
+                <p class="heading4 text-green">{{ total_applicants_count }}</p>
+            </div>
+            <span class="ph ph-users text-green text-4xl"></span>
+        </div>
+    </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="caption1 text-secondary mb-1">{% trans "Current Students" %}</p>
+                <p class="heading4 text-purple">{{ current_students_count }}</p>
+            </div>
+            <span class="ph ph-student text-purple text-4xl"></span>
+        </div>
+    </div>
+    <div class="p-6 rounded-lg bg-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="caption1 text-secondary mb-1">{% trans "Completed Terms" %}</p>
+                <p class="heading4 text-emerald">{{ completed_terms_count }}</p>
+            </div>
+            <span class="ph ph-check-circle text-emerald text-4xl"></span>
+        </div>
+    </div>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Active Postings -->
-        <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Active Co-op Postings" %}</h2>
-                    <a href="{% url 'hr_core:coop_postings_list' %}"
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
-                        {% trans "View All" %}
-                    </a>
-                </div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5">
+    <!-- Active Postings -->
+    <div class="lg:col-span-2">
+        <div class="p-8 rounded-lg bg-white">
+            <div class="flex items-center justify-between mb-6 pb-6 border-b border-line">
+                <h4 class="heading5">{% trans "Active Co-op Postings" %}</h4>
+                <a href="{% url 'hr_core:coop_postings_list' %}"
+                   class="caption1 text-primary hover:underline">
+                    {% trans "View All" %}
+                </a>
+            </div>
 
-                {% if active_postings %}
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for posting in active_postings %}
-                    <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <a href="{% url 'hr_core:coop_posting_detail' posting.id %}"
-                                       class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 truncate">
-                                        {{ posting.title }}
-                                    </a>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                        {% if posting.status == 'active' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                        {% elif posting.status == 'draft' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                        {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
-                                        {{ posting.get_status_display }}
-                                    </span>
-                                </div>
-                                <div class="mt-1 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        </svg>
-                                        {{ posting.location|default:"Remote" }}
-                                    </span>
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        {{ posting.term_start|date:"M Y" }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="ml-4 flex items-center gap-4">
-                                <div class="text-center">
-                                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ posting.applicants_count }}</p>
-                                    <p class="text-xs text-gray-500">{% trans "Applicants" %}</p>
-                                </div>
-                                <a href="{% url 'hr_core:coop_posting_applicants' posting.id %}"
-                                   class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
+            {% if active_postings %}
+            <div class="space-y-4">
+                {% for posting in active_postings %}
+                <div class="p-4 rounded-lg hover:bg-surface transition-colors">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'hr_core:coop_posting_detail' posting.id %}"
+                                   class="caption1 text-title font-semibold hover:text-primary truncate">
+                                    {{ posting.title }}
                                 </a>
+                                <span class="tag
+                                    {% if posting.status == 'active' %}bg-green bg-opacity-10 text-green
+                                    {% elif posting.status == 'draft' %}bg-yellow bg-opacity-10 text-yellow
+                                    {% else %}bg-grey bg-opacity-10 text-grey{% endif %}">
+                                    {{ posting.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="mt-1 flex items-center gap-4 caption1 text-secondary">
+                                <span class="flex items-center gap-1">
+                                    <span class="ph ph-map-pin"></span>
+                                    {{ posting.location|default:"Remote" }}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="ph ph-calendar"></span>
+                                    {{ posting.term_start|date:"M Y" }}
+                                </span>
                             </div>
                         </div>
+                        <div class="ml-4 flex items-center gap-4">
+                            <div class="text-center">
+                                <p class="heading6 text-title">{{ posting.applicants_count }}</p>
+                                <p class="caption2 text-secondary">{% trans "Applicants" %}</p>
+                            </div>
+                            <a href="{% url 'hr_core:coop_posting_applicants' posting.id %}"
+                               class="text-primary hover:text-opacity-80">
+                                <span class="ph ph-caret-right text-xl"></span>
+                            </a>
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="px-6 py-12 text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "No active postings" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Create a co-op posting to start receiving applications." %}</p>
-                    <div class="mt-6">
-                        <a href="{% url 'hr_core:coop_posting_create' %}"
-                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
-                            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            {% trans "Create Posting" %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <span class="ph ph-briefcase text-secondary text-6xl mb-4 inline-block"></span>
+                <h5 class="heading6 mb-1">{% trans "No active postings" %}</h5>
+                <p class="caption1 text-secondary mb-6">{% trans "Create a co-op posting to start receiving applications." %}</p>
+                <a href="{% url 'hr_core:coop_posting_create' %}"
+                   class="button-main inline-flex items-center gap-2">
+                    <span class="ph ph-plus text-lg"></span>
+                    {% trans "Create Posting" %}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Applicants -->
+    <div>
+        <div class="p-6 rounded-lg bg-white">
+            <h5 class="heading6 mb-4 pb-4 border-b border-line">{% trans "Recent Applicants" %}</h5>
+
+            {% if recent_applicants %}
+            <ul class="space-y-4">
+                {% for applicant in recent_applicants|slice:":5" %}
+                <li>
+                    <div class="flex items-center gap-3">
+                        {% if applicant.student.user.profile.avatar %}
+                        <img src="{{ applicant.student.user.profile.avatar.url }}" alt="{{ applicant.student.user.get_full_name }}"
+                             class="w-10 h-10 rounded-full object-cover">
+                        {% else %}
+                        <div class="w-10 h-10 rounded-full bg-primary bg-opacity-10 flex items-center justify-center">
+                            <span class="caption1 text-primary font-semibold">
+                                {{ applicant.student.user.get_full_name|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="flex-1 min-w-0">
+                            <p class="caption1 text-title truncate font-semibold">
+                                {{ applicant.student.user.get_full_name }}
+                            </p>
+                            <p class="caption2 text-secondary truncate">
+                                {{ applicant.student.program_name }}
+                            </p>
+                        </div>
+                        {% if applicant.student.user.trust_score %}
+                        {% include "components/trust_badge.html" with trust_score=applicant.student.user.trust_score size="sm" %}
+                        {% endif %}
+                    </div>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="caption2 text-secondary">
+                            {{ applicant.posting.title|truncatewords:3 }}
+                        </span>
+                        <a href="{% url 'hr_core:coop_applicant_detail' applicant.id %}"
+                           class="caption2 text-primary hover:underline">
+                            {% trans "View" %}
                         </a>
                     </div>
-                </div>
-                {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-center py-6">
+                <p class="caption1 text-secondary">{% trans "No applicants yet." %}</p>
             </div>
+            {% endif %}
         </div>
+    </div>
+</div>
 
-        <!-- Recent Applicants -->
-        <div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Recent Applicants" %}</h2>
-                </div>
+<!-- Current Students -->
+{% if current_students %}
+<div class="p-8 rounded-lg bg-white mt-7.5">
+    <div class="flex items-center justify-between mb-6 pb-6 border-b border-line">
+        <h4 class="heading5">{% trans "Current Students" %}</h4>
+        <a href="{% url 'hr_core:coop_current_students' %}"
+           class="caption1 text-primary hover:underline">
+            {% trans "View All" %}
+        </a>
+    </div>
 
-                {% if recent_applicants %}
-                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for applicant in recent_applicants|slice:":5" %}
-                    <li class="px-6 py-4">
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead class="bg-surface">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left caption2 text-secondary uppercase tracking-wider">
+                        {% trans "Student" %}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left caption2 text-secondary uppercase tracking-wider">
+                        {% trans "Position" %}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left caption2 text-secondary uppercase tracking-wider">
+                        {% trans "Institution" %}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left caption2 text-secondary uppercase tracking-wider">
+                        {% trans "Term End" %}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left caption2 text-secondary uppercase tracking-wider">
+                        {% trans "Status" %}
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">{% trans "Actions" %}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-line">
+                {% for term in current_students %}
+                <tr class="hover:bg-surface transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center gap-3">
-                            {% if applicant.student.user.profile.avatar %}
-                            <img src="{{ applicant.student.user.profile.avatar.url }}" alt="{{ applicant.student.user.get_full_name }}"
-                                 class="w-10 h-10 rounded-full object-cover">
+                            {% if term.student.user.profile.avatar %}
+                            <img src="{{ term.student.user.profile.avatar.url }}" alt="{{ term.student.user.get_full_name }}"
+                                 class="w-8 h-8 rounded-full object-cover">
                             {% else %}
-                            <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                                <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
-                                    {{ applicant.student.user.get_full_name|slice:":1"|upper }}
+                            <div class="w-8 h-8 rounded-full bg-primary bg-opacity-10 flex items-center justify-center">
+                                <span class="caption2 text-primary font-semibold">
+                                    {{ term.student.user.get_full_name|slice:":1"|upper }}
                                 </span>
                             </div>
                             {% endif %}
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                    {{ applicant.student.user.get_full_name }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    {{ applicant.student.program_name }}
-                                </p>
+                            <div>
+                                <p class="caption1 text-title font-semibold">{{ term.student.user.get_full_name }}</p>
+                                <p class="caption2 text-secondary">{{ term.student.user.email }}</p>
                             </div>
-                            {% if applicant.student.user.trust_score %}
-                            {% include "components/trust_badge.html" with trust_score=applicant.student.user.trust_score size="sm" %}
-                            {% endif %}
                         </div>
-                        <div class="mt-2 flex items-center justify-between">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ applicant.posting.title|truncatewords:3 }}
-                            </span>
-                            <a href="{% url 'hr_core:coop_applicant_detail' applicant.id %}"
-                               class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
-                                {% trans "View" %}
-                            </a>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="px-6 py-8 text-center">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{% trans "No applicants yet." %}</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap caption1 text-title">
+                        {{ term.job_title }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap caption1 text-secondary">
+                        {{ term.student.institution_name }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap caption1 text-secondary">
+                        {{ term.end_date|date:"M d, Y" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="tag bg-blue bg-opacity-10 text-blue">
+                            {{ term.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right caption1">
+                        <a href="{% url 'hr_core:coop_term_manage' term.id %}"
+                           class="text-primary hover:underline">
+                            {% trans "Manage" %}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <!-- Current Students -->
-    {% if current_students %}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Current Students" %}</h2>
-            <a href="{% url 'hr_core:coop_current_students' %}"
-               class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
-                {% trans "View All" %}
-            </a>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Student" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Position" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Institution" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Term End" %}
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {% trans "Status" %}
-                        </th>
-                        <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">{% trans "Actions" %}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for term in current_students %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                {% if term.student.user.profile.avatar %}
-                                <img src="{{ term.student.user.profile.avatar.url }}" alt="{{ term.student.user.get_full_name }}"
-                                     class="w-8 h-8 rounded-full object-cover">
-                                {% else %}
-                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                                    <span class="text-xs font-medium text-primary-600 dark:text-primary-400">
-                                        {{ term.student.user.get_full_name|slice:":1"|upper }}
-                                    </span>
-                                </div>
-                                {% endif %}
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ term.student.user.get_full_name }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ term.student.user.email }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                            {{ term.job_title }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {{ term.student.institution_name }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {{ term.end_date|date:"M d, Y" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                {{ term.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'hr_core:coop_term_manage' term.id %}"
-                               class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
-                                {% trans "Manage" %}
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}

@@ -1,244 +1,212 @@
-{% extends "base/dashboard_base.html" %}
+{% extends "base/freelanhub_dashboard_base.html" %}
 {% load static i18n humanize %}
-
-{% block breadcrumb %}
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><a href="{% url 'finance-frontend:dashboard' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Finance</a></li>
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><a href="{% url 'finance-frontend:escrow-list' %}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700">Escrow</a></li>
-<li><span class="text-gray-400 mx-2">/</span></li>
-<li><span class="text-gray-900 dark:text-gray-100 font-medium">#{{ escrow.id|truncatechars:8 }}</span></li>
-{% endblock %}
 
 {% block page_title %}Escrow Details{% endblock %}
 
-{% block content %}
-<!-- Tenant Type Badge -->
-{% if request.tenant %}
-    {% if request.tenant.tenant_type == 'company' %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
-            </svg>
-            {% trans "Company" %}
-        </span>
-    {% else %}
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-            </svg>
-            {% trans "Freelancer" %}
-        </span>
-    {% endif %}
-{% endif %}
-<div class="space-y-6">
-    <!-- Status Banner -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                    {% if escrow.status == 'released' %}
-                    bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
-                    {% elif escrow.status == 'dispute' %}
-                    bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
-                    {% elif escrow.status == 'funded' or escrow.status == 'service_delivered' %}
-                    bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
-                    {% else %}
-                    bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
-                    {% endif %}">
-                    {{ escrow.get_status_display }}
-                </span>
-                <span class="ml-4 text-sm text-gray-500 dark:text-gray-400">
-                    Created {{ escrow.created_at|date:"M d, Y" }}
-                </span>
-            </div>
-            <div class="text-right">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Amount</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ escrow.amount|floatformat:2|intcomma }}</p>
-            </div>
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <a href="{% url 'finance-frontend:escrow-list' %}" class="text-secondary hover:text-primary caption1">{% trans "Escrow" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">#{{ escrow.id|truncatechars:8 }}</span>
+</div>
+
+<!-- Status Banner -->
+<div class="p-6 rounded-lg bg-white mb-7.5">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <span class="tag
+                {% if escrow.status == 'released' %}bg-green bg-opacity-10 text-green
+                {% elif escrow.status == 'dispute' %}bg-red bg-opacity-10 text-red
+                {% elif escrow.status == 'funded' or escrow.status == 'service_delivered' %}bg-blue bg-opacity-10 text-blue
+                {% else %}bg-grey bg-opacity-10 text-grey{% endif %}">
+                {{ escrow.get_status_display }}
+            </span>
+            <span class="caption1 text-secondary">
+                {% trans "Created" %} {{ escrow.created_at|date:"M d, Y" }}
+            </span>
+        </div>
+        <div class="text-right">
+            <p class="caption1 text-secondary">{% trans "Amount" %}</p>
+            <p class="heading4 text-title">${{ escrow.amount|floatformat:2|intcomma }}</p>
         </div>
     </div>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Parties -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Parties</h3>
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="p-4 rounded-lg {% if is_buyer %}bg-primary-50 dark:bg-primary-900/20 border-2 border-primary-200 dark:border-primary-700{% else %}bg-gray-50 dark:bg-gray-700{% endif %}">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Buyer</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ escrow.buyer.get_full_name }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ escrow.buyer.email }}</p>
-                        {% if is_buyer %}<span class="inline-flex items-center mt-2 text-xs text-primary-600 dark:text-primary-400">(You)</span>{% endif %}
-                    </div>
-                    <div class="p-4 rounded-lg {% if is_seller %}bg-primary-50 dark:bg-primary-900/20 border-2 border-primary-200 dark:border-primary-700{% else %}bg-gray-50 dark:bg-gray-700{% endif %}">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Seller</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ escrow.seller.get_full_name }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ escrow.seller.email }}</p>
-                        {% if is_seller %}<span class="inline-flex items-center mt-2 text-xs text-primary-600 dark:text-primary-400">(You)</span>{% endif %}
-                    </div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-7.5">
+        <!-- Parties -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 mb-6">{% trans "Parties" %}</h4>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="p-4 rounded-lg {% if is_buyer %}bg-primary bg-opacity-10 border-2 border-primary{% else %}bg-surface{% endif %}">
+                    <p class="caption2 text-secondary uppercase mb-1">{% trans "Buyer" %}</p>
+                    <p class="caption1 text-title font-semibold">{{ escrow.buyer.get_full_name }}</p>
+                    <p class="caption1 text-secondary">{{ escrow.buyer.email }}</p>
+                    {% if is_buyer %}<span class="caption2 text-primary mt-2 inline-block">{% trans "(You)" %}</span>{% endif %}
+                </div>
+                <div class="p-4 rounded-lg {% if is_seller %}bg-primary bg-opacity-10 border-2 border-primary{% else %}bg-surface{% endif %}">
+                    <p class="caption2 text-secondary uppercase mb-1">{% trans "Seller" %}</p>
+                    <p class="caption1 text-title font-semibold">{{ escrow.seller.get_full_name }}</p>
+                    <p class="caption1 text-secondary">{{ escrow.seller.email }}</p>
+                    {% if is_seller %}<span class="caption2 text-primary mt-2 inline-block">{% trans "(You)" %}</span>{% endif %}
                 </div>
             </div>
+        </div>
 
-            <!-- Agreement Details -->
-            {% if escrow.agreement_details %}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Agreement Details</h3>
-                <div class="prose dark:prose-invert max-w-none">
-                    {{ escrow.agreement_details|linebreaks }}
-                </div>
+        <!-- Agreement Details -->
+        {% if escrow.agreement_details %}
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 mb-4">{% trans "Agreement Details" %}</h4>
+            <div class="caption1 text-secondary">
+                {{ escrow.agreement_details|linebreaks }}
             </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-            <!-- Timeline -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Activity Timeline</h3>
-                <div class="flow-root">
-                    <ul class="-mb-8">
-                        {% for log in audit_logs %}
-                        <li>
-                            <div class="relative pb-8">
-                                {% if not forloop.last %}
-                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true"></span>
-                                {% endif %}
-                                <div class="relative flex space-x-3">
+        <!-- Timeline -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 mb-6">{% trans "Activity Timeline" %}</h4>
+            <div class="flow-root">
+                <ul class="-mb-8">
+                    {% for log in audit_logs %}
+                    <li>
+                        <div class="relative pb-8">
+                            {% if not forloop.last %}
+                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-line" aria-hidden="true"></span>
+                            {% endif %}
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-surface flex items-center justify-center ring-8 ring-white">
+                                        <span class="ph ph-clock text-secondary"></span>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                     <div>
-                                        <span class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
-                                            <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </span>
+                                        <p class="caption1 text-title">{{ log.action|title }}</p>
+                                        {% if log.notes %}<p class="caption1 text-secondary">{{ log.notes }}</p>{% endif %}
                                     </div>
-                                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                        <div>
-                                            <p class="text-sm text-gray-900 dark:text-white">{{ log.action|title }}</p>
-                                            {% if log.notes %}<p class="text-sm text-gray-500 dark:text-gray-400">{{ log.notes }}</p>{% endif %}
-                                        </div>
-                                        <div class="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                                            {{ log.timestamp|date:"M d, H:i" }}
-                                        </div>
+                                    <div class="text-right caption1 text-secondary whitespace-nowrap">
+                                        {{ log.timestamp|date:"M d, H:i" }}
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                        {% empty %}
-                        <li class="text-sm text-gray-500 dark:text-gray-400">No activity yet</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Disputes -->
-            {% if disputes %}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Disputes</h3>
-                <div class="space-y-4">
-                    {% for dispute in disputes %}
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ dispute.reason }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Raised by {{ dispute.raised_by.get_full_name }} on {{ dispute.created_at|date:"M d, Y" }}
-                                </p>
-                            </div>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                {% if dispute.resolved %}
-                                bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
-                                {% else %}
-                                bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
-                                {% endif %}">
-                                {% if dispute.resolved %}Resolved{% else %}Open{% endif %}
-                            </span>
                         </div>
-                        {% if dispute.details %}
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ dispute.details }}</p>
-                        {% endif %}
-                    </div>
+                    </li>
+                    {% empty %}
+                    <li class="caption1 text-secondary">{% trans "No activity yet" %}</li>
                     {% endfor %}
-                </div>
+                </ul>
             </div>
-            {% endif %}
         </div>
 
-        <!-- Actions Sidebar -->
-        <div class="space-y-6">
-            <!-- Actions Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Actions</h3>
-                <div class="space-y-3">
-                    {% if is_buyer and escrow.status == 'initialized' %}
-                    <button hx-post="{% url 'finance-frontend:escrow-fund' pk=escrow.pk %}"
-                            hx-confirm="Fund this escrow with ${{ escrow.amount }}?"
-                            class="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
-                        Fund Escrow
-                    </button>
-                    {% endif %}
-
-                    {% if is_seller and escrow.status == 'funded' %}
-                    <button hx-post="{% url 'finance-frontend:escrow-deliver' pk=escrow.pk %}"
-                            hx-confirm="Mark service as delivered?"
-                            class="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">
-                        Mark as Delivered
-                    </button>
-                    {% endif %}
-
-                    {% if is_buyer and escrow.status == 'service_delivered' %}
-                    <button hx-post="{% url 'finance-frontend:escrow-release' pk=escrow.pk %}"
-                            hx-confirm="Release funds to seller? This action cannot be undone."
-                            class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium text-sm">
-                        Release Funds
-                    </button>
-                    {% endif %}
-
-                    {% if escrow.status in 'funded,service_delivered' %}
-                    <button hx-get="{% url 'finance-frontend:escrow-dispute-form' pk=escrow.pk %}"
-                            hx-target="#modal-container"
-                            hx-swap="innerHTML"
-                            class="w-full px-4 py-2 border border-red-300 text-red-700 dark:border-red-600 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 font-medium text-sm">
-                        Raise Dispute
-                    </button>
-                    {% endif %}
-
-                    {% if is_buyer and escrow.status == 'initialized' %}
-                    <button hx-post="{% url 'finance-frontend:escrow-cancel' pk=escrow.pk %}"
-                            hx-confirm="Cancel this escrow?"
-                            class="w-full px-4 py-2 border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm">
-                        Cancel Escrow
-                    </button>
+        <!-- Disputes -->
+        {% if disputes %}
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 mb-6">{% trans "Disputes" %}</h4>
+            <div class="space-y-4">
+                {% for dispute in disputes %}
+                <div class="border border-line rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="caption1 text-title font-semibold">{{ dispute.reason }}</p>
+                            <p class="caption1 text-secondary">
+                                {% trans "Raised by" %} {{ dispute.raised_by.get_full_name }} {% trans "on" %} {{ dispute.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <span class="tag {% if dispute.resolved %}bg-green bg-opacity-10 text-green{% else %}bg-yellow bg-opacity-10 text-yellow{% endif %}">
+                            {% if dispute.resolved %}{% trans "Resolved" %}{% else %}{% trans "Open" %}{% endif %}
+                        </span>
+                    </div>
+                    {% if dispute.details %}
+                    <p class="mt-2 caption1 text-secondary">{{ dispute.details }}</p>
                     {% endif %}
                 </div>
+                {% endfor %}
             </div>
+        </div>
+        {% endif %}
+    </div>
 
-            <!-- Key Dates -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Key Dates</h3>
-                <dl class="space-y-3">
-                    <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">Created</dt>
-                        <dd class="text-sm text-gray-900 dark:text-white">{{ escrow.created_at|date:"M d, Y" }}</dd>
-                    </div>
-                    {% if escrow.funded_at %}
-                    <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">Funded</dt>
-                        <dd class="text-sm text-gray-900 dark:text-white">{{ escrow.funded_at|date:"M d, Y" }}</dd>
-                    </div>
-                    {% endif %}
-                    {% if escrow.service_delivered_at %}
-                    <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">Delivered</dt>
-                        <dd class="text-sm text-gray-900 dark:text-white">{{ escrow.service_delivered_at|date:"M d, Y" }}</dd>
-                    </div>
-                    {% endif %}
-                    {% if escrow.released_at %}
-                    <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">Released</dt>
-                        <dd class="text-sm text-gray-900 dark:text-white">{{ escrow.released_at|date:"M d, Y" }}</dd>
-                    </div>
-                    {% endif %}
-                </dl>
+    <!-- Actions Sidebar -->
+    <div class="space-y-7.5">
+        <!-- Actions Card -->
+        <div class="p-6 rounded-lg bg-white">
+            <h4 class="heading6 mb-4">{% trans "Actions" %}</h4>
+            <div class="space-y-3">
+                {% if is_buyer and escrow.status == 'initialized' %}
+                <button hx-post="{% url 'finance-frontend:escrow-fund' pk=escrow.pk %}"
+                        hx-confirm="{% trans 'Fund this escrow with' %} ${{ escrow.amount }}?"
+                        class="button-main w-full">
+                    {% trans "Fund Escrow" %}
+                </button>
+                {% endif %}
+
+                {% if is_seller and escrow.status == 'funded' %}
+                <button hx-post="{% url 'finance-frontend:escrow-deliver' pk=escrow.pk %}"
+                        hx-confirm="{% trans 'Mark service as delivered?' %}"
+                        class="button-main w-full">
+                    {% trans "Mark as Delivered" %}
+                </button>
+                {% endif %}
+
+                {% if is_buyer and escrow.status == 'service_delivered' %}
+                <button hx-post="{% url 'finance-frontend:escrow-release' pk=escrow.pk %}"
+                        hx-confirm="{% trans 'Release funds to seller? This action cannot be undone.' %}"
+                        class="button-main w-full bg-green">
+                    {% trans "Release Funds" %}
+                </button>
+                {% endif %}
+
+                {% if escrow.status in 'funded,service_delivered' %}
+                <button hx-get="{% url 'finance-frontend:escrow-dispute-form' pk=escrow.pk %}"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML"
+                        class="button-main -border w-full border-red text-red">
+                    {% trans "Raise Dispute" %}
+                </button>
+                {% endif %}
+
+                {% if is_buyer and escrow.status == 'initialized' %}
+                <button hx-post="{% url 'finance-frontend:escrow-cancel' pk=escrow.pk %}"
+                        hx-confirm="{% trans 'Cancel this escrow?' %}"
+                        class="button-main -border w-full">
+                    {% trans "Cancel Escrow" %}
+                </button>
+                {% endif %}
             </div>
+        </div>
+
+        <!-- Key Dates -->
+        <div class="p-6 rounded-lg bg-white">
+            <h4 class="heading6 mb-4">{% trans "Key Dates" %}</h4>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="caption1 text-secondary">{% trans "Created" %}</dt>
+                    <dd class="caption1 text-title">{{ escrow.created_at|date:"M d, Y" }}</dd>
+                </div>
+                {% if escrow.funded_at %}
+                <div class="flex justify-between">
+                    <dt class="caption1 text-secondary">{% trans "Funded" %}</dt>
+                    <dd class="caption1 text-title">{{ escrow.funded_at|date:"M d, Y" }}</dd>
+                </div>
+                {% endif %}
+                {% if escrow.service_delivered_at %}
+                <div class="flex justify-between">
+                    <dt class="caption1 text-secondary">{% trans "Delivered" %}</dt>
+                    <dd class="caption1 text-title">{{ escrow.service_delivered_at|date:"M d, Y" }}</dd>
+                </div>
+                {% endif %}
+                {% if escrow.released_at %}
+                <div class="flex justify-between">
+                    <dt class="caption1 text-secondary">{% trans "Released" %}</dt>
+                    <dd class="caption1 text-title">{{ escrow.released_at|date:"M d, Y" }}</dd>
+                </div>
+                {% endif %}
+            </dl>
         </div>
     </div>
 </div>
