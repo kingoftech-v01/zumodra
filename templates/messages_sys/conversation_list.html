@@ -39,7 +39,7 @@
                 <div class="zu-card__header">
                     <ul class="nav nav-tabs card-header-tabs">
                         <li class="nav-item">
-                            <a class="nav-link {% if not filter %}active{% endif %} dark:text-gray-300" href="{% url 'messages_sys:conversations' %}">
+                            <a class="nav-link {% if not filter %}active{% endif %} dark:text-gray-300" href="{% url 'frontend:messages:conversations' %}">
                                 All <span class="badge bg-secondary">{{ total_count }}</span>
                             </a>
                         </li>
@@ -57,7 +57,7 @@
                 </div>
                 <div class="list-group list-group-flush">
                     {% for conversation in conversations %}
-                    <a href="{% url 'messages_sys:chat' conversation.uuid %}" class="list-group-item list-group-item-action dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">
+                    <a href="{% url 'frontend:messages:chat' conversation.uuid %}" class="list-group-item list-group-item-action dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">
                         <div class="d-flex w-100 justify-content-between align-items-start">
                             <div class="d-flex align-items-center">
                                 {% if conversation.unread_count %}
@@ -130,7 +130,7 @@
                 <h5 class="zu-modal__title text-gray-900 dark:text-white">New Conversation</h5>
                 <button type="button" class="btn-close dark:invert" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'messages_sys:new_conversation' %}">
+            <form method="post" action="{% url 'frontend:messages:new_conversation' %}">
                 {% csrf_token %}
                 <div class="zu-modal__body">
                     <div class="zu-form-group mb-3">

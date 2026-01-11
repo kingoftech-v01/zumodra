@@ -9,6 +9,7 @@ This module provides URL routing for the HTMX-powered frontend views:
 - Analytics (dashboards, charts, reports)
 - Notifications (list, actions, preferences)
 - Accounts (verification, trust score, profile)
+- Messages (real-time messaging, conversations)
 
 All routes are prefixed with 'app/' in the main URL configuration.
 """
@@ -45,4 +46,8 @@ urlpatterns = [
     # Accounts Views (Verification, Trust Score, Profile)
     # URL: /app/accounts/
     path('accounts/', include('accounts.urls_frontend')),
+
+    # Messages Views (Real-time Messaging)
+    # URL: /app/messages/
+    path('messages/', include('messages_sys.urls_frontend')),
 ]
