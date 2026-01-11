@@ -1,353 +1,462 @@
-{% extends "base/public_base.html" %}
+{% extends "base/freelanhub_base.html" %}
 {% load static i18n humanize %}
 
-{% block title %}{{ service.name }} - Zumodra{% endblock %}
+{% block title %}{{ service.name }} - FreelanHub{% endblock %}
 
-{% block meta_description %}{{ service.short_description|default:service.description|truncatewords:25 }}{% endblock %}
+{% block meta_description %}{{ service.description|truncatewords:30 }}{% endblock %}
 
 {% block content %}
-<div class="zu-page-bg min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Breadcrumb -->
-        <nav class="zu-breadcrumb mb-6" aria-label="Breadcrumb">
-            <ol class="zu-breadcrumb__list">
-                <li class="zu-breadcrumb__item">
-                    <a href="{% url 'browse_services' %}" class="zu-breadcrumb__link">
-                        {% trans "Services" %}
-                    </a>
-                </li>
-                {% if service.category %}
-                <li class="zu-breadcrumb__item">
-                    <svg class="zu-icon zu-icon--sm zu-icon--muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <a href="{% url 'browse_services' %}?category={{ service.category.id }}" class="zu-breadcrumb__link">
-                        {{ service.category.name }}
-                    </a>
-                </li>
-                {% endif %}
-                <li class="zu-breadcrumb__item">
-                    <svg class="zu-icon zu-icon--sm zu-icon--muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <span class="zu-breadcrumb__current">{{ service.name|truncatewords:5 }}</span>
-                </li>
-            </ol>
-        </nav>
 
-        <div class="lg:grid lg:grid-cols-3 lg:gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2">
-                <!-- Service Header -->
-                <div class="zu-card mb-6">
-                    <!-- Main Image -->
-                    <div class="zu-card__image-container zu-card__image-container--hero">
-                        {% if service.thumbnail %}
-                        <img src="{{ service.thumbnail.url }}"
-                             alt="{{ service.name }}"
-                             class="zu-card__image"
-                             loading="lazy">
-                        {% else %}
-                        <div class="zu-card__image-placeholder">
-                            <svg class="zu-icon zu-icon--xxl zu-icon--muted" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Image Gallery -->
-                    {% if service.images.exists %}
-                    <div class="zu-card__gallery">
-                        {% for image in service.images.all %}
-                        <button type="button" class="zu-card__gallery-item">
-                            <img src="{{ image.image.url }}"
-                                 alt="{{ image.alt_text }}"
-                                 class="zu-card__gallery-image"
-                                 loading="lazy">
-                        </button>
-                        {% endfor %}
-                    </div>
+<!-- Service Header -->
+<section class="service_header bg-surface lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <div class="flex max-sm:flex-col items-center justify-between gap-5">
+            <div class="text flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                    {% if service.category %}
+                    <a href="{% url 'services:service_list' %}?category={{ service.category.id }}" class="tag caption2 bg-white hover:bg-primary hover:text-white">{{ service.category.name }}</a>
                     {% endif %}
-
-                    <!-- Service Info -->
-                    <div class="zu-card__body">
-                        <!-- Title & Actions -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                {% if service.is_featured %}
-                                <span class="zu-badge zu-badge--warning mb-2">
-                                    {% trans "Featured" %}
-                                </span>
-                                {% endif %}
-                                <h1 class="zu-heading zu-heading--xl">
-                                    {{ service.name }}
-                                </h1>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                {% if user.is_authenticated %}
-                                <button type="button"
-                                        hx-post="{% url 'like_service' service.uuid %}"
-                                        hx-swap="outerHTML"
-                                        class="zu-btn zu-btn--icon {% if user_has_liked %}zu-btn--icon-active{% endif %}"
-                                        aria-label="{% trans 'Like service' %}">
-                                    <svg class="zu-icon" width="24" height="24" viewBox="0 0 24 24" fill="{% if user_has_liked %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                    </svg>
-                                </button>
-                                {% endif %}
-                                <button type="button"
-                                        onclick="navigator.share({title: '{{ service.name }}', url: window.location.href})"
-                                        class="zu-btn zu-btn--icon"
-                                        aria-label="{% trans 'Share service' %}">
-                                    <svg class="zu-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="18" cy="5" r="3"></circle>
-                                        <circle cx="6" cy="12" r="3"></circle>
-                                        <circle cx="18" cy="19" r="3"></circle>
-                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Rating & Stats -->
-                        <div class="zu-stats-row mb-6">
-                            <div class="zu-rating zu-rating--lg">
-                                {% for i in "12345" %}
-                                <svg class="zu-icon zu-icon--star {% if forloop.counter <= avg_rating %}zu-icon--star-filled{% endif %}" width="20" height="20" viewBox="0 0 24 24" fill="{% if forloop.counter <= avg_rating %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                                {% endfor %}
-                                <span class="zu-rating__value zu-rating__value--lg">{{ avg_rating }}</span>
-                                <span class="zu-rating__count">({{ comments.count }} {% trans "reviews" %})</span>
-                            </div>
-                            <span class="zu-divider zu-divider--vertical"></span>
-                            <span class="zu-text zu-text--muted">
-                                {{ service.order_count }} {% trans "orders" %}
-                            </span>
-                        </div>
-
-                        <!-- Tags -->
-                        {% if service.tags.exists %}
-                        <div class="flex flex-wrap gap-2 mb-6">
-                            {% for tag in service.tags.all %}
-                            <a href="{% url 'browse_services' %}?tag={{ tag.name }}" class="zu-badge zu-badge--muted zu-badge--clickable">
-                                {{ tag.name }}
-                            </a>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
+                    {% if service.provider.is_verified %}
+                    <span class="flex items-center gap-1 caption2">
+                        <span class="ph-fill ph-check-circle text-success"></span>
+                        <span>{% trans "Verified" %}</span>
+                    </span>
+                    {% endif %}
                 </div>
-
-                <!-- Description -->
-                <div class="zu-card mb-6">
-                    <div class="zu-card__header">
-                        <h2 class="zu-card__title">{% trans "About This Service" %}</h2>
+                <h3 class="heading3">{{ service.name }}</h3>
+                <div class="flex items-center gap-3">
+                    <div class="rate flex items-center gap-1">
+                        <span class="ph-fill ph-star text-yellow text-xl"></span>
+                        <strong class="heading6">{{ service.provider.rating_avg|default:"5.0"|floatformat:1 }}</strong>
+                        <span class="body2 text-secondary">({{ service.provider.total_reviews|default:0 }})</span>
                     </div>
-                    <div class="zu-card__body">
-                        <div class="zu-prose">
-                            {{ service.description|linebreaks }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reviews Section -->
-                <div class="zu-card">
-                    <div class="zu-card__header">
-                        <h2 class="zu-card__title">{% trans "Reviews" %} ({{ comments.count }})</h2>
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'add_review' service.uuid %}" class="zu-btn zu-btn--outline zu-btn--sm">
-                            {% trans "Write a Review" %}
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <!-- Reviews List -->
-                    <div class="zu-card__body zu-list">
-                        {% for comment in comments %}
-                        <div class="zu-list__item">
-                            <div class="flex items-start gap-4">
-                                <div class="zu-avatar zu-avatar--md">
-                                    <span class="zu-avatar__initials">
-                                        {{ comment.reviewer.get_full_name|slice:":1"|upper|default:comment.reviewer.email|slice:":1"|upper }}
-                                    </span>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h4 class="zu-text zu-text--strong">
-                                            {{ comment.reviewer.get_full_name|default:comment.reviewer.email }}
-                                        </h4>
-                                        <span class="zu-text zu-text--xs zu-text--muted">
-                                            {{ comment.created_at|timesince }} {% trans "ago" %}
-                                        </span>
-                                    </div>
-                                    <div class="zu-rating zu-rating--sm mb-2">
-                                        {% for i in "12345" %}
-                                        <svg class="zu-icon zu-icon--star {% if forloop.counter <= comment.rating %}zu-icon--star-filled{% endif %}" width="16" height="16" viewBox="0 0 24 24" fill="{% if forloop.counter <= comment.rating %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.5">
-                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                        </svg>
-                                        {% endfor %}
-                                    </div>
-                                    <p class="zu-text">
-                                        {{ comment.content }}
-                                    </p>
-
-                                    {% if comment.provider_response %}
-                                    <div class="zu-reply mt-4">
-                                        <p class="zu-text zu-text--strong mb-1">
-                                            {% trans "Response from provider" %}
-                                        </p>
-                                        <p class="zu-text zu-text--sm">
-                                            {{ comment.provider_response }}
-                                        </p>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="zu-empty-state zu-empty-state--compact">
-                            <svg class="zu-empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <p class="zu-empty-state__description">
-                                {% trans "No reviews yet. Be the first to review!" %}
-                            </p>
-                        </div>
-                        {% endfor %}
-                    </div>
+                    <span class="body2 text-secondary">|</span>
+                    <span class="body2 text-secondary">{% trans "Orders:" %} {{ service.total_orders|default:0 }}</span>
                 </div>
             </div>
-
-            <!-- Sidebar -->
-            <div class="mt-8 lg:mt-0">
-                <div class="sticky top-24 space-y-6">
-                    <!-- Pricing Card -->
-                    <div class="zu-card">
-                        <div class="zu-card__body">
-                            <div class="mb-6">
-                                <span class="zu-text zu-text--sm zu-text--muted">{% trans "Starting at" %}</span>
-                                <p class="zu-price zu-price--xl">
-                                    ${{ service.price|intcomma }}
-                                    {% if service.service_type == 'hourly' %}
-                                    <span class="zu-price__suffix">/{% trans "hr" %}</span>
-                                    {% endif %}
-                                </p>
-                            </div>
-
-                            <!-- Service Details -->
-                            <div class="zu-detail-list mb-6">
-                                {% if service.duration_days %}
-                                <div class="zu-detail-list__item">
-                                    <span class="zu-detail-list__label">{% trans "Delivery Time" %}</span>
-                                    <span class="zu-detail-list__value">{{ service.duration_days }} {% trans "days" %}</span>
-                                </div>
-                                {% endif %}
-                                {% if service.revisions_included %}
-                                <div class="zu-detail-list__item">
-                                    <span class="zu-detail-list__label">{% trans "Revisions" %}</span>
-                                    <span class="zu-detail-list__value">{{ service.revisions_included }}</span>
-                                </div>
-                                {% endif %}
-                                <div class="zu-detail-list__item">
-                                    <span class="zu-detail-list__label">{% trans "Delivery Type" %}</span>
-                                    <span class="zu-detail-list__value">{{ service.get_delivery_type_display }}</span>
-                                </div>
-                            </div>
-
-                            <!-- CTA Buttons -->
-                            <div class="space-y-3">
-                                <a href="#" class="zu-btn zu-btn--primary zu-btn--full zu-btn--lg">
-                                    {% trans "Continue" %}
-                                </a>
-                                <a href="#" class="zu-btn zu-btn--outline zu-btn--full zu-btn--lg">
-                                    {% trans "Contact Seller" %}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Provider Card -->
-                    <div class="zu-card">
-                        <div class="zu-card__body">
-                            <div class="flex items-center gap-4 mb-4">
-                                {% if service.provider.avatar %}
-                                <img src="{{ service.provider.avatar.url }}"
-                                     alt="{{ service.provider.display_name }}"
-                                     class="zu-avatar zu-avatar--lg">
-                                {% else %}
-                                <div class="zu-avatar zu-avatar--lg">
-                                    <span class="zu-avatar__initials">
-                                        {{ service.provider.display_name|slice:":1"|upper }}
-                                    </span>
-                                </div>
-                                {% endif %}
-                                <div>
-                                    <a href="{% url 'provider_profile' service.provider.uuid %}" class="zu-link zu-link--strong">
-                                        {{ service.provider.display_name }}
-                                        {% if service.provider.is_verified %}
-                                        <svg class="zu-icon zu-icon--verified inline ml-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm4.707-12.707a1 1 0 00-1.414-1.414L10 13.172l-2.293-2.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                                        </svg>
-                                        {% endif %}
-                                    </a>
-                                    <p class="zu-text zu-text--sm zu-text--muted">{{ service.provider.tagline }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Provider Stats -->
-                            <div class="zu-stats-grid zu-stats-grid--3 mb-4">
-                                <div class="zu-stat zu-stat--compact">
-                                    <p class="zu-stat__value">{{ service.provider.rating_avg|floatformat:1 }}</p>
-                                    <p class="zu-stat__label">{% trans "Rating" %}</p>
-                                </div>
-                                <div class="zu-stat zu-stat--compact">
-                                    <p class="zu-stat__value">{{ service.provider.completed_jobs_count }}</p>
-                                    <p class="zu-stat__label">{% trans "Jobs" %}</p>
-                                </div>
-                                <div class="zu-stat zu-stat--compact">
-                                    <p class="zu-stat__value">{{ service.provider.response_rate }}%</p>
-                                    <p class="zu-stat__label">{% trans "Response" %}</p>
-                                </div>
-                            </div>
-
-                            <a href="{% url 'provider_profile' service.provider.uuid %}" class="zu-btn zu-btn--secondary zu-btn--full">
-                                {% trans "View Profile" %}
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Related Services -->
-                    {% if related_services %}
-                    <div class="zu-card">
-                        <div class="zu-card__header">
-                            <h3 class="zu-card__title">{% trans "Related Services" %}</h3>
-                        </div>
-                        <div class="zu-card__body zu-list zu-list--compact">
-                            {% for related in related_services %}
-                            <a href="{% url 'service_detail' related.uuid %}" class="zu-list__item zu-list__item--clickable">
-                                <div class="zu-thumbnail zu-thumbnail--sm">
-                                    {% if related.thumbnail %}
-                                    <img src="{{ related.thumbnail.url }}" alt="{{ related.name }}" class="zu-thumbnail__image">
-                                    {% endif %}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="zu-text zu-text--truncate">
-                                        {{ related.name }}
-                                    </p>
-                                    <p class="zu-text zu-text--sm zu-text--muted">${{ related.price|intcomma }}</p>
-                                </div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
+            <div class="price flex flex-col items-end gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="body2 text-secondary">{% trans "From:" %}</span>
+                    <h5 class="heading5">${{ service.price|intcomma }}</h5>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Service Detail -->
+<section class="services_detail lg:py-20 sm:py-14 py-10">
+    <div class="container flex max-lg:flex-col gap-y-10">
+
+        <!-- Main Content -->
+        <div class="services_content w-full overflow-hidden lg:pr-15">
+
+            <!-- Service Images -->
+            {% if service.images.all %}
+            <div class="images overflow-hidden w-full">
+                <div class="swiper swiper-thumb-images section-swiper-navigation rounded-xl">
+                    <button class="custom-button-prev -border lg:left-6 left-4">
+                        <span class="ph-bold ph-arrow-left text-xl"></span>
+                    </button>
+                    <div class="swiper-wrapper">
+                        {% for image in service.images.all %}
+                        <div class="swiper-slide">
+                            <img src="{{ image.image.url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="custom-button-next -border lg:right-6 right-4">
+                        <span class="ph-bold ph-arrow-right text-xl"></span>
+                    </button>
+                </div>
+                {% if service.images.count > 1 %}
+                <div thumbsSlider="" class="swiper swiper-list-images mt-4">
+                    <div class="swiper-wrapper">
+                        {% for image in service.images.all %}
+                        <div class="swiper-slide overflow-hidden rounded-lg">
+                            <img src="{{ image.image.url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% elif service.thumbnail %}
+            <div class="images overflow-hidden w-full rounded-xl">
+                <img src="{{ service.thumbnail.url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+            </div>
+            {% endif %}
+
+            <!-- About Service -->
+            <div class="description md:mt-10 mt-7">
+                <h6 class="heading6">{% trans "About service" %}</h6>
+                <div class="flex flex-col gap-3 mt-3">
+                    {{ service.description|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Service Features -->
+            {% if service.features %}
+            <div class="services md:mt-10 mt-7">
+                <h6 class="heading6">{% trans "What's included:" %}</h6>
+                <ul class="list_services w-full mt-3">
+                    {% for feature in service.features.splitlines %}
+                    <li class="flex body2 text-secondary">
+                        <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                        <p>{{ feature }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Tags -->
+            {% if service.tags.all %}
+            <div class="tags md:mt-10 mt-7">
+                <h6 class="heading6">{% trans "Tags:" %}</h6>
+                <ul class="list_tags flex flex-wrap gap-3 gap-y-5 mt-4">
+                    {% for tag in service.tags.all %}
+                    <li>
+                        <a href="{% url 'services:service_list' %}?tag={{ tag.slug }}" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white">{{ tag.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Provider Info -->
+            <div class="about md:mt-15 mt-8">
+                <div class="introduce">
+                    <h5 class="heading5">{% trans "About the provider" %}</h5>
+                    <div class="flex flex-wrap gap-5 items-center justify-between mt-4">
+                        <a href="{% url 'services:provider_profile' service.provider.uuid %}" class="info flex items-center gap-5">
+                            {% if service.provider.avatar %}
+                            <img src="{{ service.provider.avatar.url }}" alt="{{ service.provider.display_name }}" class="flex-shrink-0 w-[100px] h-[100px] rounded-lg" />
+                            {% else %}
+                            <div class="flex-shrink-0 w-[100px] h-[100px] rounded-lg bg-primary flex items-center justify-center text-white text-4xl font-bold">
+                                {{ service.provider.display_name|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex flex-col gap-2">
+                                {% if service.provider.is_available %}
+                                <span class="tag w-fit caption1 bg-background text-success">{% trans "Available now" %}</span>
+                                {% endif %}
+                                <div class="flex items-center gap-2">
+                                    <strong class="heading6 duration-300 hover:text-primary">{{ service.provider.display_name }}</strong>
+                                    {% if service.provider.is_verified %}
+                                    <span class="ph-fill ph-crown-simple text-primary text-2xl"></span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                    <span class="address -style-1 caption1 text-secondary">{{ service.provider.location|default:"Remote" }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="group_btn flex flex-col gap-3">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'messages:start_conversation' service.provider.uuid %}" class="button-main whitespace-nowrap">{% trans "Contact me" %}</a>
+                            {% else %}
+                            <a href="{% url 'account_login' %}?next={{ request.path }}" class="button-main whitespace-nowrap">{% trans "Contact me" %}</a>
+                            {% endif %}
+                            <a href="{% url 'services:provider_profile' service.provider.uuid %}" class="button-main -border whitespace-nowrap">{% trans "View Profile" %}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio -->
+                {% if service.provider.portfolio_images.all %}
+                <div class="portfolio md:mt-10 mt-7">
+                    <h6 class="heading6">{% trans "Portfolio" %}</h6>
+                    <ul class="list_portfolio grid sm:grid-cols-3 grid-cols-2 gap-5 mt-4">
+                        {% for portfolio_item in service.provider.portfolio_images.all|slice:":4" %}
+                        <li class="overflow-hidden rounded-lg">
+                            <img src="{{ portfolio_item.image.url }}" alt="{{ portfolio_item.title }}" class="w-full h-full object-cover" />
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Reviews -->
+            <div class="review md:mt-15 mt-8">
+                <div class="heading flex flex-wrap items-center justify-between gap-4">
+                    <h5 class="heading5">{% trans "Customer Review" %}</h5>
+                    {% if user.is_authenticated %}
+                    <a href="#form-review" class="button-main -border">{% trans "Write Reviews" %}</a>
+                    {% endif %}
+                </div>
+
+                <!-- Rating Summary -->
+                <div class="rating_area flex max-sm:flex-col justify-between gap-y-3 py-6">
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <h1 class="heading1 avg_rating">{{ service.provider.rating_avg|default:"5.0"|floatformat:1 }}</h1>
+                        <div class="flex flex-col items-center gap-2">
+                            <ul class="rate flex">
+                                {% with rating=service.provider.rating_avg|default:5.0|floatformat:0|add:"0" %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                    <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                    {% else %}
+                                    <li class="ph-fill ph-star text-2xl text-line"></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% endwith %}
+                            </ul>
+                            <span class="total_rating caption1">({{ service.provider.total_reviews|default:0 }} {% trans "Ratings" %})</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review List -->
+                <div class="list_review flex flex-col items-center gap-10 md:pt-10 pt-7 border-t border-line">
+                    <ul class="list flex flex-col gap-6 w-full">
+                        {% for review in service.reviews.all|slice:":5" %}
+                        <li class="review_item flex gap-5">
+                            {% if review.user.avatar %}
+                            <img src="{{ review.user.avatar.url }}" alt="{{ review.user.get_full_name }}" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                            {% else %}
+                            <div class="user_avatar w-15 h-15 flex-shrink-0 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl">
+                                {{ review.user.get_full_name|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="review_content w-full">
+                                <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                    <div class="user_info">
+                                        <div class="flex items-center gap-2">
+                                            <span class="name heading6">{{ review.user.get_full_name }}</span>
+                                            {% if review.user.is_verified %}
+                                            <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                            {% endif %}
+                                        </div>
+                                        <span class="date caption1 text-secondary">{{ review.created_at|date:"F d, Y" }}</span>
+                                        <ul class="review_rate flex mt-1">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                <li class="ph-fill ph-star text-yellow"></li>
+                                                {% else %}
+                                                <li class="ph-fill ph-star text-line"></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <p class="desc mt-4">{{ review.comment }}</p>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-center py-10">
+                            <span class="ph ph-chat-circle-dots text-8xl text-placehover"></span>
+                            <p class="body2 text-secondary mt-4">{% trans "No reviews yet. Be the first to review this service!" %}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% if service.reviews.count > 5 %}
+                    <a href="{% url 'services:service_reviews' service.uuid %}" class="text-button underline duration-300 hover:text-primary">
+                        {% trans "See more reviews" %} ({{ service.reviews.count|add:"-5" }})
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Review Form -->
+                {% if user.is_authenticated %}
+                <div id="form-review" class="form-review md:pt-10 pt-7">
+                    <h6 class="heading6">{% trans "Leave A Review" %}</h6>
+                    <form method="post" action="{% url 'services:add_review' service.uuid %}" class="form grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
+                        {% csrf_token %}
+                        <div class="col-span-full message">
+                            <label for="comment">{% trans "Review" %}*</label>
+                            <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="comment" name="comment" rows="3" placeholder="{% trans 'Write your review' %}" required></textarea>
+                        </div>
+                        <div class="user_rating flex items-center gap-3 col-span-full">
+                            <span>{% trans "Your Rating:" %}*</span>
+                            <ul class="list_rate flex gap-1">
+                                <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="1"></li>
+                                <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="2"></li>
+                                <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="3"></li>
+                                <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="4"></li>
+                                <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="5"></li>
+                            </ul>
+                            <input type="hidden" name="rating" id="rating-value" value="5" required />
+                        </div>
+                        <div class="col-span-full">
+                            <button type="submit" class="button-main">{% trans "Post Review" %}</button>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="text-center py-10">
+                    <p class="body2 text-secondary">
+                        <a href="{% url 'account_login' %}?next={{ request.path }}" class="text-primary underline">{% trans "Sign in" %}</a>
+                        {% trans "to leave a review" %}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pricing Sidebar -->
+        <div class="pricing_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit rounded-xl overflow-hidden bg-white shadow-md duration-300">
+            {% if service.pricing_tiers.all %}
+            <!-- Tabs for Multiple Tiers -->
+            <div class="menu_tab w-full max-w-none">
+                <ul class="menu grid grid-cols-{{ service.pricing_tiers.count }} w-full border-b border-line" role="tablist">
+                    <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
+                    {% for tier in service.pricing_tiers.all %}
+                    <li class="tab_item" role="presentation">
+                        <button class="tab_btn -before -bg flex flex-col items-center gap-1 w-full py-[13px] duration-300 hover:bg-background {% if forloop.first %}active{% endif %}"
+                                id="pricing_tab{{ forloop.counter }}" role="tab" aria-controls="pricing_{{ forloop.counter }}"
+                                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                            <span class="caption1 text-secondary">{{ tier.name }}</span>
+                            <strong class="heading6">${{ tier.price|intcomma }}</strong>
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Tab Content -->
+            {% for tier in service.pricing_tiers.all %}
+            <div id="pricing_{{ forloop.counter }}" class="tab_list p-6 {% if forloop.first %}active{% endif %}"
+                 role="tabpanel" aria-labelledby="pricing_tab{{ forloop.counter }}"
+                 aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+                <h6 class="heading6">{{ tier.name }}</h6>
+                <ul class="list flex flex-col gap-3 w-full py-5 border-b border-line">
+                    <li class="flex items-center justify-between">
+                        <span>{% trans "Delivery time" %}</span>
+                        <strong class="text-title">{{ tier.delivery_days }} {% trans "days" %}</strong>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <span>{% trans "Revisions" %}</span>
+                        <strong class="text-title">{{ tier.revisions|default:"Unlimited" }}</strong>
+                    </li>
+                </ul>
+                <ul class="desc flex flex-col gap-3 w-full py-5 border-b border-line">
+                    {% for feature in tier.features.splitlines %}
+                    <li class="flex items-start gap-2">
+                        <span class="ph-bold ph-check flex-shrink-0 text-lg text-primary"></span>
+                        <span>{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="button-block flex flex-col gap-3 mt-6">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'services:order_service' service.uuid %}?tier={{ tier.id }}" class="button-main w-full text-center">{% trans "Order Now" %}</a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}?next={% url 'services:order_service' service.uuid %}?tier={{ tier.id }}" class="button-main w-full text-center">{% trans "Order Now" %}</a>
+                    {% endif %}
+                    <button class="add_wishlist_btn button-main -border w-full text-center gap-2">
+                        <span class="ph ph-heart text-xl"></span>
+                        <span class="ph-fill ph-heart text-xl"></span>
+                        <span>{% trans "Add to Wishlist" %}</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <!-- Single Price -->
+            <div class="p-6">
+                <h6 class="heading6">{% trans "Service Package" %}</h6>
+                <div class="price_info py-5 border-b border-line">
+                    <div class="flex items-center justify-between">
+                        <span class="heading5">${{ service.price|intcomma }}</span>
+                    </div>
+                </div>
+                <div class="button-block flex flex-col gap-3 mt-6">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'services:order_service' service.uuid %}" class="button-main w-full text-center">{% trans "Order Now" %}</a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}?next={% url 'services:order_service' service.uuid %}" class="button-main w-full text-center">{% trans "Order Now" %}</a>
+                    {% endif %}
+                    <button class="add_wishlist_btn button-main -border w-full text-center gap-2">
+                        <span class="ph ph-heart text-xl"></span>
+                        <span class="ph-fill ph-heart text-xl"></span>
+                        <span>{% trans "Add to Wishlist" %}</span>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+<!-- Related Services -->
+{% if related_services %}
+<section class="related_services lg:py-20 sm:py-14 py-10 bg-surface">
+    <div class="container">
+        <h5 class="heading5">{% trans "Related Services" %}</h5>
+        <ul class="list_services grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 gap-5 w-full mt-7">
+            {% for related in related_services|slice:":4" %}
+            <li class="item h-full">
+                <div class="service_item overflow-hidden relative rounded-lg h-full bg-white shadow-md duration-300 hover:shadow-xl">
+                    <a href="{% url 'services:service_detail' related.uuid %}" class="service_thumb">
+                        {% if related.thumbnail %}
+                        <img src="{{ related.thumbnail.url }}" alt="{{ related.name }}" class="w-full" />
+                        {% else %}
+                        <div class="w-full h-48 bg-surface flex items-center justify-center">
+                            <span class="ph-fill ph-briefcase text-6xl text-placehover"></span>
+                        </div>
+                        {% endif %}
+                    </a>
+                    <div class="service_info py-5 px-4">
+                        <div class="flex items-center justify-between">
+                            {% if related.category %}
+                            <a href="{% url 'services:service_list' %}?category={{ related.category.id }}" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ related.category.name }}</a>
+                            {% endif %}
+                            <div class="rate flex items-center gap-1">
+                                <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                <strong class="service_rate text-button-sm">{{ related.provider.rating_avg|default:"5.0"|floatformat:1 }}</strong>
+                            </div>
+                        </div>
+                        <a href="{% url 'services:service_detail' related.uuid %}" class="service_title text-title pt-2 duration-300 hover:text-primary">{{ related.name }}</a>
+                        <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                            <a href="{% url 'services:provider_profile' related.provider.uuid %}" class="service_author flex items-center gap-2">
+                                {% if related.provider.avatar %}
+                                <img src="{{ related.provider.avatar.url }}" alt="{{ related.provider.display_name }}" class="service_author_avatar w-8 h-8 rounded-full" />
+                                {% else %}
+                                <div class="service_author_avatar w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm">
+                                    {{ related.provider.display_name|slice:":1"|upper }}
+                                </div>
+                                {% endif %}
+                                <span class="service_author_name -style-1">{{ related.provider.display_name }}</span>
+                            </a>
+                            <div class="service_price whitespace-nowrap">
+                                <span class="price text-title">${{ related.price|intcomma }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Star rating interaction
+document.querySelectorAll('.list_rate .star').forEach((star, index) => {
+    star.addEventListener('click', function() {
+        const rating = this.getAttribute('data-value');
+        document.getElementById('rating-value').value = rating;
+
+        // Update star colors
+        document.querySelectorAll('.list_rate .star').forEach((s, i) => {
+            if (i < rating) {
+                s.classList.remove('text-line');
+                s.classList.add('text-yellow');
+            } else {
+                s.classList.remove('text-yellow');
+                s.classList.add('text-line');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
