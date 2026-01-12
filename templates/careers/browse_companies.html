@@ -114,6 +114,89 @@
     </div>
 </div>
 
+<!-- Filter Sidebar Modal -->
+<div class="modal">
+    <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
+        <form class="h-full">
+            <div class="block_filter h-full py-4 px-6">
+                <div class="filter_section search">
+                    <strong class="text-button">{% trans "Search" %}</strong>
+                    <div class="form_input relative w-full h-12 mt-2">
+                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                        <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Company name or keywords' %}" />
+                    </div>
+                </div>
+                <div class="filter_section location mt-6">
+                    <strong class="text-button">{% trans "Location" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select location">{% trans "Select location" %}</span>
+                            <div class="list_option w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find location...' %}" />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    <li class="capitalize" data-item="Africa">Africa</li>
+                                    <li class="capitalize" data-item="Americas">Americas</li>
+                                    <li class="capitalize" data-item="Asia">Asia</li>
+                                    <li class="capitalize" data-item="Europe">Europe</li>
+                                    <li class="capitalize" data-item="North America">North America</li>
+                                    <li class="capitalize" data-item="Oceania">Oceania</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+                <div class="filter_section category relative mt-6">
+                    <strong class="text-button">{% trans "Industry" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select industry">{% trans "Select industry" %}</span>
+                            <div class="list_option w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find industry...' %}" />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    <li class="capitalize" data-item="Technology">Technology</li>
+                                    <li class="capitalize" data-item="Healthcare">Healthcare</li>
+                                    <li class="capitalize" data-item="Finance">Finance</li>
+                                    <li class="capitalize" data-item="Education">Education</li>
+                                    <li class="capitalize" data-item="Manufacturing">Manufacturing</li>
+                                    <li class="capitalize" data-item="Retail">Retail</li>
+                                    <li class="capitalize" data-item="Consulting">Consulting</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+                <div class="filter_section company_size mt-6">
+                    <strong class="text-button">{% trans "Company Size" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select company size">{% trans "Select company size" %}</span>
+                            <ul class="list_option w-full bg-white">
+                                <li class="capitalize" data-item="1-10 employees">1-10 employees</li>
+                                <li class="capitalize" data-item="11-50 employees">11-50 employees</li>
+                                <li class="capitalize" data-item="51-200 employees">51-200 employees</li>
+                                <li class="capitalize" data-item="201-500 employees">201-500 employees</li>
+                                <li class="capitalize" data-item="500+ employees">500+ employees</li>
+                            </ul>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
+                <button type="button" class="button-main w-full text-center">{% trans "Apply Filters" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
