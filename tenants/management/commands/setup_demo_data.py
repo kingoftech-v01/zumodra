@@ -246,9 +246,23 @@ class Command(BaseCommand):
             'Technical Writer', 'Customer Success Manager', 'Business Analyst'
         ]
 
+        # Sample locations with coordinates for map view
+        locations = [
+            {'city': 'Montreal', 'country': 'Canada', 'lat': 45.5017, 'lon': -73.5673},
+            {'city': 'Toronto', 'country': 'Canada', 'lat': 43.6532, 'lon': -79.3832},
+            {'city': 'Vancouver', 'country': 'Canada', 'lat': 49.2827, 'lon': -123.1207},
+            {'city': 'Ottawa', 'country': 'Canada', 'lat': 45.4215, 'lon': -75.6972},
+            {'city': 'Calgary', 'country': 'Canada', 'lat': 51.0447, 'lon': -114.0719},
+        ]
+
         jobs = []
         for i in range(min(num_jobs, len(job_titles))):
             title = job_titles[i]
+            location = locations[i % len(locations)]  # Cycle through locations
+
+            # Import Point for PostGIS coordinates
+            from django.contrib.gis.geos import Point
+
             job = JobPosting.objects.create(
                 title=title,
                 reference_code=f'JOB-{str(i + 1).zfill(4)}',
@@ -259,8 +273,9 @@ class Command(BaseCommand):
                 job_type=random.choice(['full_time', 'contract']),
                 experience_level=random.choice(['mid', 'senior', 'lead']),
                 remote_policy=random.choice(['remote', 'hybrid', 'on_site']),
-                location_city='Montreal',
-                location_country='Canada',
+                location_city=location['city'],
+                location_country=location['country'],
+                location_coordinates=Point(location['lon'], location['lat'], srid=4326),  # PostGIS Point (lon, lat)
                 salary_min=Decimal(random.randint(60, 100) * 1000),
                 salary_max=Decimal(random.randint(100, 150) * 1000),
                 show_salary=random.choice([True, False]),

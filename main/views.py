@@ -146,7 +146,7 @@ def public_careers_map(request):
     # Base queryset - all published jobs with coordinates
     jobs = PublicJobCatalog.objects.filter(
         published_at__lte=timezone.now(),
-        coordinates__isnull=False  # Only jobs with location data
+        location_coordinates__isnull=False  # Only jobs with location data
     ).select_related('tenant').order_by('-is_featured', '-published_at')
 
     # Apply filters
@@ -295,12 +295,15 @@ def public_companies_map(request):
     location = request.GET.get('location')
 
     # Get tenants with published jobs and coordinates
+    # Note: Tenant model may not have company_coordinates field yet
     companies = Tenant.objects.filter(
-        published_jobs__isnull=False,
-        company_coordinates__isnull=False  # Only companies with location data
+        published_jobs__isnull=False
     ).annotate(
         open_jobs_count=Count('published_jobs')
     ).distinct().order_by('-open_jobs_count')
+
+    # Filter for companies with location (city is required for map display)
+    companies = companies.exclude(company_city__isnull=True).exclude(company_city__exact='')
 
     # Apply filters
     if search:
