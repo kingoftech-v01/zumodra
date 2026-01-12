@@ -58,7 +58,7 @@
             </div>
             <ul class="list_layout_cols list_jobs grid grid-cols-1 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
                 {% for job in jobs %}
-                <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl" data-job-id="{{ job.id }}">
                     <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
                         <a href="#" class="overflow-hidden flex-shrink-0 w-15 h-15">
                             {% if job.tenant.logo %}
@@ -160,5 +160,248 @@ if (jobs.length > 0) {
     const bounds = L.latLngBounds(jobs.map(j => [j.lat, j.lng]));
     map.fitBounds(bounds, { padding: [50, 50] });
 }
+
+// === WEBSOCKET REAL-TIME UPDATES ===
+let ws = null;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+const reconnectDelays = [1000, 2000, 4000, 8000, 16000, 30000];
+const markersMap = new Map(); // Store markers by job ID
+
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=jobs`;
+
+    console.log('[WebSocket] Connecting to:', wsUrl);
+
+    try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function(event) {
+            console.log('[WebSocket] Connected to careers jobs live updates');
+            reconnectAttempts = 0;
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log('[WebSocket] Message received:', data.type);
+
+            switch(data.type) {
+                case 'job_created':
+                    handleJobCreated(data.job);
+                    break;
+                case 'job_updated':
+                    handleJobUpdated(data.job);
+                    break;
+                case 'job_deleted':
+                    handleJobDeleted(data.job_id);
+                    break;
+            }
+        };
+
+        ws.onerror = function(error) {
+            console.error('[WebSocket] Error:', error);
+        };
+
+        ws.onclose = function(event) {
+            console.log('[WebSocket] Connection closed');
+            attemptReconnect();
+        };
+
+    } catch (error) {
+        console.error('[WebSocket] Connection failed:', error);
+        attemptReconnect();
+    }
+}
+
+function attemptReconnect() {
+    if (reconnectAttempts >= maxReconnectAttempts) {
+        console.error('[WebSocket] Max reconnection attempts reached');
+        return;
+    }
+
+    const delay = reconnectDelays[Math.min(reconnectAttempts, reconnectDelays.length - 1)];
+    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+
+    setTimeout(() => {
+        reconnectAttempts++;
+        connectWebSocket();
+    }, delay);
+}
+
+function handleJobCreated(job) {
+    console.log('[WebSocket] Job created:', job);
+
+    // Add to list
+    const jobCard = createJobCard(job);
+    const jobsList = document.querySelector('.list_jobs');
+    if (jobsList) {
+        jobsList.insertAdjacentHTML('afterbegin', jobCard);
+
+        const newCard = jobsList.firstElementChild;
+        newCard.style.opacity = '0';
+        newCard.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            newCard.style.transition = 'all 0.3s ease';
+            newCard.style.opacity = '1';
+            newCard.style.transform = 'translateY(0)';
+        }, 10);
+    }
+
+    // Add marker if has coordinates
+    if (job.lat && job.lng) {
+        addJobMarker(job);
+    }
+
+    updateResultCount();
+}
+
+function handleJobUpdated(job) {
+    console.log('[WebSocket] Job updated:', job);
+
+    // Update in list
+    const jobCard = document.querySelector(`[data-job-id="${job.id}"]`);
+    if (jobCard) {
+        const updatedCard = createJobCard(job);
+        const temp = document.createElement('div');
+        temp.innerHTML = updatedCard;
+        jobCard.replaceWith(temp.firstElementChild);
+
+        const newCard = document.querySelector(`[data-job-id="${job.id}"]`);
+        if (newCard) {
+            newCard.classList.add('animate-pulse');
+            setTimeout(() => newCard.classList.remove('animate-pulse'), 1000);
+        }
+    }
+
+    // Update marker
+    if (job.lat && job.lng) {
+        updateJobMarker(job);
+    }
+}
+
+function handleJobDeleted(jobId) {
+    console.log('[WebSocket] Job deleted:', jobId);
+
+    // Remove from list
+    const jobCard = document.querySelector(`[data-job-id="${jobId}"]`);
+    if (jobCard) {
+        jobCard.style.transition = 'all 0.3s ease';
+        jobCard.style.opacity = '0';
+        jobCard.style.transform = 'scale(0.9)';
+        setTimeout(() => jobCard.remove(), 300);
+    }
+
+    // Remove marker
+    removeJobMarker(jobId);
+
+    updateResultCount();
+}
+
+function addJobMarker(job) {
+    const marker = L.marker([job.lat, job.lng]);
+    marker.bindPopup(`
+        <div class="p-2">
+            <h6 class="font-semibold">${job.title}</h6>
+            <p class="text-sm text-secondary">${job.company}</p>
+            <p class="text-xs text-secondary">${job.location}</p>
+        </div>
+    `);
+    marker.addTo(map);
+    markersMap.set(job.id, marker);
+}
+
+function updateJobMarker(job) {
+    if (markersMap.has(job.id)) {
+        const marker = markersMap.get(job.id);
+        marker.setLatLng([job.lat, job.lng]);
+        marker.setPopupContent(`
+            <div class="p-2">
+                <h6 class="font-semibold">${job.title}</h6>
+                <p class="text-sm text-secondary">${job.company}</p>
+                <p class="text-xs text-secondary">${job.location}</p>
+            </div>
+        `);
+    } else {
+        addJobMarker(job);
+    }
+}
+
+function removeJobMarker(jobId) {
+    if (markersMap.has(jobId)) {
+        const marker = markersMap.get(jobId);
+        map.removeLayer(marker);
+        markersMap.delete(jobId);
+    }
+}
+
+function createJobCard(job) {
+    const logoUrl = job.tenant_logo || '{% static "assets/images/company/1.png" %}';
+    const salaryHtml = job.salary_range_low && job.salary_range_high
+        ? `<span class="price text-title">$${job.salary_range_low} - $${job.salary_range_high}</span>
+           <span class="text-secondary">/year</span>`
+        : `<span class="price text-title">Competitive</span>`;
+
+    return `
+        <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl" data-job-id="${job.id}">
+            <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                <a href="#" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                    <img src="${logoUrl}" alt="${job.tenant_name}" class="jobs_avatar w-full h-full object-cover" />
+                </a>
+                <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                    <a href="#" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                        <span class="jobs_company text-sm font-semibold text-primary">${job.tenant_name}</span>
+                        <strong class="jobs_name text-title -style-1">${job.title}</strong>
+                        <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                            <div class="jobs_address -style-1 text-secondary">
+                                <span class="ph ph-map-pin text-lg"></span>
+                                <span class="address caption1 align-top">${job.location || 'Remote'}</span>
+                            </div>
+                            <div class="jobs_date text-secondary">
+                                <span class="ph ph-calendar-blank text-lg"></span>
+                                <span class="date caption1 align-top">${job.created_at || 'Just now'}</span>
+                            </div>
+                        </div>
+                    </a>
+                    <button class="add_wishlist_btn -relative -border">
+                        <span class="ph ph-heart text-xl"></span>
+                        <span class="ph-fill ph-heart text-xl"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <a href="#" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">${job.job_type || 'Full-Time'}</a>
+                </div>
+                <div class="jobs_price">
+                    ${salaryHtml}
+                </div>
+            </div>
+        </li>
+    `;
+}
+
+function updateResultCount() {
+    const jobsList = document.querySelector('.list_jobs');
+    if (jobsList) {
+        const count = jobsList.querySelectorAll('.jobs_item').length;
+        const quantityEl = document.querySelector('.quantity');
+        if (quantityEl) {
+            quantityEl.textContent = `${count}+ Results`;
+        }
+    }
+}
+
+// Initialize existing markers map
+jobs.forEach(job => {
+    if (job.lat && job.lng) {
+        const marker = L.marker([job.lat, job.lng]);
+        markersMap.set(job.id, marker);
+    }
+});
+
+// Start WebSocket connection
+connectWebSocket();
+console.log('[Browse Jobs Map] WebSocket initialized with live marker updates');
 </script>
 {% endblock %}
