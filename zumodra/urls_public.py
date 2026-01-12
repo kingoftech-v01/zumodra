@@ -30,8 +30,13 @@ from .views import (
     browse_companies_view,
 )
 
-# Public careers landing view (for public schema where careers tables don't exist)
-from main.views import public_careers_landing
+# Public careers views (for public schema - aggregates jobs from all tenants)
+from main.views import (
+    public_careers_landing,
+    public_careers_map,
+    public_companies_grid,
+    public_companies_map,
+)
 
 
 # ==================== Health Check Endpoint ====================
@@ -150,13 +155,20 @@ urlpatterns += i18n_patterns(
     # Services Marketplace (included with namespace for template compatibility)
     path('services/', include('services.urls', namespace='services')),
 
-    # Careers - Public Landing Page
+    # Careers - Public Landing Pages (aggregated from all tenants)
     # Note: The careers app is in TENANT_APPS, so its database tables only exist
-    # in tenant schemas. On the public schema, we show a landing page instead.
+    # in tenant schemas. On the public schema, we aggregate jobs from PublicJobCatalog.
     # Tenant-specific career pages are accessed via tenant subdomains.
     path('careers/', include(([
+        # Job browsing (grid and map)
         path('', public_careers_landing, name='home'),
         path('jobs/', public_careers_landing, name='job_list'),
+        path('browse/', public_careers_landing, name='browse_jobs'),
+        path('browse/map/', public_careers_map, name='browse_jobs_map'),
+
+        # Company browsing (grid and map)
+        path('companies/', public_companies_grid, name='browse_companies'),
+        path('companies/map/', public_companies_map, name='browse_companies_map'),
     ], 'careers'), namespace='careers')),
 
     # Blog (Wagtail CMS)
