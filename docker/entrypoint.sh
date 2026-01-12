@@ -38,6 +38,7 @@ SKIP_MIGRATIONS="${SKIP_MIGRATIONS:-false}"
 SKIP_COLLECTSTATIC="${SKIP_COLLECTSTATIC:-false}"
 CREATE_DEMO_TENANT="${CREATE_DEMO_TENANT:-false}"
 SETUP_DEMO_DATA="${SETUP_DEMO_DATA:-false}"
+RUN_GEOCODING="${RUN_GEOCODING:-false}"
 RUN_TESTS="${RUN_TESTS:-false}"
 TESTS_FAIL_FAST="${TESTS_FAIL_FAST:-false}"
 
@@ -587,6 +588,35 @@ setup_demo_data() {
 }
 
 # -----------------------------------------------------------------------------
+# Run Geocoding (optional) - Geocodes tenant, job, and service locations
+# -----------------------------------------------------------------------------
+run_geocoding() {
+    if [ "$RUN_GEOCODING" != "true" ] && [ "$RUN_GEOCODING" != "1" ]; then
+        log_info "Skipping geocoding (RUN_GEOCODING not set)"
+        return 0
+    fi
+
+    log_info "=========================================="
+    log_info "Running Geocoding for Locations"
+    log_info "=========================================="
+
+    log_info "Geocoding tenant addresses, job locations, and service providers..."
+
+    if python manage.py geocode_locations --all 2>&1; then
+        log_info "=========================================="
+        log_info "Geocoding completed successfully!"
+        log_info "=========================================="
+        return 0
+    else
+        log_warn "=========================================="
+        log_warn "Geocoding had some issues (non-fatal)"
+        log_warn "=========================================="
+        # Don't fail - geocoding failures are non-fatal
+        return 1
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Run Tests (optional)
 # -----------------------------------------------------------------------------
 run_tests() {
@@ -700,6 +730,7 @@ main() {
             run_collectstatic
             bootstrap_demo_tenant
             setup_demo_data
+            run_geocoding || log_warn "Geocoding had issues, but continuing..."
             verify_django_setup
             run_tests || log_warn "Tests had failures, but continuing..."
             release_migration_lock
@@ -715,6 +746,7 @@ main() {
             run_collectstatic
             bootstrap_demo_tenant
             setup_demo_data
+            run_geocoding || log_warn "Geocoding had issues, but continuing..."
             verify_django_setup
             run_tests || log_warn "Tests had failures, but continuing..."
         fi
