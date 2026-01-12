@@ -120,13 +120,49 @@ def tenant_saved(sender, instance, created, **kwargs):
         broadcast_company_updated(company_data)
 
 
-# TODO: Add Service model signals when implementing projects browse pages
-# @receiver(post_save, sender=Service)
-# def service_saved(sender, instance, created, **kwargs):
-#     """Broadcast project/service creation/update via WebSocket."""
-#     pass
-#
-# @receiver(post_delete, sender=Service)
-# def service_deleted(sender, instance, **kwargs):
-#     """Broadcast project/service deletion via WebSocket."""
-#     pass
+@receiver(post_save, sender='services.Service')
+def service_saved(sender, instance, created, **kwargs):
+    """Broadcast project/service creation/update via WebSocket."""
+    # Only broadcast public/active services
+    if not instance.is_active:
+        return
+
+    # Import broadcast functions
+    from .consumers import broadcast_project_created, broadcast_project_updated
+
+    # Prepare project data for broadcast
+    project_data = {
+        'id': instance.pk,
+        'title': instance.name,
+        'description': instance.short_description or instance.description[:200] if instance.description else '',
+        'location': 'Remote',  # Services are typically remote
+        'location_coordinates': None,
+        'budget': float(instance.price) if instance.price else 0,
+        'budget_type': instance.service_type,
+        'proposals': 0,  # This would need to be calculated if needed
+        'created_at': instance.created_at.strftime('%Y-%m-%d') if hasattr(instance, 'created_at') else None,
+    }
+
+    # Add provider location if available
+    if hasattr(instance, 'provider') and instance.provider:
+        provider = instance.provider
+        if hasattr(provider, 'city') and provider.city:
+            project_data['location'] = f"{provider.city}, {provider.country}" if provider.country else provider.city
+
+        # Add coordinates from provider
+        if hasattr(provider, 'location') and provider.location:
+            project_data['location_coordinates'] = {
+                'lat': provider.location.y,
+                'lng': provider.location.x,
+            }
+        elif hasattr(provider, 'location_lat') and provider.location_lat:
+            project_data['location_coordinates'] = {
+                'lat': provider.location_lat,
+                'lng': provider.location_lng,
+            }
+
+    # Broadcast
+    if created:
+        broadcast_project_created(project_data)
+    else:
+        broadcast_project_updated(project_data)
