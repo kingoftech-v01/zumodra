@@ -366,7 +366,7 @@ def view_other_public_profile(request, profile_uuid):
     if profile.profile_visibility == PublicProfile.VISIBILITY_PRIVATE:
         if profile.user != request.user:
             messages.error(request, 'This profile is private.')
-            return redirect('dashboard')
+            return redirect('frontend:dashboard:index')
 
     elif profile.profile_visibility == PublicProfile.VISIBILITY_TENANTS_ONLY:
         # Check if viewer shares a tenant with profile owner
@@ -377,7 +377,7 @@ def view_other_public_profile(request, profile_uuid):
 
         if not viewer_tenants.intersection(profile_tenants) and profile.user != request.user:
             messages.error(request, 'This profile is only visible to shared organizations.')
-            return redirect('dashboard')
+            return redirect('frontend:dashboard:index')
 
     context = {
         'profile': profile,

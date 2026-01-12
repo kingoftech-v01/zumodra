@@ -48,7 +48,7 @@ def require_tenant_type(*allowed_types):
                 # Validate tenant type
                 if not hasattr(request, 'tenant') or not request.tenant:
                     messages.error(request, _('You must be part of a tenant.'))
-                    return redirect('dashboard')
+                    return redirect('frontend:dashboard:index')
 
                 if request.tenant.tenant_type not in allowed_types:
                     type_names = ', '.join(allowed_types)
@@ -56,7 +56,7 @@ def require_tenant_type(*allowed_types):
                         request,
                         _(f'This feature is only available for {type_names} tenants.')
                     )
-                    return redirect('dashboard')
+                    return redirect('frontend:dashboard:index')
 
                 return original_dispatch(self, request, *args, **kwargs)
 
@@ -69,7 +69,7 @@ def require_tenant_type(*allowed_types):
                 # Validate tenant type
                 if not hasattr(request, 'tenant') or not request.tenant:
                     messages.error(request, _('You must be part of a tenant.'))
-                    return redirect('dashboard')
+                    return redirect('frontend:dashboard:index')
 
                 if request.tenant.tenant_type not in allowed_types:
                     type_names = ', '.join(allowed_types)
@@ -77,7 +77,7 @@ def require_tenant_type(*allowed_types):
                         request,
                         _(f'This feature is only available for {type_names} tenants.')
                     )
-                    return redirect('dashboard')
+                    return redirect('frontend:dashboard:index')
 
                 return view_func_or_class(request, *args, **kwargs)
 

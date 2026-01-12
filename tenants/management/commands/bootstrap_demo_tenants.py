@@ -173,7 +173,7 @@ class Command(BaseCommand):
 
     def _bootstrap(self):
         """Main bootstrap logic."""
-        from tenants.models import Tenant, Plan
+        from tenants.models import Tenant, Plan, Domain
 
         # Step 1: Setup plans
         self._log_step(1, 'Setting up subscription plans')
@@ -184,13 +184,56 @@ class Command(BaseCommand):
         for i, config in enumerate(DEMO_TENANTS, start=2):
             self._log_step(i, f"Creating demo tenant: {config['name']} (type: {config['tenant_type'].upper()})")
 
+            # IMPORTANT: Switch to public schema before checking/creating tenant
+            connection.set_schema_to_public()
+
             # Check if tenant exists
             existing = Tenant.objects.filter(slug=config['slug']).first()
             if existing:
                 if self.reset:
                     self._log_info(f"   Deleting existing tenant: {existing.slug}")
                     if not self.dry_run:
-                        existing.delete()
+                        # Delete using raw SQL to avoid cascade issues with cross-schema FKs
+                        from django.db import connection as conn
+                        tenant_id = existing.id
+                        schema_name = existing.schema_name
+
+                        # First, drop the tenant schema (this removes all tenant data)
+                        with conn.cursor() as cursor:
+                            cursor.execute(f"DROP SCHEMA IF EXISTS {schema_name} CASCADE;")
+
+                        # Delete all public schema records that reference this tenant
+                        # Find all tables with FK to tenants_tenant and delete records
+                        with conn.cursor() as cursor:
+                            # Query to find all tables with foreign keys to tenants_tenant
+                            cursor.execute("""
+                                SELECT DISTINCT
+                                    tc.table_schema,
+                                    tc.table_name,
+                                    kcu.column_name
+                                FROM information_schema.table_constraints AS tc
+                                JOIN information_schema.key_column_usage AS kcu
+                                    ON tc.constraint_name = kcu.constraint_name
+                                    AND tc.table_schema = kcu.table_schema
+                                JOIN information_schema.constraint_column_usage AS ccu
+                                    ON ccu.constraint_name = tc.constraint_name
+                                    AND ccu.table_schema = tc.table_schema
+                                WHERE tc.constraint_type = 'FOREIGN KEY'
+                                    AND ccu.table_name = 'tenants_tenant'
+                                    AND tc.table_schema = 'public'
+                            """)
+
+                            fk_tables = cursor.fetchall()
+
+                            # Delete from each table that has FK to tenant
+                            for schema, table, column in fk_tables:
+                                try:
+                                    cursor.execute(f'DELETE FROM "{schema}"."{table}" WHERE {column} = %s', [tenant_id])
+                                except Exception as e:
+                                    self._log_info(f"      Warning: Could not delete from {table}: {e}")
+
+                            # Finally, delete the tenant record
+                            cursor.execute("DELETE FROM tenants_tenant WHERE id = %s", [tenant_id])
                 else:
                     self._log_info(f"   Tenant exists, skipping: {config['slug']}")
                     continue
