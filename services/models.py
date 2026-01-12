@@ -532,6 +532,24 @@ class Service(TenantAwareModel):
     view_count = models.PositiveIntegerField(default=0)
     order_count = models.PositiveIntegerField(default=0)
 
+    # Geolocation (for provider location-based features)
+    location_coordinates = gis_models.PointField(
+        srid=4326,
+        null=True,
+        blank=True,
+        help_text=_('Geographic coordinates for service location (lon, lat)')
+    )
+    geocode_attempted = models.BooleanField(
+        default=False,
+        help_text=_('Whether geocoding has been attempted')
+    )
+    geocode_error = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text=_('Error message if geocoding failed')
+    )
+
     objects = TenantAwareManager()
 
     class Meta:
