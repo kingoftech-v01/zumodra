@@ -1,474 +1,164 @@
 {% extends "base/freelanhub_base.html" %}
-{% load static i18n humanize %}
+{% load static i18n %}
 
-{% block title %}{% trans "Browse Jobs - Map View" %} - Zumodra{% endblock %}
-{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block title %}Browse Jobs - Map View - Zumodra{% endblock %}
+{% block meta_description %}Find jobs on an interactive map{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
-<style>
-.jobs.-half-map {
-    display: flex;
-}
-@media (max-width: 768px) {
-    .jobs.-half-map {
-        flex-direction: column-reverse;
-    }
-}
-</style>
 {% endblock %}
 
 {% block content %}
 
-{# Breadcrumb #}
-{% include "careers/components/_breadcrumb.html" with title="Browse Jobs" heading="Find Your Dream Job" total_jobs=total_jobs %}
-
-{# Jobs Map Section #}
-<section class="jobs -half-map flex max-md:flex-col-reverse md:overflow-hidden md:w-screen md:h-screen sm:pt-20 pt-16">
-    {# Jobs List (Scrollable) #}
-    <div class="jobs_list md:w-1/2 md:h-full w-full md:overflow-y-auto scrollbar_custom">
-        <div class="lg:p-10 md:p-7.5 p-5">
-            {# Geolocation Button #}
-            <button data-geolocation-btn onclick="requestGeolocation()" class="inline-flex items-center gap-2 py-1.5 px-3 mb-4 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
-                <span class="ph ph-map-pin text-xl"></span>
-                <span>Near Me (5km)</span>
-            </button>
-            <div data-location-display></div>
-
-            {# Filter Bar #}
-            {% include "careers/components/_filter_bar.html" with view_mode="map" %}
-
-            {# Jobs Grid #}
-            {% if jobs %}
-            <ul class="list_layout_cols list_jobs grid grid-cols-1 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
-                {% for job in jobs %}
-                    {% include "careers/components/_job_card.html" %}
-                {% endfor %}
-            </ul>
-
-            {# Pagination #}
-            {% include "careers/components/_pagination.html" %}
-
-            {% else %}
-            {# No Jobs Found #}
-            <div class="text-center py-16">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ph ph-briefcase text-4xl text-gray-400"></i>
-                </div>
-                <h3 class="heading5 mb-2">{% trans "No Jobs Found" %}</h3>
-                <p class="text-secondary">
-                    {% if search or selected_category or selected_location or selected_job_type or selected_remote %}
-                        {% trans "Try adjusting your filters to see more results." %}
-                    {% else %}
-                        {% trans "There are currently no open positions. Check back later!" %}
-                    {% endif %}
-                </p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    {# Map #}
-    <div class="map_bg md:w-1/2 md:h-full w-full h-[400px]">
-        <div id="map" class="w-full h-full"></div>
-    </div>
-</section>
-
-<!-- Filter Sidebar Modal -->
-<div class="modal">
-    <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
-        <form class="h-full">
-            <div class="block_filter h-full py-4 px-6">
-                <div class="filter_section search">
-                    <strong class="text-button">{% trans "Search" %}</strong>
-                    <div class="form_input relative w-full h-12 mt-2">
-                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
-                        <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Job title or keywords' %}" />
-                    </div>
-                </div>
-                <div class="filter_section location mt-6">
-                    <strong class="text-button">{% trans "Location" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+<!-- List jobs -->
+<div class="jobs -half-map flex max-md:flex-col-reverse md:overflow-hidden md:w-screen md:h-screen sm:pt-20 pt-16">
+    <div class="jobs_wrap relative md:w-1/2">
+        <div class="jobs_inner lg:p-10 p-6">
+            <div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full">
+                <button id="filter_btn" class="filter_btn inline-flex items-center gap-1.5 py-1.5 px-2.5 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
+                    <span class="ph ph-sliders-horizontal text-xl"></span>
+                    <span>Filters</span>
+                </button>
+                <ul class="list_layout flex items-center gap-1 2xl:absolute 2xl:left-1/2 2xl:-translate-x-1/2">
+                    <li class="max-xl:hidden">
+                        <button class="layout_btn cols_1 list active"></button>
+                    </li>
+                    <li class="xl:hidden">
+                        <a href="#!" class="layout_link cols_1 list active"></a>
+                    </li>
+                    <li class="xl:hidden">
+                        <a href="{% url 'careers:browse_jobs' %}" class="layout_link grid">
+                            <span class="ph ph-squares-four"></span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="select_filter flex items-center gap-3">
+                    <span class="caption1">Sort by:</span>
+                    <div class="select_block sm:pr-16 pr-10 pl-3 py-1 border border-line rounded">
                         <div class="select">
-                            <span class="selected capitalize" data-title="Select location">{% trans "Select location" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find location...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Africa">Africa</li>
-                                    <li class="capitalize" data-item="Americas">Americas</li>
-                                    <li class="capitalize" data-item="Asia">Asia</li>
-                                    <li class="capitalize" data-item="Europe">Europe</li>
-                                    <li class="capitalize" data-item="North America">North America</li>
-                                    <li class="capitalize" data-item="Oceania">Oceania</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section category relative mt-6">
-                    <strong class="text-button">{% trans "Category" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select category">{% trans "Select category" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find category...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Technology">Technology</li>
-                                    <li class="capitalize" data-item="Marketing">Marketing</li>
-                                    <li class="capitalize" data-item="Design">Design</li>
-                                    <li class="capitalize" data-item="Finance">Finance</li>
-                                    <li class="capitalize" data-item="Healthcare">Healthcare</li>
-                                    <li class="capitalize" data-item="Education">Education</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section job_type mt-6">
-                    <strong class="text-button">{% trans "Job Type" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select job type">{% trans "Select job type" %}</span>
-                            <ul class="list_option w-full bg-white">
-                                <li class="capitalize" data-item="Full-time">Full-time</li>
-                                <li class="capitalize" data-item="Part-time">Part-time</li>
-                                <li class="capitalize" data-item="Contract">Contract</li>
-                                <li class="capitalize" data-item="Freelance">Freelance</li>
-                                <li class="capitalize" data-item="Remote">Remote</li>
+                            <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                            <ul class="list_option p-0 bg-white">
+                                <li class="capitalize" data-item="default">sort by (default)</li>
+                                <li class="capitalize" data-item="newest">newest</li>
+                                <li class="capitalize" data-item="oldest">oldest</li>
+                                <li class="capitalize" data-item="random">random</li>
                             </ul>
                         </div>
                         <span class="icon_down ph ph-caret-down right-3"></span>
                     </div>
                 </div>
             </div>
-            <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
-                <button type="button" class="button-main w-full text-center">{% trans "Apply Filters" %}</button>
+            <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+                <span class="quantity pr-3 border-r border-line">{{ total_jobs|default:"0" }}+ Results</span>
+                <div class="list flex flex-wrap items-center gap-3"></div>
+                <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+                    <span class="ph ph-x text-sm"></span>
+                    <span class="caption1">Clear All</span>
+                </button>
             </div>
-        </form>
+            <ul class="list_layout_cols list_jobs grid grid-cols-1 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
+                {% for job in jobs %}
+                <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                        <a href="#" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                            {% if job.tenant.logo %}
+                            <img src="{{ job.tenant.logo.url }}" alt="{{ job.tenant.name }}" class="jobs_avatar w-full h-full object-cover" />
+                            {% else %}
+                            <img src="{% static 'assets/images/company/1.png' %}" alt="{{ job.tenant.name }}" class="jobs_avatar w-full h-full object-cover" />
+                            {% endif %}
+                        </a>
+                        <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                            <a href="#" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                <span class="jobs_company text-sm font-semibold text-primary">{{ job.tenant.name }}</span>
+                                <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
+                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                    <div class="jobs_address -style-1 text-secondary">
+                                        <span class="ph ph-map-pin text-lg"></span>
+                                        <span class="address caption1 align-top">{{ job.location_city|default:"Remote" }}</span>
+                                    </div>
+                                    <div class="jobs_date text-secondary">
+                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                        <span class="date caption1 align-top">{{ job.created_at|timesince }} ago</span>
+                                    </div>
+                                </div>
+                            </a>
+                            <button class="add_wishlist_btn -relative -border">
+                                <span class="ph ph-heart text-xl"></span>
+                                <span class="ph-fill ph-heart text-xl"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <a href="#" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ job.job_type|default:"Full-Time" }}</a>
+                        </div>
+                        <div class="jobs_price">
+                            {% if job.salary_range_low and job.salary_range_high %}
+                            <span class="price text-title">${{ job.salary_range_low }} - ${{ job.salary_range_high }}</span>
+                            <span class="text-secondary">/year</span>
+                            {% else %}
+                            <span class="price text-title">Competitive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="col-span-full text-center py-16">
+                    <p class="text-secondary">No jobs found.</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="map_bg md:w-1/2 md:h-full w-full h-[400px]">
+        <div id="map" class="w-full h-full"></div>
     </div>
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'assets/js/leaflet.min.js' %}"></script>
+<script src="{% static 'assets/js/leaflet.js' %}"></script>
 <script>
-// === MAP INITIALIZATION ===
+// Initialize map
 const map = L.map('map').setView([37.7749, -122.4194], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);
 
-const markers = L.layerGroup().addTo(map);
-let radiusCircle = null;
-let userMarker = null;
-
-// === JOB DATA ===
-const jobLocations = [
+// Add markers for jobs with coordinates
+const jobs = [
     {% for job in jobs %}
-    {% if job.job.location_coordinates %}
+    {% if job.location_coordinates %}
     {
         id: {{ job.id }},
-        title: "{{ job.job.title|escapejs }}",
-        company: "{{ job.job.tenant.name|default:'Company'|escapejs }}",
-        location: "{{ job.job.location_city|escapejs }}{% if job.job.location_country %}, {{ job.job.location_country|escapejs }}{% endif %}",
-        lat: {{ job.job.location_coordinates.y }},
-        lng: {{ job.job.location_coordinates.x }},
-        url: "{% url 'careers:job_detail' job.custom_slug|default:job.pk %}"
+        title: "{{ job.title|escapejs }}",
+        company: "{{ job.tenant.name|escapejs }}",
+        location: "{{ job.location_city|default:'Remote'|escapejs }}",
+        lat: {{ job.location_coordinates.y }},
+        lng: {{ job.location_coordinates.x }}
     }{% if not forloop.last %},{% endif %}
     {% endif %}
     {% endfor %}
 ];
 
-// === RENDER MARKERS ===
-function renderMarkers() {
-    markers.clearLayers();
-    jobLocations.forEach(job => {
-        const marker = L.marker([job.lat, job.lng]);
-        marker.jobId = job.id;
-        marker.bindPopup(createJobPopup(job));
-        markers.addLayer(marker);
-    });
-
-    if (jobLocations.length > 0) {
-        const bounds = L.latLngBounds(jobLocations.map(j => [j.lat, j.lng]));
-        map.fitBounds(bounds, { padding: [50, 50] });
-    }
-}
-
-function createJobPopup(job) {
-    return `
-        <div class="p-3 max-w-xs">
-            <h6 class="text-title font-semibold mb-1">${job.title}</h6>
-            <p class="text-sm text-secondary mb-2">${job.company}</p>
-            <p class="text-xs text-secondary flex items-center gap-1 mb-2">
-                <span class="ph ph-map-pin"></span>
-                ${job.location}
-            </p>
-            <a href="${job.url}" class="button-main -sm mt-2 w-full text-center">View Details</a>
+jobs.forEach(job => {
+    const marker = L.marker([job.lat, job.lng]);
+    marker.bindPopup(`
+        <div class="p-2">
+            <h6 class="font-semibold">${job.title}</h6>
+            <p class="text-sm text-secondary">${job.company}</p>
+            <p class="text-xs text-secondary">${job.location}</p>
         </div>
-    `;
-}
-
-renderMarkers();
-
-// === GEOLOCATION ===
-let userLocation = null;
-const searchRadius = 5000; // 5km
-
-function requestGeolocation() {
-    if (!navigator.geolocation) {
-        showLocationFallback();
-        return;
-    }
-
-    const btn = document.querySelector('[data-geolocation-btn]');
-    btn.innerHTML = '<span class="ph ph-spinner animate-spin"></span> Getting location...';
-
-    navigator.geolocation.getCurrentPosition(
-        handleGeolocationSuccess,
-        handleGeolocationError,
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
-    );
-}
-
-function handleGeolocationSuccess(position) {
-    userLocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    };
-
-    updateLocationDisplay();
-    centerMapOnUser();
-    applyGeolocationFilter();
-
-    const btn = document.querySelector('[data-geolocation-btn]');
-    btn.innerHTML = '<span class="ph ph-map-pin"></span> Near Me (5km)';
-}
-
-function handleGeolocationError(error) {
-    console.error('[Geolocation] Error:', error);
-    const btn = document.querySelector('[data-geolocation-btn]');
-    btn.innerHTML = '<span class="ph ph-map-pin"></span> Near Me (5km)';
-    showLocationFallback();
-}
-
-function centerMapOnUser() {
-    if (!userLocation) return;
-
-    map.setView([userLocation.lat, userLocation.lng], 12);
-
-    // Add radius circle
-    if (radiusCircle) map.removeLayer(radiusCircle);
-    radiusCircle = L.circle([userLocation.lat, userLocation.lng], {
-        color: '#3B82F6',
-        fillColor: '#3B82F6',
-        fillOpacity: 0.1,
-        radius: searchRadius
-    }).addTo(map);
-
-    // Add user marker
-    if (userMarker) map.removeLayer(userMarker);
-    userMarker = L.marker([userLocation.lat, userLocation.lng], {
-        icon: L.divIcon({
-            className: 'user-marker',
-            html: '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>',
-            iconSize: [16, 16]
-        })
-    }).addTo(map);
-    userMarker.bindPopup('Your location').openPopup();
-}
-
-function applyGeolocationFilter() {
-    if (!userLocation) return;
-
-    const items = document.querySelectorAll('[data-lat][data-lng]');
-    let hiddenCount = 0;
-
-    items.forEach(item => {
-        const itemLat = parseFloat(item.dataset.lat);
-        const itemLng = parseFloat(item.dataset.lng);
-        const distance = calculateDistance(userLocation.lat, userLocation.lng, itemLat, itemLng);
-
-        if (distance > searchRadius) {
-            item.style.display = 'none';
-            hiddenCount++;
-        } else {
-            item.style.display = '';
-            addDistanceBadge(item, distance);
-        }
-    });
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3;
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c;
-}
-
-function addDistanceBadge(item, distance) {
-    const existing = item.querySelector('.distance-badge');
-    if (existing) existing.remove();
-
-    const badge = document.createElement('span');
-    badge.className = 'distance-badge absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs rounded-full';
-    badge.textContent = distance < 1000 ? `${Math.round(distance)}m` : `${(distance/1000).toFixed(1)}km`;
-    item.appendChild(badge);
-}
-
-function updateLocationDisplay() {
-    const display = document.querySelector('[data-location-display]');
-    if (display && userLocation) {
-        display.innerHTML = `
-            <div class="flex items-center gap-2 text-sm text-secondary mb-4">
-                <span class="ph ph-map-pin text-primary"></span>
-                <span>Showing results within 5km</span>
-                <button onclick="clearGeolocation()" class="text-xs underline">Clear</button>
-            </div>
-        `;
-    }
-}
-
-function clearGeolocation() {
-    userLocation = null;
-    if (radiusCircle) map.removeLayer(radiusCircle);
-    if (userMarker) map.removeLayer(userMarker);
-    document.querySelectorAll('[data-lat][data-lng]').forEach(item => item.style.display = '');
-    document.querySelectorAll('.distance-badge').forEach(badge => badge.remove());
-    const display = document.querySelector('[data-location-display]');
-    if (display) display.innerHTML = '';
-}
-
-function showLocationFallback() {
-    const display = document.querySelector('[data-location-display]');
-    display.innerHTML = `
-        <div class="location_fallback mt-4 p-4 bg-surface rounded-lg">
-            <p class="text-sm text-secondary mb-3">Enter your location manually:</p>
-            <div class="flex gap-2">
-                <input type="text" id="manual_location_input" class="form-input flex-1" placeholder="City or address" />
-                <button onclick="geocodeManualLocation()" class="button-main">Search</button>
-            </div>
-        </div>
-    `;
-}
-
-async function geocodeManualLocation() {
-    const input = document.getElementById('manual_location_input');
-    const address = input.value.trim();
-    if (!address) return;
-
-    try {
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
-            { headers: { 'User-Agent': 'Zumodra Career Pages' } }
-        );
-        const results = await response.json();
-
-        if (results.length > 0) {
-            userLocation = {
-                lat: parseFloat(results[0].lat),
-                lng: parseFloat(results[0].lon),
-                manual: true
-            };
-            handleGeolocationSuccess({ coords: userLocation });
-        }
-    } catch (error) {
-        console.error('[Geocoding] Error:', error);
-    }
-}
-
-// === WEBSOCKET ===
-let ws = null;
-let reconnectAttempts = 0;
-
-function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=jobs`;
-
-    ws = new WebSocket(wsUrl);
-
-    ws.onopen = function() {
-        console.log('[WebSocket] Connected');
-        reconnectAttempts = 0;
-    };
-
-    ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        switch(data.type) {
-            case 'job_created': handleJobCreated(data.job); break;
-            case 'job_updated': handleJobUpdated(data.job); break;
-            case 'job_deleted': handleJobDeleted(data.job_id); break;
-        }
-    };
-
-    ws.onclose = function() {
-        if (reconnectAttempts < 5) {
-            setTimeout(() => {
-                reconnectAttempts++;
-                connectWebSocket();
-            }, Math.min(1000 * Math.pow(2, reconnectAttempts), 30000));
-        }
-    };
-
-    setInterval(() => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
-        }
-    }, 30000);
-}
-
-function handleJobCreated(job) {
-    if (job.location_coordinates) {
-        jobLocations.push(job);
-        const marker = L.marker([job.location_coordinates.lat, job.location_coordinates.lng]);
-        marker.jobId = job.id;
-        marker.bindPopup(createJobPopup(job));
-        markers.addLayer(marker);
-    }
-}
-
-function handleJobUpdated(job) {
-    const index = jobLocations.findIndex(j => j.id === job.id);
-    if (index !== -1) {
-        jobLocations[index] = job;
-        markers.eachLayer(layer => {
-            if (layer.jobId === job.id) {
-                layer.setPopupContent(createJobPopup(job));
-            }
-        });
-    }
-}
-
-function handleJobDeleted(jobId) {
-    const index = jobLocations.findIndex(j => j.id === jobId);
-    if (index !== -1) {
-        jobLocations.splice(index, 1);
-        markers.eachLayer(layer => {
-            if (layer.jobId === jobId) {
-                markers.removeLayer(layer);
-            }
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    connectWebSocket();
+    `);
+    marker.addTo(map);
 });
+
+// Fit map to show all markers
+if (jobs.length > 0) {
+    const bounds = L.latLngBounds(jobs.map(j => [j.lat, j.lng]));
+    map.fitBounds(bounds, { padding: [50, 50] });
+}
 </script>
 {% endblock %}
