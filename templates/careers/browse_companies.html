@@ -6,58 +6,120 @@
 
 {% block content %}
 
-{# Breadcrumb #}
-{% include "careers/components/_breadcrumb.html" with title="Browse Companies" heading="Discover Great Companies" total_jobs=total_companies %}
-
-{# Companies List Section #}
-<section class="employers lg:py-20 sm:py-14 py-10">
-    <div class="container flex flex-col items-center">
-        {# Filter and Sort Bar #}
-        {% include "careers/components/_company_filter_bar.html" with view_mode="grid" total_companies=total_companies %}
-
-        {# Active Filters #}
-        {% include "careers/components/_company_active_filters.html" %}
-
-        {# Companies Grid #}
-        {% if companies %}
-        <ul class="list_layout_cols list_employers grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
-            {% for company in companies %}
-                {% include "careers/components/_company_card.html" %}
-            {% endfor %}
-        </ul>
-
-        {# Pagination #}
-        {% include "careers/components/_company_pagination.html" %}
-
-        {% else %}
-        {# No Companies Found #}
-        <div class="text-center py-16">
-            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="ph ph-buildings text-4xl text-gray-400"></i>
+{# Breadcrumb Section #}
+<section class="breadcrumb lg:py-20 md:py-14 py-10">
+    <div class="container">
+        <div class="content flex flex-col items-center gap-y-3">
+            <div class="list_nav flex items-center justify-center flex-wrap gap-2">
+                <a href="{% url 'home' %}" class="text-secondary hover:text-primary">{% trans "Home" %}</a>
+                <span class="ph ph-caret-right text-sm text-secondary"></span>
+                <span class="caption1 capitalize">{% trans "Browse Companies" %}</span>
             </div>
-            <h3 class="heading5 mb-2">{% trans "No Companies Found" %}</h3>
-            <p class="text-secondary">
-                {% if search or selected_location or selected_industry %}
-                    {% trans "Try adjusting your filters to see more results." %}
-                {% else %}
-                    {% trans "No companies are currently hiring. Check back later!" %}
-                {% endif %}
-            </p>
+            <div class="heading3 text-center">{% trans "Find Your Dream Company" %}</div>
         </div>
-        {% endif %}
     </div>
 </section>
+
+<!-- List employers -->
+<div class="employers lg:py-20 sm:py-14 py-10">
+    <div class="container flex flex-col items-center">
+        <div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full">
+            <button id="filter_btn" class="filter_btn inline-flex items-center gap-1.5 py-1.5 px-2.5 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
+                <span class="ph ph-sliders-horizontal text-xl"></span>
+                <span>Filters</span>
+            </button>
+            <ul class="list_layout flex items-center gap-2 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+                <li class="max-xl:hidden">
+                    <button class="layout_btn cols_4 active"></button>
+                </li>
+                <li class="ml-1.5 max-xl:hidden">
+                    <button class="layout_btn cols_3"></button>
+                </li>
+                <li class="max-xl:hidden">
+                    <button class="layout_btn cols_2"></button>
+                </li>
+                <li class="xl:hidden">
+                    <a href="#!" class="layout_link cols_2 active"></a>
+                </li>
+                <li class="xl:hidden">
+                    <a href="{% url 'careers:browse_companies_map' %}" class="layout_link map">
+                        <span class="ph ph-map-pin"></span>
+                    </a>
+                </li>
+            </ul>
+            <div class="select_filter flex items-center gap-3">
+                <span class="caption1">Sort by:</span>
+                <div class="select_block sm:pr-16 pr-10 pl-3 py-1 border border-line rounded">
+                    <div class="select">
+                        <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                        <ul class="list_option p-0 bg-white">
+                            <li class="capitalize" data-item="default">sort by (default)</li>
+                            <li class="capitalize" data-item="newest">newest</li>
+                            <li class="capitalize" data-item="oldest">oldest</li>
+                            <li class="capitalize" data-item="random">random</li>
+                        </ul>
+                    </div>
+                    <span class="icon_down ph ph-caret-down right-3"></span>
+                </div>
+            </div>
+        </div>
+        <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+            <span class="quantity pr-3 border-r border-line">{{ total_companies }}+ Results</span>
+            <div class="list flex flex-wrap items-center gap-3"></div>
+            <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+                <span class="ph ph-x text-sm"></span>
+                <span class="caption1">Clear All</span>
+            </button>
+        </div>
+        <ul class="list_layout_cols list_employers grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
+            {% for company in companies %}
+            <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300">
+                <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
+                    {% if company.logo %}
+                    <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
+                    {% else %}
+                    <div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
+                        <span class="ph ph-buildings text-4xl text-secondary"></span>
+                    </div>
+                    {% endif %}
+                </a>
+                <ul class="rate flex items-center mt-4">
+                    <li class="ph-fill ph-star text-yellow"></li>
+                    <li class="ph-fill ph-star text-yellow"></li>
+                    <li class="ph-fill ph-star text-yellow"></li>
+                    <li class="ph-fill ph-star text-yellow"></li>
+                    <li class="ph-fill ph-star text-yellow"></li>
+                </ul>
+                <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">{{ company.name }}</a>
+                <div class="employers_address -style-1 text-secondary mt-1">
+                    <span class="ph ph-map-pin text-lg"></span>
+                    <span class="address caption1 align-top">{{ company.city }}{% if company.country %}, {{ company.country }}{% endif %}</span>
+                </div>
+                <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">{{ company.open_jobs_count }} job opening{{ company.open_jobs_count|pluralize }}</a>
+                <button class="add_wishlist_btn absolute top-5 right-5 -border">
+                    <span class="ph ph-heart text-xl"></span>
+                    <span class="ph-fill ph-heart text-xl"></span>
+                </button>
+            </li>
+            {% empty %}
+            <li class="col-span-full text-center py-16">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="ph ph-buildings text-4xl text-gray-400"></span>
+                </div>
+                <h3 class="heading5 mb-2">{% trans "No Companies Found" %}</h3>
+                <p class="text-secondary">{% trans "There are currently no companies. Check back later!" %}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Wishlist functionality
-document.querySelectorAll('.add_wishlist_btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        this.classList.toggle('active');
-        // TODO: Add AJAX call to save wishlist
-    });
-});
-</script>
+<script src="{% static 'assets/js/jquery-3.7.0.js' %}"></script>
+<script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/slick.min.js' %}"></script>
+<script src="{% static 'assets/js/count-down.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
 {% endblock %}
