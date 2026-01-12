@@ -351,6 +351,88 @@ fix_migration_permissions() {
 }
 
 # -----------------------------------------------------------------------------
+# Enable PostGIS Extension (required for geographic fields)
+# -----------------------------------------------------------------------------
+enable_postgis() {
+    log_info "Enabling PostGIS extension in database..."
+
+    python3 << 'PYEOF'
+import os
+import sys
+
+# Read database config from environment
+host = os.environ.get("DB_HOST", "localhost")
+port = os.environ.get("DB_PORT", "5432")
+dbname = os.environ.get("DB_NAME", "zumodra")
+user = os.environ.get("DB_USER", "postgres")
+password = os.environ.get("DB_PASSWORD", "")
+
+try:
+    port = int(port)
+except ValueError:
+    print(f"[POSTGIS] Invalid port value: {port}")
+    sys.exit(1)
+
+# Try psycopg (v3) first, fall back to psycopg2
+driver = None
+try:
+    import psycopg
+    driver = "psycopg3"
+except ImportError:
+    try:
+        import psycopg2 as psycopg
+        driver = "psycopg2"
+    except ImportError:
+        print("[POSTGIS] Neither psycopg nor psycopg2 is installed!")
+        sys.exit(1)
+
+try:
+    if driver == "psycopg3":
+        conn = psycopg.connect(
+            host=host,
+            port=port,
+            dbname=dbname,
+            user=user,
+            password=password,
+            connect_timeout=5,
+        )
+    else:
+        conn = psycopg.connect(
+            host=host,
+            port=port,
+            dbname=dbname,
+            user=user,
+            password=password,
+            connect_timeout=5,
+        )
+
+    # Enable PostGIS extension
+    conn.autocommit = True
+    with conn.cursor() as cur:
+        cur.execute("CREATE EXTENSION IF NOT EXISTS postgis;")
+        print("[POSTGIS] PostGIS extension enabled successfully!")
+
+        # Verify PostGIS is working
+        cur.execute("SELECT PostGIS_version();")
+        version = cur.fetchone()[0]
+        print(f"[POSTGIS] PostGIS version: {version}")
+
+    conn.close()
+    sys.exit(0)
+except Exception as e:
+    print(f"[POSTGIS] Failed to enable PostGIS: {e}")
+    sys.exit(1)
+PYEOF
+
+    if [ $? -eq 0 ]; then
+        log_info "PostGIS extension enabled successfully!"
+    else
+        log_error "Failed to enable PostGIS extension!"
+        return 1
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Run Django Migrations (django-tenants compatible)
 # -----------------------------------------------------------------------------
 run_migrations() {
@@ -363,6 +445,9 @@ run_migrations() {
 
     # Fix migration directory permissions (Docker compatibility)
     fix_migration_permissions
+
+    # Enable PostGIS extension before migrations
+    enable_postgis || return 1
 
     # Step 1: Run migrations for SHARED_APPS on the public schema
     log_info "Step 1/4: Migrating shared schema (public)..."
