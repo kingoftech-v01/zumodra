@@ -1,21 +1,61 @@
 {% extends "base/freelanhub_base.html" %}
-{% load static i18n humanize %}
+{% load static i18n %}
 
-{% block title %}{% trans "Browse Companies" %} - Zumodra{% endblock %}
-{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block title %}Browse Companies - Zumodra{% endblock %}
+{% block meta_description %}Browse top companies hiring on Zumodra{% endblock %}
 
 {% block content %}
 
-{# Breadcrumb Section #}
-<section class="breadcrumb lg:py-20 md:py-14 py-10">
-    <div class="container">
-        <div class="content flex flex-col items-center gap-y-3">
-            <div class="list_nav flex items-center justify-center flex-wrap gap-2">
-                <a href="{% url 'home' %}" class="text-secondary hover:text-primary">{% trans "Home" %}</a>
-                <span class="ph ph-caret-right text-sm text-secondary"></span>
-                <span class="caption1 capitalize">{% trans "Browse Companies" %}</span>
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+            <img src="{% static 'assets/images/components/breadcrumb_employer.webp' %}" alt="breadcrumb_employer" class="w-full h-full object-cover" />
+        </div>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">Home</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white">For Candidates</span>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">Employers</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Employers Default</h3>
+                <div class="form_search z-[1] w-full mt-5 animate animate_top" style="--i: 3">
+                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white">
+                        <div class="form_input relative w-full">
+                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
+                            <input type="text" class="input_search w-full h-full pl-10" placeholder="Job title, key words or company" required />
+                        </div>
+                        <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                            <div class="select">
+                                <span class="selected" data-title="City, State or Zip">City, State or Zip</span>
+                                <ul class="list_option bg-white max-sm:w-full">
+                                    <li data-item="Las Vegas, USA">Las Vegas, USA</li>
+                                    <li data-item="Cape Town, South Africa">Cape Town, South Africa</li>
+                                    <li data-item="Sydney, Australia">Sydney, Australia</li>
+                                    <li data-item="Tokyo, Japan">Tokyo, Japan</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl sm:right-0 right-3"></span>
+                        </div>
+                        <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                            <div class="select">
+                                <span class="selected" data-title="All Categories">All Categories</span>
+                                <ul class="list_option bg-white max-sm:w-full">
+                                    <li data-item="Graphic & Design">Graphic & Design</li>
+                                    <li data-item="Wrting">Wrting</li>
+                                    <li data-item="Videos">Videos</li>
+                                    <li data-item="Digital Marketing">Digital Marketing</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl sm:right-0 right-3"></span>
+                        </div>
+                        <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">Search</button>
+                    </form>
+                </div>
             </div>
-            <div class="heading3 text-center">{% trans "Find Your Dream Company" %}</div>
         </div>
     </div>
 </section>
@@ -64,7 +104,7 @@
             </div>
         </div>
         <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
-            <span class="quantity pr-3 border-r border-line">{{ total_companies }}+ Results</span>
+            <span class="quantity pr-3 border-r border-line">{{ total_companies|default:"0" }}+ Results</span>
             <div class="list flex flex-wrap items-center gap-3"></div>
             <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
                 <span class="ph ph-x text-sm"></span>
@@ -78,9 +118,7 @@
                     {% if company.logo %}
                     <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
                     {% else %}
-                    <div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
-                        <span class="ph ph-buildings text-4xl text-secondary"></span>
-                    </div>
+                    <img src="{% static 'assets/images/company/1.png' %}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
                     {% endif %}
                 </a>
                 <ul class="rate flex items-center mt-4">
@@ -93,9 +131,9 @@
                 <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">{{ company.name }}</a>
                 <div class="employers_address -style-1 text-secondary mt-1">
                     <span class="ph ph-map-pin text-lg"></span>
-                    <span class="address caption1 align-top">{{ company.city }}{% if company.country %}, {{ company.country }}{% endif %}</span>
+                    <span class="address caption1 align-top">{{ company.city|default:"Remote" }}{% if company.country %}, {{ company.country }}{% endif %}</span>
                 </div>
-                <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">{{ company.open_jobs_count }} job opening{{ company.open_jobs_count|pluralize }}</a>
+                <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">{{ company.open_jobs_count|default:0 }} job opening{{ company.open_jobs_count|default:0|pluralize }}</a>
                 <button class="add_wishlist_btn absolute top-5 right-5 -border">
                     <span class="ph ph-heart text-xl"></span>
                     <span class="ph-fill ph-heart text-xl"></span>
@@ -103,228 +141,25 @@
             </li>
             {% empty %}
             <li class="col-span-full text-center py-16">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="ph ph-buildings text-4xl text-gray-400"></span>
-                </div>
-                <h3 class="heading5 mb-2">{% trans "No Companies Found" %}</h3>
-                <p class="text-secondary">{% trans "There are currently no companies. Check back later!" %}</p>
+                <p class="text-secondary">No companies found.</p>
             </li>
             {% endfor %}
+        </ul>
+        <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+            </li>
         </ul>
     </div>
 </div>
 
-<!-- Filter Sidebar Modal -->
-<div class="modal">
-    <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
-        <form class="h-full">
-            <div class="block_filter h-full py-4 px-6">
-                <div class="filter_section search">
-                    <strong class="text-button">{% trans "Search" %}</strong>
-                    <div class="form_input relative w-full h-12 mt-2">
-                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
-                        <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Company name or keywords' %}" />
-                    </div>
-                </div>
-                <div class="filter_section location mt-6">
-                    <strong class="text-button">{% trans "Location" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select location">{% trans "Select location" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find location...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Africa">Africa</li>
-                                    <li class="capitalize" data-item="Americas">Americas</li>
-                                    <li class="capitalize" data-item="Asia">Asia</li>
-                                    <li class="capitalize" data-item="Europe">Europe</li>
-                                    <li class="capitalize" data-item="North America">North America</li>
-                                    <li class="capitalize" data-item="Oceania">Oceania</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section category relative mt-6">
-                    <strong class="text-button">{% trans "Industry" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select industry">{% trans "Select industry" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find industry...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Technology">Technology</li>
-                                    <li class="capitalize" data-item="Healthcare">Healthcare</li>
-                                    <li class="capitalize" data-item="Finance">Finance</li>
-                                    <li class="capitalize" data-item="Education">Education</li>
-                                    <li class="capitalize" data-item="Manufacturing">Manufacturing</li>
-                                    <li class="capitalize" data-item="Retail">Retail</li>
-                                    <li class="capitalize" data-item="Consulting">Consulting</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section company_size mt-6">
-                    <strong class="text-button">{% trans "Company Size" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select company size">{% trans "Select company size" %}</span>
-                            <ul class="list_option w-full bg-white">
-                                <li class="capitalize" data-item="1-10 employees">1-10 employees</li>
-                                <li class="capitalize" data-item="11-50 employees">11-50 employees</li>
-                                <li class="capitalize" data-item="51-200 employees">51-200 employees</li>
-                                <li class="capitalize" data-item="201-500 employees">201-500 employees</li>
-                                <li class="capitalize" data-item="500+ employees">500+ employees</li>
-                            </ul>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
-                <button type="button" class="button-main w-full text-center">{% trans "Apply Filters" %}</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'assets/js/jquery-3.7.0.js' %}"></script>
-<script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
-<script src="{% static 'assets/js/slick.min.js' %}"></script>
-<script src="{% static 'assets/js/count-down.js' %}"></script>
-<script src="{% static 'assets/js/main.js' %}"></script>
-<script>
-// WebSocket for real-time company updates
-let ws = null;
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-
-function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=companies`;
-
-    ws = new WebSocket(wsUrl);
-
-    ws.onopen = function(e) {
-        console.log('[WebSocket] Connected to companies live updates');
-        reconnectAttempts = 0;
-    };
-
-    ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-
-        switch(data.type) {
-            case 'connection_established':
-                console.log('[WebSocket] Connection confirmed');
-                break;
-            case 'company_created':
-                handleCompanyCreated(data.company);
-                break;
-            case 'company_updated':
-                handleCompanyUpdated(data.company);
-                break;
-            case 'pong':
-                break;
-        }
-    };
-
-    ws.onerror = function(error) {
-        console.error('[WebSocket] Error:', error);
-    };
-
-    ws.onclose = function(event) {
-        console.log('[WebSocket] Disconnected');
-
-        if (reconnectAttempts < maxReconnectAttempts) {
-            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-            console.log(`[WebSocket] Reconnecting in ${delay}ms...`);
-
-            setTimeout(() => {
-                reconnectAttempts++;
-                connectWebSocket();
-            }, delay);
-        }
-    };
-
-    setInterval(() => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
-        }
-    }, 30000);
-}
-
-function handleCompanyCreated(company) {
-    const companyCard = createCompanyCard(company);
-    const companiesList = document.querySelector('.list_employers');
-    companiesList.insertAdjacentHTML('afterbegin', companyCard);
-
-    const newCard = companiesList.querySelector('.employers_item:first-child');
-    newCard.classList.add('animate-fade-in');
-
-    updateResultCount(1);
-}
-
-function handleCompanyUpdated(company) {
-    const existingCard = document.querySelector(`[data-company-id="${company.id}"]`);
-    if (existingCard) {
-        existingCard.classList.add('animate-pulse');
-        setTimeout(() => existingCard.classList.remove('animate-pulse'), 1000);
-    }
-}
-
-function createCompanyCard(company) {
-    return `
-        <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300" data-company-id="${company.id}">
-            <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
-                ${company.logo ? `<img src="${company.logo}" alt="${company.name}" class="employers_logo w-full h-full object-cover" />` : `
-                <div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
-                    <span class="ph ph-buildings text-4xl text-secondary"></span>
-                </div>`}
-            </a>
-            <ul class="rate flex items-center mt-4">
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-            </ul>
-            <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">${company.name}</a>
-            <div class="employers_address -style-1 text-secondary mt-1">
-                <span class="ph ph-map-pin text-lg"></span>
-                <span class="address caption1 align-top">${company.city || ''}${company.country ? ', ' + company.country : ''}</span>
-            </div>
-            <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">${company.open_jobs_count || 0} job opening${(company.open_jobs_count || 0) !== 1 ? 's' : ''}</a>
-            <button class="add_wishlist_btn absolute top-5 right-5 -border">
-                <span class="ph ph-heart text-xl"></span>
-                <span class="ph-fill ph-heart text-xl"></span>
-            </button>
-        </li>
-    `;
-}
-
-function updateResultCount(change) {
-    const countEl = document.querySelector('.quantity');
-    if (countEl) {
-        const currentCount = parseInt(countEl.textContent.match(/\d+/)[0]);
-        const newCount = currentCount + change;
-        countEl.textContent = `${newCount}+ Results`;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    connectWebSocket();
-});
-</script>
 {% endblock %}
