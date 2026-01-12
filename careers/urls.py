@@ -68,6 +68,7 @@ from .views import (
 from .template_views import (
     # Server-rendered template views
     CareerSiteHomeView,
+    BrowseJobsMapView,
     JobDetailPageView,
     ApplicationPageView,
     ApplicationSuccessView,
@@ -133,6 +134,10 @@ admin_patterns = [
 template_patterns = [
     # Career home (job list)
     path('', CareerSiteHomeView.as_view(), name='home'),
+
+    # Browse jobs views
+    path('browse/', CareerSiteHomeView.as_view(), name='browse_jobs'),
+    path('browse/map/', BrowseJobsMapView.as_view(), name='browse_jobs_map'),
 
     # Job detail pages
     path('jobs/<int:pk>/', JobDetailPageView.as_view(), name='job-detail'),

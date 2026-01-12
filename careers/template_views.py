@@ -264,9 +264,123 @@ class CareerSiteContextMixin:
 class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
     """
     Career site home page with job listings.
-    SEO-optimized server-rendered job listing page.
+    SEO-optimized server-rendered job listing page with FreelanceHub-style grid.
     """
-    template_name = 'careers/job_list.html'
+    template_name = 'careers/browse_jobs.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site = self.get_career_site()
+
+        if not site:
+            raise Http404(_("Career site not found"))
+
+        # Get filter parameters
+        category = self.request.GET.get('category')
+        location = self.request.GET.get('location')
+        job_type = self.request.GET.get('job_type')
+        remote = self.request.GET.get('remote')
+        search = self.request.GET.get('search', '').strip()
+        page = self.request.GET.get('page', 1)
+
+        # Base queryset
+        now = timezone.now()
+        jobs = JobListing.objects.filter(
+            job__status='open',
+            job__published_on_career_page=True,
+            published_at__isnull=False,
+        ).exclude(
+            expires_at__lt=now
+        ).select_related(
+            'job', 'job__category'
+        ).order_by('-is_featured', '-feature_priority', '-published_at')
+
+        # Apply filters
+        if category:
+            jobs = jobs.filter(job__category__slug=category)
+
+        if location:
+            jobs = jobs.filter(
+                job__location_city__icontains=location
+            ) | jobs.filter(
+                job__location_country__icontains=location
+            )
+
+        if job_type:
+            jobs = jobs.filter(job__job_type=job_type)
+
+        if remote == 'true':
+            jobs = jobs.filter(job__remote_policy__in=['remote', 'hybrid', 'flexible'])
+
+        if search:
+            jobs = jobs.filter(
+                job__title__icontains=search
+            ) | jobs.filter(
+                job__description__icontains=search
+            )
+
+        # Pagination
+        paginator = Paginator(jobs, 12)  # 12 jobs per page
+        try:
+            jobs_page = paginator.page(page)
+        except PageNotAnInteger:
+            jobs_page = paginator.page(1)
+        except EmptyPage:
+            jobs_page = paginator.page(paginator.num_pages)
+
+        # Serialize jobs for JSON-LD
+        jobs_serialized = PublicJobListSerializer(
+            jobs_page.object_list, many=True, context={'request': self.request}
+        ).data
+
+        # Get filter options
+        from ats.models import JobCategory
+        categories = JobCategory.objects.filter(
+            is_active=True
+        ).annotate(
+            job_count=Count('jobs', filter=models.Q(jobs__status='open'))
+        ).filter(job_count__gt=0).order_by('name')
+
+        locations = JobListing.objects.filter(
+            job__status='open',
+            published_at__isnull=False
+        ).exclude(
+            job__location_city=''
+        ).values_list('job__location_city', flat=True).distinct()
+
+        context.update({
+            'jobs': jobs_page,
+            'jobs_serialized': jobs_serialized,
+            'total_jobs': paginator.count,
+            'categories': categories,
+            'locations': list(set(locations)),
+            'job_types': [
+                ('full_time', _('Full-time')),
+                ('part_time', _('Part-time')),
+                ('contract', _('Contract')),
+                ('internship', _('Internship')),
+                ('temporary', _('Temporary')),
+                ('freelance', _('Freelance')),
+            ],
+            # Current filters (match template variable names)
+            'selected_category': category,
+            'selected_location': location,
+            'selected_job_type': job_type,
+            'selected_remote': remote,
+            'search': search,
+            # Featured jobs
+            'featured_jobs': jobs.filter(is_featured=True)[:3],
+        })
+
+        return context
+
+
+class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
+    """
+    Career site job listings with map view.
+    FreelanceHub-style half-map layout with job locations.
+    """
+    template_name = 'careers/browse_jobs_map.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -363,11 +477,11 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
                 ('freelance', _('Freelance')),
             ],
             # Current filters
-            'current_category': category,
-            'current_location': location,
-            'current_job_type': job_type,
-            'current_remote': remote,
-            'current_search': search,
+            'selected_category': category,
+            'selected_location': location,
+            'selected_job_type': job_type,
+            'selected_remote': remote,
+            'search': search,
             # Featured jobs
             'featured_jobs': jobs.filter(is_featured=True)[:3],
         })

@@ -1,0 +1,25 @@
+{% load static i18n %}
+
+{# Breadcrumb component for careers pages #}
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full bg-primary"></div>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center h-full">
+                <div class="list_breadcrumb flex items-center gap-2">
+                    <a href="{% url 'home' %}" class="caption1 text-white">{% trans "Home" %}</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">{{ title|default:"Browse Jobs" }}</span>
+                </div>
+                <h3 class="heading3 text-white mt-2">{{ heading|default:"Find Your Dream Job" }}</h3>
+                {% if subtitle %}
+                <p class="text-white opacity-90 mt-2">{{ subtitle }}</p>
+                {% elif total_jobs %}
+                <p class="text-white opacity-90 mt-2">
+                    {% blocktrans count counter=total_jobs %}{{ counter }} job available{% plural %}{{ counter }} jobs available{% endblocktrans %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

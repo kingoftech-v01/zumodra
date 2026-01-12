@@ -1,0 +1,73 @@
+{% load static i18n humanize %}
+
+{# FreelanceHub-style job card component #}
+<li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+        {# Company Logo #}
+        {% if job.tenant.company_logo %}
+        <a href="{% url 'careers:job_detail' job.slug %}" class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-lg">
+            <img src="{{ job.tenant.company_logo.url }}" alt="{{ job.tenant.name }}" class="jobs_avatar w-full h-full object-cover" />
+        </a>
+        {% else %}
+        <div class="overflow-hidden flex-shrink-0 w-15 h-15 rounded-lg bg-surface flex items-center justify-center">
+            <span class="ph ph-buildings text-3xl text-secondary"></span>
+        </div>
+        {% endif %}
+
+        <div class="jobs_content flex items-center justify-between gap-2 w-full">
+            <a href="{% url 'careers:job_detail' job.slug %}" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                <span class="jobs_company text-sm font-semibold text-primary">{{ job.tenant.name|default:"Company Name" }}</span>
+                <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
+                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                    {# Location #}
+                    <div class="jobs_address -style-1 text-secondary">
+                        <span class="ph ph-map-pin text-lg"></span>
+                        <span class="address caption1 align-top">
+                            {% if job.location_city %}
+                                {{ job.location_city }}{% if job.location_country %}, {{ job.location_country }}{% endif %}
+                            {% else %}
+                                {% if job.remote_policy == 'remote' %}
+                                    {% trans "Remote" %}
+                                {% else %}
+                                    {% trans "Location TBD" %}
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {# Posted Date #}
+                    <div class="jobs_date text-secondary">
+                        <span class="ph ph-calendar-blank text-lg"></span>
+                        <span class="date caption1 align-top">{{ job.published_at|timesince }} {% trans "ago" %}</span>
+                    </div>
+                </div>
+            </a>
+            {# Wishlist Button #}
+            <button class="add_wishlist_btn -relative -border" data-job-id="{{ job.id }}" aria-label="{% trans 'Add to wishlist' %}">
+                <span class="ph ph-heart text-xl"></span>
+                <span class="ph-fill ph-heart text-xl"></span>
+            </button>
+        </div>
+    </div>
+
+    {# Job Tags and Salary #}
+    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+        <div class="flex flex-wrap items-center gap-2.5">
+            <span class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ job.get_job_type_display }}</span>
+            {% if job.category %}
+            <span class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ job.category.name }}</span>
+            {% endif %}
+            {% if job.remote_policy != 'on_site' %}
+            <span class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ job.get_remote_policy_display }}</span>
+            {% endif %}
+        </div>
+        {% if job.salary_min or job.salary_max %}
+        <div class="jobs_price">
+            <span class="price text-title">
+                {% if job.salary_min %}${{ job.salary_min|floatformat:0 }}{% endif %}
+                {% if job.salary_max %} - ${{ job.salary_max|floatformat:0 }}{% endif %}
+            </span>
+            <span class="text-secondary">/{% trans "year" %}</span>
+        </div>
+        {% endif %}
+    </div>
+</li>
