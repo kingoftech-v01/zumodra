@@ -284,10 +284,27 @@ class Command(BaseCommand):
                 status=JobPosting.JobStatus.OPEN,
                 published_at=timezone.now(),
                 created_by=admin,
+                # Career page visibility
+                published_on_career_page=True,
+                is_internal_only=False,
             )
             jobs.append(job)
 
         self.stdout.write(self.style.SUCCESS(f"   Created {len(jobs)} jobs"))
+
+        # Manually sync jobs to PublicJobCatalog
+        self.stdout.write("   Syncing jobs to public catalog...")
+        from core.sync.job_sync import JobPublicSyncService
+        sync_service = JobPublicSyncService()
+        synced_count = 0
+        for job in jobs:
+            try:
+                catalog_entry = sync_service.sync_to_public(job)
+                if catalog_entry:
+                    synced_count += 1
+            except Exception as e:
+                self.stdout.write(self.style.WARNING(f"   Failed to sync job {job.title}: {e}"))
+        self.stdout.write(self.style.SUCCESS(f"   Synced {synced_count}/{len(jobs)} jobs to public catalog"))
 
         # Create sample candidates
         self.stdout.write(f"\n8. Creating {num_candidates} sample candidates...")
