@@ -1,0 +1,31 @@
+{% load static i18n %}
+
+{# Company Pagination Component #}
+{# Reusable pagination for company lists #}
+
+{% if companies.has_other_pages %}
+<div class="list_pagination flex items-center justify-center md:gap-5 gap-3 md:mt-12 mt-8">
+    {% if companies.has_previous %}
+    <a href="?page={{ companies.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}{% if selected_industry %}&industry={{ selected_industry }}{% endif %}"
+       class="item flex items-center justify-center w-11 h-11 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary">
+        <span class="ph ph-caret-left text-xl"></span>
+    </a>
+    {% endif %}
+
+    {% for num in companies.paginator.page_range %}
+        {% if companies.number == num %}
+        <span class="item flex items-center justify-center w-11 h-11 border border-primary bg-primary text-white rounded-lg">{{ num }}</span>
+        {% elif num > companies.number|add:'-3' and num < companies.number|add:'3' %}
+        <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}{% if selected_industry %}&industry={{ selected_industry }}{% endif %}"
+           class="item flex items-center justify-center w-11 h-11 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if companies.has_next %}
+    <a href="?page={{ companies.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}{% if selected_industry %}&industry={{ selected_industry }}{% endif %}"
+       class="item flex items-center justify-center w-11 h-11 border border-line rounded-lg duration-300 hover:bg-primary hover:text-white hover:border-primary">
+        <span class="ph ph-caret-right text-xl"></span>
+    </a>
+    {% endif %}
+</div>
+{% endif %}

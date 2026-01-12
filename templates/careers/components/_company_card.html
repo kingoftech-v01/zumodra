@@ -1,0 +1,56 @@
+{% load static i18n humanize %}
+
+{# FreelanceHub-style company/employer card component #}
+<li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+    {# Company Logo #}
+    {% if company.company_logo %}
+    <a href="{% url 'careers:company_detail' company.slug %}" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg">
+        <img src="{{ company.company_logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
+    </a>
+    {% else %}
+    <a href="{% url 'careers:company_detail' company.slug %}" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg bg-surface flex items-center justify-center">
+        <span class="ph ph-buildings text-4xl text-secondary"></span>
+    </a>
+    {% endif %}
+
+    {# Rating (if available) #}
+    {% if company.rating %}
+    <ul class="rate flex items-center mt-4">
+        {% for i in "12345" %}
+            {% if forloop.counter <= company.rating %}
+            <li class="ph-fill ph-star text-yellow"></li>
+            {% else %}
+            <li class="ph ph-star text-secondary"></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {# Company Name #}
+    <a href="{% url 'careers:company_detail' company.slug %}" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary text-center">
+        {{ company.name }}
+    </a>
+
+    {# Location #}
+    <div class="employers_address -style-1 text-secondary mt-1">
+        <span class="ph ph-map-pin text-lg"></span>
+        <span class="address caption1 align-top">
+            {% if company.location_city %}
+                {{ company.location_city }}{% if company.location_country %}, {{ company.location_country }}{% endif %}
+            {% else %}
+                {% trans "Location not specified" %}
+            {% endif %}
+        </span>
+    </div>
+
+    {# Job Openings Button #}
+    <a href="{% url 'careers:company_jobs' company.slug %}" class="button-main -border w-full mt-4 text-center whitespace-nowrap">
+        {% blocktrans count counter=company.open_jobs_count %}{{ counter }} job opening{% plural %}{{ counter }} job openings{% endblocktrans %}
+    </a>
+
+    {# Wishlist Button #}
+    <button class="add_wishlist_btn absolute top-5 right-5 -border" data-company-id="{{ company.id }}" aria-label="{% trans 'Add to wishlist' %}">
+        <span class="ph ph-heart text-xl"></span>
+        <span class="ph-fill ph-heart text-xl"></span>
+    </button>
+</li>

@@ -1,0 +1,54 @@
+{% load static i18n %}
+
+{# Company Filter Bar Component #}
+{# Usage: {% include "careers/components/_company_filter_bar.html" with view_mode="grid" total_companies=total_companies %} #}
+
+<div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full{% if not map_view %} pb-7.5 border-b border-line{% endif %}">
+    <div class="left flex items-center gap-3">
+        <strong class="total_result text-title">
+            {% blocktrans count counter=total_companies %}{{ counter }} company{% plural %}{{ counter }} companies{% endblocktrans %}
+        </strong>
+        <div class="list_filter flex items-center gap-2">
+            {# View Modes #}
+            {% if view_mode == 'grid' %}
+            <div class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-primary bg-primary text-white">
+                <span class="ph ph-grid-four text-xl"></span>
+                <span class="caption1">{% trans "Grid" %}</span>
+            </div>
+            {% else %}
+            <a href="{% url 'careers:browse_companies' %}" class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary">
+                <span class="ph ph-grid-four text-xl"></span>
+                <span class="caption1">{% trans "Grid" %}</span>
+            </a>
+            {% endif %}
+
+            {% if view_mode == 'map' %}
+            <div class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-primary bg-primary text-white">
+                <span class="ph ph-map-pin text-xl"></span>
+                <span class="caption1">{% trans "Map" %}</span>
+            </div>
+            {% else %}
+            <a href="{% url 'careers:browse_companies_map' %}" class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary">
+                <span class="ph ph-map-pin text-xl"></span>
+                <span class="caption1">{% trans "Map" %}</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="select_filter flex items-center gap-3">
+        <span class="caption1">{% trans "Sort by:" %}</span>
+        <div class="select_block sm:pr-16 pr-10 pl-3 py-1 border border-line rounded">
+            <div class="select">
+                <span class="selected caption1 capitalize" data-title="{% trans 'sort default' %}">{% trans "default" %}</span>
+                <ul class="list_option p-0 bg-white">
+                    <li class="capitalize" data-item="default">{% trans "sort by (default)" %}</li>
+                    <li class="capitalize" data-item="newest">{% trans "newest" %}</li>
+                    <li class="capitalize" data-item="oldest">{% trans "oldest" %}</li>
+                    <li class="capitalize" data-item="most-jobs">{% trans "most jobs" %}</li>
+                </ul>
+            </div>
+            <span class="icon_down ph ph-caret-down right-3"></span>
+        </div>
+    </div>
+</div>

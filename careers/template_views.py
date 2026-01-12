@@ -1003,3 +1003,190 @@ class CareersSitemapView(View):
         xml_content += '</urlset>'
 
         return HttpResponse(xml_content, content_type='application/xml')
+
+
+# ==================== COMPANY BROWSING VIEWS ====================
+
+class BrowseCompaniesView(TemplateView):
+    """
+    Public company browsing page with grid layout.
+    FreelanceHub-style grid view for browsing all active companies on the platform.
+    """
+    template_name = 'careers/browse_companies.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filter parameters
+        location = self.request.GET.get('location', '').strip()
+        industry = self.request.GET.get('industry', '').strip()
+        search = self.request.GET.get('search', '').strip()
+        page = self.request.GET.get('page', 1)
+
+        # Import Tenant model
+        from tenants.models import Tenant
+
+        # Base queryset - only active companies
+        companies = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).select_related('plan')
+
+        # Annotate with open jobs count
+        from ats.models import Job
+        companies = companies.annotate(
+            open_jobs_count=Count(
+                'jobs',
+                filter=models.Q(jobs__status='open')
+            )
+        )
+
+        # Apply filters
+        if location:
+            companies = companies.filter(
+                models.Q(city__icontains=location) |
+                models.Q(state__icontains=location) |
+                models.Q(country__icontains=location)
+            )
+
+        if industry:
+            companies = companies.filter(industry__icontains=industry)
+
+        if search:
+            companies = companies.filter(
+                models.Q(name__icontains=search) |
+                models.Q(industry__icontains=search)
+            )
+
+        # Order by: companies with most open jobs first
+        companies = companies.order_by('-open_jobs_count', '-created_at')
+
+        # Pagination
+        paginator = Paginator(companies, 16)  # 16 companies per page (4x4 grid)
+        try:
+            companies_page = paginator.page(page)
+        except PageNotAnInteger:
+            companies_page = paginator.page(1)
+        except EmptyPage:
+            companies_page = paginator.page(paginator.num_pages)
+
+        # Get unique industries for filter dropdown
+        industries = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).exclude(industry='').values_list('industry', flat=True).distinct()
+
+        # Add company_logo property to each company for template compatibility
+        for company in companies_page.object_list:
+            company.company_logo = company.logo
+            company.location_city = company.city
+            company.location_country = company.country
+
+        context.update({
+            'companies': companies_page,
+            'total_companies': paginator.count,
+            'industries': list(set(industries)),
+            'view_mode': 'grid',
+            # Current filters
+            'selected_location': location,
+            'selected_industry': industry,
+            'search': search,
+            # Meta tags
+            'meta_description': _('Browse and discover companies hiring on Zumodra. Find your next opportunity at top companies.'),
+        })
+
+        return context
+
+
+class BrowseCompaniesMapView(TemplateView):
+    """
+    Public company browsing page with map layout.
+    FreelanceHub-style half-map view showing companies on an interactive map.
+    """
+    template_name = 'careers/browse_companies_map.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filter parameters
+        location = self.request.GET.get('location', '').strip()
+        industry = self.request.GET.get('industry', '').strip()
+        search = self.request.GET.get('search', '').strip()
+        page = self.request.GET.get('page', 1)
+
+        # Import Tenant model
+        from tenants.models import Tenant
+
+        # Base queryset - only active companies
+        companies = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).select_related('plan')
+
+        # Annotate with open jobs count
+        from ats.models import Job
+        companies = companies.annotate(
+            open_jobs_count=Count(
+                'jobs',
+                filter=models.Q(jobs__status='open')
+            )
+        )
+
+        # Apply filters
+        if location:
+            companies = companies.filter(
+                models.Q(city__icontains=location) |
+                models.Q(state__icontains=location) |
+                models.Q(country__icontains=location)
+            )
+
+        if industry:
+            companies = companies.filter(industry__icontains=industry)
+
+        if search:
+            companies = companies.filter(
+                models.Q(name__icontains=search) |
+                models.Q(industry__icontains=search)
+            )
+
+        # Order by: companies with most open jobs first
+        companies = companies.order_by('-open_jobs_count', '-created_at')
+
+        # Pagination
+        paginator = Paginator(companies, 12)  # 12 companies per page for map view
+        try:
+            companies_page = paginator.page(page)
+        except PageNotAnInteger:
+            companies_page = paginator.page(1)
+        except EmptyPage:
+            companies_page = paginator.page(paginator.num_pages)
+
+        # Get unique industries for filter dropdown
+        industries = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).exclude(industry='').values_list('industry', flat=True).distinct()
+
+        # Add company_logo and location properties for template compatibility
+        for company in companies_page.object_list:
+            company.company_logo = company.logo
+            company.location_city = company.city
+            company.location_country = company.country
+            # For map markers, we'll need coordinates
+            # TODO: Add geocoding or use existing coordinates if available
+            company.location_coordinates = None
+
+        context.update({
+            'companies': companies_page,
+            'total_companies': paginator.count,
+            'industries': list(set(industries)),
+            'view_mode': 'map',
+            # Current filters
+            'selected_location': location,
+            'selected_industry': industry,
+            'search': search,
+            # Meta tags
+            'meta_description': _('Browse companies on a map. Find companies hiring in your area.'),
+        })
+
+        return context

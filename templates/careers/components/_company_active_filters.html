@@ -1,0 +1,35 @@
+{% load static i18n %}
+
+{# Company Active Filters Component #}
+{# Shows active search/location/industry filters with remove buttons #}
+
+{% if search or selected_location or selected_industry %}
+<div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+    <span class="quantity pr-3 border-r border-line">{{ total_companies|default:0 }}+ {% trans "Results" %}</span>
+    <div class="list flex flex-wrap items-center gap-3">
+        {% if search %}
+        <span class="item flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-secondary">
+            "{{ search }}"
+            <a href="?{% if selected_location %}location={{ selected_location }}&{% endif %}{% if selected_industry %}industry={{ selected_industry }}{% endif %}" class="ph ph-x text-sm"></a>
+        </span>
+        {% endif %}
+        {% if selected_location %}
+        <span class="item flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-secondary">
+            <span class="ph ph-map-pin text-sm"></span>
+            {{ selected_location }}
+            <a href="?{% if search %}search={{ search }}&{% endif %}{% if selected_industry %}industry={{ selected_industry }}{% endif %}" class="ph ph-x text-sm"></a>
+        </span>
+        {% endif %}
+        {% if selected_industry %}
+        <span class="item flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-secondary">
+            {{ selected_industry|title }}
+            <a href="?{% if search %}search={{ search }}&{% endif %}{% if selected_location %}location={{ selected_location }}{% endif %}" class="ph ph-x text-sm"></a>
+        </span>
+        {% endif %}
+    </div>
+    <a href="{% url 'careers:browse_companies' %}" class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+        <span class="ph ph-x text-sm"></span>
+        <span class="caption1">{% trans "Clear All" %}</span>
+    </a>
+</div>
+{% endif %}

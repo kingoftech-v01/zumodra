@@ -83,6 +83,14 @@
                                     <div class="text-xs text-gray-500">{% trans 'Discover opportunities' %}</div>
                                 </div>
                             </a>
+                            <a href="{% url 'careers:browse_companies' %}"
+                               class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                <span class="ph-bold ph-buildings text-xl text-primary"></span>
+                                <div>
+                                    <div class="font-medium">{% trans 'Companies' %}</div>
+                                    <div class="text-xs text-gray-500">{% trans 'Browse companies hiring' %}</div>
+                                </div>
+                            </a>
                         </div>
                     </li>
 
@@ -296,6 +304,13 @@
                                class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
                                @click="mobileMenuOpen = false">
                                 {% trans 'Jobs' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'careers:browse_companies' %}"
+                               class="block px-4 py-2 text-gray-600 hover:text-primary transition-colors"
+                               @click="mobileMenuOpen = false">
+                                {% trans 'Companies' %}
                             </a>
                         </li>
                     </ul>

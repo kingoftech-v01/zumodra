@@ -69,6 +69,8 @@ from .template_views import (
     # Server-rendered template views
     CareerSiteHomeView,
     BrowseJobsMapView,
+    BrowseCompaniesView,
+    BrowseCompaniesMapView,
     JobDetailPageView,
     ApplicationPageView,
     ApplicationSuccessView,
@@ -138,6 +140,10 @@ template_patterns = [
     # Browse jobs views
     path('browse/', CareerSiteHomeView.as_view(), name='browse_jobs'),
     path('browse/map/', BrowseJobsMapView.as_view(), name='browse_jobs_map'),
+
+    # Browse companies views
+    path('companies/', BrowseCompaniesView.as_view(), name='browse_companies'),
+    path('companies/map/', BrowseCompaniesMapView.as_view(), name='browse_companies_map'),
 
     # Job detail pages
     path('jobs/<int:pk>/', JobDetailPageView.as_view(), name='job-detail'),

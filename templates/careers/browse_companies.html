@@ -1,0 +1,63 @@
+{% extends "base/freelanhub_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Browse Companies" %} - Zumodra{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+
+{# Breadcrumb #}
+{% include "careers/components/_breadcrumb.html" with title="Browse Companies" heading="Discover Great Companies" total_jobs=total_companies %}
+
+{# Companies List Section #}
+<section class="employers lg:py-20 sm:py-14 py-10">
+    <div class="container flex flex-col items-center">
+        {# Filter and Sort Bar #}
+        {% include "careers/components/_company_filter_bar.html" with view_mode="grid" total_companies=total_companies %}
+
+        {# Active Filters #}
+        {% include "careers/components/_company_active_filters.html" %}
+
+        {# Companies Grid #}
+        {% if companies %}
+        <ul class="list_layout_cols list_employers grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
+            {% for company in companies %}
+                {% include "careers/components/_company_card.html" %}
+            {% endfor %}
+        </ul>
+
+        {# Pagination #}
+        {% include "careers/components/_company_pagination.html" %}
+
+        {% else %}
+        {# No Companies Found #}
+        <div class="text-center py-16">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-buildings text-4xl text-gray-400"></i>
+            </div>
+            <h3 class="heading5 mb-2">{% trans "No Companies Found" %}</h3>
+            <p class="text-secondary">
+                {% if search or selected_location or selected_industry %}
+                    {% trans "Try adjusting your filters to see more results." %}
+                {% else %}
+                    {% trans "No companies are currently hiring. Check back later!" %}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Wishlist functionality
+document.querySelectorAll('.add_wishlist_btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        // TODO: Add AJAX call to save wishlist
+    });
+});
+</script>
+{% endblock %}
