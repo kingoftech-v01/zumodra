@@ -2,7 +2,7 @@
 ATS Signals - Automatic actions for ATS events.
 """
 
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
