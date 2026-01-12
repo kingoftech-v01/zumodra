@@ -10,7 +10,7 @@
                     <strong class="text-button">search</strong>
                     <div class="form_input relative w-full h-12 mt-2">
                         <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
-                        <input type="text" name="search" value="{{ search|default:'' }}" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Skill, Industry" />
+                        <input type="text" name="search" id="company-search-input" value="{{ search|default:'' }}" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Search by name, industry, or location" />
                     </div>
                 </div>
                 <div class="filter_section location mt-6">
@@ -108,9 +108,27 @@
     </div>
 </div>
 
+<script src="{% static 'assets/js/address-autocomplete.js' %}"></script>
 <script>
 // Filter Modal - Sync select dropdowns with hidden inputs
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize address autocomplete on search input
+    const searchAutocomplete = new AddressAutocomplete('#company-search-input', {
+        placeholder: 'Search by name, industry, or location',
+        minLength: 2,
+        debounceDelay: 400,
+        onSelect: function(data) {
+            console.log('Selected address:', data);
+            // Optionally auto-fill location dropdown
+            if (data.address && data.address.city) {
+                const locationValue = document.querySelector('.location_value');
+                const locationSelected = document.querySelector('.filter_section.location .selected');
+                if (locationValue) locationValue.value = data.address.city;
+                if (locationSelected) locationSelected.textContent = data.address.city;
+            }
+        }
+    });
+
     // Location select
     const locationOptions = document.querySelectorAll('.filter_section.location .list_option li');
     const locationValue = document.querySelector('.location_value');

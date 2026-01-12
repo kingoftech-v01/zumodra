@@ -8,14 +8,15 @@
 **Source**: `freelanhub_reference/Main/freelanhub-html/employers-default.html` (lines 1923-2017)
 
 **Features** (5 filters):
-- ✅ Search input (Skill, Industry)
-- ✅ Location dropdown with internal search (Africa, Americas, Antarctica, Asia, Europe, Oceania, Australia and New Zealand)
-- ✅ Category/Industry dropdown with internal search (Accounting & Consulting, Admin Support, Customer Service, etc.)
+- ✅ Search input with **Nominatim address autocomplete** (searches by name, industry, or location)
+- ✅ Location dropdown with internal search (dynamically loaded from database)
+- ✅ Category/Industry dropdown with internal search (dynamically loaded from database)
 - ✅ Radius slider (1-100km) with live display update
 - ✅ Company Size dropdown (1-5, 5-20, 20-50, 50-100, 100-200 employees)
 - ✅ Form submits via GET to `{% url 'careers:browse_companies' %}`
 - ✅ Hidden inputs sync with dropdown selections via JavaScript
 - ✅ Preserves filter values from query parameters
+- ✅ **Queryset filtering applied** - all filters actually work!
 
 **Usage**:
 ```django
@@ -35,16 +36,13 @@ Complete documentation including:
 ### 3. Cleanup
 - ✅ Removed old generic `_filter_sidebar.html` (not acceptable - each page needs specific filter)
 
-## 🚧 In Progress
-
-### Jobs Filter Component
-**Target File**: `templates/careers/components/_filter_jobs.html`
+### 2. Jobs Filter Component
+**File**: [templates/careers/components/_filter_jobs.html](templates/careers/components/_filter_jobs.html)
 
 **Source**: `freelanhub_reference/Main/freelanhub-html/jobs-default.html` (lines 2106-2321)
 
-**Complexity**: 215 lines, 11 filter sections + Job Alert form
-
-**Required Fields**:
+**Features** (11 filters + Job Alert form):
+- ✅ Search input with **Nominatim address autocomplete**
 1. Search - text input for "Skill, Industry"
 2. Location - dropdown with search + hidden input
 3. Category - dropdown with search + hidden input

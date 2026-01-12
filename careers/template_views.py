@@ -306,9 +306,8 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
 
         if location:
             jobs = jobs.filter(
-                job__location_city__icontains=location
-            ) | jobs.filter(
-                job__location_country__icontains=location
+                models.Q(job__location_city__icontains=location) |
+                models.Q(job__location_country__icontains=location)
             )
 
         if job_type:
@@ -319,10 +318,52 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
 
         if search:
             jobs = jobs.filter(
-                job__title__icontains=search
-            ) | jobs.filter(
-                job__description__icontains=search
+                models.Q(job__title__icontains=search) |
+                models.Q(job__description__icontains=search) |
+                models.Q(job__location_city__icontains=search)
             )
+
+        # Additional filters from new jobs filter component
+        industry = self.request.GET.get('industry', '').strip()
+        if industry:
+            jobs = jobs.filter(job__industry__icontains=industry)
+
+        career_level = self.request.GET.get('career_level', '').strip()
+        if career_level:
+            jobs = jobs.filter(job__career_level__icontains=career_level)
+
+        # Experience level (checkbox array)
+        selected_experience = self.request.GET.getlist('experience')
+        if selected_experience:
+            jobs = jobs.filter(job__experience_level__in=selected_experience)
+
+        # Salary range filter
+        salary_min = self.request.GET.get('salary_min', '').strip()
+        salary_max = self.request.GET.get('salary_max', '').strip()
+        if salary_min:
+            try:
+                jobs = jobs.filter(job__salary_min__gte=Decimal(salary_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if salary_max:
+            try:
+                jobs = jobs.filter(job__salary_max__lte=Decimal(salary_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Hourly rate filter
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        if hourly_min:
+            try:
+                jobs = jobs.filter(job__hourly_rate_min__gte=Decimal(hourly_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if hourly_max:
+            try:
+                jobs = jobs.filter(job__hourly_rate_max__lte=Decimal(hourly_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
 
         # Pagination
         paginator = Paginator(jobs, 12)  # 12 jobs per page
@@ -353,12 +394,31 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
             job__location_city=''
         ).values_list('job__location_city', flat=True).distinct()
 
+        # Additional filter parameters for new jobs filter
+        industry = self.request.GET.get('industry', '').strip()
+        career_level = self.request.GET.get('career_level', '').strip()
+        selected_experience = self.request.GET.getlist('experience')
+        salary_min = self.request.GET.get('salary_min', '0')
+        salary_max = self.request.GET.get('salary_max', '300000')
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        radius = self.request.GET.get('radius', '100')
+
+        # Get unique industries for filter dropdown
+        from ats.models import Job
+        industries = Job.objects.filter(
+            status='open'
+        ).exclude(
+            industry=''
+        ).values_list('industry', flat=True).distinct()
+
         context.update({
             'jobs': jobs_page,
             'jobs_serialized': jobs_serialized,
             'total_jobs': paginator.count,
             'categories': categories,
             'locations': list(set(locations)),
+            'industries': list(set(industries)) if industries else [],
             'job_types': [
                 ('full_time', _('Full-time')),
                 ('part_time', _('Part-time')),
@@ -371,7 +431,15 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
             'selected_category': category,
             'selected_location': location,
             'selected_job_type': job_type,
+            'selected_industry': industry,
+            'selected_career_level': career_level,
+            'selected_experience': selected_experience,
             'selected_remote': remote,
+            'salary_min': salary_min,
+            'salary_max': salary_max,
+            'hourly_min': hourly_min,
+            'hourly_max': hourly_max,
+            'radius': radius,
             'search': search,
             # Featured jobs
             'featured_jobs': jobs.filter(is_featured=True)[:3],
@@ -422,9 +490,8 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
 
         if location:
             jobs = jobs.filter(
-                job__location_city__icontains=location
-            ) | jobs.filter(
-                job__location_country__icontains=location
+                models.Q(job__location_city__icontains=location) |
+                models.Q(job__location_country__icontains=location)
             )
 
         if job_type:
@@ -435,10 +502,52 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
 
         if search:
             jobs = jobs.filter(
-                job__title__icontains=search
-            ) | jobs.filter(
-                job__description__icontains=search
+                models.Q(job__title__icontains=search) |
+                models.Q(job__description__icontains=search) |
+                models.Q(job__location_city__icontains=search)
             )
+
+        # Additional filters from new jobs filter component
+        industry = self.request.GET.get('industry', '').strip()
+        if industry:
+            jobs = jobs.filter(job__industry__icontains=industry)
+
+        career_level = self.request.GET.get('career_level', '').strip()
+        if career_level:
+            jobs = jobs.filter(job__career_level__icontains=career_level)
+
+        # Experience level (checkbox array)
+        selected_experience = self.request.GET.getlist('experience')
+        if selected_experience:
+            jobs = jobs.filter(job__experience_level__in=selected_experience)
+
+        # Salary range filter
+        salary_min = self.request.GET.get('salary_min', '').strip()
+        salary_max = self.request.GET.get('salary_max', '').strip()
+        if salary_min:
+            try:
+                jobs = jobs.filter(job__salary_min__gte=Decimal(salary_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if salary_max:
+            try:
+                jobs = jobs.filter(job__salary_max__lte=Decimal(salary_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Hourly rate filter
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        if hourly_min:
+            try:
+                jobs = jobs.filter(job__hourly_rate_min__gte=Decimal(hourly_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if hourly_max:
+            try:
+                jobs = jobs.filter(job__hourly_rate_max__lte=Decimal(hourly_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
 
         # Pagination
         paginator = Paginator(jobs, 12)  # 12 jobs per page
@@ -469,12 +578,31 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
             job__location_city=''
         ).values_list('job__location_city', flat=True).distinct()
 
+        # Additional filter parameters for new jobs filter
+        industry = self.request.GET.get('industry', '').strip()
+        career_level = self.request.GET.get('career_level', '').strip()
+        selected_experience = self.request.GET.getlist('experience')
+        salary_min = self.request.GET.get('salary_min', '0')
+        salary_max = self.request.GET.get('salary_max', '300000')
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        radius = self.request.GET.get('radius', '100')
+
+        # Get unique industries for filter dropdown
+        from ats.models import Job
+        industries = Job.objects.filter(
+            status='open'
+        ).exclude(
+            industry=''
+        ).values_list('industry', flat=True).distinct()
+
         context.update({
             'jobs': jobs_page,
             'jobs_serialized': jobs_serialized,
             'total_jobs': paginator.count,
             'categories': categories,
             'locations': list(set(locations)),
+            'industries': list(set(industries)) if industries else [],
             'job_types': [
                 ('full_time', _('Full-time')),
                 ('part_time', _('Part-time')),
@@ -487,7 +615,15 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
             'selected_category': category,
             'selected_location': location,
             'selected_job_type': job_type,
+            'selected_industry': industry,
+            'selected_career_level': career_level,
+            'selected_experience': selected_experience,
             'selected_remote': remote,
+            'salary_min': salary_min,
+            'salary_max': salary_max,
+            'hourly_min': hourly_min,
+            'hourly_max': hourly_max,
+            'radius': radius,
             'search': search,
             # Featured jobs
             'featured_jobs': jobs.filter(is_featured=True)[:3],
@@ -1064,8 +1200,27 @@ class BrowseCompaniesView(TemplateView):
         if search:
             companies = companies.filter(
                 models.Q(name__icontains=search) |
-                models.Q(industry__icontains=search)
+                models.Q(industry__icontains=search) |
+                models.Q(city__icontains=search) |
+                models.Q(country__icontains=search)
             )
+
+        # Company size filter
+        company_size = self.request.GET.get('company_size', '').strip()
+        if company_size:
+            # Parse company size range (e.g., "1-5 employees" -> filter by employee_count)
+            import re
+            size_match = re.match(r'(\d+)-(\d+)', company_size)
+            if size_match:
+                min_size = int(size_match.group(1))
+                max_size = int(size_match.group(2))
+                # Assuming Tenant model has an employee_count field
+                # If not, this filter will be ignored
+                if hasattr(Tenant, 'employee_count'):
+                    companies = companies.filter(
+                        employee_count__gte=min_size,
+                        employee_count__lte=max_size
+                    )
 
         # Order by: companies with most open jobs first
         companies = companies.order_by('-open_jobs_count', '-created_at')
@@ -1091,14 +1246,27 @@ class BrowseCompaniesView(TemplateView):
             company.location_city = company.city
             company.location_country = company.country
 
+        # Get filter parameters for new companies filter
+        company_size = self.request.GET.get('company_size', '').strip()
+        radius = self.request.GET.get('radius', '100')
+
+        # Get unique locations for filter dropdown
+        locations = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).exclude(city='').values_list('city', flat=True).distinct()
+
         context.update({
             'companies': companies_page,
             'total_companies': paginator.count,
             'industries': list(set(industries)),
+            'locations': list(set(locations)),
             'view_mode': 'grid',
             # Current filters
             'selected_location': location,
             'selected_industry': industry,
+            'selected_size': company_size,
+            'radius': radius,
             'search': search,
             # Meta tags
             'meta_description': _('Browse and discover companies hiring on Zumodra. Find your next opportunity at top companies.'),
@@ -1157,8 +1325,27 @@ class BrowseCompaniesMapView(TemplateView):
         if search:
             companies = companies.filter(
                 models.Q(name__icontains=search) |
-                models.Q(industry__icontains=search)
+                models.Q(industry__icontains=search) |
+                models.Q(city__icontains=search) |
+                models.Q(country__icontains=search)
             )
+
+        # Company size filter
+        company_size = self.request.GET.get('company_size', '').strip()
+        if company_size:
+            # Parse company size range (e.g., "1-5 employees" -> filter by employee_count)
+            import re
+            size_match = re.match(r'(\d+)-(\d+)', company_size)
+            if size_match:
+                min_size = int(size_match.group(1))
+                max_size = int(size_match.group(2))
+                # Assuming Tenant model has an employee_count field
+                # If not, this filter will be ignored
+                if hasattr(Tenant, 'employee_count'):
+                    companies = companies.filter(
+                        employee_count__gte=min_size,
+                        employee_count__lte=max_size
+                    )
 
         # Order by: companies with most open jobs first
         companies = companies.order_by('-open_jobs_count', '-created_at')
@@ -1187,14 +1374,27 @@ class BrowseCompaniesMapView(TemplateView):
             # TODO: Add geocoding or use existing coordinates if available
             company.location_coordinates = None
 
+        # Get filter parameters for new companies filter
+        company_size = self.request.GET.get('company_size', '').strip()
+        radius = self.request.GET.get('radius', '100')
+
+        # Get unique locations for filter dropdown
+        locations = Tenant.objects.filter(
+            status=Tenant.TenantStatus.ACTIVE,
+            tenant_type=Tenant.TenantType.COMPANY
+        ).exclude(city='').values_list('city', flat=True).distinct()
+
         context.update({
             'companies': companies_page,
             'total_companies': paginator.count,
             'industries': list(set(industries)),
+            'locations': list(set(locations)),
             'view_mode': 'map',
             # Current filters
             'selected_location': location,
             'selected_industry': industry,
+            'selected_size': company_size,
+            'radius': radius,
             'search': search,
             # Meta tags
             'meta_description': _('Browse companies on a map. Find companies hiring in your area.'),
@@ -1251,7 +1451,8 @@ class BrowseProjectsView(TemplateView):
             projects = projects.filter(
                 models.Q(name__icontains=search) |
                 models.Q(description__icontains=search) |
-                models.Q(short_description__icontains=search)
+                models.Q(short_description__icontains=search) |
+                models.Q(provider__city__icontains=search)
             )
 
         if budget_min:
@@ -1263,6 +1464,57 @@ class BrowseProjectsView(TemplateView):
         if budget_max:
             try:
                 projects = projects.filter(price__lte=Decimal(budget_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Additional filters from new projects filter component
+        timezone_param = self.request.GET.get('timezone', '').strip()
+        if timezone_param:
+            # Assuming Service model has a timezone field
+            if hasattr(projects.model, 'timezone'):
+                projects = projects.filter(timezone__icontains=timezone_param)
+
+        english_level = self.request.GET.get('english_level', '').strip()
+        if english_level:
+            # Assuming Service model has an english_level field
+            if hasattr(projects.model, 'english_level'):
+                projects = projects.filter(english_level__icontains=english_level)
+
+        # Experience level (checkbox array)
+        selected_experience = self.request.GET.getlist('experience')
+        if selected_experience:
+            # Assuming Service model has an experience_level field
+            if hasattr(projects.model, 'experience_level'):
+                projects = projects.filter(experience_level__in=selected_experience)
+
+        # Fixed-price range filter (use price_min/price_max from new filter)
+        price_min = self.request.GET.get('price_min', '').strip()
+        price_max = self.request.GET.get('price_max', '').strip()
+        if price_min:
+            try:
+                projects = projects.filter(price__gte=Decimal(price_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if price_max:
+            try:
+                projects = projects.filter(price__lte=Decimal(price_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Hourly rate filter
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        if hourly_min:
+            try:
+                # Assuming Service model has an hourly_rate field
+                if hasattr(projects.model, 'hourly_rate'):
+                    projects = projects.filter(hourly_rate__gte=Decimal(hourly_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if hourly_max:
+            try:
+                if hasattr(projects.model, 'hourly_rate'):
+                    projects = projects.filter(hourly_rate__lte=Decimal(hourly_max))
             except (ValueError, Decimal.InvalidOperation):
                 pass
 
@@ -1293,14 +1545,47 @@ class BrowseProjectsView(TemplateView):
             project.proposal_count = 0  # TODO: Add actual proposal count
             project.client_spent = 0  # TODO: Add actual client spent
 
+        # Additional filter parameters for new projects filter
+        timezone_param = self.request.GET.get('timezone', '').strip()
+        english_level = self.request.GET.get('english_level', '').strip()
+        selected_experience = self.request.GET.getlist('experience')
+        price_min = self.request.GET.get('price_min', '0')
+        price_max = self.request.GET.get('price_max', '3000')
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+
+        # Static filter options for projects
+        locations_list = ['Africa', 'Americas', 'Antarctica', 'Asia', 'Europe', 'Oceania', 'Australia and New Zealand']
+        timezones_list = [
+            '(UTC-11:00) Midway Island',
+            '(UTC-10:00) Hawaii',
+            '(UTC-08:00) Alaska',
+            '(UTC-07:00) Pacific Time',
+            '(UTC-07:00) Arizona',
+            '(UTC-06:00) Mountain Time',
+            '(UTC-05:00) Eastern Time',
+        ]
+        english_levels_list = ['Basic', 'Conversational', 'Fluent', 'Native Or Bilingual', 'Professional']
+
         context.update({
             'projects': projects_page,
             'total_projects': paginator.count,
             'categories': categories,
+            'locations': locations_list,
+            'timezones': timezones_list,
+            'english_levels': english_levels_list,
             # Current filters
             'selected_category': category,
             'selected_location': location,
+            'selected_timezone': timezone_param,
+            'selected_english_level': english_level,
+            'selected_experience': selected_experience,
+            'price_min': price_min,
+            'price_max': price_max,
+            'hourly_min': hourly_min,
+            'hourly_max': hourly_max,
             'search': search,
+            # Legacy budget params (keep for backward compatibility)
             'budget_min': budget_min,
             'budget_max': budget_max,
             # Meta tags
@@ -1356,7 +1641,8 @@ class BrowseProjectsMapView(TemplateView):
             projects = projects.filter(
                 models.Q(name__icontains=search) |
                 models.Q(description__icontains=search) |
-                models.Q(short_description__icontains=search)
+                models.Q(short_description__icontains=search) |
+                models.Q(provider__city__icontains=search)
             )
 
         if budget_min:
@@ -1368,6 +1654,57 @@ class BrowseProjectsMapView(TemplateView):
         if budget_max:
             try:
                 projects = projects.filter(price__lte=Decimal(budget_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Additional filters from new projects filter component
+        timezone_param = self.request.GET.get('timezone', '').strip()
+        if timezone_param:
+            # Assuming Service model has a timezone field
+            if hasattr(projects.model, 'timezone'):
+                projects = projects.filter(timezone__icontains=timezone_param)
+
+        english_level = self.request.GET.get('english_level', '').strip()
+        if english_level:
+            # Assuming Service model has an english_level field
+            if hasattr(projects.model, 'english_level'):
+                projects = projects.filter(english_level__icontains=english_level)
+
+        # Experience level (checkbox array)
+        selected_experience = self.request.GET.getlist('experience')
+        if selected_experience:
+            # Assuming Service model has an experience_level field
+            if hasattr(projects.model, 'experience_level'):
+                projects = projects.filter(experience_level__in=selected_experience)
+
+        # Fixed-price range filter (use price_min/price_max from new filter)
+        price_min = self.request.GET.get('price_min', '').strip()
+        price_max = self.request.GET.get('price_max', '').strip()
+        if price_min:
+            try:
+                projects = projects.filter(price__gte=Decimal(price_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if price_max:
+            try:
+                projects = projects.filter(price__lte=Decimal(price_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Hourly rate filter
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+        if hourly_min:
+            try:
+                # Assuming Service model has an hourly_rate field
+                if hasattr(projects.model, 'hourly_rate'):
+                    projects = projects.filter(hourly_rate__gte=Decimal(hourly_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+        if hourly_max:
+            try:
+                if hasattr(projects.model, 'hourly_rate'):
+                    projects = projects.filter(hourly_rate__lte=Decimal(hourly_max))
             except (ValueError, Decimal.InvalidOperation):
                 pass
 
@@ -1400,15 +1737,48 @@ class BrowseProjectsMapView(TemplateView):
             # For map markers, use provider's location if available
             project.location_coordinates = project.provider.location if hasattr(project.provider, 'location') else None
 
+        # Additional filter parameters for new projects filter
+        timezone_param = self.request.GET.get('timezone', '').strip()
+        english_level = self.request.GET.get('english_level', '').strip()
+        selected_experience = self.request.GET.getlist('experience')
+        price_min = self.request.GET.get('price_min', '0')
+        price_max = self.request.GET.get('price_max', '3000')
+        hourly_min = self.request.GET.get('hourly_min', '').strip()
+        hourly_max = self.request.GET.get('hourly_max', '').strip()
+
+        # Static filter options for projects
+        locations_list = ['Africa', 'Americas', 'Antarctica', 'Asia', 'Europe', 'Oceania', 'Australia and New Zealand']
+        timezones_list = [
+            '(UTC-11:00) Midway Island',
+            '(UTC-10:00) Hawaii',
+            '(UTC-08:00) Alaska',
+            '(UTC-07:00) Pacific Time',
+            '(UTC-07:00) Arizona',
+            '(UTC-06:00) Mountain Time',
+            '(UTC-05:00) Eastern Time',
+        ]
+        english_levels_list = ['Basic', 'Conversational', 'Fluent', 'Native Or Bilingual', 'Professional']
+
         context.update({
             'projects': projects_page,
             'total_projects': paginator.count,
             'categories': categories,
+            'locations': locations_list,
+            'timezones': timezones_list,
+            'english_levels': english_levels_list,
             'view_mode': 'map',
             # Current filters
             'selected_category': category,
             'selected_location': location,
+            'selected_timezone': timezone_param,
+            'selected_english_level': english_level,
+            'selected_experience': selected_experience,
+            'price_min': price_min,
+            'price_max': price_max,
+            'hourly_min': hourly_min,
+            'hourly_max': hourly_max,
             'search': search,
+            # Legacy budget params (keep for backward compatibility)
             'budget_min': budget_min,
             'budget_max': budget_max,
             # Meta tags

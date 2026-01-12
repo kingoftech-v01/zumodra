@@ -1,0 +1,294 @@
+{% load static i18n %}
+
+{# Projects Filter Modal - Direct from FreelanHub project-default.html #}
+<!-- Modal -->
+<div class="modal">
+    <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
+        <form method="get" action="" class="h-full">
+            <div class="block_filter h-full py-4 px-6">
+                <div class="filter_section search">
+                    <strong class="text-button">search</strong>
+                    <div class="form_input relative w-full h-12 mt-2">
+                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                        <input type="text" name="search" id="project-search-input" value="{{ search|default:'' }}" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Project title, keywords, or location" />
+                    </div>
+                </div>
+                <div class="filter_section category relative z-[2] mt-6">
+                    <strong class="text-button">category</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select category">{% if selected_category %}{{ selected_category }}{% else %}Select category{% endif %}</span>
+                            <div class="list_option w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find category..." />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    {% for category in categories %}
+                                    <li class="capitalize" data-item="{{ category }}">{{ category }}</li>
+                                    {% empty %}
+                                    <li class="capitalize" data-item="Accounting & Consulting">Accounting & Consulting</li>
+                                    <li class="capitalize" data-item="Admin Support">Admin Support</li>
+                                    <li class="capitalize" data-item="Customer Service">Customer Service</li>
+                                    <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                    <li class="capitalize" data-item="Data Science & Analytics">Data Science & Analytics</li>
+                                    <li class="capitalize" data-item="Engineering & Architecture">Engineering & Architecture</li>
+                                    <li class="capitalize" data-item="IT & Networking">IT & Networking</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                    <input type="hidden" name="category" value="{{ selected_category|default:'' }}" class="category_value" />
+                </div>
+                <div class="filter_section experience mt-6">
+                    <strong class="text-button">Experience level</strong>
+                    <div class="list_level flex flex-col gap-2 mt-2">
+                        <div class="checkbox_block">
+                            <input type="checkbox" name="experience" value="entry" class="checkbox" id="entry" data-label="entry" {% if 'entry' in selected_experience %}checked{% endif %} />
+                            <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                            <label class="label pl-6" for="entry">Entry Level</label>
+                        </div>
+                        <div class="checkbox_block">
+                            <input type="checkbox" name="experience" value="intermediate" class="checkbox" id="intermediate" data-label="intermediate" {% if 'intermediate' in selected_experience %}checked{% endif %} />
+                            <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                            <label class="label pl-6" for="intermediate">Intermediate</label>
+                        </div>
+                        <div class="checkbox_block">
+                            <input type="checkbox" name="experience" value="expert" class="checkbox" id="expert" data-label="expert" {% if 'expert' in selected_experience %}checked{% endif %} />
+                            <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                            <label class="label pl-6" for="expert">Expert</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter_section filter_price mt-6">
+                    <strong class="text-button">Filter by Fixed-Price</strong>
+                    <div class="tow_bar_block mt-5">
+                        <div class="progress"></div>
+                    </div>
+                    <div class="range_input">
+                        <input class="input range_min" name="price_min_range" type="range" min="0" max="3000" value="{{ price_min|default:0 }}" />
+                        <input class="input range_max" name="price_max_range" type="range" min="0" max="3000" value="{{ price_max|default:3000 }}" />
+                    </div>
+                    <div class="price_block flex items-center justify-between mt-4">
+                        <div class="price_min flex items-center overflow-hidden relative w-32 h-10">
+                            <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                            <input type="number" name="price_min" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="{{ price_min|default:0 }}" />
+                            <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                        </div>
+                        <span class="ph-bold ph-minus text-xl"></span>
+                        <div class="price_max flex items-center overflow-hidden relative w-32 h-10">
+                            <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                            <input type="number" name="price_max" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="{{ price_max|default:3000 }}" />
+                            <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter_section hourly mt-6">
+                    <strong class="text-button">Filter by Hourly</strong>
+                    <div class="hour_block flex items-center justify-between mt-2">
+                        <div class="min flex items-center overflow-hidden relative w-32 h-10">
+                            <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                            <input type="number" name="hourly_min" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="{{ hourly_min|default:'' }}" />
+                            <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                        </div>
+                        <span class="ph-bold ph-minus text-xl"></span>
+                        <div class="max flex items-center overflow-hidden relative w-32 h-10">
+                            <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                            <input type="number" name="hourly_max" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="{{ hourly_max|default:'' }}" />
+                            <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter_section location mt-6">
+                    <strong class="text-button">Client Location</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select client location">{% if selected_location %}{{ selected_location }}{% else %}Select client location{% endif %}</span>
+                            <div class="list_option w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find location..." />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    {% for location in locations %}
+                                    <li class="capitalize" data-item="{{ location }}">{{ location }}</li>
+                                    {% empty %}
+                                    <li class="capitalize" data-item="Africa">Africa</li>
+                                    <li class="capitalize" data-item="Americas">Americas</li>
+                                    <li class="capitalize" data-item="Antarctica">Antarctica</li>
+                                    <li class="capitalize" data-item="Asia">Asia</li>
+                                    <li class="capitalize" data-item="Europe">Europe</li>
+                                    <li class="capitalize" data-item="Oceania">Oceania</li>
+                                    <li class="capitalize" data-item="Australia and New Zealand">Australia and New Zealand</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                    <input type="hidden" name="location" value="{{ selected_location|default:'' }}" class="location_value" />
+                </div>
+                <div class="filter_section timezone mt-6">
+                    <strong class="text-button">Client timezone</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select client timezone">{% if selected_timezone %}{{ selected_timezone }}{% else %}Select client timezone{% endif %}</span>
+                            <div class="list_option -top w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find timezone..." />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    {% for timezone in timezones %}
+                                    <li class="capitalize" data-item="{{ timezone }}">{{ timezone }}</li>
+                                    {% empty %}
+                                    <li class="capitalize" data-item="(UTC-11:00) Midway Island">(UTC-11:00) Midway Island</li>
+                                    <li class="capitalize" data-item="(UTC-10:00) Hawaii">(UTC-10:00) Hawaii</li>
+                                    <li class="capitalize" data-item="(UTC-08:00) Alaska">(UTC-08:00) Alaska</li>
+                                    <li class="capitalize" data-item="(UTC-07:00) Pacific Time">(UTC-07:00) Pacific Time</li>
+                                    <li class="capitalize" data-item="(UTC-07:00) Arizona">(UTC-07:00) Arizona</li>
+                                    <li class="capitalize" data-item="(UTC-06:00) Mountain Time">(UTC-06:00) Mountain Time</li>
+                                    <li class="capitalize" data-item="(UTC-05:00) Eastern Time">(UTC-05:00) Eastern Time</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                    <input type="hidden" name="timezone" value="{{ selected_timezone|default:'' }}" class="timezone_value" />
+                </div>
+                <div class="filter_section english mt-6">
+                    <strong class="text-button">English Level</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="Select english level">{% if selected_english_level %}{{ selected_english_level }}{% else %}Select english level{% endif %}</span>
+                            <div class="list_option -top w-full bg-white">
+                                <div class="form_input relative w-full h-11">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find level..." />
+                                </div>
+                                <ul class="list_result mt-3">
+                                    {% for level in english_levels %}
+                                    <li class="capitalize" data-item="{{ level }}">{{ level }}</li>
+                                    {% empty %}
+                                    <li class="capitalize" data-item="Basic">Basic</li>
+                                    <li class="capitalize" data-item="Conversational">Conversational</li>
+                                    <li class="capitalize" data-item="Fluent">Fluent</li>
+                                    <li class="capitalize" data-item="Native Or Bilingual">Native Or Bilingual</li>
+                                    <li class="capitalize" data-item="Professional">Professional</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                    <input type="hidden" name="english_level" value="{{ selected_english_level|default:'' }}" class="english_level_value" />
+                </div>
+            </div>
+            <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
+                <button type="submit" class="button-main w-full text-center">Find Projects</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{% static 'assets/js/address-autocomplete.js' %}"></script>
+<script>
+// Filter Modal - Sync select dropdowns with hidden inputs
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize address autocomplete on search input
+    const projectSearchAutocomplete = new AddressAutocomplete('#project-search-input', {
+        placeholder: 'Project title, keywords, or location',
+        minLength: 2,
+        debounceDelay: 400,
+        onSelect: function(data) {
+            console.log('Selected address:', data);
+            // Auto-fill client location dropdown
+            if (data.address && data.address.city) {
+                const locationValue = document.querySelector('.location_value');
+                const locationSelected = document.querySelector('.filter_section.location .selected');
+                if (locationValue) locationValue.value = data.address.city;
+                if (locationSelected) locationSelected.textContent = data.address.city;
+            }
+        }
+    });
+
+    // Category select
+    const categoryOptions = document.querySelectorAll('.filter_section.category .list_option li');
+    const categoryValue = document.querySelector('.category_value');
+    const categorySelected = document.querySelector('.filter_section.category .selected');
+
+    categoryOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-item');
+            if (categoryValue) categoryValue.value = value;
+            if (categorySelected) categorySelected.textContent = value;
+        });
+    });
+
+    // Location select
+    const locationOptions = document.querySelectorAll('.filter_section.location .list_option li');
+    const locationValue = document.querySelector('.location_value');
+    const locationSelected = document.querySelector('.filter_section.location .selected');
+
+    locationOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-item');
+            if (locationValue) locationValue.value = value;
+            if (locationSelected) locationSelected.textContent = value;
+        });
+    });
+
+    // Timezone select
+    const timezoneOptions = document.querySelectorAll('.filter_section.timezone .list_option li');
+    const timezoneValue = document.querySelector('.timezone_value');
+    const timezoneSelected = document.querySelector('.filter_section.timezone .selected');
+
+    timezoneOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-item');
+            if (timezoneValue) timezoneValue.value = value;
+            if (timezoneSelected) timezoneSelected.textContent = value;
+        });
+    });
+
+    // English level select
+    const englishOptions = document.querySelectorAll('.filter_section.english .list_option li');
+    const englishValue = document.querySelector('.english_level_value');
+    const englishSelected = document.querySelector('.filter_section.english .selected');
+
+    englishOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-item');
+            if (englishValue) englishValue.value = value;
+            if (englishSelected) englishSelected.textContent = value;
+        });
+    });
+
+    // Dual-range price slider sync
+    const priceMinRange = document.querySelector('.filter_section.filter_price .range_min');
+    const priceMaxRange = document.querySelector('.filter_section.filter_price .range_max');
+    const priceMinInput = document.querySelector('.filter_section.filter_price input[name="price_min"]');
+    const priceMaxInput = document.querySelector('.filter_section.filter_price input[name="price_max"]');
+
+    if (priceMinRange && priceMinInput) {
+        priceMinRange.addEventListener('input', function() {
+            priceMinInput.value = this.value;
+        });
+        priceMinInput.addEventListener('input', function() {
+            priceMinRange.value = this.value;
+        });
+    }
+
+    if (priceMaxRange && priceMaxInput) {
+        priceMaxRange.addEventListener('input', function() {
+            priceMaxInput.value = this.value;
+        });
+        priceMaxInput.addEventListener('input', function() {
+            priceMaxRange.value = this.value;
+        });
+    }
+});
+</script>
