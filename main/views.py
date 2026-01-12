@@ -253,15 +253,15 @@ def public_companies_grid(request):
 
     if location:
         companies = companies.filter(
-            Q(company_city__icontains=location) |
-            Q(company_country__icontains=location)
+            Q(city__icontains=location) |
+            Q(country__icontains=location)
         )
 
     # Get unique locations
     locations = Tenant.objects.filter(
         published_jobs__isnull=False,
-        company_city__isnull=False
-    ).values_list('company_city', 'company_country').distinct()
+        city__isnull=False
+    ).values_list('city', 'country').distinct()
 
     location_list = list(set([
         f"{city}, {country}" for city, country in locations
@@ -303,7 +303,7 @@ def public_companies_map(request):
     ).distinct().order_by('-open_jobs_count')
 
     # Filter for companies with location (city is required for map display)
-    companies = companies.exclude(company_city__isnull=True).exclude(company_city__exact='')
+    companies = companies.exclude(city__isnull=True).exclude(city__exact='')
 
     # Apply filters
     if search:
@@ -314,15 +314,15 @@ def public_companies_map(request):
 
     if location:
         companies = companies.filter(
-            Q(company_city__icontains=location) |
-            Q(company_country__icontains=location)
+            Q(city__icontains=location) |
+            Q(country__icontains=location)
         )
 
     # Get unique locations
     locations = Tenant.objects.filter(
         published_jobs__isnull=False,
-        company_city__isnull=False
-    ).values_list('company_city', 'company_country').distinct()
+        city__isnull=False
+    ).values_list('city', 'country').distinct()
 
     location_list = list(set([
         f"{city}, {country}" for city, country in locations
@@ -372,9 +372,9 @@ def public_job_detail(request, pk=None, slug=None):
     else:
         raise Http404(_("Job not found"))
 
-    # Check expiration
-    if job.expires_at and job.expires_at < now:
-        raise Http404(_("This job posting has expired"))
+    # Check application deadline
+    if job.application_deadline and job.application_deadline < now:
+        raise Http404(_("This job posting application deadline has passed"))
 
     # Get related jobs (same category)
     related_jobs = PublicJobCatalog.objects.filter(
