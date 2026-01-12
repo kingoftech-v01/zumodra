@@ -1,7 +1,8 @@
 # Careers Routing and Public Schema Fixes - Summary
 
 **Date**: 2026-01-11
-**Status**: ✅ Fixed and Ready for Deployment
+**Status**: ✅ All Critical Errors Fixed - Ready for Testing
+**Last Updated**: 2026-01-11 (Latest round of fixes)
 
 ---
 
@@ -87,6 +88,75 @@ Calgary:    51.0447°N, -114.0719°W
 
 **Commits**:
 - `6e75cc9` - fix: correct field names and add location coordinates to demo data
+
+---
+
+### 5. ✅ AttributeError: PublicJobCatalog has no 'expires_at'
+**Problem**: `AttributeError: 'PublicJobCatalog' object has no attribute 'expires_at'`
+
+**Root Cause**:
+- `public_job_detail()` checked `job.expires_at` but PublicJobCatalog only has `application_deadline`
+- Field name mismatch between JobPosting and PublicJobCatalog
+
+**Solution**:
+- Changed `job.expires_at` → `job.application_deadline` in `public_job_detail()`
+- Updated error message accordingly
+
+**Commits**:
+- `31541e1` - fix: correct Tenant field names in public careers views
+
+---
+
+### 6. ✅ FieldError: Cannot resolve 'company_city'
+**Problem**: `FieldError: Cannot resolve keyword 'company_city' into field`
+
+**Root Cause**:
+- Views used `company_city` and `company_country` but Tenant model has `city` and `country`
+- Incorrect field names in public_companies_grid() and public_companies_map()
+
+**Solution**:
+- Changed all `company_city` → `city` references
+- Changed all `company_country` → `country` references
+- Updated filters in both grid and map views
+
+**Commits**:
+- `31541e1` - fix: correct Tenant field names in public careers views
+
+---
+
+### 7. ✅ No Jobs Showing Despite Demo Data
+**Problem**: Map view shows "0 results" even though demo data created jobs
+
+**Root Cause**:
+- Demo jobs weren't syncing to PublicJobCatalog automatically
+- `published_on_career_page` flag not explicitly set
+- Celery sync task may not be running consistently
+
+**Solution**:
+- Explicitly set `published_on_career_page=True` in demo data creation
+- Explicitly set `is_internal_only=False`
+- Added manual sync after creating demo jobs
+- Import and call `JobPublicSyncService.sync_to_public()` directly
+- Show sync success count in command output
+
+**Commits**:
+- `6115e12` - fix: ensure demo jobs are published and synced to public catalog
+
+---
+
+### 8. ✅ Signup Button Not Visible (White on White)
+**Problem**: "Get Started" button hard to see on white backgrounds
+
+**Root Cause**:
+- Button has `bg-primary text-white` but no shadow
+- On white header backgrounds, button blends in
+
+**Solution**:
+- Added `shadow-sm` class to signup button
+- Ensures button is always visible regardless of background
+
+**Commits**:
+- `2f7168c` - fix: improve signup button visibility with shadow
 
 ---
 
