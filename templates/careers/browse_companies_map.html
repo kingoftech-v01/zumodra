@@ -1,8 +1,8 @@
 {% extends "base/freelanhub_base.html" %}
-{% load static i18n humanize %}
+{% load static i18n %}
 
-{% block title %}{% trans "Browse Companies - Map View" %} - Zumodra{% endblock %}
-{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block title %}Browse Companies - Map View - Zumodra{% endblock %}
+{% block meta_description %}Browse top companies on an interactive map{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}" />
@@ -52,7 +52,7 @@
                 </div>
             </div>
             <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
-                <span class="quantity pr-3 border-r border-line">{{ total_companies }}+ Results</span>
+                <span class="quantity pr-3 border-r border-line">{{ total_companies|default:"0" }}+ Results</span>
                 <div class="list flex flex-wrap items-center gap-3"></div>
                 <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
                     <span class="ph ph-x text-sm"></span>
@@ -66,9 +66,7 @@
                         {% if company.logo %}
                         <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
                         {% else %}
-                        <div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
-                            <span class="ph ph-buildings text-4xl text-secondary"></span>
-                        </div>
+                        <img src="{% static 'assets/images/company/1.png' %}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
                         {% endif %}
                     </a>
                     <ul class="rate flex items-center mt-4">
@@ -81,9 +79,9 @@
                     <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">{{ company.name }}</a>
                     <div class="employers_address -style-1 text-secondary mt-1">
                         <span class="ph ph-map-pin text-lg"></span>
-                        <span class="address caption1 align-top">{{ company.city }}{% if company.country %}, {{ company.country }}{% endif %}</span>
+                        <span class="address caption1 align-top">{{ company.city|default:"Remote" }}{% if company.country %}, {{ company.country }}{% endif %}</span>
                     </div>
-                    <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">{{ company.open_jobs_count }} job opening{{ company.open_jobs_count|pluralize }}</a>
+                    <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">{{ company.open_jobs_count|default:0 }} job opening{{ company.open_jobs_count|default:0|pluralize }}</a>
                     <button class="add_wishlist_btn absolute top-5 right-5 -border">
                         <span class="ph ph-heart text-xl"></span>
                         <span class="ph-fill ph-heart text-xl"></span>
@@ -91,11 +89,7 @@
                 </li>
                 {% empty %}
                 <li class="col-span-full text-center py-16">
-                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="ph ph-buildings text-4xl text-gray-400"></span>
-                    </div>
-                    <h3 class="heading5 mb-2">{% trans "No Companies Found" %}</h3>
-                    <p class="text-secondary">{% trans "There are currently no companies. Check back later!" %}</p>
+                    <p class="text-secondary">No companies found.</p>
                 </li>
                 {% endfor %}
             </ul>
@@ -106,577 +100,50 @@
     </div>
 </div>
 
-<!-- Filter Sidebar Modal -->
-<div class="modal">
-    <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
-        <form class="h-full">
-            <div class="block_filter h-full py-4 px-6">
-                <div class="filter_section search">
-                    <strong class="text-button">{% trans "Search" %}</strong>
-                    <div class="form_input relative w-full h-12 mt-2">
-                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
-                        <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Company name or keywords' %}" />
-                    </div>
-                </div>
-                <div class="filter_section location mt-6">
-                    <strong class="text-button">{% trans "Location" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select location">{% trans "Select location" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find location...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Africa">Africa</li>
-                                    <li class="capitalize" data-item="Americas">Americas</li>
-                                    <li class="capitalize" data-item="Asia">Asia</li>
-                                    <li class="capitalize" data-item="Europe">Europe</li>
-                                    <li class="capitalize" data-item="North America">North America</li>
-                                    <li class="capitalize" data-item="Oceania">Oceania</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section category relative mt-6">
-                    <strong class="text-button">{% trans "Industry" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select industry">{% trans "Select industry" %}</span>
-                            <div class="list_option w-full bg-white">
-                                <div class="form_input relative w-full h-11">
-                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
-                                    <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="{% trans 'Find industry...' %}" />
-                                </div>
-                                <ul class="list_result mt-3">
-                                    <li class="capitalize" data-item="Technology">Technology</li>
-                                    <li class="capitalize" data-item="Healthcare">Healthcare</li>
-                                    <li class="capitalize" data-item="Finance">Finance</li>
-                                    <li class="capitalize" data-item="Education">Education</li>
-                                    <li class="capitalize" data-item="Manufacturing">Manufacturing</li>
-                                    <li class="capitalize" data-item="Retail">Retail</li>
-                                    <li class="capitalize" data-item="Consulting">Consulting</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-                <div class="filter_section company_size mt-6">
-                    <strong class="text-button">{% trans "Company Size" %}</strong>
-                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
-                        <div class="select">
-                            <span class="selected capitalize" data-title="Select company size">{% trans "Select company size" %}</span>
-                            <ul class="list_option w-full bg-white">
-                                <li class="capitalize" data-item="1-10 employees">1-10 employees</li>
-                                <li class="capitalize" data-item="11-50 employees">11-50 employees</li>
-                                <li class="capitalize" data-item="51-200 employees">51-200 employees</li>
-                                <li class="capitalize" data-item="201-500 employees">201-500 employees</li>
-                                <li class="capitalize" data-item="500+ employees">500+ employees</li>
-                            </ul>
-                        </div>
-                        <span class="icon_down ph ph-caret-down right-3"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
-                <button type="button" class="button-main w-full text-center">{% trans "Apply Filters" %}</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'assets/js/leaflet.min.js' %}"></script>
+<script src="{% static 'assets/js/leaflet.js' %}"></script>
 <script>
-// === MAP INITIALIZATION ===
+// Initialize map
 const map = L.map('map').setView([37.7749, -122.4194], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);
 
-const markers = L.layerGroup().addTo(map);
-let radiusCircle = null;
-let userMarker = null;
-
-// === GEOLOCATION ===
-let userLocation = null;
-const searchRadius = 5000; // 5km in meters
-
-function requestGeolocation() {
-    if (!navigator.geolocation) {
-        alert('{% trans "Geolocation is not supported by your browser" %}');
-        return;
-    }
-
-    const geoButton = document.querySelector('.geolocation-btn');
-    if (geoButton) {
-        geoButton.innerHTML = '<span class="ph ph-spinner animate-spin"></span> {% trans "Getting location..." %}';
-        geoButton.disabled = true;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        handleGeolocationSuccess,
-        handleGeolocationError,
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
-    );
-}
-
-function handleGeolocationSuccess(position) {
-    userLocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        accuracy: position.coords.accuracy
-    };
-
-    console.log('[Geolocation] User location acquired:', userLocation);
-    updateLocationDisplay();
-    centerMapOnUser();
-    applyGeolocationFilter();
-
-    const geoButton = document.querySelector('.geolocation-btn');
-    if (geoButton) {
-        geoButton.innerHTML = '<span class="ph ph-check-circle"></span> {% trans "Location enabled" %}';
-        geoButton.disabled = false;
-    }
-}
-
-function handleGeolocationError(error) {
-    console.error('[Geolocation] Error:', error);
-    let message = '{% trans "Unable to get your location" %}';
-
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            message = '{% trans "Location permission denied. Please enable location access in your browser settings." %}';
-            break;
-        case error.POSITION_UNAVAILABLE:
-            message = '{% trans "Location information is unavailable." %}';
-            break;
-        case error.TIMEOUT:
-            message = '{% trans "Location request timed out." %}';
-            break;
-    }
-
-    const geoButton = document.querySelector('.geolocation-btn');
-    if (geoButton) {
-        geoButton.innerHTML = '<span class="ph ph-map-pin"></span> {% trans "Near Me" %}';
-        geoButton.disabled = false;
-    }
-
-    showLocationFallback(message);
-}
-
-function showLocationFallback(errorMessage) {
-    const fallbackHTML = `
-        <div class="location-fallback p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-4">
-            <p class="text-sm text-yellow-800 mb-2">${errorMessage}</p>
-            <div class="flex gap-2">
-                <input type="text" id="manual-location" placeholder="{% trans 'Enter your city or address' %}"
-                       class="flex-1 px-3 py-2 border border-line rounded-lg text-sm" />
-                <button onclick="geocodeManualLocation()" class="button-main -sm">{% trans "Search" %}</button>
-            </div>
-        </div>
-    `;
-
-    const filterSection = document.querySelector('.filter_section.location');
-    if (filterSection && !document.querySelector('.location-fallback')) {
-        filterSection.insertAdjacentHTML('afterend', fallbackHTML);
-    }
-}
-
-async function geocodeManualLocation() {
-    const input = document.getElementById('manual-location');
-    const address = input.value.trim();
-
-    if (!address) {
-        alert('{% trans "Please enter a location" %}');
-        return;
-    }
-
-    try {
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
-            { headers: { 'User-Agent': 'Zumodra Career Pages' } }
-        );
-
-        const results = await response.json();
-
-        if (results.length > 0) {
-            userLocation = {
-                lat: parseFloat(results[0].lat),
-                lng: parseFloat(results[0].lon),
-                manual: true
-            };
-
-            handleGeolocationSuccess({ coords: userLocation });
-
-            const fallback = document.querySelector('.location-fallback');
-            if (fallback) fallback.remove();
-        } else {
-            alert('{% trans "Location not found. Please try a different address." %}');
-        }
-    } catch (error) {
-        console.error('[Geocoding] Error:', error);
-        alert('{% trans "Failed to geocode location. Please try again." %}');
-    }
-}
-
-function updateLocationDisplay() {
-    const display = document.querySelector('.location-display');
-    if (display && userLocation) {
-        display.textContent = `{% trans "Showing companies within 5km" %}`;
-    }
-}
-
-function centerMapOnUser() {
-    if (!userLocation) return;
-
-    map.setView([userLocation.lat, userLocation.lng], 12);
-
-    // Add 5km radius circle
-    if (radiusCircle) {
-        map.removeLayer(radiusCircle);
-    }
-    radiusCircle = L.circle([userLocation.lat, userLocation.lng], {
-        color: '#3B82F6',
-        fillColor: '#3B82F6',
-        fillOpacity: 0.1,
-        radius: searchRadius
-    }).addTo(map);
-
-    // Add user marker
-    if (userMarker) {
-        map.removeLayer(userMarker);
-    }
-    userMarker = L.marker([userLocation.lat, userLocation.lng], {
-        icon: L.divIcon({
-            className: 'user-marker',
-            html: '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>',
-            iconSize: [16, 16]
-        })
-    }).addTo(map);
-}
-
-function applyGeolocationFilter() {
-    if (!userLocation) return;
-
-    const companyItems = document.querySelectorAll('.employers_item');
-    let visibleCount = 0;
-
-    companyLocations.forEach((company, index) => {
-        if (company.location_coordinates) {
-            const distance = calculateDistance(
-                userLocation.lat,
-                userLocation.lng,
-                company.location_coordinates.lat,
-                company.location_coordinates.lng
-            );
-
-            const item = companyItems[index];
-            if (item) {
-                if (distance <= searchRadius) {
-                    item.style.display = '';
-                    visibleCount++;
-
-                    // Add distance badge
-                    const distanceKm = (distance / 1000).toFixed(1);
-                    let badge = item.querySelector('.distance-badge');
-                    if (!badge) {
-                        badge = document.createElement('div');
-                        badge.className = 'distance-badge absolute top-5 left-5 bg-blue-500 text-white text-xs px-2 py-1 rounded-full';
-                        item.appendChild(badge);
-                    }
-                    badge.textContent = `${distanceKm} km`;
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        }
-    });
-
-    updateResultCount(visibleCount);
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // Earth's radius in meters
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c; // Distance in meters
-}
-
-function updateResultCount(count) {
-    const quantityEl = document.querySelector('.quantity');
-    if (quantityEl) {
-        quantityEl.textContent = `${count}+ Results`;
-    }
-}
-
-// === COMPANY LOCATIONS DATA ===
-const companyLocations = [
+// Add markers for companies with coordinates
+const companies = [
     {% for company in companies %}
+    {% if company.location_coordinates %}
     {
         id: {{ company.id }},
         name: "{{ company.name|escapejs }}",
-        location: "{{ company.city|escapejs }}{% if company.country %}, {{ company.country|escapejs }}{% endif %}",
-        jobs: {{ company.open_jobs_count|default:0 }},
-        {% if company.location_coordinates %}
-        location_coordinates: {
-            lat: {{ company.location_coordinates.y }},
-            lng: {{ company.location_coordinates.x }}
-        },
-        {% endif %}
-        logo: "{% if company.logo %}{{ company.logo.url }}{% endif %}"
+        city: "{{ company.city|default:'Remote'|escapejs }}",
+        lat: {{ company.location_coordinates.y }},
+        lng: {{ company.location_coordinates.x }},
+        jobs: {{ company.open_jobs_count|default:0 }}
     }{% if not forloop.last %},{% endif %}
+    {% endif %}
     {% endfor %}
 ];
 
-// === DYNAMIC MARKER INITIALIZATION ===
-function initializeMarkers() {
-    markers.clearLayers();
-
-    let hasCoordinates = false;
-    const bounds = [];
-
-    companyLocations.forEach(company => {
-        if (company.location_coordinates) {
-            hasCoordinates = true;
-            const { lat, lng } = company.location_coordinates;
-            bounds.push([lat, lng]);
-
-            const marker = L.marker([lat, lng]);
-            marker.companyId = company.id;
-            marker.bindPopup(createCompanyPopup(company));
-            markers.addLayer(marker);
-        }
-    });
-
-    // Auto-fit map to show all markers
-    if (hasCoordinates && bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [50, 50] });
-    }
-
-    console.log(`[Map] Initialized ${bounds.length} company markers`);
-}
-
-function createCompanyPopup(company) {
-    return `
-        <div class="p-3 max-w-xs">
-            <div class="flex items-center gap-3 mb-2">
-                ${company.logo ?
-                    `<img src="${company.logo}" alt="${company.name}" class="w-10 h-10 object-cover rounded" />` :
-                    `<div class="w-10 h-10 bg-surface flex items-center justify-center rounded">
-                        <span class="ph ph-buildings text-xl text-secondary"></span>
-                    </div>`
-                }
-                <div>
-                    <h6 class="text-title font-semibold">${company.name}</h6>
-                    <p class="text-xs text-secondary">
-                        <span class="ph ph-map-pin"></span> ${company.location}
-                    </p>
-                </div>
-            </div>
-            <a href="#" class="button-main -sm w-full text-center mt-2">
-                ${company.jobs} job opening${company.jobs !== 1 ? 's' : ''}
-            </a>
+companies.forEach(company => {
+    const marker = L.marker([company.lat, company.lng]);
+    marker.bindPopup(`
+        <div class="p-2">
+            <h6 class="font-semibold">${company.name}</h6>
+            <p class="text-sm text-secondary">${company.city}</p>
+            <p class="text-xs mt-1">${company.jobs} job opening${company.jobs !== 1 ? 's' : ''}</p>
         </div>
-    `;
-}
-
-// === WEBSOCKET REAL-TIME UPDATES ===
-let ws = null;
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-const reconnectDelays = [1000, 2000, 4000, 8000, 16000, 30000];
-
-function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=companies`;
-
-    console.log('[WebSocket] Connecting to:', wsUrl);
-
-    try {
-        ws = new WebSocket(wsUrl);
-
-        ws.onopen = function(event) {
-            console.log('[WebSocket] Connected to careers live updates');
-            reconnectAttempts = 0;
-        };
-
-        ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            console.log('[WebSocket] Message received:', data.type);
-
-            switch(data.type) {
-                case 'company_created':
-                    handleCompanyCreated(data.company);
-                    break;
-                case 'company_updated':
-                    handleCompanyUpdated(data.company);
-                    break;
-            }
-        };
-
-        ws.onerror = function(error) {
-            console.error('[WebSocket] Error:', error);
-        };
-
-        ws.onclose = function(event) {
-            console.log('[WebSocket] Connection closed');
-            attemptReconnect();
-        };
-
-    } catch (error) {
-        console.error('[WebSocket] Connection failed:', error);
-        attemptReconnect();
-    }
-}
-
-function attemptReconnect() {
-    if (reconnectAttempts >= maxReconnectAttempts) {
-        console.error('[WebSocket] Max reconnection attempts reached');
-        return;
-    }
-
-    const delay = reconnectDelays[Math.min(reconnectAttempts, reconnectDelays.length - 1)];
-    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
-
-    setTimeout(() => {
-        reconnectAttempts++;
-        connectWebSocket();
-    }, delay);
-}
-
-function handleCompanyCreated(company) {
-    console.log('[WebSocket] Company created:', company);
-
-    // Add to company locations array
-    companyLocations.unshift(company);
-
-    // Add marker to map
-    if (company.location_coordinates) {
-        const marker = L.marker([company.location_coordinates.lat, company.location_coordinates.lng]);
-        marker.companyId = company.id;
-        marker.bindPopup(createCompanyPopup(company));
-        markers.addLayer(marker);
-    }
-
-    // Add company card to list
-    const companyCard = createCompanyCard(company);
-    const companiesList = document.querySelector('.list_employers');
-    if (companiesList) {
-        companiesList.insertAdjacentHTML('afterbegin', companyCard);
-
-        // Animate in
-        const newCard = companiesList.firstElementChild;
-        newCard.style.opacity = '0';
-        newCard.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-            newCard.style.transition = 'all 0.3s ease';
-            newCard.style.opacity = '1';
-            newCard.style.transform = 'translateY(0)';
-        }, 10);
-    }
-
-    updateResultCount(companyLocations.length);
-}
-
-function handleCompanyUpdated(company) {
-    console.log('[WebSocket] Company updated:', company);
-
-    // Update in array
-    const index = companyLocations.findIndex(c => c.id === company.id);
-    if (index !== -1) {
-        companyLocations[index] = company;
-    }
-
-    // Update marker
-    markers.eachLayer(layer => {
-        if (layer.companyId === company.id) {
-            layer.setPopupContent(createCompanyPopup(company));
-
-            // Update position if coordinates changed
-            if (company.location_coordinates) {
-                layer.setLatLng([company.location_coordinates.lat, company.location_coordinates.lng]);
-            }
-        }
-    });
-
-    // Update card in DOM
-    const companyCard = document.querySelector(`[data-company-id="${company.id}"]`);
-    if (companyCard) {
-        const updatedCard = createCompanyCard(company);
-        const temp = document.createElement('div');
-        temp.innerHTML = updatedCard;
-        companyCard.replaceWith(temp.firstElementChild);
-
-        // Pulse animation
-        const newCard = document.querySelector(`[data-company-id="${company.id}"]`);
-        if (newCard) {
-            newCard.classList.add('animate-pulse');
-            setTimeout(() => newCard.classList.remove('animate-pulse'), 1000);
-        }
-    }
-}
-
-function createCompanyCard(company) {
-    return `
-        <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300" data-company-id="${company.id}">
-            <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
-                ${company.logo ?
-                    `<img src="${company.logo}" alt="${company.name}" class="employers_logo w-full h-full object-cover" />` :
-                    `<div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
-                        <span class="ph ph-buildings text-4xl text-secondary"></span>
-                    </div>`
-                }
-            </a>
-            <ul class="rate flex items-center mt-4">
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-                <li class="ph-fill ph-star text-yellow"></li>
-            </ul>
-            <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">${company.name}</a>
-            <div class="employers_address -style-1 text-secondary mt-1">
-                <span class="ph ph-map-pin text-lg"></span>
-                <span class="address caption1 align-top">${company.location}</span>
-            </div>
-            <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">
-                ${company.jobs} job opening${company.jobs !== 1 ? 's' : ''}
-            </a>
-            <button class="add_wishlist_btn absolute top-5 right-5 -border">
-                <span class="ph ph-heart text-xl"></span>
-                <span class="ph-fill ph-heart text-xl"></span>
-            </button>
-        </li>
-    `;
-}
-
-// === INITIALIZATION ===
-document.addEventListener('DOMContentLoaded', function() {
-    initializeMarkers();
-    connectWebSocket();
-
-    console.log('[Browse Companies Map] Initialized with', companyLocations.length, 'companies');
+    `);
+    marker.addTo(map);
 });
+
+// Fit map to show all markers
+if (companies.length > 0) {
+    const bounds = L.latLngBounds(companies.map(c => [c.lat, c.lng]));
+    map.fitBounds(bounds, { padding: [50, 50] });
+}
 </script>
-<script src="{% static 'assets/js/jquery-3.7.0.js' %}"></script>
-<script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
-<script src="{% static 'assets/js/slick.min.js' %}"></script>
-<script src="{% static 'assets/js/count-down.js' %}"></script>
-<script src="{% static 'assets/js/main.js' %}"></script>
 {% endblock %}

@@ -1,269 +1,187 @@
 {% extends "base/freelanhub_base.html" %}
-{% load static i18n humanize %}
+{% load static i18n %}
 
-{% block title %}{% trans "Browse Jobs" %} - Zumodra{% endblock %}
-{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block title %}Browse Jobs - Zumodra{% endblock %}
+{% block meta_description %}Find your dream job on Zumodra{% endblock %}
 
 {% block content %}
 
-{# Breadcrumb #}
-{% include "careers/components/_breadcrumb.html" with title="Browse Jobs" heading="Find Your Dream Job" total_jobs=total_jobs %}
-
-{# Jobs List Section #}
-<section class="jobs_default lg:py-20 sm:py-14 py-10">
-    <div class="container">
-        {# Filter Bar with View Toggle #}
-        {% include "careers/components/_filter_bar.html" with view_mode="grid" %}
-
-        {# Jobs Grid #}
-        {% if jobs %}
-        <ul class="list_layout_cols list_jobs grid xl:grid-cols-3 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
-            {% for job in jobs %}
-                {% include "careers/components/_job_card.html" %}
-            {% endfor %}
-        </ul>
-
-        {# Pagination #}
-        {% include "careers/components/_pagination.html" %}
-
-        {% else %}
-        {# No Jobs Found #}
-        <div class="text-center py-16">
-            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="ph ph-briefcase text-4xl text-gray-400"></i>
-            </div>
-            <h3 class="heading5 mb-2">{% trans "No Jobs Found" %}</h3>
-            <p class="text-secondary">
-                {% if search or selected_category or selected_location or selected_job_type or selected_remote %}
-                    {% trans "Try adjusting your filters to see more results." %}
-                {% else %}
-                    {% trans "There are currently no open positions. Check back later!" %}
-                {% endif %}
-            </p>
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 py-15">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+            <img src="{% static 'assets/images/components/breadcrumb_job.webp' %}" alt="breadcrumb_job" class="w-full h-full object-cover" />
         </div>
-        {% endif %}
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">Home</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white">For Candidates</span>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">Jobs</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Jobs Default</h3>
+                <div class="form_search z-[1] w-full mt-5 animate animate_top" style="--i: 3">
+                    <form class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white">
+                        <div class="form_input relative w-full">
+                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
+                            <input type="text" class="input_search w-full h-full pl-10" placeholder="Skill, Industry" required />
+                        </div>
+                        <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                            <div class="select">
+                                <span class="selected" data-title="City, State or Zip">City, State or Zip</span>
+                                <ul class="list_option bg-white max-sm:w-full">
+                                    <li data-item="Las Vegas, USA">Las Vegas, USA</li>
+                                    <li data-item="Cape Town, South Africa">Cape Town, South Africa</li>
+                                    <li data-item="Sydney, Australia">Sydney, Australia</li>
+                                    <li data-item="Tokyo, Japan">Tokyo, Japan</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl sm:right-0 right-3"></span>
+                        </div>
+                        <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                            <div class="select">
+                                <span class="selected" data-title="All Categories">All Categories</span>
+                                <ul class="list_option bg-white max-sm:w-full">
+                                    <li data-item="Graphic & Design">Graphic & Design</li>
+                                    <li data-item="Wrting">Wrting</li>
+                                    <li data-item="Videos">Videos</li>
+                                    <li data-item="Digital Marketing">Digital Marketing</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down sm:text-2xl text-xl sm:right-0 right-3"></span>
+                        </div>
+                        <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">Search</button>
+                    </form>
+                </div>
+                <div class="list_tags flex flex-wrap items-center gap-3 mt-5 animate animate_top" style="--i: 4">
+                    <strong class="text-button-sm text-white">Top Services:</strong>
+                    <a href="#" class="tag -small -border text-white text-button-sm hover:bg-white hover:text-black">Graphics</a>
+                    <a href="#" class="tag -small -border text-white text-button-sm hover:bg-white hover:text-black">Website</a>
+                    <a href="#" class="tag -small -border text-white text-button-sm hover:bg-white hover:text-black">Logo</a>
+                    <a href="#" class="tag -small -border text-white text-button-sm hover:bg-white hover:text-black">Development</a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
-{% endblock %}
-
-{% block extra_js %}
-<script>
-// === JOB LOCATIONS DATA ===
-const jobLocations = [
-    {% for job in jobs %}
-    {
-        id: {{ job.id }},
-        title: "{{ job.job.title|escapejs }}",
-        company: "{{ job.job.tenant.name|default:'Company'|escapejs }}",
-        location: "{{ job.job.location_city|default:'Remote'|escapejs }}",
-        job_type: "{{ job.job.job_type|default:'Full-time'|escapejs }}",
-        posted_date: "{{ job.job.created_at|date:'Y-m-d' }}",
-        {% if job.job.location_coordinates %}
-        location_coordinates: {
-            lat: {{ job.job.location_coordinates.y }},
-            lng: {{ job.job.location_coordinates.x }}
-        },
-        {% endif %}
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-];
-
-// === WEBSOCKET REAL-TIME UPDATES ===
-let ws = null;
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-const reconnectDelays = [1000, 2000, 4000, 8000, 16000, 30000];
-
-function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=jobs`;
-
-    console.log('[WebSocket] Connecting to:', wsUrl);
-
-    try {
-        ws = new WebSocket(wsUrl);
-
-        ws.onopen = function(event) {
-            console.log('[WebSocket] Connected to careers live updates');
-            reconnectAttempts = 0;
-        };
-
-        ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            console.log('[WebSocket] Message received:', data.type);
-
-            switch(data.type) {
-                case 'job_created':
-                    handleJobCreated(data.job);
-                    break;
-                case 'job_updated':
-                    handleJobUpdated(data.job);
-                    break;
-                case 'job_deleted':
-                    handleJobDeleted(data.job_id);
-                    break;
-            }
-        };
-
-        ws.onerror = function(error) {
-            console.error('[WebSocket] Error:', error);
-        };
-
-        ws.onclose = function(event) {
-            console.log('[WebSocket] Connection closed');
-            attemptReconnect();
-        };
-
-    } catch (error) {
-        console.error('[WebSocket] Connection failed:', error);
-        attemptReconnect();
-    }
-}
-
-function attemptReconnect() {
-    if (reconnectAttempts >= maxReconnectAttempts) {
-        console.error('[WebSocket] Max reconnection attempts reached');
-        return;
-    }
-
-    const delay = reconnectDelays[Math.min(reconnectAttempts, reconnectDelays.length - 1)];
-    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
-
-    setTimeout(() => {
-        reconnectAttempts++;
-        connectWebSocket();
-    }, delay);
-}
-
-function handleJobCreated(job) {
-    console.log('[WebSocket] Job created:', job);
-
-    // Add to job locations array
-    jobLocations.unshift(job);
-
-    // Add job card to list
-    const jobCard = createJobCard(job);
-    const jobsList = document.querySelector('.list_jobs');
-    if (jobsList) {
-        jobsList.insertAdjacentHTML('afterbegin', jobCard);
-
-        // Animate in
-        const newCard = jobsList.firstElementChild;
-        newCard.style.opacity = '0';
-        newCard.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-            newCard.style.transition = 'all 0.3s ease';
-            newCard.style.opacity = '1';
-            newCard.style.transform = 'translateY(0)';
-        }, 10);
-    }
-
-    updateResultCount(jobLocations.length);
-}
-
-function handleJobUpdated(job) {
-    console.log('[WebSocket] Job updated:', job);
-
-    // Update in array
-    const index = jobLocations.findIndex(j => j.id === job.id);
-    if (index !== -1) {
-        jobLocations[index] = job;
-    }
-
-    // Update card in DOM
-    const jobCard = document.querySelector(`[data-job-id="${job.id}"]`);
-    if (jobCard) {
-        const updatedCard = createJobCard(job);
-        const temp = document.createElement('div');
-        temp.innerHTML = updatedCard;
-        jobCard.replaceWith(temp.firstElementChild);
-
-        // Pulse animation
-        const newCard = document.querySelector(`[data-job-id="${job.id}"]`);
-        if (newCard) {
-            newCard.classList.add('animate-pulse');
-            setTimeout(() => newCard.classList.remove('animate-pulse'), 1000);
-        }
-    }
-}
-
-function handleJobDeleted(jobId) {
-    console.log('[WebSocket] Job deleted:', jobId);
-
-    // Remove from array
-    const index = jobLocations.findIndex(j => j.id === jobId);
-    if (index !== -1) {
-        jobLocations.splice(index, 1);
-    }
-
-    // Remove card with fade-out animation
-    const jobCard = document.querySelector(`[data-job-id="${jobId}"]`);
-    if (jobCard) {
-        jobCard.style.transition = 'all 0.3s ease';
-        jobCard.style.opacity = '0';
-        jobCard.style.transform = 'scale(0.9)';
-        setTimeout(() => jobCard.remove(), 300);
-    }
-
-    updateResultCount(jobLocations.length);
-}
-
-function createJobCard(job) {
-    return `
-        <li class="jobs_item relative p-6 rounded-lg bg-white shadow-md duration-300" data-job-id="${job.id}">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-15 h-15 bg-surface rounded flex-shrink-0 flex items-center justify-center">
-                        <span class="ph ph-briefcase text-2xl text-secondary"></span>
-                    </div>
-                    <div>
-                        <a href="#" class="jobs_name heading6 duration-300 hover:text-primary">${job.title}</a>
-                        <div class="jobs_company text-secondary mt-1">
-                            <span class="ph ph-buildings text-lg"></span>
-                            <span class="caption1 align-top">${job.company}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="jobs_info flex flex-wrap items-center gap-3 mt-4">
-                <div class="flex items-center gap-1">
-                    <span class="ph ph-map-pin text-lg text-secondary"></span>
-                    <span class="caption1 text-secondary">${job.location}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <span class="ph ph-clock text-lg text-secondary"></span>
-                    <span class="caption1 text-secondary">${job.job_type}</span>
-                </div>
-            </div>
-            <button class="add_wishlist_btn absolute top-5 right-5 -border">
-                <span class="ph ph-heart text-xl"></span>
-                <span class="ph-fill ph-heart text-xl"></span>
+<!-- List jobs -->
+<div class="jobs lg:py-20 sm:py-14 py-10">
+    <div class="container flex flex-col items-center">
+        <div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full">
+            <button id="filter_btn" class="filter_btn inline-flex items-center gap-1.5 py-1.5 px-2.5 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
+                <span class="ph ph-sliders-horizontal text-xl"></span>
+                <span>Filters</span>
             </button>
-        </li>
-    `;
-}
+            <ul class="list_layout flex items-center gap-1 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+                <li class="max-xl:hidden">
+                    <button class="layout_btn cols_3 active"></button>
+                </li>
+                <li class="max-xl:hidden">
+                    <button class="layout_btn cols_2"></button>
+                </li>
+                <li class="xl:hidden">
+                    <a href="#!" class="layout_link cols_2 active"></a>
+                </li>
+                <li class="xl:hidden">
+                    <a href="{% url 'careers:browse_jobs_map' %}" class="layout_link map">
+                        <span class="ph ph-map-pin"></span>
+                    </a>
+                </li>
+            </ul>
+            <div class="select_filter flex items-center gap-3">
+                <span class="caption1">Sort by:</span>
+                <div class="select_block sm:pr-16 pr-10 pl-3 py-1 border border-line rounded">
+                    <div class="select">
+                        <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                        <ul class="list_option p-0 bg-white">
+                            <li class="capitalize" data-item="default">sort by (default)</li>
+                            <li class="capitalize" data-item="newest">newest</li>
+                            <li class="capitalize" data-item="oldest">oldest</li>
+                            <li class="capitalize" data-item="random">random</li>
+                        </ul>
+                    </div>
+                    <span class="icon_down ph ph-caret-down right-3"></span>
+                </div>
+            </div>
+        </div>
+        <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+            <span class="quantity pr-3 border-r border-line">{{ total_jobs|default:"0" }}+ Results</span>
+            <div class="list flex flex-wrap items-center gap-3"></div>
+            <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+                <span class="ph ph-x text-sm"></span>
+                <span class="caption1">Clear All</span>
+            </button>
+        </div>
+        <ul class="list_layout_cols list_jobs grid xl:grid-cols-3 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
+            {% for job in jobs %}
+            <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                    <a href="#" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                        {% if job.tenant.logo %}
+                        <img src="{{ job.tenant.logo.url }}" alt="{{ job.tenant.name }}" class="jobs_avatar w-full h-full object-cover" />
+                        {% else %}
+                        <img src="{% static 'assets/images/company/1.png' %}" alt="{{ job.tenant.name }}" class="jobs_avatar w-full h-full object-cover" />
+                        {% endif %}
+                    </a>
+                    <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                        <a href="#" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                            <span class="jobs_company text-sm font-semibold text-primary">{{ job.tenant.name }}</span>
+                            <strong class="jobs_name text-title -style-1">{{ job.title }}</strong>
+                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                <div class="jobs_address -style-1 text-secondary">
+                                    <span class="ph ph-map-pin text-lg"></span>
+                                    <span class="address caption1 align-top">{{ job.location_city|default:"Remote" }}</span>
+                                </div>
+                                <div class="jobs_date text-secondary">
+                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                    <span class="date caption1 align-top">{{ job.created_at|timesince }} ago</span>
+                                </div>
+                            </div>
+                        </a>
+                        <button class="add_wishlist_btn -relative -border">
+                            <span class="ph ph-heart text-xl"></span>
+                            <span class="ph-fill ph-heart text-xl"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <a href="#" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ job.job_type|default:"Full-Time" }}</a>
+                    </div>
+                    <div class="jobs_price">
+                        {% if job.salary_range_low and job.salary_range_high %}
+                        <span class="price text-title">${{ job.salary_range_low }} - ${{ job.salary_range_high }}</span>
+                        <span class="text-secondary">/year</span>
+                        {% else %}
+                        <span class="price text-title">Competitive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            {% empty %}
+            <li class="col-span-full text-center py-16">
+                <p class="text-secondary">No jobs found.</p>
+            </li>
+            {% endfor %}
+        </ul>
+        <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+            </li>
+            <li role="presentation">
+                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+            </li>
+        </ul>
+    </div>
+</div>
 
-function updateResultCount(count) {
-    const breadcrumbCount = document.querySelector('.breadcrumb .total-count');
-    if (breadcrumbCount) {
-        breadcrumbCount.textContent = count;
-    }
-}
-
-// === WISHLIST FUNCTIONALITY ===
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.add_wishlist_btn')) {
-        const btn = e.target.closest('.add_wishlist_btn');
-        btn.classList.toggle('active');
-        // TODO: Add AJAX call to save wishlist
-    }
-});
-
-// === INITIALIZATION ===
-document.addEventListener('DOMContentLoaded', function() {
-    connectWebSocket();
-    console.log('[Browse Jobs] Initialized with', jobLocations.length, 'jobs');
-});
-</script>
 {% endblock %}
