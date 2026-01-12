@@ -186,6 +186,9 @@ urlpatterns = [
     # Job detail aliases (template uses underscore)
     path('job/<int:pk>/', JobDetailPageView.as_view(), name='job_detail'),
     path('job/<slug:slug>/', JobDetailPageView.as_view(), name='job_detail'),
+
+    # Job alert alias (used by filter component)
+    path('job-alert/save/', JobAlertSubscribeView.as_view(), name='job_alert_save'),
 ]
 
 
