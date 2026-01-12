@@ -1619,12 +1619,12 @@ class PublicProviderCatalog(models.Model):
         verbose_name_plural = _('Public Provider Catalog')
         ordering = ['-is_featured', '-rating_avg', '-published_at']
         indexes = [
-            models.Index(fields=['tenant', 'is_verified'], name='provider_catalog_tenant_verified'),
-            models.Index(fields=['provider_type', 'is_accepting_projects'], name='provider_catalog_type_accepting'),
-            models.Index(fields=['country', 'city'], name='provider_catalog_location'),
-            models.Index(fields=['tenant_schema_name', 'provider_uuid'], name='provider_catalog_sync_ref'),
-            models.Index(fields=['-rating_avg', '-total_reviews'], name='provider_catalog_rating'),
-            models.Index(fields=['availability_status'], name='provider_catalog_availability'),
+            models.Index(fields=['tenant', 'is_verified'], name='pcat_ten_verified'),
+            models.Index(fields=['provider_type', 'is_accepting_projects'], name='pcat_type_accept'),
+            models.Index(fields=['country', 'city'], name='pcat_location'),
+            models.Index(fields=['tenant_schema_name', 'provider_uuid'], name='pcat_sync_ref'),
+            models.Index(fields=['-rating_avg', '-total_reviews'], name='pcat_rating'),
+            models.Index(fields=['availability_status'], name='pcat_availability'),
         ]
         constraints = [
             models.UniqueConstraint(
