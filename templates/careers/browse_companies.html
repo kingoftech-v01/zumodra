@@ -145,22 +145,14 @@
             </li>
             {% endfor %}
         </ul>
-        <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
-            <li role="presentation">
-                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
-            </li>
-            <li role="presentation">
-                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
-            </li>
-            <li role="presentation">
-                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
-            </li>
-            <li role="presentation">
-                <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
-            </li>
-        </ul>
+
+        {# Dynamic Pagination Component #}
+        {% include "careers/components/_company_pagination.html" %}
     </div>
 </div>
+
+{# Filter Sidebar Component #}
+{% include "careers/components/_filter_sidebar.html" with show_search=True locations=locations industries=industries selected_location=selected_location selected_industry=selected_industry %}
 
 {% endblock %}
 

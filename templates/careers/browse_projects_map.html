@@ -131,7 +131,8 @@
     </div>
 </div>
 
-{# Filter Sidebar Modal - To be implemented #}
+{# Filter Sidebar Component #}
+{% include "careers/components/_filter_sidebar.html" with show_search=True locations=locations categories=categories selected_location=selected_location selected_category=selected_category %}
 
 {% endblock %}
 
