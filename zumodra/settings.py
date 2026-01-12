@@ -64,6 +64,7 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',  # PostGIS for geographic fields in public schema
 
     # Custom User Model - SHARED (users can belong to multiple tenants)
     'custom_account_u',

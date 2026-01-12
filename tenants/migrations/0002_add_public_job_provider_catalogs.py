@@ -4,6 +4,7 @@
 from django.db import migrations, models
 import django.db.models.deletion
 import django.contrib.postgres.fields
+import django.contrib.gis.db.models
 import uuid
 
 
@@ -76,7 +77,7 @@ class Migration(migrations.Migration):
                 ('location_city', models.CharField(blank=True, db_index=True, max_length=100, verbose_name='City')),
                 ('location_state', models.CharField(blank=True, max_length=100, verbose_name='State/Province')),
                 ('location_country', models.CharField(blank=True, db_index=True, max_length=100, verbose_name='Country')),
-                ('location_coordinates', models.JSONField(blank=True, null=True, verbose_name='Location Coordinates')),
+                ('location_coordinates', django.contrib.gis.db.models.PointField(blank=True, null=True, srid=4326, verbose_name='Location Coordinates')),
 
                 # Description Fields (sanitized HTML)
                 ('description', models.TextField(blank=True, verbose_name='Job Description')),
@@ -180,7 +181,7 @@ class Migration(migrations.Migration):
                 ('city', models.CharField(blank=True, db_index=True, max_length=100, verbose_name='City')),
                 ('state', models.CharField(blank=True, max_length=100, verbose_name='State/Province')),
                 ('country', models.CharField(blank=True, db_index=True, max_length=100, verbose_name='Country')),
-                ('location', models.JSONField(blank=True, null=True, verbose_name='Full Location Data')),
+                ('location', django.contrib.gis.db.models.PointField(blank=True, null=True, srid=4326, verbose_name='Location Coordinates')),
 
                 # Categories & Skills (denormalized as JSON arrays)
                 ('category_names', models.JSONField(blank=True, default=list, verbose_name='Category Names')),

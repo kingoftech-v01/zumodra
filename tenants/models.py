@@ -12,6 +12,7 @@ This module defines the core multi-tenancy models for Zumodra:
 import uuid
 from decimal import Decimal
 from django.db import models
+from django.contrib.gis.db import models as gis_models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
@@ -1334,7 +1335,7 @@ class PublicJobCatalog(models.Model):
     location_city = models.CharField(max_length=100, blank=True, db_index=True)
     location_state = models.CharField(max_length=100, blank=True)
     location_country = models.CharField(max_length=100, blank=True, db_index=True)
-    location_coordinates = models.JSONField(null=True, blank=True, help_text=_('lat/lng coordinates as JSON'))
+    location_coordinates = gis_models.PointField(null=True, blank=True, srid=4326)
 
     # Description Fields (sanitized HTML)
     description = models.TextField(blank=True, help_text=_('Sanitized HTML'))
@@ -1519,7 +1520,7 @@ class PublicProviderCatalog(models.Model):
     city = models.CharField(max_length=100, blank=True, db_index=True)
     state = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True, db_index=True)
-    location = models.JSONField(null=True, blank=True, help_text=_('Full location data as JSON'))
+    location = gis_models.PointField(null=True, blank=True, srid=4326)
 
     # Categories (denormalized as JSON arrays)
     category_names = models.JSONField(
