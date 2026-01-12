@@ -13,10 +13,11 @@ All views are SEO-optimized with proper meta tags and structured data.
 
 import json
 import logging
+from decimal import Decimal
 from django.views.generic import TemplateView, FormView, View
 from django.views.generic.edit import CreateView
 from django.shortcuts import get_object_or_404, redirect
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -1187,6 +1188,217 @@ class BrowseCompaniesMapView(TemplateView):
             'search': search,
             # Meta tags
             'meta_description': _('Browse companies on a map. Find companies hiring in your area.'),
+        })
+
+        return context
+
+
+# ==================== PROJECT/SERVICE BROWSING VIEWS ====================
+
+class BrowseProjectsView(TemplateView):
+    """
+    Public projects/services browsing page with grid layout.
+    FreelanceHub-style grid view for browsing freelance projects and services.
+    """
+    template_name = 'careers/browse_projects.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filter parameters
+        category = self.request.GET.get('category', '').strip()
+        location = self.request.GET.get('location', '').strip()
+        search = self.request.GET.get('search', '').strip()
+        budget_min = self.request.GET.get('budget_min', '').strip()
+        budget_max = self.request.GET.get('budget_max', '').strip()
+        page = self.request.GET.get('page', 1)
+
+        # Import Service model
+        from services.models import Service
+
+        # Base queryset - only active services
+        projects = Service.objects.filter(
+            is_active=True
+        ).select_related('provider', 'category')
+
+        # Apply filters
+        if category:
+            projects = projects.filter(
+                models.Q(category__slug__icontains=category) |
+                models.Q(category__name__icontains=category)
+            )
+
+        if location:
+            projects = projects.filter(
+                models.Q(provider__city__icontains=location) |
+                models.Q(provider__state__icontains=location) |
+                models.Q(provider__country__icontains=location)
+            )
+
+        if search:
+            projects = projects.filter(
+                models.Q(name__icontains=search) |
+                models.Q(description__icontains=search) |
+                models.Q(short_description__icontains=search)
+            )
+
+        if budget_min:
+            try:
+                projects = projects.filter(price__gte=Decimal(budget_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        if budget_max:
+            try:
+                projects = projects.filter(price__lte=Decimal(budget_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Order by: newest first
+        projects = projects.order_by('-created_at')
+
+        # Pagination
+        paginator = Paginator(projects, 12)  # 12 projects per page
+        try:
+            projects_page = paginator.page(page)
+        except PageNotAnInteger:
+            projects_page = paginator.page(1)
+        except EmptyPage:
+            projects_page = paginator.page(paginator.num_pages)
+
+        # Get unique categories for filter dropdown
+        from services.models import ServiceCategory
+        categories = ServiceCategory.objects.filter(
+            services__is_active=True
+        ).distinct()
+
+        # Add computed properties for template compatibility
+        for project in projects_page.object_list:
+            project.title = project.name
+            project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
+            project.budget = project.price or 0
+            project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
+            project.proposal_count = 0  # TODO: Add actual proposal count
+            project.client_spent = 0  # TODO: Add actual client spent
+
+        context.update({
+            'projects': projects_page,
+            'total_projects': paginator.count,
+            'categories': categories,
+            # Current filters
+            'selected_category': category,
+            'selected_location': location,
+            'search': search,
+            'budget_min': budget_min,
+            'budget_max': budget_max,
+            # Meta tags
+            'meta_description': _('Browse freelance projects and services on Zumodra. Find your next freelance opportunity.'),
+        })
+
+        return context
+
+
+class BrowseProjectsMapView(TemplateView):
+    """
+    Public projects/services browsing page with map layout.
+    FreelanceHub-style half-map view showing projects on an interactive map.
+    """
+    template_name = 'careers/browse_projects_map.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filter parameters
+        category = self.request.GET.get('category', '').strip()
+        location = self.request.GET.get('location', '').strip()
+        search = self.request.GET.get('search', '').strip()
+        budget_min = self.request.GET.get('budget_min', '').strip()
+        budget_max = self.request.GET.get('budget_max', '').strip()
+        page = self.request.GET.get('page', 1)
+
+        # Import Service model
+        from services.models import Service
+
+        # Base queryset - only active services
+        projects = Service.objects.filter(
+            is_active=True
+        ).select_related('provider', 'category')
+
+        # Apply filters
+        if category:
+            projects = projects.filter(
+                models.Q(category__slug__icontains=category) |
+                models.Q(category__name__icontains=category)
+            )
+
+        if location:
+            projects = projects.filter(
+                models.Q(provider__city__icontains=location) |
+                models.Q(provider__state__icontains=location) |
+                models.Q(provider__country__icontains=location)
+            )
+
+        if search:
+            projects = projects.filter(
+                models.Q(name__icontains=search) |
+                models.Q(description__icontains=search) |
+                models.Q(short_description__icontains=search)
+            )
+
+        if budget_min:
+            try:
+                projects = projects.filter(price__gte=Decimal(budget_min))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        if budget_max:
+            try:
+                projects = projects.filter(price__lte=Decimal(budget_max))
+            except (ValueError, Decimal.InvalidOperation):
+                pass
+
+        # Order by: newest first
+        projects = projects.order_by('-created_at')
+
+        # Pagination
+        paginator = Paginator(projects, 12)  # 12 projects per page for map view
+        try:
+            projects_page = paginator.page(page)
+        except PageNotAnInteger:
+            projects_page = paginator.page(1)
+        except EmptyPage:
+            projects_page = paginator.page(paginator.num_pages)
+
+        # Get unique categories for filter dropdown
+        from services.models import ServiceCategory
+        categories = ServiceCategory.objects.filter(
+            services__is_active=True
+        ).distinct()
+
+        # Add computed properties and coordinates for template/map compatibility
+        for project in projects_page.object_list:
+            project.title = project.name
+            project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
+            project.budget = project.price or 0
+            project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
+            project.proposal_count = 0  # TODO: Add actual proposal count
+            project.client_spent = 0  # TODO: Add actual client spent
+            # For map markers, use provider's location if available
+            project.location_coordinates = project.provider.location if hasattr(project.provider, 'location') else None
+
+        context.update({
+            'projects': projects_page,
+            'total_projects': paginator.count,
+            'categories': categories,
+            'view_mode': 'map',
+            # Current filters
+            'selected_category': category,
+            'selected_location': location,
+            'search': search,
+            'budget_min': budget_min,
+            'budget_max': budget_max,
+            # Meta tags
+            'meta_description': _('Browse freelance projects on a map. Find projects in your area.'),
         })
 
         return context

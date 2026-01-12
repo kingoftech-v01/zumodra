@@ -28,6 +28,13 @@
     {# Jobs List (Scrollable) #}
     <div class="jobs_list md:w-1/2 md:h-full w-full md:overflow-y-auto scrollbar_custom">
         <div class="lg:p-10 md:p-7.5 p-5">
+            {# Geolocation Button #}
+            <button data-geolocation-btn onclick="requestGeolocation()" class="inline-flex items-center gap-2 py-1.5 px-3 mb-4 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
+                <span class="ph ph-map-pin text-xl"></span>
+                <span>Near Me (5km)</span>
+            </button>
+            <div data-location-display></div>
+
             {# Filter Bar #}
             {% include "careers/components/_filter_bar.html" with view_mode="map" %}
 
@@ -154,60 +161,314 @@
 {% block extra_js %}
 <script src="{% static 'assets/js/leaflet.min.js' %}"></script>
 <script>
-// Initialize Leaflet map
-const map = L.map('map').setView([37.7749, -122.4194], 5); // Default: San Francisco
-
-// Add OpenStreetMap tiles
+// === MAP INITIALIZATION ===
+const map = L.map('map').setView([37.7749, -122.4194], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);
 
-// Job locations data
+const markers = L.layerGroup().addTo(map);
+let radiusCircle = null;
+let userMarker = null;
+
+// === JOB DATA ===
 const jobLocations = [
     {% for job in jobs %}
-    {% if job.location_coordinates %}
+    {% if job.job.location_coordinates %}
     {
         id: {{ job.id }},
-        title: "{{ job.title|escapejs }}",
-        company: "{{ job.tenant.name|default:'Company'|escapejs }}",
-        location: "{{ job.location_city|escapejs }}{% if job.location_country %}, {{ job.location_country|escapejs }}{% endif %}",
-        lat: {{ job.location_coordinates.y }},
-        lng: {{ job.location_coordinates.x }},
-        url: "{% url 'careers:job_detail' job.slug %}"
+        title: "{{ job.job.title|escapejs }}",
+        company: "{{ job.job.tenant.name|default:'Company'|escapejs }}",
+        location: "{{ job.job.location_city|escapejs }}{% if job.job.location_country %}, {{ job.job.location_country|escapejs }}{% endif %}",
+        lat: {{ job.job.location_coordinates.y }},
+        lng: {{ job.job.location_coordinates.x }},
+        url: "{% url 'careers:job_detail' job.custom_slug|default:job.pk %}"
     }{% if not forloop.last %},{% endif %}
     {% endif %}
     {% endfor %}
 ];
 
-// Add markers to map
-jobLocations.forEach(job => {
-    const marker = L.marker([job.lat, job.lng]).addTo(map);
-    marker.bindPopup(`
-        <div class="p-2">
+// === RENDER MARKERS ===
+function renderMarkers() {
+    markers.clearLayers();
+    jobLocations.forEach(job => {
+        const marker = L.marker([job.lat, job.lng]);
+        marker.jobId = job.id;
+        marker.bindPopup(createJobPopup(job));
+        markers.addLayer(marker);
+    });
+
+    if (jobLocations.length > 0) {
+        const bounds = L.latLngBounds(jobLocations.map(j => [j.lat, j.lng]));
+        map.fitBounds(bounds, { padding: [50, 50] });
+    }
+}
+
+function createJobPopup(job) {
+    return `
+        <div class="p-3 max-w-xs">
             <h6 class="text-title font-semibold mb-1">${job.title}</h6>
             <p class="text-sm text-secondary mb-2">${job.company}</p>
             <p class="text-xs text-secondary flex items-center gap-1 mb-2">
                 <span class="ph ph-map-pin"></span>
                 ${job.location}
             </p>
-            <a href="${job.url}" class="text-sm text-primary font-semibold">{% trans "View Details" %} →</a>
+            <a href="${job.url}" class="button-main -sm mt-2 w-full text-center">View Details</a>
         </div>
-    `);
-});
-
-// Fit map to show all markers
-if (jobLocations.length > 0) {
-    const bounds = L.latLngBounds(jobLocations.map(job => [job.lat, job.lng]));
-    map.fitBounds(bounds, { padding: [50, 50] });
+    `;
 }
 
-// Wishlist functionality
-document.querySelectorAll('.add_wishlist_btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        this.classList.toggle('active');
-        // TODO: Add AJAX call to save wishlist
+renderMarkers();
+
+// === GEOLOCATION ===
+let userLocation = null;
+const searchRadius = 5000; // 5km
+
+function requestGeolocation() {
+    if (!navigator.geolocation) {
+        showLocationFallback();
+        return;
+    }
+
+    const btn = document.querySelector('[data-geolocation-btn]');
+    btn.innerHTML = '<span class="ph ph-spinner animate-spin"></span> Getting location...';
+
+    navigator.geolocation.getCurrentPosition(
+        handleGeolocationSuccess,
+        handleGeolocationError,
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+}
+
+function handleGeolocationSuccess(position) {
+    userLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+    };
+
+    updateLocationDisplay();
+    centerMapOnUser();
+    applyGeolocationFilter();
+
+    const btn = document.querySelector('[data-geolocation-btn]');
+    btn.innerHTML = '<span class="ph ph-map-pin"></span> Near Me (5km)';
+}
+
+function handleGeolocationError(error) {
+    console.error('[Geolocation] Error:', error);
+    const btn = document.querySelector('[data-geolocation-btn]');
+    btn.innerHTML = '<span class="ph ph-map-pin"></span> Near Me (5km)';
+    showLocationFallback();
+}
+
+function centerMapOnUser() {
+    if (!userLocation) return;
+
+    map.setView([userLocation.lat, userLocation.lng], 12);
+
+    // Add radius circle
+    if (radiusCircle) map.removeLayer(radiusCircle);
+    radiusCircle = L.circle([userLocation.lat, userLocation.lng], {
+        color: '#3B82F6',
+        fillColor: '#3B82F6',
+        fillOpacity: 0.1,
+        radius: searchRadius
+    }).addTo(map);
+
+    // Add user marker
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker([userLocation.lat, userLocation.lng], {
+        icon: L.divIcon({
+            className: 'user-marker',
+            html: '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>',
+            iconSize: [16, 16]
+        })
+    }).addTo(map);
+    userMarker.bindPopup('Your location').openPopup();
+}
+
+function applyGeolocationFilter() {
+    if (!userLocation) return;
+
+    const items = document.querySelectorAll('[data-lat][data-lng]');
+    let hiddenCount = 0;
+
+    items.forEach(item => {
+        const itemLat = parseFloat(item.dataset.lat);
+        const itemLng = parseFloat(item.dataset.lng);
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, itemLat, itemLng);
+
+        if (distance > searchRadius) {
+            item.style.display = 'none';
+            hiddenCount++;
+        } else {
+            item.style.display = '';
+            addDistanceBadge(item, distance);
+        }
     });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c;
+}
+
+function addDistanceBadge(item, distance) {
+    const existing = item.querySelector('.distance-badge');
+    if (existing) existing.remove();
+
+    const badge = document.createElement('span');
+    badge.className = 'distance-badge absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs rounded-full';
+    badge.textContent = distance < 1000 ? `${Math.round(distance)}m` : `${(distance/1000).toFixed(1)}km`;
+    item.appendChild(badge);
+}
+
+function updateLocationDisplay() {
+    const display = document.querySelector('[data-location-display]');
+    if (display && userLocation) {
+        display.innerHTML = `
+            <div class="flex items-center gap-2 text-sm text-secondary mb-4">
+                <span class="ph ph-map-pin text-primary"></span>
+                <span>Showing results within 5km</span>
+                <button onclick="clearGeolocation()" class="text-xs underline">Clear</button>
+            </div>
+        `;
+    }
+}
+
+function clearGeolocation() {
+    userLocation = null;
+    if (radiusCircle) map.removeLayer(radiusCircle);
+    if (userMarker) map.removeLayer(userMarker);
+    document.querySelectorAll('[data-lat][data-lng]').forEach(item => item.style.display = '');
+    document.querySelectorAll('.distance-badge').forEach(badge => badge.remove());
+    const display = document.querySelector('[data-location-display]');
+    if (display) display.innerHTML = '';
+}
+
+function showLocationFallback() {
+    const display = document.querySelector('[data-location-display]');
+    display.innerHTML = `
+        <div class="location_fallback mt-4 p-4 bg-surface rounded-lg">
+            <p class="text-sm text-secondary mb-3">Enter your location manually:</p>
+            <div class="flex gap-2">
+                <input type="text" id="manual_location_input" class="form-input flex-1" placeholder="City or address" />
+                <button onclick="geocodeManualLocation()" class="button-main">Search</button>
+            </div>
+        </div>
+    `;
+}
+
+async function geocodeManualLocation() {
+    const input = document.getElementById('manual_location_input');
+    const address = input.value.trim();
+    if (!address) return;
+
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+            { headers: { 'User-Agent': 'Zumodra Career Pages' } }
+        );
+        const results = await response.json();
+
+        if (results.length > 0) {
+            userLocation = {
+                lat: parseFloat(results[0].lat),
+                lng: parseFloat(results[0].lon),
+                manual: true
+            };
+            handleGeolocationSuccess({ coords: userLocation });
+        }
+    } catch (error) {
+        console.error('[Geocoding] Error:', error);
+    }
+}
+
+// === WEBSOCKET ===
+let ws = null;
+let reconnectAttempts = 0;
+
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=jobs`;
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = function() {
+        console.log('[WebSocket] Connected');
+        reconnectAttempts = 0;
+    };
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        switch(data.type) {
+            case 'job_created': handleJobCreated(data.job); break;
+            case 'job_updated': handleJobUpdated(data.job); break;
+            case 'job_deleted': handleJobDeleted(data.job_id); break;
+        }
+    };
+
+    ws.onclose = function() {
+        if (reconnectAttempts < 5) {
+            setTimeout(() => {
+                reconnectAttempts++;
+                connectWebSocket();
+            }, Math.min(1000 * Math.pow(2, reconnectAttempts), 30000));
+        }
+    };
+
+    setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+        }
+    }, 30000);
+}
+
+function handleJobCreated(job) {
+    if (job.location_coordinates) {
+        jobLocations.push(job);
+        const marker = L.marker([job.location_coordinates.lat, job.location_coordinates.lng]);
+        marker.jobId = job.id;
+        marker.bindPopup(createJobPopup(job));
+        markers.addLayer(marker);
+    }
+}
+
+function handleJobUpdated(job) {
+    const index = jobLocations.findIndex(j => j.id === job.id);
+    if (index !== -1) {
+        jobLocations[index] = job;
+        markers.eachLayer(layer => {
+            if (layer.jobId === job.id) {
+                layer.setPopupContent(createJobPopup(job));
+            }
+        });
+    }
+}
+
+function handleJobDeleted(jobId) {
+    const index = jobLocations.findIndex(j => j.id === jobId);
+    if (index !== -1) {
+        jobLocations.splice(index, 1);
+        markers.eachLayer(layer => {
+            if (layer.jobId === jobId) {
+                markers.removeLayer(layer);
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    connectWebSocket();
 });
 </script>
 {% endblock %}

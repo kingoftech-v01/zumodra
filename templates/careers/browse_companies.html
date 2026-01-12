@@ -205,4 +205,126 @@
 <script src="{% static 'assets/js/slick.min.js' %}"></script>
 <script src="{% static 'assets/js/count-down.js' %}"></script>
 <script src="{% static 'assets/js/main.js' %}"></script>
+<script>
+// WebSocket for real-time company updates
+let ws = null;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=companies`;
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = function(e) {
+        console.log('[WebSocket] Connected to companies live updates');
+        reconnectAttempts = 0;
+    };
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        switch(data.type) {
+            case 'connection_established':
+                console.log('[WebSocket] Connection confirmed');
+                break;
+            case 'company_created':
+                handleCompanyCreated(data.company);
+                break;
+            case 'company_updated':
+                handleCompanyUpdated(data.company);
+                break;
+            case 'pong':
+                break;
+        }
+    };
+
+    ws.onerror = function(error) {
+        console.error('[WebSocket] Error:', error);
+    };
+
+    ws.onclose = function(event) {
+        console.log('[WebSocket] Disconnected');
+
+        if (reconnectAttempts < maxReconnectAttempts) {
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+            console.log(`[WebSocket] Reconnecting in ${delay}ms...`);
+
+            setTimeout(() => {
+                reconnectAttempts++;
+                connectWebSocket();
+            }, delay);
+        }
+    };
+
+    setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+        }
+    }, 30000);
+}
+
+function handleCompanyCreated(company) {
+    const companyCard = createCompanyCard(company);
+    const companiesList = document.querySelector('.list_employers');
+    companiesList.insertAdjacentHTML('afterbegin', companyCard);
+
+    const newCard = companiesList.querySelector('.employers_item:first-child');
+    newCard.classList.add('animate-fade-in');
+
+    updateResultCount(1);
+}
+
+function handleCompanyUpdated(company) {
+    const existingCard = document.querySelector(`[data-company-id="${company.id}"]`);
+    if (existingCard) {
+        existingCard.classList.add('animate-pulse');
+        setTimeout(() => existingCard.classList.remove('animate-pulse'), 1000);
+    }
+}
+
+function createCompanyCard(company) {
+    return `
+        <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300" data-company-id="${company.id}">
+            <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
+                ${company.logo ? `<img src="${company.logo}" alt="${company.name}" class="employers_logo w-full h-full object-cover" />` : `
+                <div class="employers_logo w-full h-full bg-surface flex items-center justify-center">
+                    <span class="ph ph-buildings text-4xl text-secondary"></span>
+                </div>`}
+            </a>
+            <ul class="rate flex items-center mt-4">
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+            </ul>
+            <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">${company.name}</a>
+            <div class="employers_address -style-1 text-secondary mt-1">
+                <span class="ph ph-map-pin text-lg"></span>
+                <span class="address caption1 align-top">${company.city || ''}${company.country ? ', ' + company.country : ''}</span>
+            </div>
+            <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">${company.open_jobs_count || 0} job opening${(company.open_jobs_count || 0) !== 1 ? 's' : ''}</a>
+            <button class="add_wishlist_btn absolute top-5 right-5 -border">
+                <span class="ph ph-heart text-xl"></span>
+                <span class="ph-fill ph-heart text-xl"></span>
+            </button>
+        </li>
+    `;
+}
+
+function updateResultCount(change) {
+    const countEl = document.querySelector('.quantity');
+    if (countEl) {
+        const currentCount = parseInt(countEl.textContent.match(/\d+/)[0]);
+        const newCount = currentCount + change;
+        countEl.textContent = `${newCount}+ Results`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    connectWebSocket();
+});
+</script>
 {% endblock %}

@@ -5,3 +5,7 @@ class CareersConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'careers'
     verbose_name = 'Public Career Pages'
+
+    def ready(self):
+        """Import signals when app is ready."""
+        import careers.signals  # noqa

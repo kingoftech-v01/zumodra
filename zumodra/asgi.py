@@ -22,6 +22,7 @@ django_asgi_app = get_asgi_application()
 # Import routing after Django is initialized
 import messages_sys.routing
 import notifications.routing
+import careers.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
@@ -29,7 +30,8 @@ application = ProtocolTypeRouter({
         AuthMiddlewareStack(
             URLRouter(
                 messages_sys.routing.websocket_urlpatterns +
-                notifications.routing.websocket_urlpatterns
+                notifications.routing.websocket_urlpatterns +
+                careers.routing.websocket_urlpatterns
             )
         )
     ),

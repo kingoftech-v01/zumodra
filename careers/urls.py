@@ -71,6 +71,8 @@ from .template_views import (
     BrowseJobsMapView,
     BrowseCompaniesView,
     BrowseCompaniesMapView,
+    BrowseProjectsView,
+    BrowseProjectsMapView,
     JobDetailPageView,
     ApplicationPageView,
     ApplicationSuccessView,
@@ -178,6 +180,8 @@ urlpatterns = [
     path('browse/map/', BrowseJobsMapView.as_view(), name='browse_jobs_map'),
     path('companies/', BrowseCompaniesView.as_view(), name='browse_companies'),
     path('companies/map/', BrowseCompaniesMapView.as_view(), name='browse_companies_map'),
+    path('projects/', BrowseProjectsView.as_view(), name='browse_projects'),
+    path('projects/map/', BrowseProjectsMapView.as_view(), name='browse_projects_map'),
 
     # Job detail aliases (template uses underscore)
     path('job/<int:pk>/', JobDetailPageView.as_view(), name='job_detail'),
