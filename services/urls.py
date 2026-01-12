@@ -11,7 +11,8 @@ urlpatterns = [
     path('nearby/', browse_nearby_services, name='browse_nearby_services'),
     path('search/ajax/', search_services_ajax, name='search_services_ajax'),
 
-    # ==================== PROVIDER PROFILE ====================
+    # ==================== PROVIDER BROWSING & PROFILE ====================
+    path('providers/', browse_providers, name='browse_providers'),  # Browse all providers/freelancers
     path('provider/dashboard/', provider_dashboard, name='provider_dashboard'),
     path('provider/create/', create_provider_profile, name='create_provider_profile'),
     path('provider/edit/', edit_provider_profile, name='edit_provider_profile'),

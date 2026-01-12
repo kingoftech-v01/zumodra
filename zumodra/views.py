@@ -96,6 +96,11 @@ def about_us_view(request):
 
 
 def services_view(request):
+    """Platform services overview page (ATS, HRIS, KYC, Marketplace, etc.)."""
+    return render(request, 'services.html')
+
+
+def marketplace_browse_view(request):
     """
     Public marketplace browsing (no tenant context required).
 
@@ -214,6 +219,41 @@ def term_of_use_view(request):
 def privacy_policy_view(request):
     """Privacy policy legal page."""
     return render(request, 'privacy-policy.html')
+
+
+def browse_companies_view(request):
+    """
+    Browse all companies/tenants on the platform.
+    Shows company tenants with their information and services.
+    """
+    from tenants.models import Tenant
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+
+    companies_query = Tenant.objects.filter(
+        tenant_type='company'
+    ).exclude(schema_name='public').order_by('-created_at')
+
+    # Search by name or description
+    search = request.GET.get('search', '')
+    if search:
+        companies_query = companies_query.filter(
+            Q(name__icontains=search) |
+            Q(description__icontains=search)
+        ).distinct()
+
+    # Pagination
+    paginator = Paginator(companies_query, 12)
+    page_number = request.GET.get('page', 1)
+    companies = paginator.get_page(page_number)
+
+    context = {
+        'companies': companies,
+        'search': search,
+        'total_count': paginator.count,
+    }
+
+    return render(request, 'browse_companies.html', context)
 
 
 def auth_test_view(request):

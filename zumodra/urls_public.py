@@ -27,6 +27,7 @@ from .views import (
     auth_test_view,
     become_seller_view,
     become_buyer_view,
+    browse_companies_view,
 )
 
 # Public careers landing view (for public schema where careers tables don't exist)
@@ -135,6 +136,8 @@ urlpatterns += i18n_patterns(
     # Public pages
     path('', home_view, name='home'),
     path('about/', about_us_view, name='about'),
+    path('our-services/', services_view, name='services'),
+    path('companies/', browse_companies_view, name='browse_companies'),
     path('contact/', contact_us_view, name='contact_us'),
     path('faq/', faq_view, name='faq'),
     path('pricing/', pricing_view, name='pricing'),

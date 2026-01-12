@@ -510,6 +510,102 @@ def provider_profile_view(request, provider_uuid):
     return render(request, 'services/provider_profile.html', context)
 
 
+def browse_providers(request):
+    """
+    Browse all service providers/freelancers from the public catalog.
+
+    Shows providers with their services, ratings, and profiles.
+    Queries PublicProviderCatalog (public schema) instead of ServiceProvider
+    (tenant schema) to avoid cross-schema access issues.
+
+    NOTE: Data is synced via signals when providers update marketplace_enabled flag.
+    """
+    from tenants.models import PublicProviderCatalog
+    from django.utils import timezone
+
+    try:
+        # Query public catalog instead of tenant schemas
+        providers_query = PublicProviderCatalog.objects.filter(
+            published_at__lte=timezone.now()
+        ).select_related('tenant').order_by('-is_featured', '-rating_avg', '-published_at')
+
+        # Search by name, tagline, or bio
+        search = request.GET.get('search', '')
+        if search:
+            providers_query = providers_query.filter(
+                Q(display_name__icontains=search) |
+                Q(tagline__icontains=search) |
+                Q(bio__icontains=search) |
+                Q(category_names__icontains=search) |
+                Q(city__icontains=search) |
+                Q(country__icontains=search)
+            ).distinct()
+
+        # Filter by minimum rating
+        min_rating = request.GET.get('min_rating')
+        if min_rating:
+            try:
+                providers_query = providers_query.filter(rating_avg__gte=float(min_rating))
+            except (ValueError, TypeError):
+                pass
+
+        # Filter by location
+        location = request.GET.get('location', '')
+        if location:
+            providers_query = providers_query.filter(
+                Q(city__icontains=location) |
+                Q(country__icontains=location) |
+                Q(state__icontains=location)
+            )
+
+        # Filter by verified status
+        if request.GET.get('verified') == 'true':
+            providers_query = providers_query.filter(is_verified=True)
+
+        # Filter by availability
+        if request.GET.get('available') == 'true':
+            providers_query = providers_query.filter(
+                is_accepting_projects=True,
+                availability_status='available'
+            )
+
+        # Sorting
+        sort_by = request.GET.get('sort', '-is_featured')
+        allowed_sorts = [
+            '-is_featured', '-published_at', 'published_at',
+            '-rating_avg', 'rating_avg',
+            '-completed_jobs_count', 'completed_jobs_count',
+            'display_name', '-display_name',
+            'hourly_rate', '-hourly_rate'
+        ]
+        if sort_by in allowed_sorts:
+            providers_query = providers_query.order_by(sort_by)
+
+        # Pagination
+        paginator = Paginator(providers_query, 12)
+        page_number = request.GET.get('page', 1)
+        providers = paginator.get_page(page_number)
+
+        context = {
+            'providers': providers,
+            'search': search,
+            'total_count': paginator.count,
+            'min_rating': min_rating,
+            'location': location,
+        }
+
+    except Exception as e:
+        logger.error(f"Error browsing providers: {e}", exc_info=True)
+        context = {
+            'providers': [],
+            'search': '',
+            'total_count': 0,
+            'error': 'Unable to load providers. Please try again later.'
+        }
+
+    return render(request, 'services/browse_providers.html', context)
+
+
 # ==================== SERVICE CRUD (Provider) ====================
 
 @login_required

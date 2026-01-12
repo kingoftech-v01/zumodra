@@ -1257,3 +1257,396 @@ class PublicServiceCatalog(models.Model):
         """
         from django.urls import reverse
         return reverse('services:request_cross_tenant', kwargs={'catalog_service_uuid': self.uuid})
+
+
+class PublicJobCatalog(models.Model):
+    """
+    Read-only public catalog of job postings published by tenants.
+    Denormalized for performance - synced via signals from tenant schemas.
+
+    This model lives in the PUBLIC schema and aggregates jobs marked as
+    `published_on_career_page=True` from all tenant schemas. It enables the
+    public careers page browsing without requiring cross-schema queries.
+
+    Synchronization:
+    - Triggered by JobPosting.post_save signal in tenant schemas
+    - Only jobs with published_on_career_page=True and is_internal_only=False
+    - Denormalized data (title, location, salary, etc.) for fast reads
+    - Auto-updated when source job changes
+
+    Security:
+    - Salary only included if show_salary=True
+    - Internal-only jobs excluded
+    - Sensitive fields (hiring manager, internal notes) never synced
+    """
+
+    # Identity
+    id = models.BigAutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True,
+        db_index=True,
+        help_text=_('Job UUID (same as source JobPosting)')
+    )
+    tenant = models.ForeignKey(
+        'Tenant',
+        on_delete=models.CASCADE,
+        related_name='published_jobs',
+        help_text=_('Tenant/company offering this job')
+    )
+
+    # Job Reference (for sync tracking)
+    job_uuid = models.UUIDField(
+        db_index=True,
+        help_text=_('UUID of job in tenant schema')
+    )
+    tenant_schema_name = models.CharField(
+        max_length=63,
+        help_text=_('Schema name of tenant (for sync reference)')
+    )
+
+    # Denormalized Job Data
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, blank=True)
+    reference_code = models.CharField(max_length=50, blank=True)
+
+    # Category (denormalized)
+    category_name = models.CharField(max_length=100, db_index=True, blank=True)
+    category_slug = models.SlugField(max_length=100, db_index=True, blank=True)
+
+    # Job Classification
+    job_type = models.CharField(
+        max_length=20,
+        db_index=True,
+        help_text=_('full_time, part_time, contract, internship, temporary, freelance')
+    )
+    experience_level = models.CharField(
+        max_length=20,
+        db_index=True,
+        help_text=_('entry, junior, mid, senior, lead, executive')
+    )
+    remote_policy = models.CharField(
+        max_length=20,
+        db_index=True,
+        help_text=_('on_site, remote, hybrid, flexible')
+    )
+
+    # Location (denormalized)
+    location_city = models.CharField(max_length=100, blank=True, db_index=True)
+    location_state = models.CharField(max_length=100, blank=True)
+    location_country = models.CharField(max_length=100, blank=True, db_index=True)
+    location_coordinates = models.PointField(null=True, blank=True)
+
+    # Description Fields (sanitized HTML)
+    description = models.TextField(blank=True, help_text=_('Sanitized HTML'))
+    responsibilities = models.TextField(blank=True)
+    requirements = models.TextField(blank=True)
+    nice_to_have = models.TextField(blank=True)
+    benefits = models.TextField(blank=True)
+
+    # Compensation (conditional - only if show_salary=True)
+    salary_min = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Only included if job.show_salary=True')
+    )
+    salary_max = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    salary_currency = models.CharField(max_length=3, default='CAD')
+    salary_period = models.CharField(
+        max_length=20,
+        default='yearly',
+        help_text=_('hourly, daily, weekly, monthly, yearly')
+    )
+    show_salary = models.BooleanField(default=False)
+
+    # Skills (PostgreSQL arrays)
+    required_skills = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of required skills')
+    )
+    preferred_skills = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of preferred skills')
+    )
+
+    # Hiring Details
+    positions_count = models.PositiveIntegerField(default=1)
+    team = models.CharField(max_length=100, blank=True)
+
+    # Company Info (denormalized from tenant)
+    company_name = models.CharField(max_length=255, db_index=True)
+    company_logo_url = models.CharField(max_length=500, blank=True)
+
+    # Status & Visibility
+    is_featured = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_('Featured jobs appear prominently on careers page')
+    )
+
+    # Deadlines & Metadata
+    application_deadline = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(
+        db_index=True,
+        help_text=_('When job was first published to catalog')
+    )
+
+    # Sync Tracking
+    synced_at = models.DateTimeField(
+        auto_now=True,
+        help_text=_('Last sync timestamp from tenant schema')
+    )
+
+    # SEO
+    meta_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.TextField(max_length=500, blank=True)
+
+    class Meta:
+        verbose_name = _('Public Job Catalog Entry')
+        verbose_name_plural = _('Public Job Catalog')
+        ordering = ['-is_featured', '-published_at']
+        indexes = [
+            models.Index(fields=['tenant', 'is_featured'], name='job_catalog_tenant_featured'),
+            models.Index(fields=['job_type', 'experience_level'], name='job_catalog_type_level'),
+            models.Index(fields=['location_country', 'location_city'], name='job_catalog_location'),
+            models.Index(fields=['tenant_schema_name', 'job_uuid'], name='job_catalog_sync_ref'),
+            models.Index(fields=['-published_at'], name='job_catalog_published'),
+            models.Index(fields=['remote_policy'], name='job_catalog_remote'),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant_schema_name', 'job_uuid'],
+                name='unique_job_per_tenant_schema'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.title} at {self.company_name}"
+
+    def get_tenant_job_url(self):
+        """
+        Generate URL to view job in tenant context.
+        Returns absolute URL to job detail page on tenant subdomain.
+        """
+        domain = self.tenant.get_primary_domain()
+        if domain:
+            return f"https://{domain.domain}/jobs/{self.uuid}/"
+        return None
+
+    def get_apply_url(self):
+        """
+        Generate URL for applying to this job.
+        Points to the tenant's application page.
+        """
+        domain = self.tenant.get_primary_domain()
+        if domain:
+            return f"https://{domain.domain}/jobs/{self.uuid}/apply/"
+        return None
+
+
+class PublicProviderCatalog(models.Model):
+    """
+    Read-only public catalog of service providers (freelancers) published by tenants.
+    Denormalized for performance - synced via signals from tenant schemas.
+
+    This model lives in the PUBLIC schema and aggregates providers with
+    `marketplace_enabled=True` from all tenant schemas. It enables public
+    browsing of freelancers without cross-schema queries.
+
+    Synchronization:
+    - Triggered by ServiceProvider.post_save signal in tenant schemas
+    - Only providers with marketplace_enabled=True and is_active=True
+    - Denormalized profile data (bio, skills, ratings) for fast reads
+    - Auto-updated when source provider changes
+
+    Security:
+    - Sensitive data (email, phone, bank details) never synced
+    - Only public profile information included
+    - Location limited to city/country (no full addresses)
+    """
+
+    # Identity
+    id = models.BigAutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True,
+        db_index=True,
+        help_text=_('Provider UUID (same as source ServiceProvider)')
+    )
+    tenant = models.ForeignKey(
+        'Tenant',
+        on_delete=models.CASCADE,
+        related_name='published_providers',
+        help_text=_('Tenant/company where provider operates')
+    )
+
+    # Provider Reference (for sync tracking)
+    provider_uuid = models.UUIDField(
+        db_index=True,
+        help_text=_('UUID of provider in tenant schema')
+    )
+    tenant_schema_name = models.CharField(
+        max_length=63,
+        help_text=_('Schema name of tenant (for sync reference)')
+    )
+
+    # Profile Information
+    display_name = models.CharField(max_length=255, db_index=True)
+    provider_type = models.CharField(
+        max_length=20,
+        db_index=True,
+        help_text=_('individual, agency, company')
+    )
+    bio = models.TextField(
+        max_length=2000,
+        blank=True,
+        help_text=_('Sanitized bio (max 2000 chars)')
+    )
+    tagline = models.CharField(max_length=200, blank=True)
+
+    # Media URLs (stored as strings, not FileFields)
+    avatar_url = models.CharField(max_length=500, blank=True)
+    cover_image_url = models.CharField(max_length=500, blank=True)
+
+    # Location (city/country only, no full addresses)
+    city = models.CharField(max_length=100, blank=True, db_index=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True, db_index=True)
+    location = models.PointField(null=True, blank=True)
+
+    # Categories (denormalized as JSON arrays)
+    category_names = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of category names')
+    )
+    category_slugs = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of category slugs for filtering')
+    )
+
+    # Skills (denormalized with metadata)
+    skills_data = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=_('List of {name, level, years_experience} dicts')
+    )
+
+    # Pricing
+    hourly_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Hourly rate if applicable')
+    )
+    minimum_budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('Minimum project budget')
+    )
+    currency = models.CharField(max_length=3, default='CAD')
+
+    # Stats & Reputation (denormalized)
+    rating_avg = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        db_index=True,
+        help_text=_('Average rating across all reviews')
+    )
+    total_reviews = models.PositiveIntegerField(
+        default=0,
+        help_text=_('Total number of reviews received')
+    )
+    completed_jobs_count = models.PositiveIntegerField(
+        default=0,
+        help_text=_('Number of completed projects/jobs')
+    )
+    response_rate = models.PositiveSmallIntegerField(
+        default=0,
+        help_text=_('Percentage of messages responded to (0-100)')
+    )
+    avg_response_time_hours = models.PositiveSmallIntegerField(
+        default=0,
+        help_text=_('Average response time in hours')
+    )
+
+    # Availability & Status
+    availability_status = models.CharField(
+        max_length=20,
+        default='available',
+        db_index=True,
+        help_text=_('available, busy, unavailable')
+    )
+    is_verified = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_('KYC verified provider')
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_('Featured providers shown prominently')
+    )
+    is_accepting_projects = models.BooleanField(default=True, db_index=True)
+    can_work_remotely = models.BooleanField(default=True)
+    can_work_onsite = models.BooleanField(default=False)
+
+    # Sync Tracking
+    published_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text=_('When provider was first published to catalog')
+    )
+    synced_at = models.DateTimeField(
+        auto_now=True,
+        help_text=_('Last sync timestamp from tenant schema')
+    )
+
+    class Meta:
+        verbose_name = _('Public Provider Catalog Entry')
+        verbose_name_plural = _('Public Provider Catalog')
+        ordering = ['-is_featured', '-rating_avg', '-published_at']
+        indexes = [
+            models.Index(fields=['tenant', 'is_verified'], name='provider_catalog_tenant_verified'),
+            models.Index(fields=['provider_type', 'is_accepting_projects'], name='provider_catalog_type_accepting'),
+            models.Index(fields=['country', 'city'], name='provider_catalog_location'),
+            models.Index(fields=['tenant_schema_name', 'provider_uuid'], name='provider_catalog_sync_ref'),
+            models.Index(fields=['-rating_avg', '-total_reviews'], name='provider_catalog_rating'),
+            models.Index(fields=['availability_status'], name='provider_catalog_availability'),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant_schema_name', 'provider_uuid'],
+                name='unique_provider_per_tenant_schema'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.display_name} ({self.provider_type})"
+
+    def get_tenant_provider_url(self):
+        """
+        Generate URL to view provider profile in tenant context.
+        Returns absolute URL to provider detail page on tenant subdomain.
+        """
+        domain = self.tenant.get_primary_domain()
+        if domain:
+            return f"https://{domain.domain}/providers/{self.uuid}/"
+        return None
+
+    def get_skills_list(self):
+        """Extract skill names from skills_data JSON."""
+        if not self.skills_data:
+            return []
+        return [skill.get('name', '') for skill in self.skills_data if skill.get('name')]

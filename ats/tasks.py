@@ -880,3 +880,209 @@ class BulkMoveApplicationsTask(SecureTenantTask):
 
 # Register the task
 bulk_move_applications = BulkMoveApplicationsTask()
+
+
+# ==================== Public Job Catalog Sync Tasks ====================
+
+from celery import shared_task
+from tenants.context import tenant_context, public_schema_context
+from core.sync.job_sync import JobPublicSyncService
+
+
+@shared_task(
+    bind=True,
+    name='ats.sync_job_to_catalog',
+    max_retries=3,
+    default_retry_delay=60,  # 1 minute
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_backoff_max=600,  # Max 10 minutes
+)
+def sync_job_to_catalog_task(self, job_uuid, tenant_schema, tenant_id):
+    """
+    Async task to sync JobPosting → PublicJobCatalog.
+
+    Workflow:
+        1. Load tenant and switch to tenant schema
+        2. Fetch JobPosting instance
+        3. Check sync conditions (published, not internal, open)
+        4. Extract and map safe fields
+        5. Switch to public schema
+        6. Update or create PublicJobCatalog entry
+
+    Args:
+        job_uuid: UUID string of the job to sync
+        tenant_schema: Source tenant schema name
+        tenant_id: Tenant primary key
+
+    Returns:
+        dict: {'status': 'success'|'not_found'|'skipped', 'job_uuid': str}
+
+    Raises:
+        Retry exception on errors (auto-retry with exponential backoff)
+    """
+    from tenants.models import Tenant
+    from ats.models import JobPosting
+
+    try:
+        # Load tenant
+        tenant = Tenant.objects.get(pk=tenant_id)
+
+        # Switch to tenant schema
+        with tenant_context(tenant):
+            try:
+                job = JobPosting.objects.get(uuid=job_uuid)
+            except JobPosting.DoesNotExist:
+                logger.warning(
+                    f"Job {job_uuid} not found in {tenant_schema} - may have been deleted"
+                )
+                return {'status': 'not_found', 'job_uuid': job_uuid}
+
+            # Perform sync
+            sync_service = JobPublicSyncService()
+
+            # Check if should sync
+            if not sync_service.should_sync(job):
+                logger.debug(
+                    f"Job {job_uuid} does not meet sync conditions - removing from catalog"
+                )
+                # Remove from catalog if exists
+                sync_service.remove_from_public(job)
+                return {'status': 'skipped', 'job_uuid': job_uuid, 'reason': 'conditions_not_met'}
+
+            # Sync to public catalog
+            catalog_entry = sync_service.sync_to_public(job)
+
+            if catalog_entry:
+                logger.info(
+                    f"Successfully synced job {job_uuid} to public catalog from {tenant_schema}"
+                )
+                return {
+                    'status': 'success',
+                    'job_uuid': job_uuid,
+                    'catalog_id': catalog_entry.id
+                }
+            else:
+                logger.error(f"Sync failed for job {job_uuid} - no catalog entry created")
+                return {'status': 'error', 'job_uuid': job_uuid}
+
+    except Tenant.DoesNotExist:
+        logger.error(f"Tenant {tenant_id} not found for job sync")
+        return {'status': 'error', 'error': 'tenant_not_found'}
+
+    except Exception as e:
+        logger.error(
+            f"Error syncing job {job_uuid} from {tenant_schema}: {e}",
+            exc_info=True
+        )
+        # Raise to trigger Celery retry
+        raise self.retry(exc=e)
+
+
+@shared_task(
+    bind=True,
+    name='ats.remove_job_from_catalog',
+    max_retries=3,
+    default_retry_delay=30,
+)
+def remove_job_from_catalog_task(self, job_uuid, tenant_schema):
+    """
+    Async task to remove job from PublicJobCatalog.
+
+    Called when JobPosting is deleted or conditions no longer met.
+
+    Args:
+        job_uuid: UUID string of the job to remove
+        tenant_schema: Source tenant schema name
+
+    Returns:
+        dict: {'status': 'success', 'deleted': int}
+    """
+    from tenants.models import PublicJobCatalog
+
+    try:
+        with public_schema_context():
+            deleted_count, _ = PublicJobCatalog.objects.filter(
+                tenant_schema_name=tenant_schema,
+                job_uuid=job_uuid
+            ).delete()
+
+            logger.info(
+                f"Removed job {job_uuid} from public catalog (deleted={deleted_count})"
+            )
+
+            return {
+                'status': 'success',
+                'deleted': deleted_count,
+                'job_uuid': job_uuid
+            }
+
+    except Exception as e:
+        logger.error(
+            f"Error removing job {job_uuid} from catalog: {e}",
+            exc_info=True
+        )
+        raise self.retry(exc=e)
+
+
+@shared_task(name='ats.bulk_sync_tenant_jobs')
+def bulk_sync_tenant_jobs(tenant_id):
+    """
+    Bulk sync all eligible jobs for a tenant.
+
+    Used for:
+    - Initial data load
+    - Recovery from sync failures
+    - Manual re-sync operations
+
+    Args:
+        tenant_id: Tenant primary key
+
+    Returns:
+        dict: {'tenant': str, 'synced': int, 'skipped': int, 'errors': int}
+    """
+    from tenants.models import Tenant
+    from ats.models import JobPosting
+
+    tenant = Tenant.objects.get(pk=tenant_id)
+    sync_service = JobPublicSyncService()
+
+    with tenant_context(tenant):
+        # Get all jobs that should be synced
+        jobs = JobPosting.objects.filter(
+            published_on_career_page=True,
+            is_internal_only=False,
+            status='open',
+        )
+
+        synced_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        for job in jobs:
+            try:
+                if sync_service.should_sync(job):
+                    catalog_entry = sync_service.sync_to_public(job)
+                    if catalog_entry:
+                        synced_count += 1
+                    else:
+                        error_count += 1
+                else:
+                    skipped_count += 1
+
+            except Exception as e:
+                logger.error(f"Failed to sync job {job.uuid}: {e}")
+                error_count += 1
+
+        logger.info(
+            f"Bulk sync completed for {tenant.name}: "
+            f"synced={synced_count}, skipped={skipped_count}, errors={error_count}"
+        )
+
+        return {
+            'tenant': tenant.name,
+            'synced': synced_count,
+            'skipped': skipped_count,
+            'errors': error_count,
+            'total': jobs.count(),
+        }

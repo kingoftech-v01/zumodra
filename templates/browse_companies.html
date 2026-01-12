@@ -1,0 +1,133 @@
+{% extends "base/freelanhub_base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Browse Companies" %} - Zumodra{% endblock %}
+
+{% block meta_description %}{% trans "Discover companies and organizations on Zumodra. Find employers, view company profiles, and explore opportunities." %}{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+    <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+        <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full bg-primary"></div>
+        <div class="container relative h-full">
+            <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                    <a href="{% url 'home' %}" class="caption1 text-white">{% trans "Home" %}</a>
+                    <span class="caption1 text-white opacity-40">/</span>
+                    <span class="caption1 text-white opacity-60">{% trans "Browse Companies" %}</span>
+                </div>
+                <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">{% trans "Browse Companies" %}</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filters -->
+<section class="companies lg:py-20 sm:py-14 py-10">
+    <div class="container">
+        <!-- Search Bar -->
+        <div class="search-bar mb-8">
+            <form method="GET" class="flex gap-3 max-w-2xl mx-auto">
+                <input type="text" name="search" value="{{ search }}"
+                       placeholder="{% trans 'Search companies by name...' %}"
+                       class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition">
+                    {% trans "Search" %}
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Count -->
+        {% if total_count > 0 %}
+        <p class="text-sm text-gray-600 mb-6">
+            {% blocktrans count counter=total_count %}Found {{ counter }} company{% plural %}Found {{ counter }} companies{% endblocktrans %}
+        </p>
+        {% endif %}
+
+        <!-- Companies Grid -->
+        {% if companies %}
+        <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
+            {% for company in companies %}
+            <div class="company-card bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <!-- Company Logo -->
+                <div class="flex items-start gap-4 mb-4">
+                    {% if company.logo %}
+                    <img src="{{ company.logo.url }}" alt="{{ company.name }}"
+                         class="w-16 h-16 rounded-lg object-cover">
+                    {% else %}
+                    <div class="w-16 h-16 rounded-lg bg-primary text-white flex items-center justify-center text-2xl font-bold">
+                        {{ company.name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-lg">{{ company.name }}</h4>
+                        {% if company.description %}
+                        <p class="text-sm text-gray-600 line-clamp-2">{{ company.description|truncatewords:15 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Company Info -->
+                <div class="space-y-2 mb-4">
+                    {% if company.created_at %}
+                    <p class="text-sm text-gray-600 flex items-center gap-2">
+                        <i class="ph ph-calendar text-gray-400"></i>
+                        {% trans "Joined" %} {{ company.created_at|date:"F Y" }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- View Company Button -->
+                <a href="/{{ company.slug }}/"
+                   class="block text-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition">
+                    {% trans "View Company" %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if companies.has_other_pages %}
+        <div class="pagination flex justify-center gap-2 mt-10">
+            {% if companies.has_previous %}
+            <a href="?page={{ companies.previous_page_number }}{% if search %}&search={{ search }}{% endif %}"
+               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                {% trans "Previous" %}
+            </a>
+            {% endif %}
+
+            <span class="px-4 py-2 border border-primary bg-primary/10 rounded-lg">
+                {% trans "Page" %} {{ companies.number }} {% trans "of" %} {{ companies.paginator.num_pages }}
+            </span>
+
+            {% if companies.has_next %}
+            <a href="?page={{ companies.next_page_number }}{% if search %}&search={{ search }}{% endif %}"
+               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                {% trans "Next" %}
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- No Companies Found -->
+        <div class="text-center py-16">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-buildings text-4xl text-gray-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">{% trans "No Companies Found" %}</h3>
+            <p class="text-gray-600">
+                {% if search %}
+                {% trans "Try adjusting your search criteria." %}
+                {% else %}
+                {% trans "There are currently no companies available." %}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

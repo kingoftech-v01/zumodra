@@ -933,3 +933,268 @@ def cleanup_expired_cross_tenant_requests(self):
     except Exception as e:
         logger.error(f"Error cleaning up cross-tenant requests: {e}", exc_info=True)
         raise self.retry(exc=e)
+
+
+# ==================== Public Provider Catalog Sync Tasks ====================
+
+from tenants.context import tenant_context, public_schema_context
+from core.sync.provider_sync import ProviderPublicSyncService
+
+
+@shared_task(
+    bind=True,
+    name='services.sync_provider_to_catalog',
+    max_retries=3,
+    default_retry_delay=60,  # 1 minute
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_backoff_max=600,  # Max 10 minutes
+)
+def sync_provider_to_catalog_task(self, provider_uuid, tenant_schema, tenant_id):
+    """
+    Async task to sync ServiceProvider → PublicProviderCatalog.
+
+    Workflow:
+        1. Load tenant and switch to tenant schema
+        2. Fetch ServiceProvider instance
+        3. Check sync conditions (marketplace_enabled, is_active)
+        4. Extract and map safe fields (categories, skills, stats)
+        5. Switch to public schema
+        6. Update or create PublicProviderCatalog entry
+
+    Args:
+        provider_uuid: UUID string of the provider to sync
+        tenant_schema: Source tenant schema name
+        tenant_id: Tenant primary key
+
+    Returns:
+        dict: {'status': 'success'|'not_found'|'skipped', 'provider_uuid': str}
+
+    Raises:
+        Retry exception on errors (auto-retry with exponential backoff)
+    """
+    from tenants.models import Tenant
+    from services.models import ServiceProvider
+
+    try:
+        # Load tenant
+        tenant = Tenant.objects.get(pk=tenant_id)
+
+        # Switch to tenant schema and load provider
+        with tenant_context(tenant):
+            try:
+                provider = ServiceProvider.objects.get(uuid=provider_uuid)
+            except ServiceProvider.DoesNotExist:
+                logger.warning(
+                    f"ServiceProvider {provider_uuid} not found in {tenant_schema}"
+                )
+                return {
+                    'status': 'not_found',
+                    'provider_uuid': provider_uuid,
+                    'tenant_schema': tenant_schema,
+                }
+
+            # Initialize sync service
+            sync_service = ProviderPublicSyncService()
+
+            # Check if provider should be synced
+            if not sync_service.should_sync(provider):
+                logger.info(
+                    f"Provider {provider_uuid} from {tenant_schema} does not meet sync conditions, "
+                    "removing from catalog if exists"
+                )
+                sync_service.remove_from_public(provider)
+                return {
+                    'status': 'skipped',
+                    'reason': 'conditions_not_met',
+                    'provider_uuid': provider_uuid,
+                    'tenant_schema': tenant_schema,
+                }
+
+            # Sync to public catalog
+            try:
+                catalog_entry = sync_service.sync_to_public(provider, created=False)
+
+                logger.info(
+                    f"Successfully synced provider {provider_uuid} from {tenant_schema} "
+                    f"to PublicProviderCatalog (ID: {catalog_entry.id})"
+                )
+
+                return {
+                    'status': 'success',
+                    'catalog_id': catalog_entry.id,
+                    'provider_uuid': str(provider_uuid),
+                    'tenant_schema': tenant_schema,
+                    'display_name': catalog_entry.display_name,
+                }
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to sync provider {provider_uuid} from {tenant_schema} to catalog: {e}",
+                    exc_info=True
+                )
+                raise
+
+    except Tenant.DoesNotExist:
+        logger.error(f"Tenant ID {tenant_id} not found")
+        return {
+            'status': 'error',
+            'reason': 'tenant_not_found',
+            'tenant_id': tenant_id,
+        }
+
+    except Exception as e:
+        logger.error(
+            f"Error syncing provider {provider_uuid} from {tenant_schema}: {e}",
+            exc_info=True
+        )
+        # Auto-retry with exponential backoff
+        raise self.retry(exc=e)
+
+
+@shared_task(
+    bind=True,
+    name='services.remove_provider_from_catalog',
+    max_retries=2,
+    default_retry_delay=30,
+)
+def remove_provider_from_catalog_task(self, provider_uuid, tenant_schema):
+    """
+    Async task to remove ServiceProvider from PublicProviderCatalog.
+
+    Called when provider is deleted or marketplace_enabled changes to False.
+
+    Args:
+        provider_uuid: UUID string of the provider to remove
+        tenant_schema: Source tenant schema name
+
+    Returns:
+        dict: {'status': 'success', 'deleted': int}
+    """
+    from tenants.models import PublicProviderCatalog
+
+    try:
+        # Switch to public schema
+        with public_schema_context():
+            deleted_count, _ = PublicProviderCatalog.objects.filter(
+                tenant_schema_name=tenant_schema,
+                provider_uuid=provider_uuid
+            ).delete()
+
+        if deleted_count > 0:
+            logger.info(
+                f"Removed provider {provider_uuid} from PublicProviderCatalog "
+                f"(tenant: {tenant_schema})"
+            )
+        else:
+            logger.debug(
+                f"Provider {provider_uuid} not found in catalog "
+                f"(tenant: {tenant_schema}, already removed)"
+            )
+
+        return {
+            'status': 'success',
+            'deleted': deleted_count,
+            'provider_uuid': provider_uuid,
+            'tenant_schema': tenant_schema,
+        }
+
+    except Exception as e:
+        logger.error(
+            f"Error removing provider {provider_uuid} from catalog: {e}",
+            exc_info=True
+        )
+        raise self.retry(exc=e)
+
+
+@shared_task(
+    name='services.bulk_sync_tenant_providers',
+    soft_time_limit=600,  # 10 minutes
+    time_limit=660,  # Hard limit at 11 minutes
+)
+def bulk_sync_tenant_providers(tenant_id):
+    """
+    Bulk sync all eligible providers for a tenant to PublicProviderCatalog.
+
+    Used for:
+    - Initial data population when system is first deployed
+    - Re-sync all providers after catalog schema changes
+    - Manual re-sync via management command
+
+    Args:
+        tenant_id: Tenant primary key
+
+    Returns:
+        dict: Summary statistics {synced, skipped, errors, total}
+    """
+    from tenants.models import Tenant
+    from services.models import ServiceProvider
+
+    try:
+        tenant = Tenant.objects.get(pk=tenant_id)
+        sync_service = ProviderPublicSyncService()
+
+        synced_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        with tenant_context(tenant):
+            # Get all providers that should be in catalog
+            providers = ServiceProvider.objects.filter(
+                marketplace_enabled=True,
+                is_active=True,
+                user__is_active=True,
+            ).select_related('user')
+
+            total_count = providers.count()
+
+            logger.info(
+                f"Starting bulk provider sync for {tenant.name} "
+                f"({total_count} eligible providers)"
+            )
+
+            for provider in providers:
+                try:
+                    if sync_service.should_sync(provider):
+                        sync_service.sync_to_public(provider)
+                        synced_count += 1
+                    else:
+                        skipped_count += 1
+                except Exception as e:
+                    logger.error(
+                        f"Error syncing provider {provider.uuid} in bulk sync: {e}",
+                        exc_info=True
+                    )
+                    error_count += 1
+
+        result = {
+            'status': 'completed',
+            'tenant': tenant.name,
+            'tenant_id': tenant_id,
+            'total': total_count,
+            'synced': synced_count,
+            'skipped': skipped_count,
+            'errors': error_count,
+            'timestamp': timezone.now().isoformat(),
+        }
+
+        logger.info(
+            f"Bulk provider sync completed for {tenant.name}: "
+            f"{synced_count} synced, {skipped_count} skipped, {error_count} errors"
+        )
+
+        return result
+
+    except Tenant.DoesNotExist:
+        logger.error(f"Tenant ID {tenant_id} not found for bulk provider sync")
+        return {
+            'status': 'error',
+            'reason': 'tenant_not_found',
+            'tenant_id': tenant_id,
+        }
+    except Exception as e:
+        logger.error(
+            f"Error in bulk provider sync for tenant {tenant_id}: {e}",
+            exc_info=True
+        )
+        raise

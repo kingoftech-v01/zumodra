@@ -223,3 +223,86 @@ def handle_provider_marketplace_change(sender, instance, **kwargs):
                 f"Failed to remove provider {instance.uuid} services from catalog: {e}",
                 exc_info=True
             )
+
+
+# ==================== Public Provider Catalog Sync Signals ====================
+
+@receiver(post_save, sender=ServiceProvider)
+def sync_provider_to_public_catalog(sender, instance, created, **kwargs):
+    """
+    Trigger async Celery task to sync ServiceProvider to PublicProviderCatalog.
+
+    This signal fires every time a ServiceProvider is saved. It queues an async
+    task that will:
+    1. Check if provider meets sync conditions (marketplace_enabled, is_active)
+    2. Extract safe fields and denormalize data (categories, skills, stats)
+    3. Update or create entry in PublicProviderCatalog (public schema)
+
+    Args:
+        sender: ServiceProvider model class
+        instance: ServiceProvider instance being saved
+        created: Boolean indicating if this is a new record
+        **kwargs: Additional signal arguments
+    """
+    # Prevent infinite loops from update_fields
+    if kwargs.get('update_fields') and 'synced_at' in kwargs.get('update_fields', []):
+        return
+
+    # Validate schema (prevent triggering from public schema)
+    if connection.schema_name == 'public':
+        logger.warning(
+            "ServiceProvider signal fired in public schema - skipping sync. "
+            "This should not happen in normal operation."
+        )
+        return
+
+    # Import here to avoid circular imports
+    from services.tasks import sync_provider_to_catalog_task
+
+    # Queue async Celery task
+    try:
+        sync_provider_to_catalog_task.delay(
+            provider_uuid=str(instance.uuid),
+            tenant_schema=connection.schema_name,
+            tenant_id=instance.tenant_id,
+        )
+        logger.debug(
+            f"Queued provider sync task for {instance.uuid} from {connection.schema_name}"
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed to queue provider sync task for {instance.uuid}: {e}",
+            exc_info=True
+        )
+
+
+@receiver(post_delete, sender=ServiceProvider)
+def remove_provider_from_catalog(sender, instance, **kwargs):
+    """
+    Trigger async Celery task to remove provider from PublicProviderCatalog.
+
+    Called when a ServiceProvider is deleted from tenant schema.
+    Ensures corresponding entry is removed from public catalog.
+
+    Args:
+        sender: ServiceProvider model class
+        instance: ServiceProvider instance being deleted
+        **kwargs: Additional signal arguments
+    """
+    # Import here to avoid circular imports
+    from services.tasks import remove_provider_from_catalog_task
+
+    # Queue async removal task
+    try:
+        remove_provider_from_catalog_task.delay(
+            provider_uuid=str(instance.uuid),
+            tenant_schema=connection.schema_name,
+        )
+        logger.debug(
+            f"Queued provider removal task for {instance.uuid} from {connection.schema_name}"
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed to queue provider removal task for {instance.uuid}: {e}",
+            exc_info=True
+        )
