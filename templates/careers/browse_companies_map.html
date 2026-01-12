@@ -61,7 +61,7 @@
             </div>
             <ul class="list_layout_cols list_employers grid min-[1700px]:grid-cols-3 xl:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 md:gap-7.5 gap-6 w-full md:mt-10 mt-7">
                 {% for company in companies %}
-                <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300">
+                <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300" data-company-id="{{ company.id }}">
                     <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
                         {% if company.logo %}
                         <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
@@ -145,5 +145,201 @@ if (companies.length > 0) {
     const bounds = L.latLngBounds(companies.map(c => [c.lat, c.lng]));
     map.fitBounds(bounds, { padding: [50, 50] });
 }
+
+// === WEBSOCKET REAL-TIME UPDATES ===
+let ws = null;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+const reconnectDelays = [1000, 2000, 4000, 8000, 16000, 30000];
+const markersMap = new Map(); // Store markers by company ID
+
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/careers/live/?channel=companies`;
+
+    console.log('[WebSocket] Connecting to:', wsUrl);
+
+    try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function(event) {
+            console.log('[WebSocket] Connected to careers companies live updates');
+            reconnectAttempts = 0;
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log('[WebSocket] Message received:', data.type);
+
+            switch(data.type) {
+                case 'company_created':
+                    handleCompanyCreated(data.company);
+                    break;
+                case 'company_updated':
+                    handleCompanyUpdated(data.company);
+                    break;
+            }
+        };
+
+        ws.onerror = function(error) {
+            console.error('[WebSocket] Error:', error);
+        };
+
+        ws.onclose = function(event) {
+            console.log('[WebSocket] Connection closed');
+            attemptReconnect();
+        };
+
+    } catch (error) {
+        console.error('[WebSocket] Connection failed:', error);
+        attemptReconnect();
+    }
+}
+
+function attemptReconnect() {
+    if (reconnectAttempts >= maxReconnectAttempts) {
+        console.error('[WebSocket] Max reconnection attempts reached');
+        return;
+    }
+
+    const delay = reconnectDelays[Math.min(reconnectAttempts, reconnectDelays.length - 1)];
+    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+
+    setTimeout(() => {
+        reconnectAttempts++;
+        connectWebSocket();
+    }, delay);
+}
+
+function handleCompanyCreated(company) {
+    console.log('[WebSocket] Company created:', company);
+
+    // Add to list
+    const companyCard = createCompanyCard(company);
+    const companiesList = document.querySelector('.list_employers');
+    if (companiesList) {
+        companiesList.insertAdjacentHTML('afterbegin', companyCard);
+
+        const newCard = companiesList.firstElementChild;
+        newCard.style.opacity = '0';
+        newCard.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            newCard.style.transition = 'all 0.3s ease';
+            newCard.style.opacity = '1';
+            newCard.style.transform = 'translateY(0)';
+        }, 10);
+    }
+
+    // Add marker if has coordinates
+    if (company.lat && company.lng) {
+        addCompanyMarker(company);
+    }
+
+    updateResultCount();
+}
+
+function handleCompanyUpdated(company) {
+    console.log('[WebSocket] Company updated:', company);
+
+    // Update in list
+    const companyCard = document.querySelector(`[data-company-id="${company.id}"]`);
+    if (companyCard) {
+        const updatedCard = createCompanyCard(company);
+        const temp = document.createElement('div');
+        temp.innerHTML = updatedCard;
+        companyCard.replaceWith(temp.firstElementChild);
+
+        const newCard = document.querySelector(`[data-company-id="${company.id}"]`);
+        if (newCard) {
+            newCard.classList.add('animate-pulse');
+            setTimeout(() => newCard.classList.remove('animate-pulse'), 1000);
+        }
+    }
+
+    // Update marker
+    if (company.lat && company.lng) {
+        updateCompanyMarker(company);
+    }
+}
+
+function addCompanyMarker(company) {
+    const marker = L.marker([company.lat, company.lng]);
+    marker.bindPopup(`
+        <div class="p-2">
+            <h6 class="font-semibold">${company.name}</h6>
+            <p class="text-sm text-secondary">${company.city}</p>
+            <p class="text-xs mt-1">${company.jobs} job opening${company.jobs !== 1 ? 's' : ''}</p>
+        </div>
+    `);
+    marker.addTo(map);
+    markersMap.set(company.id, marker);
+}
+
+function updateCompanyMarker(company) {
+    if (markersMap.has(company.id)) {
+        const marker = markersMap.get(company.id);
+        marker.setLatLng([company.lat, company.lng]);
+        marker.setPopupContent(`
+            <div class="p-2">
+                <h6 class="font-semibold">${company.name}</h6>
+                <p class="text-sm text-secondary">${company.city}</p>
+                <p class="text-xs mt-1">${company.jobs} job opening${company.jobs !== 1 ? 's' : ''}</p>
+            </div>
+        `);
+    } else {
+        addCompanyMarker(company);
+    }
+}
+
+function createCompanyCard(company) {
+    const logoUrl = company.logo || '{% static "assets/images/company/1.png" %}';
+    return `
+        <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300" data-company-id="${company.id}">
+            <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15">
+                <img src="${logoUrl}" alt="${company.name}" class="employers_logo w-full h-full object-cover" />
+            </a>
+            <ul class="rate flex items-center mt-4">
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+                <li class="ph-fill ph-star text-yellow"></li>
+            </ul>
+            <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary">${company.name}</a>
+            <div class="employers_address -style-1 text-secondary mt-1">
+                <span class="ph ph-map-pin text-lg"></span>
+                <span class="address caption1 align-top">${company.city || 'Remote'}${company.country ? ', ' + company.country : ''}</span>
+            </div>
+            <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">${company.open_jobs_count || 0} job opening${company.open_jobs_count !== 1 ? 's' : ''}</a>
+            <button class="add_wishlist_btn absolute top-5 right-5 -border">
+                <span class="ph ph-heart text-xl"></span>
+                <span class="ph-fill ph-heart text-xl"></span>
+            </button>
+        </li>
+    `;
+}
+
+function updateResultCount() {
+    const companiesList = document.querySelector('.list_employers');
+    if (companiesList) {
+        const count = companiesList.querySelectorAll('.employers_item').length;
+        const quantityEl = document.querySelector('.quantity');
+        if (quantityEl) {
+            quantityEl.textContent = `${count}+ Results`;
+        }
+    }
+}
+
+// Initialize existing markers map
+companies.forEach(company => {
+    if (company.lat && company.lng) {
+        const marker = L.marker([company.lat, company.lng]);
+        markersMap.set(company.id, marker);
+    }
+});
+
+// Start WebSocket connection
+connectWebSocket();
+console.log('[Browse Companies Map] WebSocket initialized with live marker updates');
 </script>
 {% endblock %}
