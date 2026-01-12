@@ -37,6 +37,7 @@ SERVICE_TYPE="${SERVICE_TYPE:-web}"
 SKIP_MIGRATIONS="${SKIP_MIGRATIONS:-false}"
 SKIP_COLLECTSTATIC="${SKIP_COLLECTSTATIC:-false}"
 CREATE_DEMO_TENANT="${CREATE_DEMO_TENANT:-false}"
+SETUP_DEMO_DATA="${SETUP_DEMO_DATA:-false}"
 RUN_TESTS="${RUN_TESTS:-false}"
 TESTS_FAIL_FAST="${TESTS_FAIL_FAST:-false}"
 
@@ -568,6 +569,24 @@ bootstrap_demo_tenant() {
 }
 
 # -----------------------------------------------------------------------------
+# Setup Demo Data (optional) - Creates sample jobs, candidates, etc.
+# -----------------------------------------------------------------------------
+setup_demo_data() {
+    if [ "$SETUP_DEMO_DATA" != "true" ] && [ "$SETUP_DEMO_DATA" != "1" ]; then
+        log_info "Skipping demo data setup (SETUP_DEMO_DATA not set)"
+        return 0
+    fi
+
+    log_info "Setting up demo data (jobs, candidates, etc.)..."
+
+    if python manage.py setup_demo_data --num-jobs 15 --num-candidates 50 2>&1; then
+        log_info "Demo data setup completed successfully!"
+    else
+        log_warn "Demo data setup had issues (non-fatal, continuing...)"
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Run Tests (optional)
 # -----------------------------------------------------------------------------
 run_tests() {
@@ -680,6 +699,7 @@ main() {
             create_cache_table
             run_collectstatic
             bootstrap_demo_tenant
+            setup_demo_data
             verify_django_setup
             run_tests || log_warn "Tests had failures, but continuing..."
             release_migration_lock
@@ -694,6 +714,7 @@ main() {
             create_cache_table
             run_collectstatic
             bootstrap_demo_tenant
+            setup_demo_data
             verify_django_setup
             run_tests || log_warn "Tests had failures, but continuing..."
         fi

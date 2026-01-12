@@ -160,6 +160,49 @@ Calgary:    51.0447°N, -114.0719°W
 
 ---
 
+### 9. ✅ NoReverseMatch: 'company_detail' Not Found
+**Problem**: `NoReverseMatch: Reverse for 'company_detail' not found`
+
+**Root Cause**:
+- `_company_card.html` component referenced non-existent URL patterns
+- Used `{% url 'careers:company_detail' %}` and `{% url 'careers:company_jobs' %}`
+- Field names also incorrect: `company_logo`, `location_city`, `location_country`
+
+**Solution**:
+- Changed all URL references to `#` placeholders (matching main templates)
+- Fixed field names: `company_logo` → `logo`, `location_city` → `city`, `location_country` → `country`
+- Added default 5-star rating display when rating not available
+- Simplified job opening button text
+
+**Commits**:
+- (pending) - fix: correct company card component URLs and field names
+
+---
+
+### 10. ✅ Demo Data Not Auto-Populated on Startup
+**Problem**: Demo data needs to be manually run after deployment
+
+**Root Cause**:
+- No automatic demo data population in Docker entrypoint
+- Requires manual command execution after container starts
+
+**Solution**:
+- Added `SETUP_DEMO_DATA` environment variable to entrypoint
+- Created `setup_demo_data()` function that runs after tenant creation
+- Automatically runs `python manage.py setup_demo_data --num-jobs 15 --num-candidates 50`
+- Follows same pattern as `CREATE_DEMO_TENANT`
+
+**Usage**:
+```bash
+# In .env or docker-compose.yml
+SETUP_DEMO_DATA=true
+```
+
+**Commits**:
+- (pending) - feat: add automatic demo data setup to entrypoint
+
+---
+
 ## Current Architecture
 
 ### Data Flow
@@ -296,14 +339,35 @@ curl https://{tenant}.zumodra.rhematek-solutions.com/en/careers/job/1/
 6. `6115e12` - fix: ensure demo jobs are published and synced to public catalog
 7. `2f7168c` - fix: improve signup button visibility with shadow
 8. `b44f2ab` - docs: update careers fixes summary with latest field corrections
+9. `22ba632` - fix: restore exact FreelanceHub template structure for company browsing
+10. (pending) - fix: correct company card component URLs and field names
+11. (pending) - feat: add automatic demo data setup to entrypoint
 
-**Total Files Changed**: 10 files
-**Lines Added**: ~550 lines
-**Lines Removed**: ~30 lines
+**Total Files Changed**: 13 files
+**Lines Added**: ~600 lines
+**Lines Removed**: ~50 lines
 
 ---
 
 ## Quick Deployment Commands
+
+### Option 1: Automatic Demo Data (Recommended)
+
+Set environment variables in `.env` or `docker-compose.yml`:
+```bash
+CREATE_DEMO_TENANT=true
+SETUP_DEMO_DATA=true
+```
+
+Then restart:
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+Demo data will be automatically created on container startup!
+
+### Option 2: Manual Demo Data
 
 ```bash
 # 1. Pull latest code

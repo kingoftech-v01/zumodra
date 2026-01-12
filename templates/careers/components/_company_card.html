@@ -3,12 +3,12 @@
 {# FreelanceHub-style company/employer card component #}
 <li class="employers_item flex flex-col items-center relative p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
     {# Company Logo #}
-    {% if company.company_logo %}
-    <a href="{% url 'careers:company_detail' company.slug %}" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg">
-        <img src="{{ company.company_logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
+    {% if company.logo %}
+    <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg">
+        <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="employers_logo w-full h-full object-cover" />
     </a>
     {% else %}
-    <a href="{% url 'careers:company_detail' company.slug %}" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg bg-surface flex items-center justify-center">
+    <a href="#" class="overflow-hidden block flex-shrink-0 w-15 h-15 rounded-lg bg-surface flex items-center justify-center">
         <span class="ph ph-buildings text-4xl text-secondary"></span>
     </a>
     {% endif %}
@@ -24,10 +24,18 @@
             {% endif %}
         {% endfor %}
     </ul>
+    {% else %}
+    <ul class="rate flex items-center mt-4">
+        <li class="ph-fill ph-star text-yellow"></li>
+        <li class="ph-fill ph-star text-yellow"></li>
+        <li class="ph-fill ph-star text-yellow"></li>
+        <li class="ph-fill ph-star text-yellow"></li>
+        <li class="ph-fill ph-star text-yellow"></li>
+    </ul>
     {% endif %}
 
     {# Company Name #}
-    <a href="{% url 'careers:company_detail' company.slug %}" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary text-center">
+    <a href="#" class="employers_name text-title -style-1 mt-1 duration-300 hover:text-primary text-center">
         {{ company.name }}
     </a>
 
@@ -35,8 +43,8 @@
     <div class="employers_address -style-1 text-secondary mt-1">
         <span class="ph ph-map-pin text-lg"></span>
         <span class="address caption1 align-top">
-            {% if company.location_city %}
-                {{ company.location_city }}{% if company.location_country %}, {{ company.location_country }}{% endif %}
+            {% if company.city %}
+                {{ company.city }}{% if company.country %}, {{ company.country }}{% endif %}
             {% else %}
                 {% trans "Location not specified" %}
             {% endif %}
@@ -44,8 +52,8 @@
     </div>
 
     {# Job Openings Button #}
-    <a href="{% url 'careers:company_jobs' company.slug %}" class="button-main -border w-full mt-4 text-center whitespace-nowrap">
-        {% blocktrans count counter=company.open_jobs_count %}{{ counter }} job opening{% plural %}{{ counter }} job openings{% endblocktrans %}
+    <a href="#" class="button-main -border w-full mt-4 text-center whitespace-nowrap">
+        {{ company.open_jobs_count }} job opening{{ company.open_jobs_count|pluralize }}
     </a>
 
     {# Wishlist Button #}
