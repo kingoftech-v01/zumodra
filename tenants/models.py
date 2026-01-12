@@ -1334,7 +1334,7 @@ class PublicJobCatalog(models.Model):
     location_city = models.CharField(max_length=100, blank=True, db_index=True)
     location_state = models.CharField(max_length=100, blank=True)
     location_country = models.CharField(max_length=100, blank=True, db_index=True)
-    location_coordinates = models.PointField(null=True, blank=True)
+    location_coordinates = models.JSONField(null=True, blank=True, help_text=_('lat/lng coordinates as JSON'))
 
     # Description Fields (sanitized HTML)
     description = models.TextField(blank=True, help_text=_('Sanitized HTML'))
@@ -1519,7 +1519,7 @@ class PublicProviderCatalog(models.Model):
     city = models.CharField(max_length=100, blank=True, db_index=True)
     state = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True, db_index=True)
-    location = models.PointField(null=True, blank=True)
+    location = models.JSONField(null=True, blank=True, help_text=_('Full location data as JSON'))
 
     # Categories (denormalized as JSON arrays)
     category_names = models.JSONField(
