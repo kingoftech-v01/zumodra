@@ -21,12 +21,16 @@ from django.http import Http404, JsonResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from django.db import models
 from django.db.models import F, Count
 from django.contrib import messages
 from django import forms
 from django.core.validators import FileExtensionValidator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.cache import cache
 
 from .models import CareerPage, CareerSite, JobListing, PublicApplication, JobAlert
 from .serializers import (
@@ -376,6 +380,8 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
         return context
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')  # 5 minute cache
+@method_decorator(vary_on_cookie, name='dispatch')
 class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
     """
     Career site job listings with map view.
@@ -1008,6 +1014,8 @@ class CareersSitemapView(View):
 
 # ==================== COMPANY BROWSING VIEWS ====================
 
+@method_decorator(cache_page(60 * 5), name='dispatch')  # 5 minute cache
+@method_decorator(vary_on_cookie, name='dispatch')
 class BrowseCompaniesView(TemplateView):
     """
     Public company browsing page with grid layout.
@@ -1099,6 +1107,8 @@ class BrowseCompaniesView(TemplateView):
         return context
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')  # 5 minute cache
+@method_decorator(vary_on_cookie, name='dispatch')
 class BrowseCompaniesMapView(TemplateView):
     """
     Public company browsing page with map layout.
@@ -1195,6 +1205,8 @@ class BrowseCompaniesMapView(TemplateView):
 
 # ==================== PROJECT/SERVICE BROWSING VIEWS ====================
 
+@method_decorator(cache_page(60 * 5), name='dispatch')  # 5 minute cache
+@method_decorator(vary_on_cookie, name='dispatch')
 class BrowseProjectsView(TemplateView):
     """
     Public projects/services browsing page with grid layout.
@@ -1298,6 +1310,8 @@ class BrowseProjectsView(TemplateView):
         return context
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')  # 5 minute cache
+@method_decorator(vary_on_cookie, name='dispatch')
 class BrowseProjectsMapView(TemplateView):
     """
     Public projects/services browsing page with map layout.

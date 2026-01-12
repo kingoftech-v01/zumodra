@@ -4,8 +4,10 @@ WebSocket consumers for real-time career page updates.
 
 import json
 import logging
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +30,35 @@ class CareersLiveUpdateConsumer(AsyncWebsocketConsumer):
     COMPANIES_GROUP = 'careers_companies_live'
     PROJECTS_GROUP = 'careers_projects_live'
 
+    # Rate limiting constants
+    MAX_CONNECTIONS_PER_IP = 5
+    MAX_MESSAGES_PER_MINUTE = 60
+    RATE_LIMIT_WINDOW = 60  # seconds
+
     async def connect(self):
-        """Handle WebSocket connection."""
+        """Handle WebSocket connection with rate limiting."""
+        # Get client IP
+        client_ip = self.scope['client'][0] if self.scope.get('client') else 'unknown'
+
+        # Rate limit: Max connections per IP
+        conn_key = f'ws_connections:{client_ip}'
+        current_connections = cache.get(conn_key, 0)
+
+        if current_connections >= self.MAX_CONNECTIONS_PER_IP:
+            logger.warning(f"Rate limit exceeded for IP {client_ip}: {current_connections} connections")
+            await self.close(code=4003)  # Too Many Requests
+            return
+
+        # Increment connection count
+        cache.set(conn_key, current_connections + 1, timeout=300)  # 5 minute timeout
+
         # Extract channel type from query params
         query_string = self.scope.get('query_string', b'').decode()
         params = dict(qc.split('=') for qc in query_string.split('&') if '=' in qc)
 
         self.channel_type = params.get('channel', 'jobs')  # jobs, companies, or projects
+        self.client_ip = client_ip
+        self.message_timestamps = []  # Track message timestamps for rate limiting
 
         # Join appropriate group
         if self.channel_type == 'jobs':
@@ -71,10 +95,33 @@ class CareersLiveUpdateConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
 
+        # Decrement connection count
+        if hasattr(self, 'client_ip'):
+            conn_key = f'ws_connections:{self.client_ip}'
+            current_connections = cache.get(conn_key, 0)
+            if current_connections > 0:
+                cache.set(conn_key, current_connections - 1, timeout=300)
+
     async def receive(self, text_data=None, bytes_data=None):
-        """Handle incoming messages (filters, ping)."""
+        """Handle incoming messages with rate limiting (filters, ping)."""
         if not text_data:
             return
+
+        # Rate limit: Max messages per minute
+        current_time = time.time()
+        # Remove timestamps older than rate limit window
+        self.message_timestamps = [ts for ts in self.message_timestamps if current_time - ts < self.RATE_LIMIT_WINDOW]
+
+        if len(self.message_timestamps) >= self.MAX_MESSAGES_PER_MINUTE:
+            logger.warning(f"Message rate limit exceeded for client {self.client_ip}")
+            await self.send_json({
+                'type': 'error',
+                'message': 'Rate limit exceeded. Too many messages.'
+            })
+            return
+
+        # Add current timestamp
+        self.message_timestamps.append(current_time)
 
         try:
             data = json.loads(text_data)
