@@ -338,3 +338,52 @@ def public_companies_map(request):
     }
 
     return render(request, 'careers/browse_companies_map.html', context)
+
+
+def public_job_detail(request, pk=None, slug=None):
+    """
+    Public job detail page (works with PublicJobCatalog).
+
+    Shows job details from the public catalog. Works with both ID and slug.
+    """
+    from tenants.models import PublicJobCatalog
+    from django.shortcuts import get_object_or_404
+    from django.utils import timezone
+    from django.http import Http404
+
+    now = timezone.now()
+
+    # Get job by ID or slug
+    if pk:
+        job = get_object_or_404(
+            PublicJobCatalog.objects.select_related('tenant'),
+            pk=pk,
+            published_at__lte=now
+        )
+    elif slug:
+        job = get_object_or_404(
+            PublicJobCatalog.objects.select_related('tenant'),
+            slug=slug,
+            published_at__lte=now
+        )
+    else:
+        raise Http404(_("Job not found"))
+
+    # Check expiration
+    if job.expires_at and job.expires_at < now:
+        raise Http404(_("This job posting has expired"))
+
+    # Get related jobs (same category)
+    related_jobs = PublicJobCatalog.objects.filter(
+        category_slug=job.category_slug,
+        published_at__lte=now
+    ).exclude(pk=job.pk).select_related('tenant')[:3]
+
+    context = {
+        'job': job,
+        'related_jobs': related_jobs,
+        'page_title': f"{job.title} - {job.company_name}",
+        'meta_description': f"Apply for {job.title} at {job.company_name}. {job.location_city}, {job.location_country}.",
+    }
+
+    return render(request, 'careers/job_detail.html', context)

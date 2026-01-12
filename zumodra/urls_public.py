@@ -36,6 +36,7 @@ from main.views import (
     public_careers_map,
     public_companies_grid,
     public_companies_map,
+    public_job_detail,
 )
 
 
@@ -165,6 +166,10 @@ urlpatterns += i18n_patterns(
         path('jobs/', public_careers_landing, name='job_list'),
         path('browse/', public_careers_landing, name='browse_jobs'),
         path('browse/map/', public_careers_map, name='browse_jobs_map'),
+
+        # Job detail pages
+        path('job/<int:pk>/', public_job_detail, name='job_detail'),
+        path('job/<slug:slug>/', public_job_detail, name='job_detail'),
 
         # Company browsing (grid and map)
         path('companies/', public_companies_grid, name='browse_companies'),

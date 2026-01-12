@@ -178,6 +178,10 @@ urlpatterns = [
     path('browse/map/', BrowseJobsMapView.as_view(), name='browse_jobs_map'),
     path('companies/', BrowseCompaniesView.as_view(), name='browse_companies'),
     path('companies/map/', BrowseCompaniesMapView.as_view(), name='browse_companies_map'),
+
+    # Job detail aliases (template uses underscore)
+    path('job/<int:pk>/', JobDetailPageView.as_view(), name='job_detail'),
+    path('job/<slug:slug>/', JobDetailPageView.as_view(), name='job_detail'),
 ]
 
 
