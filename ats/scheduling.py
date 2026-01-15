@@ -108,6 +108,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.db.models import TenantAwareModel
 from core.db.managers import TenantAwareManager
+from ats.models import InterviewSlot
 
 logger = logging.getLogger(__name__)
 
@@ -236,116 +237,6 @@ class SchedulingResult:
     calendar_event_id: Optional[str] = None
     conflicts: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
-
-
-# =============================================================================
-# INTERVIEW SLOT MODEL
-# =============================================================================
-
-class InterviewSlot(TenantAwareModel):
-    """
-    Availability slots for interviewers.
-
-    Allows interviewers to define when they are available for interviews,
-    with support for recurring availability and exceptions.
-    """
-
-    interviewer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='interview_slots'
-    )
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    timezone = models.CharField(max_length=50, default='America/Toronto')
-    status = models.CharField(
-        max_length=20,
-        choices=[(s.value, s.name.replace('_', ' ').title()) for s in SlotStatus],
-        default=SlotStatus.AVAILABLE.value
-    )
-
-    # Recurrence
-    is_recurring = models.BooleanField(default=False)
-    recurrence_rule = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text=_('iCalendar RRULE format')
-    )
-    recurrence_end = models.DateField(null=True, blank=True)
-
-    # Booking
-    booked_interview = models.ForeignKey(
-        'ats.Interview',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='booked_slots'
-    )
-
-    # Preferences
-    interview_types = models.JSONField(
-        default=list,
-        blank=True,
-        help_text=_('Types of interviews this slot is available for')
-    )
-    max_interviews_per_day = models.PositiveIntegerField(default=4)
-    buffer_minutes = models.PositiveIntegerField(
-        default=15,
-        help_text=_('Buffer time between interviews')
-    )
-
-    notes = models.TextField(blank=True)
-
-    objects = TenantAwareManager()
-
-    class Meta:
-        verbose_name = _('Interview Slot')
-        verbose_name_plural = _('Interview Slots')
-        ordering = ['start_time']
-        indexes = [
-            models.Index(fields=['interviewer', 'start_time', 'status']),
-            models.Index(fields=['tenant', 'start_time', 'end_time']),
-        ]
-
-    def __str__(self):
-        return f"{self.interviewer.get_full_name()} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
-
-    @property
-    def duration_minutes(self) -> int:
-        """Return slot duration in minutes."""
-        return int((self.end_time - self.start_time).total_seconds() / 60)
-
-    @property
-    def is_available(self) -> bool:
-        """Check if slot is available for booking."""
-        return self.status == SlotStatus.AVAILABLE.value and self.start_time > timezone.now()
-
-    @property
-    def is_past(self) -> bool:
-        """Check if slot is in the past."""
-        return self.end_time < timezone.now()
-
-    def to_timezone(self, tz: str) -> 'InterviewSlot':
-        """
-        Return slot times converted to specified timezone.
-
-        Args:
-            tz: Target timezone string
-
-        Returns:
-            Self with times converted to target timezone
-
-        Raises:
-            ValueError: If timezone is invalid
-        """
-        if not validate_timezone(tz):
-            raise ValueError(f"Invalid timezone: {tz}")
-
-        target_tz = ZoneInfo(tz)
-        self.start_time = self.start_time.astimezone(target_tz)
-        self.end_time = self.end_time.astimezone(target_tz)
-        self.timezone = tz
-        return self
 
 
 # =============================================================================

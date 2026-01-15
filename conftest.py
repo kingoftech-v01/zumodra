@@ -153,6 +153,7 @@ class TenantFactory(DjangoModelFactory):
     class Meta:
         model = 'tenants.Tenant'
         django_get_or_create = ('slug',)
+        skip_postgeneration_save = True
 
     name = factory.Sequence(lambda n: f"Company {n}")
     slug = factory.Sequence(lambda n: f"company-{n}")
@@ -175,6 +176,15 @@ class TenantFactory(DjangoModelFactory):
     state = factory.Faker('state')
     postal_code = factory.Faker('postcode')
     country = 'CA'
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Override create to disable schema creation for tests."""
+        obj = model_class(*args, **kwargs)
+        # Disable auto schema creation before save
+        obj.auto_create_schema = False
+        obj.save()
+        return obj
 
 
 class TrialTenantFactory(TenantFactory):
@@ -414,8 +424,9 @@ class JobCategoryFactory(DjangoModelFactory):
 
     class Meta:
         model = 'ats.JobCategory'
-        django_get_or_create = ('slug',)
+        django_get_or_create = ('tenant', 'slug',)
 
+    tenant = factory.SubFactory(TenantFactory)
     name = factory.Sequence(lambda n: f"Category {n}")
     slug = factory.Sequence(lambda n: f"category-{n}")
     description = factory.Faker('text', max_nb_chars=200)
@@ -430,6 +441,7 @@ class PipelineFactory(DjangoModelFactory):
     class Meta:
         model = 'ats.Pipeline'
 
+    tenant = factory.SubFactory(TenantFactory)
     name = factory.Sequence(lambda n: f"Pipeline {n}")
     description = factory.Faker('text', max_nb_chars=200)
     is_default = False
@@ -467,13 +479,14 @@ class JobPostingFactory(DjangoModelFactory):
     class Meta:
         model = 'ats.JobPosting'
 
+    tenant = factory.SubFactory(TenantFactory)
     title = factory.Faker('job')
     slug = factory.LazyAttribute(lambda o: f"{o.title.lower().replace(' ', '-')}-{uuid.uuid4().hex[:6]}")
     reference_code = factory.Sequence(lambda n: f"JOB-{n:05d}")
-    category = factory.SubFactory(JobCategoryFactory)
+    category = factory.SubFactory(JobCategoryFactory, tenant=factory.SelfAttribute('..tenant'))
 
     status = 'open'
-    pipeline = factory.SubFactory(PipelineFactory)
+    pipeline = factory.SubFactory(PipelineFactory, tenant=factory.SelfAttribute('..tenant'))
 
     description = factory.Faker('text', max_nb_chars=1000)
     responsibilities = factory.Faker('text', max_nb_chars=500)
@@ -522,6 +535,7 @@ class CandidateFactory(DjangoModelFactory):
     class Meta:
         model = 'ats.Candidate'
 
+    tenant = factory.SubFactory(TenantFactory)
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.LazyAttribute(lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com")
@@ -552,11 +566,12 @@ class ApplicationFactory(DjangoModelFactory):
     class Meta:
         model = 'ats.Application'
 
-    candidate = factory.SubFactory(CandidateFactory)
-    job = factory.SubFactory(JobPostingFactory)
+    tenant = factory.SubFactory(TenantFactory)
+    candidate = factory.SubFactory(CandidateFactory, tenant=factory.SelfAttribute('..tenant'))
+    job = factory.SubFactory(JobPostingFactory, tenant=factory.SelfAttribute('..tenant'))
 
     status = 'new'
-    current_stage = factory.SubFactory(PipelineStageFactory)
+    current_stage = factory.SubFactory(PipelineStageFactory, pipeline=factory.SelfAttribute('..job.pipeline'))
 
     cover_letter = factory.Faker('text', max_nb_chars=500)
     send_rejection_email = True
@@ -692,6 +707,7 @@ class EmployeeFactory(DjangoModelFactory):
     class Meta:
         model = 'hr_core.Employee'
 
+    tenant = factory.SubFactory(TenantFactory)
     user = factory.SubFactory(UserFactory)
     employee_id = factory.Sequence(lambda n: f"EMP{n:05d}")
     status = 'active'
@@ -731,8 +747,9 @@ class TimeOffTypeFactory(DjangoModelFactory):
 
     class Meta:
         model = 'hr_core.TimeOffType'
-        django_get_or_create = ('code',)
+        django_get_or_create = ('tenant', 'code',)
 
+    tenant = factory.SubFactory(TenantFactory)
     name = factory.Sequence(lambda n: f"Time Off Type {n}")
     code = factory.Sequence(lambda n: f"TOT{n}")
     description = factory.Faker('sentence')
@@ -777,7 +794,8 @@ class TimeOffRequestFactory(DjangoModelFactory):
         model = 'hr_core.TimeOffRequest'
 
     employee = factory.SubFactory(EmployeeFactory)
-    time_off_type = factory.SubFactory(VacationTypeFactory)
+    tenant = factory.LazyAttribute(lambda o: o.employee.tenant)
+    time_off_type = factory.SubFactory(VacationTypeFactory, tenant=factory.SelfAttribute('..tenant'))
 
     start_date = factory.LazyFunction(lambda: (timezone.now() + timedelta(days=14)).date())
     end_date = factory.LazyFunction(lambda: (timezone.now() + timedelta(days=18)).date())
@@ -844,7 +862,7 @@ class OnboardingTaskProgressFactory(DjangoModelFactory):
         model = 'hr_core.OnboardingTaskProgress'
 
     onboarding = factory.SubFactory(EmployeeOnboardingFactory)
-    task = factory.SubFactory(OnboardingTaskFactory)
+    task = factory.SubFactory(OnboardingTaskFactory, checklist=factory.SelfAttribute('..onboarding.checklist'))
     is_completed = False
     due_date = factory.LazyFunction(lambda: (timezone.now() + timedelta(days=7)).date())
 

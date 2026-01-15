@@ -121,11 +121,11 @@ class DServiceViewSet(SecureTenantViewSet):
 
     Filters: ?category=1&min_price=100&max_price=500&search=web
     """
-    queryset = DService.objects.select_related('provider', 'DServiceCategory').prefetch_related('tags')
+    queryset = DService.objects.select_related('provider', 'category').prefetch_related('tags')
     serializer_class = DServiceSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['DServiceCategory', 'provider']
+    filterset_fields = ['category', 'provider']
     search_fields = ['name', 'description', 'tags__tag']
     ordering_fields = ['price', 'created_at', 'duration_minutes']
     tenant_field = None  # Services are linked via provider

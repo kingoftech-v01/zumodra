@@ -69,7 +69,8 @@ class EmployeeMinimalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'uuid', 'employee_id', 'full_name', 'email', 'job_title', 'status']
+        # Note: Employee uses 'id' as UUID primary key (inherited from TenantAwareModel)
+        fields = ['id', 'employee_id', 'full_name', 'email', 'job_title', 'status']
         read_only_fields = fields
 
 
@@ -86,8 +87,9 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
+        # Note: Employee uses 'id' as UUID primary key (inherited from TenantAwareModel)
         fields = [
-            'id', 'uuid', 'employee_id', 'full_name', 'email',
+            'id', 'employee_id', 'full_name', 'email',
             'job_title', 'department_name', 'manager_name', 'status',
             'employment_type', 'hire_date', 'start_date', 'work_location',
             'is_active_employee', 'created_at'
@@ -132,8 +134,9 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
+        # Note: Employee uses 'id' as UUID primary key (inherited from TenantAwareModel)
         fields = [
-            'id', 'uuid', 'user', 'employee_id', 'full_name',
+            'id', 'user', 'employee_id', 'full_name',
             'status', 'employment_type',
             # Position
             'job_title', 'department', 'department_id', 'manager', 'manager_id',
@@ -156,7 +159,7 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'uuid', 'user', 'years_of_service', 'is_active_employee',
+            'id', 'user', 'years_of_service', 'is_active_employee',
             'created_at', 'updated_at', 'direct_reports', 'direct_reports_count'
         ]
 
@@ -249,8 +252,9 @@ class EmployeeOrgChartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
+        # Note: Employee uses 'id' as UUID primary key (inherited from TenantAwareModel)
         fields = [
-            'id', 'uuid', 'employee_id', 'full_name', 'email',
+            'id', 'employee_id', 'full_name', 'email',
             'job_title', 'department', 'avatar_url', 'direct_reports'
         ]
 

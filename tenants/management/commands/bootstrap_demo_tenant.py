@@ -69,7 +69,7 @@ DEMO_USERS = {
         'password': 'Demo@2024!',
         'first_name': 'Demo',
         'last_name': 'Admin',
-        'role': 'OWNER',
+        'role': 'owner',  # Use lowercase to match TenantUser.UserRole choices
         'is_superuser': True,
     },
     'hr_manager': {
@@ -77,35 +77,35 @@ DEMO_USERS = {
         'password': 'Demo@2024!',
         'first_name': 'Sarah',
         'last_name': 'Johnson',
-        'role': 'HR_MANAGER',
+        'role': 'hr_manager',  # Use lowercase to match TenantUser.UserRole choices
     },
     'recruiter': {
         'email': f'recruiter@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Michael',
         'last_name': 'Chen',
-        'role': 'RECRUITER',
+        'role': 'recruiter',  # Use lowercase to match TenantUser.UserRole choices
     },
     'hiring_manager': {
         'email': f'hiring@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Emily',
         'last_name': 'Davis',
-        'role': 'HIRING_MANAGER',
+        'role': 'hiring_manager',  # Use lowercase to match TenantUser.UserRole choices
     },
     'employee': {
         'email': f'employee@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'John',
         'last_name': 'Smith',
-        'role': 'EMPLOYEE',
+        'role': 'employee',  # Use lowercase to match TenantUser.UserRole choices
     },
     'candidate': {
         'email': f'candidate@{EMAIL_DOMAIN}',
         'password': 'Demo@2024!',
         'first_name': 'Alex',
         'last_name': 'Wilson',
-        'role': 'VIEWER',
+        'role': 'viewer',  # Use lowercase to match TenantUser.UserRole choices
     },
 }
 

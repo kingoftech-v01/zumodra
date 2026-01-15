@@ -47,42 +47,44 @@ class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = [
-            'title', 'description', 'category', 'tags',
-            'base_price', 'price_type', 'delivery_time',
-            'revisions_included', 'requirements',
+            'name', 'description', 'category',
+            'price', 'service_type', 'duration_days',
+            'revisions_included', 'short_description',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 6}),
-            'requirements': forms.Textarea(attrs={'rows': 4}),
+            'short_description': forms.Textarea(attrs={'rows': 4}),
         }
 
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        NoXSS()(title)
-        NoSQLInjection()(title)
-        return sanitize_plain_text(title)
+    def clean_name(self):
+        name = self.cleaned_data.get('name', '')
+        NoXSS()(name)
+        NoSQLInjection()(name)
+        return sanitize_plain_text(name)
 
     def clean_description(self):
         description = self.cleaned_data.get('description', '')
         NoSQLInjection()(description)
         return sanitize_html(description)
 
-    def clean_requirements(self):
-        requirements = self.cleaned_data.get('requirements', '')
-        NoSQLInjection()(requirements)
-        return sanitize_html(requirements)
+    def clean_short_description(self):
+        short_description = self.cleaned_data.get('short_description', '')
+        if short_description:
+            NoSQLInjection()(short_description)
+            return sanitize_plain_text(short_description)
+        return short_description
 
-    def clean_base_price(self):
-        price = self.cleaned_data.get('base_price')
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
         if price and price < 0:
             raise ValidationError(_('Price must be a positive number.'))
         return price
 
-    def clean_delivery_time(self):
-        delivery_time = self.cleaned_data.get('delivery_time')
-        if delivery_time and delivery_time < 1:
+    def clean_duration_days(self):
+        duration_days = self.cleaned_data.get('duration_days')
+        if duration_days and duration_days < 1:
             raise ValidationError(_('Delivery time must be at least 1 day.'))
-        return delivery_time
+        return duration_days
 
 
 class ServiceImageForm(forms.ModelForm):
@@ -94,14 +96,21 @@ class ServiceImageForm(forms.ModelForm):
 
     class Meta:
         model = ServiceImage
-        fields = ['image', 'caption', 'is_primary']
+        fields = ['image', 'description', 'alt_text', 'sort_order']
 
-    def clean_caption(self):
-        caption = self.cleaned_data.get('caption', '')
-        if caption:
-            NoXSS()(caption)
-            return sanitize_plain_text(caption)
-        return caption
+    def clean_description(self):
+        description = self.cleaned_data.get('description', '')
+        if description:
+            NoXSS()(description)
+            return sanitize_plain_text(description)
+        return description
+
+    def clean_alt_text(self):
+        alt_text = self.cleaned_data.get('alt_text', '')
+        if alt_text:
+            NoXSS()(alt_text)
+            return sanitize_plain_text(alt_text)
+        return alt_text
 
 
 class ServiceSearchForm(forms.Form):
@@ -145,12 +154,11 @@ class ProposalForm(forms.ModelForm):
     class Meta:
         model = ServiceProposal
         fields = [
-            'cover_letter', 'proposed_price', 'delivery_days',
-            'milestones',
+            'cover_letter', 'proposed_rate', 'rate_type',
+            'proposed_timeline_days', 'estimated_hours',
         ]
         widgets = {
             'cover_letter': forms.Textarea(attrs={'rows': 6}),
-            'milestones': forms.Textarea(attrs={'rows': 4}),
         }
 
     def clean_cover_letter(self):
@@ -158,24 +166,17 @@ class ProposalForm(forms.ModelForm):
         NoSQLInjection()(cover_letter)
         return sanitize_html(cover_letter)
 
-    def clean_proposed_price(self):
-        price = self.cleaned_data.get('proposed_price')
-        if price and price <= 0:
-            raise ValidationError(_('Price must be a positive number.'))
-        return price
+    def clean_proposed_rate(self):
+        rate = self.cleaned_data.get('proposed_rate')
+        if rate and rate <= 0:
+            raise ValidationError(_('Rate must be a positive number.'))
+        return rate
 
-    def clean_delivery_days(self):
-        days = self.cleaned_data.get('delivery_days')
+    def clean_proposed_timeline_days(self):
+        days = self.cleaned_data.get('proposed_timeline_days')
         if days and days < 1:
-            raise ValidationError(_('Delivery time must be at least 1 day.'))
+            raise ValidationError(_('Timeline must be at least 1 day.'))
         return days
-
-    def clean_milestones(self):
-        milestones = self.cleaned_data.get('milestones', '')
-        if milestones:
-            NoSQLInjection()(milestones)
-            return sanitize_html(milestones)
-        return milestones
 
 
 class ProposalResponseForm(forms.Form):
@@ -226,13 +227,12 @@ class ContractForm(forms.ModelForm):
     class Meta:
         model = ServiceContract
         fields = [
-            'title', 'description', 'total_amount',
-            'payment_terms', 'deadline',
+            'title', 'description', 'agreed_rate',
+            'rate_type', 'currency', 'agreed_deadline',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 6}),
-            'payment_terms': forms.Textarea(attrs={'rows': 3}),
-            'deadline': forms.DateInput(attrs={'type': 'date'}),
+            'agreed_deadline': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def clean_title(self):
@@ -246,18 +246,11 @@ class ContractForm(forms.ModelForm):
         NoSQLInjection()(description)
         return sanitize_html(description)
 
-    def clean_payment_terms(self):
-        terms = self.cleaned_data.get('payment_terms', '')
-        if terms:
-            NoSQLInjection()(terms)
-            return sanitize_html(terms)
-        return terms
-
-    def clean_total_amount(self):
-        amount = self.cleaned_data.get('total_amount')
-        if amount and amount <= 0:
-            raise ValidationError(_('Amount must be a positive number.'))
-        return amount
+    def clean_agreed_rate(self):
+        rate = self.cleaned_data.get('agreed_rate')
+        if rate and rate <= 0:
+            raise ValidationError(_('Rate must be a positive number.'))
+        return rate
 
 
 class ContractMilestoneForm(forms.Form):
@@ -390,9 +383,8 @@ class ServiceReviewForm(forms.ModelForm):
     class Meta:
         model = ServiceReview
         fields = [
-            'overall_rating', 'quality_rating', 'communication_rating',
-            'timeliness_rating', 'value_rating',
-            'title', 'content', 'would_recommend',
+            'rating', 'rating_quality', 'rating_communication',
+            'rating_timeliness', 'title', 'content',
         ]
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5}),
@@ -416,8 +408,8 @@ class ServiceReviewForm(forms.ModelForm):
 
         # Validate all ratings are in range
         rating_fields = [
-            'overall_rating', 'quality_rating', 'communication_rating',
-            'timeliness_rating', 'value_rating'
+            'rating', 'rating_quality', 'rating_communication',
+            'rating_timeliness'
         ]
 
         for field in rating_fields:
@@ -456,19 +448,13 @@ class ClientRequestForm(forms.ModelForm):
         model = ClientRequest
         fields = [
             'title', 'description', 'category',
-            'budget_min', 'budget_max', 'deadline',
-            'requirements', 'attachments',
+            'budget_min', 'budget_max', 'currency',
+            'deadline', 'remote_allowed',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 6}),
-            'requirements': forms.Textarea(attrs={'rows': 4}),
             'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
-
-    attachments = forms.FileField(
-        required=False,
-        validators=[FileValidator('document')],
-    )
 
     def clean_title(self):
         title = self.cleaned_data.get('title', '')
@@ -480,13 +466,6 @@ class ClientRequestForm(forms.ModelForm):
         description = self.cleaned_data.get('description', '')
         NoSQLInjection()(description)
         return sanitize_html(description)
-
-    def clean_requirements(self):
-        requirements = self.cleaned_data.get('requirements', '')
-        if requirements:
-            NoSQLInjection()(requirements)
-            return sanitize_html(requirements)
-        return requirements
 
     def clean(self):
         cleaned_data = super().clean()
@@ -519,16 +498,12 @@ class CrossTenantServiceRequestForm(forms.ModelForm):
         model = CrossTenantServiceRequest
         fields = [
             'title', 'description', 'budget',
-            'deadline', 'hiring_context', 'requirements',
+            'deadline', 'hiring_context',
         ]
         widgets = {
             'description': forms.Textarea(attrs={
                 'rows': 6,
                 'placeholder': _('Describe your project requirements, goals, and expectations...')
-            }),
-            'requirements': forms.Textarea(attrs={
-                'rows': 4,
-                'placeholder': _('List specific requirements, deliverables, or constraints...')
             }),
             'deadline': forms.DateInput(attrs={
                 'type': 'date',
@@ -580,13 +555,6 @@ class CrossTenantServiceRequestForm(forms.ModelForm):
         description = self.cleaned_data.get('description', '')
         NoSQLInjection()(description)
         return sanitize_html(description)
-
-    def clean_requirements(self):
-        requirements = self.cleaned_data.get('requirements', '')
-        if requirements:
-            NoSQLInjection()(requirements)
-            return sanitize_html(requirements)
-        return requirements
 
     def clean_budget(self):
         budget = self.cleaned_data.get('budget')
@@ -645,21 +613,27 @@ class ServiceProviderProfileForm(forms.ModelForm):
     class Meta:
         model = ServiceProvider
         fields = [
-            'headline', 'bio', 'hourly_rate',
-            'availability', 'languages', 'skills',
-            'portfolio_url', 'linkedin_url', 'github_url',
+            'display_name', 'bio', 'tagline',
+            'hourly_rate', 'minimum_budget', 'currency',
+            'provider_type', 'city', 'country',
         ]
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 6}),
-            'languages': forms.Textarea(attrs={'rows': 2}),
         }
 
-    def clean_headline(self):
-        headline = self.cleaned_data.get('headline', '')
-        if headline:
-            NoXSS()(headline)
-            return sanitize_plain_text(headline)
-        return headline
+    def clean_display_name(self):
+        display_name = self.cleaned_data.get('display_name', '')
+        if display_name:
+            NoXSS()(display_name)
+            return sanitize_plain_text(display_name)
+        return display_name
+
+    def clean_tagline(self):
+        tagline = self.cleaned_data.get('tagline', '')
+        if tagline:
+            NoXSS()(tagline)
+            return sanitize_plain_text(tagline)
+        return tagline
 
     def clean_bio(self):
         bio = self.cleaned_data.get('bio', '')
@@ -674,20 +648,8 @@ class ServiceProviderProfileForm(forms.ModelForm):
             raise ValidationError(_('Hourly rate must be a positive number.'))
         return rate
 
-    def clean_portfolio_url(self):
-        url = self.cleaned_data.get('portfolio_url', '')
-        if url and not url.startswith(('http://', 'https://')):
-            raise ValidationError(_('Please enter a valid URL.'))
-        return url
-
-    def clean_linkedin_url(self):
-        url = self.cleaned_data.get('linkedin_url', '')
-        if url and 'linkedin.com' not in url.lower():
-            raise ValidationError(_('Please enter a valid LinkedIn URL.'))
-        return url
-
-    def clean_github_url(self):
-        url = self.cleaned_data.get('github_url', '')
-        if url and 'github.com' not in url.lower():
-            raise ValidationError(_('Please enter a valid GitHub URL.'))
-        return url
+    def clean_minimum_budget(self):
+        budget = self.cleaned_data.get('minimum_budget')
+        if budget and budget < 0:
+            raise ValidationError(_('Minimum budget must be a positive number.'))
+        return budget

@@ -106,11 +106,18 @@ class TestJobCategory:
 
     def test_category_unique_slug_per_tenant(self, job_category_factory, tenant_factory):
         """Test that category slug is unique per tenant."""
+        from ats.models import JobCategory
+
         cat1 = job_category_factory(slug='engineering')
 
         # Same slug should fail within same tenant
         with pytest.raises(IntegrityError):
-            job_category_factory(slug='engineering', tenant=cat1.tenant)
+            with transaction.atomic():
+                JobCategory.objects.create(
+                    tenant=cat1.tenant,
+                    name='Engineering 2',
+                    slug='engineering'
+                )
 
 
 # =============================================================================
@@ -1038,6 +1045,8 @@ class TestOfferWorkflow:
 
         assert offer.status == 'accepted'
         assert offer.responded_at is not None
+        # Refresh application from database to get updated status
+        offer.application.refresh_from_db()
         assert offer.application.status == 'hired'
 
     def test_decline_offer(self, offer_factory):
@@ -1629,7 +1638,8 @@ class TestValidation:
 
     def test_job_salary_validation(self, job_posting_factory):
         """Test that salary_min cannot exceed salary_max."""
-        job = job_posting_factory(
+        # Use build() to create without saving to database, then test clean()
+        job = job_posting_factory.build(
             salary_min=Decimal('100000'),
             salary_max=Decimal('50000')
         )

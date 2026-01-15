@@ -31,7 +31,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import transaction, connection
-from django.db.models import Count, Avg, Q, F
+from django.db.models import Avg, Q, F
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
@@ -646,8 +646,9 @@ class JobPostingViewSet(RecruiterViewSet):
         queryset = JobPosting.objects.for_current_tenant().select_related(
             'category', 'pipeline', 'hiring_manager', 'recruiter', 'created_by'
         )
-        # Annotate with application count for sorting
-        queryset = queryset.annotate(applications_count=Count('applications'))
+        # Note: applications_count is a @property on the model, so we don't annotate here
+        # to avoid conflicts. If sorting by applications_count is needed, use a different
+        # annotation name (e.g., _applications_count_annotated)
         return queryset
 
     def perform_create(self, serializer):

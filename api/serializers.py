@@ -68,7 +68,7 @@ class DServiceProviderProfileSerializer(serializers.ModelSerializer):
 class DServiceSerializer(serializers.ModelSerializer):
     """Service listing"""
     provider = DServiceProviderProfileSerializer(read_only=True)
-    category = DServiceCategorySerializer(source='DServiceCategory', read_only=True)
+    category = DServiceCategorySerializer(read_only=True)  # source defaults to field name
 
     class Meta:
         model = DService

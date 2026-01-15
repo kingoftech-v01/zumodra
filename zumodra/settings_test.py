@@ -28,7 +28,7 @@ PASSWORD_HASHERS = [
 # DATABASE CONFIGURATION
 # =============================================================================
 
-# Use PostgreSQL for tests (required for ArrayField in ai_matching models)
+# Use PostgreSQL for tests with PostGIS support
 # The ai_matching app uses PostgreSQL-specific features like ArrayField
 import os
 
@@ -36,17 +36,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('TEST_DB_NAME', 'zumodra_test'),
-        'USER': os.environ.get('TEST_DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', 'zumodra_dev_password'),
-        'HOST': os.environ.get('TEST_DB_HOST', 'localhost'),
-        'PORT': os.environ.get('TEST_DB_PORT', '5434'),
+        'USER': os.environ.get('TEST_DB_USER', os.environ.get('DB_USER', 'postgres')),
+        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', os.environ.get('DB_PASSWORD', 'zumodra_dev_password')),
+        'HOST': os.environ.get('TEST_DB_HOST', os.environ.get('DB_HOST', 'localhost')),
+        'PORT': os.environ.get('TEST_DB_PORT', os.environ.get('DB_PORT', '5432')),
         'TEST': {
             'NAME': 'zumodra_test',
         },
     }
 }
 
-# Disable django-tenants for testing (use single schema)
+# Disable django-tenants routers for unit testing (all tables in public schema)
 DATABASE_ROUTERS = []
 
 # =============================================================================
@@ -192,7 +192,7 @@ MIDDLEWARE = [m for m in MIDDLEWARE if m not in [
 # INSTALLED APPS ADJUSTMENTS
 # =============================================================================
 
-# Remove apps that may cause issues in tests
+# Remove django_tenants for unit tests (all tables in single schema)
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
     'django_tenants',
 ]]

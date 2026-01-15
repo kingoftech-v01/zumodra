@@ -9,7 +9,7 @@ from django_tenants.utils import tenant_context
 
 from custom_account_u.models import CustomUser, PublicProfile, ProfileFieldSync
 from accounts.models import TenantProfile, TenantUser
-from tenants.models import Tenant, Invitation
+from tenants.models import Tenant, TenantInvitation
 from accounts.services import ProfileSyncService
 
 
@@ -136,7 +136,7 @@ class TestInvitationWithProfileSync:
 
         # Create invitation
         with tenant_context(tenant):
-            invitation = Invitation.objects.create(
+            invitation = TenantInvitation.objects.create(
                 tenant=tenant,
                 email=invitee.email,
                 invited_by=inviter,
@@ -190,7 +190,7 @@ class TestInvitationWithProfileSync:
         ).exists()
 
         with tenant_context(tenant):
-            invitation = Invitation.objects.create(
+            invitation = TenantInvitation.objects.create(
                 tenant=tenant,
                 email=invitee.email,
                 invited_by=inviter,

@@ -89,8 +89,11 @@ def sync_job_to_public_catalog(sender, instance, created, **kwargs):
     if kwargs.get('update_fields') and 'synced_at' in kwargs.get('update_fields', []):
         return
 
+    # Get schema name (default to 'public' when django-tenants not active)
+    schema_name = getattr(connection, 'schema_name', 'public')
+
     # Validate schema (prevent triggering from public schema)
-    if connection.schema_name == 'public':
+    if schema_name == 'public':
         logger.warning(
             "JobPosting signal fired in public schema - skipping sync. "
             "This should not happen in normal operation."
@@ -104,11 +107,11 @@ def sync_job_to_public_catalog(sender, instance, created, **kwargs):
     try:
         sync_job_to_catalog_task.delay(
             job_uuid=str(instance.uuid),
-            tenant_schema=connection.schema_name,
+            tenant_schema=schema_name,
             tenant_id=instance.tenant_id,
         )
         logger.debug(
-            f"Queued sync task for job {instance.uuid} from {connection.schema_name}"
+            f"Queued sync task for job {instance.uuid} from {schema_name}"
         )
     except Exception as e:
         logger.error(
@@ -133,14 +136,21 @@ def remove_job_from_catalog(sender, instance, **kwargs):
     # Import here to avoid circular imports
     from ats.tasks import remove_job_from_catalog_task
 
+    # Get schema name (default to 'public' when django-tenants not active)
+    schema_name = getattr(connection, 'schema_name', 'public')
+
+    # Skip if in public schema (shouldn't happen normally)
+    if schema_name == 'public':
+        return
+
     # Queue async removal task
     try:
         remove_job_from_catalog_task.delay(
             job_uuid=str(instance.uuid),
-            tenant_schema=connection.schema_name,
+            tenant_schema=schema_name,
         )
         logger.debug(
-            f"Queued removal task for job {instance.uuid} from {connection.schema_name}"
+            f"Queued removal task for job {instance.uuid} from {schema_name}"
         )
     except Exception as e:
         logger.error(
