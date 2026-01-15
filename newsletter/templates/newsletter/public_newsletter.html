@@ -1,0 +1,79 @@
+{% extends "base/freelanhub_base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ page_title|default:"Newsletter" }} - FreelanHub{% endblock %}
+
+{% block meta_description %}{{ meta_description|default:"Subscribe to our newsletter to stay updated with the latest jobs and opportunities." }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="breadcrumb-block bg-surface md:py-12 py-10">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="heading3">{% trans "Newsletter" %}</h1>
+            <div class="flex items-center justify-center gap-2 mt-4">
+                <a href="{% url 'home' %}" class="text-secondary hover:text-primary">{% trans "Home" %}</a>
+                <span class="text-secondary">/</span>
+                <span class="text-title">{% trans "Newsletter" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-content md:py-20 py-14">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12">
+                <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="ph-bold ph-envelope text-4xl text-primary"></span>
+                </div>
+
+                <h2 class="heading4 mb-4">{% trans "Stay Updated" %}</h2>
+                <p class="text-secondary mb-8">
+                    {% trans "Subscribe to our newsletter and be the first to know about new job opportunities, career tips, and industry insights." %}
+                </p>
+
+                <form method="post" action="{% url 'newsletter:subscribe' %}" class="max-w-md mx-auto">
+                    {% csrf_token %}
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="{% trans 'Enter your email address' %}"
+                            class="flex-1 h-12 px-4 border border-line rounded-lg focus:border-primary focus:outline-none"
+                            required
+                        >
+                        <button type="submit" class="button-main h-12 px-6 whitespace-nowrap">
+                            {% trans "Subscribe" %}
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-sm text-secondary mt-6">
+                    {% trans "We respect your privacy. Unsubscribe at any time." %}
+                </p>
+            </div>
+
+            <!-- Features -->
+            <div class="grid md:grid-cols-3 gap-6 mt-12">
+                <div class="text-center p-6">
+                    <span class="ph-bold ph-briefcase text-3xl text-primary mb-3 inline-block"></span>
+                    <h3 class="text-button mb-2">{% trans "Job Alerts" %}</h3>
+                    <p class="text-secondary text-sm">{% trans "Get notified about new positions matching your profile" %}</p>
+                </div>
+                <div class="text-center p-6">
+                    <span class="ph-bold ph-lightbulb text-3xl text-primary mb-3 inline-block"></span>
+                    <h3 class="text-button mb-2">{% trans "Career Tips" %}</h3>
+                    <p class="text-secondary text-sm">{% trans "Expert advice to advance your career" %}</p>
+                </div>
+                <div class="text-center p-6">
+                    <span class="ph-bold ph-chart-line-up text-3xl text-primary mb-3 inline-block"></span>
+                    <h3 class="text-button mb-2">{% trans "Industry News" %}</h3>
+                    <p class="text-secondary text-sm">{% trans "Stay informed about market trends" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

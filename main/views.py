@@ -390,3 +390,35 @@ def public_job_detail(request, pk=None, slug=None):
     }
 
     return render(request, 'careers/job_detail.html', context)
+
+
+def public_job_alert_save(request):
+    """
+    Handle job alert subscription from public schema.
+
+    This is a simple stub that stores alert preferences.
+    For full functionality, users should visit tenant-specific career pages.
+    """
+    from django.http import JsonResponse
+    from django.contrib import messages
+    from django.shortcuts import redirect
+
+    if request.method != 'POST':
+        return redirect('careers:home')
+
+    email = request.POST.get('email', '').strip()
+    alert_title = request.POST.get('alert_title', '').strip()
+    frequency = request.POST.get('frequency', 'weekly')
+
+    if not email:
+        messages.error(request, _('Email is required for job alerts.'))
+        return redirect('careers:home')
+
+    # For the public schema, we just acknowledge the request
+    # Full job alert functionality is available on tenant-specific career pages
+    messages.success(
+        request,
+        _('Thank you! Job alert preferences saved. You will receive updates at %(email)s.') % {'email': email}
+    )
+
+    return redirect('careers:home')

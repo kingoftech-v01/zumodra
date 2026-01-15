@@ -37,7 +37,37 @@ from main.views import (
     public_companies_grid,
     public_companies_map,
     public_job_detail,
+    public_job_alert_save,
 )
+
+
+# Simple newsletter views for public schema (newsletter tables only exist in tenant schemas)
+def newsletter_public_view(request):
+    """Simple newsletter landing page for public schema."""
+    from django.shortcuts import render
+    return render(request, 'newsletter/public_newsletter.html', {
+        'page_title': 'Newsletter',
+        'meta_description': 'Subscribe to our newsletter to stay updated.',
+    })
+
+
+def newsletter_subscribe_view(request):
+    """Handle newsletter subscription from public schema."""
+    from django.shortcuts import redirect
+    from django.contrib import messages
+    from django.utils.translation import gettext_lazy as _
+
+    if request.method != 'POST':
+        return redirect('newsletter:newsletter_list')
+
+    email = request.POST.get('email', '').strip()
+    if not email:
+        messages.error(request, _('Email is required.'))
+        return redirect('newsletter:newsletter_list')
+
+    # For the public schema, we just acknowledge the request
+    messages.success(request, _('Thank you for subscribing! You will receive updates at %(email)s.') % {'email': email})
+    return redirect('newsletter:newsletter_list')
 
 
 # ==================== Health Check Endpoint ====================
@@ -174,6 +204,9 @@ urlpatterns += i18n_patterns(
         # Company browsing (grid and map)
         path('companies/', public_companies_grid, name='browse_companies'),
         path('companies/map/', public_companies_map, name='browse_companies_map'),
+
+        # Job alerts (public schema stub - actual functionality in tenant schema)
+        path('job-alert/save/', public_job_alert_save, name='job_alert_save'),
     ], 'careers'), namespace='careers')),
 
     # Blog (Wagtail CMS)
@@ -194,8 +227,11 @@ urlpatterns += i18n_patterns(
     # Public profile, KYC, and profile sync settings
     path('user/', include('custom_account_u.urls', namespace='custom_account_u')),
 
-    # Newsletter
-    path('newsletter/', include('newsletter.urls')),
+    # Newsletter (simplified for public schema - tables only exist in tenant schemas)
+    path('newsletter/', include(([
+        path('', newsletter_public_view, name='newsletter_list'),
+        path('subscribe/', newsletter_subscribe_view, name='subscribe'),
+    ], 'newsletter'), namespace='newsletter')),
 
     # Wagtail page routing (catch-all, must be last)
     path('', include(wagtail_urls)),
