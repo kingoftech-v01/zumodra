@@ -506,17 +506,70 @@ run_migrations() {
             return 1
         fi
 
+        # Step 4.5: CRITICAL - Verify demo tenant migrations (BLOCKING)
+        log_info "Step 4.5/6: Verifying demo tenant migrations (BLOCKING CHECK)..."
+
+        DEMO_CHECK_OUTPUT=$(python manage.py verify_tenant_migrations --tenant=demo --fix 2>&1)
+        DEMO_CHECK_STATUS=$?
+
+        echo "$DEMO_CHECK_OUTPUT"
+
+        if [ $DEMO_CHECK_STATUS -ne 0 ]; then
+            log_error "╔════════════════════════════════════════════════════════════════╗"
+            log_error "║  FATAL: Demo tenant migration verification FAILED             ║"
+            log_error "║                                                                ║"
+            log_error "║  The finance app and other tenant migrations were not applied ║"
+            log_error "║  Container startup is BLOCKED to prevent data corruption      ║"
+            log_error "║                                                                ║"
+            log_error "║  ACTION REQUIRED:                                              ║"
+            log_error "║  1. Check migration files exist in finance/migrations/        ║"
+            log_error "║  2. Verify TENANT_APPS includes 'finance' in settings.py      ║"
+            log_error "║  3. Check logs above for specific migration errors            ║"
+            log_error "║  4. Manually run: python manage.py migrate_schemas --tenant   ║"
+            log_error "╚════════════════════════════════════════════════════════════════╝"
+            exit 1  # BLOCKING: Halt container startup
+        fi
+
+        log_info "✓ Demo tenant migrations verified and applied successfully!"
+
+        # Step 4.6: CRITICAL - Verify ALL tenant migrations (BLOCKING)
+        log_info "Step 4.6/6: Verifying all tenant migrations (BLOCKING CHECK)..."
+
+        ALL_CHECK_OUTPUT=$(python manage.py verify_tenant_migrations --fix 2>&1)
+        ALL_CHECK_STATUS=$?
+
+        echo "$ALL_CHECK_OUTPUT"
+
+        if [ $ALL_CHECK_STATUS -ne 0 ]; then
+            log_error "╔════════════════════════════════════════════════════════════════╗"
+            log_error "║  FATAL: Tenant migration verification FAILED                  ║"
+            log_error "║                                                                ║"
+            log_error "║  One or more tenants have pending migrations                  ║"
+            log_error "║  Container startup is BLOCKED to prevent data corruption      ║"
+            log_error "║                                                                ║"
+            log_error "║  ACTION REQUIRED:                                              ║"
+            log_error "║  1. Check logs above for affected tenants                     ║"
+            log_error "║  2. Run: python manage.py verify_tenant_migrations --json     ║"
+            log_error "║  3. Then: python manage.py migrate_schemas --tenant --noinput ║"
+            log_error "╚════════════════════════════════════════════════════════════════╝"
+            exit 1  # BLOCKING: Halt container startup
+        fi
+
+        log_info "✓ All tenant migrations verified and applied successfully!"
+
         # Step 5: Backfill TenantProfiles for existing users
-        log_info "Step 5/5: Backfilling TenantProfiles for existing users..."
+        log_info "Step 5/6: Backfilling TenantProfiles for existing users..."
         if python manage.py create_tenant_profiles; then
             log_info "✓ TenantProfiles backfilled successfully!"
         else
             log_warn "TenantProfile backfill had issues (may be no users yet)"
         fi
     else
-        log_info "Step 3/5: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
-        log_info "Step 4/5: No new tenants to migrate"
-        log_info "Step 5/5: Skipping TenantProfile backfill (no demo tenants)"
+        log_info "Step 3/6: Skipping demo tenant creation (CREATE_DEMO_TENANT not set)"
+        log_info "Step 4/6: No new tenants to migrate"
+        log_info "Step 4.5/6: Skipping demo tenant verification (no demo tenants)"
+        log_info "Step 4.6/6: Skipping all tenant verification (no demo tenants created)"
+        log_info "Step 5/6: Skipping TenantProfile backfill (no demo tenants)"
     fi
 }
 

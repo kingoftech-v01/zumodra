@@ -381,6 +381,35 @@ class Command(BaseCommand):
         tenant.save()
         tenant.activate()
 
+        # CRITICAL: Explicitly run migrations for tenant schema
+        # Don't rely on auto_create_schema - it's unreliable for TENANT_APPS
+        self.stdout.write(self.style.WARNING(
+            f"   Running migrations for tenant schema: {tenant.schema_name}..."
+        ))
+
+        from django_tenants.utils import schema_context
+
+        try:
+            with schema_context(tenant.schema_name):
+                call_command(
+                    'migrate_schemas',
+                    schema_name=tenant.schema_name,
+                    verbosity=1,
+                    interactive=False
+                )
+            self.stdout.write(self.style.SUCCESS(
+                f"   ✓ Migrations completed for tenant: {tenant.schema_name}"
+            ))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(
+                f"   ✗ FATAL: Migration failed for tenant {tenant.schema_name}: {str(e)}"
+            ))
+            # Clean up the broken tenant
+            tenant.delete()
+            raise CommandError(
+                f"Tenant migration failed: {str(e)}. Tenant has been rolled back."
+            )
+
         # Add demo domain
         Domain.objects.get_or_create(
             domain=DEMO_TENANT_CONFIG['domain'],

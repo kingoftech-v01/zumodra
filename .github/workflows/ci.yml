@@ -212,9 +212,9 @@ jobs:
         python-version: ['3.11', '3.12']
 
     services:
-      # PostgreSQL 16 with PostGIS for geospatial support
+      # PostgreSQL 15 with PostGIS for geospatial support (matches local dev environment)
       postgres:
-        image: postgis/postgis:16-3.4
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres_test_password
@@ -350,19 +350,19 @@ jobs:
               ignore::PendingDeprecationWarning
           EOF
 
-          # Run pytest with coverage
+          # Run pytest with coverage (60% minimum - matches pytest.ini)
           pytest \
             --cov=. \
             --cov-report=xml:coverage.xml \
             --cov-report=html:htmlcov \
             --cov-report=term-missing \
-            --cov-fail-under=10 \
+            --cov-fail-under=60 \
             -n auto \
             --ignore=.venv \
             --ignore=django-crm-main \
             --ignore=staticfiles \
             --ignore=media \
-            -v || true
+            -v
 
       - name: Run Django tests as fallback
         if: failure()
@@ -488,170 +488,13 @@ jobs:
         continue-on-error: true
 
   # ============================================================================
-  # DEPLOY STAGING JOB - Auto-deploy to Staging
-  # ============================================================================
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: github.ref == 'refs/heads/develop'
-    environment:
-      name: staging
-      url: https://staging.zumodra.com
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Staging
-        run: |
-          echo "Deploying to staging environment..."
-          echo "Image: ${{ needs.build.outputs.image_tag }}"
-          # Add your staging deployment commands here
-          # Examples:
-          # - kubectl set image deployment/zumodra zumodra=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
-          # - docker-compose -f docker-compose.staging.yml pull && docker-compose -f docker-compose.staging.yml up -d
-          # - ssh staging-server "cd /app && docker-compose pull && docker-compose up -d"
-
-      - name: Run database migrations on staging
-        run: |
-          echo "Running migrations on staging..."
-          # Add migration command here
-          # Example: ssh staging-server "cd /app && docker-compose exec -T web python manage.py migrate --noinput"
-
-      - name: Verify staging deployment
-        run: |
-          echo "Verifying staging deployment..."
-          # Add health check here
-          # Example: curl -f https://staging.zumodra.com/health/ || exit 1
-
-      - name: Notify deployment status
-        if: always()
-        run: |
-          echo "Staging deployment completed with status: ${{ job.status }}"
-          # Add Slack/Discord/Email notification here
-
-  # ============================================================================
-  # DEPLOY PRODUCTION JOB - Deploy to Production with Manual Approval
-  # ============================================================================
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: production
-      url: https://zumodra.com
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Production deployment confirmation
-        run: |
-          echo "Production deployment approved!"
-          echo "Deploying version: ${{ github.sha }}"
-          echo "Image: ${{ needs.build.outputs.image_tag }}"
-
-      - name: Create backup before deployment
-        run: |
-          echo "Creating database backup before deployment..."
-          # Add backup command here
-          # Example: ssh prod-server "pg_dump zumodra > backup_$(date +%Y%m%d_%H%M%S).sql"
-
-      - name: Deploy to Production
-        run: |
-          echo "Deploying to production environment..."
-          # Add your production deployment commands here
-          # Examples:
-          # - kubectl set image deployment/zumodra zumodra=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --namespace=production
-          # - docker-compose -f docker-compose.prod.yml pull && docker-compose -f docker-compose.prod.yml up -d
-          # - AWS ECS update-service
-          # - Heroku container:release
-
-      - name: Run database migrations on production
-        run: |
-          echo "Running migrations on production..."
-          # Add migration command here
-          # Example: kubectl exec -it deployment/zumodra -- python manage.py migrate --noinput
-
-      - name: Verify production deployment
-        run: |
-          echo "Verifying production deployment..."
-          # Add comprehensive health checks
-          # Example:
-          # curl -f https://zumodra.com/health/ || exit 1
-          # curl -f https://zumodra.com/api/v1/status/ || exit 1
-
-      - name: Run smoke tests
-        run: |
-          echo "Running smoke tests on production..."
-          # Add smoke test commands
-          # Example: pytest tests/smoke/ --base-url=https://zumodra.com
-
-      - name: Create GitHub Release
-        if: success()
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: release-${{ github.sha }}
-          release_name: Release ${{ github.sha }}
-          body: |
-            Automated production release
-            - Commit: ${{ github.sha }}
-            - Branch: ${{ github.ref_name }}
-            - Deployed: ${{ github.event.head_commit.timestamp }}
-          draft: false
-          prerelease: false
-        continue-on-error: true
-
-      - name: Notify deployment status
-        if: always()
-        run: |
-          echo "Production deployment completed with status: ${{ job.status }}"
-          # Add notifications (Slack, Discord, Email, PagerDuty)
-          # Example with Slack:
-          # curl -X POST -H 'Content-type: application/json' \
-          #   --data '{"text":"Production deployment ${{ job.status }}"}' \
-          #   ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  # ============================================================================
-  # ROLLBACK JOB - Manual rollback capability
-  # ============================================================================
-  rollback:
-    name: Rollback Production
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && failure()
-    environment:
-      name: production
-      url: https://zumodra.com
-
-    steps:
-      - name: Rollback to previous version
-        run: |
-          echo "Rolling back to previous stable version..."
-          # Add rollback commands here
-          # Example: kubectl rollout undo deployment/zumodra --namespace=production
-
-      - name: Verify rollback
-        run: |
-          echo "Verifying rollback..."
-          # Add health check after rollback
-
-      - name: Notify rollback status
-        run: |
-          echo "Rollback completed"
-          # Add notification
-
-  # ============================================================================
   # CLEANUP JOB - Clean up old Docker images
   # ============================================================================
   cleanup:
     name: Cleanup Old Images
     runs-on: ubuntu-latest
-    needs: [deploy-staging, deploy-production]
-    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    needs: [build]
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
 
     steps:
       - name: Delete old container images
