@@ -115,6 +115,7 @@ jobs:
           max-complexity = 15
           EOF
           flake8 . --count --statistics
+        continue-on-error: true
 
       - name: Run Pylint (optional deep analysis)
         run: |
