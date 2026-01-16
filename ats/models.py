@@ -1091,7 +1091,8 @@ class JobPosting(TenantSoftDeleteModel):
     status = models.CharField(
         max_length=35,
         choices=JobStatus.choices,
-        default=JobStatus.DRAFT
+        default=JobStatus.DRAFT,
+        db_index=True  # Index for filtering jobs by status (published/draft/closed)
     )
     pipeline = models.ForeignKey(
         Pipeline,
@@ -1226,9 +1227,9 @@ class JobPosting(TenantSoftDeleteModel):
     meta_description = models.TextField(blank=True, max_length=500)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by newest/oldest
     updated_at = models.DateTimeField(auto_now=True)
-    published_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for filtering published jobs
     closed_at = models.DateTimeField(null=True, blank=True)
 
     # Creator
@@ -1965,7 +1966,8 @@ class Application(TenantAwareModel):
     status = models.CharField(
         max_length=35,
         choices=ApplicationStatus.choices,
-        default=ApplicationStatus.NEW
+        default=ApplicationStatus.NEW,
+        db_index=True  # Index for filtering applications by status
     )
     current_stage = models.ForeignKey(
         PipelineStage,
@@ -2524,7 +2526,8 @@ class Interview(models.Model):
     status = models.CharField(
         max_length=35,
         choices=InterviewStatus.choices,
-        default=InterviewStatus.SCHEDULED
+        default=InterviewStatus.SCHEDULED,
+        db_index=True  # Index for filtering interviews by status
     )
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -2540,7 +2543,7 @@ class Interview(models.Model):
     )
 
     # Scheduling
-    scheduled_start = models.DateTimeField()
+    scheduled_start = models.DateTimeField(db_index=True)  # Index for querying upcoming/past interviews
     scheduled_end = models.DateTimeField()
     timezone = models.CharField(max_length=50, default='America/Toronto')
     actual_start = models.DateTimeField(null=True, blank=True)
