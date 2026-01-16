@@ -73,6 +73,10 @@ SHARED_APPS = [
 
     # Blog app (shared - only system admin publishes blog posts)
     'blog',
+
+    # Careers app (shared - public job listings accessible across all tenants)
+    # Public users browse jobs from all tenants via PublicJobCatalog
+    'careers',
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)
@@ -146,7 +150,7 @@ TENANT_APPS = [
     'accounts',  # KYC, progressive revelation, RBAC
     'ats',  # Applicant Tracking System
     'hr_core',  # HR operations
-    'careers',  # Public career pages
+    # REMOVED (2026-01-16): 'careers' moved to SHARED_APPS - public job listings, not tenant-specific
 ]
 
 # Combine for INSTALLED_APPS
