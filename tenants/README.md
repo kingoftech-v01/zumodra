@@ -112,6 +112,48 @@ python manage.py migrate_schemas --tenant
 python manage.py migrate_schemas --tenant --schema=acme
 ```
 
+## Middleware Error Handling
+
+The `ZumodraTenantMiddleware` handles tenant resolution with proper HTTP error responses:
+
+### Tenant Resolution Scenarios
+
+**1. Tenant Found (Normal Case)**
+- Request is routed to tenant's schema
+- All subsequent queries scoped to tenant
+- Status checks performed (suspended, trial expiration, etc.)
+
+**2. Tenant Not Found**
+- If `SHOW_PUBLIC_IF_NO_TENANT_FOUND=True`: Falls back to public schema (development default)
+- If `SHOW_PUBLIC_IF_NO_TENANT_FOUND=False`: Returns HTTP 404 (production recommended)
+- Examples: `nonexistent.zumodra.com`, invalid X-Tenant-ID header
+
+**3. System Error During Resolution**
+- Returns HTTP 503 Service Unavailable
+- Examples: Rate limiting, database errors, cache failures
+- Distinct from 404 (not found) and 403 (forbidden)
+
+**4. Unauthorized Access**
+- Returns HTTP 403 Forbidden
+- Example: User accessing another user's tenant via header without permission
+
+### Configuration
+
+```python
+# In zumodra/settings_tenants.py
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = True   # Development (fallback to public)
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = False  # Production (return 404)
+```
+
+### Logging
+
+All tenant resolution events are logged with context:
+- Tenant found: INFO level
+- Tenant not found: WARNING level
+- System errors: ERROR level
+
+See `tenants/middleware.py` module docstring for detailed documentation.
+
 ## Contributing
 
 **CRITICAL RULES:**
@@ -120,6 +162,7 @@ python manage.py migrate_schemas --tenant --schema=acme
 3. Use `TenantTestCase` for tests
 4. Document schema changes
 5. Verify migration rollback safety
+6. Ensure middleware returns proper HTTP status codes (404, 403, 503)
 
 ---
 
