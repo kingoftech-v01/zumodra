@@ -237,6 +237,8 @@ services:
       interval: 60s
       timeout: 30s
     depends_on:
+      web:
+        condition: service_healthy
       db:
         condition: service_healthy
       redis:
@@ -275,6 +277,8 @@ services:
       test: ["CMD", "test", "-f", "/tmp/celerybeat.pid"]
       interval: 60s
     depends_on:
+      web:
+        condition: service_healthy
       db:
         condition: service_healthy
       redis:
