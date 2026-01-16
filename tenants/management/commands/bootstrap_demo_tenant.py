@@ -331,13 +331,21 @@ class Command(BaseCommand):
         self._log_step(10, 'Creating notifications data (channels, templates)')
         self._create_notifications_data(tenant, users)
 
-        # Step 11: Create verification data
-        self._log_step(11, 'Creating verification/trust data')
+        # Step 11: Create Appointments data
+        self._log_step(11, 'Creating appointments data (services, staff, bookings)')
+        self._create_appointments_data(tenant, users)
+
+        # Step 12: Create verification data
+        self._log_step(12, 'Creating verification/trust data')
         self._create_verification_data(users)
 
-        # Step 12: Create messaging data
+        # Step 13: Create Analytics data
+        self._log_step(13, 'Creating analytics data (page views, actions, metrics)')
+        self._create_analytics_data(tenant, users)
+
+        # Step 14: Create messaging data
         if not self.skip_messaging:
-            self._log_step(12, 'Creating messaging data (conversations)')
+            self._log_step(14, 'Creating messaging data (conversations)')
             self._create_messaging_data(users)
 
         # Summary
@@ -642,37 +650,42 @@ class Command(BaseCommand):
 
         admin = users['admin']
 
-        # Create time-off types
-        pto, _ = TimeOffType.objects.get_or_create(
-            code='PTO',
-            tenant=tenant,
-            defaults={
-                'name': 'Paid Time Off',
-                'is_accrued': True,
-                'accrual_rate': Decimal('1.25'),
-                'max_balance': Decimal('25'),
-            }
-        )
-        sick, _ = TimeOffType.objects.get_or_create(
-            code='SICK',
-            tenant=tenant,
-            defaults={
-                'name': 'Sick Leave',
-                'is_accrued': True,
-                'accrual_rate': Decimal('0.5'),
-                'max_balance': Decimal('12'),
-            }
-        )
-        TimeOffType.objects.get_or_create(
-            code='PERSONAL',
-            tenant=tenant,
-            defaults={
-                'name': 'Personal Day',
-                'is_accrued': False,
-                'max_balance': Decimal('3'),
-            }
-        )
-        self.stdout.write("   Time-off types: 3")
+        # Create time-off types (at least 10)
+        time_off_types_config = [
+            {'code': 'PTO', 'name': 'Paid Time Off', 'is_accrued': True, 'accrual_rate': Decimal('1.25'), 'max_balance': Decimal('25')},
+            {'code': 'SICK', 'name': 'Sick Leave', 'is_accrued': True, 'accrual_rate': Decimal('0.5'), 'max_balance': Decimal('12')},
+            {'code': 'PERSONAL', 'name': 'Personal Day', 'is_accrued': False, 'max_balance': Decimal('3')},
+            {'code': 'VACATION', 'name': 'Vacation', 'is_accrued': True, 'accrual_rate': Decimal('1.0'), 'max_balance': Decimal('20')},
+            {'code': 'BEREAVEMENT', 'name': 'Bereavement Leave', 'is_accrued': False, 'max_balance': Decimal('5')},
+            {'code': 'PARENTAL', 'name': 'Parental Leave', 'is_accrued': False, 'max_balance': Decimal('12')},
+            {'code': 'JURY', 'name': 'Jury Duty', 'is_accrued': False, 'max_balance': Decimal('999')},
+            {'code': 'MILITARY', 'name': 'Military Leave', 'is_accrued': False, 'max_balance': Decimal('15')},
+            {'code': 'SABBATICAL', 'name': 'Sabbatical', 'is_accrued': False, 'max_balance': Decimal('90')},
+            {'code': 'UNPAID', 'name': 'Unpaid Leave', 'is_accrued': False, 'max_balance': Decimal('999')},
+        ]
+
+        created_time_off_types = []
+        pto = None
+        sick = None
+
+        for config in time_off_types_config:
+            time_off_type, _ = TimeOffType.objects.get_or_create(
+                code=config['code'],
+                tenant=tenant,
+                defaults={
+                    'name': config['name'],
+                    'is_accrued': config['is_accrued'],
+                    'accrual_rate': config.get('accrual_rate', Decimal('0')),
+                    'max_balance': config['max_balance'],
+                }
+            )
+            created_time_off_types.append(time_off_type)
+            if config['code'] == 'PTO':
+                pto = time_off_type
+            elif config['code'] == 'SICK':
+                sick = time_off_type
+
+        self.stdout.write(f"   Time-off types: {len(created_time_off_types)}")
 
         # Create employees
         employees = []
@@ -716,7 +729,7 @@ class Command(BaseCommand):
             try:
                 TimeOffRequest.objects.get_or_create(
                     employee=emp,
-                    time_off_type=random.choice([pto, sick]),
+                    time_off_type=random.choice([pto, sick] if pto and sick else created_time_off_types[:2]),
                     start_date=timezone.now().date() + timedelta(days=random.randint(7, 60)),
                     tenant=tenant,
                     defaults={
@@ -729,6 +742,267 @@ class Command(BaseCommand):
             except Exception:
                 pass
         self.stdout.write(f"   Time-off requests: {request_count}")
+
+        # Create departments (at least 10)
+        try:
+            from hr_core.models import Department
+
+            departments_config = [
+                {'name': 'Engineering', 'code': 'ENG', 'description': 'Software Engineering and Development'},
+                {'name': 'Product', 'code': 'PROD', 'description': 'Product Management and Strategy'},
+                {'name': 'Design', 'code': 'DES', 'description': 'User Experience and Design'},
+                {'name': 'Marketing', 'code': 'MKT', 'description': 'Marketing and Communications'},
+                {'name': 'Sales', 'code': 'SALES', 'description': 'Sales and Business Development'},
+                {'name': 'Customer Success', 'code': 'CS', 'description': 'Customer Support and Success'},
+                {'name': 'Finance', 'code': 'FIN', 'description': 'Finance and Accounting'},
+                {'name': 'Human Resources', 'code': 'HR', 'description': 'Human Resources and People Operations'},
+                {'name': 'Operations', 'code': 'OPS', 'description': 'Operations and Infrastructure'},
+                {'name': 'Legal', 'code': 'LEGAL', 'description': 'Legal and Compliance'},
+                {'name': 'Executive', 'code': 'EXEC', 'description': 'Executive Leadership'},
+            ]
+
+            created_departments = []
+            for config in departments_config:
+                dept = self._safe_create(
+                    f"Department '{config['name']}'",
+                    Department.objects.get_or_create,
+                    tenant=tenant,
+                    code=config['code'],
+                    defaults={
+                        'name': config['name'],
+                        'description': config['description'],
+                        'is_active': True,
+                    }
+                )
+                if dept and isinstance(dept, tuple):
+                    dept = dept[0]
+                if dept:
+                    created_departments.append(dept)
+
+            # Assign employees to departments
+            for emp in employees:
+                if created_departments:
+                    emp.department = random.choice(created_departments)
+                    try:
+                        emp.save()
+                    except Exception:
+                        pass
+
+            self.stdout.write(f"   Departments: {len(created_departments)}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Department model not available"))
+
+        # Create skills and map to employees (at least 10)
+        try:
+            from hr_core.models import Skill, EmployeeSkill
+
+            created_skills = []
+            for skill_name in SKILLS[:15]:  # Create 15 skills
+                skill = self._safe_create(
+                    f"Skill '{skill_name}'",
+                    Skill.objects.get_or_create,
+                    tenant=tenant,
+                    name=skill_name,
+                    defaults={
+                        'slug': slugify(skill_name),
+                        'description': f'{skill_name} skill',
+                        'category': random.choice(['technical', 'soft', 'domain']),
+                    }
+                )
+                if skill and isinstance(skill, tuple):
+                    skill = skill[0]
+                if skill:
+                    created_skills.append(skill)
+
+            # Map skills to employees
+            skill_mappings = 0
+            for emp in employees:
+                # Each employee gets 3-7 skills
+                employee_skills = random.sample(created_skills, min(random.randint(3, 7), len(created_skills)))
+                for skill in employee_skills:
+                    try:
+                        mapping = self._safe_create(
+                            f"EmployeeSkill mapping",
+                            EmployeeSkill.objects.get_or_create,
+                            employee=emp,
+                            skill=skill,
+                            defaults={
+                                'proficiency_level': random.choice(['beginner', 'intermediate', 'advanced', 'expert']),
+                                'years_of_experience': random.randint(1, 10),
+                            }
+                        )
+                        if mapping:
+                            skill_mappings += 1
+                    except Exception:
+                        pass
+
+            self.stdout.write(f"   Skills: {len(created_skills)}, Mappings: {skill_mappings}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Skill models not available"))
+
+        # Create compensation records (at least 10)
+        try:
+            from hr_core.models import EmployeeCompensation
+
+            compensation_count = 0
+            for emp in employees[:15]:  # Create for first 15 employees
+                # Create 1-3 compensation records per employee (salary history)
+                num_records = random.randint(1, 3)
+                for i in range(num_records):
+                    try:
+                        effective_date = emp.hire_date + timedelta(days=i * 365)  # Yearly changes
+
+                        comp = self._safe_create(
+                            f"Compensation for {emp.user.get_full_name()}",
+                            EmployeeCompensation.objects.create,
+                            employee=emp,
+                            tenant=tenant,
+                            effective_date=effective_date,
+                            compensation_type='salary',
+                            amount=emp.base_salary * Decimal(str(1 + (i * 0.05))),  # 5% increase per year
+                            currency='USD',
+                            frequency='annual',
+                            notes=f'Annual salary {"increase" if i > 0 else "starting"}',
+                        )
+                        if comp:
+                            compensation_count += 1
+                    except Exception as e:
+                        if self.verbosity >= 2:
+                            logger.debug(f"Failed to create compensation: {e}")
+
+            self.stdout.write(f"   Compensation records: {compensation_count}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Compensation model not available"))
+
+        # Create performance reviews (at least 10)
+        try:
+            from hr_core.models import PerformanceReview
+
+            review_count = 0
+            for emp in employees[:12]:  # Create for first 12 employees
+                try:
+                    review_date = timezone.now().date() - timedelta(days=random.randint(30, 365))
+
+                    review = self._safe_create(
+                        f"PerformanceReview for {emp.user.get_full_name()}",
+                        PerformanceReview.objects.create,
+                        employee=emp,
+                        reviewer=admin,
+                        tenant=tenant,
+                        review_period_start=review_date - timedelta(days=180),
+                        review_period_end=review_date,
+                        review_date=review_date,
+                        overall_rating=random.choice([3, 4, 4, 5]),  # Skewed toward good ratings
+                        goals_rating=random.choice([3, 4, 4, 5]),
+                        skills_rating=random.choice([3, 4, 4, 5]),
+                        summary=f'Performance review for {emp.user.get_full_name()}. Overall performance meets/exceeds expectations.',
+                        strengths='Strong technical skills, excellent collaboration, proactive problem solving.',
+                        areas_for_improvement='Could improve time management and communication.',
+                        goals_next_period='Focus on leadership development and mentoring.',
+                        status='completed',
+                    )
+                    if review:
+                        review_count += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create performance review: {e}")
+
+            self.stdout.write(f"   Performance reviews: {review_count}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   PerformanceReview model not available"))
+
+        # Create onboarding checklists and instances (at least 10)
+        try:
+            from hr_core.models import OnboardingChecklist, OnboardingTask, EmployeeOnboarding
+
+            # Create onboarding checklist templates (at least 10)
+            checklists_config = [
+                {'name': 'Software Engineer Onboarding', 'description': 'Technical onboarding for engineers', 'duration_days': 30},
+                {'name': 'Sales Representative Onboarding', 'description': 'Sales team onboarding program', 'duration_days': 21},
+                {'name': 'General Employee Onboarding', 'description': 'Standard onboarding for all employees', 'duration_days': 14},
+                {'name': 'Manager Onboarding', 'description': 'Leadership onboarding program', 'duration_days': 45},
+                {'name': 'Remote Employee Onboarding', 'description': 'Onboarding for remote workers', 'duration_days': 14},
+                {'name': 'Intern Onboarding', 'description': 'Internship program onboarding', 'duration_days': 7},
+                {'name': 'Customer Success Onboarding', 'description': 'CS team onboarding', 'duration_days': 21},
+                {'name': 'Product Manager Onboarding', 'description': 'PM onboarding program', 'duration_days': 30},
+                {'name': 'Designer Onboarding', 'description': 'Design team onboarding', 'duration_days': 21},
+                {'name': 'Executive Onboarding', 'description': 'Leadership team onboarding', 'duration_days': 60},
+            ]
+
+            created_checklists = []
+            for config in checklists_config:
+                checklist = self._safe_create(
+                    f"OnboardingChecklist '{config['name']}'",
+                    OnboardingChecklist.objects.get_or_create,
+                    tenant=tenant,
+                    name=config['name'],
+                    defaults={
+                        'description': config['description'],
+                        'duration_days': config['duration_days'],
+                        'is_active': True,
+                    }
+                )
+                if checklist and isinstance(checklist, tuple):
+                    checklist = checklist[0]
+                if checklist:
+                    created_checklists.append(checklist)
+
+            # Create tasks for each checklist
+            task_templates = [
+                {'title': 'Complete HR paperwork', 'description': 'Fill out tax forms, benefits enrollment', 'day': 1},
+                {'title': 'Setup workstation', 'description': 'Configure laptop, install software', 'day': 1},
+                {'title': 'Team introduction meeting', 'description': 'Meet with team members', 'day': 2},
+                {'title': 'Review company handbook', 'description': 'Read and acknowledge policies', 'day': 3},
+                {'title': 'Security training', 'description': 'Complete security awareness training', 'day': 5},
+                {'title': 'First project assignment', 'description': 'Receive first task/project', 'day': 7},
+                {'title': '1-week check-in', 'description': 'Meeting with manager', 'day': 7},
+                {'title': '30-day review', 'description': 'First month performance review', 'day': 30},
+            ]
+
+            for checklist in created_checklists:
+                for i, task_config in enumerate(task_templates):
+                    try:
+                        self._safe_create(
+                            f"OnboardingTask for {checklist.name}",
+                            OnboardingTask.objects.create,
+                            checklist=checklist,
+                            title=task_config['title'],
+                            description=task_config['description'],
+                            due_day=task_config['day'],
+                            is_required=random.choice([True, True, False]),
+                            order=i + 1,
+                        )
+                    except Exception:
+                        pass
+
+            # Create onboarding instances for new employees
+            onboarding_count = 0
+            recent_employees = [e for e in employees if (timezone.now().date() - e.hire_date).days <= 90][:10]
+
+            for emp in recent_employees:
+                if created_checklists:
+                    checklist = random.choice(created_checklists)
+                    try:
+                        onboarding = self._safe_create(
+                            f"EmployeeOnboarding for {emp.user.get_full_name()}",
+                            EmployeeOnboarding.objects.create,
+                            employee=emp,
+                            checklist=checklist,
+                            tenant=tenant,
+                            start_date=emp.hire_date,
+                            expected_completion_date=emp.hire_date + timedelta(days=checklist.duration_days),
+                            status=random.choice(['in_progress', 'in_progress', 'completed']),
+                            assigned_buddy=random.choice(employees) if len(employees) > 1 else None,
+                        )
+                        if onboarding:
+                            onboarding_count += 1
+                    except Exception as e:
+                        if self.verbosity >= 2:
+                            logger.debug(f"Failed to create onboarding: {e}")
+
+            self.stdout.write(f"   Onboarding checklists: {len(created_checklists)}, Instances: {onboarding_count}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Onboarding models not available"))
 
     def _create_marketplace_data(self, tenant, users):
         """Create marketplace/services demo data."""
@@ -1430,6 +1704,231 @@ class Command(BaseCommand):
         # Log summary
         self._log_section('Notifications Data Created', counts)
 
+    def _create_appointments_data(self, tenant, users):
+        """Create appointment system demo data (minimum 10 each)."""
+        try:
+            from appointment.models import (
+                Service as AppointmentService, StaffMember, WorkingHours,
+                Appointment, AppointmentRequest
+            )
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Appointment models not available, skipping"))
+            return
+
+        counts = {
+            'services': 0,
+            'staff_members': 0,
+            'working_hours': 0,
+            'appointments': 0,
+            'appointment_requests': 0,
+        }
+
+        # Create appointment service types (at least 10)
+        appointment_services_config = [
+            {'name': 'Initial Consultation', 'duration': 30, 'price': Decimal('50.00'), 'description': '30-minute initial consultation'},
+            {'name': 'Technical Interview', 'duration': 60, 'price': Decimal('0.00'), 'description': '1-hour technical assessment'},
+            {'name': 'Behavioral Interview', 'duration': 45, 'price': Decimal('0.00'), 'description': '45-minute behavioral interview'},
+            {'name': 'Career Coaching', 'duration': 60, 'price': Decimal('100.00'), 'description': 'One-on-one career coaching session'},
+            {'name': 'Resume Review', 'duration': 30, 'price': Decimal('75.00'), 'description': 'Professional resume review and feedback'},
+            {'name': 'Mock Interview', 'duration': 45, 'price': Decimal('80.00'), 'description': 'Practice interview with feedback'},
+            {'name': 'Onboarding Session', 'duration': 90, 'price': Decimal('0.00'), 'description': 'New employee onboarding'},
+            {'name': 'Performance Review', 'duration': 60, 'price': Decimal('0.00'), 'description': 'Employee performance review meeting'},
+            {'name': 'Skills Assessment', 'duration': 120, 'price': Decimal('150.00'), 'description': 'Comprehensive skills evaluation'},
+            {'name': 'Exit Interview', 'duration': 30, 'price': Decimal('0.00'), 'description': 'Employee exit interview'},
+            {'name': 'Team Meeting', 'duration': 60, 'price': Decimal('0.00'), 'description': 'Team sync and planning meeting'},
+            {'name': 'Training Session', 'duration': 120, 'price': Decimal('200.00'), 'description': 'Professional training workshop'},
+        ]
+
+        created_services = []
+        for i, service_config in enumerate(appointment_services_config):
+            try:
+                service = self._safe_create(
+                    f"AppointmentService '{service_config['name']}'",
+                    AppointmentService.objects.get_or_create,
+                    tenant=tenant,
+                    name=service_config['name'],
+                    defaults={
+                        'slug': slugify(service_config['name']),
+                        'description': service_config['description'],
+                        'duration_minutes': service_config['duration'],
+                        'price': service_config['price'],
+                        'is_active': True,
+                        'requires_approval': random.choice([True, False]),
+                        'max_bookings_per_day': random.randint(5, 20),
+                    }
+                )
+                if service and isinstance(service, tuple):
+                    service = service[0]
+                if service:
+                    created_services.append(service)
+                    counts['services'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create appointment service {service_config['name']}: {e}")
+
+        # Get employees from HR data to use as staff members
+        try:
+            from hr_core.models import Employee
+
+            employees = list(Employee.objects.filter(tenant=tenant)[:15])
+        except (ImportError, Exception):
+            employees = []
+
+        # Create staff members (at least 10)
+        created_staff = []
+        if employees:
+            for i, employee in enumerate(employees[:12]):  # Create 12 to ensure we get 10+
+                try:
+                    staff = self._safe_create(
+                        f"StaffMember for {employee.user.get_full_name()}",
+                        StaffMember.objects.get_or_create,
+                        tenant=tenant,
+                        user=employee.user,
+                        defaults={
+                            'display_name': employee.user.get_full_name(),
+                            'title': employee.job_title if hasattr(employee, 'job_title') else 'Staff Member',
+                            'bio': f'Professional with expertise in recruitment and HR.',
+                            'is_active': True,
+                            'is_available': random.choice([True, True, False]),
+                        }
+                    )
+                    if staff and isinstance(staff, tuple):
+                        staff = staff[0]
+                    if staff:
+                        created_staff.append(staff)
+                        counts['staff_members'] += 1
+
+                        # Link staff to services (each staff can provide 2-4 services)
+                        staff_services = random.sample(created_services, min(random.randint(2, 4), len(created_services)))
+                        staff.services.set(staff_services)
+
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create staff member for {employee.user.get_full_name()}: {e}")
+        else:
+            # If no employees, create staff from demo users
+            for i, (user_key, user) in enumerate(list(users.items())[:10]):
+                try:
+                    staff = self._safe_create(
+                        f"StaffMember for {user_key}",
+                        StaffMember.objects.get_or_create,
+                        tenant=tenant,
+                        user=user,
+                        defaults={
+                            'display_name': user.get_full_name(),
+                            'title': 'Staff Member',
+                            'bio': f'Professional staff member.',
+                            'is_active': True,
+                            'is_available': True,
+                        }
+                    )
+                    if staff and isinstance(staff, tuple):
+                        staff = staff[0]
+                    if staff:
+                        created_staff.append(staff)
+                        counts['staff_members'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create staff member for {user_key}: {e}")
+
+        # Create working hours for staff members
+        weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+
+        for staff in created_staff:
+            for day in weekdays:
+                try:
+                    working_hours = self._safe_create(
+                        f"WorkingHours for {staff.display_name} on {day}",
+                        WorkingHours.objects.get_or_create,
+                        staff_member=staff,
+                        day_of_week=day,
+                        defaults={
+                            'start_time': '09:00:00',
+                            'end_time': '17:00:00',
+                            'is_available': True,
+                        }
+                    )
+                    if working_hours:
+                        counts['working_hours'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create working hours for {staff.display_name} on {day}: {e}")
+
+        # Create appointments (at least 10)
+        appointment_statuses = ['scheduled', 'scheduled', 'completed', 'canceled', 'no_show']
+
+        for i in range(15):  # Create 15 to ensure we get 10+
+            try:
+                if not created_services or not created_staff:
+                    break
+
+                service = random.choice(created_services)
+                staff = random.choice(created_staff)
+                client = random.choice(list(users.values()))
+
+                # Schedule appointments in the past, present, and future
+                days_offset = random.randint(-30, 30)
+                appointment_date = timezone.now() + timedelta(days=days_offset)
+                appointment_time = appointment_date.replace(hour=random.randint(9, 16), minute=random.choice([0, 30]))
+
+                status = random.choice(appointment_statuses)
+                if days_offset < 0:
+                    status = random.choice(['completed', 'completed', 'no_show', 'canceled'])
+
+                appointment = self._safe_create(
+                    f"Appointment #{i+1}",
+                    Appointment.objects.create,
+                    tenant=tenant,
+                    service=service,
+                    staff_member=staff,
+                    client=client,
+                    appointment_datetime=appointment_time,
+                    duration_minutes=service.duration_minutes,
+                    status=status,
+                    notes=f'Appointment for {service.name}',
+                    reminder_sent=random.choice([True, False]),
+                )
+                if appointment:
+                    counts['appointments'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create appointment {i+1}: {e}")
+
+        # Create appointment requests (at least 10)
+        request_statuses = ['pending', 'pending', 'approved', 'rejected']
+
+        for i in range(12):  # Create 12 to ensure we get 10+
+            try:
+                if not created_services or not created_staff:
+                    break
+
+                service = random.choice(created_services)
+                client = random.choice(list(users.values()))
+
+                # Request dates in the future
+                request_date = timezone.now() + timedelta(days=random.randint(1, 60))
+                request_time = request_date.replace(hour=random.randint(9, 16), minute=random.choice([0, 30]))
+
+                request = self._safe_create(
+                    f"AppointmentRequest #{i+1}",
+                    AppointmentRequest.objects.create,
+                    tenant=tenant,
+                    service=service,
+                    client=client,
+                    requested_datetime=request_time,
+                    duration_minutes=service.duration_minutes,
+                    status=random.choice(request_statuses),
+                    message=f'Request for {service.name} appointment',
+                )
+                if request:
+                    counts['appointment_requests'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create appointment request {i+1}: {e}")
+
+        # Log summary
+        self._log_section('Appointments Data Created', counts)
+
     def _create_verification_data(self, users):
         """Create verification and trust score demo data."""
         try:
@@ -1469,7 +1968,309 @@ class Command(BaseCommand):
             except Exception:
                 pass
 
-        self.stdout.write(f"   Verifications: {verifications}")
+        self.stdout.write(f"   KYC & Trust Scores: {verifications}")
+
+        # Create user reviews (at least 10)
+        try:
+            from accounts.models import Review
+
+            reviews_count = 0
+            user_list = list(users.values())
+
+            for i in range(15):  # Create 15 reviews to ensure 10+
+                try:
+                    reviewer = random.choice(user_list)
+                    reviewee = random.choice([u for u in user_list if u != reviewer])
+
+                    review = self._safe_create(
+                        f"Review #{i+1}",
+                        Review.objects.create,
+                        reviewer=reviewer,
+                        reviewee=reviewee,
+                        rating=random.choice([3, 4, 4, 5, 5]),  # Skewed toward positive
+                        title=random.choice([
+                            'Great to work with',
+                            'Highly professional',
+                            'Excellent communication',
+                            'Reliable and skilled',
+                            'Outstanding performance',
+                        ]),
+                        comment=random.choice([
+                            'Very professional and delivered quality work on time.',
+                            'Great communication throughout the project.',
+                            'Highly skilled and easy to work with.',
+                            'Would definitely work with again.',
+                            'Exceeded expectations on this project.',
+                        ]),
+                        would_recommend=random.choice([True, True, True, False]),
+                        is_verified=True,
+                        is_published=True,
+                    )
+                    if review:
+                        reviews_count += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create review {i+1}: {e}")
+
+            self.stdout.write(f"   User reviews: {reviews_count}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Review model not available"))
+
+        # Create employment verifications (at least 10)
+        employment_verifications = 0
+        for i, (key, user) in enumerate(list(users.items())[:12]):  # First 12 users
+            try:
+                verification = self._safe_create(
+                    f"EmploymentVerification for {key}",
+                    EmploymentVerification.objects.create,
+                    user=user,
+                    company_name=random.choice([
+                        'Tech Corp', 'StartupXYZ', 'Enterprise Inc',
+                        'Innovation Labs', 'Digital Solutions', 'Global Tech',
+                        'Software House', 'Data Systems', 'Cloud Networks',
+                        'AI Innovations', 'Mobile First', 'Web Dynamics'
+                    ]),
+                    job_title=random.choice(JOB_TITLES),
+                    start_date=timezone.now().date() - timedelta(days=random.randint(730, 2500)),
+                    end_date=timezone.now().date() - timedelta(days=random.randint(0, 365)) if random.random() > 0.3 else None,
+                    is_current=random.choice([True, False]),
+                    verification_status=random.choice(['verified', 'verified', 'pending', 'failed']),
+                    verified_by=random.choice(['automated', 'manual', 'third_party']),
+                    verified_at=timezone.now() - timedelta(days=random.randint(1, 90)),
+                    notes='Employment verified through HR records',
+                )
+                if verification:
+                    employment_verifications += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create employment verification: {e}")
+
+        self.stdout.write(f"   Employment verifications: {employment_verifications}")
+
+        # Create education verifications (at least 10)
+        try:
+            from accounts.models import EducationVerification
+
+            education_verifications = 0
+            universities = [
+                'MIT', 'Stanford University', 'Harvard University',
+                'UC Berkeley', 'Carnegie Mellon', 'University of Toronto',
+                'University of Waterloo', 'McGill University', 'UBC',
+                'Cornell University', 'Princeton University', 'Yale University'
+            ]
+
+            degrees = [
+                ('Bachelor of Science', 'Computer Science'),
+                ('Bachelor of Science', 'Software Engineering'),
+                ('Bachelor of Arts', 'Business Administration'),
+                ('Master of Science', 'Data Science'),
+                ('Master of Business Administration', 'MBA'),
+                ('Bachelor of Engineering', 'Electrical Engineering'),
+                ('Master of Science', 'Computer Science'),
+                ('Bachelor of Science', 'Information Systems'),
+                ('PhD', 'Computer Science'),
+                ('Bachelor of Arts', 'Design'),
+            ]
+
+            for i, (key, user) in enumerate(list(users.items())[:12]):
+                try:
+                    degree_type, field_of_study = random.choice(degrees)
+                    graduation_year = random.randint(2005, 2022)
+
+                    edu_verification = self._safe_create(
+                        f"EducationVerification for {key}",
+                        EducationVerification.objects.create,
+                        user=user,
+                        institution_name=random.choice(universities),
+                        degree_type=degree_type,
+                        field_of_study=field_of_study,
+                        start_year=graduation_year - random.randint(2, 4),
+                        graduation_year=graduation_year,
+                        verification_status=random.choice(['verified', 'verified', 'verified', 'pending']),
+                        verified_by=random.choice(['automated', 'institution', 'third_party']),
+                        verified_at=timezone.now() - timedelta(days=random.randint(1, 180)),
+                        gpa=round(random.uniform(3.0, 4.0), 2) if random.random() > 0.3 else None,
+                        honors=random.choice([None, None, 'Cum Laude', 'Magna Cum Laude', 'Summa Cum Laude']),
+                    )
+                    if edu_verification:
+                        education_verifications += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create education verification: {e}")
+
+            self.stdout.write(f"   Education verifications: {education_verifications}")
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   EducationVerification model not available"))
+
+    def _create_analytics_data(self, tenant, users):
+        """Create analytics demo data."""
+        try:
+            from analytics.models import (
+                PageView, UserAction, DiversityMetric, RecruitmentMetric
+            )
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Analytics models not available, skipping"))
+            return
+
+        counts = {
+            'page_views': 0,
+            'user_actions': 0,
+            'diversity_metrics': 0,
+            'recruitment_metrics': 0,
+        }
+
+        # Create page view records (at least 10)
+        pages = [
+            '/dashboard/', '/jobs/', '/candidates/', '/applications/',
+            '/interviews/', '/offers/', '/employees/', '/services/',
+            '/messages/', '/settings/', '/reports/', '/analytics/'
+        ]
+
+        for i in range(20):  # Create 20 page views
+            try:
+                user = random.choice(list(users.values()))
+                page = random.choice(pages)
+
+                page_view = self._safe_create(
+                    f"PageView #{i+1}",
+                    PageView.objects.create,
+                    tenant=tenant,
+                    user=user if random.random() > 0.2 else None,  # 20% anonymous
+                    page_url=page,
+                    referrer=random.choice([None, '/dashboard/', 'https://google.com', 'https://linkedin.com']),
+                    session_id=str(uuid.uuid4()),
+                    ip_address=f'{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}',
+                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    viewed_at=timezone.now() - timedelta(days=random.randint(0, 30), hours=random.randint(0, 23)),
+                )
+                if page_view:
+                    counts['page_views'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create page view {i+1}: {e}")
+
+        # Create user action logs (at least 10)
+        action_types = [
+            ('job_posted', 'Job posting created'),
+            ('application_submitted', 'Application submitted'),
+            ('interview_scheduled', 'Interview scheduled'),
+            ('offer_extended', 'Offer extended'),
+            ('candidate_hired', 'Candidate hired'),
+            ('message_sent', 'Message sent'),
+            ('profile_updated', 'Profile updated'),
+            ('document_uploaded', 'Document uploaded'),
+            ('contract_signed', 'Contract signed'),
+            ('payment_made', 'Payment made'),
+            ('review_submitted', 'Review submitted'),
+            ('service_created', 'Service created'),
+        ]
+
+        for i in range(15):  # Create 15 user actions
+            try:
+                user = random.choice(list(users.values()))
+                action_type, description = random.choice(action_types)
+
+                user_action = self._safe_create(
+                    f"UserAction #{i+1}",
+                    UserAction.objects.create,
+                    tenant=tenant,
+                    user=user,
+                    action_type=action_type,
+                    description=description,
+                    metadata={
+                        'source': random.choice(['web', 'mobile', 'api']),
+                        'browser': random.choice(['Chrome', 'Firefox', 'Safari', 'Edge']),
+                    },
+                    created_at=timezone.now() - timedelta(days=random.randint(0, 30), hours=random.randint(0, 23)),
+                )
+                if user_action:
+                    counts['user_actions'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create user action {i+1}: {e}")
+
+        # Create diversity metrics snapshot
+        try:
+            diversity_metric = self._safe_create(
+                "DiversityMetric snapshot",
+                DiversityMetric.objects.create,
+                tenant=tenant,
+                metric_date=timezone.now().date(),
+                total_employees=25,
+                gender_distribution={
+                    'male': 12,
+                    'female': 10,
+                    'non_binary': 2,
+                    'prefer_not_to_say': 1,
+                },
+                ethnicity_distribution={
+                    'asian': 8,
+                    'black': 4,
+                    'hispanic': 5,
+                    'white': 6,
+                    'other': 2,
+                },
+                age_distribution={
+                    '18-25': 3,
+                    '26-35': 12,
+                    '36-45': 7,
+                    '46-55': 2,
+                    '56+': 1,
+                },
+                department_diversity={
+                    'Engineering': {'male': 8, 'female': 4},
+                    'Product': {'male': 2, 'female': 3},
+                    'Design': {'male': 1, 'female': 4},
+                    'Sales': {'male': 3, 'female': 2},
+                },
+            )
+            if diversity_metric:
+                counts['diversity_metrics'] += 1
+        except Exception as e:
+            if self.verbosity >= 2:
+                logger.debug(f"Failed to create diversity metric: {e}")
+
+        # Create recruitment metrics snapshot
+        try:
+            recruitment_metric = self._safe_create(
+                "RecruitmentMetric snapshot",
+                RecruitmentMetric.objects.create,
+                tenant=tenant,
+                metric_date=timezone.now().date(),
+                period_type='monthly',
+                total_job_postings=20,
+                total_applications=150,
+                total_interviews=20,
+                total_offers=10,
+                total_hires=5,
+                average_time_to_hire=35,  # days
+                average_time_to_interview=10,  # days
+                application_to_interview_rate=Decimal('0.133'),  # 13.3%
+                interview_to_offer_rate=Decimal('0.50'),  # 50%
+                offer_acceptance_rate=Decimal('0.80'),  # 80%
+                source_breakdown={
+                    'career_site': 60,
+                    'linkedin': 45,
+                    'referral': 25,
+                    'indeed': 15,
+                    'other': 5,
+                },
+                funnel_data={
+                    'applications': 150,
+                    'screening': 50,
+                    'interviews': 20,
+                    'offers': 10,
+                    'hires': 5,
+                },
+            )
+            if recruitment_metric:
+                counts['recruitment_metrics'] += 1
+        except Exception as e:
+            if self.verbosity >= 2:
+                logger.debug(f"Failed to create recruitment metric: {e}")
+
+        # Log summary
+        self._log_section('Analytics Data Created', counts)
 
     def _create_messaging_data(self, users):
         """Create messaging/conversation demo data."""
