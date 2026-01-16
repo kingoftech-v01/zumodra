@@ -1,0 +1,177 @@
+{% extends 'base/dashboard_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "My Appointments" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>{% trans "My Appointments" %}</h2>
+            <p class="text-muted">{% trans "View and manage your appointments" %}</p>
+        </div>
+    </div>
+
+    {% if appointments %}
+    <!-- Appointments List -->
+    <div class="row g-4">
+        {% for appointment in appointments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="zu-card shadow-sm h-100">
+                <div class="zu-card__body">
+                    <!-- Service Info -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <div>
+                                <h5 class="mb-1">{{ appointment.appointment_request.service.name }}</h5>
+                                {% if appointment.appointment_request.service.description %}
+                                <p class="text-muted small mb-0">{{ appointment.appointment_request.service.description|truncatewords:15 }}</p>
+                                {% endif %}
+                            </div>
+                            {% if appointment.paid %}
+                            <span class="badge bg-success">{% trans "Paid" %}</span>
+                            {% else %}
+                            <span class="badge bg-warning">{% trans "Unpaid" %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Date & Time -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center text-muted small mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>{{ appointment.appointment_request.date|date:"l, F j, Y" }}</span>
+                        </div>
+                        <div class="d-flex align-items-center text-muted small">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>{{ appointment.appointment_request.start_time|time:"g:i A" }} - {{ appointment.appointment_request.end_time|time:"g:i A" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Staff Member -->
+                    {% if appointment.appointment_request.staff_member %}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center text-muted small">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>{% trans "With" %} {{ appointment.appointment_request.staff_member }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Price -->
+                    {% if appointment.amount_to_pay %}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-muted small">{% trans "Amount" %}:</span>
+                            <span class="fw-bold">${{ appointment.amount_to_pay }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{% url 'frontend:appointment_customer:appointment_detail' appointment.id %}"
+                           class="zu-btn zu-btn--outline zu-btn--sm flex-grow-1">
+                            {% trans "View Details" %}
+                        </a>
+                        {% if not appointment.paid %}
+                        <button type="button"
+                                class="zu-btn zu-btn--danger zu-btn--sm"
+                                onclick="confirmCancel({{ appointment.id }})">
+                            {% trans "Cancel" %}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="zu-card shadow-sm">
+        <div class="zu-card__body text-center py-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-muted mb-3">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <h4 class="mb-2">{% trans "No Appointments Yet" %}</h4>
+            <p class="text-muted mb-0">{% trans "You don't have any appointments scheduled." %}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% trans "Cancel Appointment" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Are you sure you want to cancel this appointment? This action cannot be undone." %}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="zu-btn zu-btn--outline" data-bs-dismiss="modal">{% trans "Keep Appointment" %}</button>
+                <button type="button" class="zu-btn zu-btn--danger" id="confirmCancelBtn">{% trans "Yes, Cancel" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let appointmentIdToCancel = null;
+
+function confirmCancel(appointmentId) {
+    appointmentIdToCancel = appointmentId;
+    new bootstrap.Modal(document.getElementById('cancelModal')).show();
+}
+
+document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+    if (appointmentIdToCancel) {
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value
+            || document.querySelector('meta[name="csrf-token"]')?.content;
+
+        fetch(`{% url 'frontend:appointment_customer:my_appointments' %}/cancel/${appointmentIdToCancel}/json/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || '{% trans "Failed to cancel appointment" %}');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans "An error occurred while canceling the appointment" %}');
+        });
+
+        bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
+    }
+});
+</script>
+{% endblock %}
