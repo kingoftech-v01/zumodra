@@ -55,7 +55,7 @@
                     </span>
                 </div>
             </div>
-            <button hx-post="{% url 'finance-frontend:connect-refresh-status' %}"
+            <button hx-post="{% url 'frontend:finance:connect-refresh-status' %}"
                     hx-swap="outerHTML"
                     hx-target="closest .bg-white"
                     class="inline-flex items-center px-3 py-2 border border-gray-300  rounded-md caption1 font-medium text-title  bg-white  hover:bg-gray-50 ">
@@ -110,7 +110,7 @@
                 </p>
                 <div class="mt-4">
                     <a href="#"
-                       hx-post="{% url 'finance-frontend:connect-onboarding' %}"
+                       hx-post="{% url 'frontend:finance:connect-onboarding' %}"
                        hx-vals='{"return_url": "{{ request.build_absolute_uri }}", "refresh_url": "{{ request.build_absolute_uri }}"}'
                        class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 font-medium caption1">
                         Continue Onboarding
@@ -129,7 +129,7 @@
             Access your Stripe Express dashboard to view your earnings, manage payouts, and update your account settings.
         </p>
         <a href="#"
-           hx-get="{% url 'finance-frontend:connect-dashboard-link' %}"
+           hx-get="{% url 'frontend:finance:connect-dashboard-link' %}"
            hx-swap="none"
            class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium caption1">
             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@
             <p class="text-secondary  mb-7.5">
                 Connect your bank account to start receiving payments for your services on the marketplace.
             </p>
-            <form hx-post="{% url 'finance-frontend:connect-create' %}"
+            <form hx-post="{% url 'frontend:finance:connect-create' %}"
                   hx-swap="innerHTML"
                   hx-target="body"
                   class="space-y-4">

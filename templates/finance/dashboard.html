@@ -26,7 +26,7 @@
 </div>
 <!-- Quick Stats -->
 <div id="finance-quick-stats"
-     hx-get="{% url 'finance-frontend:quick-stats' %}"
+     hx-get="{% url 'frontend:finance:quick-stats' %}"
      hx-trigger="load, every 60s"
      hx-swap="innerHTML">
     {% include "finance/partials/_quick_stats.html" %}
@@ -40,13 +40,13 @@
         <div class="p-8 rounded-lg bg-white">
             <div class="flex items-center justify-between mb-6 pb-6 border-b border-line">
                 <h4 class="heading5">{% trans "Recent Payments" %}</h4>
-                <a href="{% url 'finance-frontend:payment-history' %}"
+                <a href="{% url 'frontend:finance:payment-history' %}"
                    class="caption1 text-primary hover:underline">
                     {% trans "View all" %}
                 </a>
             </div>
             <div id="recent-payments"
-                 hx-get="{% url 'finance-frontend:recent-payments' %}"
+                 hx-get="{% url 'frontend:finance:recent-payments' %}"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 {% include "finance/partials/_recent_payments.html" %}
@@ -57,13 +57,13 @@
         <div class="p-8 rounded-lg bg-white">
             <div class="flex items-center justify-between mb-6 pb-6 border-b border-line">
                 <h4 class="heading5">{% trans "Pending Invoices" %}</h4>
-                <a href="{% url 'finance-frontend:invoices' %}"
+                <a href="{% url 'frontend:finance:invoices' %}"
                    class="caption1 text-primary hover:underline">
                     {% trans "View all" %}
                 </a>
             </div>
             <div id="pending-invoices"
-                 hx-get="{% url 'finance-frontend:pending-invoices' %}"
+                 hx-get="{% url 'frontend:finance:pending-invoices' %}"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 {% include "finance/partials/_pending_invoices.html" %}
@@ -97,7 +97,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{% url 'finance-frontend:subscription' %}"
+                <a href="{% url 'frontend:finance:subscription' %}"
                    class="button-main -border w-full">
                     {% trans "Manage Subscription" %}
                 </a>
@@ -105,7 +105,7 @@
             {% else %}
             <div class="text-center py-4">
                 <p class="caption1 text-secondary mb-4">{% trans "No active subscription" %}</p>
-                <a href="{% url 'finance-frontend:subscription' %}"
+                <a href="{% url 'frontend:finance:subscription' %}"
                    class="button-main">
                     {% trans "View Plans" %}
                 </a>
@@ -116,7 +116,7 @@
         <!-- Escrow Summary -->
         <div class="p-6 rounded-lg bg-white"
              id="escrow-summary"
-             hx-get="{% url 'finance-frontend:escrow-summary' %}"
+             hx-get="{% url 'frontend:finance:escrow-summary' %}"
              hx-trigger="load"
              hx-swap="innerHTML">
             {% include "finance/partials/_escrow_summary.html" %}
@@ -128,7 +128,7 @@
                 <h4 class="heading6">{% trans "Payment Methods" %}</h4>
                 <span class="caption1 text-secondary">{{ payment_methods_count }} {% trans "saved" %}</span>
             </div>
-            <a href="{% url 'finance-frontend:payment-methods' %}"
+            <a href="{% url 'frontend:finance:payment-methods' %}"
                class="button-main -border w-full">
                 {% trans "Manage Payment Methods" %}
             </a>
@@ -156,7 +156,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{% url 'finance-frontend:connected-account' %}"
+                <a href="{% url 'frontend:finance:connected-account' %}"
                    class="button-main -border w-full">
                     {% trans "Manage Seller Account" %}
                 </a>

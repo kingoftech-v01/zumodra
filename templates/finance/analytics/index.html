@@ -31,7 +31,7 @@
         <select id="period-selector"
                 class="rounded-md border-gray-300    shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 hx-trigger="change"
-                hx-get="{% url 'finance-frontend:chart-data' %}"
+                hx-get="{% url 'frontend:finance:chart-data' %}"
                 hx-include="[name='chart_type']"
                 hx-target="#chart-container">
             <option value="7d">Last 7 days</option>

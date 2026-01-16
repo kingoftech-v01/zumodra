@@ -6,9 +6,9 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
-    <a href="{% url 'finance-frontend:escrow-list' %}" class="text-secondary hover:text-primary caption1">{% trans "Escrow" %}</a>
+    <a href="{% url 'frontend:finance:escrow-list' %}" class="text-secondary hover:text-primary caption1">{% trans "Escrow" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">#{{ escrow.id|truncatechars:8 }}</span>
 </div>
@@ -138,7 +138,7 @@
             <h4 class="heading6 mb-4">{% trans "Actions" %}</h4>
             <div class="space-y-3">
                 {% if is_buyer and escrow.status == 'initialized' %}
-                <button hx-post="{% url 'finance-frontend:escrow-fund' pk=escrow.pk %}"
+                <button hx-post="{% url 'frontend:finance:escrow-fund' pk=escrow.pk %}"
                         hx-confirm="{% trans 'Fund this escrow with' %} ${{ escrow.amount }}?"
                         class="button-main w-full">
                     {% trans "Fund Escrow" %}
@@ -146,7 +146,7 @@
                 {% endif %}
 
                 {% if is_seller and escrow.status == 'funded' %}
-                <button hx-post="{% url 'finance-frontend:escrow-deliver' pk=escrow.pk %}"
+                <button hx-post="{% url 'frontend:finance:escrow-deliver' pk=escrow.pk %}"
                         hx-confirm="{% trans 'Mark service as delivered?' %}"
                         class="button-main w-full">
                     {% trans "Mark as Delivered" %}
@@ -154,7 +154,7 @@
                 {% endif %}
 
                 {% if is_buyer and escrow.status == 'service_delivered' %}
-                <button hx-post="{% url 'finance-frontend:escrow-release' pk=escrow.pk %}"
+                <button hx-post="{% url 'frontend:finance:escrow-release' pk=escrow.pk %}"
                         hx-confirm="{% trans 'Release funds to seller? This action cannot be undone.' %}"
                         class="button-main w-full bg-green">
                     {% trans "Release Funds" %}
@@ -162,7 +162,7 @@
                 {% endif %}
 
                 {% if escrow.status in 'funded,service_delivered' %}
-                <button hx-get="{% url 'finance-frontend:escrow-dispute-form' pk=escrow.pk %}"
+                <button hx-get="{% url 'frontend:finance:escrow-dispute-form' pk=escrow.pk %}"
                         hx-target="#modal-container"
                         hx-swap="innerHTML"
                         class="button-main -border w-full border-red text-red">
@@ -171,7 +171,7 @@
                 {% endif %}
 
                 {% if is_buyer and escrow.status == 'initialized' %}
-                <button hx-post="{% url 'finance-frontend:escrow-cancel' pk=escrow.pk %}"
+                <button hx-post="{% url 'frontend:finance:escrow-cancel' pk=escrow.pk %}"
                         hx-confirm="{% trans 'Cancel this escrow?' %}"
                         class="button-main -border w-full">
                     {% trans "Cancel Escrow" %}

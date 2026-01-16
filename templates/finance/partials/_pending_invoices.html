@@ -3,7 +3,7 @@
 <div class="divide-y divide-gray-200 dark:divide-gray-700">
     {% for invoice in pending_invoices %}
     <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-         hx-get="{% url 'finance-frontend:invoice-detail-modal' invoice_number=invoice.invoice_number %}"
+         hx-get="{% url 'frontend:finance:invoice-detail-modal' invoice_number=invoice.invoice_number %}"
          hx-target="#modal-container"
          hx-swap="innerHTML">
         <div class="flex items-center justify-between">

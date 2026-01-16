@@ -60,7 +60,7 @@ urlpatterns = [
     # ==========================================================================
     # Dashboard (redirects to frontend finance dashboard)
     # ==========================================================================
-    path('', RedirectView.as_view(pattern_name='frontend:finance-frontend:dashboard', permanent=False), name='dashboard'),
+    path('', RedirectView.as_view(pattern_name='frontend:finance:dashboard', permanent=False), name='dashboard'),
 
     # ==========================================================================
     # Payment Transaction URLs

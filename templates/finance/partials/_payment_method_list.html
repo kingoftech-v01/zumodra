@@ -46,14 +46,14 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     {% if not method.is_default %}
-                    <button hx-post="{% url 'finance-frontend:payment-method-default' pk=method.pk %}"
+                    <button hx-post="{% url 'frontend:finance:payment-method-default' pk=method.pk %}"
                             hx-target="#payment-methods-list"
                             hx-swap="innerHTML"
                             class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
                         Set Default
                     </button>
                     {% endif %}
-                    <button hx-delete="{% url 'finance-frontend:payment-method-delete' pk=method.pk %}"
+                    <button hx-delete="{% url 'frontend:finance:payment-method-delete' pk=method.pk %}"
                             hx-confirm="Remove this payment method?"
                             hx-target="#payment-methods-list"
                             hx-swap="innerHTML"
@@ -73,7 +73,7 @@
         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No payment methods</h3>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a payment method to make purchases.</p>
         <div class="mt-6">
-            <button hx-get="{% url 'finance-frontend:payment-method-form' %}"
+            <button hx-get="{% url 'frontend:finance:payment-method-form' %}"
                     hx-target="#modal-container"
                     hx-swap="innerHTML"
                     class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium text-sm">

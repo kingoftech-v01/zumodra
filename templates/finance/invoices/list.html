@@ -6,7 +6,7 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Invoices" %}</span>
 </div>
@@ -50,7 +50,7 @@
 
 <!-- Filters -->
 <div class="p-6 rounded-lg bg-white mb-7.5">
-    <form id="invoice-filters" hx-get="{% url 'finance-frontend:invoice-list-partial' %}" hx-target="#invoice-list" hx-trigger="change, submit" hx-push-url="true">
+    <form id="invoice-filters" hx-get="{% url 'frontend:finance:invoice-list-partial' %}" hx-target="#invoice-list" hx-trigger="change, submit" hx-push-url="true">
         <div class="flex flex-wrap gap-4 items-end">
             <div>
                 <label for="paid" class="block caption1 text-title mb-2">{% trans "Status" %}</label>
@@ -80,7 +80,7 @@
 
 <!-- Invoice List -->
 <div id="invoice-list"
-     hx-get="{% url 'finance-frontend:invoice-list-partial' %}"
+     hx-get="{% url 'frontend:finance:invoice-list-partial' %}"
      hx-trigger="load"
      hx-swap="innerHTML">
     <div class="flex justify-center py-12">

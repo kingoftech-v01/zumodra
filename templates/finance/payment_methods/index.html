@@ -6,7 +6,7 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Payment Methods" %}</span>
 </div>
@@ -17,7 +17,7 @@
         <h3 class="heading3">{% trans "Payment Methods" %}</h3>
         <p class="caption1 text-secondary mt-1">{% trans "Manage your saved payment methods" %}</p>
     </div>
-    <button hx-get="{% url 'finance-frontend:payment-method-form' %}"
+    <button hx-get="{% url 'frontend:finance:payment-method-form' %}"
             hx-target="#modal-container"
             hx-swap="innerHTML"
             class="button-main flex items-center gap-2">
@@ -45,7 +45,7 @@
 
 <!-- Payment Methods List -->
 <div id="payment-methods-list"
-     hx-get="{% url 'finance-frontend:payment-method-list' %}"
+     hx-get="{% url 'frontend:finance:payment-method-list' %}"
      hx-trigger="load"
      hx-swap="innerHTML">
     {% include "finance/partials/_payment_method_list.html" %}

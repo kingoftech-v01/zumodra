@@ -3,7 +3,7 @@
 <div class="divide-y divide-gray-200 dark:divide-gray-700">
     {% for payment in recent_payments %}
     <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-         hx-get="{% url 'finance-frontend:payment-detail' pk=payment.pk %}"
+         hx-get="{% url 'frontend:finance:payment-detail' pk=payment.pk %}"
          hx-target="#modal-container"
          hx-swap="innerHTML">
         <div class="flex items-center justify-between">

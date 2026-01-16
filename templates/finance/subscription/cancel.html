@@ -6,9 +6,9 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
-    <a href="{% url 'finance-frontend:subscription' %}" class="text-secondary hover:text-primary caption1">{% trans "Subscription" %}</a>
+    <a href="{% url 'frontend:finance:subscription' %}" class="text-secondary hover:text-primary caption1">{% trans "Subscription" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Cancel" %}</span>
 </div>
@@ -73,7 +73,7 @@
 
     <!-- Cancel Form -->
     <div class="p-8 rounded-lg bg-white">
-        <form hx-post="{% url 'finance-frontend:subscription-cancel-confirm' %}"
+        <form hx-post="{% url 'frontend:finance:subscription-cancel-confirm' %}"
               hx-swap="outerHTML"
               class="space-y-6">
             {% csrf_token %}
@@ -105,7 +105,7 @@
             </div>
 
             <div class="flex justify-between items-center pt-4 border-t border-line">
-                <a href="{% url 'finance-frontend:subscription' %}"
+                <a href="{% url 'frontend:finance:subscription' %}"
                    class="caption1 text-primary hover:underline">
                     {% trans "Keep My Subscription" %}
                 </a>

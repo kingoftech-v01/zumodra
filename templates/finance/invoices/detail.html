@@ -6,9 +6,9 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
-    <a href="{% url 'finance-frontend:invoices' %}" class="text-secondary hover:text-primary caption1">{% trans "Invoices" %}</a>
+    <a href="{% url 'frontend:finance:invoices' %}" class="text-secondary hover:text-primary caption1">{% trans "Invoices" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{{ invoice.invoice_number }}</span>
 </div>
@@ -84,7 +84,7 @@
         <h4 class="heading5 mb-4">{% trans "Pay Invoice" %}</h4>
 
         {% if payment_methods %}
-        <form hx-post="{% url 'finance-frontend:invoice-pay' invoice_number=invoice.invoice_number %}"
+        <form hx-post="{% url 'frontend:finance:invoice-pay' invoice_number=invoice.invoice_number %}"
               hx-swap="outerHTML"
               class="space-y-4">
             {% csrf_token %}
@@ -107,7 +107,7 @@
         {% else %}
         <div class="text-center py-4">
             <p class="caption1 text-secondary mb-4">{% trans "No payment methods on file" %}</p>
-            <a href="{% url 'finance-frontend:payment-methods' %}" class="button-main">
+            <a href="{% url 'frontend:finance:payment-methods' %}" class="button-main">
                 {% trans "Add Payment Method" %}
             </a>
         </div>
@@ -130,12 +130,12 @@
 
     <!-- Actions -->
     <div class="flex justify-between items-center">
-        <a href="{% url 'finance-frontend:invoices' %}"
+        <a href="{% url 'frontend:finance:invoices' %}"
            class="caption1 text-secondary hover:text-title flex items-center gap-2">
             <span class="ph ph-arrow-left"></span>
             {% trans "Back to Invoices" %}
         </a>
-        <a href="{% url 'finance-frontend:invoice-download' invoice_number=invoice.invoice_number %}"
+        <a href="{% url 'frontend:finance:invoice-download' invoice_number=invoice.invoice_number %}"
            class="button-main -border flex items-center gap-2">
             <span class="ph ph-download-simple"></span>
             {% trans "Download PDF" %}

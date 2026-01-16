@@ -6,7 +6,7 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Escrow" %}</span>
 </div>
@@ -50,7 +50,7 @@
 
 <!-- Filters -->
 <div class="p-6 rounded-lg bg-white mb-7.5">
-    <form id="escrow-filters" hx-get="{% url 'finance-frontend:escrow-list-partial' %}" hx-target="#escrow-list" hx-trigger="change, submit" hx-push-url="true">
+    <form id="escrow-filters" hx-get="{% url 'frontend:finance:escrow-list-partial' %}" hx-target="#escrow-list" hx-trigger="change, submit" hx-push-url="true">
         <div class="flex flex-wrap gap-4 items-end">
             <div>
                 <label for="role" class="block caption1 text-title mb-2">{% trans "Role" %}</label>
@@ -82,7 +82,7 @@
 
 <!-- Escrow List -->
 <div id="escrow-list"
-     hx-get="{% url 'finance-frontend:escrow-list-partial' %}"
+     hx-get="{% url 'frontend:finance:escrow-list-partial' %}"
      hx-trigger="load"
      hx-swap="innerHTML">
     <div class="flex justify-center py-12">

@@ -6,7 +6,7 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Success" %}</span>
 </div>
@@ -46,7 +46,7 @@
            class="button-main w-full sm:w-auto">
             {% trans "Go to Dashboard" %}
         </a>
-        <a href="{% url 'finance-frontend:subscription' %}"
+        <a href="{% url 'frontend:finance:subscription' %}"
            class="button-main -border w-full sm:w-auto">
             {% trans "Manage Subscription" %}
         </a>

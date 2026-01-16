@@ -6,7 +6,7 @@
 {% block dashboard_content %}
 <!-- Breadcrumb -->
 <div class="breadcrumb flex items-center gap-2 mb-6">
-    <a href="{% url 'finance-frontend:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
+    <a href="{% url 'frontend:finance:dashboard' %}" class="text-secondary hover:text-primary caption1">{% trans "Finance" %}</a>
     <span class="ph ph-caret-right text-secondary"></span>
     <span class="text-title caption1">{% trans "Subscription" %}</span>
 </div>
@@ -68,12 +68,12 @@
 
     <div class="mt-6 flex justify-end space-x-3">
         {% if subscription.status == 'active' %}
-        <a href="{% url 'finance-frontend:subscription-cancel' %}"
+        <a href="{% url 'frontend:finance:subscription-cancel' %}"
            class="button-main -border border-red text-red">
             {% trans "Cancel Subscription" %}
         </a>
         {% elif subscription.status == 'canceling' %}
-        <button hx-post="{% url 'finance-frontend:subscription-reactivate' %}"
+        <button hx-post="{% url 'frontend:finance:subscription-reactivate' %}"
                 class="button-main">
             {% trans "Reactivate Subscription" %}
         </button>
@@ -120,14 +120,14 @@
                     {% trans "Current Plan" %}
                 </button>
                 {% elif subscription %}
-                <button hx-post="{% url 'finance-frontend:subscription-upgrade' %}"
+                <button hx-post="{% url 'frontend:finance:subscription-upgrade' %}"
                         hx-vals='{"new_plan_id": "{{ plan.id }}"}'
                         hx-confirm="{% trans 'Change to' %} {{ plan.name }} {% trans 'plan?' %}"
                         class="button-main w-full">
                     {% if plan.price > subscription.plan.price %}{% trans "Upgrade" %}{% else %}{% trans "Switch" %}{% endif %} {% trans "to" %} {{ plan.name }}
                 </button>
                 {% else %}
-                <a href="{% url 'finance-frontend:subscription-checkout' plan_id=plan.id %}"
+                <a href="{% url 'frontend:finance:subscription-checkout' plan_id=plan.id %}"
                    class="button-main w-full">
                     {% trans "Get Started" %}
                 </a>
