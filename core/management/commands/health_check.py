@@ -64,6 +64,7 @@ class Command(BaseCommand):
             results['checks']['celery'] = self._check_celery(timeout)
             results['checks']['storage'] = self._check_storage()
             results['checks']['external_services'] = self._check_external_services(timeout)
+            results['checks']['tenant_migrations'] = self._check_tenant_migrations()
 
         # Determine overall status
         failed_checks = [
@@ -177,6 +178,55 @@ class Command(BaseCommand):
         except Exception as e:
             result['status'] = 'unhealthy'
             result['message'] = f'Migration check error: {str(e)}'
+
+        return result
+
+    def _check_tenant_migrations(self):
+        """Check for pending migrations in all tenant schemas."""
+        result = {'status': 'healthy', 'message': '', 'details': {}}
+
+        try:
+            from django_tenants.utils import get_tenant_model, schema_context
+            from django.db.migrations.executor import MigrationExecutor
+
+            Tenant = get_tenant_model()
+            tenants = Tenant.objects.exclude(schema_name='public')
+
+            if not tenants.exists():
+                result['message'] = 'No tenant schemas to check'
+                return result
+
+            tenants_with_issues = []
+            for tenant in tenants:
+                try:
+                    with schema_context(tenant.schema_name):
+                        executor = MigrationExecutor(connection)
+                        targets = executor.loader.graph.leaf_nodes()
+                        pending = executor.migration_plan(targets)
+
+                        if pending:
+                            tenants_with_issues.append({
+                                'schema': tenant.schema_name,
+                                'pending_count': len(pending),
+                                'migrations': [str(m) for m in pending[:3]]
+                            })
+                except Exception as e:
+                    tenants_with_issues.append({
+                        'schema': tenant.schema_name,
+                        'error': str(e)
+                    })
+
+            if tenants_with_issues:
+                result['status'] = 'warning'
+                result['message'] = f"{len(tenants_with_issues)} tenant(s) have pending migrations or errors"
+                result['details']['tenants_with_issues'] = tenants_with_issues
+            else:
+                result['message'] = f"All {tenants.count()} tenant(s) have complete migrations"
+                result['details']['total_tenants'] = tenants.count()
+
+        except Exception as e:
+            result['status'] = 'unhealthy'
+            result['message'] = f'Tenant migration check error: {str(e)}'
 
         return result
 

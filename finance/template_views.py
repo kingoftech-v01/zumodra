@@ -18,6 +18,7 @@ from decimal import Decimal
 from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import OperationalError, ProgrammingError
 from django.db.models import Sum, Count, Q, Avg
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -66,62 +67,105 @@ class FinanceDashboardView(LoginRequiredMixin, TenantViewMixin, TemplateView):
         now = timezone.now()
         month_ago = now - timedelta(days=30)
 
-        # Payment statistics
-        payments = PaymentTransaction.objects.filter(user=user)
-        context['total_spent'] = payments.filter(succeeded=True).aggregate(
-            total=Sum('amount')
-        )['total'] or Decimal('0.00')
-        context['total_spent_month'] = payments.filter(
-            succeeded=True,
-            created_at__gte=month_ago
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-        context['payment_count'] = payments.filter(succeeded=True).count()
+        # Initialize defaults
+        context['migration_error'] = False
 
-        # Invoice statistics
-        invoices = Invoice.objects.filter(user=user)
-        context['outstanding_invoices'] = invoices.filter(paid=False).count()
-        context['outstanding_amount'] = invoices.filter(paid=False).aggregate(
-            total=Sum('amount_due')
-        )['total'] or Decimal('0.00')
+        # Payment statistics with database error handling
+        try:
+            payments = PaymentTransaction.objects.filter(user=user)
+            context['total_spent'] = payments.filter(succeeded=True).aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+            context['total_spent_month'] = payments.filter(
+                succeeded=True,
+                created_at__gte=month_ago
+            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+            context['payment_count'] = payments.filter(succeeded=True).count()
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - PaymentTransaction: {e}")
+            context['total_spent'] = Decimal('0.00')
+            context['total_spent_month'] = Decimal('0.00')
+            context['payment_count'] = 0
+            context['migration_error'] = True
 
-        # Subscription status
+        # Invoice statistics with database error handling
+        try:
+            invoices = Invoice.objects.filter(user=user)
+            context['outstanding_invoices'] = invoices.filter(paid=False).count()
+            context['outstanding_amount'] = invoices.filter(paid=False).aggregate(
+                total=Sum('amount_due')
+            )['total'] or Decimal('0.00')
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - Invoice: {e}")
+            context['outstanding_invoices'] = 0
+            context['outstanding_amount'] = Decimal('0.00')
+            context['migration_error'] = True
+
+        # Subscription status with database error handling
         try:
             context['subscription'] = UserSubscription.objects.get(user=user)
         except UserSubscription.DoesNotExist:
             context['subscription'] = None
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - UserSubscription: {e}")
+            context['subscription'] = None
+            context['migration_error'] = True
 
-        # Escrow summary
-        escrow_as_buyer = EscrowTransaction.objects.filter(buyer=user)
-        escrow_as_seller = EscrowTransaction.objects.filter(seller=user)
+        # Escrow summary with database error handling
+        try:
+            escrow_as_buyer = EscrowTransaction.objects.filter(buyer=user)
+            escrow_as_seller = EscrowTransaction.objects.filter(seller=user)
 
-        context['escrow_pending_buyer'] = escrow_as_buyer.filter(
-            status__in=['initialized', 'funded', 'service_delivered']
-        ).count()
-        context['escrow_pending_seller'] = escrow_as_seller.filter(
-            status__in=['initialized', 'funded', 'service_delivered']
-        ).count()
-        context['escrow_pending_amount'] = escrow_as_buyer.filter(
-            status__in=['initialized', 'funded', 'service_delivered']
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+            context['escrow_pending_buyer'] = escrow_as_buyer.filter(
+                status__in=['initialized', 'funded', 'service_delivered']
+            ).count()
+            context['escrow_pending_seller'] = escrow_as_seller.filter(
+                status__in=['initialized', 'funded', 'service_delivered']
+            ).count()
+            context['escrow_pending_amount'] = escrow_as_buyer.filter(
+                status__in=['initialized', 'funded', 'service_delivered']
+            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - EscrowTransaction: {e}")
+            context['escrow_pending_buyer'] = 0
+            context['escrow_pending_seller'] = 0
+            context['escrow_pending_amount'] = Decimal('0.00')
+            context['migration_error'] = True
 
-        # Recent payments
-        context['recent_payments'] = payments.order_by('-created_at')[:5]
+        # Recent payments with database error handling
+        try:
+            context['recent_payments'] = PaymentTransaction.objects.filter(user=user).order_by('-created_at')[:5]
+        except (OperationalError, ProgrammingError):
+            context['recent_payments'] = []
 
-        # Pending invoices
-        context['pending_invoices'] = invoices.filter(
-            paid=False
-        ).order_by('due_date')[:5]
+        # Pending invoices with database error handling
+        try:
+            context['pending_invoices'] = Invoice.objects.filter(
+                user=user,
+                paid=False
+            ).order_by('due_date')[:5]
+        except (OperationalError, ProgrammingError):
+            context['pending_invoices'] = []
 
-        # Payment methods count
-        context['payment_methods_count'] = PaymentMethod.objects.filter(
-            user=user
-        ).count()
+        # Payment methods count with database error handling
+        try:
+            context['payment_methods_count'] = PaymentMethod.objects.filter(
+                user=user
+            ).count()
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - PaymentMethod: {e}")
+            context['payment_methods_count'] = 0
+            context['migration_error'] = True
 
-        # Connected account status
+        # Connected account status with database error handling
         try:
             context['connected_account'] = ConnectedAccount.objects.get(user=user)
         except ConnectedAccount.DoesNotExist:
             context['connected_account'] = None
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - ConnectedAccount: {e}")
+            context['connected_account'] = None
+            context['migration_error'] = True
 
         return context
 
@@ -337,14 +381,27 @@ class SubscriptionTemplateView(LoginRequiredMixin, TenantViewMixin, TemplateView
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # Current subscription
+        # Initialize migration error flag
+        context['migration_error'] = False
+
+        # Current subscription with database-level error handling
         try:
             context['subscription'] = UserSubscription.objects.get(user=user)
         except UserSubscription.DoesNotExist:
             context['subscription'] = None
+        except (OperationalError, ProgrammingError) as e:
+            # Database table doesn't exist - migrations not applied
+            logger.error(f"Finance tables not available for tenant - UserSubscription: {e}")
+            context['subscription'] = None
+            context['migration_error'] = True
 
-        # Available plans
-        context['plans'] = SubscriptionPlan.objects.all()
+        # Available plans with database error handling
+        try:
+            context['plans'] = SubscriptionPlan.objects.all()
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available for tenant - SubscriptionPlan: {e}")
+            context['plans'] = []
+            context['migration_error'] = True
 
         return context
 
@@ -355,13 +412,19 @@ class SubscriptionStatusPartialView(LoginRequiredMixin, TenantViewMixin, View):
     """
 
     def get(self, request):
+        migration_error = False
         try:
             subscription = UserSubscription.objects.get(user=request.user)
         except UserSubscription.DoesNotExist:
             subscription = None
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - SubscriptionStatusPartialView: {e}")
+            subscription = None
+            migration_error = True
 
         return render(request, 'finance/partials/_subscription_status.html', {
-            'subscription': subscription
+            'subscription': subscription,
+            'migration_error': migration_error
         })
 
 
@@ -371,16 +434,28 @@ class SubscriptionPlansPartialView(LoginRequiredMixin, TenantViewMixin, View):
     """
 
     def get(self, request):
-        plans = SubscriptionPlan.objects.all()
+        migration_error = False
+
+        try:
+            plans = SubscriptionPlan.objects.all()
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - SubscriptionPlansPartialView (plans): {e}")
+            plans = []
+            migration_error = True
 
         try:
             current_subscription = UserSubscription.objects.get(user=request.user)
         except UserSubscription.DoesNotExist:
             current_subscription = None
+        except (OperationalError, ProgrammingError) as e:
+            logger.error(f"Finance tables not available - SubscriptionPlansPartialView (subscription): {e}")
+            current_subscription = None
+            migration_error = True
 
         return render(request, 'finance/partials/_subscription_plans.html', {
             'plans': plans,
             'current_subscription': current_subscription,
+            'migration_error': migration_error,
         })
 
 

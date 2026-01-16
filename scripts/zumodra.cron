@@ -1,0 +1,28 @@
+# Zumodra automated monitoring cron jobs
+# Copy this file to /etc/cron.d/zumodra or add to user crontab
+#
+# For system crontab (/etc/cron.d/zumodra):
+#   sudo cp scripts/zumodra.cron /etc/cron.d/zumodra
+#   sudo systemctl restart cron
+#
+# For user crontab:
+#   crontab -e
+#   # Then paste the lines below (without the 'root' user specification)
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Migration monitoring every 15 minutes
+*/15 * * * * root /app/scripts/monitor_tenant_migrations.sh
+
+# Health check every 5 minutes
+*/5 * * * * root /app/scripts/health_check_cron.sh
+
+# Daily migration verification at 2 AM (failsafe)
+0 2 * * * root /app/scripts/fix_production_migrations.sh
+
+# Optional: Weekly log cleanup (Sundays at 3 AM)
+# 0 3 * * 0 root find /var/log/zumodra -name "*.log" -mtime +30 -delete
+
+# Optional: Weekly summary report (Mondays at 9 AM)
+# 0 9 * * 1 root /app/scripts/weekly_migration_report.sh
