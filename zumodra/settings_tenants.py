@@ -50,6 +50,29 @@ SHARED_APPS = [
 
     # Newsletter (shared for public pages footer)
     'newsletter',
+
+    # MULTI-TENANT CONFIGURATION (2026-01-16):
+    # Wagtail CMS apps are in SHARED_APPS (public schema only) because:
+    # - Only the system admin (public schema) publishes blog posts
+    # - Individual tenants do not need blog/CMS functionality
+    # - This prevents creating unnecessary Wagtail tables in every tenant schema
+    # - Reduces database bloat and improves tenant provisioning speed
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail_localize',
+    'wagtail_localize.locales',
+    'wagtail',
+
+    # Blog app (shared - only system admin publishes blog posts)
+    'blog',
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)
@@ -98,27 +121,15 @@ TENANT_APPS = [
     'django_q',
     'django_extensions',
 
-    # Wagtail CMS (tenant-scoped)
-    'wagtail.contrib.forms',
-    'wagtail.contrib.redirects',
-    'wagtail.embeds',
-    'wagtail.sites',
-    'wagtail.users',
-    'wagtail.snippets',
-    'wagtail.documents',
-    'wagtail.images',
-    'wagtail.search',
-    'wagtail.admin',
-    'wagtail_localize',
-    'wagtail_localize.locales',
-    'wagtail',
+    # REMOVED (2026-01-16): Wagtail CMS apps moved to SHARED_APPS (public schema only)
+    # Tenants do not need blog/CMS functionality - only system admin publishes blog posts
 
     # Real-time
     'channels',
 
     # Existing Zumodra apps (tenant-scoped)
     'main',
-    'blog',
+    # REMOVED (2026-01-16): 'blog' moved to SHARED_APPS - tenants don't publish blog posts
     'finance',
     'messages_sys',
     'configurations',
@@ -195,6 +206,7 @@ MIDDLEWARE = [
     'auditlog.middleware.AuditlogMiddleware',
     'csp.middleware.CSPMiddleware',
     'axes.middleware.AxesMiddleware',
+    # Wagtail middleware: Only affects public schema (admin blog) - safe for tenant requests
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 
     'tenants.middleware.TenantUsageMiddleware',  # Usage tracking

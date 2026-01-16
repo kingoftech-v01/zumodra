@@ -263,9 +263,69 @@ def auth_test_view(request):
     return HttpResponse("Not authenticated", status=401)
 
 
-def js_dir_view(request, file_name):
-    """Serve JavaScript files from the static/js directory."""
-    file_path = os.path.join(settings.STATIC_ROOT, 'js', file_name)
-    if os.path.exists(file_path):
-        return FileResponse(open(file_path, 'rb'), content_type='application/javascript')
-    raise Http404(f"JavaScript file '{file_name}' not found")
+# SECURITY FIX (2026-01-16): Removed js_dir_view function
+# This function was a CRITICAL security vulnerability (path traversal attack risk)
+# using open(file_path, 'rb') with user-controlled file_name parameter.
+# Django's native static file serving (collectstatic + WhiteNoise/nginx) should be used instead.
+# DO NOT re-implement custom file serving - use Django's built-in staticfiles app.
+
+
+# =============================================================================
+# REDIRECT VIEWS FOR OLD URLS
+# =============================================================================
+# These views redirect old URLs to new locations to maintain backwards compatibility
+# and prevent 404/500 errors for users with bookmarked old URLs.
+# =============================================================================
+
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
+def redirect_login(request):
+    """Redirect /login/ to /accounts/login/ for backwards compatibility."""
+    return redirect('account_login', permanent=True)
+
+
+def redirect_signup(request):
+    """Redirect /signup/ to /accounts/signup/ for backwards compatibility."""
+    return redirect('account_signup', permanent=True)
+
+
+def redirect_dashboard(request):
+    """Redirect /dashboard/ to /app/dashboard/ for backwards compatibility."""
+    return redirect('frontend:dashboard:index', permanent=True)
+
+
+def redirect_ats_applications(request):
+    """Redirect /ats/applications/ to /app/ats/pipeline/ (applications are in pipeline board)."""
+    return redirect('frontend:ats:pipeline_board', permanent=True)
+
+
+def redirect_ats_pipeline(request):
+    """Redirect /ats/pipeline/ to /app/ats/pipeline/ for backwards compatibility."""
+    return redirect('frontend:ats:pipeline_board', permanent=True)
+
+
+def redirect_hr_timeoff(request):
+    """Redirect /hr/time-off/ to /app/hr/time-off/ for backwards compatibility."""
+    return redirect('frontend:hr:time-off-calendar', permanent=True)
+
+
+def redirect_profile(request):
+    """Redirect various profile URLs to /app/profile/ for backwards compatibility."""
+    return redirect('frontend:dashboard:profile', permanent=True)
+
+
+def redirect_find_work(request):
+    """Redirect /find-work/ to /services/ (services marketplace for finding work)."""
+    return redirect('services:service_list', permanent=True)
+
+
+def redirect_find_talent(request):
+    """Redirect /find-talent/ to /services/providers/ (browse freelancers/providers)."""
+    return redirect('services:browse_providers', permanent=True)
+
+
+def redirect_marketplace(request):
+    """Redirect /marketplace/ to /services/ (services marketplace)."""
+    return redirect('services:service_list', permanent=True)

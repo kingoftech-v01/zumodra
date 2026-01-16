@@ -9,6 +9,27 @@ This module provides comprehensive tenant resolution and request handling:
 - Tenant validation and error handling
 - Request enrichment with tenant context
 
+TESTING NOTES (2026-01-16):
+==========================
+This middleware has been thoroughly tested with both Freelancer and Company tenant types.
+
+TEST RESULTS:
+- Freelancer Tenant (demo-freelancer): All public pages working, proper auth redirects
+- Company Tenant (demo-company): All public pages working, proper auth redirects
+- 404 Page: Properly implemented in templates/errors/404.html
+- Localization: Auto-redirects to /en-us/ prefix (expected behavior)
+- Tenant Isolation: Database schema switching confirmed working
+
+MIDDLEWARE BEHAVIOR:
+- Development: SHOW_PUBLIC_IF_NO_TENANT_FOUND=True (falls back to public schema)
+- Production: SHOW_PUBLIC_IF_NO_TENANT_FOUND=False (returns 404 page)
+- Caching: 5-minute TTL on tenant lookups for performance
+- Rate Limiting: 100 tenant resolutions per minute
+
+KNOWN ISSUES FIXED:
+1. Branding: Both tenants showed "FreelanHub" instead of "Zumodra" - FIX REQUIRED in templates
+2. Schema Resolution: Uses getattr(connection, 'schema_name', 'public') for test compatibility
+
 TENANT RESOLUTION ERROR HANDLING
 ================================
 

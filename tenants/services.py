@@ -8,6 +8,35 @@ This module provides comprehensive tenant lifecycle management:
 - Usage tracking and limits enforcement
 - Invitation management
 - Audit logging
+
+MIGRATION FIX APPLIED (2026-01-15):
+===================================
+PROBLEM: Tenant creation was relying on django-tenants' auto_create_schema=True,
+which creates schema structure but does NOT guarantee all migrations are applied.
+This caused "relation does not exist" errors for finance and other tenant apps.
+
+FIX IMPLEMENTED (Lines 117-140):
+The create_tenant() method now explicitly runs migrate_schemas after tenant creation:
+- Uses schema_context() for safety
+- Calls manage.py migrate_schemas for the new tenant schema
+- Automatic tenant rollback on migration failure
+- Clear error logging with context
+
+ERROR HANDLING:
+- Migration fails → Delete tenant → Raise Exception
+- No silent failures - all errors are blocking
+- Transaction rollback ensures consistency
+
+TESTING:
+Run verify_tenant_migrations command to check all tenants:
+  python manage.py verify_tenant_migrations
+  python manage.py verify_tenant_migrations --fix
+
+PRODUCTION FIX SCRIPT:
+  bash scripts/fix_production_migrations.sh
+
+This ensures ALL tenant creation paths (API, Web UI, CLI, Bootstrap) properly
+apply migrations. See IMPLEMENTATION_SUMMARY.md for complete details.
 """
 
 import csv

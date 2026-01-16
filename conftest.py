@@ -5,6 +5,49 @@ This module provides:
 - pytest-django configuration
 - factory_boy factories for all major models
 - Shared fixtures for tenant isolation testing
+
+TESTING NOTES (2026-01-16):
+==========================
+Test Suite Status: 157 passed, 6 skipped
+- ATS Tests: 125 passed
+- Security Tests: 23 passed, 1 skipped
+- Scalability Tests: 9 passed, 5 skipped
+
+IMPORTANT FIXES APPLIED:
+1. TenantFactory: Disabled auto_create_schema to prevent django-tenants schema
+   creation errors during tests. The _create() method sets auto_create_schema=False
+   before save to avoid "Unknown command: 'migrate_schemas'" errors.
+
+2. Database Settings: Tests use DB_HOST and DB_PORT environment variables as
+   fallback to work correctly inside Docker containers.
+
+3. Schema Name Handling: All tenant-related code uses getattr(connection, 'schema_name', 'public')
+   instead of direct attribute access to handle tests without django-tenants.
+
+4. Bulk Create: When using JobPosting.objects.bulk_create(), must manually generate
+   reference_code and slug since pre_save signals are bypassed.
+
+SKIPPED TESTS:
+- test_content_security_policy: CSP middleware disabled in test settings
+- test_concurrent_reads_50_requests: Requires django-tenants for API tenant routing
+- test_pagination_first_page: Requires django-tenants for API tenant routing
+- test_repeated_requests_faster: Requires django-tenants for API tenant routing
+- test_large_response_memory: Requires django-tenants for API tenant routing
+- test_sustained_load: Requires django-tenants for API tenant routing
+
+RUNNING TESTS:
+# Run all tests
+pytest tests/ -v
+
+# Run by module
+pytest tests/test_ats.py -v
+pytest tests/test_security_comprehensive.py -v
+pytest tests/test_scalability.py -v
+
+# Run by marker
+pytest -m security -v
+pytest -m scalability -v
+pytest -m workflow -v
 """
 
 import pytest

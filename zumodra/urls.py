@@ -29,7 +29,18 @@ from .views import (
     term_of_use_view,
     privacy_policy_view,
     auth_test_view,
-    js_dir_view,
+    # js_dir_view removed - security vulnerability (2026-01-16)
+    # Redirect views for old URLs
+    redirect_login,
+    redirect_signup,
+    redirect_dashboard,
+    redirect_ats_applications,
+    redirect_ats_pipeline,
+    redirect_hr_timeoff,
+    redirect_profile,
+    redirect_find_work,
+    redirect_find_talent,
+    redirect_marketplace,
 )
 
 # Wagtail imports
@@ -248,6 +259,20 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('allauth.urls')),                 # allauth URLs
     path('accounts/two-factor/', include('allauth.mfa.urls')),  # MFA URLs (built-in allauth 65.3.0+)
 
+    # Redirect old URLs to new locations (backwards compatibility)
+    # These redirect views prevent 404/500 errors for bookmarked old URLs
+    path('login/', redirect_login, name='redirect_login'),
+    path('signup/', redirect_signup, name='redirect_signup'),
+    path('dashboard/', redirect_dashboard, name='redirect_dashboard'),
+    path('ats/applications/', redirect_ats_applications, name='redirect_ats_applications'),
+    path('ats/pipeline/', redirect_ats_pipeline, name='redirect_ats_pipeline'),
+    path('hr/time-off/', redirect_hr_timeoff, name='redirect_hr_timeoff'),
+    path('profile/', redirect_profile, name='redirect_profile'),
+    path('accounts/profile/', redirect_profile, name='redirect_accounts_profile'),
+    path('find-work/', redirect_find_work, name='redirect_find_work'),
+    path('find-talent/', redirect_find_talent, name='redirect_find_talent'),
+    path('marketplace/', redirect_marketplace, name='redirect_marketplace'),
+
     # Frontend Template Views (HTMX-powered)
     # All frontend views including dashboard, appointments, messages are handled through core.urls_frontend
     path('app/', include('core.urls_frontend', namespace='frontend')),  # All frontend views with namespace
@@ -296,7 +321,8 @@ urlpatterns += i18n_patterns(
 
     # Development/testing
     path('auth-test/', auth_test_view, name='auth_test'),
-    path('static/js/dir/<str:file_name>', js_dir_view, name='js_dir'),
+    # SECURITY: js_dir URL pattern removed (2026-01-16) - path traversal vulnerability
+    # Use Django's native staticfiles serving instead (collectstatic + WhiteNoise/nginx)
 )
 
 # ==================== CRITICAL: Wagtail CMS Catch-All Routing ====================
