@@ -88,10 +88,13 @@ def dispatch_webhook_for_model(
             data=data,
             event_id=str(instance.pk) if instance.pk else None
         )
+    except ImportError as e:
+        # Expected during initial setup - tables might not exist yet
+        logger.debug(f"Skipping webhook dispatch during setup (ImportError): {e}")
     except Exception as e:
-        # During initial setup, tables might not exist yet - this is expected
-        # Log as warning instead of error to avoid false alarms
-        logger.warning(f"Failed to dispatch webhook {app_name}.{event_type} (expected during setup): {e}")
+        # Real errors should be logged as errors, not warnings
+        logger.error(f"Failed to dispatch webhook {app_name}.{event_type}: {e}", exc_info=True)
+        # Note: We still don't crash the signal to avoid blocking model saves
 
 
 # =============================================================================

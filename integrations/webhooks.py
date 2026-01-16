@@ -57,7 +57,8 @@ class WebhookValidator:
             True if signature is valid, False otherwise
         """
         if not self.secret_key:
-            return True  # No secret configured, skip validation
+            logger.error(f"No secret key configured for webhook endpoint {self.endpoint.id} - rejecting webhook")
+            return False  # Reject webhooks without signature verification capability
 
         # Try common signature header names
         signature_headers = [
@@ -292,29 +293,41 @@ class IncomingWebhookView(View):
         )
 
     def _extract_event_id(self, provider: str, request, payload: Dict) -> str:
-        """Extract event ID for deduplication."""
+        """Extract event ID for deduplication, with fallback to payload hash."""
+        event_id = ''
+
         if provider == 'slack':
-            return payload.get('event_id', '')
+            event_id = payload.get('event_id', '')
 
         elif provider == 'zoom':
-            return payload.get('payload', {}).get('object', {}).get('uuid', '')
+            event_id = payload.get('payload', {}).get('object', {}).get('uuid', '')
 
         elif provider == 'docusign':
-            return request.headers.get('X-DocuSign-Connect-Envelope-ID', '')
+            event_id = request.headers.get('X-DocuSign-Connect-Envelope-ID', '')
 
         elif provider == 'hellosign':
-            return payload.get('event', {}).get('event_hash', '')
+            event_id = payload.get('event', {}).get('event_hash', '')
 
         elif provider == 'stripe':
-            return payload.get('id', '')
+            event_id = payload.get('id', '')
 
-        # Default patterns
-        return (
-            payload.get('event_id') or
-            payload.get('id') or
-            payload.get('uuid') or
-            ''
-        )
+        else:
+            # Default patterns
+            event_id = (
+                payload.get('event_id') or
+                payload.get('id') or
+                payload.get('uuid') or
+                ''
+            )
+
+        # If no event_id found, generate deterministic hash of payload for deduplication
+        if not event_id:
+            payload_str = json.dumps(payload, sort_keys=True, default=str)
+            payload_hash = hashlib.sha256(payload_str.encode()).hexdigest()[:16]
+            event_id = f"hash_{payload_hash}"
+            logger.warning(f"No native event_id for {provider}, using payload hash: {event_id}")
+
+        return event_id
 
     def _extract_signature(self, provider: str, request, endpoint: WebhookEndpoint) -> str:
         """Extract signature from request headers."""
@@ -378,22 +391,41 @@ class IncomingWebhookView(View):
         elif provider == 'stripe':
             # Stripe signature verification
             import time
-            parts = dict(p.split('=', 1) for p in signature.split(','))
-            timestamp = parts.get('t', '')
-            sig_v1 = parts.get('v1', '')
+            try:
+                parts = dict(p.split('=', 1) for p in signature.split(','))
+                if 'v1' not in parts or 't' not in parts:
+                    logger.warning("Stripe signature missing required parts (t and/or v1)")
+                    return False
 
-            signed_payload = f"{timestamp}.{payload.decode()}"
-            expected = hmac.new(
-                secret.encode(),
-                signed_payload.encode(),
-                hashlib.sha256
-            ).hexdigest()
+                timestamp = parts.get('t', '')
+                sig_v1 = parts.get('v1', '')
 
-            # Also check timestamp is within tolerance
-            if abs(int(timestamp) - int(time.time())) > 300:
+                # Validate timestamp is valid integer
+                try:
+                    request_timestamp = int(timestamp)
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid Stripe timestamp: {timestamp}")
+                    return False
+
+                # Check timestamp is within 5 minute tolerance
+                current_time = int(time.time())
+                time_diff = abs(current_time - request_timestamp)
+                if time_diff > 300:
+                    logger.warning(f"Stripe webhook timestamp out of range: {time_diff} seconds old")
+                    return False
+
+                signed_payload = f"{timestamp}.{payload.decode()}"
+                expected = hmac.new(
+                    secret.encode(),
+                    signed_payload.encode(),
+                    hashlib.sha256
+                ).hexdigest()
+
+                return hmac.compare_digest(expected, sig_v1)
+
+            except (ValueError, AttributeError) as e:
+                logger.error(f"Stripe signature verification failed: {e}")
                 return False
-
-            return hmac.compare_digest(expected, sig_v1)
 
         elif provider == 'github':
             # GitHub signature (sha256)
@@ -408,8 +440,27 @@ class IncomingWebhookView(View):
 
         elif provider == 'hellosign':
             # HelloSign uses event_hash in payload for verification
-            # The secret is used to compute the hash
-            return True  # Simplified - implement full verification
+            event_hash = payload.get('event', {}).get('event_hash', '')
+            if not event_hash:
+                logger.warning("HelloSign webhook missing event_hash in payload")
+                return False
+
+            # HelloSign signs the event object as JSON string
+            event_data = payload.get('event', {})
+            # Reconstruct the signed payload as HelloSign creates it
+            import json
+            signed_payload = json.dumps(event_data, separators=(',', ':'), sort_keys=False)
+
+            expected = hmac.new(
+                secret.encode(),
+                signed_payload.encode(),
+                hashlib.sha256
+            ).hexdigest()
+
+            result = hmac.compare_digest(expected, event_hash)
+            if not result:
+                logger.warning(f"HelloSign signature verification failed. Expected: {expected[:16]}..., Got: {event_hash[:16]}...")
+            return result
 
         else:
             # Generic HMAC verification

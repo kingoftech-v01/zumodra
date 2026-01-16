@@ -338,7 +338,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/nginx-sites/zumodra.dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx-sites/zumodra.rhematek.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/app/static:ro
       - media_volume:/app/media:ro
     ports:
@@ -353,7 +353,7 @@ services:
           memory: 64M
     healthcheck:
       <<: *healthcheck-defaults
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health/"]
       interval: 15s
     depends_on:
       web:

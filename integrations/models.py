@@ -761,6 +761,7 @@ class WebhookDelivery(models.Model):
     event_id = models.CharField(
         max_length=255,
         blank=True,
+        db_index=True,
         help_text=_('External event ID for deduplication')
     )
 
@@ -822,6 +823,13 @@ class WebhookDelivery(models.Model):
             models.Index(fields=['endpoint', '-received_at']),
             models.Index(fields=['endpoint', 'status']),
             models.Index(fields=['event_id']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['endpoint', 'event_id'],
+                condition=~models.Q(event_id=''),
+                name='unique_webhook_delivery_per_endpoint'
+            ),
         ]
 
     def __str__(self):
