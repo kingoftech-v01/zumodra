@@ -24,6 +24,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
+# Import pagination classes
+from api.base import StandardPagination
+
 from .models import (
     Employee, TimeOffType, TimeOffRequest,
     OnboardingChecklist, OnboardingTask, EmployeeOnboarding,
@@ -149,6 +152,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         'user', 'department', 'manager', 'manager__user'
     ).prefetch_related('direct_reports')
     permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = EmployeeFilter
     search_fields = [
@@ -504,6 +508,7 @@ class TimeOffTypeViewSet(viewsets.ModelViewSet):
     queryset = TimeOffType.objects.all()
     serializer_class = TimeOffTypeSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'code']
     ordering_fields = ['name', 'code']
@@ -544,6 +549,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
     )
     serializer_class = TimeOffRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsEmployeeOrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = TimeOffRequestFilter
     ordering_fields = ['start_date', 'created_at', 'status']
@@ -729,6 +735,7 @@ class OnboardingChecklistViewSet(viewsets.ModelViewSet):
     queryset = OnboardingChecklist.objects.prefetch_related('tasks')
     serializer_class = OnboardingChecklistSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['is_active', 'employment_type', 'department']
     search_fields = ['name', 'description']
@@ -762,6 +769,7 @@ class OnboardingTaskViewSet(viewsets.ModelViewSet):
     queryset = OnboardingTask.objects.select_related('checklist', 'document_template')
     serializer_class = OnboardingTaskSerializer
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['checklist', 'category', 'is_required']
     ordering_fields = ['order', 'due_days']
@@ -783,6 +791,7 @@ class EmployeeOnboardingViewSet(viewsets.ModelViewSet):
     ).prefetch_related('task_progress', 'task_progress__task')
     serializer_class = EmployeeOnboardingSerializer
     permission_classes = [permissions.IsAuthenticated, IsEmployeeOrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['employee', 'checklist']
     ordering_fields = ['start_date', 'target_completion_date']
@@ -870,6 +879,7 @@ class DocumentTemplateViewSet(viewsets.ModelViewSet):
     queryset = DocumentTemplate.objects.all()
     serializer_class = DocumentTemplateSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category', 'is_active', 'requires_signature']
     search_fields = ['name', 'description']
@@ -954,6 +964,7 @@ class EmployeeDocumentViewSet(viewsets.ModelViewSet):
     )
     serializer_class = EmployeeDocumentSerializer
     permission_classes = [permissions.IsAuthenticated, IsEmployeeOrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = EmployeeDocumentFilter
     search_fields = ['title', 'description']
@@ -1091,6 +1102,7 @@ class OffboardingViewSet(viewsets.ModelViewSet):
     )
     serializer_class = OffboardingSerializer
     permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['separation_type', 'eligible_for_rehire']
     ordering_fields = ['last_working_day', 'created_at']
@@ -1192,6 +1204,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
     )
     serializer_class = PerformanceReviewSerializer
     permission_classes = [permissions.IsAuthenticated, IsEmployeeOrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = PerformanceReviewFilter
     ordering_fields = ['review_period_end', 'created_at', 'status']
@@ -1788,6 +1801,7 @@ class PerformanceImprovementPlanViewSet(viewsets.ModelViewSet):
         'employee', 'employee__user', 'initiated_by'
     ).prefetch_related('milestones', 'progress_notes')
     permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'outcome', 'employee']
     search_fields = ['employee__first_name', 'employee__last_name', 'reason']
@@ -2099,6 +2113,7 @@ class PIPMilestoneViewSet(viewsets.ModelViewSet):
     queryset = PIPMilestone.objects.select_related('pip', 'pip__employee')
     serializer_class = PIPMilestoneSerializer
     permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['pip', 'status']
     ordering_fields = ['due_date', 'created_at']
@@ -2163,6 +2178,7 @@ class PIPProgressNoteViewSet(viewsets.ModelViewSet):
     )
     serializer_class = PIPProgressNoteSerializer
     permission_classes = [permissions.IsAuthenticated, IsHROrManager]
+    pagination_class = StandardPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['pip', 'note_type']
     ordering_fields = ['created_at']
