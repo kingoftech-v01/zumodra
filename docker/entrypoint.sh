@@ -616,9 +616,12 @@ create_cache_table() {
 verify_django_setup() {
     log_info "Verifying Django configuration..."
 
+    # Temporarily disable exit-on-error to capture deployment check results
+    set +e
     # Capture both stdout and stderr from deployment checks
     check_output=$(python manage.py check --deploy 2>&1)
     check_exit_code=$?
+    set -e
 
     if [ $check_exit_code -eq 0 ]; then
         log_info "Django configuration verified!"
