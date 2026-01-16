@@ -39,19 +39,22 @@ class TenantUser(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='tenant_memberships'
+        related_name='tenant_memberships',
+        db_index=True  # Index for filtering by user
     )
     tenant = models.ForeignKey(
         'tenants.Tenant',
         on_delete=models.CASCADE,
-        related_name='members'
+        related_name='members',
+        db_index=True  # Index for filtering by tenant
     )
 
     # Role & Permissions
     role = models.CharField(
         max_length=20,
         choices=UserRole.choices,
-        default=UserRole.EMPLOYEE
+        default=UserRole.EMPLOYEE,
+        db_index=True  # Index for role-based queries
     )
     custom_permissions = models.ManyToManyField(
         Permission,
@@ -77,14 +80,21 @@ class TenantUser(models.Model):
     )
 
     # Status
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True,
+        db_index=True  # Index for filtering active/inactive users
+    )
     is_primary_tenant = models.BooleanField(
         default=False,
+        db_index=True,  # Index for finding primary tenant
         help_text=_('Is this the user\'s primary tenant?')
     )
 
     # Timestamps
-    joined_at = models.DateTimeField(auto_now_add=True)
+    joined_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting and filtering by join date
+    )
     last_active_at = models.DateTimeField(null=True, blank=True)
     deactivated_at = models.DateTimeField(null=True, blank=True)
 
@@ -221,13 +231,19 @@ class UserProfile(models.Model):
     notification_preferences = models.JSONField(default=dict, blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting and filtering by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     profile_completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = _('User Profile')
         verbose_name_plural = _('User Profiles')
+        indexes = [
+            models.Index(fields=['user']),  # Index for user lookups
+        ]
 
     def __str__(self):
         return f"Profile: {self.user.email}"
@@ -287,17 +303,20 @@ class KYCVerification(models.Model):
     # Verification Details
     verification_type = models.CharField(
         max_length=20,
-        choices=VerificationType.choices
+        choices=VerificationType.choices,
+        db_index=True  # Index for filtering by verification type
     )
     status = models.CharField(
         max_length=20,
         choices=VerificationStatus.choices,
-        default=VerificationStatus.PENDING
+        default=VerificationStatus.PENDING,
+        db_index=True  # Index for filtering by status (pending, verified, etc.)
     )
     level = models.CharField(
         max_length=20,
         choices=VerificationLevel.choices,
-        default=VerificationLevel.BASIC
+        default=VerificationLevel.BASIC,
+        db_index=True  # Index for filtering by verification level
     )
 
     # Provider Information
@@ -354,7 +373,10 @@ class KYCVerification(models.Model):
     notes = models.TextField(blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting and filtering by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
     verified_at = models.DateTimeField(null=True, blank=True)
@@ -367,6 +389,7 @@ class KYCVerification(models.Model):
         indexes = [
             models.Index(fields=['user', 'verification_type']),
             models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['user', 'status']),  # For filtering verifications by status
         ]
 
     def __str__(self):
@@ -459,7 +482,8 @@ class ProgressiveConsent(models.Model):
     status = models.CharField(
         max_length=20,
         choices=ConsentStatus.choices,
-        default=ConsentStatus.NOT_REQUESTED
+        default=ConsentStatus.NOT_REQUESTED,
+        db_index=True  # Index for filtering by consent status
     )
 
     # Context (e.g., job application)
@@ -468,7 +492,11 @@ class ProgressiveConsent(models.Model):
     purpose = models.TextField(blank=True, help_text=_('Purpose for data access'))
 
     # Timestamps
-    requested_at = models.DateTimeField(null=True, blank=True)
+    requested_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for sorting by request time
+    )
     responded_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     revoked_at = models.DateTimeField(null=True, blank=True)
@@ -482,6 +510,10 @@ class ProgressiveConsent(models.Model):
         verbose_name_plural = _('Progressive Consents')
         unique_together = ['grantor', 'grantee_user', 'grantee_tenant', 'data_category', 'context_type', 'context_id']
         ordering = ['-requested_at']
+        indexes = [
+            models.Index(fields=['grantor', 'status']),  # For filtering consents by grantor and status
+            models.Index(fields=['grantee_user', 'status']),  # For filtering consents by grantee and status
+        ]
 
     def __str__(self):
         grantee = self.grantee_user or self.grantee_tenant
@@ -589,16 +621,23 @@ class SecurityQuestion(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='security_questions'
+        related_name='security_questions',
+        db_index=True  # Index for filtering by user
     )
     question = models.CharField(max_length=255)
     answer_hash = models.CharField(max_length=255, help_text=_('Hashed answer'))
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     last_used_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = _('Security Question')
         verbose_name_plural = _('Security Questions')
+        indexes = [
+            models.Index(fields=['user', 'created_at']),  # For user's security questions by date
+        ]
 
     def __str__(self):
         return f"Security Q for {self.user.email}"
@@ -618,15 +657,25 @@ class LoginHistory(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='login_history'
+        related_name='login_history',
+        db_index=True  # Index for filtering by user
     )
-    result = models.CharField(max_length=20, choices=LoginResult.choices)
-    ip_address = models.GenericIPAddressField()
+    result = models.CharField(
+        max_length=20,
+        choices=LoginResult.choices,
+        db_index=True  # Index for filtering by login result
+    )
+    ip_address = models.GenericIPAddressField(
+        db_index=True  # Index for security monitoring and brute force detection
+    )
     user_agent = models.TextField(blank=True)
     location = models.JSONField(default=dict, blank=True)
     device_fingerprint = models.CharField(max_length=255, blank=True)
     failure_reason = models.CharField(max_length=100, blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting and filtering by login time
+    )
 
     class Meta:
         verbose_name = _('Login History')
@@ -735,8 +784,16 @@ class TrustScore(models.Model):
     )
 
     # Verification Flags
-    is_id_verified = models.BooleanField(default=False, help_text=_('Level 1: KYC verified'))
-    is_career_verified = models.BooleanField(default=False, help_text=_('Level 2: 80%+ career verified'))
+    is_id_verified = models.BooleanField(
+        default=False,
+        db_index=True,  # Index for filtering verified users
+        help_text=_('Level 1: KYC verified')
+    )
+    is_career_verified = models.BooleanField(
+        default=False,
+        db_index=True,  # Index for filtering career-verified users
+        help_text=_('Level 2: 80%+ career verified')
+    )
     verified_employment_count = models.PositiveIntegerField(default=0)
     verified_education_count = models.PositiveIntegerField(default=0)
     total_employment_count = models.PositiveIntegerField(default=0)
@@ -765,7 +822,10 @@ class TrustScore(models.Model):
     disputes_pending = models.PositiveIntegerField(default=0)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     last_calculated_at = models.DateTimeField(null=True, blank=True)
 
@@ -775,6 +835,7 @@ class TrustScore(models.Model):
         indexes = [
             models.Index(fields=['trust_level', 'overall_score']),
             models.Index(fields=['entity_type', 'trust_level']),
+            models.Index(fields=['is_id_verified', 'is_career_verified']),  # For filtering verified users
         ]
 
     def __str__(self):
@@ -954,11 +1015,17 @@ class EmploymentVerification(models.Model):
     status = models.CharField(
         max_length=20,
         choices=VerificationStatus.choices,
-        default=VerificationStatus.UNVERIFIED
+        default=VerificationStatus.UNVERIFIED,
+        db_index=True  # Index for filtering by verification status
     )
 
     # Verification Token (for email links)
-    verification_token = models.CharField(max_length=255, unique=True, blank=True)
+    verification_token = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        db_index=True  # Index for token lookups
+    )
     token_expires_at = models.DateTimeField(null=True, blank=True)
 
     # Verification Response
@@ -978,7 +1045,10 @@ class EmploymentVerification(models.Model):
     performance_rating = models.CharField(max_length=50, blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     request_sent_at = models.DateTimeField(null=True, blank=True)
     reminder_sent_at = models.DateTimeField(null=True, blank=True)
@@ -986,6 +1056,7 @@ class EmploymentVerification(models.Model):
     expires_at = models.DateTimeField(
         null=True,
         blank=True,
+        db_index=True,  # Index for finding expired verifications
         help_text=_('Verification expiry (typically 2 years)')
     )
 
@@ -996,6 +1067,7 @@ class EmploymentVerification(models.Model):
         indexes = [
             models.Index(fields=['user', 'status']),
             models.Index(fields=['verification_token']),
+            models.Index(fields=['status', 'created_at']),  # For filtering by status and date
         ]
 
     def __str__(self):
@@ -1124,11 +1196,17 @@ class EducationVerification(models.Model):
     status = models.CharField(
         max_length=20,
         choices=VerificationStatus.choices,
-        default=VerificationStatus.UNVERIFIED
+        default=VerificationStatus.UNVERIFIED,
+        db_index=True  # Index for filtering by verification status
     )
 
     # Verification Token
-    verification_token = models.CharField(max_length=255, unique=True, blank=True)
+    verification_token = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        db_index=True  # Index for token lookups
+    )
     token_expires_at = models.DateTimeField(null=True, blank=True)
 
     # Documents
@@ -1151,11 +1229,18 @@ class EducationVerification(models.Model):
     graduation_confirmed = models.BooleanField(null=True, blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     request_sent_at = models.DateTimeField(null=True, blank=True)
     verified_at = models.DateTimeField(null=True, blank=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for finding expired verifications
+    )
 
     class Meta:
         verbose_name = _('Education Verification')
@@ -1164,6 +1249,7 @@ class EducationVerification(models.Model):
         indexes = [
             models.Index(fields=['user', 'status']),
             models.Index(fields=['verification_token']),
+            models.Index(fields=['status', 'created_at']),  # For filtering by status and date
         ]
 
     def __str__(self):
@@ -1284,11 +1370,15 @@ class Review(models.Model):
     status = models.CharField(
         max_length=20,
         choices=ReviewStatus.choices,
-        default=ReviewStatus.PENDING
+        default=ReviewStatus.PENDING,
+        db_index=True  # Index for filtering by review status
     )
 
     # AI Analysis (for negative reviews)
-    is_negative = models.BooleanField(default=False)
+    is_negative = models.BooleanField(
+        default=False,
+        db_index=True  # Index for finding negative reviews
+    )
     ai_analysis = models.JSONField(
         default=dict,
         blank=True,
@@ -1323,7 +1413,10 @@ class Review(models.Model):
     )
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)
     disputed_at = models.DateTimeField(null=True, blank=True)
@@ -1337,6 +1430,7 @@ class Review(models.Model):
             models.Index(fields=['reviewee', 'status', '-created_at']),
             models.Index(fields=['reviewer', '-created_at']),
             models.Index(fields=['overall_rating', 'status']),
+            models.Index(fields=['is_negative', 'status']),  # For finding negative reviews pending review
         ]
         constraints = [
             models.UniqueConstraint(
@@ -1456,12 +1550,14 @@ class CandidateCV(models.Model):
     slug = models.SlugField(max_length=100)
     is_primary = models.BooleanField(
         default=False,
+        db_index=True,  # Index for finding primary CV
         help_text=_('Primary/default CV')
     )
     status = models.CharField(
         max_length=20,
         choices=CVStatus.choices,
-        default=CVStatus.DRAFT
+        default=CVStatus.DRAFT,
+        db_index=True  # Index for filtering by CV status
     )
 
     # Target
@@ -1569,7 +1665,10 @@ class CandidateCV(models.Model):
     )
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -1577,6 +1676,10 @@ class CandidateCV(models.Model):
         verbose_name_plural = _('Candidate CVs')
         ordering = ['-is_primary', '-updated_at']
         unique_together = ['user', 'slug']
+        indexes = [
+            models.Index(fields=['user', 'is_primary']),  # For finding user's primary CV
+            models.Index(fields=['user', 'status']),  # For filtering user's CVs by status
+        ]
 
     def __str__(self):
         return f"{self.user.email}: {self.name}"
@@ -1762,9 +1865,13 @@ class StudentProfile(models.Model):
     enrollment_status = models.CharField(
         max_length=20,
         choices=EnrollmentStatus.choices,
-        default=EnrollmentStatus.ACTIVE
+        default=EnrollmentStatus.ACTIVE,
+        db_index=True  # Index for filtering by enrollment status
     )
-    enrollment_verified = models.BooleanField(default=False)
+    enrollment_verified = models.BooleanField(
+        default=False,
+        db_index=True  # Index for finding verified students
+    )
     enrollment_verified_at = models.DateTimeField(null=True, blank=True)
 
     # Co-op Program Details
@@ -1821,12 +1928,19 @@ class StudentProfile(models.Model):
     coordinator_email = models.EmailField(blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _('Student Profile')
         verbose_name_plural = _('Student Profiles')
+        indexes = [
+            models.Index(fields=['enrollment_status']),  # For filtering students by enrollment status
+            models.Index(fields=['enrollment_verified']),  # For finding verified students
+        ]
 
     def __str__(self):
         return f"{self.user.email}: {self.program_name} at {self.institution_name}"
@@ -1872,7 +1986,8 @@ class CoopTerm(models.Model):
     status = models.CharField(
         max_length=20,
         choices=TermStatus.choices,
-        default=TermStatus.SEARCHING
+        default=TermStatus.SEARCHING,
+        db_index=True  # Index for filtering co-op terms by status
     )
 
     # Employer/Position
@@ -1926,7 +2041,10 @@ class CoopTerm(models.Model):
     school_notes = models.TextField(blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -1934,6 +2052,10 @@ class CoopTerm(models.Model):
         verbose_name_plural = _('Co-op Terms')
         ordering = ['student', 'term_number']
         unique_together = ['student', 'term_number']
+        indexes = [
+            models.Index(fields=['student', 'status']),  # For filtering student's terms by status
+            models.Index(fields=['status', 'start_date']),  # For finding active terms
+        ]
 
     def __str__(self):
         return f"{self.student.user.email}: Term {self.term_number} - {self.employer_name or 'Searching'}"

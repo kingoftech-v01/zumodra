@@ -11,9 +11,20 @@ import uuid
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    mfa_enabled = models.BooleanField(default=False)
-    anonymous_mode = models.BooleanField(default=False)
-    c_u_uuid = models.CharField(default=uuid.uuid4, editable=False, unique=True)
+    mfa_enabled = models.BooleanField(
+        default=False,
+        db_index=True  # Index for filtering users with MFA enabled
+    )
+    anonymous_mode = models.BooleanField(
+        default=False,
+        db_index=True  # Index for filtering anonymous users
+    )
+    c_u_uuid = models.CharField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True  # Index for fast user lookups by UUID
+    )
 
     # USER VERIFICATION (GLOBAL, NOT TENANT-SPECIFIC)
     cv_verified = models.BooleanField(
@@ -48,11 +59,17 @@ class PublicProfile(models.Model):
     Lives in PUBLIC schema (shared across all tenants).
     Used for portfolio, CV, skills, and public marketplace identity.
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True
+    )
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='public_profile'
+        related_name='public_profile',
+        db_index=True  # Index for user lookups
     )
 
     # Identity
@@ -133,6 +150,7 @@ class PublicProfile(models.Model):
     # Marketplace
     available_for_work = models.BooleanField(
         default=False,
+        db_index=True,  # Index for finding available freelancers
         help_text=_('Available for freelance work')
     )
     hourly_rate_min = models.DecimalField(
@@ -166,17 +184,24 @@ class PublicProfile(models.Model):
         max_length=20,
         choices=VISIBILITY_CHOICES,
         default=VISIBILITY_TENANTS_ONLY,
+        db_index=True,  # Index for filtering profiles by visibility
         help_text=_('Who can view this profile')
     )
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _('Public Profile')
         verbose_name_plural = _('Public Profiles')
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['available_for_work', 'profile_visibility']),  # For finding available public profiles
+        ]
 
     def __str__(self):
         return f"PublicProfile: {self.display_name} ({self.user.email})"
@@ -215,11 +240,17 @@ class ProfileFieldSync(models.Model):
     Per-user, per-tenant privacy controls for field-level synchronization.
     Lives in PUBLIC schema. Controls which PublicProfile fields sync to TenantProfile.
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True
+    )
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='profile_sync_settings'
+        related_name='profile_sync_settings',
+        db_index=True  # Index for user lookups
     )
     tenant_uuid = models.UUIDField(
         help_text=_('UUID of tenant (not FK to avoid cross-schema issues)'),
@@ -283,11 +314,15 @@ class ProfileFieldSync(models.Model):
     # Auto-sync disabled (manual only)
     auto_sync = models.BooleanField(
         default=False,
+        db_index=True,  # Index for finding profiles with auto-sync enabled
         help_text=_('Automatically sync when public profile changes (NOT recommended)')
     )
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True  # Index for sorting by creation date
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -295,6 +330,10 @@ class ProfileFieldSync(models.Model):
         verbose_name_plural = _('Profile Field Sync Settings')
         unique_together = ['user', 'tenant_uuid']
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'tenant_uuid']),  # For user's sync settings per tenant
+            models.Index(fields=['auto_sync']),  # For finding auto-sync enabled profiles
+        ]
 
     def __str__(self):
         return f"Sync settings: {self.user.email} → Tenant {self.tenant_uuid}"
