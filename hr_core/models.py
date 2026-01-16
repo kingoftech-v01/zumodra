@@ -566,7 +566,7 @@ class OnboardingTaskProgress(models.Model):
     onboarding = models.ForeignKey(
         EmployeeOnboarding,
         on_delete=models.CASCADE,
-        related_name=\'task_progress\',
+        related_name='task_progress',
         db_index=True  # Index for filtering task progress by onboarding
     )
     task = models.ForeignKey(
@@ -1637,7 +1637,7 @@ class EmployeeGoal(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _(\'Employee Goal\')
+        verbose_name = _('Employee Goal')
         verbose_name_plural = _('Employee Goals')
         ordering = ['-priority', 'target_date']
 
@@ -1692,7 +1692,7 @@ class PerformanceImprovementPlan(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name=\'pips\',
+        related_name='pips',
         db_index=True  # Index for filtering PIPs by employee
     )
     initiated_by = models.ForeignKey(
@@ -1783,7 +1783,7 @@ class PerformanceImprovementPlan(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _(\'Performance Improvement Plan\')
+        verbose_name = _('Performance Improvement Plan')
         verbose_name_plural = _('Performance Improvement Plans')
         ordering = ['-created_at']
 
@@ -1995,7 +1995,7 @@ class PIPProgressNote(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _(\'PIP Progress Note\')
+        verbose_name = _('PIP Progress Note')
         verbose_name_plural = _('PIP Progress Notes')
         ordering = ['-created_at']
 
