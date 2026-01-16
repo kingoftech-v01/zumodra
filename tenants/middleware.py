@@ -8,6 +8,50 @@ This module provides comprehensive tenant resolution and request handling:
 - Redis-based tenant caching for performance
 - Tenant validation and error handling
 - Request enrichment with tenant context
+
+TENANT RESOLUTION ERROR HANDLING
+================================
+
+When a request comes in, the middleware attempts to resolve which tenant it belongs to.
+Different scenarios are handled as follows:
+
+1. TENANT FOUND (Normal Case)
+   - Tenant is resolved via subdomain, custom domain, or API header
+   - Schema is switched to tenant's schema
+   - Tenant status is checked (suspended, cancelled, pending, trial expiration)
+   - Request is allowed to proceed
+
+2. TENANT NOT FOUND (Missing Tenant Scenario)
+   - If SHOW_PUBLIC_IF_NO_TENANT_FOUND=True:
+     * Falls back to public schema (default behavior for development)
+     * Allows access to public/marketing pages
+   - If SHOW_PUBLIC_IF_NO_TENANT_FOUND=False:
+     * Returns HTTP 404 with "Tenant not found" message
+     * Prevents access to non-existent tenants
+   - Examples:
+     * Accessing nonexistent.zumodra.com with invalid subdomain
+     * Using wrong custom domain
+     * API request with invalid X-Tenant-ID header
+
+3. TENANT RESOLUTION ERROR (System-Level Error)
+   - Returns HTTP 503 Service Unavailable
+   - Examples:
+     * Rate limiting exceeded
+     * Database connectivity issues
+     * Cache failures during resolution
+   - Distinct from 404 (resource doesn't exist) and 403 (access denied)
+
+4. UNAUTHORIZED ACCESS (Invalid User Tenant Access)
+   - Returns HTTP 403 Forbidden
+   - Occurs when user tries to access a tenant via header they don't have access to
+   - Example: User A trying to access User B's tenant via X-Tenant-ID header
+
+IMPORTANT: This middleware ALWAYS ensures a request.tenant is set before
+proceeding to views. If tenant resolution fails, an appropriate error response
+is returned immediately, preventing the request from reaching application views.
+
+See _tenant_not_found_response() and _tenant_error_response() for detailed
+error handling logic.
 """
 
 import logging
@@ -117,6 +161,9 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
         1. X-Tenant-ID header (for API clients)
         2. Subdomain extraction from host
         3. Custom domain lookup
+
+        If no tenant is found via these strategies and SHOW_PUBLIC_IF_NO_TENANT_FOUND
+        is enabled, the public schema tenant is used. Otherwise, a 404 response is returned.
         """
         # Try to resolve tenant using our enhanced strategies
         tenant = None
@@ -135,16 +182,49 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
             logger.error(f"Tenant resolution error: {e}")
             return self._tenant_error_response(request)
 
-        if tenant:
-            # Set tenant on request (bypass parent processing)
-            request.tenant = tenant
-            self._setup_tenant_schema(tenant)
-            request._tenant_resolution_method = resolution_method
-            # Also set in thread-local context for use in signals, tasks, etc.
-            set_current_tenant(tenant)
-        else:
-            # Fall back to parent implementation
-            super().process_request(request)
+        # CRITICAL FIX: Handle when no tenant is found via any resolution strategy
+        # This prevents falling back to parent class which may fail with 500 error
+        if not tenant:
+            # Check if we should fall back to public schema or return 404
+            if getattr(settings, 'SHOW_PUBLIC_IF_NO_TENANT_FOUND', False):
+                # Use public schema as fallback
+                # This is useful for development/testing where we want public access without
+                # needing a tenant record for every possible subdomain
+                logger.info(
+                    f"No tenant found for host {request.get_host()}. "
+                    f"Using public schema as fallback (SHOW_PUBLIC_IF_NO_TENANT_FOUND=True)"
+                )
+                try:
+                    # Get the public schema tenant
+                    from django_tenants.utils import get_public_schema_name
+                    public_schema_name = get_public_schema_name()
+                    tenant = Tenant.objects.get(schema_name=public_schema_name)
+                    resolution_method = 'public_fallback'
+                except Tenant.DoesNotExist:
+                    # Even public schema doesn't exist - database is misconfigured
+                    # Return 503 instead of proceeding with 500 error
+                    logger.error(
+                        f"Public schema tenant not found for host {request.get_host()}. "
+                        f"Database may be misconfigured. This indicates a critical system issue."
+                    )
+                    return self._tenant_error_response(request)
+            else:
+                # No tenant found and fallback is disabled - return proper 404 response
+                # This ensures the user gets a clear "not found" error instead of 500
+                hostname = request.get_host()
+                logger.warning(
+                    f"Tenant not found for host '{hostname}'. "
+                    f"SHOW_PUBLIC_IF_NO_TENANT_FOUND is disabled. Returning 404."
+                )
+                # Return 404 Not Found instead of 403 or 500 errors
+                return self._tenant_not_found_response(request)
+
+        # Set tenant on request
+        request.tenant = tenant
+        self._setup_tenant_schema(tenant)
+        request._tenant_resolution_method = resolution_method
+        # Also set in thread-local context for use in signals, tasks, etc.
+        set_current_tenant(tenant)
 
         # Skip checks for public schema
         if request.tenant.schema_name == get_public_schema_name():
@@ -193,8 +273,29 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
         """
         Resolve tenant using multiple strategies.
 
+        This method attempts to find which tenant owns the incoming request by trying
+        different resolution strategies in order:
+        1. X-Tenant-ID header (for API clients)
+        2. Subdomain extraction
+        3. Custom domain lookup
+
+        IMPORTANT: When NO TENANT IS FOUND via any strategy, this returns (None, None).
+        This is NOT an error condition - it's handled by process_request which may:
+        - Fall back to public schema if SHOW_PUBLIC_IF_NO_TENANT_FOUND=True
+        - Return 404 if SHOW_PUBLIC_IF_NO_TENANT_FOUND=False
+
+        Only raises exceptions for actual error conditions:
+        - TenantResolutionError: Rate limiting exceeded, user lacks permission
+        - TenantInactiveError: Tenant state check failed (not used currently)
+
         Returns:
-            Tuple of (Tenant, resolution_method) or (None, None)
+            Tuple of (Tenant, resolution_method) if tenant found, otherwise (None, None)
+            - resolution_method is one of: 'header', 'subdomain', 'domain', 'public_fallback'
+
+        Examples of missing tenant scenarios (returns (None, None)):
+        - nonexistent.zumodra.com -> subdomain "nonexistent" not in database
+        - Request to custom domain not registered for any tenant
+        - API request with X-Tenant-ID that doesn't exist
         """
         hostname = request.get_host().split(':')[0].lower()
 
@@ -247,10 +348,32 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
         """
         Extract subdomain from hostname.
 
+        This method extracts the subdomain part from a full hostname based on the
+        configured TENANT_BASE_DOMAIN. If the hostname doesn't match the base domain
+        pattern, None is returned, which indicates the request should be resolved
+        via other strategies (custom domain, etc.).
+
+        Args:
+            hostname: Full hostname (e.g., 'acme.zumodra.com')
+
+        Returns:
+            Subdomain string if matched, otherwise None
+            - 'acme' from 'acme.zumodra.com'
+            - None from 'zumodra.com' (no subdomain)
+            - None from 'invalid.com' (doesn't match base domain)
+
         Examples:
-            acme.zumodra.com -> acme
-            www.zumodra.com -> www
-            zumodra.com -> None
+            With TENANT_BASE_DOMAIN='zumodra.com':
+            - acme.zumodra.com -> 'acme'
+            - www.zumodra.com -> 'www'
+            - app.acme.zumodra.com -> 'acme' (takes last part)
+            - zumodra.com -> None (no subdomain)
+            - other.com -> None (doesn't match base domain)
+
+        MISSING TENANT HANDLING:
+            Even if a subdomain is extracted (e.g., 'nonexistent'), if no tenant
+            with that slug exists in the database, None is returned from
+            _resolve_tenant() which triggers 404 handling in process_request().
         """
         base_domain = TENANT_BASE_DOMAIN.lower()
 
@@ -592,13 +715,67 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
         return any(path.startswith(url) for url in self.EXEMPT_URLS)
 
     def _tenant_not_found_response(self, request):
-        """Handle tenant not found response."""
-        return HttpResponseForbidden(
-            "Tenant not found. Please check the URL or contact support."
+        """
+        Handle tenant not found response.
+
+        Returns a 404 HTTP response (Not Found) instead of 403 (Forbidden)
+        because the tenant/resource does not exist, not because access is denied.
+
+        For API requests, returns JSON; for HTML requests, uses the standard 404 handler.
+        """
+        from django.http import Http404
+
+        hostname = request.get_host()
+
+        # Log the not found attempt
+        logger.info(
+            f"Tenant not found for hostname '{hostname}' | "
+            f"Path: {request.path} | User: {getattr(request.user, 'email', 'anonymous')}"
         )
 
+        # For API requests, return JSON 404
+        if request.path.startswith('/api/'):
+            return JsonResponse(
+                {
+                    'error': 'Not Found',
+                    'detail': f'Tenant not found for domain: {hostname}',
+                    'status_code': 404,
+                },
+                status=404
+            )
+
+        # For other requests, raise Http404 which will be handled by Django's 404 handler
+        # This ensures consistent error page rendering
+        raise Http404(f"Tenant not found for domain: {hostname}")
+
     def _tenant_error_response(self, request):
-        """Handle tenant resolution error response."""
+        """
+        Handle tenant resolution error response.
+
+        Returns 503 Service Unavailable for system-level errors (e.g., database issues,
+        rate limiting) that prevent proper tenant resolution.
+
+        This is distinct from 404 (tenant not found) and 403 (access denied).
+        """
+        hostname = request.get_host()
+
+        logger.error(
+            f"Tenant resolution error for hostname '{hostname}' | "
+            f"Path: {request.path} | User: {getattr(request.user, 'email', 'anonymous')}"
+        )
+
+        # For API requests, return JSON 503
+        if request.path.startswith('/api/'):
+            return JsonResponse(
+                {
+                    'error': 'Service Unavailable',
+                    'detail': 'Unable to process your request. Please try again later.',
+                    'status_code': 503,
+                },
+                status=503
+            )
+
+        # For HTML requests, return 503 response
         return HttpResponseForbidden(
             "Unable to process your request. Please try again later."
         )
