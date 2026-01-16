@@ -248,14 +248,18 @@ def public_companies_grid(request):
     if search:
         companies = companies.filter(
             Q(name__icontains=search) |
-            Q(description__icontains=search)
+            Q(industry__icontains=search)
         )
 
     if location:
         companies = companies.filter(
             Q(city__icontains=location) |
-            Q(country__icontains=location)
+            Q(country__icontains=location) |
+            Q(state__icontains=location)
         )
+
+    if industry:
+        companies = companies.filter(industry__icontains=industry)
 
     # Get unique locations
     locations = Tenant.objects.filter(
@@ -309,13 +313,14 @@ def public_companies_map(request):
     if search:
         companies = companies.filter(
             Q(name__icontains=search) |
-            Q(description__icontains=search)
+            Q(industry__icontains=search)
         )
 
     if location:
         companies = companies.filter(
             Q(city__icontains=location) |
-            Q(country__icontains=location)
+            Q(country__icontains=location) |
+            Q(state__icontains=location)
         )
 
     # Get unique locations
