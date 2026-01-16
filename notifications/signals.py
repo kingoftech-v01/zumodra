@@ -22,7 +22,14 @@ User = get_user_model()
 def create_notification_preferences(sender, instance, created, **kwargs):
     """Create notification preferences when a new user is created."""
     if created:
-        NotificationPreference.objects.get_or_create(user=instance)
+        try:
+            NotificationPreference.objects.get_or_create(user=instance)
+        except Exception as e:
+            # During migrations, tables might not exist yet - expected behavior
+            logger.warning(
+                f"Failed to create notification preferences for user {instance.id} "
+                f"(expected during migrations): {e}"
+            )
 
 
 @receiver(post_save, sender=User)
