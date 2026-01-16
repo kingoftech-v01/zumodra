@@ -7,7 +7,7 @@
         <div class="left flex items-center gap-15 max-[1600px]:gap-6 h-full">
             <!-- Logo -->
             <h1>
-                <a href="{% url 'home' %}">
+                <a href="/">
                     <img src="{% static 'assets/images/rhematekCS.png' %}" alt="Zumodra" class="logo-white md:h-[42px] h-8 w-auto" />
                     <img src="{% static 'assets/images/rhematekC.png' %}" alt="Zumodra" class="logo-black md:h-[42px] h-8 w-auto hidden" />
                 </a>
@@ -19,7 +19,7 @@
             <nav class="navigator h-full max-lg:hidden">
                 <ul class="list flex items-center gap-5 h-full">
                     <li class="h-full relative">
-                        <a href="{% url 'home' %}" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
+                        <a href="/" class="flex items-center gap-1 h-full px-3 text-secondary hover:text-primary duration-300">
                             <span class="text-button">{% trans 'Home' %}</span>
                         </a>
                     </li>
@@ -72,7 +72,7 @@
     <!-- Mobile Menu -->
     <div class="menu_mobile_block absolute top-full left-0 w-full bg-white shadow-lg max-lg:block hidden">
         <ul class="list p-4">
-            <li><a href="{% url 'home' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Home' %}</a></li>
+            <li><a href="/" class="block py-3 px-4 hover:bg-surface">{% trans 'Home' %}</a></li>
             <li><a href="{% url 'about' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'About' %}</a></li>
             <li><a href="{% url 'privacy_policy' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Privacy' %}</a></li>
             <li><a href="{% url 'term_of_use' %}" class="block py-3 px-4 hover:bg-surface">{% trans 'Terms' %}</a></li>

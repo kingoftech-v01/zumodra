@@ -27,7 +27,7 @@
 
             {% comment %} ========== LOGO ========== {% endcomment %}
             <div class="flex items-center">
-                <a href="{% url 'home' %}" class="flex items-center" aria-label="Zumodra Home">
+                <a href="/" class="flex items-center" aria-label="Zumodra Home">
                     {% comment %} Single logo that works in all states {% endcomment %}
                     <img src="{% static 'assets/images/rhematekC.png' %}"
                          alt="Zumodra"
@@ -41,7 +41,7 @@
 
                     {% comment %} Home {% endcomment %}
                     <li>
-                        <a href="{% url 'home' %}"
+                        <a href="/"
                            class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"
                            :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }">
                             {% trans 'Home' %}
@@ -273,7 +273,7 @@
 
                 {% comment %} Home {% endcomment %}
                 <li>
-                    <a href="{% url 'home' %}"
+                    <a href="/"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                        @click="mobileMenuOpen = false">
                         <span class="ph-bold ph-house text-xl"></span>

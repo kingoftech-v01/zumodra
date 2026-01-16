@@ -5,14 +5,14 @@
     <div class="header_inner absolute flex items-center justify-between top-0 left-0 right-0 z-[1] w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 bg-white">
         <div class="header_left flex items-center gap-10 h-full">
             <h1>
-                <a href="{% url 'home' %}">
+                <a href="/">
                     <img src="{% static 'assets/images/logo.png' %}" alt="{% trans 'FreelanHub' %}" class="md:h-[42px] h-8 w-auto" />
                 </a>
             </h1>
             <div class="navigator h-full max-[1400px]:hidden">
                 <ul class="list flex items-center gap-5 h-full">
                     <li class="h-full relative">
-                        <a href="{% url 'home' %}" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                        <a href="/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
                             <span class="text-title relative">{% trans "Home" %}</span>
                         </a>
                     </li>
@@ -189,7 +189,7 @@
                 <div class="list-nav mt-3">
                     <ul>
                         <li class="nav_item py-2">
-                            <a href="{% url 'home' %}" class="text-xl font-semibold">{% trans "Home" %}</a>
+                            <a href="/" class="text-xl font-semibold">{% trans "Home" %}</a>
                         </li>
                         <li class="nav_item py-2">
                             <a href="{% url 'careers:home' %}" class="text-xl font-semibold">{% trans "Browse Jobs" %}</a>
