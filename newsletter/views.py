@@ -50,23 +50,12 @@ def is_authenticated(user):
 
 class NewsletterViewBase:
     """ Base class for newsletter views. """
-    allow_empty = True  # Allow empty to handle missing tables gracefully
+    allow_empty = True
     slug_url_kwarg = 'newsletter_slug'
-    _queryset_error = False  # Flag to indicate queryset error
 
     def get_queryset(self):
-        """Get newsletters, handling missing tables gracefully."""
-        from django.db.utils import ProgrammingError, OperationalError
-        try:
-            # Test if table exists by forcing evaluation
-            qs = Newsletter.objects.filter(visible=True)
-            list(qs[:1])  # Force evaluation to check table exists
-            return Newsletter.on_site.filter(visible=True)
-        except (ProgrammingError, OperationalError, Exception) as e:
-            # Table might not exist in public schema
-            logger.warning(f"Newsletter queryset error: {type(e).__name__}: {e}")
-            self._queryset_error = True
-            return Newsletter.objects.none()
+        """Get newsletters."""
+        return Newsletter.on_site.filter(visible=True)
 
 
 class NewsletterDetailView(NewsletterViewBase, DetailView):
@@ -80,18 +69,8 @@ class NewsletterListView(NewsletterViewBase, ListView):
     """
 
     def dispatch(self, request, *args, **kwargs):
-        """Handle requests, catching database errors."""
-        from django.db.utils import ProgrammingError
-        try:
-            return super().dispatch(request, *args, **kwargs)
-        except (ProgrammingError, Exception) as e:
-            if 'does not exist' in str(e) or 'newsletter' in str(e).lower():
-                # Newsletter tables might not exist - show empty list
-                from django.shortcuts import render
-                logger.warning(f"Newsletter error: {type(e).__name__}: {e}")
-                context = {'object_list': [], 'newsletter_unavailable': True}
-                return render(request, 'newsletter/newsletter_list.html', context)
-            raise
+        """Handle requests."""
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, **kwargs):
         """ Allow post requests. """

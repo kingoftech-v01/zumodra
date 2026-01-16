@@ -509,7 +509,7 @@ run_migrations() {
         # Step 4.5: CRITICAL - Verify demo tenant migrations (BLOCKING)
         log_info "Step 4.5/6: Verifying demo tenant migrations (BLOCKING CHECK)..."
 
-        DEMO_CHECK_OUTPUT=$(python manage.py verify_tenant_migrations --tenant=demo --fix 2>&1)
+        DEMO_CHECK_OUTPUT=$(python manage.py verify_tenant_migrations --tenant=demo-company --fix 2>&1)
         DEMO_CHECK_STATUS=$?
 
         echo "$DEMO_CHECK_OUTPUT"

@@ -450,39 +450,28 @@ def dispatch_webhook(
         Number of webhooks queued for delivery
     """
     from .tasks import deliver_outbound_webhook
-    from django.db import ProgrammingError, OperationalError
 
-    try:
-        webhooks = OutboundWebhook.objects.filter(
-            tenant_id=tenant_id,
-            is_enabled=True,
-            status__in=[OutboundWebhook.Status.ACTIVE]
-        )
-    except (ProgrammingError, OperationalError) as e:
-        # Table doesn't exist yet (during initial migrations)
-        logger.debug(f"Webhook table not available yet: {e}")
-        return 0
+    webhooks = OutboundWebhook.objects.filter(
+        tenant_id=tenant_id,
+        is_enabled=True,
+        status__in=[OutboundWebhook.Status.ACTIVE]
+    )
 
     queued = 0
     for webhook in webhooks:
         if webhook.should_receive_event(app_name, event_type):
-            try:
-                # Create delivery record
-                delivery = OutboundWebhookDelivery.objects.create(
-                    webhook=webhook,
-                    app_name=app_name,
-                    event_type=event_type,
-                    event_id=event_id or str(uuid.uuid4()),
-                    payload=data
-                )
+            # Create delivery record
+            delivery = OutboundWebhookDelivery.objects.create(
+                webhook=webhook,
+                app_name=app_name,
+                event_type=event_type,
+                event_id=event_id or str(uuid.uuid4()),
+                payload=data
+            )
 
-                # Queue for async delivery
-                deliver_outbound_webhook.delay(str(delivery.id))
-                queued += 1
-            except (ProgrammingError, OperationalError) as e:
-                # Delivery table doesn't exist yet (during migrations)
-                logger.debug(f"Webhook delivery table not available yet: {e}")
-                continue
+            # Queue for async delivery
+            deliver_outbound_webhook.delay(str(delivery.id))
+            queued += 1
 
     if queued:
         logger.info(f"Dispatched {queued} webhooks for {app_name}.{event_type}")
