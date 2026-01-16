@@ -460,25 +460,32 @@ run_migrations() {
         return 1
     fi
 
-    # Step 2: Migrate existing tenant schemas (if any exist)
+    # Step 2: Migrate existing tenant schemas (BLOCKING - MUST SUCCEED)
     log_info "Step 2/4: Migrating existing tenant schemas..."
     if python manage.py migrate_schemas --tenant --noinput; then
-        log_info "Existing tenant schema migrations completed successfully!"
+        log_info "✓ Existing tenant schema migrations completed successfully!"
     else
-        log_warn "Tenant schema migration had issues (may be no tenants yet)"
-        # Don't fail if there are no tenants - this is expected on first run
+        log_error "✗ FATAL: Tenant schema migration FAILED!"
+        log_error "Container cannot start with missing migrations."
+        log_error "All tenant schemas must have complete migrations applied."
+        return 1
     fi
 
-    # Step 2.5: Verify tenant migrations were applied successfully
+    # Step 2.5: Verify tenant migrations were applied successfully (BLOCKING - MUST PASS)
     log_info "Step 2.5/5: Verifying tenant migrations..."
     if python manage.py verify_tenant_migrations --fix 2>&1 | tee -a /tmp/migration_verification.log; then
         log_info "✓ All tenant migrations verified and applied!"
     else
-        log_warn "✗ Tenant migration verification reported issues"
-        log_warn "Some tenant schemas may have incomplete migrations."
-        log_warn "Check /tmp/migration_verification.log for details"
-        # Note: We don't return 1 here to allow service to start with warnings
-        # Monitoring scripts will detect and alert on migration issues
+        log_error "✗ FATAL: Tenant migration verification FAILED!"
+        log_error "Some tenant schemas have incomplete migrations."
+        log_error "=========================================="
+        log_error "Migration Verification Report:"
+        log_error "=========================================="
+        cat /tmp/migration_verification.log | while IFS= read -r line; do
+            log_error "  $line"
+        done
+        log_error "=========================================="
+        return 1
     fi
 
     # Step 3: Create demo tenants if configured
