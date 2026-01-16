@@ -50,6 +50,12 @@ from .template_views import (
 
     # Utility views
     TeamMemberSearchView,
+
+    # Background check views
+    InitiateBackgroundCheckView,
+    BackgroundCheckStatusView,
+    BackgroundCheckReportView,
+    BackgroundCheckStatusPartialView,
 )
 
 app_name = 'ats'
@@ -110,4 +116,12 @@ urlpatterns = [
 
     # Team member search
     path('htmx/team-members/search/', TeamMemberSearchView.as_view(), name='team_member_search'),
+
+    # ===== BACKGROUND CHECK ROUTES =====
+    path('applications/<uuid:uuid>/background-check/initiate/', InitiateBackgroundCheckView.as_view(), name='background_check_initiate'),
+    path('applications/<uuid:uuid>/background-check/status/', BackgroundCheckStatusView.as_view(), name='background_check_status'),
+    path('applications/<uuid:uuid>/background-check/report/', BackgroundCheckReportView.as_view(), name='background_check_report'),
+
+    # HTMX partial for background check status badge
+    path('htmx/applications/<uuid:uuid>/background-check/status-badge/', BackgroundCheckStatusPartialView.as_view(), name='background_check_status_partial'),
 ]

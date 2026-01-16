@@ -32,7 +32,8 @@ from tenants.decorators import require_tenant_type
 from .models import (
     JobPosting, JobCategory, Pipeline, PipelineStage,
     Candidate, Application, ApplicationActivity, ApplicationNote,
-    Interview, InterviewFeedback, Offer, InterviewSlot
+    Interview, InterviewFeedback, Offer, InterviewSlot,
+    BackgroundCheck
 )
 
 logger = logging.getLogger(__name__)
@@ -1874,3 +1875,243 @@ class TeamMemberSearchView(LoginRequiredMixin, TenantViewMixin, View):
         ]
 
         return JsonResponse({'results': results})
+
+
+# =============================================================================
+# BACKGROUND CHECK VIEWS
+# =============================================================================
+
+class InitiateBackgroundCheckView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, HTMXMixin, TemplateView):
+    """
+    View to initiate a background check for an application.
+
+    Displays a form to select the background check package and collect consent.
+    """
+    template_name = 'ats/background_check_initiate.html'
+    partial_template_name = 'ats/partials/background_check_initiate_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        application_uuid = self.kwargs.get('uuid')
+        application = get_object_or_404(
+            Application.objects.select_related('candidate', 'job', 'job__pipeline'),
+            uuid=application_uuid,
+            tenant=self.request.tenant
+        )
+
+        # Check if background check already exists
+        existing_check = BackgroundCheck.objects.filter(
+            tenant=self.request.tenant,
+            application=application
+        ).first()
+
+        # Get available packages
+        packages = [
+            {
+                'value': 'basic',
+                'label': 'Basic',
+                'description': 'SSN verification and basic criminal record check',
+                'price': '$29.99'
+            },
+            {
+                'value': 'standard',
+                'label': 'Standard',
+                'description': 'SSN, criminal, employment verification',
+                'price': '$49.99'
+            },
+            {
+                'value': 'pro',
+                'label': 'Professional',
+                'description': 'Standard + education verification + references',
+                'price': '$79.99'
+            },
+            {
+                'value': 'comprehensive',
+                'label': 'Comprehensive',
+                'description': 'All checks + credit report + motor vehicle records',
+                'price': '$129.99'
+            }
+        ]
+
+        context.update({
+            'application': application,
+            'existing_check': existing_check,
+            'packages': packages,
+            'candidate_name': str(application.candidate),
+            'job_title': application.job.title,
+        })
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """Handle form submission to initiate background check."""
+        from .background_checks import BackgroundCheckService
+        from django.core.exceptions import PermissionDenied
+
+        application_uuid = self.kwargs.get('uuid')
+        application = get_object_or_404(
+            Application.objects.select_related('candidate', 'job'),
+            uuid=application_uuid,
+            tenant=request.tenant
+        )
+
+        package = request.POST.get('package', 'standard')
+        consent_given = request.POST.get('consent_given') == 'on'
+
+        if not consent_given:
+            messages.error(request, 'Candidate consent is required to initiate a background check.')
+            return redirect('frontend:ats:background_check_initiate', uuid=application_uuid)
+
+        try:
+            service = BackgroundCheckService(tenant=request.tenant)
+            background_check = service.initiate_check(
+                application=application,
+                package=package,
+                initiated_by=request.user
+            )
+
+            # Record consent
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip_address = x_forwarded_for.split(',')[0]
+            else:
+                ip_address = request.META.get('REMOTE_ADDR')
+
+            background_check.consent_ip_address = ip_address
+            background_check.consent_timestamp = timezone.now()
+            background_check.save(update_fields=['consent_ip_address', 'consent_timestamp'])
+
+            messages.success(
+                request,
+                f'Background check initiated successfully. '
+                f'The candidate will receive an email with instructions.'
+            )
+
+            return redirect('frontend:ats:background_check_status', uuid=application_uuid)
+
+        except PermissionDenied as e:
+            messages.error(request, str(e))
+            return redirect('frontend:ats:application_detail', uuid=application_uuid)
+        except Exception as e:
+            logger.error(f"Failed to initiate background check: {e}", exc_info=True)
+            messages.error(request, 'Failed to initiate background check. Please try again.')
+            return redirect('frontend:ats:background_check_initiate', uuid=application_uuid)
+
+
+class BackgroundCheckStatusView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, HTMXMixin, TemplateView):
+    """
+    View to display background check status and results.
+
+    Shows current status, completion progress, and results when available.
+    """
+    template_name = 'ats/background_check_status.html'
+    partial_template_name = 'ats/partials/background_check_status_partial.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        application_uuid = self.kwargs.get('uuid')
+        application = get_object_or_404(
+            Application.objects.select_related('candidate', 'job'),
+            uuid=application_uuid,
+            tenant=self.request.tenant
+        )
+
+        try:
+            background_check = BackgroundCheck.objects.select_related(
+                'initiated_by'
+            ).prefetch_related('documents').get(
+                tenant=self.request.tenant,
+                application=application
+            )
+        except BackgroundCheck.DoesNotExist:
+            background_check = None
+
+        context.update({
+            'application': application,
+            'background_check': background_check,
+            'candidate_name': str(application.candidate),
+            'job_title': application.job.title,
+        })
+
+        return context
+
+
+class BackgroundCheckReportView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, TemplateView):
+    """
+    View to display the full background check report.
+
+    Shows detailed results from the provider including all screenings.
+    """
+    template_name = 'ats/background_check_report.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        application_uuid = self.kwargs.get('uuid')
+        application = get_object_or_404(
+            Application.objects.select_related('candidate', 'job'),
+            uuid=application_uuid,
+            tenant=self.request.tenant
+        )
+
+        try:
+            background_check = BackgroundCheck.objects.select_related(
+                'initiated_by'
+            ).prefetch_related('documents').get(
+                tenant=self.request.tenant,
+                application=application
+            )
+
+            # Get full report from service
+            from .background_checks import BackgroundCheckService
+            service = BackgroundCheckService(tenant=self.request.tenant)
+            full_report = service.get_report(background_check.id)
+
+        except BackgroundCheck.DoesNotExist:
+            background_check = None
+            full_report = None
+
+        context.update({
+            'application': application,
+            'background_check': background_check,
+            'full_report': full_report,
+            'candidate_name': str(application.candidate),
+            'job_title': application.job.title,
+        })
+
+        return context
+
+
+class BackgroundCheckStatusPartialView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
+    """
+    HTMX partial view that returns just the background check status badge.
+
+    Used for auto-refreshing status on the application detail page.
+    """
+
+    def get(self, request, uuid):
+        """Return background check status badge partial."""
+        application = get_object_or_404(
+            Application.objects.select_related('candidate', 'job'),
+            uuid=uuid,
+            tenant=request.tenant
+        )
+
+        try:
+            background_check = BackgroundCheck.objects.get(
+                tenant=request.tenant,
+                application=application
+            )
+        except BackgroundCheck.DoesNotExist:
+            background_check = None
+
+        return render(
+            request,
+            'ats/partials/background_check_badge.html',
+            {
+                'application': application,
+                'background_check': background_check,
+            }
+        )

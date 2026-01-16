@@ -499,27 +499,62 @@ def _dispatch_webhook_action(integration, action: str, result: Dict, delivery: W
 
 
 def _handle_background_check_complete(integration, result: Dict):
-    """Handle background check completion event."""
-    # Import your candidate/application models here
-    # from ats.models import Candidate, BackgroundCheck
+    """
+    Handle background check completion event from Checkr/Sterling.
 
-    logger.info(f"Background check completed: {result}")
+    Called when a background check report completes.
+    Extracts report ID from webhook payload and updates BackgroundCheck record.
 
-    # Example: Update candidate status
-    # candidate_id = result.get('candidate_id') or result.get('screening_id')
-    # status = result.get('status', 'complete')
-    #
-    # try:
-    #     bg_check = BackgroundCheck.objects.get(external_id=candidate_id)
-    #     bg_check.status = status
-    #     bg_check.result = result.get('result')
-    #     bg_check.save()
-    #
-    #     # Send notification
-    #     from notifications.services import notify_background_check_complete
-    #     notify_background_check_complete(bg_check)
-    # except BackgroundCheck.DoesNotExist:
-    #     logger.warning(f"Background check not found: {candidate_id}")
+    Args:
+        integration: Integration instance (Checkr/Sterling)
+        result: Parsed webhook result containing report data
+    """
+    from ats.background_checks import BackgroundCheckService
+    from ats.models import BackgroundCheck
+
+    logger.info(f"Processing background check completion webhook from {integration.provider}")
+
+    try:
+        # Extract report ID from result
+        # Checkr sends: result['data']['object']['id']
+        # Sterling sends: result['screening']['id']
+        payload = result.get('payload', result)
+
+        if integration.provider == 'checkr':
+            report_id = payload.get('data', {}).get('object', {}).get('id')
+        elif integration.provider == 'sterling':
+            report_id = payload.get('screening', {}).get('id')
+        else:
+            report_id = payload.get('report_id') or payload.get('id')
+
+        if not report_id:
+            logger.error(f"No report ID found in background check webhook payload: {payload}")
+            return
+
+        # Find background check by external report ID
+        try:
+            background_check = BackgroundCheck.objects.get(external_report_id=report_id)
+        except BackgroundCheck.DoesNotExist:
+            logger.error(f"Background check not found for report_id={report_id}")
+            return
+
+        # Call BackgroundCheckService to process the webhook
+        service = BackgroundCheckService(tenant=background_check.tenant)
+        service.handle_webhook_result(
+            report_id=report_id,
+            payload=payload,
+            provider_name=integration.provider
+        )
+
+        logger.info(
+            f"Background check webhook processed successfully: "
+            f"check_id={background_check.id}, report_id={report_id}, "
+            f"result={background_check.result}"
+        )
+
+    except Exception as e:
+        logger.error(f"Error handling background check webhook: {e}", exc_info=True)
+        raise  # Re-raise to trigger retry
 
 
 def _handle_esign_event(integration, result: Dict):

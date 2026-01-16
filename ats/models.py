@@ -1928,6 +1928,10 @@ class Application(TenantAwareModel):
         INTERVIEWING = 'interviewing', _('Interviewing')
         OFFER_PENDING = 'offer_pending', _('Offer Pending')
         OFFER_EXTENDED = 'offer_extended', _('Offer Extended')
+        BACKGROUND_CHECK_PENDING = 'background_check_pending', _('Background Check Pending')
+        BACKGROUND_CHECK_IN_PROGRESS = 'background_check_in_progress', _('Background Check In Progress')
+        BACKGROUND_CHECK_CLEARED = 'background_check_cleared', _('Background Check Cleared')
+        BACKGROUND_CHECK_FAILED = 'background_check_failed', _('Background Check Failed')
         HIRED = 'hired', _('Hired')
         REJECTED = 'rejected', _('Rejected')
         WITHDRAWN = 'withdrawn', _('Withdrawn')
@@ -1940,6 +1944,9 @@ class Application(TenantAwareModel):
     ACTIVE_STATUSES = {ApplicationStatus.NEW, ApplicationStatus.IN_REVIEW,
                        ApplicationStatus.SHORTLISTED, ApplicationStatus.INTERVIEWING,
                        ApplicationStatus.OFFER_PENDING, ApplicationStatus.OFFER_EXTENDED,
+                       ApplicationStatus.BACKGROUND_CHECK_PENDING,
+                       ApplicationStatus.BACKGROUND_CHECK_IN_PROGRESS,
+                       ApplicationStatus.BACKGROUND_CHECK_CLEARED,
                        ApplicationStatus.ON_HOLD}
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -3922,3 +3929,344 @@ class OfferApproval(TenantAwareModel):
         offer.save(update_fields=['approval_status', 'approval_level_required', 'updated_at'])
 
         return approvals
+
+
+# ==============================================================================
+# Background Check Models
+# ==============================================================================
+
+class BackgroundCheck(TenantAwareModel):
+    """
+    Background check record for candidates.
+
+    Tracks pre-employment screening through third-party providers
+    like Checkr, Sterling, or HireRight.
+
+    Workflow:
+    1. Initiated after offer acceptance
+    2. Candidate receives invitation
+    3. Provider conducts checks
+    4. Results received via webhook
+    5. Application status updated
+    """
+    PROVIDER_CHOICES = [
+        ('checkr', _('Checkr')),
+        ('sterling', _('Sterling')),
+        ('hireright', _('HireRight')),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', _('Pending Initiation')),
+        ('invited', _('Invitation Sent')),
+        ('in_progress', _('In Progress')),
+        ('completed', _('Completed')),
+        ('failed', _('Failed')),
+        ('cancelled', _('Cancelled')),
+    ]
+
+    RESULT_CHOICES = [
+        ('clear', _('Clear')),
+        ('consider', _('Consider')),
+        ('suspended', _('Suspended')),
+    ]
+
+    PACKAGE_CHOICES = [
+        ('basic', _('Basic - Identity + Criminal')),
+        ('standard', _('Standard - Basic + Employment')),
+        ('pro', _('Pro - Standard + Education')),
+        ('comprehensive', _('Comprehensive - Pro + MVR + Credit')),
+    ]
+
+    # Relationships
+    application = models.ForeignKey(
+        'Application',
+        on_delete=models.CASCADE,
+        related_name='background_checks',
+        verbose_name=_('Application'),
+        help_text=_('The application this background check is for')
+    )
+    initiated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='initiated_background_checks',
+        verbose_name=_('Initiated By'),
+        help_text=_('User who initiated the background check')
+    )
+
+    # Provider Information
+    provider = models.CharField(
+        max_length=50,
+        choices=PROVIDER_CHOICES,
+        verbose_name=_('Provider'),
+        help_text=_('Background check service provider')
+    )
+    external_candidate_id = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('External Candidate ID'),
+        help_text=_("Provider's candidate identifier")
+    )
+    external_report_id = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('External Report ID'),
+        help_text=_("Provider's report identifier")
+    )
+    package = models.CharField(
+        max_length=100,
+        choices=PACKAGE_CHOICES,
+        default='standard',
+        verbose_name=_('Package'),
+        help_text=_('Screening package selected')
+    )
+
+    # Status and Results
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Status'),
+        help_text=_('Current status of the background check')
+    )
+    result = models.CharField(
+        max_length=50,
+        choices=RESULT_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name=_('Result'),
+        help_text=_('Final result of the background check')
+    )
+
+    # Timestamps
+    initiated_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Initiated At')
+    )
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Completed At')
+    )
+
+    # Report Data
+    report_url = models.URLField(
+        blank=True,
+        verbose_name=_('Report URL'),
+        help_text=_("URL to view the full report on provider's site")
+    )
+    report_data = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_('Report Data'),
+        help_text=_('Full report data from provider')
+    )
+
+    # Consent
+    consent_given = models.BooleanField(
+        default=False,
+        verbose_name=_('Consent Given'),
+        help_text=_('Candidate has given consent for background check')
+    )
+    consent_ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        verbose_name=_('Consent IP Address'),
+        help_text=_('IP address from which consent was given')
+    )
+    consent_timestamp = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Consent Timestamp'),
+        help_text=_('When consent was given')
+    )
+
+    # Notes
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Notes'),
+        help_text=_('Internal notes about this background check')
+    )
+
+    class Meta:
+        verbose_name = _('Background Check')
+        verbose_name_plural = _('Background Checks')
+        ordering = ['-initiated_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant', 'application'],
+                name='unique_background_check_per_application'
+            )
+        ]
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['result']),
+            models.Index(fields=['provider']),
+            models.Index(fields=['external_report_id']),
+        ]
+
+    def __str__(self):
+        return f"Background Check for {self.application.candidate} - {self.get_status_display()}"
+
+    def is_in_progress(self):
+        """Check if background check is currently in progress."""
+        return self.status in ['invited', 'in_progress']
+
+    def is_complete(self):
+        """Check if background check is completed."""
+        return self.status == 'completed'
+
+    def is_clear(self):
+        """Check if background check passed with clear result."""
+        return self.is_complete() and self.result == 'clear'
+
+    def mark_completed(self, result, report_data=None, report_url=''):
+        """
+        Mark the background check as completed.
+
+        Args:
+            result: Result code ('clear', 'consider', 'suspended')
+            report_data: Full report data from provider
+            report_url: URL to view full report
+        """
+        self.status = 'completed'
+        self.result = result
+        self.completed_at = timezone.now()
+        if report_data:
+            self.report_data = report_data
+        if report_url:
+            self.report_url = report_url
+        self.save(update_fields=['status', 'result', 'completed_at', 'report_data', 'report_url', 'updated_at'])
+
+        # Update application status
+        if self.result == 'clear':
+            self.application.status = 'BACKGROUND_CHECK_CLEARED'
+        else:
+            self.application.status = 'BACKGROUND_CHECK_FAILED'
+        self.application.save(update_fields=['status', 'updated_at'])
+
+
+class BackgroundCheckDocument(TenantAwareModel):
+    """
+    Individual documents/screenings within a background check.
+
+    Each background check may consist of multiple screenings:
+    - SSN Trace
+    - Criminal Records (county, state, federal)
+    - Employment Verification
+    - Education Verification
+    - Motor Vehicle Records (MVR)
+    - Credit Report
+    - Professional License Verification
+    """
+    DOCUMENT_TYPE_CHOICES = [
+        ('ssn_trace', _('SSN Trace')),
+        ('criminal_county', _('County Criminal Records')),
+        ('criminal_state', _('State Criminal Records')),
+        ('criminal_federal', _('Federal Criminal Records')),
+        ('employment', _('Employment Verification')),
+        ('education', _('Education Verification')),
+        ('mvr', _('Motor Vehicle Records')),
+        ('credit', _('Credit Report')),
+        ('license', _('Professional License')),
+        ('reference', _('Reference Check')),
+        ('drug_test', _('Drug Screening')),
+        ('other', _('Other')),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', _('Pending')),
+        ('in_progress', _('In Progress')),
+        ('completed', _('Completed')),
+        ('failed', _('Failed')),
+        ('unable_to_verify', _('Unable to Verify')),
+    ]
+
+    RESULT_CHOICES = [
+        ('clear', _('Clear')),
+        ('consider', _('Consider')),
+        ('suspended', _('Suspended')),
+        ('records_found', _('Records Found')),
+        ('verified', _('Verified')),
+        ('not_verified', _('Not Verified')),
+    ]
+
+    # Relationships
+    background_check = models.ForeignKey(
+        'BackgroundCheck',
+        on_delete=models.CASCADE,
+        related_name='documents',
+        verbose_name=_('Background Check')
+    )
+
+    # Document Information
+    document_type = models.CharField(
+        max_length=100,
+        choices=DOCUMENT_TYPE_CHOICES,
+        verbose_name=_('Document Type'),
+        help_text=_('Type of screening or document')
+    )
+    external_document_id = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('External Document ID'),
+        help_text=_("Provider's document identifier")
+    )
+
+    # Status and Result
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Status')
+    )
+    result = models.CharField(
+        max_length=50,
+        choices=RESULT_CHOICES,
+        blank=True,
+        verbose_name=_('Result')
+    )
+
+    # Timestamps
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Completed At')
+    )
+
+    # Data
+    document_data = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_('Document Data'),
+        help_text=_('Full document data from provider')
+    )
+
+    # Findings
+    findings_summary = models.TextField(
+        blank=True,
+        verbose_name=_('Findings Summary'),
+        help_text=_('Summary of findings for this document')
+    )
+
+    class Meta:
+        verbose_name = _('Background Check Document')
+        verbose_name_plural = _('Background Check Documents')
+        ordering = ['document_type', '-completed_at']
+        indexes = [
+            models.Index(fields=['document_type']),
+            models.Index(fields=['status']),
+            models.Index(fields=['result']),
+        ]
+
+    def __str__(self):
+        return f"{self.get_document_type_display()} - {self.get_status_display()}"
+
+    def is_complete(self):
+        """Check if document screening is complete."""
+        return self.status == 'completed'
+
+    def has_concerns(self):
+        """Check if document has concerning results."""
+        return self.result in ['consider', 'suspended', 'records_found', 'not_verified']

@@ -8,7 +8,8 @@ from django.utils.html import format_html
 from .models import (
     JobCategory, Pipeline, PipelineStage, JobPosting,
     Candidate, Application, ApplicationActivity, ApplicationNote,
-    Interview, InterviewFeedback, Offer, SavedSearch
+    Interview, InterviewFeedback, Offer, SavedSearch,
+    BackgroundCheck, BackgroundCheckDocument
 )
 
 
@@ -252,3 +253,174 @@ class SavedSearchAdmin(admin.ModelAdmin):
     search_fields = ['name', 'user__email']
     readonly_fields = ['uuid', 'created_at', 'updated_at']
     raw_id_fields = ['user']
+
+
+class BackgroundCheckDocumentInline(admin.TabularInline):
+    """Inline for background check documents/screenings."""
+    model = BackgroundCheckDocument
+    extra = 0
+    readonly_fields = ['document_type', 'status', 'result', 'completed_at', 'created_at']
+    fields = ['document_type', 'status', 'result', 'findings_summary', 'completed_at']
+
+    def has_add_permission(self, request, obj=None):
+        """Documents are created automatically by provider."""
+        return False
+
+
+@admin.register(BackgroundCheck)
+class BackgroundCheckAdmin(admin.ModelAdmin):
+    """Admin interface for background checks."""
+
+    list_display = [
+        'application', 'provider', 'package', 'status_badge', 'result_badge',
+        'initiated_at', 'completed_at'
+    ]
+    list_filter = ['provider', 'status', 'result', 'package', 'initiated_at']
+    search_fields = [
+        'application__candidate__first_name',
+        'application__candidate__last_name',
+        'application__candidate__email',
+        'external_report_id',
+        'external_candidate_id'
+    ]
+    readonly_fields = [
+        'uuid', 'external_candidate_id', 'external_report_id',
+        'status', 'result', 'initiated_at', 'completed_at',
+        'report_url_link', 'report_data_display', 'created_at', 'updated_at'
+    ]
+    raw_id_fields = ['application', 'initiated_by']
+    inlines = [BackgroundCheckDocumentInline]
+    date_hierarchy = 'initiated_at'
+
+    fieldsets = (
+        ('Application', {
+            'fields': ('application', 'initiated_by', 'initiated_at')
+        }),
+        ('Provider', {
+            'fields': (
+                'provider', 'package', 'external_candidate_id', 'external_report_id'
+            )
+        }),
+        ('Status', {
+            'fields': ('status', 'result', 'completed_at')
+        }),
+        ('Consent', {
+            'fields': ('consent_given', 'consent_ip_address', 'consent_timestamp')
+        }),
+        ('Report', {
+            'fields': ('report_url_link', 'notes', 'report_data_display'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def status_badge(self, obj):
+        """Display colored status badge."""
+        colors = {
+            'pending': 'gray',
+            'invited': 'blue',
+            'in_progress': 'orange',
+            'completed': 'green',
+            'failed': 'red',
+            'cancelled': 'gray',
+        }
+        color = colors.get(obj.status, 'gray')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+
+    def result_badge(self, obj):
+        """Display colored result badge."""
+        if not obj.result:
+            return '-'
+
+        colors = {
+            'clear': 'green',
+            'consider': 'orange',
+            'suspended': 'red',
+        }
+        color = colors.get(obj.result, 'gray')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px;">{}</span>',
+            color, obj.get_result_display()
+        )
+    result_badge.short_description = 'Result'
+
+    def report_url_link(self, obj):
+        """Display report URL as clickable link."""
+        if obj.report_url:
+            return format_html(
+                '<a href="{}" target="_blank">View Report</a>',
+                obj.report_url
+            )
+        return '-'
+    report_url_link.short_description = 'Report URL'
+
+    def report_data_display(self, obj):
+        """Display formatted report data."""
+        import json
+        if obj.report_data:
+            return format_html(
+                '<pre style="max-height: 400px; overflow-y: auto;">{}</pre>',
+                json.dumps(obj.report_data, indent=2)
+            )
+        return '-'
+    report_data_display.short_description = 'Report Data'
+
+
+@admin.register(BackgroundCheckDocument)
+class BackgroundCheckDocumentAdmin(admin.ModelAdmin):
+    """Admin interface for individual background check documents."""
+
+    list_display = [
+        'background_check', 'document_type', 'status', 'result',
+        'completed_at', 'created_at'
+    ]
+    list_filter = ['document_type', 'status', 'result', 'completed_at']
+    search_fields = [
+        'background_check__application__candidate__email',
+        'document_type',
+        'findings_summary'
+    ]
+    readonly_fields = [
+        'uuid', 'background_check', 'document_type', 'status', 'result',
+        'completed_at', 'document_data_display', 'created_at', 'updated_at'
+    ]
+
+    fieldsets = (
+        ('Background Check', {
+            'fields': ('background_check',)
+        }),
+        ('Document Details', {
+            'fields': ('document_type', 'status', 'result', 'completed_at')
+        }),
+        ('Findings', {
+            'fields': ('findings_summary', 'document_data_display')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def document_data_display(self, obj):
+        """Display formatted document data."""
+        import json
+        if obj.document_data:
+            return format_html(
+                '<pre style="max-height: 400px; overflow-y: auto;">{}</pre>',
+                json.dumps(obj.document_data, indent=2)
+            )
+        return '-'
+    document_data_display.short_description = 'Document Data'
+
+    def has_add_permission(self, request):
+        """Documents are created automatically by provider."""
+        return False

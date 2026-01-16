@@ -64,7 +64,8 @@ from .models import (
     JobCategory, Pipeline, PipelineStage, JobPosting,
     Candidate, Application, ApplicationActivity, ApplicationNote,
     Interview, InterviewFeedback, Offer, SavedSearch,
-    InterviewSlot, OfferTemplate, OfferApproval
+    InterviewSlot, OfferTemplate, OfferApproval,
+    BackgroundCheck
 )
 from .serializers import (
     JobCategorySerializer, JobCategoryListSerializer,
@@ -93,7 +94,9 @@ from .serializers import (
     StageConversionRateSerializer, PipelineBottleneckSerializer, SLAStatusSerializer,
     PipelineComparisonSerializer, PipelineAnalyticsSerializer,
     RecruitingFunnelSerializer, DEIMetricsSerializer, CostPerHireSerializer,
-    TimeToFillSerializer, SourceQualitySerializer, RecruiterPerformanceSerializer
+    TimeToFillSerializer, SourceQualitySerializer, RecruiterPerformanceSerializer,
+    # Background check serializers
+    BackgroundCheckSerializer, InitiateBackgroundCheckSerializer
 )
 from .filters import (
     JobCategoryFilter, PipelineFilter, PipelineStageFilter,
@@ -1403,6 +1406,141 @@ class ApplicationViewSet(RecruiterViewSet):
             'action': action_type,
             'affected_count': count
         })
+
+    @action(detail=True, methods=['post'], url_path='background-check/initiate')
+    def initiate_background_check(self, request, uuid=None):
+        """
+        Initiate background check for this application.
+
+        Requires:
+        - package: Background check package level (basic/standard/pro/comprehensive)
+        - consent_given: Boolean indicating candidate has given consent
+
+        Security:
+        - Checks feature flag on tenant plan
+        - Records consent with IP address and timestamp
+        - Validates provider integration is configured
+
+        Returns background check record with external provider IDs.
+        """
+        from .background_checks import BackgroundCheckService
+
+        application = self.get_object()
+        serializer = InitiateBackgroundCheckSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Get client IP for consent tracking
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip_address = x_forwarded_for.split(',')[0]
+        else:
+            ip_address = request.META.get('REMOTE_ADDR')
+
+        try:
+            service = BackgroundCheckService(tenant=request.tenant)
+            background_check = service.initiate_check(
+                application=application,
+                package=serializer.validated_data['package'],
+                initiated_by=request.user,
+                provider_name=serializer.validated_data.get('provider_name')
+            )
+
+            # Record consent details
+            background_check.consent_ip_address = ip_address
+            background_check.consent_timestamp = timezone.now()
+            background_check.save(update_fields=['consent_ip_address', 'consent_timestamp'])
+
+            return Response(
+                BackgroundCheckSerializer(background_check).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        except PermissionDenied as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        except ValueError as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Failed to initiate background check: {e}", exc_info=True)
+            return Response(
+                {'error': 'Failed to initiate background check. Please try again.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='background-check/status')
+    def background_check_status(self, request, uuid=None):
+        """
+        Get current background check status for this application.
+
+        Returns:
+        - Background check record with status, result, and documents
+        - 404 if no background check has been initiated
+        """
+        application = self.get_object()
+
+        try:
+            background_check = BackgroundCheck.objects.select_related(
+                'application__candidate',
+                'application__job',
+                'initiated_by'
+            ).prefetch_related('documents').get(
+                tenant=request.tenant,
+                application=application
+            )
+
+            return Response(BackgroundCheckSerializer(background_check).data)
+
+        except BackgroundCheck.DoesNotExist:
+            return Response(
+                {'detail': 'No background check found for this application'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=True, methods=['get'], url_path='background-check/report')
+    def background_check_report(self, request, uuid=None):
+        """
+        Get full background check report from provider.
+
+        Returns:
+        - Cached report data if check is complete
+        - Live data from provider API if available
+        - Error message if check is not yet complete
+
+        Security:
+        - Only returns reports for applications in current tenant
+        - Requires check to be in completed status
+        """
+        from .background_checks import BackgroundCheckService
+
+        application = self.get_object()
+
+        try:
+            background_check = BackgroundCheck.objects.get(
+                tenant=request.tenant,
+                application=application
+            )
+
+            service = BackgroundCheckService(tenant=request.tenant)
+            report = service.get_report(background_check.id)
+
+            return Response(report)
+
+        except BackgroundCheck.DoesNotExist:
+            return Response(
+                {'detail': 'No background check found for this application'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Failed to retrieve background check report: {e}", exc_info=True)
+            return Response(
+                {'error': 'Failed to retrieve background check report'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # ==================== INTERVIEW VIEWSET ====================

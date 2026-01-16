@@ -24,6 +24,7 @@ from .services import (
     MatchingService, RecommendationService, ResumeParserService,
     JobDescriptionAnalyzer, BiasDetectionService
 )
+from .services.explanations import MatchExplanationService
 from .serializers import (
     MatchCandidatesInputSerializer, MatchJobsInputSerializer,
     ParseResumeInputSerializer, AnalyzeJobDescriptionInputSerializer,
@@ -1159,6 +1160,8 @@ class MatchExplanationView(APIView):
     Get detailed explanation for a specific match.
 
     GET /api/ai-matching/match/<uuid:match_id>/explain/
+    Query params:
+        - use_gpt4: boolean (default: true) - Use GPT-4 for enhanced explanations
     """
     permission_classes = [IsAuthenticated]
 
@@ -1185,7 +1188,49 @@ class MatchExplanationView(APIView):
                             status=status.HTTP_403_FORBIDDEN
                         )
 
-            # Build detailed explanation
+            # Check if GPT-4 explanations are requested (default: true)
+            use_gpt4 = request.query_params.get('use_gpt4', 'true').lower() == 'true'
+
+            # Build match result dict for explanation service
+            match_result_dict = {
+                'overall_score': float(match.overall_score),
+                'skill_score': float(match.skill_score or 0),
+                'experience_score': float(match.experience_score or 0),
+                'location_score': float(match.location_score or 0),
+                'salary_score': float(match.salary_score or 0),
+                'semantic_score': float(match.semantic_similarity or 0),
+                'matched_skills': match.matched_skills,
+                'missing_skills': match.missing_skills,
+                'confidence': match.confidence_level,
+            }
+
+            # Generate AI-powered explanation if requested
+            gpt_explanation = None
+            if use_gpt4:
+                try:
+                    explanation_service = MatchExplanationService()
+                    candidate_name = getattr(match.candidate, 'full_name', None)
+                    job_title = getattr(match.job, 'title', None)
+
+                    gpt_explanation_obj = explanation_service.generate_explanation(
+                        match_result_dict,
+                        candidate_name=candidate_name,
+                        job_title=job_title
+                    )
+
+                    gpt_explanation = {
+                        'overall_explanation': gpt_explanation_obj.overall_explanation,
+                        'strengths': gpt_explanation_obj.strengths,
+                        'weaknesses': gpt_explanation_obj.weaknesses,
+                        'recommendations': gpt_explanation_obj.recommendations,
+                        'detailed_breakdown': gpt_explanation_obj.detailed_breakdown,
+                        'confidence': gpt_explanation_obj.confidence,
+                    }
+                except Exception as e:
+                    logger.warning(f"GPT-4 explanation failed, using fallback: {e}")
+                    # Will use fallback explanations below
+
+            # Build detailed explanation response
             explanation_data = {
                 'match_id': str(match.uuid),
                 'candidate_id': match.candidate.id,
@@ -1210,8 +1255,14 @@ class MatchExplanationView(APIView):
                 'experience_analysis': match.explanation.get('experience_analysis', {}),
                 'location_analysis': match.explanation.get('location_analysis', {}),
                 'salary_analysis': match.explanation.get('salary_analysis', {}),
-                'human_readable_summary': self._generate_summary(match),
-                'improvement_suggestions': self._generate_suggestions(match),
+                'human_readable_summary': (
+                    gpt_explanation['overall_explanation'] if gpt_explanation
+                    else self._generate_summary(match)
+                ),
+                'improvement_suggestions': (
+                    gpt_explanation['recommendations'] if gpt_explanation
+                    else self._generate_suggestions(match)
+                ),
                 'algorithm_details': {
                     'algorithm': match.matching_algorithm,
                     'confidence': match.confidence_level,
@@ -1219,6 +1270,15 @@ class MatchExplanationView(APIView):
                     'expires_at': match.expires_at.isoformat() if match.expires_at else None,
                 },
             }
+
+            # Add GPT-4 enhanced explanation if available
+            if gpt_explanation:
+                explanation_data['gpt4_insights'] = {
+                    'strengths': gpt_explanation['strengths'],
+                    'weaknesses': gpt_explanation['weaknesses'],
+                    'detailed_breakdown': gpt_explanation['detailed_breakdown'],
+                    'powered_by': 'OpenAI GPT-4',
+                }
 
             return Response(explanation_data)
 

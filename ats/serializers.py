@@ -29,7 +29,8 @@ from .models import (
     Candidate, Application, ApplicationActivity, ApplicationNote,
     Interview, InterviewFeedback, Offer, SavedSearch,
     InterviewSlot, InterviewTemplate, OfferTemplate, OfferApproval,
-    InterviewType, MeetingProvider
+    InterviewType, MeetingProvider,
+    BackgroundCheck, BackgroundCheckDocument
 )
 from .validators import (
     ApplicationValidator,
@@ -2475,3 +2476,119 @@ class TenantAwareSerializer(serializers.ModelSerializer):
             if hasattr(model, 'tenant'):
                 validated_data['tenant'] = tenant
         return super().create(validated_data)
+
+
+# ==================== BACKGROUND CHECKS ====================
+
+class BackgroundCheckDocumentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for individual background check documents.
+    """
+
+    class Meta:
+        model = BackgroundCheckDocument
+        fields = [
+            'id',
+            'document_type',
+            'status',
+            'result',
+            'completed_at',
+            'findings_summary',
+            'document_data',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class BackgroundCheckSerializer(serializers.ModelSerializer):
+    """
+    Serializer for background check records.
+    """
+    documents = BackgroundCheckDocumentSerializer(many=True, read_only=True)
+    initiated_by_name = serializers.SerializerMethodField()
+    application_info = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BackgroundCheck
+        fields = [
+            'id',
+            'application',
+            'application_info',
+            'provider',
+            'package',
+            'status',
+            'result',
+            'external_candidate_id',
+            'external_report_id',
+            'initiated_by',
+            'initiated_by_name',
+            'initiated_at',
+            'completed_at',
+            'report_url',
+            'report_data',
+            'consent_given',
+            'consent_ip_address',
+            'consent_timestamp',
+            'notes',
+            'documents',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id',
+            'external_candidate_id',
+            'external_report_id',
+            'status',
+            'result',
+            'initiated_at',
+            'completed_at',
+            'report_url',
+            'report_data',
+            'created_at',
+            'updated_at',
+        ]
+
+    def get_initiated_by_name(self, obj):
+        """Get name of user who initiated the check."""
+        if obj.initiated_by:
+            return f"{obj.initiated_by.first_name} {obj.initiated_by.last_name}".strip() or obj.initiated_by.email
+        return None
+
+    def get_application_info(self, obj):
+        """Get basic application information."""
+        return {
+            'id': obj.application.id,
+            'uuid': str(obj.application.uuid),
+            'candidate_name': str(obj.application.candidate),
+            'job_title': obj.application.job.title,
+            'status': obj.application.status,
+        }
+
+
+class InitiateBackgroundCheckSerializer(serializers.Serializer):
+    """
+    Serializer for initiating a background check.
+    """
+    package = serializers.ChoiceField(
+        choices=['basic', 'standard', 'pro', 'comprehensive'],
+        default='standard',
+        help_text="Background check package level"
+    )
+    consent_given = serializers.BooleanField(
+        required=True,
+        help_text="Candidate must provide consent before background check can be initiated"
+    )
+    provider_name = serializers.ChoiceField(
+        choices=['checkr', 'sterling', 'hireright'],
+        required=False,
+        help_text="Specific provider to use (optional, defaults to tenant's configured provider)"
+    )
+
+    def validate_consent_given(self, value):
+        """Ensure consent is given."""
+        if not value:
+            raise serializers.ValidationError(
+                "Candidate consent is required to initiate a background check."
+            )
+        return value
