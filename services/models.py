@@ -200,10 +200,14 @@ class ProviderSkill(TenantAwareModel):
     level = models.CharField(
         max_length=20,
         choices=SkillLevel.choices,
-        default=SkillLevel.BEGINNER
+        default=SkillLevel.BEGINNER,
+        db_index=True  # Index for filtering skills by level
     )
     years_experience = models.PositiveSmallIntegerField(default=0)
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(
+        default=False,
+        db_index=True  # Index for finding verified skills
+    )
 
     objects = TenantAwareManager()
 
@@ -287,6 +291,7 @@ class ServiceProvider(TenantAwareModel):
         decimal_places=2,
         null=True,
         blank=True,
+        db_index=True,  # Index for filtering providers by hourly rate
         help_text=_("Default hourly rate")
     )
     minimum_budget = models.DecimalField(
@@ -294,9 +299,14 @@ class ServiceProvider(TenantAwareModel):
         decimal_places=2,
         null=True,
         blank=True,
+        db_index=True,  # Index for filtering providers by minimum budget
         help_text=_("Minimum project budget")
     )
-    currency = models.CharField(max_length=3, default='CAD')
+    currency = models.CharField(
+        max_length=3,
+        default='CAD',
+        db_index=True  # Index for currency-based filtering
+    )
 
     # Ratings & Stats
     rating_avg = models.DecimalField(
@@ -315,10 +325,18 @@ class ServiceProvider(TenantAwareModel):
     availability_status = models.CharField(
         max_length=20,
         choices=AvailabilityStatus.choices,
-        default=AvailabilityStatus.AVAILABLE
+        default=AvailabilityStatus.AVAILABLE,
+        db_index=True  # Index for filtering providers by availability status
     )
-    is_verified = models.BooleanField(default=False, help_text=_("KYC verified"))
-    is_featured = models.BooleanField(default=False)
+    is_verified = models.BooleanField(
+        default=False,
+        db_index=True,  # Index for finding KYC-verified providers
+        help_text=_("KYC verified")
+    )
+    is_featured = models.BooleanField(
+        default=False,
+        db_index=True  # Index for finding featured providers in marketplace
+    )
 
     # MARKETPLACE VISIBILITY
     marketplace_enabled = models.BooleanField(
@@ -342,7 +360,11 @@ class ServiceProvider(TenantAwareModel):
     stripe_payouts_enabled = models.BooleanField(default=False)
 
     # Timestamps
-    last_active_at = models.DateTimeField(null=True, blank=True)
+    last_active_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for tracking active providers
+    )
 
     objects = TenantAwareManager()
 
@@ -457,13 +479,15 @@ class Service(TenantAwareModel):
     service_type = models.CharField(
         max_length=20,
         choices=ServiceType.choices,
-        default=ServiceType.FIXED_PRICE
+        default=ServiceType.FIXED_PRICE,
+        db_index=True  # Index for filtering services by pricing model
     )
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True,
+        db_index=True,  # Index for price range filtering
         help_text=_("Price for fixed-price services")
     )
     price_min = models.DecimalField(
@@ -471,25 +495,33 @@ class Service(TenantAwareModel):
         decimal_places=2,
         null=True,
         blank=True,
+        db_index=True,  # Index for custom quote price filtering
         help_text=_("Minimum price for custom quotes")
     )
     price_max = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
-        blank=True
+        blank=True,
+        db_index=True  # Index for price ceiling filtering
     )
-    currency = models.CharField(max_length=3, default='CAD')
+    currency = models.CharField(
+        max_length=3,
+        default='CAD',
+        db_index=True  # Index for currency-based filtering
+    )
 
     # Delivery
     delivery_type = models.CharField(
         max_length=20,
         choices=DeliveryType.choices,
-        default=DeliveryType.REMOTE
+        default=DeliveryType.REMOTE,
+        db_index=True  # Index for filtering services by delivery type
     )
     duration_days = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
+        db_index=True,  # Index for filtering services by duration
         help_text=_("Estimated delivery time in days")
     )
     revisions_included = models.PositiveSmallIntegerField(default=1)
@@ -505,10 +537,12 @@ class Service(TenantAwareModel):
     # Status
     is_active = models.BooleanField(
         default=True,
+        db_index=True,  # Index for finding active services
         help_text=_('Service is active and available for booking within tenant')
     )
     is_featured = models.BooleanField(
         default=False,
+        db_index=True,  # Index for finding featured services in marketplace
         help_text=_('Featured services appear prominently in tenant marketplace')
     )
 
@@ -657,7 +691,8 @@ class ClientRequest(TenantAwareModel):
     status = models.CharField(
         max_length=20,
         choices=RequestStatus.choices,
-        default=RequestStatus.OPEN
+        default=RequestStatus.OPEN,
+        db_index=True  # Index for filtering client requests by status
     )
 
     objects = TenantAwareManager()
@@ -767,13 +802,13 @@ class CrossTenantServiceRequest(TenantAwareModel):
         max_length=20,
         choices=RequestStatus.choices,
         default=RequestStatus.PENDING,
-        db_index=True
+        db_index=True  # Index for filtering cross-tenant requests by status
     )
     hiring_context = models.CharField(
         max_length=20,
         choices=HiringContext.choices,
         default=HiringContext.ORGANIZATIONAL,
-        db_index=True,
+        db_index=True,  # Index for distinguishing organizational vs personal hiring
         help_text=_('Is this request for organization or personal use?')
     )
     provider_response = models.TextField(
@@ -783,6 +818,7 @@ class CrossTenantServiceRequest(TenantAwareModel):
     responded_at = models.DateTimeField(
         null=True,
         blank=True,
+        db_index=True,  # Index for tracking provider response timestamps
         help_text=_('When provider responded')
     )
 
@@ -910,11 +946,16 @@ class ServiceProposal(TenantAwareModel):
     )
 
     # Pricing
-    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    proposed_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        db_index=True  # Index for filtering proposals by rate
+    )
     rate_type = models.CharField(
         max_length=20,
         choices=[('fixed', 'Fixed'), ('hourly', 'Hourly')],
-        default='fixed'
+        default='fixed',
+        db_index=True  # Index for filtering proposals by rate type
     )
     estimated_hours = models.PositiveSmallIntegerField(null=True, blank=True)
 
@@ -927,7 +968,8 @@ class ServiceProposal(TenantAwareModel):
     status = models.CharField(
         max_length=20,
         choices=ProposalStatus.choices,
-        default=ProposalStatus.PENDING
+        default=ProposalStatus.PENDING,
+        db_index=True  # Index for filtering proposals by status
     )
 
     objects = TenantAwareManager()
@@ -1005,14 +1047,27 @@ class ServiceContract(TenantAwareModel):
     # Contract Details
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    agreed_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    agreed_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        db_index=True  # Index for filtering contracts by agreed rate
+    )
     rate_type = models.CharField(
         max_length=20,
         choices=[('fixed', 'Fixed'), ('hourly', 'Hourly')],
-        default='fixed'
+        default='fixed',
+        db_index=True  # Index for filtering contracts by rate type
     )
-    currency = models.CharField(max_length=3, default='CAD')
-    agreed_deadline = models.DateField(null=True, blank=True)
+    currency = models.CharField(
+        max_length=3,
+        default='CAD',
+        db_index=True  # Index for currency-based filtering
+    )
+    agreed_deadline = models.DateField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for deadline-based filtering and sorting
+    )
     revisions_allowed = models.PositiveSmallIntegerField(default=1)
     revisions_used = models.PositiveSmallIntegerField(default=0)
 
@@ -1035,12 +1090,29 @@ class ServiceContract(TenantAwareModel):
     status = models.CharField(
         max_length=20,
         choices=ContractStatus.choices,
-        default=ContractStatus.DRAFT
+        default=ContractStatus.DRAFT,
+        db_index=True  # Index for filtering contracts by status
     )
-    started_at = models.DateTimeField(null=True, blank=True)
-    delivered_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    cancelled_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for filtering active/completed contracts
+    )
+    delivered_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for tracking delivery dates
+    )
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for finding completed contracts
+    )
+    cancelled_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for tracking cancellations
+    )
     cancellation_reason = models.TextField(blank=True)
 
     objects = TenantAwareManager()
@@ -1146,7 +1218,11 @@ class ServiceReview(TenantAwareModel):
 
     # Response
     provider_response = models.TextField(blank=True, validators=[MaxLengthValidator(5000)])
-    provider_responded_at = models.DateTimeField(null=True, blank=True)
+    provider_responded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for tracking provider response timestamps
+    )
 
     objects = TenantAwareManager()
 
@@ -1181,8 +1257,15 @@ class ContractMessage(TenantAwareModel):
     )
     content = models.TextField()
     attachments = models.JSONField(default=list, blank=True)
-    is_system_message = models.BooleanField(default=False)
-    read_at = models.DateTimeField(null=True, blank=True)
+    is_system_message = models.BooleanField(
+        default=False,
+        db_index=True  # Index for filtering system vs user messages
+    )
+    read_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True  # Index for finding unread messages
+    )
 
     objects = TenantAwareManager()
 
