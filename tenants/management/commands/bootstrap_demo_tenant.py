@@ -2396,17 +2396,85 @@ We are looking for a talented {title} to join our growing team. In this role, yo
             self.stdout.write('')
 
         self.stdout.write(self.style.MIGRATE_HEADING('Demo Data Created:'))
-        self.stdout.write('  - 6 demo users with different roles')
-        self.stdout.write('  - 8 job categories')
-        self.stdout.write('  - 15 job postings across all categories')
-        self.stdout.write('  - 50 candidates with applications')
-        self.stdout.write('  - Interviews and offers in pipeline')
-        self.stdout.write('  - 25 employees with profiles')
-        self.stdout.write('  - Time-off types and requests')
+
+        # Users & Tenants
+        self.stdout.write('\n  ' + self.style.SUCCESS('Users & Authentication:'))
+        self.stdout.write(f'  - {len(DEMO_USERS)} demo users with different roles')
+        self.stdout.write('  - KYC verifications and trust scores for all users')
+        self.stdout.write('  - 10+ user reviews')
+        self.stdout.write('  - 10+ employment verifications')
+        self.stdout.write('  - 10+ education verifications')
+
+        # ATS
+        self.stdout.write('\n  ' + self.style.SUCCESS('Applicant Tracking System (ATS):'))
+        self.stdout.write('  - 10+ job categories')
+        self.stdout.write('  - 10+ pipeline stages')
+        self.stdout.write('  - 20 job postings')
+        self.stdout.write('  - 50 candidates with profiles')
+        self.stdout.write('  - 75-150 applications')
+        self.stdout.write('  - 20+ interviews scheduled')
+        self.stdout.write('  - 10+ interview feedback entries')
+        self.stdout.write('  - 10+ job offers')
+
+        # HR
+        self.stdout.write('\n  ' + self.style.SUCCESS('Human Resources:'))
+        self.stdout.write('  - 25 employees')
+        self.stdout.write('  - 10+ departments')
+        self.stdout.write('  - 10 time-off types')
+        self.stdout.write('  - 10+ time-off requests')
+        self.stdout.write('  - 10 onboarding checklists with tasks')
+        self.stdout.write('  - 10+ onboarding instances')
+        self.stdout.write('  - 10+ compensation records (salary history)')
+        self.stdout.write('  - 10+ performance reviews')
+        self.stdout.write('  - 15 skills with employee mappings')
+
+        # Services/Marketplace
         if not self.skip_marketplace:
-            self.stdout.write('  - Service providers and categories')
+            self.stdout.write('\n  ' + self.style.SUCCESS('Marketplace & Services:'))
+            self.stdout.write('  - 10+ service categories')
+            self.stdout.write('  - 10 service providers')
+            self.stdout.write('  - 10-30 service listings')
+            self.stdout.write('  - 10+ service proposals')
+            self.stdout.write('  - 10+ service contracts')
+            self.stdout.write('  - Contract milestones')
+
+        # Finance
+        self.stdout.write('\n  ' + self.style.SUCCESS('Finance & Payments:'))
+        self.stdout.write('  - 10+ payment methods')
+        self.stdout.write('  - 10+ user subscriptions')
+        self.stdout.write('  - 10+ escrow transactions')
+        self.stdout.write('  - 10+ invoices with line items')
+        self.stdout.write('  - 10+ payment transactions')
+        self.stdout.write('  - 10+ connected accounts (Stripe)')
+
+        # Notifications
+        self.stdout.write('\n  ' + self.style.SUCCESS('Notifications:'))
+        self.stdout.write('  - 4 notification channels (email, SMS, push, in-app)')
+        self.stdout.write('  - 12 notification templates')
+        self.stdout.write('  - 15+ notifications sent')
+        self.stdout.write('  - Notification preferences for all users')
+
+        # Appointments
+        self.stdout.write('\n  ' + self.style.SUCCESS('Appointments:'))
+        self.stdout.write('  - 12 appointment service types')
+        self.stdout.write('  - 10+ staff members')
+        self.stdout.write('  - Working hours configured')
+        self.stdout.write('  - 10+ appointments booked')
+        self.stdout.write('  - 10+ appointment requests')
+
+        # Messaging
         if not self.skip_messaging:
-            self.stdout.write('  - Conversations between users')
-        self.stdout.write('  - KYC verifications and trust scores')
+            self.stdout.write('\n  ' + self.style.SUCCESS('Messaging:'))
+            self.stdout.write('  - 10+ conversations')
+            self.stdout.write('  - 30+ messages')
+
+        # Analytics
+        self.stdout.write('\n  ' + self.style.SUCCESS('Analytics:'))
+        self.stdout.write('  - 20 page views logged')
+        self.stdout.write('  - 15 user actions tracked')
+        self.stdout.write('  - Diversity metrics snapshot')
+        self.stdout.write('  - Recruitment metrics snapshot')
+
+        self.stdout.write('\n  ' + self.style.MIGRATE_HEADING('Total: 500+ demo records across all entity types'))
 
         self.stdout.write('\n' + '=' * 60)

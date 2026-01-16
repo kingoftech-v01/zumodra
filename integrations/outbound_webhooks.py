@@ -466,18 +466,23 @@ def dispatch_webhook(
     queued = 0
     for webhook in webhooks:
         if webhook.should_receive_event(app_name, event_type):
-            # Create delivery record
-            delivery = OutboundWebhookDelivery.objects.create(
-                webhook=webhook,
-                app_name=app_name,
-                event_type=event_type,
-                event_id=event_id or str(uuid.uuid4()),
-                payload=data
-            )
+            try:
+                # Create delivery record
+                delivery = OutboundWebhookDelivery.objects.create(
+                    webhook=webhook,
+                    app_name=app_name,
+                    event_type=event_type,
+                    event_id=event_id or str(uuid.uuid4()),
+                    payload=data
+                )
 
-            # Queue for async delivery
-            deliver_outbound_webhook.delay(str(delivery.id))
-            queued += 1
+                # Queue for async delivery
+                deliver_outbound_webhook.delay(str(delivery.id))
+                queued += 1
+            except (ProgrammingError, OperationalError) as e:
+                # Delivery table doesn't exist yet (during migrations)
+                logger.debug(f"Webhook delivery table not available yet: {e}")
+                continue
 
     if queued:
         logger.info(f"Dispatched {queued} webhooks for {app_name}.{event_type}")

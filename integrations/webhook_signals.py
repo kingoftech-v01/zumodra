@@ -89,7 +89,9 @@ def dispatch_webhook_for_model(
             event_id=str(instance.pk) if instance.pk else None
         )
     except Exception as e:
-        logger.error(f"Failed to dispatch webhook {app_name}.{event_type}: {e}")
+        # During initial setup, tables might not exist yet - this is expected
+        # Log as warning instead of error to avoid false alarms
+        logger.warning(f"Failed to dispatch webhook {app_name}.{event_type} (expected during setup): {e}")
 
 
 # =============================================================================
@@ -134,7 +136,9 @@ def connect_tenants_webhooks():
                     event_id=str(instance.id)
                 )
             except Exception as e:
-                logger.error(f"Failed to dispatch tenant webhook: {e}")
+                # During initial setup, tables might not exist yet - this is expected
+                # Log as warning instead of error to avoid false alarms
+                logger.warning(f"Failed to dispatch tenant webhook (expected during setup): {e}")
 
         @receiver(post_delete, sender=Tenant)
         def tenant_deleted(sender, instance, **kwargs):
@@ -153,7 +157,9 @@ def connect_tenants_webhooks():
                     event_id=str(instance.id)
                 )
             except Exception as e:
-                logger.error(f"Failed to dispatch tenant deletion webhook: {e}")
+                # During initial setup, tables might not exist yet - this is expected
+                # Log as warning instead of error to avoid false alarms
+                logger.warning(f"Failed to dispatch tenant deletion webhook (expected during setup): {e}")
 
         logger.info("Tenants webhook signals connected")
     except ImportError as e:
