@@ -685,7 +685,7 @@ class InterviewTemplate(TenantAwareModel):
         help_text=_('Name of the interview template')
     )
     interview_type = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=InterviewType.choices,
         default=InterviewType.VIDEO
     )
@@ -902,7 +902,7 @@ class PipelineStage(models.Model):
     )
     name = models.CharField(max_length=100)
     stage_type = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=StageType.choices,
         default=StageType.NEW
     )
@@ -1089,7 +1089,7 @@ class JobPosting(TenantSoftDeleteModel):
 
     # Status & Pipeline
     status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=JobStatus.choices,
         default=JobStatus.DRAFT
     )
@@ -1110,19 +1110,19 @@ class JobPosting(TenantSoftDeleteModel):
 
     # Type & Level
     job_type = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=JobType.choices,
         default=JobType.FULL_TIME
     )
     experience_level = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=ExperienceLevel.choices,
         default=ExperienceLevel.MID
     )
 
     # Location
     remote_policy = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=RemotePolicy.choices,
         default=RemotePolicy.ON_SITE
     )
@@ -1146,7 +1146,7 @@ class JobPosting(TenantSoftDeleteModel):
     )
     salary_currency = models.CharField(max_length=3, default='CAD')
     salary_period = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=[
             ('hourly', _('Hourly')),
             ('daily', _('Daily')),
@@ -1665,7 +1665,7 @@ class Candidate(TenantSoftDeleteModel):
 
     # Source & Tracking
     source = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=Source.choices,
         default=Source.DIRECT
     )
@@ -1963,7 +1963,7 @@ class Application(TenantAwareModel):
 
     # Status & Stage
     status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=ApplicationStatus.choices,
         default=ApplicationStatus.NEW
     )
@@ -2517,12 +2517,12 @@ class Interview(models.Model):
 
     # Type & Status (using global InterviewType)
     interview_type = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=InterviewType.choices,
         default=InterviewType.VIDEO
     )
     status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=InterviewStatus.choices,
         default=InterviewStatus.SCHEDULED
     )
@@ -2564,7 +2564,7 @@ class Interview(models.Model):
 
     # Video Conferencing Provider (NEW)
     meeting_provider = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=MeetingProvider.choices,
         blank=True,
         help_text=_('Video conferencing platform')
@@ -2877,7 +2877,7 @@ class InterviewFeedback(models.Model):
 
     # Recommendation
     recommendation = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=[
             ('strong_yes', _('Strong Yes')),
             ('yes', _('Yes')),
@@ -2969,14 +2969,14 @@ class Offer(models.Model):
 
     # Status
     status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=OfferStatus.choices,
         default=OfferStatus.DRAFT
     )
 
     # Approval Workflow (NEW)
     approval_status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=ApprovalStatusChoices.choices,
         default=ApprovalStatusChoices.NOT_REQUIRED,
         help_text=_('Current approval workflow status')
@@ -3029,7 +3029,7 @@ class Offer(models.Model):
 
     # E-Sign Provider (NEW)
     esign_provider = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=ESignProvider.choices,
         blank=True,
         help_text=_('E-signature provider (docusign, hellosign, etc.)')
@@ -3451,7 +3451,7 @@ class SavedSearch(models.Model):
         help_text=_('Get notified when new candidates match')
     )
     alert_frequency = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=[
             ('instant', _('Instant')),
             ('daily', _('Daily')),
@@ -3497,7 +3497,7 @@ class OfferTemplate(TenantAwareModel):
     )
     department = models.CharField(max_length=100, blank=True)
     job_type = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=JobPosting.JobType.choices,
         blank=True
     )
@@ -3749,7 +3749,7 @@ class OfferApproval(TenantAwareModel):
 
     # Status
     status = models.CharField(
-        max_length=20,
+        max_length=35,
         choices=ApprovalStatus.choices,
         default=ApprovalStatus.PENDING
     )

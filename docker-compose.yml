@@ -170,6 +170,7 @@ services:
     environment:
       <<: *common-env
       SERVICE_TYPE: web
+      SKIP_MIGRATIONS: "true"
       CREATE_DEMO_TENANT: ${CREATE_DEMO_TENANT:-true}
       RUN_TESTS: ${RUN_TESTS:-true}
       TEST_COVERAGE: ${TEST_COVERAGE:-false}

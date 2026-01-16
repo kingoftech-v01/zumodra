@@ -284,7 +284,7 @@ class BackgroundCheckAdmin(admin.ModelAdmin):
         'external_candidate_id'
     ]
     readonly_fields = [
-        'uuid', 'external_candidate_id', 'external_report_id',
+        'external_candidate_id', 'external_report_id',
         'status', 'result', 'initiated_at', 'completed_at',
         'report_url_link', 'report_data_display', 'created_at', 'updated_at'
     ]
@@ -390,7 +390,7 @@ class BackgroundCheckDocumentAdmin(admin.ModelAdmin):
         'findings_summary'
     ]
     readonly_fields = [
-        'uuid', 'background_check', 'document_type', 'status', 'result',
+        'background_check', 'document_type', 'status', 'result',
         'completed_at', 'document_data_display', 'created_at', 'updated_at'
     ]
 
