@@ -15,12 +15,12 @@ class PaymentTransaction(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)  # amount in USD or your currency
+    amount = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)  # Index for financial queries
     currency = models.CharField(max_length=10, default='USD')
     stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    succeeded = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for timeline queries
+    succeeded = models.BooleanField(default=False, db_index=True)  # Index for status filtering
     failure_code = models.CharField(max_length=100, blank=True, null=True)
     failure_message = models.TextField(blank=True, null=True)
 
@@ -51,9 +51,9 @@ class UserSubscription(models.Model):
     Linked to Stripe subscription ID and current active status.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription_status_user')
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.SET_NULL, null=True)
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.SET_NULL, null=True, db_index=True)  # Index for plan-based queries
     stripe_subscription_id = models.CharField(max_length=255, unique=True)
-    status = models.CharField(max_length=50)  # e.g. active, past_due, canceled
+    status = models.CharField(max_length=50, db_index=True)  # Index for subscription status filtering (active, past_due, canceled)
     current_period_start = models.DateTimeField()
     current_period_end = models.DateTimeField()
 
@@ -68,13 +68,13 @@ class Invoice(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invoices')
     invoice_number = models.CharField(max_length=100, unique=True)
     stripe_invoice_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    amount_due = models.DecimalField(max_digits=10, decimal_places=2)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)  # Index for financial reporting
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0, db_index=True)  # Index for payment tracking
     currency = models.CharField(max_length=10, default='USD')
     due_date = models.DateTimeField(null=True, blank=True)
-    paid = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    paid_at = models.DateTimeField(null=True, blank=True)
+    paid = models.BooleanField(default=False, db_index=True)  # Index for invoice status filtering
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for invoice timeline queries
+    paid_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for payment date filtering
 
     def __str__(self):
         return f"Invoice {self.invoice_number} - User {self.user} - Paid: {self.paid}"
@@ -85,9 +85,9 @@ class RefundRequest(models.Model):
     Model managing refund requests for payments.
     """
     payment = models.OneToOneField(PaymentTransaction, on_delete=models.CASCADE, related_name='refund_request')
-    requested_at = models.DateTimeField(auto_now_add=True)
-    approved = models.BooleanField(default=False)
-    processed_at = models.DateTimeField(null=True, blank=True)
+    requested_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for refund timeline queries
+    approved = models.BooleanField(default=False, db_index=True)  # Index for refund status filtering
+    processed_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for processed refund tracking
     processed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='processed_refunds')
     reason = models.TextField(blank=True)
 
@@ -106,8 +106,8 @@ class PaymentMethod(models.Model):
     card_last4 = models.CharField(max_length=4)
     card_exp_month = models.PositiveIntegerField()
     card_exp_year = models.PositiveIntegerField()
-    is_default = models.BooleanField(default=False)
-    added_at = models.DateTimeField(auto_now_add=True)
+    is_default = models.BooleanField(default=False, db_index=True)  # Index for default payment method lookup
+    added_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for payment method timeline
 
     def __str__(self):
         return f"{self.card_brand} ****{self.card_last4} for {self.user}"
@@ -120,9 +120,9 @@ class StripeWebhookEvent(models.Model):
     """
     event_id = models.CharField(max_length=255, unique=True)
     json_payload = models.JSONField()
-    received_at = models.DateTimeField(auto_now_add=True)
-    processed = models.BooleanField(default=False)
-    processed_at = models.DateTimeField(null=True, blank=True)
+    received_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for webhook event timeline
+    processed = models.BooleanField(default=False, db_index=True)  # Index for unprocessed webhook filtering
+    processed_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for processed webhook tracking
     error_message = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -148,10 +148,10 @@ class EscrowTransaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='escrow_buyer_transactions')
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='escrow_seller_transactions')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)  # Index for escrow financial queries
     currency = models.CharField(max_length=10, default='USD')
-    status = models.CharField(max_length=20, choices=ESCROW_STATUS_CHOICES, default='initialized')
-    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=ESCROW_STATUS_CHOICES, default='initialized', db_index=True)  # Index for escrow status filtering
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for escrow timeline queries
     funded_at = models.DateTimeField(null=True, blank=True)
     service_delivered_at = models.DateTimeField(null=True, blank=True)
     released_at = models.DateTimeField(null=True, blank=True)
@@ -209,9 +209,9 @@ class Dispute(models.Model):
     raised_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='raised_disputes')
     reason = models.TextField()
     details = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    resolved = models.BooleanField(default=False)
-    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for dispute timeline
+    resolved = models.BooleanField(default=False, db_index=True)  # Index for unresolved dispute filtering
+    resolved_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for dispute resolution tracking
     resolution_notes = models.TextField(blank=True)
 
     def __str__(self):
@@ -224,10 +224,10 @@ class EscrowPayout(models.Model):
     """
     escrow = models.OneToOneField(EscrowTransaction, on_delete=models.CASCADE, related_name='payout')
     payout_id = models.CharField(max_length=255, unique=True)  # payout transaction id from payment gateway
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)  # Index for payout amount queries
     currency = models.CharField(max_length=10, default='USD')
-    paid_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=50, default='completed')  # e.g. pending, completed, failed
+    paid_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for payout timeline queries
+    status = models.CharField(max_length=50, default='completed', db_index=True)  # Index for payout status filtering
     failure_reason = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -242,7 +242,7 @@ class EscrowAudit(models.Model):
     escrow = models.ForeignKey(EscrowTransaction, on_delete=models.CASCADE, related_name='audit_logs')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     action = models.CharField(max_length=100)  # e.g. 'funded', 'dispute_raised', 'payout_initiated'
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for audit log timeline queries
     notes = models.TextField(blank=True)
 
     def __str__(self):
@@ -279,7 +279,7 @@ class ConnectedAccount(models.Model):
 
     # Stripe Connect account identifiers
     account_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    account_status = models.CharField(max_length=20, choices=ACCOUNT_STATUS_CHOICES, default='pending')
+    account_status = models.CharField(max_length=20, choices=ACCOUNT_STATUS_CHOICES, default='pending', db_index=True)  # Index for account status filtering
 
     # Account capabilities
     charges_enabled = models.BooleanField(default=False)
@@ -296,9 +296,9 @@ class ConnectedAccount(models.Model):
     business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES, default='individual')
 
     # Metadata
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    activated_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for account creation timeline
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for recently updated accounts
+    activated_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for activated account tracking
 
     # Additional Stripe metadata
     stripe_metadata = models.JSONField(default=dict, blank=True)
@@ -499,8 +499,8 @@ class PayoutSchedule(models.Model):
         help_text="Minimum balance required to trigger a payout"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for schedule creation timeline
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for recently updated schedules
 
     class Meta:
         verbose_name = 'Payout Schedule'
@@ -610,13 +610,13 @@ class PlatformFee(models.Model):
     stripe_transfer_id = models.CharField(max_length=255, blank=True, null=True)
 
     # Status tracking
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    collected_at = models.DateTimeField(null=True, blank=True)
-    refunded_at = models.DateTimeField(null=True, blank=True)
-    refunded_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)  # Index for fee status filtering
+    collected_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for collected fee tracking
+    refunded_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for refunded fee tracking
+    refunded_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, db_index=True)  # Index for refund amount queries
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for fee creation timeline
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for recently updated fees
 
     class Meta:
         verbose_name = 'Platform Fee'
@@ -708,7 +708,8 @@ class StripeConnectOnboarding(models.Model):
     status = models.CharField(
         max_length=25,
         choices=ONBOARDING_STATUS_CHOICES,
-        default='not_started'
+        default='not_started',
+        db_index=True  # Index for onboarding status filtering
     )
 
     # Onboarding URLs
@@ -739,15 +740,15 @@ class StripeConnectOnboarding(models.Model):
     )
 
     # Timestamps
-    started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-    link_expires_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for onboarding start tracking
+    completed_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for completed onboarding tracking
+    last_updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for recently updated onboardings
+    link_expires_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for expired link detection
 
     # Error tracking
     error_message = models.TextField(blank=True, null=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for onboarding creation timeline
 
     class Meta:
         verbose_name = 'Stripe Connect Onboarding'
