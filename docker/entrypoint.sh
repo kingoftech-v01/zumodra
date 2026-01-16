@@ -469,6 +469,18 @@ run_migrations() {
         # Don't fail if there are no tenants - this is expected on first run
     fi
 
+    # Step 2.5: Verify tenant migrations were applied successfully
+    log_info "Step 2.5/5: Verifying tenant migrations..."
+    if python manage.py verify_tenant_migrations --fix 2>&1 | tee -a /tmp/migration_verification.log; then
+        log_info "✓ All tenant migrations verified and applied!"
+    else
+        log_warn "✗ Tenant migration verification reported issues"
+        log_warn "Some tenant schemas may have incomplete migrations."
+        log_warn "Check /tmp/migration_verification.log for details"
+        # Note: We don't return 1 here to allow service to start with warnings
+        # Monitoring scripts will detect and alert on migration issues
+    fi
+
     # Step 3: Create demo tenants if configured
     if [ "$CREATE_DEMO_TENANT" = "true" ]; then
         log_info "Step 3/5: Creating demo tenants..."
@@ -544,10 +556,20 @@ create_cache_table() {
 verify_django_setup() {
     log_info "Verifying Django configuration..."
 
-    if python manage.py check --deploy 2>/dev/null; then
+    # Capture both stdout and stderr from deployment checks
+    check_output=$(python manage.py check --deploy 2>&1)
+    check_exit_code=$?
+
+    if [ $check_exit_code -eq 0 ]; then
         log_info "Django configuration verified!"
     else
-        log_warn "Django deployment checks returned warnings (non-fatal)"
+        log_warn "Django deployment checks returned warnings/errors (non-fatal):"
+        log_warn "================================================================"
+        # Display the actual output line by line with proper formatting
+        echo "$check_output" | while IFS= read -r line; do
+            log_warn "  $line"
+        done
+        log_warn "================================================================"
     fi
 }
 
