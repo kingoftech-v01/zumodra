@@ -83,26 +83,92 @@ def set_invitation_token(sender, instance, created, **kwargs):
 
 
 @receiver(post_schema_sync, sender=get_tenant_model())
-def create_tenant_site(sender, tenant, **kwargs):
+def create_tenant_site_and_run_migrations(sender, tenant, **kwargs):
     """
-    Create a Site object for the tenant after its schema is created/synced.
+    After tenant schema is created/synced:
+    1. Run migrations to ensure all tables exist (FAIL HARD if migrations fail)
+    2. Create Site object for the tenant
+
     This is required for django-allauth to function properly in tenant schemas.
+
+    CRITICAL: This uses STRICT error handling. If migrations fail, the entire
+    tenant creation fails with a clear error message. NO SILENT FAILURES.
     """
+    import logging
     from django.contrib.sites.models import Site
+    from django.core.management import call_command
+    from django.core.management.base import CommandError
 
-    # Use tenant's schema context to create the Site in the correct schema
-    with schema_context(tenant.schema_name):
-        # Get the tenant's primary domain
-        primary_domain = tenant.get_primary_domain()
-        domain_name = primary_domain.domain if primary_domain else f"{tenant.schema_name}.zumodra.rhematek-solutions.com"
+    logger = logging.getLogger(__name__)
 
-        # Create or update the Site for this tenant
-        site, created = Site.objects.update_or_create(
-            pk=1,  # Use pk=1 to match SITE_ID setting
-            defaults={
-                'domain': domain_name,
-                'name': tenant.name or tenant.schema_name.title()
-            }
+    # Step 1: Run migrations for this tenant schema (FAIL HARD ON ERROR)
+    try:
+        logger.info(f"🔄 Running migrations for tenant: {tenant.schema_name}")
+        call_command(
+            'migrate_schemas',
+            schema_name=tenant.schema_name,
+            verbosity=1,
+            interactive=False
         )
-        if created:
-            print(f"Created Site for tenant {tenant.schema_name}: {domain_name}")
+        logger.info(f"✅ Migrations completed successfully for tenant: {tenant.schema_name}")
+    except CommandError as e:
+        error_msg = (
+            f"❌ CRITICAL MIGRATION FAILURE for tenant '{tenant.schema_name}':\n"
+            f"   Migration command failed: {str(e)}\n"
+            f"   Tenant creation ABORTED. The tenant schema exists but is INCOMPLETE.\n"
+            f"   Required action: Delete tenant '{tenant.schema_name}' and recreate.\n"
+            f"   OR run: python manage.py migrate_schemas --schema={tenant.schema_name}"
+        )
+        logger.critical(error_msg)
+        # FAIL HARD - Raise exception to block tenant creation
+        raise RuntimeError(error_msg) from e
+    except Exception as e:
+        error_msg = (
+            f"❌ UNEXPECTED ERROR during migration for tenant '{tenant.schema_name}':\n"
+            f"   Error: {type(e).__name__}: {str(e)}\n"
+            f"   Tenant creation ABORTED. System state is INCONSISTENT.\n"
+            f"   Required action: Investigate error, delete incomplete tenant, retry."
+        )
+        logger.critical(error_msg)
+        # FAIL HARD - Don't allow partial tenant state
+        raise RuntimeError(error_msg) from e
+
+    # Step 2: Create Site object within tenant schema
+    try:
+        # Use tenant's schema context to create the Site in the correct schema
+        with schema_context(tenant.schema_name):
+            # Get the tenant's primary domain
+            primary_domain = tenant.get_primary_domain()
+
+            # Use primary domain if exists, otherwise construct from schema name
+            if primary_domain:
+                domain_name = primary_domain.domain
+            else:
+                # Use environment-based domain construction
+                from core.domain import get_primary_domain
+                base_domain = get_primary_domain()
+                domain_name = f"{tenant.schema_name}.{base_domain}"
+
+            # Create or update the Site for this tenant
+            site, created = Site.objects.update_or_create(
+                pk=1,  # Use pk=1 to match SITE_ID setting
+                defaults={
+                    'domain': domain_name,
+                    'name': tenant.name or tenant.schema_name.title()
+                }
+            )
+
+            if created:
+                logger.info(f"✅ Created Site for tenant {tenant.schema_name}: {domain_name}")
+            else:
+                logger.info(f"✅ Updated Site for tenant {tenant.schema_name}: {domain_name}")
+    except Exception as e:
+        error_msg = (
+            f"❌ CRITICAL ERROR creating Site object for tenant '{tenant.schema_name}':\n"
+            f"   Error: {type(e).__name__}: {str(e)}\n"
+            f"   Migrations succeeded but Site creation failed.\n"
+            f"   Required action: Check django.contrib.sites configuration."
+        )
+        logger.critical(error_msg)
+        # FAIL HARD
+        raise RuntimeError(error_msg) from e

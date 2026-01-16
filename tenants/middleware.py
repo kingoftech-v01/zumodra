@@ -866,3 +866,228 @@ class TenantSecurityMiddleware:
         response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
 
         return response
+
+
+class TenantMigrationCheckMiddleware:
+    """
+    Middleware that blocks requests to tenants with incomplete migrations.
+
+    CRITICAL: This ensures the SaaS blocks completely if a tenant's migrations
+    haven't run, instead of serving requests with missing database tables.
+
+    Emergency bypass: Set DISABLE_MIGRATION_CHECK=true to temporarily disable
+    (logs critical warnings but allows requests through).
+
+    This middleware performs a one-time check per schema per process, caching
+    the results to avoid performance overhead.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self._checked_schemas = set()  # Cache of schemas we've already validated
+        self.logger = logging.getLogger(__name__)
+
+    def __call__(self, request):
+        import os
+
+        # Emergency bypass for disaster recovery
+        if os.environ.get('DISABLE_MIGRATION_CHECK', '').lower() in ('true', '1', 'yes'):
+            self.logger.warning(
+                "⚠️  MIGRATION CHECK DISABLED via DISABLE_MIGRATION_CHECK environment variable. "
+                "This is UNSAFE and should only be used for emergency access."
+            )
+            return self.get_response(request)
+
+        # Skip check for public schema
+        if not hasattr(request, 'tenant') or request.tenant.schema_name == 'public':
+            return self.get_response(request)
+
+        tenant = request.tenant
+        schema_name = tenant.schema_name
+
+        # Check if we've already validated this schema in this process
+        if schema_name in self._checked_schemas:
+            return self.get_response(request)
+
+        # Verify migrations are complete for this tenant
+        try:
+            from django.core.management import call_command
+            from django.core.management.base import CommandError
+            from io import StringIO
+
+            output = StringIO()
+            call_command(
+                'verify_tenant_migrations',
+                tenant=schema_name,
+                json=True,
+                stdout=output
+            )
+            # If command succeeded, cache this schema as validated
+            self._checked_schemas.add(schema_name)
+            return self.get_response(request)
+
+        except CommandError as e:
+            # Migrations are incomplete - BLOCK THE REQUEST
+            error_html = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Service Unavailable - Migrations Required</title>
+                <style>
+                    body {{
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                        margin: 0;
+                        padding: 50px 20px;
+                        background: #f5f5f5;
+                        color: #333;
+                    }}
+                    .error-box {{
+                        background: #fff;
+                        border-left: 5px solid #dc3545;
+                        padding: 30px;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        border-radius: 4px;
+                    }}
+                    h1 {{
+                        color: #dc3545;
+                        margin-top: 0;
+                        font-size: 28px;
+                    }}
+                    code {{
+                        background: #f8f9fa;
+                        padding: 2px 6px;
+                        border-radius: 3px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                    }}
+                    pre {{
+                        background: #f8f9fa;
+                        padding: 15px;
+                        border-radius: 4px;
+                        overflow-x: auto;
+                    }}
+                    .details {{
+                        background: #f8f9fa;
+                        padding: 15px;
+                        margin: 20px 0;
+                        border-radius: 4px;
+                    }}
+                    .details h3 {{
+                        margin-top: 0;
+                        color: #666;
+                        font-size: 16px;
+                    }}
+                    .details ul {{
+                        margin: 10px 0;
+                        padding-left: 20px;
+                    }}
+                    .details li {{
+                        margin: 8px 0;
+                    }}
+                    .admin-section {{
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #dee2e6;
+                    }}
+                    .admin-section h3 {{
+                        color: #666;
+                        font-size: 18px;
+                    }}
+                    .footer {{
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #dee2e6;
+                        font-size: 13px;
+                        color: #6c757d;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="error-box">
+                    <h1>❌ Service Unavailable - Database Not Ready</h1>
+                    <p><strong>This tenant's database migrations are incomplete.</strong></p>
+                    <p>The application cannot serve requests until all database migrations have been applied successfully.</p>
+
+                    <div class="details">
+                        <h3>Technical Details:</h3>
+                        <ul>
+                            <li><strong>Tenant:</strong> <code>{schema_name}</code></li>
+                            <li><strong>Domain:</strong> <code>{request.get_host()}</code></li>
+                            <li><strong>Error:</strong> {str(e)}</li>
+                        </ul>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>For Administrators:</h3>
+                        <p>Run the following command to fix this issue:</p>
+                        <pre><code>python manage.py migrate_schemas --schema={schema_name}</code></pre>
+                        <p>Or to auto-fix all tenants:</p>
+                        <pre><code>python manage.py verify_tenant_migrations --fix</code></pre>
+                    </div>
+
+                    <div class="footer">
+                        <p><em>This error page ensures data integrity by preventing access to incomplete database schemas.</em></p>
+                        <p>If you believe this is an error, contact your system administrator.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            self.logger.critical(
+                f"❌ BLOCKED request to tenant '{schema_name}' - migrations incomplete. "
+                f"Error: {e}"
+            )
+            from django.http import HttpResponse
+            return HttpResponse(error_html, status=503, content_type='text/html')
+
+        except Exception as e:
+            # Unexpected error during check - FAIL SAFE, block the request
+            self.logger.critical(
+                f"❌ BLOCKED request to tenant '{schema_name}' - migration check failed: {e}"
+            )
+            error_html = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Service Unavailable</title>
+                <style>
+                    body {{
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                        margin: 50px;
+                        text-align: center;
+                        background: #f5f5f5;
+                    }}
+                    .error-box {{
+                        background: #fff;
+                        padding: 40px;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }}
+                    h1 {{ color: #dc3545; }}
+                    code {{
+                        background: #f8f9fa;
+                        padding: 2px 6px;
+                        border-radius: 3px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="error-box">
+                    <h1>❌ Service Temporarily Unavailable</h1>
+                    <p>An unexpected error occurred while verifying the database state.</p>
+                    <p><strong>Tenant:</strong> <code>{schema_name}</code></p>
+                    <p><em>Please contact support if this persists.</em></p>
+                </div>
+            </body>
+            </html>
+            """
+            from django.http import HttpResponse
+            return HttpResponse(error_html, status=503, content_type='text/html')

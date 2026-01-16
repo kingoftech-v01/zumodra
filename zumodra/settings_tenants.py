@@ -160,6 +160,7 @@ DATABASE_ROUTERS = [
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',  # MUST BE FIRST
     'tenants.middleware.TenantContextMiddleware',  # Custom tenant context
+    'tenants.middleware.TenantMigrationCheckMiddleware',  # CRITICAL: Block unmigrated tenants
 
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files
