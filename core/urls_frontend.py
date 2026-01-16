@@ -52,7 +52,11 @@ urlpatterns = [
     # URL: /app/messages/
     path('messages/', include('messages_sys.urls_frontend')),
 
-    # Appointments Views (Scheduling, Booking, Calendar)
-    # URL: /app/appointments/
+    # Appointments Views - Staff/Admin (Scheduling, Booking, Calendar)
+    # URL: /app/appointments/ (requires staff access)
     path('appointments/', include('appointment.urls_frontend')),
+
+    # Appointments Views - Customer (My Appointments)
+    # URL: /app/my-appointments/ (requires authentication only)
+    path('my-appointments/', include('appointment.urls_customer')),
 ]
