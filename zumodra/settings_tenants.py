@@ -148,7 +148,23 @@ TENANT_DOMAIN_MODEL = "tenants.Domain"
 # Public schema name
 PUBLIC_SCHEMA_NAME = 'public'
 
-# Show public schema by default if no tenant found
+# TENANT NOT FOUND BEHAVIOR
+# This setting controls how the middleware handles requests to non-existent tenants
+# (e.g., accessing nonexistent.zumodra.com)
+#
+# SHOW_PUBLIC_IF_NO_TENANT_FOUND = True  (DEFAULT - Development/Testing)
+#   - Falls back to public schema when no tenant is found
+#   - Allows access to marketing/public pages on any subdomain
+#   - Prevents 404 errors during development
+#   - RECOMMENDED for: development, testing, public landing pages
+#
+# SHOW_PUBLIC_IF_NO_TENANT_FOUND = False (Production)
+#   - Returns HTTP 404 when tenant is not found
+#   - Strict tenant resolution - only registered tenants can be accessed
+#   - Prevents information leakage via tenant enumeration
+#   - RECOMMENDED for: production, when you want to protect tenant existence
+#
+# See tenants/middleware.py for detailed error handling documentation
 SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
 
 # Database router for tenant isolation
