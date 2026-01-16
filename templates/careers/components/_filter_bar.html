@@ -14,7 +14,7 @@
                 <span class="caption1">{% trans "Grid" %}</span>
             </div>
             {% else %}
-            <a href="{% url 'careers:browse_jobs' %}" class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary">
+            <a href="{% url 'frontend:ats:job_list' %}" class="item flex items-center gap-1 px-3 py-2 rounded-lg border border-line duration-300 hover:bg-primary hover:text-white hover:border-primary">
                 <span class="ph ph-grid-four text-xl"></span>
                 <span class="caption1">{% trans "Grid" %}</span>
             </a>
@@ -89,7 +89,7 @@
         </span>
         {% endif %}
     </div>
-    <a href="{% if view_mode == 'map' %}{% url 'careers:browse_jobs_map' %}{% else %}{% url 'careers:browse_jobs' %}{% endif %}" class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+    <a href="{% if view_mode == 'map' %}{% url 'careers:browse_jobs_map' %}{% else %}{% url 'frontend:ats:job_list' %}{% endif %}" class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
         <span class="ph ph-x text-sm"></span>
         <span class="caption1">{% trans "Clear All" %}</span>
     </a>

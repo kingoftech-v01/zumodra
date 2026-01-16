@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'careers:job_list' %}?type=coop"
+<a href="{% url 'frontend:ats:job_list' %}?type=coop"
    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm caption1 font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
     <i class="ph ph-caret-right text-secondary"></i>
     {% trans "Find Co-op Jobs" %}
@@ -139,7 +139,7 @@
                 </p>
                 <div class="mt-4 flex items-center gap-3">
                     {% if upcoming_term.status == 'searching' %}
-                    <a href="{% url 'careers:job_list' %}?type=coop"
+                    <a href="{% url 'frontend:ats:job_list' %}?type=coop"
                        class="inline-flex items-center px-4 py-2 caption1 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                         {% trans "Search Jobs" %}
                     </a>
