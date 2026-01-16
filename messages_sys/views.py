@@ -26,10 +26,13 @@ def chat_view(request):
     user_status_cache_key = f"user_status_{user.id}"
     cached_status = cache.get(user_status_cache_key)
     if cached_status is None:
-        user_status_obj = UserStatus.objects.filter(user=user).first()
+        user_status_obj, created = UserStatus.objects.get_or_create(
+            user=user,
+            defaults={'is_online': False, 'last_seen': None}
+        )
         cached_status = {
-            'is_online': user_status_obj.is_online if user_status_obj else False,
-            'last_seen': user_status_obj.last_seen if user_status_obj else None
+            'is_online': user_status_obj.is_online,
+            'last_seen': user_status_obj.last_seen
         }
         cache.set(user_status_cache_key, cached_status, timeout=60)  # 1 min cache
 
