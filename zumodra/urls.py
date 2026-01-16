@@ -299,9 +299,46 @@ urlpatterns += i18n_patterns(
     path('static/js/dir/<str:file_name>', js_dir_view, name='js_dir'),
 )
 
-# Wagtail pages - must be last (catch-all routing)
+# ==================== CRITICAL: Wagtail CMS Catch-All Routing ====================
+#
+# IMPORTANT: Wagtail's URL pattern MUST be the LAST pattern in urlpatterns!
+#
+# Why Wagtail must be last:
+# ------------------------
+# Wagtail uses a catch-all URL pattern (`path('', include(wagtail_urls))`) that
+# attempts to match ANY URL that wasn't matched by previous patterns. Wagtail's
+# routing system tries to find a Page object that matches the requested URL path.
+#
+# How Wagtail routing works:
+# --------------------------
+# 1. Django processes URL patterns in order from top to bottom
+# 2. If a URL matches a specific pattern (e.g., /careers/, /services/), that view is used
+# 3. If no specific pattern matches, the request reaches Wagtail's catch-all pattern
+# 4. Wagtail then searches its Page tree to find a page with a matching URL path
+# 5. If found, Wagtail serves that page using the Page.serve() method
+# 6. If not found, Django's 404 handler is called
+#
+# What happens if Wagtail is NOT last:
+# ------------------------------------
+# - Wagtail would intercept URLs meant for other apps (e.g., /careers/, /services/)
+# - This causes 'ContentType' object has no attribute 'route' errors when Wagtail's
+#   root page is misconfigured or points to a ContentType instead of a Page object
+# - Application URLs would never be reached, breaking functionality
+#
+# The fix:
+# --------
+# 1. Always keep Wagtail's pattern as the LAST pattern in i18n_patterns
+# 2. Define all specific URL patterns (apps, views) BEFORE the Wagtail catch-all
+# 3. Run `python manage.py fix_wagtail_site` to ensure Site.root_page is valid
+# 4. Verify that Wagtail's Site.root_page is a Page object, not a ContentType
+#
+# ==================================================================================
+
 urlpatterns += i18n_patterns(
-    path('', include(wagtail_urls)),  # Wagtail page routing
+    # Wagtail CMS page routing - MUST BE LAST!
+    # This is a catch-all pattern that matches any remaining URLs
+    # and attempts to serve them as Wagtail CMS pages
+    path('', include(wagtail_urls)),
 )
 
 # Custom error handlers (using branded error pages from views_errors.py)

@@ -233,7 +233,34 @@ urlpatterns += i18n_patterns(
         path('subscribe/', newsletter_subscribe_view, name='subscribe'),
     ], 'newsletter'), namespace='newsletter')),
 
-    # Wagtail page routing (catch-all, must be last)
+    # ==================== CRITICAL: Wagtail CMS Catch-All Routing ====================
+    #
+    # IMPORTANT: Wagtail's URL pattern MUST be the LAST pattern in urlpatterns!
+    #
+    # Why Wagtail must be last:
+    # ------------------------
+    # Wagtail uses a catch-all URL pattern that attempts to match ANY URL that wasn't
+    # matched by previous patterns. If placed earlier, it would intercept URLs meant
+    # for other apps (careers, services, etc.), causing 500 errors.
+    #
+    # What this pattern does:
+    # ----------------------
+    # - Matches any URL path not handled by specific patterns above
+    # - Searches Wagtail's Page tree for a matching page
+    # - Serves the page if found, or passes to Django's 404 handler
+    #
+    # If you see 'ContentType' object has no attribute 'route' errors:
+    # ----------------------------------------------------------------
+    # This means Wagtail's Site.root_page is corrupted (pointing to ContentType
+    # instead of a Page object). Fix it by running:
+    #
+    #     python manage.py fix_wagtail_site
+    #
+    # This command ensures Site.root_page points to a valid Page object.
+    #
+    # ==================================================================================
+
+    # Wagtail CMS page routing - MUST BE LAST!
     path('', include(wagtail_urls)),
 )
 
