@@ -58,6 +58,15 @@ from .template_views import (
     BackgroundCheckStatusPartialView,
 )
 
+# TODO: These views need to be implemented
+# from .views import (
+#     CandidateEditView,
+#     CandidateImportView,
+#     CandidateAddNoteView,
+#     CandidateEditTagsView,
+#     ApplicationListView,
+# )
+
 app_name = 'ats'
 
 urlpatterns = [
@@ -124,4 +133,14 @@ urlpatterns = [
 
     # HTMX partial for background check status badge
     path('htmx/applications/<uuid:uuid>/background-check/status-badge/', BackgroundCheckStatusPartialView.as_view(), name='background_check_status_partial'),
+
+    # ===== PLACEHOLDER ROUTES (TODO: Implement these views) =====
+    # These URL patterns are referenced in templates but views are not yet implemented
+    # Commenting them out to prevent import errors - uncomment when views are ready
+
+    # path('candidates/<uuid:pk>/edit/', CandidateEditView.as_view(), name='candidate_edit'),
+    # path('candidates/import/', CandidateImportView.as_view(), name='candidate_import'),
+    # path('candidates/<uuid:pk>/add-note/', CandidateAddNoteView.as_view(), name='candidate_add_note'),
+    # path('candidates/<uuid:pk>/edit-tags/', CandidateEditTagsView.as_view(), name='candidate_edit_tags'),
+    # path('applications/', ApplicationListView.as_view(), name='application_list'),
 ]

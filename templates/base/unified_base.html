@@ -248,7 +248,7 @@
 
     {% comment %} ===== LOCAL JAVASCRIPT - NO CDN ===== {% endcomment %}
     {% comment %} Alpine.js Collapse Plugin - must load before Alpine.js {% endcomment %}
-    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="{% static 'assets/js/vendor/alpine-collapse.min.js' %}" defer></script>
 
     {% comment %} Alpine.js - Reactive framework {% endcomment %}
     <script src="{% static 'assets/js/vendor/alpine.min.js' %}" defer></script>
