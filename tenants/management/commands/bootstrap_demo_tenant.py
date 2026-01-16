@@ -14,6 +14,7 @@ Environment variable:
     CREATE_DEMO_TENANT=1  # Enable demo tenant creation in entrypoint
 """
 
+import logging
 import os
 import random
 import uuid
@@ -29,6 +30,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # DEMO DATA CONFIGURATION
@@ -244,6 +246,30 @@ class Command(BaseCommand):
         finally:
             connection.set_schema_to_public()
 
+    def _safe_create(self, model_name, create_func, *args, **kwargs):
+        """Wrapper for safe model creation with detailed logging."""
+        try:
+            obj = create_func(*args, **kwargs)
+            if self.verbosity >= 2:
+                logger.info(f"✓ Created {model_name}: {obj}")
+            return obj
+        except Exception as e:
+            logger.error(f"✗ Failed to create {model_name}: {e}")
+            if self.verbosity >= 1:
+                logger.error(f"  Error details: {str(e)}")
+            if self.verbosity >= 2:
+                logger.error(f"  Args: {args}")
+                logger.error(f"  Kwargs: {kwargs}")
+                import traceback
+                logger.error(traceback.format_exc())
+            return None
+
+    def _log_section(self, title, counts_dict):
+        """Log a section summary with entity counts."""
+        self.stdout.write(self.style.SUCCESS(f"\n✓ {title}:"))
+        for entity, count in counts_dict.items():
+            self.stdout.write(f"  {entity}: {count}")
+
     def _bootstrap(self):
         """Main bootstrap logic."""
         from tenants.models import Tenant, Plan, Domain
@@ -292,17 +318,26 @@ class Command(BaseCommand):
         self._create_hr_data(tenant, users)
 
         # Step 8: Create marketplace data
+        marketplace_data = None
         if not self.skip_marketplace:
             self._log_step(8, 'Creating marketplace data (services, contracts)')
-            self._create_marketplace_data(tenant, users)
+            marketplace_data = self._create_marketplace_data(tenant, users)
 
-        # Step 9: Create verification data
-        self._log_step(9, 'Creating verification/trust data')
+        # Step 9: Create Finance data
+        self._log_step(9, 'Creating finance data (payments, escrow, invoices)')
+        self._create_finance_data(tenant, users, marketplace_data)
+
+        # Step 10: Create Notifications data
+        self._log_step(10, 'Creating notifications data (channels, templates)')
+        self._create_notifications_data(tenant, users)
+
+        # Step 11: Create verification data
+        self._log_step(11, 'Creating verification/trust data')
         self._create_verification_data(users)
 
-        # Step 10: Create messaging data
+        # Step 12: Create messaging data
         if not self.skip_messaging:
-            self._log_step(10, 'Creating messaging data (conversations)')
+            self._log_step(12, 'Creating messaging data (conversations)')
             self._create_messaging_data(users)
 
         # Summary
@@ -830,6 +865,570 @@ class Command(BaseCommand):
                     pass
 
         self.stdout.write(f"   Services created: {len(services)} ({sum(1 for s in services if not s.is_private)} public, {sum(1 for s in services if s.is_private)} private)")
+
+        # Create service proposals (at least 10)
+        proposals = []
+        proposal_statuses = ['pending', 'accepted', 'accepted', 'rejected', 'withdrawn']
+
+        for i, service in enumerate(services[:15]):  # Create proposals for first 15 services
+            try:
+                # Client is one of the demo users
+                client = random.choice([users['admin'], users['hr_manager'], users['hiring_manager']])
+
+                proposal = self._safe_create(
+                    f"ServiceProposal #{i+1}",
+                    ServiceProposal.objects.create,
+                    service=service,
+                    client=client,
+                    provider=service.provider,
+                    tenant=tenant,
+                    title=f"Proposal for {service.title}",
+                    description=f"Detailed proposal for {service.title}. Includes timeline, deliverables, and pricing.",
+                    proposed_price=service.price * Decimal(str(random.uniform(0.9, 1.1))),
+                    estimated_duration=service.delivery_days,
+                    status=random.choice(proposal_statuses),
+                    terms_accepted=random.choice([True, False]),
+                )
+                if proposal:
+                    proposals.append(proposal)
+            except Exception as e:
+                if self.verbosity >= 1:
+                    logger.warning(f"Failed to create proposal {i+1}: {e}")
+
+        self.stdout.write(f"   Service proposals: {len(proposals)}")
+
+        # Create service contracts from accepted proposals (at least 10)
+        contracts = []
+        accepted_proposals = [p for p in proposals if p.status == 'accepted']
+
+        for i, proposal in enumerate(accepted_proposals[:15]):  # Ensure we try to create enough
+            try:
+                contract_statuses = ['draft', 'active', 'active', 'active', 'completed', 'completed']
+                status = random.choice(contract_statuses)
+
+                start_date = timezone.now() - timedelta(days=random.randint(1, 90))
+                end_date = start_date + timedelta(days=proposal.estimated_duration)
+
+                contract = self._safe_create(
+                    f"ServiceContract #{i+1}",
+                    ServiceContract.objects.create,
+                    proposal=proposal,
+                    service=proposal.service,
+                    client=proposal.client,
+                    provider=proposal.provider,
+                    tenant=tenant,
+                    title=f"Contract for {proposal.service.title}",
+                    description=proposal.description,
+                    contract_value=proposal.proposed_price,
+                    status=status,
+                    start_date=start_date,
+                    end_date=end_date,
+                    payment_terms='milestone',
+                    is_escrow_enabled=random.choice([True, True, False]),  # 67% use escrow
+                )
+
+                if contract:
+                    contracts.append(contract)
+
+                    # Create milestones for each contract (2-4 milestones)
+                    num_milestones = random.randint(2, 4)
+                    milestone_value = contract.contract_value / num_milestones
+
+                    for m in range(num_milestones):
+                        milestone_statuses = ['pending', 'in_progress', 'completed', 'approved']
+
+                        try:
+                            milestone = self._safe_create(
+                                f"Milestone {m+1} for Contract #{i+1}",
+                                ContractMilestone.objects.create,
+                                contract=contract,
+                                title=f"Milestone {m+1}: {random.choice(['Planning', 'Development', 'Testing', 'Delivery', 'Review'])}",
+                                description=f"Milestone {m+1} deliverables and requirements",
+                                milestone_value=milestone_value,
+                                due_date=start_date + timedelta(days=(m+1) * (proposal.estimated_duration // num_milestones)),
+                                status=random.choice(milestone_statuses),
+                                order=m + 1,
+                            )
+                        except Exception as e:
+                            if self.verbosity >= 2:
+                                logger.debug(f"Failed to create milestone {m+1} for contract {i+1}: {e}")
+
+            except Exception as e:
+                if self.verbosity >= 1:
+                    logger.warning(f"Failed to create contract {i+1}: {e}")
+
+        self.stdout.write(f"   Service contracts: {len(contracts)}")
+
+        # Store contracts for Finance section to use
+        return {'services': services, 'proposals': proposals, 'contracts': contracts, 'providers': providers}
+
+    def _create_finance_data(self, tenant, users, marketplace_data):
+        """Create finance-related demo data (minimum 10 each)."""
+        try:
+            from finance.models import (
+                PaymentMethod, PaymentTransaction, Invoice, InvoiceLineItem,
+                EscrowTransaction, UserSubscription, ConnectedAccount
+            )
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Finance models not available, skipping"))
+            return
+
+        counts = {
+            'payment_methods': 0,
+            'escrow_transactions': 0,
+            'invoices': 0,
+            'invoice_line_items': 0,
+            'payment_transactions': 0,
+            'user_subscriptions': 0,
+            'connected_accounts': 0,
+        }
+
+        # Create payment methods for demo users (at least 10)
+        payment_method_types = ['card', 'bank_account', 'paypal', 'stripe']
+
+        for i, (user_key, user) in enumerate(users.items()):
+            # Create 1-2 payment methods per user to ensure we get 10+
+            num_methods = 2 if i < 5 else 1
+
+            for method_num in range(num_methods):
+                try:
+                    is_default = method_num == 0
+
+                    method = self._safe_create(
+                        f"PaymentMethod for {user_key}",
+                        PaymentMethod.objects.create,
+                        user=user,
+                        tenant=tenant,
+                        method_type=random.choice(payment_method_types),
+                        provider='stripe',
+                        provider_payment_method_id=f'pm_{uuid.uuid4().hex[:24]}',
+                        last4='4242' if method_num == 0 else str(random.randint(1000, 9999)),
+                        brand='visa' if method_num == 0 else random.choice(['visa', 'mastercard', 'amex']),
+                        exp_month=random.randint(1, 12),
+                        exp_year=timezone.now().year + random.randint(1, 5),
+                        is_default=is_default,
+                        is_verified=True,
+                    )
+                    if method:
+                        counts['payment_methods'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create payment method for {user_key}: {e}")
+
+        # Create user subscriptions for demo users (link to existing plans)
+        from tenants.models import Plan
+
+        plans = list(Plan.objects.all())
+        if plans:
+            for i, (user_key, user) in enumerate(users.items()):
+                try:
+                    plan = random.choice(plans)
+                    status = random.choice(['active', 'active', 'active', 'trial', 'past_due', 'canceled'])
+
+                    subscription = self._safe_create(
+                        f"UserSubscription for {user_key}",
+                        UserSubscription.objects.create,
+                        user=user,
+                        tenant=tenant,
+                        plan=plan,
+                        status=status,
+                        current_period_start=timezone.now() - timedelta(days=random.randint(1, 30)),
+                        current_period_end=timezone.now() + timedelta(days=random.randint(1, 30)),
+                        stripe_subscription_id=f'sub_{uuid.uuid4().hex[:24]}',
+                        trial_end=timezone.now() + timedelta(days=14) if status == 'trial' else None,
+                    )
+                    if subscription:
+                        counts['user_subscriptions'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create subscription for {user_key}: {e}")
+
+        # If marketplace data exists, create finance records for contracts
+        if marketplace_data and marketplace_data.get('contracts'):
+            contracts = marketplace_data['contracts']
+            providers = marketplace_data.get('providers', [])
+
+            # Create Connected Accounts for service providers
+            for i, provider in enumerate(providers[:10]):  # At least 10
+                try:
+                    account = self._safe_create(
+                        f"ConnectedAccount for provider {i+1}",
+                        ConnectedAccount.objects.create,
+                        user=provider.user,
+                        tenant=tenant,
+                        provider='stripe',
+                        account_id=f'acct_{uuid.uuid4().hex[:16]}',
+                        account_type='express',
+                        charges_enabled=True,
+                        payouts_enabled=random.choice([True, False]),
+                        details_submitted=True,
+                        is_active=True,
+                    )
+                    if account:
+                        counts['connected_accounts'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create connected account for provider {i+1}: {e}")
+
+            # Create escrow transactions for contracts with escrow enabled (at least 10)
+            escrow_contracts = [c for c in contracts if c.is_escrow_enabled][:15]
+
+            for i, contract in enumerate(escrow_contracts):
+                try:
+                    escrow_statuses = ['pending', 'funded', 'funded', 'in_progress', 'released', 'released']
+                    status = random.choice(escrow_statuses)
+
+                    escrow = self._safe_create(
+                        f"EscrowTransaction for contract {i+1}",
+                        EscrowTransaction.objects.create,
+                        contract=contract,
+                        tenant=tenant,
+                        buyer=contract.client,
+                        seller=contract.provider.user,
+                        amount=contract.contract_value,
+                        currency='USD',
+                        status=status,
+                        funded_at=timezone.now() - timedelta(days=random.randint(1, 30)) if status != 'pending' else None,
+                        released_at=timezone.now() - timedelta(days=random.randint(1, 10)) if status == 'released' else None,
+                        escrow_fee=contract.contract_value * Decimal('0.02'),  # 2% fee
+                        stripe_payment_intent_id=f'pi_{uuid.uuid4().hex[:24]}',
+                    )
+                    if escrow:
+                        counts['escrow_transactions'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create escrow for contract {i+1}: {e}")
+
+            # Create invoices for contracts (at least 10)
+            for i, contract in enumerate(contracts[:15]):
+                try:
+                    invoice_statuses = ['draft', 'sent', 'paid', 'paid', 'overdue', 'canceled']
+                    status = random.choice(invoice_statuses)
+
+                    due_date = timezone.now() + timedelta(days=random.randint(7, 30))
+                    if status == 'overdue':
+                        due_date = timezone.now() - timedelta(days=random.randint(1, 30))
+
+                    invoice = self._safe_create(
+                        f"Invoice for contract {i+1}",
+                        Invoice.objects.create,
+                        tenant=tenant,
+                        invoice_number=f'INV-{timezone.now().year}-{str(i+1).zfill(4)}',
+                        client=contract.client,
+                        provider=contract.provider.user,
+                        contract=contract,
+                        status=status,
+                        issue_date=timezone.now() - timedelta(days=random.randint(1, 15)),
+                        due_date=due_date,
+                        subtotal=contract.contract_value,
+                        tax_amount=contract.contract_value * Decimal('0.1'),  # 10% tax
+                        total_amount=contract.contract_value * Decimal('1.1'),
+                        currency='USD',
+                        paid_at=timezone.now() - timedelta(days=random.randint(1, 10)) if status == 'paid' else None,
+                        notes=f'Invoice for {contract.title}',
+                    )
+
+                    if invoice:
+                        counts['invoices'] += 1
+
+                        # Create invoice line items (1-3 items per invoice)
+                        num_items = random.randint(1, 3)
+                        item_value = contract.contract_value / num_items
+
+                        for item_num in range(num_items):
+                            try:
+                                line_item = self._safe_create(
+                                    f"InvoiceLineItem {item_num+1} for Invoice #{i+1}",
+                                    InvoiceLineItem.objects.create,
+                                    invoice=invoice,
+                                    description=f'{random.choice(["Development", "Design", "Consulting", "Implementation"])} services - Phase {item_num+1}',
+                                    quantity=1,
+                                    unit_price=item_value,
+                                    amount=item_value,
+                                    order=item_num + 1,
+                                )
+                                if line_item:
+                                    counts['invoice_line_items'] += 1
+                            except Exception as e:
+                                if self.verbosity >= 2:
+                                    logger.debug(f"Failed to create line item {item_num+1} for invoice {i+1}: {e}")
+
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create invoice for contract {i+1}: {e}")
+
+            # Create payment transactions (at least 10)
+            payment_types = ['payment', 'refund', 'payout', 'fee']
+
+            for i in range(15):  # Create 15 to ensure we get 10+
+                try:
+                    transaction_type = random.choice(payment_types)
+                    status = random.choice(['pending', 'succeeded', 'succeeded', 'failed'])
+
+                    # Pick random user and contract
+                    user = random.choice(list(users.values()))
+                    contract = random.choice(contracts) if contracts else None
+
+                    amount = Decimal(random.randint(100, 10000))
+
+                    transaction = self._safe_create(
+                        f"PaymentTransaction #{i+1}",
+                        PaymentTransaction.objects.create,
+                        tenant=tenant,
+                        user=user,
+                        transaction_type=transaction_type,
+                        amount=amount,
+                        currency='USD',
+                        status=status,
+                        provider='stripe',
+                        provider_transaction_id=f'txn_{uuid.uuid4().hex[:24]}',
+                        contract=contract,
+                        description=f'{transaction_type.title()} for {contract.title if contract else "service"}',
+                        created_at=timezone.now() - timedelta(days=random.randint(1, 60)),
+                    )
+                    if transaction:
+                        counts['payment_transactions'] += 1
+                except Exception as e:
+                    if self.verbosity >= 2:
+                        logger.debug(f"Failed to create payment transaction {i+1}: {e}")
+
+        # Log summary
+        self._log_section('Finance Data Created', counts)
+
+    def _create_notifications_data(self, tenant, users):
+        """Create notification system demo data (minimum 10 each)."""
+        try:
+            from notifications.models import (
+                NotificationChannel, NotificationTemplate,
+                Notification, UserNotificationPreference
+            )
+        except ImportError:
+            self.stdout.write(self.style.WARNING("   Notification models not available, skipping"))
+            return
+
+        counts = {
+            'channels': 0,
+            'templates': 0,
+            'notifications': 0,
+            'preferences': 0,
+        }
+
+        # Create notification channels (email, SMS, push, in-app)
+        channels_config = [
+            {'name': 'Email', 'channel_type': 'email', 'is_enabled': True, 'priority': 1},
+            {'name': 'SMS', 'channel_type': 'sms', 'is_enabled': True, 'priority': 2},
+            {'name': 'Push Notifications', 'channel_type': 'push', 'is_enabled': True, 'priority': 3},
+            {'name': 'In-App', 'channel_type': 'in_app', 'is_enabled': True, 'priority': 4},
+        ]
+
+        created_channels = []
+        for config in channels_config:
+            try:
+                channel = self._safe_create(
+                    f"NotificationChannel '{config['name']}'",
+                    NotificationChannel.objects.get_or_create,
+                    tenant=tenant,
+                    channel_type=config['channel_type'],
+                    defaults={
+                        'name': config['name'],
+                        'is_enabled': config['is_enabled'],
+                        'priority': config['priority'],
+                    }
+                )
+                if channel and isinstance(channel, tuple):
+                    channel = channel[0]
+                if channel:
+                    created_channels.append(channel)
+                    counts['channels'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create channel {config['name']}: {e}")
+
+        # Create notification templates (at least 10)
+        templates_config = [
+            {
+                'name': 'Welcome Email',
+                'event_type': 'user_registered',
+                'subject': 'Welcome to {{tenant_name}}!',
+                'body': 'Hi {{user_name}}, welcome to our platform. We\'re excited to have you!',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Application Received',
+                'event_type': 'application_received',
+                'subject': 'Your application has been received',
+                'body': 'Hi {{candidate_name}}, we received your application for {{job_title}}. We\'ll review it shortly.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Interview Scheduled',
+                'event_type': 'interview_scheduled',
+                'subject': 'Interview scheduled for {{job_title}}',
+                'body': 'Hi {{candidate_name}}, your interview is scheduled for {{interview_date}} at {{interview_time}}.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Offer Extended',
+                'event_type': 'offer_extended',
+                'subject': 'Job offer for {{job_title}}',
+                'body': 'Congratulations {{candidate_name}}! We\'d like to extend an offer for the {{job_title}} position.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Contract Signed',
+                'event_type': 'contract_signed',
+                'subject': 'Contract signed',
+                'body': 'Your contract for {{service_name}} has been signed. Work can now begin.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Payment Received',
+                'event_type': 'payment_received',
+                'subject': 'Payment received',
+                'body': 'We\'ve received your payment of {{amount}}. Thank you!',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Message Received',
+                'event_type': 'message_received',
+                'subject': 'New message from {{sender_name}}',
+                'body': 'You have a new message: "{{message_preview}}"',
+                'channel_type': 'in_app',
+            },
+            {
+                'name': 'Milestone Completed',
+                'event_type': 'milestone_completed',
+                'subject': 'Milestone completed',
+                'body': 'Milestone "{{milestone_name}}" has been completed for {{contract_name}}.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Time Off Approved',
+                'event_type': 'time_off_approved',
+                'subject': 'Time off request approved',
+                'body': 'Your time off request from {{start_date}} to {{end_date}} has been approved.',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Password Reset',
+                'event_type': 'password_reset',
+                'subject': 'Password reset request',
+                'body': 'Click here to reset your password: {{reset_link}}',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Account Verification',
+                'event_type': 'account_verification',
+                'subject': 'Verify your account',
+                'body': 'Please verify your account by clicking: {{verification_link}}',
+                'channel_type': 'email',
+            },
+            {
+                'name': 'Invoice Generated',
+                'event_type': 'invoice_generated',
+                'subject': 'New invoice {{invoice_number}}',
+                'body': 'A new invoice has been generated for {{amount}}. Due date: {{due_date}}',
+                'channel_type': 'email',
+            },
+        ]
+
+        created_templates = []
+        for i, template_config in enumerate(templates_config):
+            try:
+                template = self._safe_create(
+                    f"NotificationTemplate '{template_config['name']}'",
+                    NotificationTemplate.objects.get_or_create,
+                    tenant=tenant,
+                    event_type=template_config['event_type'],
+                    channel_type=template_config['channel_type'],
+                    defaults={
+                        'name': template_config['name'],
+                        'subject': template_config['subject'],
+                        'body': template_config['body'],
+                        'is_active': True,
+                    }
+                )
+                if template and isinstance(template, tuple):
+                    template = template[0]
+                if template:
+                    created_templates.append(template)
+                    counts['templates'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create template {template_config['name']}: {e}")
+
+        # Create notifications for users (at least 10)
+        notification_samples = [
+            ('Application submitted successfully', 'Your application for Senior Software Engineer has been submitted.', 'info'),
+            ('Interview reminder', 'You have an interview scheduled for tomorrow at 2:00 PM.', 'reminder'),
+            ('New message received', 'You have a new message from the hiring team.', 'info'),
+            ('Offer pending', 'You have a pending job offer. Please review and respond.', 'action'),
+            ('Profile incomplete', 'Please complete your profile to improve your chances.', 'warning'),
+            ('Payment successful', 'Your payment of $500 was processed successfully.', 'success'),
+            ('Contract awaiting signature', 'Your contract is ready for signature.', 'action'),
+            ('Time off approved', 'Your time off request has been approved.', 'success'),
+            ('Document uploaded', 'Your document has been uploaded successfully.', 'success'),
+            ('Verification complete', 'Your account verification is complete.', 'success'),
+            ('New job match', 'We found 3 new jobs matching your profile.', 'info'),
+            ('Password changed', 'Your password was successfully changed.', 'security'),
+            ('Security alert', 'New login detected from unknown device.', 'security'),
+            ('Survey request', 'Please take our quick survey about your experience.', 'info'),
+            ('System maintenance', 'Scheduled maintenance tonight from 2-4 AM.', 'warning'),
+        ]
+
+        for i, (title, message, notification_type) in enumerate(notification_samples):
+            try:
+                # Send to random user
+                user = random.choice(list(users.values()))
+                channel = random.choice(created_channels) if created_channels else None
+
+                notification = self._safe_create(
+                    f"Notification '{title}'",
+                    Notification.objects.create,
+                    tenant=tenant,
+                    user=user,
+                    channel=channel,
+                    title=title,
+                    message=message,
+                    notification_type=notification_type,
+                    is_read=random.choice([True, False, False]),  # 33% read
+                    created_at=timezone.now() - timedelta(days=random.randint(0, 30)),
+                )
+                if notification:
+                    counts['notifications'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create notification {i+1}: {e}")
+
+        # Create notification preferences for all users
+        for user_key, user in users.items():
+            try:
+                # Create preferences for each channel
+                for channel in created_channels:
+                    preference = self._safe_create(
+                        f"NotificationPreference for {user_key} on {channel.channel_type}",
+                        UserNotificationPreference.objects.get_or_create,
+                        user=user,
+                        tenant=tenant,
+                        channel=channel,
+                        defaults={
+                            'is_enabled': random.choice([True, True, True, False]),  # 75% enabled
+                            'event_types': random.sample([
+                                'application_received', 'interview_scheduled', 'offer_extended',
+                                'message_received', 'payment_received', 'contract_signed'
+                            ], k=random.randint(3, 6)),
+                        }
+                    )
+                    if preference and isinstance(preference, tuple):
+                        preference = preference[0]
+                    if preference:
+                        counts['preferences'] += 1
+            except Exception as e:
+                if self.verbosity >= 2:
+                    logger.debug(f"Failed to create preferences for {user_key}: {e}")
+
+        # Log summary
+        self._log_section('Notifications Data Created', counts)
 
     def _create_verification_data(self, users):
         """Create verification and trust score demo data."""

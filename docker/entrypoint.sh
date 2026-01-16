@@ -736,11 +736,52 @@ main() {
             release_migration_lock
             log_info "Migration lock released"
         elif [ "$lock_status" = "WAITING" ]; then
-            log_info "Another instance is running migrations, waiting 30s..."
-            sleep 30
+            log_info "Another instance is running migrations, waiting for completion..."
+
+            # Wait up to 10 minutes (600 seconds) for migrations to complete
+            local max_wait=600
+            local wait_interval=10
+            local waited=0
+
+            while [ $waited -lt $max_wait ]; do
+                sleep $wait_interval
+                waited=$((waited + wait_interval))
+
+                # Check if lock is released (migrations completed)
+                local new_lock_status
+                new_lock_status=$(acquire_migration_lock)
+                if [ "$new_lock_status" = "ACQUIRED" ]; then
+                    log_info "✓ Migration lock released, migrations completed by another instance"
+                    release_migration_lock
+                    break
+                fi
+
+                log_info "Still waiting for migrations... (${waited}s / ${max_wait}s)"
+            done
+
+            if [ $waited -ge $max_wait ]; then
+                log_error "Timeout waiting for migrations after ${max_wait}s"
+                exit 1
+            fi
+
+            # Verify migrations completed successfully
+            log_info "Verifying migrations completed successfully..."
+            if ! python manage.py migrate_schemas --check; then
+                log_error "Migrations verification failed - running migrations on this instance"
+                # Fallback: try to run migrations on this instance
+                run_migrations || exit 1
+                create_cache_table
+                run_collectstatic
+                bootstrap_demo_tenant
+                setup_demo_data
+                run_geocoding || log_warn "Geocoding had issues, but continuing..."
+                verify_django_setup
+            else
+                log_info "✓ Migrations verified successfully"
+            fi
         else
             # Lock acquisition failed (Redis error) - proceed anyway for dev
-            log_warn "Could not acquire migration lock, proceeding without lock..."
+            log_warn "Could not acquire migration lock (Redis error), proceeding without lock..."
             run_migrations || exit 1
             create_cache_table
             run_collectstatic
