@@ -3977,6 +3977,15 @@ class BackgroundCheck(TenantAwareModel):
         ('comprehensive', _('Comprehensive - Pro + MVR + Credit')),
     ]
 
+    # UUID for external reference
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        verbose_name=_('UUID'),
+        help_text=_('Unique identifier for external API access')
+    )
+
     # Relationships
     application = models.ForeignKey(
         'Application',
@@ -4191,6 +4200,15 @@ class BackgroundCheckDocument(TenantAwareModel):
         ('verified', _('Verified')),
         ('not_verified', _('Not Verified')),
     ]
+
+    # UUID for external reference
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        verbose_name=_('UUID'),
+        help_text=_('Unique identifier for external API access')
+    )
 
     # Relationships
     background_check = models.ForeignKey(

@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('ats', '0001_initial'),
+        ('tenants', '__latest__'),
     ]
 
     operations = [
@@ -48,6 +49,12 @@ class Migration(migrations.Migration):
             name='BackgroundCheck',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('tenant', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='tenants.tenant',
+                    db_index=True,
+                    help_text='Tenant this record belongs to'
+                )),
                 ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
@@ -184,6 +191,12 @@ class Migration(migrations.Migration):
             name='BackgroundCheckDocument',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('tenant', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='tenants.tenant',
+                    db_index=True,
+                    help_text='Tenant this record belongs to'
+                )),
                 ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
