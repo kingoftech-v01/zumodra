@@ -68,12 +68,14 @@ class Employee(TenantAwareModel):
     status = models.CharField(
         max_length=20,
         choices=EmploymentStatus.choices,
-        default=EmploymentStatus.PENDING
+        default=EmploymentStatus.PENDING,
+        db_index=True  # Index for filtering by employment status
     )
     employment_type = models.CharField(
         max_length=20,
         choices=EmploymentType.choices,
-        default=EmploymentType.FULL_TIME
+        default=EmploymentType.FULL_TIME,
+        db_index=True  # Index for filtering by employment type
     )
 
     # Position
@@ -83,7 +85,8 @@ class Employee(TenantAwareModel):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='employees'
+        related_name='employees',
+        db_index=True  # Index for filtering employees by department
     )
     manager = models.ForeignKey(
         'self',
@@ -215,8 +218,8 @@ class Employee(TenantAwareModel):
     )
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
         verbose_name = _('Employee')
@@ -442,17 +445,19 @@ class OnboardingChecklist(models.Model):
         max_length=20,
         choices=Employee.EmploymentType.choices,
         blank=True,
-        help_text=_('Apply to specific employment type or leave blank for all')
+        help_text=_('Apply to specific employment type or leave blank for all'),
+        db_index=True  # Index for filtering checklists by employment type
     )
     department = models.ForeignKey(
         'configurations.Department',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        db_index=True  # Index for filtering checklists by department
     )
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True, db_index=True)  # Index for filtering active checklists
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
         verbose_name = _('Onboarding Checklist')
@@ -484,7 +489,8 @@ class OnboardingTask(models.Model):
     category = models.CharField(
         max_length=20,
         choices=TaskCategory.choices,
-        default=TaskCategory.OTHER
+        default=TaskCategory.OTHER,
+        db_index=True  # Index for filtering tasks by category
     )
     order = models.PositiveIntegerField(default=0)
 
@@ -530,7 +536,8 @@ class EmployeeOnboarding(models.Model):
     checklist = models.ForeignKey(
         OnboardingChecklist,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        db_index=True  # Index for filtering onboarding by checklist
     )
     start_date = models.DateField()
     target_completion_date = models.DateField(null=True, blank=True)
@@ -559,13 +566,15 @@ class OnboardingTaskProgress(models.Model):
     onboarding = models.ForeignKey(
         EmployeeOnboarding,
         on_delete=models.CASCADE,
-        related_name='task_progress'
+        related_name=\'task_progress\',
+        db_index=True  # Index for filtering task progress by onboarding
     )
     task = models.ForeignKey(
         OnboardingTask,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True  # Index for filtering progress by task
     )
-    is_completed = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False, db_index=True)  # Index for filtering by completion status
     completed_at = models.DateTimeField(null=True, blank=True)
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -693,13 +702,15 @@ class EmployeeDocument(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='documents'
+        related_name='documents',
+        db_index=True  # Index for filtering documents by employee
     )
     template = models.ForeignKey(
         DocumentTemplate,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        db_index=True  # Index for filtering documents by template
     )
 
     # Document Info
@@ -707,7 +718,8 @@ class EmployeeDocument(models.Model):
     category = models.CharField(
         max_length=20,
         choices=DocumentTemplate.DocumentCategory.choices,
-        default=DocumentTemplate.DocumentCategory.OTHER
+        default=DocumentTemplate.DocumentCategory.OTHER,
+        db_index=True  # Index for filtering documents by category
     )
     description = models.TextField(blank=True)
     file = models.FileField(
@@ -724,7 +736,8 @@ class EmployeeDocument(models.Model):
     status = models.CharField(
         max_length=20,
         choices=DocumentStatus.choices,
-        default=DocumentStatus.DRAFT
+        default=DocumentStatus.DRAFT,
+        db_index=True  # Index for filtering documents by status
     )
 
     # E-Signature (DocuSign integration)
@@ -742,10 +755,11 @@ class EmployeeDocument(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='uploaded_documents'
+        related_name='uploaded_documents',
+        db_index=True  # Index for filtering documents by uploader
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
         verbose_name = _('Employee Document')
@@ -778,13 +792,15 @@ class Offboarding(models.Model):
     employee = models.OneToOneField(
         Employee,
         on_delete=models.CASCADE,
-        related_name='offboarding'
+        related_name='offboarding',
+        db_index=True  # Index for finding offboarding by employee
     )
 
     # Separation Details
     separation_type = models.CharField(
         max_length=20,
-        choices=SeparationType.choices
+        choices=SeparationType.choices,
+        db_index=True  # Index for filtering by separation type
     )
     reason = models.TextField(blank=True)
     notice_date = models.DateField()
@@ -823,11 +839,12 @@ class Offboarding(models.Model):
     processed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        db_index=True  # Index for filtering offboarding by processor
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
+    completed_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for filtering by completion
 
     class Meta:
         verbose_name = _('Offboarding')
@@ -868,27 +885,31 @@ class PerformanceReview(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='performance_reviews'
+        related_name='performance_reviews',
+        db_index=True  # Index for filtering reviews by employee
     )
     reviewer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='hr_performance_reviews_given'
+        related_name='hr_performance_reviews_given',
+        db_index=True  # Index for filtering reviews by reviewer
     )
 
     # Review Details
     review_type = models.CharField(
         max_length=20,
         choices=ReviewType.choices,
-        default=ReviewType.ANNUAL
+        default=ReviewType.ANNUAL,
+        db_index=True  # Index for filtering by review type
     )
     review_period_start = models.DateField()
     review_period_end = models.DateField()
     status = models.CharField(
         max_length=20,
         choices=ReviewStatus.choices,
-        default=ReviewStatus.DRAFT
+        default=ReviewStatus.DRAFT,
+        db_index=True  # Index for filtering by review status
     )
 
     # Ratings
@@ -930,9 +951,9 @@ class PerformanceReview(models.Model):
     manager_signed_at = models.DateTimeField(null=True, blank=True)
 
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
+    completed_at = models.DateTimeField(null=True, blank=True, db_index=True)  # Index for filtering by completion
 
     class Meta:
         verbose_name = _('Performance Review')
@@ -1535,7 +1556,8 @@ class EmployeeGoal(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='goals'
+        related_name='goals',
+        db_index=True  # Index for filtering goals by employee
     )
 
     # Goal Details
@@ -1557,12 +1579,14 @@ class EmployeeGoal(models.Model):
             ('team', _('Team')),
             ('personal', _('Personal')),
         ],
-        default='performance'
+        default='performance',
+        db_index=True  # Index for filtering goals by category
     )
     priority = models.CharField(
         max_length=20,
         choices=GoalPriority.choices,
-        default=GoalPriority.MEDIUM
+        default=GoalPriority.MEDIUM,
+        db_index=True  # Index for filtering goals by priority
     )
 
     # Timeline
@@ -1609,11 +1633,11 @@ class EmployeeGoal(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
 
     # Audit
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _('Employee Goal')
+        verbose_name = _(\'Employee Goal\')
         verbose_name_plural = _('Employee Goals')
         ordering = ['-priority', 'target_date']
 
@@ -1668,7 +1692,8 @@ class PerformanceImprovementPlan(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='pips'
+        related_name=\'pips\',
+        db_index=True  # Index for filtering PIPs by employee
     )
     initiated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -1688,7 +1713,8 @@ class PerformanceImprovementPlan(models.Model):
     status = models.CharField(
         max_length=20,
         choices=PIPStatus.choices,
-        default=PIPStatus.DRAFT
+        default=PIPStatus.DRAFT,
+        db_index=True  # Index for filtering PIPs by status
     )
     reason = models.TextField(
         help_text=_('Detailed reason for placing employee on PIP')
@@ -1728,7 +1754,8 @@ class PerformanceImprovementPlan(models.Model):
     outcome = models.CharField(
         max_length=20,
         choices=PIPOutcome.choices,
-        default=PIPOutcome.PENDING
+        default=PIPOutcome.PENDING,
+        db_index=True  # Index for filtering PIPs by outcome
     )
     final_assessment = models.TextField(blank=True)
     final_rating = models.PositiveSmallIntegerField(
@@ -1752,11 +1779,11 @@ class PerformanceImprovementPlan(models.Model):
     hr_signed_at = models.DateTimeField(null=True, blank=True)
 
     # Audit
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _('Performance Improvement Plan')
+        verbose_name = _(\'Performance Improvement Plan\')
         verbose_name_plural = _('Performance Improvement Plans')
         ordering = ['-created_at']
 
@@ -1877,7 +1904,8 @@ class PIPMilestone(models.Model):
     status = models.CharField(
         max_length=20,
         choices=MilestoneStatus.choices,
-        default=MilestoneStatus.PENDING
+        default=MilestoneStatus.PENDING,
+        db_index=True  # Index for filtering milestones by status
     )
     progress_notes = models.TextField(blank=True)
 
@@ -1963,11 +1991,11 @@ class PIPProgressNote(models.Model):
     attachments = models.JSONField(default=list, blank=True)
 
     # Audit
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)  # Index for sorting by creation date
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)  # Index for sorting by modification date
 
     class Meta:
-        verbose_name = _('PIP Progress Note')
+        verbose_name = _(\'PIP Progress Note\')
         verbose_name_plural = _('PIP Progress Notes')
         ordering = ['-created_at']
 
