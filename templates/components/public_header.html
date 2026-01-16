@@ -223,11 +223,61 @@
                             <span class="ph-bold ph-squares-four text-lg"></span>
                             <span>{% trans 'Dashboard' %}</span>
                         </a>
-                        <a href="{% url 'account_logout' %}"
-                           class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200">
-                            <span class="ph-bold ph-sign-out text-lg"></span>
-                            <span>{% trans 'Sign Out' %}</span>
-                        </a>
+
+                        {% comment %} User Menu Dropdown {% endcomment %}
+                        <div class="relative" x-data="{ userMenuOpen: false }">
+                            <button @click="userMenuOpen = !userMenuOpen"
+                                    class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 {% if transparent %}text-white border-white/30 hover:bg-white hover:text-gray-900{% else %}text-gray-700 border-gray-300 hover:bg-gray-100{% endif %}"
+                                    :class="{ 'text-gray-700 border-gray-300 hover:bg-gray-100': scrolled }">
+                                <span class="ph-bold ph-user-circle text-lg"></span>
+                                <span>{{ user.username|truncatechars:15 }}</span>
+                                <span class="ph-bold ph-caret-down text-xs" :class="{ 'rotate-180': userMenuOpen }"></span>
+                            </button>
+
+                            <div x-show="userMenuOpen"
+                                 x-cloak
+                                 @click.outside="userMenuOpen = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-[100]">
+
+                                <a href="{% url 'custom_account_u:public_profile' %}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <span class="ph-bold ph-user text-lg"></span>
+                                    <span>{% trans 'My Profile' %}</span>
+                                </a>
+
+                                <a href="{% url 'mfa_index' %}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <span class="ph-bold ph-shield-check text-lg"></span>
+                                    <div class="flex-1 flex items-center justify-between">
+                                        <span>{% trans 'Two-Factor Auth' %}</span>
+                                        {% comment %} Show setup badge if MFA not enabled {% endcomment %}
+                                        {% if not user.mfa_authenticators.all %}
+                                        <span class="ml-2 bg-yellow-500 text-white text-xs px-2 py-0.5 rounded">{% trans 'Setup' %}</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+
+                                <a href="{% url 'account_email' %}"
+                                   class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <span class="ph-bold ph-envelope text-lg"></span>
+                                    <span>{% trans 'Email Settings' %}</span>
+                                </a>
+
+                                <hr class="my-2 border-gray-200">
+
+                                <a href="{% url 'account_logout' %}"
+                                   class="flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                                    <span class="ph-bold ph-sign-out text-lg"></span>
+                                    <span>{% trans 'Sign Out' %}</span>
+                                </a>
+                            </div>
+                        </div>
                     {% else %}
                         <a href="{% url 'account_login' %}"
                            class="px-4 py-2 rounded-lg font-medium transition-all duration-200 {% if transparent %}text-white hover:bg-white/10{% else %}text-gray-700 hover:bg-gray-100{% endif %}"

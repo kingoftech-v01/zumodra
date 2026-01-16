@@ -42,9 +42,21 @@ class DashboardView(LoginRequiredMixin, TenantViewMixin, TemplateView):
         tenant = self.get_tenant()
         user = self.request.user
 
-        if not tenant:
-            context['stats'] = {}
+        # Handle public users (no tenant or public schema)
+        if not tenant or (hasattr(tenant, 'schema_name') and tenant.schema_name == 'public'):
+            # Use public user dashboard template
+            self.template_name = 'dashboard/public_user_dashboard.html'
+
+            # Public user context
+            context['is_public_user'] = True
+            context['stats'] = {
+                'profile_completion': self._calculate_profile_completion(user),
+            }
             context['recent_activity'] = []
+            context['recommended_jobs'] = self._get_recommended_jobs(user)[:5]
+            context['show_tenant_invite'] = True
+            context['mfa_enabled'] = self._user_has_mfa(user)
+            context['mfa_required_date'] = user.date_joined + timedelta(days=30)
             return context
 
         # Import models here to avoid circular imports
@@ -157,6 +169,51 @@ class DashboardView(LoginRequiredMixin, TenantViewMixin, TemplateView):
             context['unread_notifications'] = 0
 
         return context
+
+    def _calculate_profile_completion(self, user):
+        """
+        Calculate profile completion percentage for public users.
+
+        Checks key profile fields and returns percentage complete.
+        """
+        from accounts.models import UserProfile
+
+        try:
+            profile = user.userprofile
+            fields = ['bio', 'phone', 'location', 'linkedin_url']
+            completed = sum(1 for field in fields if getattr(profile, field, None))
+            return int((completed / len(fields)) * 100)
+        except UserProfile.DoesNotExist:
+            return 0
+        except Exception as e:
+            logger.warning(f"Error calculating profile completion: {e}")
+            return 0
+
+    def _get_recommended_jobs(self, user):
+        """
+        Get recommended jobs from PublicJobCatalog for public users.
+
+        Returns active public job listings ordered by creation date.
+        """
+        try:
+            from tenants.models import PublicJobCatalog
+            return PublicJobCatalog.objects.filter(is_active=True).order_by('-created_at')
+        except Exception as e:
+            logger.warning(f"Error fetching recommended jobs: {e}")
+            return PublicJobCatalog.objects.none()
+
+    def _user_has_mfa(self, user):
+        """
+        Check if user has MFA enabled.
+
+        Supports django-allauth MFA (TOTP and WebAuthn).
+        """
+        try:
+            if hasattr(user, 'mfa_authenticators'):
+                return user.mfa_authenticators.filter(is_active=True).exists()
+        except Exception as e:
+            logger.warning(f"Error checking MFA status: {e}")
+        return False
 
 
 class SearchView(LoginRequiredMixin, TenantViewMixin, View):

@@ -221,6 +221,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'custom_account_u.middleware.Require2FAMiddleware',
+    'accounts.middleware.MFAEnforcementMiddleware',  # 30-day MFA grace period enforcement
 
     # Messages & Security
     'django.contrib.messages.middleware.MessageMiddleware',
