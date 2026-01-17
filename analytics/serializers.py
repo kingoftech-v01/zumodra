@@ -9,6 +9,8 @@ This module provides serializers for:
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from datetime import date, timedelta
 

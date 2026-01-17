@@ -10,6 +10,8 @@ This module provides DRF serializers for:
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import Q
@@ -33,9 +35,11 @@ class UserMinimalSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'avatar_url']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return obj.get_full_name()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_avatar_url(self, obj):
         if hasattr(obj, 'avatar') and obj.avatar:
             return obj.avatar.url
@@ -53,6 +57,7 @@ class UserStatusSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'is_online', 'last_seen', 'last_seen_display']
         read_only_fields = ['id', 'user', 'last_seen']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_last_seen_display(self, obj):
         if obj.is_online:
             return 'Online'
@@ -89,6 +94,7 @@ class ContactListSerializer(serializers.ModelSerializer):
         fields = ['id', 'contact', 'is_favorite', 'is_online', 'created_at']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_online(self, obj):
         try:
             return obj.contact.status.is_online
@@ -111,18 +117,21 @@ class ContactDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_online(self, obj):
         try:
             return obj.contact.status.is_online
         except UserStatus.DoesNotExist:
             return False
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_last_seen(self, obj):
         try:
             return obj.contact.status.last_seen
         except UserStatus.DoesNotExist:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_conversation_id(self, obj):
         """Get the direct conversation ID with this contact"""
         request = self.context.get('request')
@@ -192,6 +201,7 @@ class FriendRequestListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.accepted:
             return 'Accepted'
@@ -219,6 +229,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.accepted:
             return 'Accepted'
@@ -226,6 +237,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer):
             return 'Rejected'
         return 'Pending'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_accept(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -235,6 +247,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer):
             not obj.accepted and not obj.rejected
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_reject(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -244,6 +257,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer):
             not obj.accepted and not obj.rejected
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_cancel(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -355,11 +369,13 @@ class ConversationListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_last_message_preview(self, obj):
         if obj.last_message_text:
             return obj.last_message_text[:50] + ('...' if len(obj.last_message_text) > 50 else '')
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_unread_count(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -369,9 +385,11 @@ class ConversationListSerializer(serializers.ModelSerializer):
             is_read=False
         ).exclude(sender=request.user).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_group(self, obj):
         return obj.participants.count() > 2
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_other_participant(self, obj):
         """For direct chats, return the other participant"""
         request = self.context.get('request')
@@ -404,6 +422,7 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_unread_count(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -413,9 +432,11 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
             is_read=False
         ).exclude(sender=request.user).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_group(self, obj):
         return obj.participants.count() > 2
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_other_participant(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -426,9 +447,11 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 return UserMinimalSerializer(other, context=self.context).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_leave(self, obj):
         return obj.participants.count() > 2  # Can only leave group chats
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_add_participants(self, obj):
         return obj.participants.count() > 2  # Can only add to group chats
 
@@ -521,12 +544,14 @@ class MessageListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_own(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
         return obj.sender_id == request.user.id
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_attachment(self, obj):
         return bool(obj.file or obj.voice_message)
 
@@ -550,22 +575,26 @@ class MessageDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_own(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
         return obj.sender_id == request.user.id
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_file_url(self, obj):
         if obj.file:
             return obj.file.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_voice_message_url(self, obj):
         if obj.voice_message:
             return obj.voice_message.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_read_by(self, obj):
         """Get list of users who have read this message"""
         statuses = obj.statuses.filter(read_at__isnull=False).select_related('user')
@@ -639,6 +668,7 @@ class MessageSearchResultSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_conversation_name(self, obj):
         if obj.conversation.name:
             return obj.conversation.name
@@ -652,6 +682,7 @@ class MessageSearchResultSerializer(serializers.ModelSerializer):
                 return other.get_full_name()
         return 'Chat'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_content_highlight(self, obj):
         """Return content with search term highlighted"""
         query = self.context.get('query', '')

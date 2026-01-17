@@ -9,6 +9,8 @@ Provides serializers for:
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 from core.serializers import TenantAwareSerializer, AuditedSerializerMixin
 
@@ -102,6 +104,7 @@ class CompanyDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_sites_count(self, obj):
         return obj.sites.count()
 
@@ -170,9 +173,11 @@ class DepartmentListSerializer(TenantAwareSerializer):
         fields = ['id', 'name', 'company', 'company_name', 'manager', 'manager_name', 'parent', 'members_count']
         read_only_fields = ['id']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_manager_name(self, obj):
         return obj.manager.get_full_name() if obj.manager else None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_members_count(self, obj):
         return obj.memberships.filter(is_active=True).count()
 
@@ -193,9 +198,11 @@ class DepartmentDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_manager_name(self, obj):
         return obj.manager.get_full_name() if obj.manager else None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_sub_departments(self, obj):
         return [{'id': d.id, 'name': d.name} for d in obj.sub_departments.all()]
 
@@ -222,6 +229,7 @@ class RoleListSerializer(TenantAwareSerializer):
         fields = ['id', 'name', 'company', 'company_name', 'is_default', 'members_count']
         read_only_fields = ['id']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_members_count(self, obj):
         return obj.memberships.filter(is_active=True).count()
 
@@ -239,6 +247,7 @@ class RoleDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_permissions_list(self, obj):
         return list(obj.permissions.values_list('codename', flat=True))
 
@@ -271,6 +280,7 @@ class MembershipListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_user_name(self, obj):
         return obj.user.get_full_name()
 
@@ -293,9 +303,11 @@ class MembershipDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'joined_at', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_user_name(self, obj):
         return obj.user.get_full_name()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_permissions(self, obj):
         return list(obj.get_all_permissions())
 
@@ -334,6 +346,7 @@ class JobListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'posted_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_applications_count(self, obj):
         return obj.applications.count()
 
@@ -383,6 +396,7 @@ class JobApplicationListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'applied_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_candidate_name(self, obj):
         return obj.candidate.user.get_full_name()
 
@@ -404,9 +418,11 @@ class JobApplicationDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'applied_at', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_candidate_name(self, obj):
         return obj.candidate.user.get_full_name()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_reviewed_by_name(self, obj):
         return obj.reviewed_by.get_full_name() if obj.reviewed_by else None
 
@@ -569,6 +585,7 @@ class CandidateProfileSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_user_name(self, obj):
         return obj.user.get_full_name()
 
@@ -591,6 +608,7 @@ class LeaveRequestListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'duration_days', 'created_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_employee_name(self, obj):
         return obj.employee_record.membership.user.get_full_name()
 
@@ -609,9 +627,11 @@ class LeaveRequestDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'duration_days', 'reviewed_at', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_employee_name(self, obj):
         return obj.employee_record.membership.user.get_full_name()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_reviewed_by_name(self, obj):
         return obj.reviewed_by.get_full_name() if obj.reviewed_by else None
 
@@ -633,5 +653,6 @@ class InternalNotificationSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['id', 'created_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_created_by_name(self, obj):
         return obj.created_by.get_full_name() if obj.created_by else None

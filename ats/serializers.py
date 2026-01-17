@@ -19,6 +19,8 @@ Enhanced with:
 import logging
 from decimal import Decimal
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db import connection, transaction
@@ -72,6 +74,7 @@ class TenantFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
         )
     """
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_queryset(self):
         """
         Filter queryset by current tenant.
@@ -111,6 +114,7 @@ class TenantFilteredUserRelatedField(serializers.PrimaryKeyRelatedField):
     field but is related through a TenantUser or similar model.
     """
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_queryset(self):
         """
         Filter user queryset by current tenant context.
@@ -164,6 +168,7 @@ class UserMinimalSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.email
 
@@ -188,13 +193,16 @@ class JobCategorySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'full_path', 'depth']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_children(self, obj):
         children = obj.children.filter(is_active=True)
         return JobCategorySerializer(children, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_jobs_count(self, obj):
         return obj.jobs.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_open_jobs_count(self, obj):
         return obj.jobs.filter(status='open').count()
 
@@ -247,14 +255,17 @@ class PipelineStageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'uuid', 'average_time_in_stage', 'is_terminal',
                           'is_first_stage', 'is_last_stage']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_applications_count(self, obj):
         return obj.applications.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_average_time_in_stage_days(self, obj):
         if obj.average_time_in_stage:
             return obj.average_time_in_stage.days
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_next_stage_name(self, obj):
         next_stage = obj.get_next_stage()
         return next_stage.name if next_stage else None
@@ -300,9 +311,11 @@ class PipelineSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'uuid', 'created_at', 'updated_at', 'stages_count',
                           'total_applications', 'conversion_rate']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_jobs_count(self, obj):
         return obj.jobs.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_average_time_to_hire_days(self, obj):
         avg_time = obj.average_time_to_hire
         if avg_time:
@@ -331,6 +344,7 @@ class PipelineListSerializer(serializers.ModelSerializer):
         model = Pipeline
         fields = ['id', 'uuid', 'name', 'is_default', 'is_active', 'stages_count']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_stages_count(self, obj):
         return obj.stages.filter(is_active=True).count()
 
@@ -388,6 +402,7 @@ class JobPostingListSerializer(serializers.ModelSerializer):
             'days_open', 'created_at', 'published_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_hiring_manager_name(self, obj):
         if obj.hiring_manager:
             return f"{obj.hiring_manager.first_name} {obj.hiring_manager.last_name}".strip()
@@ -432,13 +447,16 @@ class JobPostingDetailSerializer(serializers.ModelSerializer):
             'tenant_type', 'can_create_jobs'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_create_jobs(self, obj):
         """Check if tenant can create jobs (COMPANY only)."""
         return obj.tenant.can_create_jobs() if hasattr(obj, 'tenant') and obj.tenant else False
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_applications_count(self, obj):
         return obj.applications.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_applications_by_stage(self, obj):
         """Get application counts grouped by pipeline stage."""
         if not obj.pipeline:
@@ -591,6 +609,7 @@ class CandidateListSerializer(serializers.ModelSerializer):
             'latest_application', 'created_at', 'last_activity_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_latest_application(self, obj):
         latest = obj.applications.order_by('-applied_at').first()
         if latest:
@@ -644,10 +663,12 @@ class CandidateDetailSerializer(serializers.ModelSerializer):
             'applications', 'tenant_type'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_applications(self, obj):
         applications = obj.applications.select_related('job', 'current_stage').order_by('-applied_at')[:10]
         return ApplicationListSerializer(applications, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_skill_summary(self, obj):
         """Return skills summary with counts."""
         return {
@@ -826,6 +847,7 @@ class ApplicationListSerializer(serializers.ModelSerializer):
             'applied_at', 'last_stage_change_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_match_score_summary(self, obj):
         """
         Get lightweight match score summary for list views.
@@ -919,31 +941,38 @@ class ApplicationDetailSerializer(serializers.ModelSerializer):
             'tenant_type'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_interviews(self, obj):
         interviews = obj.interviews.all().order_by('-scheduled_start')[:5]
         return InterviewListSerializer(interviews, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_offers(self, obj):
         offers = obj.offers.all().order_by('-created_at')[:3]
         return OfferListSerializer(offers, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_activities(self, obj):
         activities = obj.activities.all().order_by('-created_at')[:20]
         return ApplicationActivitySerializer(activities, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_notes_count(self, obj):
         return obj.notes.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_time_to_hire_days(self, obj):
         time_to_hire = obj.time_to_hire
         if time_to_hire:
             return time_to_hire.days
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_skill_match_score(self, obj):
         """Calculate skill match between candidate and job."""
         return obj.candidate.get_skill_match_score(obj.job)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_match_score(self, obj):
         """
         Get hybrid match score with three-score breakdown.
@@ -1210,9 +1239,11 @@ class InterviewListSerializer(serializers.ModelSerializer):
             'created_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_interviewers_count(self, obj):
         return obj.interviewers.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_feedback_count(self, obj):
         return obj.feedback.count()
 
@@ -1240,6 +1271,7 @@ class InterviewDetailSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'feedback', 'tenant_type'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_feedback(self, obj):
         feedback_list = obj.feedback.all()
         return InterviewFeedbackSerializer(feedback_list, many=True).data
@@ -1524,6 +1556,7 @@ class SavedSearchSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'user', 'last_run_at', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_results_count(self, obj):
         """Get count of candidates matching the saved search filters."""
         # This would need to implement the actual filter logic
@@ -1984,6 +2017,7 @@ class InterviewTemplateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'created_by', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_default_duration_minutes(self, obj):
         """Return default duration in minutes."""
         if obj.default_duration:
@@ -2454,6 +2488,7 @@ class TenantAwareSerializer(serializers.ModelSerializer):
     provides helper methods for tenant-filtered queries.
     """
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tenant(self):
         """
         Get the current tenant from request context or database connection.
@@ -2549,12 +2584,14 @@ class BackgroundCheckSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_initiated_by_name(self, obj):
         """Get name of user who initiated the check."""
         if obj.initiated_by:
             return f"{obj.initiated_by.first_name} {obj.initiated_by.last_name}".strip() or obj.initiated_by.email
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_application_info(self, obj):
         """Get basic application information."""
         return {

@@ -6,6 +6,8 @@ Uses base serializer classes from api.serializers_base for consistent tenant han
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -68,14 +70,17 @@ class IntegrationCredentialSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_access_token(self, obj):
         """Check if access token exists without exposing it."""
         return bool(obj.access_token)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_refresh_token(self, obj):
         """Check if refresh token exists without exposing it."""
         return bool(obj.refresh_token)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_api_key(self, obj):
         """Check if API key exists without exposing it."""
         return bool(obj.api_key)
@@ -124,6 +129,7 @@ class IntegrationListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_credentials(self, obj):
         return hasattr(obj, 'credentials')
 
@@ -192,9 +198,11 @@ class IntegrationSerializer(TenantAwareSerializer):
             'updated_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_webhook_count(self, obj):
         return obj.webhook_endpoints.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_recent_sync_count(self, obj):
         return obj.sync_logs.count()
 
@@ -344,6 +352,7 @@ class WebhookEndpointListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_url(self, obj):
         return obj.get_full_url()
 
@@ -399,9 +408,11 @@ class WebhookEndpointSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_url(self, obj):
         return obj.get_full_url()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_success_rate(self, obj):
         """Calculate success rate percentage."""
         if obj.total_received == 0:

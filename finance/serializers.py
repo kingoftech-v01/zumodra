@@ -12,6 +12,8 @@ This module provides DRF serializers for:
 
 from decimal import Decimal
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from django.db import transaction
 
@@ -36,6 +38,7 @@ class UserMinimalSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return obj.get_full_name()
 
@@ -61,6 +64,7 @@ class PaymentTransactionListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.succeeded:
             return 'Succeeded'
@@ -94,6 +98,7 @@ class PaymentTransactionDetailSerializer(SensitiveFieldMixin, serializers.ModelS
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.succeeded:
             return 'Succeeded'
@@ -101,9 +106,11 @@ class PaymentTransactionDetailSerializer(SensitiveFieldMixin, serializers.ModelS
             return 'Failed'
         return 'Processing'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_has_refund_request(self, obj):
         return hasattr(obj, 'refund_request')
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_refund_status(self, obj):
         if hasattr(obj, 'refund_request'):
             refund = obj.refund_request
@@ -152,10 +159,12 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_price_display(self, obj):
         interval_label = 'month' if obj.interval == 'month' else 'year'
         return f"${obj.price}/{interval_label}"
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_features(self, obj):
         # Parse features from description or return empty list
         if obj.description:
@@ -193,18 +202,22 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_active(self, obj):
         return obj.status == 'active'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_remaining(self, obj):
         if obj.current_period_end:
             delta = obj.current_period_end - timezone.now()
             return max(0, delta.days)
         return 0
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_cancel(self, obj):
         return obj.status in ['active', 'trialing']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_upgrade(self, obj):
         return obj.status in ['active', 'trialing']
 
@@ -262,6 +275,7 @@ class InvoiceListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.paid:
             return 'Paid'
@@ -269,6 +283,7 @@ class InvoiceListSerializer(serializers.ModelSerializer):
             return 'Overdue'
         return 'Pending'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_overdue(self, obj):
         if obj.paid:
             return False
@@ -299,6 +314,7 @@ class InvoiceDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.paid:
             return 'Paid'
@@ -306,6 +322,7 @@ class InvoiceDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializer):
             return 'Overdue'
         return 'Pending'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_overdue(self, obj):
         if obj.paid:
             return False
@@ -313,9 +330,11 @@ class InvoiceDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializer):
             return timezone.now() > obj.due_date
         return False
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_balance_due(self, obj):
         return obj.amount_due - obj.amount_paid
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_pay(self, obj):
         return not obj.paid and (obj.amount_due - obj.amount_paid) > 0
 
@@ -370,9 +389,11 @@ class PaymentMethodSerializer(SensitiveFieldMixin, serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_card_display(self, obj):
         return f"{obj.card_brand} ****{obj.card_last4}"
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_expired(self, obj):
         now = timezone.now()
         if obj.card_exp_year < now.year:
@@ -445,6 +466,7 @@ class RefundRequestSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_status_display(self, obj):
         if obj.approved:
             return 'Approved'
@@ -452,6 +474,7 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             return 'Rejected'
         return 'Pending'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_approve(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -516,6 +539,7 @@ class EscrowTransactionListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_participant(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -561,19 +585,23 @@ class EscrowTransactionDetailSerializer(
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_disputes(self, obj):
         disputes = obj.disputes.all()[:5]
         return DisputeListSerializer(disputes, many=True, context=self.context).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_audit_logs(self, obj):
         logs = obj.audit_logs.all().order_by('-timestamp')[:10]
         return EscrowAuditSerializer(logs, many=True, context=self.context).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_payout_info(self, obj):
         if hasattr(obj, 'payout'):
             return EscrowPayoutSerializer(obj.payout, context=self.context).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_fund(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -583,6 +611,7 @@ class EscrowTransactionDetailSerializer(
             obj.buyer == request.user
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_release(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -592,6 +621,7 @@ class EscrowTransactionDetailSerializer(
             obj.buyer == request.user
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_dispute(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -601,12 +631,14 @@ class EscrowTransactionDetailSerializer(
             (obj.buyer == request.user or obj.seller == request.user)
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_buyer(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
         return obj.buyer == request.user
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_seller(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -704,6 +736,7 @@ class DisputeDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_respond(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -717,6 +750,7 @@ class DisputeDetailSerializer(serializers.ModelSerializer):
             (escrow.buyer == request.user or escrow.seller == request.user)
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_resolve(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
@@ -838,6 +872,7 @@ class ConnectedAccountListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_ready(self, obj):
         return obj.charges_enabled and obj.payouts_enabled
 
@@ -877,9 +912,11 @@ class ConnectedAccountDetailSerializer(
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_ready(self, obj):
         return obj.charges_enabled and obj.payouts_enabled
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_payout_schedule(self, obj):
         if hasattr(obj, 'payout_schedule'):
             return PayoutScheduleSerializer(
@@ -887,6 +924,7 @@ class ConnectedAccountDetailSerializer(
             ).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_onboarding_status(self, obj):
         if hasattr(obj, 'onboarding'):
             return StripeConnectOnboardingSerializer(
@@ -894,12 +932,14 @@ class ConnectedAccountDetailSerializer(
             ).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_create_onboarding_link(self, obj):
         return (
             obj.account_id and
             obj.account_status in ['pending', 'onboarding', 'restricted']
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_total_platform_fees(self, obj):
         from django.db.models import Sum
         total = obj.platform_fees.filter(status='collected').aggregate(
@@ -1065,6 +1105,7 @@ class PlatformFeeDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializ
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_refund(self, obj):
         return (
             obj.status == 'collected' and
@@ -1072,6 +1113,7 @@ class PlatformFeeDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializ
             obj.refunded_amount < obj.fee_amount
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_net_fee(self, obj):
         return obj.fee_amount - obj.refunded_amount
 
@@ -1135,6 +1177,7 @@ class StripeConnectOnboardingSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_requirements_summary(self, obj):
         current = len(obj.requirements_current)
         past_due = len(obj.requirements_past_due)
@@ -1170,6 +1213,7 @@ class TransferListSerializer(serializers.Serializer):
     created = serializers.DateTimeField()
     reversed = serializers.BooleanField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_amount_display(self, obj):
         amount = obj.get('amount', 0) / 100
         currency = obj.get('currency', 'usd').upper()
@@ -1206,9 +1250,11 @@ class BalanceSerializer(serializers.Serializer):
     total_available = serializers.SerializerMethodField()
     total_pending = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_total_available(self, obj):
         return sum(b.get('amount', 0) for b in obj.get('available', [])) / 100
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_total_pending(self, obj):
         return sum(b.get('amount', 0) for b in obj.get('pending', [])) / 100
 
@@ -1227,6 +1273,7 @@ class BalanceTransactionSerializer(serializers.Serializer):
     available_on = serializers.DateTimeField()
     status = serializers.CharField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_amount_display(self, obj):
         amount = obj.get('amount', 0) / 100
         return f"${amount:.2f}"
@@ -1247,6 +1294,7 @@ class StripeWebhookEventSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_age_minutes(self, obj):
         delta = timezone.now() - obj.received_at
         return int(delta.total_seconds() / 60)

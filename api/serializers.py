@@ -2,6 +2,8 @@
 API Serializers - Convert Django models to JSON
 """
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from custom_account_u.models import CustomUser as User
 from services.models import (
     Service, ServiceProvider, ServiceCategory,

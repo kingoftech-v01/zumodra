@@ -12,6 +12,8 @@ Public serializers expose no sensitive data and are optimized for SEO.
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework.fields import (
     CharField, EmailField, FileField, BooleanField,
     UUIDField, SlugField, DateField, URLField,
@@ -70,6 +72,7 @@ class PublicCareerSiteSerializer(serializers.Serializer):
     google_analytics_id = CharField(read_only=True)
     facebook_pixel_id = CharField(read_only=True)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_logo_url(self, obj):
         """Return absolute URL for logo."""
         if obj.logo:
@@ -79,6 +82,7 @@ class PublicCareerSiteSerializer(serializers.Serializer):
             return obj.logo.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_favicon_url(self, obj):
         """Return absolute URL for favicon."""
         if obj.favicon:
@@ -88,6 +92,7 @@ class PublicCareerSiteSerializer(serializers.Serializer):
             return obj.favicon.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_cover_image_url(self, obj):
         """Return absolute URL for cover image."""
         if obj.cover_image:
@@ -97,6 +102,7 @@ class PublicCareerSiteSerializer(serializers.Serializer):
             return obj.cover_image.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_og_image_url(self, obj):
         """Return absolute URL for Open Graph image."""
         if obj.og_image:
@@ -106,6 +112,7 @@ class PublicCareerSiteSerializer(serializers.Serializer):
             return obj.og_image.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_benefits_sections(self, obj):
         """Parse and return benefits content sections."""
         if obj.show_benefits and obj.benefits_content:
@@ -114,12 +121,14 @@ class PublicCareerSiteSerializer(serializers.Serializer):
             ]
         return []
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_values(self, obj):
         """Return company values if enabled."""
         if obj.show_values:
             return obj.values_content or []
         return []
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_social_links(self, obj):
         """Return social media links as structured data."""
         links = []
@@ -163,12 +172,14 @@ class PublicJobListSerializer(serializers.Serializer):
     category_name = SerializerMethodField()
     category_color = SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_department(self, obj):
         """Return department/category name."""
         if obj.job.category:
             return obj.job.category.name
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_location_display(self, obj):
         """Format location for display."""
         parts = [
@@ -179,18 +190,22 @@ class PublicJobListSerializer(serializers.Serializer):
             return _('Remote')
         return ', '.join(parts) if parts else _('Location flexible')
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_employment_type_display(self, obj):
         """Return human-readable employment type."""
         return obj.job.get_job_type_display() if hasattr(obj.job, 'get_job_type_display') else obj.job.job_type
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_experience_level_display(self, obj):
         """Return human-readable experience level."""
         return obj.job.get_experience_level_display() if hasattr(obj.job, 'get_experience_level_display') else obj.job.experience_level
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_remote_policy_display(self, obj):
         """Return human-readable remote policy."""
         return obj.job.get_remote_policy_display() if hasattr(obj.job, 'get_remote_policy_display') else obj.job.remote_policy
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_salary_range(self, obj):
         """Return salary range only if show_salary_ranges is enabled."""
         # Check career page settings
@@ -208,12 +223,14 @@ class PublicJobListSerializer(serializers.Serializer):
                 }
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_new(self, obj):
         """Check if job was posted within the last 7 days."""
         if not obj.published_at:
             return False
         return (timezone.now() - obj.published_at).days <= 7
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_remaining(self, obj):
         """Days until job expires."""
         if not obj.expires_at:
@@ -221,6 +238,7 @@ class PublicJobListSerializer(serializers.Serializer):
         delta = obj.expires_at - timezone.now()
         return max(0, delta.days)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_application_count_display(self, obj):
         """Return application count if enabled."""
         if not obj.show_application_count:
@@ -232,10 +250,12 @@ class PublicJobListSerializer(serializers.Serializer):
             return f"{obj.application_count_threshold}+ applicants"
         return f"{count} applicant{'s' if count != 1 else ''}"
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_category_name(self, obj):
         """Return category name."""
         return obj.job.category.name if obj.job.category else None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_category_color(self, obj):
         """Return category color for UI."""
         return obj.job.category.color if obj.job.category else '#3B82F6'
@@ -266,18 +286,22 @@ class PublicJobDetailSerializer(PublicJobListSerializer):
     structured_data = SerializerMethodField()
     related_jobs = SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_required_skills(self, obj):
         """Return required skills as list."""
         return obj.job.required_skills or []
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_preferred_skills(self, obj):
         """Return preferred skills as list."""
         return obj.job.preferred_skills or []
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_languages_required(self, obj):
         """Return required languages as list."""
         return obj.job.languages_required or []
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_custom_questions(self, obj):
         """Return custom questions applicant must answer."""
         # Combine job-level and listing-level custom questions
@@ -289,6 +313,7 @@ class PublicJobDetailSerializer(PublicJobListSerializer):
             questions.extend(form_fields)
         return questions
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_application_deadline(self, obj):
         """Return formatted application deadline."""
         if obj.job.application_deadline:
@@ -297,6 +322,7 @@ class PublicJobDetailSerializer(PublicJobListSerializer):
             return obj.expires_at.isoformat()
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_structured_data(self, obj):
         """
         Return JSON-LD structured data for Google Jobs.
@@ -378,6 +404,7 @@ class PublicJobDetailSerializer(PublicJobListSerializer):
         }
         return mapping.get(job_type, 'OTHER')
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_related_jobs(self, obj):
         """Return up to 3 related jobs in the same category."""
         if not obj.job.category:
@@ -630,11 +657,13 @@ class CareerPagePublicSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_sections(self, obj):
         """Return only visible sections, ordered."""
         visible_sections = obj.sections.filter(is_visible=True).order_by('order')
         return CareerPageSectionSerializer(visible_sections, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_job_count(self, obj):
         """Count of active public job listings."""
         return JobListing.objects.filter(
@@ -645,6 +674,7 @@ class CareerPagePublicSerializer(serializers.ModelSerializer):
             expires_at__lt=timezone.now()
         ).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_logo_url(self, obj):
         if obj.logo:
             request = self.context.get('request')
@@ -653,6 +683,7 @@ class CareerPagePublicSerializer(serializers.ModelSerializer):
             return obj.logo.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_cover_image_url(self, obj):
         if obj.cover_image:
             request = self.context.get('request')
@@ -661,6 +692,7 @@ class CareerPagePublicSerializer(serializers.ModelSerializer):
             return obj.cover_image.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_favicon_url(self, obj):
         if obj.favicon:
             request = self.context.get('request')
@@ -669,6 +701,7 @@ class CareerPagePublicSerializer(serializers.ModelSerializer):
             return obj.favicon.url
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_og_image_url(self, obj):
         if obj.og_image:
             request = self.context.get('request')
@@ -720,6 +753,7 @@ class CareerPageAdminSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'created_at', 'updated_at', 'analytics']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_analytics(self, obj):
         """Return career page analytics summary."""
         now = timezone.now()
@@ -788,6 +822,7 @@ class JobPostingPublicSerializer(serializers.ModelSerializer):
             'published_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_salary_range(self, obj):
         """Return salary range if show_salary is enabled."""
         career_page = CareerPage.objects.first()
@@ -795,6 +830,7 @@ class JobPostingPublicSerializer(serializers.ModelSerializer):
             return obj.salary_range_display
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_location_display(self, obj):
         """Format location for display."""
         parts = [
@@ -826,6 +862,7 @@ class JobListingPublicSerializer(serializers.ModelSerializer):
             'is_new', 'days_remaining', 'is_expired',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_application_count_display(self, obj):
         """Return application count if enabled."""
         if not obj.show_application_count:
@@ -837,12 +874,14 @@ class JobListingPublicSerializer(serializers.ModelSerializer):
             return f"{obj.application_count_threshold}+ applicants"
         return f"{count} applicant{'s' if count != 1 else ''}"
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_new(self, obj):
         """Check if job was posted within the last 7 days."""
         if not obj.published_at:
             return False
         return (timezone.now() - obj.published_at).days <= 7
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_remaining(self, obj):
         """Days until job expires."""
         if not obj.expires_at:
@@ -865,11 +904,13 @@ class JobListingDetailPublicSerializer(JobListingPublicSerializer):
             'related_jobs', 'view_count',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_custom_form_fields(self, obj):
         """Parse custom form configuration for frontend rendering."""
         form_config = obj.custom_application_form or {}
         return form_config.get('fields', [])
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_related_jobs(self, obj):
         """Return up to 3 related jobs in the same category."""
         if not obj.job.category:
@@ -916,6 +957,7 @@ class JobListingAdminSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['view_count', 'apply_click_count', 'analytics', 'funnel_metrics']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_analytics(self, obj):
         """Detailed analytics for the job listing."""
         applications = obj.public_applications.all()
@@ -939,6 +981,7 @@ class JobListingAdminSerializer(serializers.ModelSerializer):
             'application_rate': self._calculate_application_rate(obj),
         }
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_funnel_metrics(self, obj):
         """Conversion funnel metrics."""
         views = obj.view_count or 1
@@ -1099,11 +1142,13 @@ class PublicApplicationStatusSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_job_title(self, obj):
         if obj.job_listing:
             return obj.job_listing.job.title
         return 'General Application'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_company_name(self, obj):
         # Return company name if available
         return None  # Extend based on tenant/company model
@@ -1142,6 +1187,7 @@ class TalentPoolMemberSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'added_at', 'added_by', 'added_by_name']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_added_by_name(self, obj):
         if obj.added_by:
             return obj.added_by.get_full_name() or obj.added_by.email
@@ -1171,9 +1217,11 @@ class TalentPoolSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'created_by', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_member_count(self, obj):
         return obj.members.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_created_by_name(self, obj):
         if obj.created_by:
             return obj.created_by.get_full_name() or obj.created_by.email
@@ -1238,6 +1286,7 @@ class PublicJobCatalogListSerializer(serializers.ModelSerializer):
             'public_url',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_location(self, obj):
         """Get formatted location string"""
         parts = []
@@ -1249,16 +1298,19 @@ class PublicJobCatalogListSerializer(serializers.ModelSerializer):
             parts.append(obj.location_country)
         return ', '.join(parts) if parts else ''
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_remote(self, obj):
         """Check if job is remote-friendly"""
         return obj.remote_policy in ['remote', 'hybrid', 'flexible']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tenant_url(self, obj):
         """Get URL to view job on tenant subdomain"""
         if hasattr(obj, 'get_tenant_job_url'):
             return obj.get_tenant_job_url()
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_public_url(self, obj):
         """Get public URL to view job"""
         if hasattr(obj, 'get_public_url'):
@@ -1325,6 +1377,7 @@ class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
             'public_url',
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_location(self, obj):
         """Get formatted location string"""
         parts = []
@@ -1336,16 +1389,19 @@ class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
             parts.append(obj.location_country)
         return ', '.join(parts) if parts else ''
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_remote(self, obj):
         """Check if job is remote-friendly"""
         return obj.remote_policy in ['remote', 'hybrid', 'flexible']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tenant_url(self, obj):
         """Get URL to view job on tenant subdomain"""
         if hasattr(obj, 'get_tenant_job_url'):
             return obj.get_tenant_job_url()
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_public_url(self, obj):
         """Get public URL to view job"""
         if hasattr(obj, 'get_public_url'):

@@ -3,6 +3,8 @@ Newsletter Serializers - DRF serializers for newsletter models.
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 from .models import Newsletter, Subscription, Article, Attachment, Message, Submission
 
@@ -21,10 +23,12 @@ class NewsletterListSerializer(serializers.ModelSerializer):
             'subscriber_count', 'subscribe_url', 'unsubscribe_url'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_subscriber_count(self, obj):
         """Get count of active subscribers."""
         return obj.subscription_set.filter(subscribed=True).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_subscribe_url(self, obj):
         """Get subscribe URL."""
         try:
@@ -32,6 +36,7 @@ class NewsletterListSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_unsubscribe_url(self, obj):
         """Get unsubscribe URL."""
         try:
@@ -50,11 +55,13 @@ class NewsletterDetailSerializer(NewsletterListSerializer):
             'subscription_generator_class', 'recent_messages', 'sites'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_recent_messages(self, obj):
         """Get recent messages for this newsletter."""
         messages = Message.objects.filter(newsletter=obj).order_by('-date_create')[:5]
         return MessageListSerializer(messages, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_sites(self, obj):
         """Get associated sites."""
         return [{'id': site.id, 'domain': site.domain} for site in obj.site.all()]
@@ -100,6 +107,7 @@ class SubscriptionDetailSerializer(SubscriptionListSerializer):
     class Meta(SubscriptionListSerializer.Meta):
         fields = SubscriptionListSerializer.Meta.fields + ['user_info']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_user_info(self, obj):
         """Get associated user info if any."""
         if obj.user:
@@ -185,6 +193,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'image', 'image_url', 'image_thumbnail_width', 'image_below_text'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_image_url(self, obj):
         """Get image URL."""
         if obj.image:
@@ -214,6 +223,7 @@ class AttachmentSerializer(serializers.ModelSerializer):
         model = Attachment
         fields = ['id', 'file', 'file_name', 'file_url', 'message']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_file_url(self, obj):
         """Get file URL."""
         if obj.file:
@@ -234,10 +244,12 @@ class MessageListSerializer(serializers.ModelSerializer):
             'date_create', 'date_modify', 'article_count', 'attachment_count'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_article_count(self, obj):
         """Get article count."""
         return obj.articles.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_attachment_count(self, obj):
         """Get attachment count."""
         return obj.attachments.count()
@@ -279,6 +291,7 @@ class SubmissionListSerializer(serializers.ModelSerializer):
             'recipient_count'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_recipient_count(self, obj):
         """Get recipient count."""
         return obj.subscriptions.count()
@@ -294,6 +307,7 @@ class SubmissionDetailSerializer(SubmissionListSerializer):
             'message_detail', 'site_info'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_site_info(self, obj):
         """Get site info."""
         if obj.site:

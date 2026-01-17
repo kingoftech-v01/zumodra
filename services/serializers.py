@@ -12,6 +12,8 @@ Provides serializers for:
 
 from decimal import Decimal
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 from core.serializers import TenantAwareSerializer
 from core.validators import sanitize_html
@@ -44,9 +46,11 @@ class UserMinimalSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return obj.get_full_name() or obj.email.split('@')[0]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_avatar_url(self, obj):
         if hasattr(obj, 'avatar') and obj.avatar:
             return obj.avatar.url
@@ -72,6 +76,7 @@ class ServiceCategorySerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_subcategories(self, obj):
         subcats = obj.subcategories.all()
         if subcats.exists():
@@ -166,6 +171,7 @@ class ServiceProviderDetailSerializer(TenantAwareSerializer):
             'stripe_payouts_enabled', 'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_coordinates(self, obj):
         return obj.coordinates
 
@@ -294,6 +300,7 @@ class ClientRequestListSerializer(TenantAwareSerializer):
             'client', 'client_email', 'proposals_count', 'created_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_proposals_count(self, obj):
         return obj.proposals.count()
 
@@ -319,12 +326,15 @@ class ClientRequestDetailSerializer(TenantAwareSerializer):
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_required_skills(self, obj):
         return list(obj.required_skills.values_list('name', flat=True))
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_proposals_count(self, obj):
         return obj.proposals.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_matches_count(self, obj):
         return obj.matches.count()
 
@@ -529,6 +539,7 @@ class ServiceReviewListSerializer(TenantAwareSerializer):
             'rating', 'title', 'created_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_reviewer_name(self, obj):
         return obj.reviewer.get_full_name() or obj.reviewer.email.split('@')[0]
 

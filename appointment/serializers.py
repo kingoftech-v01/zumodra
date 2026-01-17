@@ -3,6 +3,8 @@ Appointment Serializers - DRF serializers for appointment models.
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 
 from .models import (
@@ -36,6 +38,7 @@ class ServiceDetailSerializer(ServiceListSerializer):
     class Meta(ServiceListSerializer.Meta):
         fields = ServiceListSerializer.Meta.fields + ['staff_members']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_staff_members(self, obj):
         """Get staff members offering this service."""
         staff = StaffMember.objects.filter(services_offered=obj)
@@ -97,11 +100,13 @@ class StaffMemberDetailSerializer(StaffMemberListSerializer):
             'services_offered', 'working_hours', 'days_off'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_working_hours(self, obj):
         """Get working hours."""
         hours = obj.get_working_hours()
         return WorkingHoursSerializer(hours, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_off(self, obj):
         """Get days off."""
         days = obj.get_days_off()
@@ -177,6 +182,7 @@ class AppointmentRequestListSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_staff_member_name(self, obj):
         """Get staff member name."""
         if obj.staff_member:
@@ -197,6 +203,7 @@ class AppointmentRequestDetailSerializer(AppointmentRequestListSerializer):
             'reschedule_history', 'can_reschedule'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_reschedule_history(self, obj):
         """Get reschedule history."""
         history = obj.get_reschedule_history()
@@ -242,6 +249,7 @@ class AppointmentRescheduleHistorySerializer(serializers.ModelSerializer):
             'reschedule_status', 'id_request', 'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_staff_member_name(self, obj):
         """Get staff member name."""
         if obj.staff_member:
@@ -288,6 +296,7 @@ class AppointmentDetailSerializer(AppointmentListSerializer):
             'staff_member_detail', 'payment_info'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_staff_member_detail(self, obj):
         """Get staff member detail."""
         staff = obj.get_staff_member()
@@ -295,6 +304,7 @@ class AppointmentDetailSerializer(AppointmentListSerializer):
             return StaffMemberListSerializer(staff).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_payment_info(self, obj):
         """Get payment info."""
         try:

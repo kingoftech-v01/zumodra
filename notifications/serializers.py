@@ -9,6 +9,8 @@ from datetime import timedelta
 from typing import List
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -46,6 +48,7 @@ class UserMinimalSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'full_name']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return obj.get_full_name() or obj.username
 
@@ -117,6 +120,7 @@ class NotificationPreferenceSerializer(TenantAwareSerializer):
             'apns_token': {'write_only': True},
         }
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_available_channels(self, obj):
         """Get list of available notification channels."""
         return [
@@ -233,6 +237,7 @@ class NotificationListSerializer(TenantAwareSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_time_ago(self, obj):
         """Get human-readable time since notification was created."""
         if obj.created_at:
@@ -281,6 +286,7 @@ class NotificationSerializer(TenantAwareSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_time_ago(self, obj):
         """Get human-readable time since notification was created."""
         if obj.created_at:

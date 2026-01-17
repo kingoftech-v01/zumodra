@@ -13,6 +13,8 @@ This module provides serializers for:
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
@@ -58,6 +60,7 @@ class PlanSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_features(self, obj):
         """Return list of enabled feature names."""
         features = []
@@ -91,6 +94,7 @@ class PlanSerializer(serializers.ModelSerializer):
 
         return features
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_savings_yearly(self, obj):
         """Calculate yearly savings compared to monthly billing."""
         if obj.price_monthly and obj.price_yearly:
@@ -161,15 +165,18 @@ class TenantSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'activated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_primary_domain(self, obj):
         """Get the primary domain for this tenant."""
         primary = obj.domains.filter(is_primary=True).first()
         return primary.domain if primary else None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_create_jobs(self, obj):
         """Check if tenant can create job postings (COMPANY only)."""
         return obj.can_create_jobs()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_have_employees(self, obj):
         """Check if tenant can have multiple employees (COMPANY only)."""
         return obj.can_have_employees()
@@ -204,6 +211,7 @@ class TenantPublicSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_create_jobs(self, obj):
         """Check if tenant can create job postings (COMPANY only)."""
         return obj.can_create_jobs()
@@ -323,6 +331,7 @@ class DomainSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'is_verified', 'created_at', 'verified_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_verified(self, obj):
         """Check if domain is verified."""
         return obj.verified_at is not None
@@ -446,6 +455,7 @@ class TenantUsageSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_limits(self, obj):
         """Get plan limits for comparison."""
         plan = obj.tenant.plan
@@ -460,6 +470,7 @@ class TenantUsageSerializer(serializers.ModelSerializer):
             'storage_limit_gb': plan.storage_limit_gb
         }
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_usage_percentages(self, obj):
         """Calculate usage as percentage of limits."""
         plan = obj.tenant.plan
@@ -479,6 +490,7 @@ class TenantUsageSerializer(serializers.ModelSerializer):
             'storage': calc_percentage(obj.storage_used_gb, plan.storage_limit_gb)
         }
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_within_limits(self, obj):
         """Check if tenant is within all limits."""
         return obj.is_within_limits()

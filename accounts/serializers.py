@@ -15,6 +15,8 @@ This module provides serializers for:
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
@@ -84,6 +86,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'profile_completed_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_address(self, obj):
         """Return formatted full address."""
         parts = filter(None, [
@@ -140,6 +143,7 @@ class TenantUserSerializer(serializers.ModelSerializer):
             'joined_at', 'last_active_at', 'deactivated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_user_profile(self, obj):
         """Get nested user profile if exists."""
         try:
@@ -148,10 +152,12 @@ class TenantUserSerializer(serializers.ModelSerializer):
         except UserProfile.DoesNotExist:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_permissions(self, obj):
         """Get list of permissions for this tenant user."""
         return list(obj.get_all_permissions())
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_reports_to_name(self, obj):
         """Get the name of the supervisor."""
         if obj.reports_to:
@@ -547,16 +553,19 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'email', 'date_joined', 'last_login']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_profile(self, obj):
         try:
             return UserProfileSerializer(obj.profile, context=self.context).data
         except UserProfile.DoesNotExist:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tenant_memberships(self, obj):
         memberships = TenantUser.objects.filter(user=obj, is_active=True)
         return TenantUserSerializer(memberships, many=True, context=self.context).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_kyc_status(self, obj):
         """Get overall KYC verification status."""
         verifications = KYCVerification.objects.filter(user=obj)
@@ -766,6 +775,7 @@ class EducationVerificationSerializer(serializers.ModelSerializer):
             'request_sent_at', 'verified_at', 'expires_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_institution_type_display(self, obj):
         """Get display name for institution type."""
         type_map = {

@@ -3,6 +3,8 @@ Blog Serializers - DRF serializers for Wagtail blog models.
 """
 
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from wagtail.images.models import Image
 
 from .models import BlogPostPage, BlogIndexPage, CategoryPage, Comment, BlogPostTag
@@ -54,6 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_replies(self, obj):
         """Get nested replies."""
         if obj.replies.exists():
@@ -88,6 +91,7 @@ class CategoryListSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
     post_count = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_url(self, obj):
         """Get category URL."""
         try:
@@ -95,6 +99,7 @@ class CategoryListSerializer(serializers.Serializer):
         except Exception:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_post_count(self, obj):
         """Get count of published posts in this category."""
         return BlogPostPage.objects.live().descendant_of(obj).count()
@@ -104,6 +109,7 @@ class CategoryDetailSerializer(CategoryListSerializer):
     """Detail serializer for blog categories."""
     child_categories = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_child_categories(self, obj):
         """Get child categories."""
         children = CategoryPage.objects.live().child_of(obj)
@@ -125,6 +131,7 @@ class BlogPostListSerializer(serializers.Serializer):
     tags = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_url(self, obj):
         """Get post URL."""
         try:
@@ -132,10 +139,12 @@ class BlogPostListSerializer(serializers.Serializer):
         except Exception:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tags(self, obj):
         """Get post tags."""
         return TagSerializer(obj.tags.all(), many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_comment_count(self, obj):
         """Get comment count."""
         return obj.comments.count()
@@ -150,6 +159,7 @@ class BlogPostDetailSerializer(BlogPostListSerializer):
     category = serializers.SerializerMethodField()
     related_posts = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_body(self, obj):
         """Render StreamField body content as structured data."""
         if obj.body is None:
@@ -196,11 +206,13 @@ class BlogPostDetailSerializer(BlogPostListSerializer):
 
         return content
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_comments(self, obj):
         """Get top-level comments."""
         top_level = obj.comments.filter(parent=None).order_by('-created_at')
         return CommentSerializer(top_level, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_category(self, obj):
         """Get parent category if any."""
         parent = obj.get_parent()
@@ -208,6 +220,7 @@ class BlogPostDetailSerializer(BlogPostListSerializer):
             return CategoryListSerializer(parent).data
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_related_posts(self, obj):
         """Get related posts by tags."""
         tags = obj.tags.all()
@@ -230,6 +243,7 @@ class BlogIndexSerializer(serializers.Serializer):
     total_posts = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_url(self, obj):
         """Get index page URL."""
         try:
@@ -237,10 +251,12 @@ class BlogIndexSerializer(serializers.Serializer):
         except Exception:
             return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_total_posts(self, obj):
         """Get total published posts."""
         return BlogPostPage.objects.live().count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_categories(self, obj):
         """Get all categories."""
         categories = CategoryPage.objects.live().child_of(obj)

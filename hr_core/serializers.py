@@ -11,6 +11,8 @@ This module provides DRF serializers for:
 
 from decimal import Decimal
 from rest_framework import serializers
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from django.db import transaction
 
@@ -41,6 +43,7 @@ class UserMinimalSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name']
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_name(self, obj):
         return obj.get_full_name()
 
@@ -96,6 +99,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_manager_name(self, obj):
         if obj.manager:
             return obj.manager.full_name
@@ -163,9 +167,11 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'direct_reports', 'direct_reports_count'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_direct_reports_count(self, obj):
         return obj.direct_reports.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_have_employees(self, obj):
         """Check if tenant can have employees (COMPANY only)."""
         return obj.tenant.can_have_employees() if hasattr(obj, 'tenant') and obj.tenant else False
@@ -258,10 +264,12 @@ class EmployeeOrgChartSerializer(serializers.ModelSerializer):
             'job_title', 'department', 'avatar_url', 'direct_reports'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_avatar_url(self, obj):
         # Placeholder - can be extended to include actual avatar
         return None
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_direct_reports(self, obj):
         # Recursive serialization for org chart
         depth = self.context.get('depth', 3)
@@ -330,6 +338,7 @@ class TimeOffRequestSerializer(serializers.ModelSerializer):
             'rejection_reason', 'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_approve(self, obj):
         """Check if current user can approve this request"""
         request = self.context.get('request')
@@ -347,6 +356,7 @@ class TimeOffRequestSerializer(serializers.ModelSerializer):
         except Employee.DoesNotExist:
             return request.user.is_staff
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_cancel(self, obj):
         """Check if current user can cancel this request"""
         request = self.context.get('request')
@@ -465,6 +475,7 @@ class OnboardingChecklistSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_tasks_count(self, obj):
         return obj.tasks.count()
 
@@ -483,6 +494,7 @@ class OnboardingTaskProgressSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'completed_at', 'completed_by']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_overdue(self, obj):
         if obj.is_completed or not obj.due_date:
             return False
@@ -523,12 +535,15 @@ class EmployeeOnboardingSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'completed_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_completed_tasks_count(self, obj):
         return obj.task_progress.filter(is_completed=True).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_total_tasks_count(self, obj):
         return obj.task_progress.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_complete(self, obj):
         return obj.completion_percentage == 100
 
@@ -618,6 +633,7 @@ class EmployeeDocumentSerializer(serializers.ModelSerializer):
             'uploaded_by', 'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_sign(self, obj):
         """Check if current user can sign this document"""
         request = self.context.get('request')
@@ -627,6 +643,7 @@ class EmployeeDocumentSerializer(serializers.ModelSerializer):
             return False
         return obj.employee.user == request.user
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_expired(self, obj):
         if not obj.expires_at:
             return False
@@ -730,6 +747,7 @@ class OffboardingSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'completed_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_checklist_status(self, obj):
         """Return checklist completion status"""
         checklist_items = [
@@ -748,6 +766,7 @@ class OffboardingSerializer(serializers.ModelSerializer):
             'items': {name: status for name, status in checklist_items}
         }
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_until_last_day(self, obj):
         if not obj.last_working_day:
             return None
@@ -841,6 +860,7 @@ class PerformanceReviewSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'completed_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_submit_self_assessment(self, obj):
         """Check if employee can submit self-assessment"""
         request = self.context.get('request')
@@ -851,6 +871,7 @@ class PerformanceReviewSerializer(serializers.ModelSerializer):
             obj.employee.user == request.user
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_submit_manager_review(self, obj):
         """Check if manager can submit review"""
         request = self.context.get('request')
@@ -864,6 +885,7 @@ class PerformanceReviewSerializer(serializers.ModelSerializer):
         except Employee.DoesNotExist:
             return request.user.is_staff
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_complete(self, obj):
         """Check if review can be completed"""
         request = self.context.get('request')
@@ -1038,6 +1060,7 @@ class TimeOffBalanceSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'uuid', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_available_balance(self, obj):
         """Calculate available balance (balance - pending)"""
         return obj.balance - obj.pending
@@ -1086,6 +1109,7 @@ class TimeOffBlackoutDateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_departments_list(self, obj):
         return list(obj.departments.values_list('name', flat=True))
 
@@ -1101,6 +1125,7 @@ class SkillCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'order', 'is_active', 'skills_count']
         read_only_fields = ['id']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_skills_count(self, obj):
         return obj.skills.filter(is_active=True).count()
 
@@ -1466,11 +1491,13 @@ class PIPMilestoneSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'completed_date', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_overdue(self, obj):
         if obj.status in ['achieved', 'deferred'] or not obj.due_date:
             return False
         return timezone.now().date() > obj.due_date
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_until_due(self, obj):
         if not obj.due_date:
             return None
@@ -1543,9 +1570,11 @@ class PerformanceImprovementPlanListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_milestones_count(self, obj):
         return obj.milestones.count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_progress_percentage(self, obj):
         total = obj.milestones.count()
         if total == 0:
@@ -1553,6 +1582,7 @@ class PerformanceImprovementPlanListSerializer(serializers.ModelSerializer):
         completed = obj.milestones.filter(status='completed').count()
         return int((completed / total) * 100)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_remaining(self, obj):
         if not obj.target_end_date:
             return None
@@ -1614,6 +1644,7 @@ class PerformanceImprovementPlanSerializer(serializers.ModelSerializer):
             'actual_end_date', 'created_at', 'updated_at'
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_progress_percentage(self, obj):
         total = obj.milestones.count()
         if total == 0:
@@ -1621,12 +1652,14 @@ class PerformanceImprovementPlanSerializer(serializers.ModelSerializer):
         achieved = obj.milestones.filter(status='achieved').count()
         return int((achieved / total) * 100)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_days_remaining(self, obj):
         if not obj.target_end_date:
             return None
         delta = (obj.target_end_date - timezone.now().date()).days
         return max(0, delta)
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_is_overdue(self, obj):
         if obj.status in ['completed_success', 'completed_fail', 'terminated', 'cancelled']:
             return False
@@ -1634,12 +1667,15 @@ class PerformanceImprovementPlanSerializer(serializers.ModelSerializer):
             return False
         return timezone.now().date() > obj.target_end_date
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_activate(self, obj):
         return obj.status == 'draft'
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_extend(self, obj):
         return obj.status in ['active', 'extended']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_can_complete(self, obj):
         return obj.status in ['active', 'extended']
 
