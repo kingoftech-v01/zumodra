@@ -1211,7 +1211,7 @@ class PublicJobCatalogListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicJobCatalog
         fields = [
-            'job_id',
+            'uuid',
             'title',
             'company_name',
             'location',
@@ -1255,7 +1255,7 @@ class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicJobCatalog
         fields = [
-            'job_id',
+            'uuid',
             'tenant_schema',
             'tenant_name',
             'title',

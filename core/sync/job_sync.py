@@ -40,19 +40,34 @@ class JobCatalogSyncService:
             data = {
                 'tenant_schema_name': tenant.schema_name,
                 'tenant': tenant,
+                'uuid': job_posting.id,  # Use job UUID
+                'job_uuid': job_posting.id,
                 'title': job_posting.title,
-                'description': job_posting.description,
-                'location': job_posting.location or '',
-                'job_type': job_posting.job_type or 'full_time',
-                'is_remote': job_posting.remote_work_allowed if hasattr(job_posting, 'remote_work_allowed') else False,
-                'salary_min': job_posting.salary_min,
-                'salary_max': job_posting.salary_max,
-                'salary_currency': job_posting.salary_currency if hasattr(job_posting, 'salary_currency') else 'USD',
-                'show_salary': job_posting.show_salary if hasattr(job_posting, 'show_salary') else True,
+                'slug': job_posting.slug if hasattr(job_posting, 'slug') else '',
+                'reference_code': job_posting.reference_code if hasattr(job_posting, 'reference_code') else '',
+                'job_type': job_posting.job_type if hasattr(job_posting, 'job_type') else 'full_time',
+                'experience_level': job_posting.experience_level if hasattr(job_posting, 'experience_level') else 'mid',
+                'remote_policy': job_posting.remote_policy if hasattr(job_posting, 'remote_policy') else 'on_site',
+                'location_city': job_posting.location_city if hasattr(job_posting, 'location_city') else '',
+                'location_state': job_posting.location_state if hasattr(job_posting, 'location_state') else '',
+                'location_country': job_posting.location_country if hasattr(job_posting, 'location_country') else '',
+                'description': job_posting.description if hasattr(job_posting, 'description') else '',
+                'responsibilities': job_posting.responsibilities if hasattr(job_posting, 'responsibilities') else '',
+                'requirements': job_posting.requirements if hasattr(job_posting, 'requirements') else '',
+                'nice_to_have': job_posting.nice_to_have if hasattr(job_posting, 'nice_to_have') else '',
+                'benefits': job_posting.benefits if hasattr(job_posting, 'benefits') else '',
+                'salary_min': job_posting.salary_min if hasattr(job_posting, 'salary_min') else None,
+                'salary_max': job_posting.salary_max if hasattr(job_posting, 'salary_max') else None,
+                'salary_currency': job_posting.salary_currency if hasattr(job_posting, 'salary_currency') else 'CAD',
+                'salary_period': job_posting.salary_period if hasattr(job_posting, 'salary_period') else 'yearly',
+                'show_salary': job_posting.show_salary if hasattr(job_posting, 'show_salary') else False,
+                'required_skills': job_posting.required_skills if hasattr(job_posting, 'required_skills') else [],
+                'preferred_skills': job_posting.preferred_skills if hasattr(job_posting, 'preferred_skills') else [],
+                'positions_count': job_posting.positions_count if hasattr(job_posting, 'positions_count') else 1,
+                'team': job_posting.team if hasattr(job_posting, 'team') else '',
                 'company_name': tenant.name,
-                'is_active': job_posting.status == 'open',
                 'published_at': job_posting.created_at,
-                'expires_at': job_posting.expires_at if hasattr(job_posting, 'expires_at') else None,
+                'application_deadline': job_posting.application_deadline if hasattr(job_posting, 'application_deadline') else None,
             }
 
             # Add category information if available
@@ -67,7 +82,7 @@ class JobCatalogSyncService:
 
             # Update or create in public catalog
             catalog_entry, created = PublicJobCatalog.objects.update_or_create(
-                job_id=job_posting.id,
+                uuid=job_posting.id,
                 defaults=data
             )
 
@@ -100,7 +115,7 @@ class JobCatalogSyncService:
         from tenants.models import PublicJobCatalog
 
         try:
-            deleted_count, _ = PublicJobCatalog.objects.filter(job_id=job_id).delete()
+            deleted_count, _ = PublicJobCatalog.objects.filter(uuid=job_id).delete()
 
             if deleted_count > 0:
                 logger.info(f"Removed job {job_id} from PublicJobCatalog")

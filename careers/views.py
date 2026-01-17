@@ -202,7 +202,7 @@ class PublicJobListingDetailView(CORSMixin, generics.RetrieveAPIView):
     serializer_class = PublicJobCatalogDetailSerializer
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
-    lookup_field = 'job_id'
+    lookup_field = 'uuid'
     allow_cors = True
 
     def get_queryset(self):
