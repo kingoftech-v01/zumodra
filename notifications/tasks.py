@@ -528,12 +528,13 @@ def send_appointment_reminders():
     reminder_window_start = now
     reminder_window_end = now + timedelta(hours=24)
 
+    # Appointment model doesn't have appointment_datetime field
+    # It has appointment_request which has date and start_time
     appointments = Appointment.objects.filter(
-        appointment_datetime__gte=reminder_window_start,
-        appointment_datetime__lte=reminder_window_end,
-        status='confirmed',
-        reminder_sent=False,  # Assuming this field exists
-    ).select_related('client', 'service')
+        appointment_request__date__gte=reminder_window_start.date(),
+        appointment_request__date__lte=reminder_window_end.date(),
+        want_reminder=True,  # Actual field name
+    ).select_related('client', 'appointment_request', 'appointment_request__service')
 
     sent_count = 0
     for appointment in appointments:
@@ -542,14 +543,14 @@ def send_appointment_reminders():
                 recipient=appointment.client,
                 notification_type='appointment_reminder',
                 title=f"Reminder: {appointment.service.name}",
-                message=f"Your appointment is scheduled for {appointment.appointment_datetime.strftime('%B %d at %I:%M %p')}",
+                message=f"Your appointment is scheduled for {datetime.combine(appointment.appointment_request.date, appointment.appointment_request.start_time).strftime('%B %d at %I:%M %p')}",
                 channels=['email', 'sms', 'push'],
                 action_url=f"/appointments/{appointment.id}/",
                 context_data={
                     'appointment': appointment,
                     'service_name': appointment.service.name,
-                    'appointment_date': appointment.appointment_datetime.strftime('%B %d, %Y'),
-                    'appointment_time': appointment.appointment_datetime.strftime('%I:%M %p'),
+                    'appointment_date': appointment.appointment_request.date.strftime('%B %d, %Y'),
+                    'appointment_time': appointment.appointment_request.start_time.strftime('%I:%M %p'),
                 },
                 priority='high',
             )
