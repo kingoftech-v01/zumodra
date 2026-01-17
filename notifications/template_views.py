@@ -14,7 +14,9 @@ import json
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import connection
 from django.db.models import Count
+from django.db.utils import ProgrammingError
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -41,17 +43,32 @@ class NotificationListView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
 
-        # Get unread notifications (limited for dropdown)
-        notifications = Notification.objects.filter(
-            recipient=user,
-            is_read=False
-        ).select_related('channel').order_by('-created_at')[:10]
+        # Skip notifications for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            context = {
+                'notifications': [],
+                'unread_count': 0,
+            }
+            if request.headers.get('HX-Request'):
+                return render(request, 'partials/_notification_list.html', context)
+            return JsonResponse({'notifications': [], 'unread_count': 0})
 
-        # Get total unread count
-        unread_count = Notification.objects.filter(
-            recipient=user,
-            is_read=False
-        ).count()
+        # Get unread notifications (limited for dropdown)
+        try:
+            notifications = Notification.objects.filter(
+                recipient=user,
+                is_read=False
+            ).select_related('channel').order_by('-created_at')[:10]
+
+            # Get total unread count
+            unread_count = Notification.objects.filter(
+                recipient=user,
+                is_read=False
+            ).count()
+        except ProgrammingError:
+            # Fallback if notification table doesn't exist
+            notifications = []
+            unread_count = 0
 
         context = {
             'notifications': notifications,
@@ -87,48 +104,69 @@ class NotificationFullListView(LoginRequiredMixin, ListView):
     paginate_by = 25
 
     def get_queryset(self):
-        queryset = Notification.objects.filter(
-            recipient=self.request.user
-        ).select_related('channel').order_by('-created_at')
+        # Return empty queryset for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return Notification.objects.none()
 
-        # Filter by read status
-        status = self.request.GET.get('status')
-        if status == 'unread':
-            queryset = queryset.filter(is_read=False)
-        elif status == 'read':
-            queryset = queryset.filter(is_read=True)
+        try:
+            queryset = Notification.objects.filter(
+                recipient=self.request.user
+            ).select_related('channel').order_by('-created_at')
 
-        # Filter by type
-        notification_type = self.request.GET.get('type')
-        if notification_type:
-            queryset = queryset.filter(notification_type=notification_type)
+            # Filter by read status
+            status = self.request.GET.get('status')
+            if status == 'unread':
+                queryset = queryset.filter(is_read=False)
+            elif status == 'read':
+                queryset = queryset.filter(is_read=True)
 
-        return queryset
+            # Filter by type
+            notification_type = self.request.GET.get('type')
+            if notification_type:
+                queryset = queryset.filter(notification_type=notification_type)
+
+            return queryset
+        except ProgrammingError:
+            return Notification.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get notification type counts
-        type_counts = Notification.objects.filter(
-            recipient=self.request.user
-        ).values('notification_type').annotate(
-            count=Count('id')
-        ).order_by('-count')
+        # Skip complex queries for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            context['type_counts'] = []
+            context['notification_types'] = []
+            context['current_filters'] = {'status': '', 'type': ''}
+            context['stats'] = {'total': 0, 'unread': 0}
+            return context
 
-        context['type_counts'] = type_counts
-        context['notification_types'] = Notification.NOTIFICATION_TYPES
+        try:
+            # Get notification type counts
+            type_counts = Notification.objects.filter(
+                recipient=self.request.user
+            ).values('notification_type').annotate(
+                count=Count('id')
+            ).order_by('-count')
 
-        # Current filters
-        context['current_filters'] = {
-            'status': self.request.GET.get('status', ''),
-            'type': self.request.GET.get('type', ''),
-        }
+            context['type_counts'] = type_counts
+            context['notification_types'] = Notification.NOTIFICATION_TYPES
 
-        # Stats
-        context['stats'] = {
-            'total': Notification.objects.filter(recipient=self.request.user).count(),
-            'unread': Notification.objects.filter(recipient=self.request.user, is_read=False).count(),
-        }
+            # Current filters
+            context['current_filters'] = {
+                'status': self.request.GET.get('status', ''),
+                'type': self.request.GET.get('type', ''),
+            }
+
+            # Stats
+            context['stats'] = {
+                'total': Notification.objects.filter(recipient=self.request.user).count(),
+                'unread': Notification.objects.filter(recipient=self.request.user, is_read=False).count(),
+            }
+        except ProgrammingError:
+            context['type_counts'] = []
+            context['notification_types'] = []
+            context['current_filters'] = {'status': '', 'type': ''}
+            context['stats'] = {'total': 0, 'unread': 0}
 
         return context
 
@@ -145,27 +183,34 @@ class MarkNotificationReadView(LoginRequiredMixin, View):
     """
 
     def post(self, request, pk):
-        notification = get_object_or_404(
-            Notification,
-            pk=pk,
-            recipient=request.user
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
-        notification.mark_as_read()
+        try:
+            notification = get_object_or_404(
+                Notification,
+                pk=pk,
+                recipient=request.user
+            )
 
-        if request.headers.get('HX-Request'):
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = json.dumps({
-                'notificationRead': {
-                    'id': str(notification.pk),
-                    'unread_count': Notification.objects.filter(
-                        recipient=request.user, is_read=False
-                    ).count(),
-                }
-            })
-            return response
+            notification.mark_as_read()
 
-        return JsonResponse({'status': 'success'})
+            if request.headers.get('HX-Request'):
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'notificationRead': {
+                        'id': str(notification.pk),
+                        'unread_count': Notification.objects.filter(
+                            recipient=request.user, is_read=False
+                        ).count(),
+                    }
+                })
+                return response
+
+            return JsonResponse({'status': 'success'})
+        except ProgrammingError:
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
 
 class MarkAllNotificationsReadView(LoginRequiredMixin, View):
@@ -174,24 +219,31 @@ class MarkAllNotificationsReadView(LoginRequiredMixin, View):
     """
 
     def post(self, request):
-        updated = Notification.objects.filter(
-            recipient=request.user,
-            is_read=False
-        ).update(
-            is_read=True,
-            read_at=timezone.now()
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return JsonResponse({'status': 'success', 'updated': 0})
 
-        if request.headers.get('HX-Request'):
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = json.dumps({
-                'allNotificationsRead': {
-                    'updated_count': updated,
-                }
-            })
-            return response
+        try:
+            updated = Notification.objects.filter(
+                recipient=request.user,
+                is_read=False
+            ).update(
+                is_read=True,
+                read_at=timezone.now()
+            )
 
-        return JsonResponse({'status': 'success', 'updated': updated})
+            if request.headers.get('HX-Request'):
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'allNotificationsRead': {
+                        'updated_count': updated,
+                    }
+                })
+                return response
+
+            return JsonResponse({'status': 'success', 'updated': updated})
+        except ProgrammingError:
+            return JsonResponse({'status': 'success', 'updated': 0})
 
 
 class DismissNotificationView(LoginRequiredMixin, View):
@@ -200,20 +252,27 @@ class DismissNotificationView(LoginRequiredMixin, View):
     """
 
     def post(self, request, pk):
-        notification = get_object_or_404(
-            Notification,
-            pk=pk,
-            recipient=request.user
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
-        notification.dismiss()
+        try:
+            notification = get_object_or_404(
+                Notification,
+                pk=pk,
+                recipient=request.user
+            )
 
-        if request.headers.get('HX-Request'):
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = 'notificationDismissed'
-            return response
+            notification.dismiss()
 
-        return JsonResponse({'status': 'success'})
+            if request.headers.get('HX-Request'):
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = 'notificationDismissed'
+                return response
+
+            return JsonResponse({'status': 'success'})
+        except ProgrammingError:
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
 
 class DeleteNotificationView(LoginRequiredMixin, View):
@@ -222,20 +281,27 @@ class DeleteNotificationView(LoginRequiredMixin, View):
     """
 
     def post(self, request, pk):
-        notification = get_object_or_404(
-            Notification,
-            pk=pk,
-            recipient=request.user
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
-        notification.delete()
+        try:
+            notification = get_object_or_404(
+                Notification,
+                pk=pk,
+                recipient=request.user
+            )
 
-        if request.headers.get('HX-Request'):
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = 'notificationDeleted'
-            return response
+            notification.delete()
 
-        return JsonResponse({'status': 'success'})
+            if request.headers.get('HX-Request'):
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = 'notificationDeleted'
+                return response
+
+            return JsonResponse({'status': 'success'})
+        except ProgrammingError:
+            return JsonResponse({'status': 'error', 'message': 'Notifications not available'}, status=400)
 
 
 # =============================================================================
@@ -250,10 +316,17 @@ class NotificationCountView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        count = Notification.objects.filter(
-            recipient=request.user,
-            is_read=False
-        ).count()
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            count = 0
+        else:
+            try:
+                count = Notification.objects.filter(
+                    recipient=request.user,
+                    is_read=False
+                ).count()
+            except ProgrammingError:
+                count = 0
 
         if request.headers.get('HX-Request'):
             return render(request, 'partials/_notification_badge.html', {
@@ -276,23 +349,36 @@ class NotificationPreferencesView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get or create preferences
-        preferences, created = NotificationPreference.objects.get_or_create(
-            user=self.request.user,
-            defaults={
-                'notifications_enabled': True,
-                'channel_preferences': {
-                    'email': True,
-                    'in_app': True,
-                    'push': False,
-                    'sms': False,
-                },
-                'type_preferences': {},
-            }
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            context['preferences'] = None
+            context['notification_types'] = []
+            context['type_categories'] = {}
+            return context
 
-        context['preferences'] = preferences
-        context['notification_types'] = Notification.NOTIFICATION_TYPES
+        try:
+            # Get or create preferences
+            preferences, created = NotificationPreference.objects.get_or_create(
+                user=self.request.user,
+                defaults={
+                    'notifications_enabled': True,
+                    'channel_preferences': {
+                        'email': True,
+                        'in_app': True,
+                        'push': False,
+                        'sms': False,
+                    },
+                    'type_preferences': {},
+                }
+            )
+
+            context['preferences'] = preferences
+            context['notification_types'] = Notification.NOTIFICATION_TYPES
+        except ProgrammingError:
+            context['preferences'] = None
+            context['notification_types'] = []
+            context['type_categories'] = {}
+            return context
 
         # Group notification types by category
         type_categories = {
@@ -329,9 +415,16 @@ class UpdateNotificationPreferencesView(LoginRequiredMixin, View):
     """
 
     def post(self, request):
-        preferences, created = NotificationPreference.objects.get_or_create(
-            user=request.user
-        )
+        # Skip for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            return JsonResponse({'status': 'error', 'message': 'Preferences not available'}, status=400)
+
+        try:
+            preferences, created = NotificationPreference.objects.get_or_create(
+                user=request.user
+            )
+        except ProgrammingError:
+            return JsonResponse({'status': 'error', 'message': 'Preferences not available'}, status=400)
 
         # Parse form data
         field = request.POST.get('field')
