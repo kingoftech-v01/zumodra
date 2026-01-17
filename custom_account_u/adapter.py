@@ -129,7 +129,7 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
         """
         Return the URL to redirect to after login.
         """
-        # Check if user has any tenant assignments
+        from django.urls import reverse
         from accounts.models import TenantUser
         from django.db import connection
         from django.db.utils import ProgrammingError
@@ -146,13 +146,13 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
 
                     if tenant_user:
                         # Redirect to tenant dashboard
-                        return f'/dashboard/'
+                        return reverse('frontend:dashboard:index')
             except ProgrammingError:
                 # Table doesn't exist in public schema, that's okay
                 pass
 
         # Default redirect (dashboard will handle public users)
-        return '/dashboard/'
+        return reverse('frontend:dashboard:index')
 
     def get_signup_redirect_url(self, request):
         """
@@ -175,4 +175,4 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
             return reverse('custom_account_u:public_profile_setup')
 
         # Default fallback
-        return '/dashboard/'
+        return reverse('frontend:dashboard:index')
