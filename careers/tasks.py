@@ -35,6 +35,9 @@ def process_public_applications(self):
     """
     Process applications submitted from public career page.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Handles:
     - Converting public submissions to ATS applications
     - Resume parsing
@@ -47,6 +50,13 @@ def process_public_applications(self):
     """
     from careers.models import PublicApplication
     from ats.models import Application, JobPosting
+    from django_tenants.utils import get_tenant_model
+
+    # Skip if running in public schema
+    from django.db import connection
+    if connection.schema_name == 'public':
+        logger.info("Skipping public applications processing in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()
