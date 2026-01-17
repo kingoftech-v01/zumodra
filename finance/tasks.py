@@ -53,13 +53,13 @@ def sync_stripe_payments(self):
     Returns:
         dict: Summary of sync.
     """
-    from finance.models import Payment
+    from finance.models import PaymentTransaction
 
     try:
         now = timezone.now()
 
         # Find pending payments needing sync
-        pending_payments = Payment.objects.filter(
+        pending_payments = PaymentTransaction.objects.filter(
             status='pending',
             stripe_payment_intent_id__isnull=False,
             created_at__lt=now - timedelta(minutes=5)
@@ -118,13 +118,13 @@ def generate_monthly_invoices(self):
     Returns:
         dict: Summary of invoices generated.
     """
-    from finance.models import Subscription, Invoice
+    from finance.models import UserSubscription, Invoice
 
     try:
         now = timezone.now()
 
         # Find subscriptions due for invoicing
-        due_subscriptions = Subscription.objects.filter(
+        due_subscriptions = UserSubscription.objects.filter(
             status='active',
             next_billing_date__lte=now
         )
@@ -237,13 +237,13 @@ def process_pending_refunds(self):
     Returns:
         dict: Summary of refunds processed.
     """
-    from finance.models import Refund
+    from finance.models import RefundRequest
 
     try:
         now = timezone.now()
 
         # Find pending refunds
-        pending_refunds = Refund.objects.filter(
+        pending_refunds = RefundRequest.objects.filter(
             status='pending',
             approved_at__isnull=False
         )
@@ -312,13 +312,13 @@ def retry_failed_payments(self):
     Returns:
         dict: Summary of retry attempts.
     """
-    from finance.models import Payment
+    from finance.models import PaymentTransaction
 
     try:
         now = timezone.now()
 
         # Find payments eligible for retry
-        failed_payments = Payment.objects.filter(
+        failed_payments = PaymentTransaction.objects.filter(
             status='failed',
             retry_count__lt=3,
             last_retry_at__lt=now - timedelta(hours=24)
@@ -379,13 +379,13 @@ def update_subscription_status(self):
     Returns:
         dict: Summary of updates.
     """
-    from finance.models import Subscription
+    from finance.models import UserSubscription
 
     try:
         now = timezone.now()
 
         # Find subscriptions needing status update
-        expired_subs = Subscription.objects.filter(
+        expired_subs = UserSubscription.objects.filter(
             status='active',
             current_period_end__lt=now
         )
@@ -416,7 +416,7 @@ def update_subscription_status(self):
 
         # Find past-due subscriptions to cancel
         grace_period_end = now - timedelta(days=14)
-        cancel_subs = Subscription.objects.filter(
+        cancel_subs = UserSubscription.objects.filter(
             status='past_due',
             current_period_end__lt=grace_period_end
         )
@@ -617,19 +617,19 @@ def generate_daily_financial_report(self):
     Returns:
         dict: Financial summary.
     """
-    from finance.models import Payment, Refund, Invoice, Subscription
+    from finance.models import PaymentTransaction, RefundRequest, Invoice, UserSubscription
 
     try:
         now = timezone.now()
         yesterday = now - timedelta(days=1)
 
         # Calculate daily metrics
-        daily_revenue = Payment.objects.filter(
+        daily_revenue = PaymentTransaction.objects.filter(
             status='succeeded',
             created_at__date=yesterday.date()
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
-        daily_refunds = Refund.objects.filter(
+        daily_refunds = RefundRequest.objects.filter(
             status='processed',
             processed_at__date=yesterday.date()
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
@@ -638,7 +638,7 @@ def generate_daily_financial_report(self):
             status='pending'
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
-        active_subscriptions = Subscription.objects.filter(status='active').count()
+        active_subscriptions = UserSubscription.objects.filter(status='active').count()
 
         report = {
             'date': yesterday.date().isoformat(),
