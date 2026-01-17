@@ -1370,9 +1370,16 @@ class BrowseCompaniesMapView(TemplateView):
             company.company_logo = company.logo
             company.location_city = company.city
             company.location_country = company.country
-            # For map markers, we'll need coordinates
+
+            # For map markers, use geocoded location coordinates
             # See TODO-CAREERS-001 in careers/TODO.md for geocoding implementation
-            company.location_coordinates = None
+            if company.location:
+                company.location_coordinates = {
+                    'lat': company.latitude,
+                    'lng': company.longitude,
+                }
+            else:
+                company.location_coordinates = None
 
         # Get filter parameters for new companies filter
         company_size = self.request.GET.get('company_size', '').strip()

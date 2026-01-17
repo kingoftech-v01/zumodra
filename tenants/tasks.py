@@ -725,3 +725,113 @@ def sync_all_subscriptions(self):
     except Exception as e:
         logger.error(f"Error syncing subscriptions: {str(e)}")
         raise self.retry(exc=e)
+
+
+# ==================== GEOCODING ====================
+
+@shared_task(
+    bind=True,
+    name='tenants.tasks.geocode_tenant_task',
+    max_retries=3,
+    default_retry_delay=60,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+)
+def geocode_tenant_task(self, tenant_id):
+    """
+    Asynchronously geocode a tenant's address to coordinates.
+
+    This task is triggered by the auto_geocode_tenant signal when:
+    - A new tenant is created with address information
+    - An existing tenant's address fields are updated
+
+    Implements TODO-CAREERS-001 from careers/TODO.md.
+
+    Args:
+        tenant_id: ID of the tenant to geocode
+
+    Returns:
+        dict: Geocoding result with status and coordinates
+
+    Raises:
+        Tenant.DoesNotExist: If tenant not found
+    """
+    from tenants.models import Tenant
+    from core.geocoding import GeocodingService
+
+    try:
+        tenant = Tenant.objects.get(pk=tenant_id)
+
+        logger.info(f"Starting geocoding for tenant: {tenant.name} (ID: {tenant_id})")
+
+        # Skip if no address information
+        if not tenant.city or not tenant.country:
+            logger.warning(
+                f"Tenant {tenant.name} has insufficient address info "
+                f"(city={tenant.city}, country={tenant.country})"
+            )
+            return {
+                'status': 'skipped',
+                'reason': 'Insufficient address information',
+                'tenant_id': tenant_id,
+                'tenant_name': tenant.name,
+            }
+
+        # Skip if already geocoded
+        if tenant.location:
+            logger.info(f"Tenant {tenant.name} already has location: {tenant.location}")
+            return {
+                'status': 'skipped',
+                'reason': 'Already geocoded',
+                'tenant_id': tenant_id,
+                'tenant_name': tenant.name,
+                'coordinates': {
+                    'latitude': tenant.latitude,
+                    'longitude': tenant.longitude,
+                }
+            }
+
+        # Geocode the tenant
+        GeocodingService.geocode_tenant(tenant)
+
+        # Refresh to get updated location
+        tenant.refresh_from_db()
+
+        if tenant.location:
+            logger.info(
+                f"Successfully geocoded tenant {tenant.name}: "
+                f"({tenant.latitude}, {tenant.longitude})"
+            )
+            return {
+                'status': 'success',
+                'tenant_id': tenant_id,
+                'tenant_name': tenant.name,
+                'coordinates': {
+                    'latitude': tenant.latitude,
+                    'longitude': tenant.longitude,
+                },
+                'address': f"{tenant.city}, {tenant.state or ''} {tenant.country}".strip(),
+            }
+        else:
+            logger.warning(f"Geocoding failed for tenant {tenant.name}: No results found")
+            return {
+                'status': 'failed',
+                'reason': 'No geocoding results found',
+                'tenant_id': tenant_id,
+                'tenant_name': tenant.name,
+                'address': f"{tenant.city}, {tenant.state or ''} {tenant.country}".strip(),
+            }
+
+    except Tenant.DoesNotExist:
+        error_msg = f"Tenant {tenant_id} not found for geocoding"
+        logger.error(error_msg)
+        return {
+            'status': 'error',
+            'error': error_msg,
+            'tenant_id': tenant_id,
+        }
+
+    except Exception as e:
+        logger.error(f"Error geocoding tenant {tenant_id}: {str(e)}")
+        # Retry with exponential backoff
+        raise self.retry(exc=e)

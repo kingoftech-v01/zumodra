@@ -215,6 +215,16 @@ class Tenant(TenantMixin):
     postal_code = models.CharField(max_length=20, blank=True)
     country = models.CharField(max_length=100, blank=True, default='CA')
 
+    # Geolocation (for map markers)
+    # See TODO-CAREERS-001 in careers/TODO.md
+    location = gis_models.PointField(
+        geography=True,
+        srid=4326,  # WGS84 (latitude/longitude)
+        null=True,
+        blank=True,
+        help_text=_('Geographic coordinates for company location')
+    )
+
     # Tenant Type & Verification
     tenant_type = models.CharField(
         max_length=20,
@@ -276,6 +286,25 @@ class Tenant(TenantMixin):
             return 0
         delta = self.trial_ends_at - timezone.now()
         return max(0, delta.days)
+
+    @property
+    def latitude(self):
+        """Get latitude from location PointField."""
+        if self.location:
+            return self.location.y
+        return None
+
+    @property
+    def longitude(self):
+        """Get longitude from location PointField."""
+        if self.location:
+            return self.location.x
+        return None
+
+    @property
+    def has_location(self):
+        """Check if tenant has geocoded location."""
+        return self.location is not None
 
     def activate(self):
         """Activate tenant after successful payment or approval."""

@@ -51,6 +51,42 @@ def create_tenant_settings(sender, instance, created, **kwargs):
             instance.save(update_fields=['trial_ends_at'])
 
 
+@receiver(post_save, sender=Tenant)
+def auto_geocode_tenant(sender, instance, created, **kwargs):
+    """
+    Automatically geocode tenant address when created or address fields change.
+    Implements TODO-CAREERS-001 from careers/TODO.md.
+
+    Geocoding is done asynchronously via Celery to avoid blocking tenant creation.
+    """
+    # Skip if tenant has no address info
+    if not instance.city or not instance.country:
+        return
+
+    # Skip if already geocoded (unless address changed)
+    if instance.location and not created:
+        # Check if address fields changed
+        if not kwargs.get('update_fields'):
+            return
+
+        address_fields = {'city', 'state', 'country', 'address_line1'}
+        updated_fields = set(kwargs.get('update_fields', []))
+
+        # Only geocode if address fields were updated
+        if not address_fields.intersection(updated_fields):
+            return
+
+    # Queue geocoding task (async via Celery)
+    # Import here to avoid circular imports
+    from tenants.tasks import geocode_tenant_task
+
+    # Delay task by 2 seconds to allow transaction to commit
+    geocode_tenant_task.apply_async(
+        args=[instance.pk],
+        countdown=2
+    )
+
+
 @receiver(pre_delete, sender=Tenant)
 def cleanup_tenant(sender, instance, **kwargs):
     """

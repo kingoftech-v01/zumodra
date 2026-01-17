@@ -1,0 +1,104 @@
+===============================================
+IMMEDIATE SERVER FIX - Run These Commands Now
+===============================================
+
+The server rebooted but Django services didn't start.
+Run these commands via SSH:
+
+-----------------
+STEP 1: SSH In
+-----------------
+ssh zumodra
+
+
+-----------------
+STEP 2: Start Services
+-----------------
+sudo systemctl start zumodra-web
+sudo systemctl start zumodra-channels
+sudo systemctl start nginx
+
+
+-----------------
+STEP 3: Check Status
+-----------------
+sudo systemctl status zumodra-web
+sudo systemctl status zumodra-channels
+sudo systemctl status nginx
+
+
+-----------------
+STEP 4: If Any Service Failed
+-----------------
+# Check the logs
+sudo journalctl -u zumodra-web -n 50 --no-pager
+
+
+-----------------
+STEP 5: Enable Auto-Start (So This Doesn't Happen Again)
+-----------------
+sudo systemctl enable zumodra-web
+sudo systemctl enable zumodra-channels
+sudo systemctl enable nginx
+
+
+-----------------
+STEP 6: Test
+-----------------
+curl http://localhost:8000/health/
+
+# Should return: 200 OK with JSON
+
+
+===============================================
+ALTERNATIVE: Docker Version
+===============================================
+
+If using Docker:
+
+cd /var/www/zumodra  # or your project path
+docker-compose up -d
+docker-compose ps
+
+
+===============================================
+TROUBLESHOOTING
+===============================================
+
+If services won't start:
+
+1. Check project path:
+   cd /var/www/zumodra  # Adjust if different
+   ls manage.py  # Should exist
+
+2. Check Python/venv:
+   source venv/bin/activate
+   python manage.py check
+
+3. Check database:
+   sudo systemctl start postgresql
+
+4. Check logs for specific error:
+   sudo tail -50 /var/log/zumodra/web.log
+
+
+===============================================
+QUICK TEST AFTER FIX
+===============================================
+
+# From server:
+curl http://localhost:8000/health/  # Should return 200
+
+# From your computer:
+curl https://zumodra.rhematek-solutions.com/health/  # Should return 200
+
+
+===============================================
+NEED MORE HELP?
+===============================================
+
+See: QUICK_RESTART_GUIDE.md
+Or: DEPLOYMENT_README.md
+Or: Run the diagnostic script: ./check_and_restart_server.sh
+
+===============================================

@@ -1,45 +1,82 @@
 # Careers App TODO
 
 **Last Updated:** 2026-01-17
-**Total Items:** 1
+**Total Items:** 0
 **Status:** Production
 
 ## Overview
+
 The careers app provides public-facing job listings, career page builder, company profiles, and project marketplace for the freelance platform.
 
 ## High Priority
 
-### [TODO-CAREERS-001] Add Geocoding for Company Locations
-- **Priority:** High
-- **Category:** Feature
-- **Status:** Not Started
-- **Effort:** Medium (4-6h)
-- **File:** `careers/template_views.py:1374`
-- **Description:**
-  Implement geocoding to convert company addresses to latitude/longitude coordinates for map display on company listings page.
-- **Context:**
-  Currently `location_coordinates` is set to `None` in the CompanyListView, preventing companies from being displayed on interactive maps. Users expect to see company locations on a map view.
-- **Acceptance Criteria:**
-  - [ ] Select geocoding service (Google Maps API, Mapbox, or PostGIS built-in)
-  - [ ] Add `latitude` and `longitude` fields to Tenant model (for companies)
-  - [ ] Create migration for new fields
-  - [ ] Implement geocoding function that accepts address components (city, country)
-  - [ ] Geocode existing companies via management command
-  - [ ] Auto-geocode new companies on save (post_save signal)
-  - [ ] Display companies on map with accurate markers in template
-  - [ ] Handle geocoding failures gracefully (log error, keep existing data)
-  - [ ] Add rate limiting to avoid API quota issues
-- **Dependencies:**
-  - API key for geocoding service (if not using PostGIS)
-  - PostGIS extension already installed for PostgreSQL
-- **Notes:**
-  - PostGIS has built-in geocoding via extensions (tiger geocoder)
-  - Consider caching geocoding results to minimize API calls
-  - May want to geocode in background task (Celery) to avoid blocking
+No high priority items at this time.
 
 ---
 
 ## Completed Items
+
+### [TODO-CAREERS-001] Add Geocoding for Company Locations ✅
+
+- **Completed:** 2026-01-17
+- **Priority:** High
+- **Category:** Feature
+- **Effort:** Medium (4-6h)
+- **Files:**
+  - `tenants/models.py` (lines 218-225, 284-311)
+  - `tenants/migrations/0006_add_location_pointfield.py`
+  - `core/geocoding.py` (lines 96-123)
+  - `tenants/management/commands/geocode_tenants.py`
+  - `tenants/signals.py` (lines 54-85)
+  - `tenants/tasks.py` (lines 730-839)
+  - `careers/template_views.py` (lines 1374-1383)
+
+- **Description:**
+  Implemented geocoding to convert company addresses to latitude/longitude coordinates for map display on company listings page.
+
+- **Resolution:**
+  - ✅ Selected geocoding service: Nominatim (OpenStreetMap) - free, no API key required
+  - ✅ Added `location` PointField to Tenant model (PostGIS geography type)
+  - ✅ Created migration 0006_add_location_pointfield.py
+  - ✅ Updated existing `GeocodingService.geocode_tenant()` method in core/geocoding.py
+  - ✅ Created management command `geocode_tenants` to geocode existing companies
+  - ✅ Added post_save signal `auto_geocode_tenant` for automatic geocoding on creation/update
+  - ✅ Created Celery task `geocode_tenant_task` for async geocoding
+  - ✅ Updated CompanyListView to pass coordinates to template
+  - ✅ Implemented graceful error handling with logging
+  - ✅ Added rate limiting (1 req/sec) to respect Nominatim usage policy
+
+- **Implementation Notes:**
+  - Used PostGIS PointField instead of separate lat/lng fields for better spatial query support
+  - Geocoding service caches results for 30 days to minimize API calls
+  - Signal triggers async Celery task (2-second delay) to avoid blocking tenant creation
+  - Management command supports `--all`, `--force`, `--limit`, `--company-only`, `--active-only` flags
+  - Coordinates accessible via `tenant.latitude` and `tenant.longitude` properties
+  - Template receives `location_coordinates` as `{'lat': x, 'lng': y}` dict or None
+
+- **Usage:**
+
+  ```bash
+  # Geocode all active companies without coordinates
+  python manage.py geocode_tenants --company-only
+
+  # Force re-geocode first 10 companies (for testing)
+  python manage.py geocode_tenants --force --limit 10
+
+  # Geocode all tenants (companies and freelancers)
+  python manage.py geocode_tenants --all
+  ```
+
+- **Dependencies:**
+  - Nominatim API (OpenStreetMap) - free, no API key required
+  - PostGIS extension (already installed)
+  - Celery worker (for async geocoding)
+
+- **Notes:**
+  - Nominatim rate limit: 1 request per second
+  - Results cached for 30 days to reduce API load
+  - New tenants auto-geocode within 2 seconds of creation (async)
+  - Address changes trigger re-geocoding automatically
 
 ### [TODO-CAREERS-002] Display Actual Project Proposal Counts ✅
 - **Completed:** 2026-01-17

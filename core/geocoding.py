@@ -97,29 +97,37 @@ class GeocodingService:
         """
         Geocode a tenant's address.
 
-        Updates tenant.location_coordinates in-place.
+        Updates tenant.location PointField in-place.
+        See TODO-CAREERS-001 in careers/TODO.md for implementation details.
         """
-        if tenant.location_coordinates or tenant.geocode_attempted:
-            return  # Already geocoded or attempted
+        # Skip if already geocoded
+        if tenant.location:
+            return
+
+        # Skip if no address information
+        if not tenant.city or not tenant.country:
+            logger.warning(f'Tenant {tenant.name} has insufficient address info for geocoding')
+            return
 
         address = {
-            'street': getattr(tenant, 'address', None),
-            'city': getattr(tenant, 'city', None),
-            'state': getattr(tenant, 'state', None),
-            'country': getattr(tenant, 'country', None),
+            'street': tenant.address_line1 or None,
+            'city': tenant.city,
+            'state': tenant.state,
+            'country': tenant.country,
         }
 
-        coords = cls.geocode_address(address)
+        try:
+            coords = cls.geocode_address(address)
 
-        tenant.location_coordinates = coords
-        tenant.geocode_attempted = True
+            if coords:
+                tenant.location = coords
+                tenant.save(update_fields=['location'])
+                logger.info(f'Successfully geocoded tenant {tenant.name}: {coords}')
+            else:
+                logger.warning(f'Geocoding failed for tenant {tenant.name}: No results found')
 
-        if not coords:
-            tenant.geocode_error = 'Unable to geocode address'
-
-        tenant.save(update_fields=['location_coordinates', 'geocode_attempted', 'geocode_error'])
-
-        logger.info(f'Geocoded tenant {tenant.name}: {coords}')
+        except Exception as e:
+            logger.error(f'Geocoding error for tenant {tenant.name}: {e}')
 
     @classmethod
     def geocode_job(cls, job):
