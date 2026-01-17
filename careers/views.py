@@ -123,7 +123,16 @@ class CareerPagePublicView(CORSMixin, generics.RetrieveAPIView):
         """
         Get the career page.
         Can filter by domain query param for multi-tenant setups.
+
+        Returns None when accessed from public schema (for public job browsing).
         """
+        from django.db import connection
+
+        # Check if we're in the public schema
+        if connection.schema_name == 'public':
+            # Return None - the serializer will handle creating a default response
+            return None
+
         domain = self.request.query_params.get('domain')
 
         # For multi-tenant, filter by domain
@@ -134,6 +143,25 @@ class CareerPagePublicView(CORSMixin, generics.RetrieveAPIView):
             raise Http404("No active career page found.")
 
         return queryset.first()
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET request, returning default config for public schema."""
+        from django.db import connection
+
+        if connection.schema_name == 'public':
+            # Return default career page config for public job browsing
+            return Response({
+                'title': 'Career Opportunities',
+                'description': 'Browse open positions from companies using our platform',
+                'company_name': 'Zumodra',
+                'show_company_info': False,
+                'show_culture_section': False,
+                'show_benefits_section': False,
+                'show_testimonials': False,
+                'is_active': True,
+            })
+
+        return super().get(request, *args, **kwargs)
 
 
 class PublicJobListingListView(CORSMixin, generics.ListAPIView):
@@ -717,6 +745,28 @@ class JobCategoriesListView(CORSMixin, generics.ListAPIView):
     allow_cors = True
 
     def get(self, request):
+        from django.db import connection
+
+        # If in public schema, get categories from PublicJobCatalog
+        if connection.schema_name == 'public':
+            from tenants.models import PublicJobCatalog
+            categories = PublicJobCatalog.objects.filter(
+                category_name__isnull=False
+            ).exclude(
+                category_name=''
+            ).values(
+                'category_name', 'category_slug'
+            ).distinct().order_by('category_name')
+
+            return Response([
+                {
+                    'name': cat['category_name'],
+                    'slug': cat['category_slug'],
+                }
+                for cat in categories
+            ])
+
+        # Otherwise, query from tenant schema
         from ats.models import JobCategory
         categories = JobCategory.objects.filter(is_active=True).values(
             'id', 'name', 'slug', 'icon', 'color'
@@ -735,6 +785,30 @@ class JobLocationsListView(CORSMixin, generics.ListAPIView):
     allow_cors = True
 
     def get(self, request):
+        from django.db import connection
+
+        # If in public schema, get locations from PublicJobCatalog
+        if connection.schema_name == 'public':
+            from tenants.models import PublicJobCatalog
+
+            cities = PublicJobCatalog.objects.exclude(
+                location_city=''
+            ).values_list(
+                'location_city', flat=True
+            ).distinct().order_by('location_city')
+
+            countries = PublicJobCatalog.objects.exclude(
+                location_country=''
+            ).values_list(
+                'location_country', flat=True
+            ).distinct().order_by('location_country')
+
+            return Response({
+                'cities': list(cities),
+                'countries': list(countries),
+            })
+
+        # Otherwise, query from tenant schema
         from ats.models import JobPosting
 
         # Get unique locations from open jobs
@@ -772,8 +846,62 @@ class CareerPageStatsView(CORSMixin, APIView):
     allow_cors = True
 
     def get(self, request):
+        from django.db import connection
+        from django.db.models import Count, Q
         now = timezone.now()
 
+        # If in public schema, get stats from PublicJobCatalog
+        if connection.schema_name == 'public':
+            from tenants.models import PublicJobCatalog
+
+            # Count active jobs
+            active_jobs = PublicJobCatalog.objects.filter(
+                published_at__lte=now
+            ).filter(
+                Q(application_deadline__isnull=True) | Q(application_deadline__gte=now)
+            ).count()
+
+            # Get category breakdown
+            categories = PublicJobCatalog.objects.filter(
+                published_at__lte=now,
+                category_name__isnull=False
+            ).filter(
+                Q(application_deadline__isnull=True) | Q(application_deadline__gte=now)
+            ).exclude(
+                category_name=''
+            ).values(
+                'category_name'
+            ).annotate(
+                count=Count('id')
+            ).order_by('-count')[:5]
+
+            # Get location breakdown
+            locations = PublicJobCatalog.objects.filter(
+                published_at__lte=now,
+                location_city__isnull=False
+            ).filter(
+                Q(application_deadline__isnull=True) | Q(application_deadline__gte=now)
+            ).exclude(
+                location_city=''
+            ).values(
+                'location_city'
+            ).annotate(
+                count=Count('id')
+            ).order_by('-count')[:5]
+
+            return Response({
+                'total_open_positions': active_jobs,
+                'top_categories': [
+                    {'job__category__name': cat['category_name'], 'count': cat['count']}
+                    for cat in categories
+                ],
+                'top_locations': [
+                    {'job__location_city': loc['location_city'], 'count': loc['count']}
+                    for loc in locations
+                ],
+            })
+
+        # Otherwise, query from tenant schema
         active_jobs = JobListing.objects.filter(
             job__status='open',
             job__published_on_career_page=True,
@@ -781,7 +909,6 @@ class CareerPageStatsView(CORSMixin, APIView):
         ).exclude(expires_at__lt=now).count()
 
         # Get category breakdown
-        from django.db.models import Count
         categories = JobListing.objects.filter(
             job__status='open',
             job__published_on_career_page=True,
