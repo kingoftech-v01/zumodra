@@ -40,3 +40,35 @@ def save_public_profile(sender, instance, **kwargs):
         if new_display_name and instance.public_profile.display_name != new_display_name:
             instance.public_profile.display_name = new_display_name
             instance.public_profile.save(update_fields=['display_name', 'updated_at'])
+
+
+# ==================== POST-SIGNUP ROUTING ====================
+
+from allauth.account.signals import user_signed_up
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+@receiver(user_signed_up)
+def handle_post_signup_routing(sender, request, user, **kwargs):
+    """
+    Route user to appropriate setup flow based on selected type.
+
+    User Types:
+    - 'public': Free user, browse/apply to jobs (no tenant)
+    - 'company': Organization needing tenant workspace (paid)
+    - 'freelancer': Marketplace provider needing tenant + Stripe Connect (paid)
+
+    The user_type is stored in session during signup form submission.
+    """
+    user_type = request.session.get('selected_user_type', 'public')
+
+    logger.info(f"User {user.email} signed up as type: {user_type}")
+
+    # Store in session for next view (will be used by redirect)
+    request.session['post_signup_user_type'] = user_type
+    request.session['post_signup_complete'] = False
+
+    # Signal handled - actual redirect happens in custom allauth adapter
+    # See custom_account_u/adapter.py get_signup_redirect_url()

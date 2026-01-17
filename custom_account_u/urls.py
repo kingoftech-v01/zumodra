@@ -12,6 +12,14 @@ from .views import (
 )
 from custom_account_u.api.views import PublicProfileViewSet, ProfileFieldSyncViewSet
 
+# Import wizard views
+from custom_account_u.views import (
+    SignupTypeSelectionView,
+    PublicProfileSetupView,
+    FreelancerOnboardingWizard,
+)
+from tenants.views import CompanySetupWizard
+
 # API Router
 router = DefaultRouter()
 router.register(r'profile/public', PublicProfileViewSet, basename='publicprofile')
@@ -26,6 +34,16 @@ urlpatterns = [
     # KYC endpoints
     path('idenfy/kyc/', start_kyc, name='start_kyc'),
     path('webhooks/idenfy/verification-update', idenfy_webhook, name='idenfy_webhook'),
+
+    # Multi-tier Signup Wizards
+    path('signup/choose/', SignupTypeSelectionView.as_view(), name='signup_type_selection'),
+    path('signup/company/', CompanySetupWizard.as_view(), name='company_setup_wizard'),
+    path('signup/freelancer/', FreelancerOnboardingWizard.as_view(), name='freelancer_onboarding_wizard'),
+    path('signup/profile/', PublicProfileSetupView.as_view(), name='public_profile_setup'),
+
+    # Stripe Connect callbacks (for freelancers)
+    # path('freelancer/stripe/refresh/', StripeConnectRefreshView.as_view(), name='stripe_connect_refresh'),
+    # path('freelancer/stripe/return/', StripeConnectReturnView.as_view(), name='stripe_connect_return'),
 
     # PublicProfile views
     path('profile/', public_profile_view, name='public_profile'),

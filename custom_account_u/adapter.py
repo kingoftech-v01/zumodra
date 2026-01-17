@@ -119,6 +119,22 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
     def get_signup_redirect_url(self, request):
         """
         Return the URL to redirect to after signup.
+        Routes to appropriate setup flow based on user type.
         """
-        # After signup, redirect to dashboard or onboarding
+        from django.urls import reverse
+
+        # Check if user selected a specific type during signup
+        user_type = request.session.get('post_signup_user_type', 'public')
+
+        if user_type == 'company':
+            # Company needs tenant workspace setup
+            return reverse('custom_account_u:company_setup_wizard')
+        elif user_type == 'freelancer':
+            # Freelancer needs marketplace profile + Stripe Connect
+            return reverse('custom_account_u:freelancer_onboarding_wizard')
+        elif user_type == 'public':
+            # Public user - optional profile setup
+            return reverse('custom_account_u:public_profile_setup')
+
+        # Default fallback
         return '/dashboard/'

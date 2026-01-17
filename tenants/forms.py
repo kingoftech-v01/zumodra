@@ -1125,3 +1125,91 @@ class TenantFilterForm(forms.Form):
         }),
         label=_('Created Before'),
     )
+
+
+# ==================== COMPANY SETUP WIZARD FORMS ====================
+
+class CompanyInfoForm(forms.Form):
+    """
+    Step 1 of company signup wizard: Collect company information.
+    """
+    company_name = forms.CharField(
+        max_length=255,
+        label=_('Company Name'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg',
+            'placeholder': _('Enter your company name'),
+        }),
+    )
+
+    company_size = forms.ChoiceField(
+        label=_('Company Size'),
+        choices=[
+            ('1-10', '1-10 employees'),
+            ('11-50', '11-50 employees'),
+            ('51-200', '51-200 employees'),
+            ('201-500', '201-500 employees'),
+            ('500+', '500+ employees'),
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg',
+        }),
+    )
+
+    industry = forms.CharField(
+        max_length=100,
+        label=_('Industry'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg',
+            'placeholder': _('e.g., Technology, Healthcare, Finance'),
+        }),
+    )
+
+    website = forms.URLField(
+        required=False,
+        label=_('Website (optional)'),
+        widget=forms.URLInput(attrs={
+            'class': 'form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg',
+            'placeholder': _('https://www.example.com'),
+        }),
+    )
+
+
+class PlanSelectionForm(forms.Form):
+    """
+    Step 2 of company signup wizard: Select subscription plan.
+    """
+    plan_id = forms.ChoiceField(
+        label=_('Select Plan'),
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-radio',
+        }),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically populate plan choices from database
+        plans = Plan.objects.filter(is_active=True).order_by('price_monthly')
+        self.fields['plan_id'].choices = [
+            (str(plan.id), f'{plan.name} - ${plan.price_monthly}/month')
+            for plan in plans
+        ]
+
+
+class StripePaymentForm(forms.Form):
+    """
+    Step 3 of company signup wizard: Payment information (for paid plans).
+    """
+    stripe_payment_method_id = forms.CharField(
+        widget=forms.HiddenInput(),
+        label='',
+    )
+
+    cardholder_name = forms.CharField(
+        max_length=255,
+        label=_('Name on Card'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg',
+            'placeholder': _('Full name as it appears on card'),
+        }),
+    )

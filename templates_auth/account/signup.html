@@ -127,6 +127,9 @@
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                 {% endif %}
 
+                <!-- Hidden user_type field (set by signup type selection page) -->
+                <input type="hidden" name="{{ form.user_type.name }}" value="{{ form.user_type.value|default:'public' }}" id="{{ form.user_type.id_for_label }}" />
+
                 <!-- Signup Button -->
                 <div class="block-button mt-6">
                     <button type="submit" class="button-main bg-primary w-full text-center">
