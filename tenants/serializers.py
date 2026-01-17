@@ -367,7 +367,7 @@ class TenantInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantInvitation
         fields = [
-            'id', 'uuid', 'email', 'role', 'status',
+            'id', 'uuid', 'email', 'assigned_role', 'status',
             'invited_by', 'tenant_name',
             'is_expired', 'created_at', 'expires_at', 'accepted_at'
         ]
@@ -386,7 +386,7 @@ class TenantInvitationCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TenantInvitation
-        fields = ['email', 'role']
+        fields = ['email', 'assigned_role']
 
     def validate_email(self, value):
         """Validate email format and check for existing user/invitation."""

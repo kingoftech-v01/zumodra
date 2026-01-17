@@ -1606,8 +1606,8 @@ class InterviewSlotSerializer(serializers.ModelSerializer):
         model = InterviewSlot
         fields = [
             'id', 'uuid', 'interviewer', 'start_time', 'end_time', 'timezone',
-            'is_available', 'is_recurring', 'recurrence_rule', 'recurrence_end_date',
-            'slot_type', 'max_interviews_per_slot', 'booked_interview',
+            'is_available', 'recurring', 'recurrence_rule', 'recurrence_end_date',
+            'slot_type', 'booked_by_interview',
             'booked_interview_title', 'notes', 'duration_minutes', 'is_booked',
             'can_book', 'created_at', 'updated_at'
         ]
@@ -1626,8 +1626,8 @@ class InterviewSlotCreateSerializer(serializers.ModelSerializer):
         model = InterviewSlot
         fields = [
             'interviewer_id', 'start_time', 'end_time', 'timezone',
-            'is_available', 'is_recurring', 'recurrence_rule', 'recurrence_end_date',
-            'slot_type', 'max_interviews_per_slot', 'notes'
+            'is_available', 'recurring', 'recurrence_rule', 'recurrence_end_date',
+            'slot_type', 'notes'
         ]
 
     def validate(self, data):
@@ -1710,19 +1710,19 @@ class OfferTemplateSerializer(serializers.ModelSerializer):
     created_by = UserMinimalSerializer(read_only=True)
     job_type_display = serializers.CharField(source='get_job_type_display', read_only=True)
     experience_level_display = serializers.CharField(
-        source='get_experience_level_display',
+        source='get_job_level_display',
         read_only=True
     )
 
     class Meta:
         model = OfferTemplate
         fields = [
-            'id', 'uuid', 'name', 'description',
+            'id', 'uuid', 'name',
             'job_type', 'job_type_display', 'department',
-            'experience_level', 'experience_level_display',
-            'offer_letter_template', 'terms_template', 'benefits_template',
-            'default_pto_days', 'default_bonus_percentage', 'default_equity_percentage',
-            'requires_approval', 'approval_chain', 'is_default', 'is_active',
+            'job_level', 'experience_level_display',
+            'letter_template', 'terms_template', 'benefits_package',
+            'default_pto_days', 'bonus_percentage', 'equity_shares',
+            'requires_approval',
             'created_by', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'uuid', 'created_by', 'created_at', 'updated_at']
@@ -1734,10 +1734,10 @@ class OfferTemplateCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferTemplate
         fields = [
-            'name', 'description', 'job_type', 'department', 'experience_level',
-            'offer_letter_template', 'terms_template', 'benefits_template',
-            'default_pto_days', 'default_bonus_percentage', 'default_equity_percentage',
-            'requires_approval', 'approval_chain', 'is_default'
+            'name', 'job_type', 'department', 'job_level',
+            'letter_template', 'terms_template', 'benefits_package',
+            'default_pto_days', 'bonus_percentage', 'equity_shares',
+            'requires_approval'
         ]
 
     def validate_name(self, value):
@@ -1773,14 +1773,14 @@ class OfferApprovalSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferApproval
         fields = [
-            'id', 'uuid', 'offer', 'approver', 'approval_order', 'status',
-            'status_display', 'comments', 'rejection_reason', 'requested_by',
-            'requested_at', 'responded_at', 'due_date', 'reminder_sent',
-            'reminder_sent_at', 'is_pending', 'is_overdue'
+            'id', 'uuid', 'offer', 'approver', 'level', 'status',
+            'status_display', 'comments', 'requested_by',
+            'requested_at', 'decided_at', 'due_date', 'reminder_sent',
+            'is_pending', 'is_overdue'
         ]
         read_only_fields = [
-            'id', 'uuid', 'requested_at', 'responded_at',
-            'reminder_sent', 'reminder_sent_at'
+            'id', 'uuid', 'requested_at', 'decided_at',
+            'reminder_sent'
         ]
 
 

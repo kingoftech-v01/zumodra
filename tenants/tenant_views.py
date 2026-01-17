@@ -445,7 +445,7 @@ class TenantInvitationViewSet(viewsets.ModelViewSet):
     serializer_class = TenantInvitationSerializer
     permission_classes = [IsAuthenticated, CanInviteUsers]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['status', 'role']
+    filterset_fields = ['status', 'assigned_role']
     ordering_fields = ['created_at', 'expires_at']
     ordering = ['-created_at']
 

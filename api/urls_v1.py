@@ -25,13 +25,13 @@ from rest_framework_simplejwt.views import (
 
 # Import viewsets from the original api app for services marketplace
 from .viewsets import (
-    DServiceCategoryViewSet,
-    DServiceProviderProfileViewSet,
-    DServiceViewSet,
-    DServiceRequestViewSet,
-    DServiceProposalViewSet,
-    DServiceContractViewSet,
-    DServiceCommentViewSet,
+    ServiceCategoryViewSet,
+    ServiceProviderViewSet,
+    ServiceViewSet,
+    ClientRequestViewSet,
+    ServiceProposalViewSet,
+    ServiceContractViewSet,
+    ServiceReviewViewSet,
     AppointmentViewSet,
     CompanyViewSet,
 )
@@ -41,13 +41,13 @@ from .viewsets import (
 # Original API endpoints for the services marketplace
 
 services_router = DefaultRouter()
-services_router.register(r'categories', DServiceCategoryViewSet, basename='service-category')
-services_router.register(r'providers', DServiceProviderProfileViewSet, basename='service-provider')
-services_router.register(r'services', DServiceViewSet, basename='service')
-services_router.register(r'requests', DServiceRequestViewSet, basename='service-request')
-services_router.register(r'proposals', DServiceProposalViewSet, basename='service-proposal')
-services_router.register(r'contracts', DServiceContractViewSet, basename='service-contract')
-services_router.register(r'comments', DServiceCommentViewSet, basename='service-comment')
+services_router.register(r'categories', ServiceCategoryViewSet, basename='service-category')
+services_router.register(r'providers', ServiceProviderViewSet, basename='service-provider')
+services_router.register(r'services', ServiceViewSet, basename='service')
+services_router.register(r'requests', ClientRequestViewSet, basename='service-request')
+services_router.register(r'proposals', ServiceProposalViewSet, basename='service-proposal')
+services_router.register(r'contracts', ServiceContractViewSet, basename='service-contract')
+services_router.register(r'comments', ServiceReviewViewSet, basename='service-comment')
 services_router.register(r'appointments', AppointmentViewSet, basename='appointment')
 services_router.register(r'companies', CompanyViewSet, basename='company')
 

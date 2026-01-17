@@ -4,9 +4,9 @@ API Serializers - Convert Django models to JSON
 from rest_framework import serializers
 from custom_account_u.models import CustomUser as User
 from services.models import (
-    DService, DServiceProviderProfile, DServiceCategory,
-    DServiceRequest, DServiceProposal, DServiceContract,
-    DServiceComment
+    Service, ServiceProvider, ServiceCategory,
+    ClientRequest, ServiceProposal, ServiceContract,
+    ServiceReview
 )
 from appointment.models import Appointment
 from configurations.models import Skill, Company
@@ -35,10 +35,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 # ==================== SERVICE SERIALIZERS ====================
 
-class DServiceCategorySerializer(serializers.ModelSerializer):
+class ServiceCategorySerializer(serializers.ModelSerializer):
     """Service category"""
     class Meta:
-        model = DServiceCategory
+        model = ServiceCategory
         fields = ['id', 'name', 'parent', 'description', 'created_at']
 
 
@@ -49,13 +49,13 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 
-class DServiceProviderProfileSerializer(serializers.ModelSerializer):
+class ServiceProviderSerializer(serializers.ModelSerializer):
     """Service provider profile"""
     user = UserSerializer(read_only=True)
-    categories = DServiceCategorySerializer(many=True, read_only=True)
+    categories = ServiceCategorySerializer(many=True, read_only=True)
 
     class Meta:
-        model = DServiceProviderProfile
+        model = ServiceProvider
         fields = [
             'uuid', 'user', 'bio', 'categories', 'rating_avg',
             'total_reviews', 'completed_jobs_count', 'hourly_rate',
@@ -65,73 +65,73 @@ class DServiceProviderProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['uuid', 'rating_avg', 'total_reviews', 'completed_jobs_count']
 
 
-class DServiceSerializer(serializers.ModelSerializer):
+class ServiceSerializer(serializers.ModelSerializer):
     """Service listing"""
-    provider = DServiceProviderProfileSerializer(read_only=True)
-    category = DServiceCategorySerializer(read_only=True)  # source defaults to field name
+    provider = ServiceProviderSerializer(read_only=True)
+    category = ServiceCategorySerializer(read_only=True)  # source defaults to field name
 
     class Meta:
-        model = DService
+        model = Service
         fields = [
             'uuid', 'provider', 'category', 'name', 'description',
-            'price', 'duration_minutes', 'thumbnail', 'created_at', 'updated_at'
+            'price', 'duration_days', 'created_at', 'updated_at'
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']
 
 
-class DServiceDetailSerializer(DServiceSerializer):
+class ServiceDetailSerializer(ServiceSerializer):
     """Detailed service with comments"""
     comments_count = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
 
     def get_comments_count(self, obj):
-        return obj.comments_DService.count()
+        return obj.provider.reviews.count()
 
     def get_average_rating(self, obj):
-        comments = obj.comments_DService.all()
+        comments = obj.provider.reviews.all()
         if comments:
             return sum(c.rating for c in comments) / len(comments)
         return 0
 
-    class Meta(DServiceSerializer.Meta):
-        fields = DServiceSerializer.Meta.fields + ['comments_count', 'average_rating']
+    class Meta(ServiceSerializer.Meta):
+        fields = ServiceSerializer.Meta.fields + ['comments_count', 'average_rating']
 
 
-class DServiceRequestSerializer(serializers.ModelSerializer):
+class ClientRequestSerializer(serializers.ModelSerializer):
     """Service request"""
     client = UserSerializer(read_only=True)
     required_skills = SkillSerializer(many=True, read_only=True)
 
     class Meta:
-        model = DServiceRequest
+        model = ClientRequest
         fields = [
             'uuid', 'client', 'required_skills', 'title', 'description',
-            'budget_min', 'budget_max', 'deadline', 'created_at', 'is_open'
+            'budget_min', 'budget_max', 'deadline', 'created_at', 'status'
         ]
         read_only_fields = ['uuid', 'created_at']
 
 
-class DServiceProposalSerializer(serializers.ModelSerializer):
+class ServiceProposalSerializer(serializers.ModelSerializer):
     """Service proposal"""
-    provider = DServiceProviderProfileSerializer(read_only=True)
-    request = DServiceRequestSerializer(read_only=True)
+    provider = ServiceProviderSerializer(read_only=True)
+    client_request = ClientRequestSerializer(read_only=True)
 
     class Meta:
-        model = DServiceProposal
+        model = ServiceProposal
         fields = [
-            'id', 'request', 'provider', 'proposed_rate',
-            'message', 'submitted_at', 'is_accepted'
+            'id', 'client_request', 'provider', 'proposed_rate',
+            'cover_letter', 'created_at', 'status'
         ]
-        read_only_fields = ['id', 'submitted_at', 'is_accepted']
+        read_only_fields = ['id', 'created_at', 'status']
 
 
-class DServiceContractSerializer(serializers.ModelSerializer):
+class ServiceContractSerializer(serializers.ModelSerializer):
     """Service contract"""
-    provider = DServiceProviderProfileSerializer(read_only=True)
+    provider = ServiceProviderSerializer(read_only=True)
     client = UserSerializer(read_only=True)
 
     class Meta:
-        model = DServiceContract
+        model = ServiceContract
         fields = [
             'id', 'provider', 'client', 'agreed_rate', 'agreed_deadline',
             'status', 'created_at', 'started_at', 'completed_at'
@@ -139,12 +139,12 @@ class DServiceContractSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'started_at', 'completed_at']
 
 
-class DServiceCommentSerializer(serializers.ModelSerializer):
+class ServiceReviewSerializer(serializers.ModelSerializer):
     """Service review/comment"""
     reviewer = UserSerializer(read_only=True)
 
     class Meta:
-        model = DServiceComment
+        model = ServiceReview
         fields = [
             'id', 'reviewer', 'content', 'rating',
             'created_at', 'updated_at'
@@ -178,6 +178,6 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = [
             'id', 'name', 'owner', 'description', 'website',
-            'email', 'phone', 'created_at'
+            'created_at'
         ]
         read_only_fields = ['id', 'created_at']

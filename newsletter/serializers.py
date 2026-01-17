@@ -197,7 +197,7 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ['post', 'title', 'text', 'url', 'sortorder', 'image', 'image_below_text']
+        fields = ['message', 'title', 'text', 'url', 'sortorder', 'image', 'image_below_text']
 
     def validate_text(self, value):
         """Sanitize article text."""

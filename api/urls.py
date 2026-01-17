@@ -14,13 +14,13 @@ from .viewsets import *
 router = DefaultRouter()
 
 # Service endpoints
-router.register(r'categories', DServiceCategoryViewSet, basename='category')
-router.register(r'providers', DServiceProviderProfileViewSet, basename='provider')
-router.register(r'services', DServiceViewSet, basename='service')
-router.register(r'requests', DServiceRequestViewSet, basename='request')
-router.register(r'proposals', DServiceProposalViewSet, basename='proposal')
-router.register(r'contracts', DServiceContractViewSet, basename='contract')
-router.register(r'comments', DServiceCommentViewSet, basename='comment')
+router.register(r'categories', ServiceCategoryViewSet, basename='category')
+router.register(r'providers', ServiceProviderViewSet, basename='provider')
+router.register(r'services', ServiceViewSet, basename='service')
+router.register(r'requests', ClientRequestViewSet, basename='request')
+router.register(r'proposals', ServiceProposalViewSet, basename='proposal')
+router.register(r'contracts', ServiceContractViewSet, basename='contract')
+router.register(r'comments', ServiceReviewViewSet, basename='comment')
 
 # Appointment endpoints
 router.register(r'appointments', AppointmentViewSet, basename='appointment')

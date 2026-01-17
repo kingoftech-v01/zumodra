@@ -21,9 +21,9 @@ from django.db.models import Q, Avg
 from .serializers import *
 from .base import APIResponse
 from services.models import (
-    DService, DServiceProviderProfile, DServiceCategory,
-    DServiceRequest, DServiceProposal, DServiceContract,
-    DServiceComment
+    Service, ServiceProvider, ServiceCategory,
+    ClientRequest, ServiceProposal, ServiceContract,
+    ServiceReview
 )
 from appointment.models import Appointment
 from configurations.models import Skill, Company
@@ -49,20 +49,20 @@ logger = logging.getLogger('security.api')
 
 # ==================== SERVICE VIEWSETS ====================
 
-class DServiceCategoryViewSet(SecureReadOnlyViewSet):
+class ServiceCategoryViewSet(SecureReadOnlyViewSet):
     """
     API endpoint for service categories (read-only).
 
     Categories are public data, but we still use SecureReadOnlyViewSet
     for consistent audit logging. AllowAny is used for public access.
     """
-    queryset = DServiceCategory.objects.all()
-    serializer_class = DServiceCategorySerializer
+    queryset = ServiceCategory.objects.all()
+    serializer_class = ServiceCategorySerializer
     permission_classes = [permissions.AllowAny]
     enable_audit_logging = False  # Categories are public, no need to log
 
 
-class DServiceProviderProfileViewSet(SecureTenantViewSet):
+class ServiceProviderViewSet(SecureTenantViewSet):
     """
     API endpoint for service provider profiles.
 
@@ -76,8 +76,8 @@ class DServiceProviderProfileViewSet(SecureTenantViewSet):
     - create: Any authenticated tenant user (creates own profile)
     - update/delete: Profile owner or admin
     """
-    queryset = DServiceProviderProfile.objects.select_related('user').prefetch_related('categories')
-    serializer_class = DServiceProviderProfileSerializer
+    queryset = ServiceProvider.objects.select_related('user').prefetch_related('categories')
+    serializer_class = ServiceProviderSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['availability_status', 'is_verified']
@@ -97,20 +97,20 @@ class DServiceProviderProfileViewSet(SecureTenantViewSet):
     def services(self, request, pk=None):
         """Get all services offered by this provider."""
         provider = self.get_object()
-        services = provider.DServices_offered_by_provider.all()
-        serializer = DServiceSerializer(services, many=True)
+        services = provider.services.all()
+        serializer = ServiceSerializer(services, many=True)
         return APIResponse.success(data=serializer.data)
 
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):
         """Get all reviews for this provider."""
         provider = self.get_object()
-        reviews = DServiceComment.objects.filter(provider=provider)
-        serializer = DServiceCommentSerializer(reviews, many=True)
+        reviews = ServiceReview.objects.filter(provider=provider)
+        serializer = ServiceReviewSerializer(reviews, many=True)
         return APIResponse.success(data=serializer.data)
 
 
-class DServiceViewSet(SecureTenantViewSet):
+class ServiceViewSet(SecureTenantViewSet):
     """
     API endpoint for services.
 
@@ -121,8 +121,8 @@ class DServiceViewSet(SecureTenantViewSet):
 
     Filters: ?category=1&min_price=100&max_price=500&search=web
     """
-    queryset = DService.objects.select_related('provider', 'category').prefetch_related('tags')
-    serializer_class = DServiceSerializer
+    queryset = Service.objects.select_related('provider', 'category').prefetch_related('tags')
+    serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'provider']
@@ -137,8 +137,8 @@ class DServiceViewSet(SecureTenantViewSet):
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
-            return DServiceDetailSerializer
-        return DServiceSerializer
+            return ServiceDetailSerializer
+        return ServiceSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -157,8 +157,8 @@ class DServiceViewSet(SecureTenantViewSet):
     def perform_create(self, serializer):
         """Create service - requires provider profile."""
         try:
-            provider = self.request.user.DService_provider_profile
-        except DServiceProviderProfile.DoesNotExist:
+            provider = self.request.user.service_provider
+        except ServiceProvider.DoesNotExist:
             from rest_framework.exceptions import ValidationError
             raise ValidationError({
                 'provider': 'You must create a provider profile first'
@@ -199,18 +199,18 @@ class DServiceViewSet(SecureTenantViewSet):
     def comments(self, request, pk=None):
         """Get all comments for this service."""
         service = self.get_object()
-        comments = service.comments_DService.all()
-        serializer = DServiceCommentSerializer(comments, many=True)
+        comments = service.service_reviews.all()
+        serializer = ServiceReviewSerializer(comments, many=True)
         return APIResponse.success(data=serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
         """Like/unlike a service."""
-        from services.models import DServiceLike
+        from services.models import ServiceLike
         service = self.get_object()
-        like, created = DServiceLike.objects.get_or_create(
+        like, created = ServiceLike.objects.get_or_create(
             user=request.user,
-            DService=service
+            service=service
         )
         if not created:
             like.delete()
@@ -218,7 +218,7 @@ class DServiceViewSet(SecureTenantViewSet):
         return APIResponse.success(data={'liked': True}, message='Service liked')
 
 
-class DServiceRequestViewSet(SecureTenantViewSet):
+class ClientRequestViewSet(SecureTenantViewSet):
     """
     API endpoint for service requests.
 
@@ -227,11 +227,11 @@ class DServiceRequestViewSet(SecureTenantViewSet):
     - create: Any authenticated tenant user
     - update/destroy: Request owner only
     """
-    queryset = DServiceRequest.objects.select_related('client').prefetch_related('required_skills')
-    serializer_class = DServiceRequestSerializer
+    queryset = ClientRequest.objects.select_related('client').prefetch_related('required_skills')
+    serializer_class = ClientRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['is_open']
+    filterset_fields = ['status']
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'budget_max', 'deadline']
     tenant_field = None  # Requests linked via client user
@@ -282,11 +282,11 @@ class DServiceRequestViewSet(SecureTenantViewSet):
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Only the request owner can view proposals.")
         proposals = service_request.proposals.all()
-        serializer = DServiceProposalSerializer(proposals, many=True)
+        serializer = ServiceProposalSerializer(proposals, many=True)
         return APIResponse.success(data=serializer.data)
 
 
-class DServiceProposalViewSet(SecureTenantViewSet):
+class ServiceProposalViewSet(SecureTenantViewSet):
     """
     API endpoint for service proposals.
 
@@ -297,8 +297,8 @@ class DServiceProposalViewSet(SecureTenantViewSet):
 
     Participant-based access: Only provider and client can see/interact with proposals.
     """
-    queryset = DServiceProposal.objects.select_related('provider', 'request')
-    serializer_class = DServiceProposalSerializer
+    queryset = ServiceProposal.objects.select_related('provider', 'request')
+    serializer_class = ServiceProposalSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser]
     tenant_field = None
 
@@ -306,8 +306,8 @@ class DServiceProposalViewSet(SecureTenantViewSet):
         queryset = super().get_queryset()
 
         # Show proposals where user is either provider or client (participant-only)
-        if hasattr(self.request.user, 'DService_provider_profile'):
-            provider = self.request.user.DService_provider_profile
+        if hasattr(self.request.user, 'service_provider'):
+            provider = self.request.user.service_provider
             queryset = queryset.filter(
                 Q(provider=provider) | Q(request__client=self.request.user)
             )
@@ -319,8 +319,8 @@ class DServiceProposalViewSet(SecureTenantViewSet):
     def perform_create(self, serializer):
         """Submit proposal - requires provider profile."""
         try:
-            provider = self.request.user.DService_provider_profile
-        except DServiceProviderProfile.DoesNotExist:
+            provider = self.request.user.service_provider
+        except ServiceProvider.DoesNotExist:
             from rest_framework.exceptions import ValidationError
             raise ValidationError({
                 'provider': 'You must create a provider profile first'
@@ -351,7 +351,7 @@ class DServiceProposalViewSet(SecureTenantViewSet):
         proposal.request.save()
 
         # Create contract
-        contract = DServiceContract.objects.create(
+        contract = ServiceContract.objects.create(
             request=proposal.request,
             provider=proposal.provider,
             client=request.user,
@@ -365,14 +365,14 @@ class DServiceProposalViewSet(SecureTenantViewSet):
             f"proposal={proposal.id} contract={contract.id}"
         )
 
-        serializer = DServiceContractSerializer(contract)
+        serializer = ServiceContractSerializer(contract)
         return APIResponse.created(
             data=serializer.data,
             message="Proposal accepted and contract created"
         )
 
 
-class DServiceContractViewSet(ParticipantViewSet):
+class ServiceContractViewSet(ParticipantViewSet):
     """
     API endpoint for service contracts.
 
@@ -383,8 +383,8 @@ class DServiceContractViewSet(ParticipantViewSet):
 
     Uses ParticipantViewSet to enforce that only involved parties can access.
     """
-    queryset = DServiceContract.objects.select_related('provider', 'client')
-    serializer_class = DServiceContractSerializer
+    queryset = ServiceContract.objects.select_related('provider', 'client')
+    serializer_class = ServiceContractSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['status']
@@ -399,8 +399,8 @@ class DServiceContractViewSet(ParticipantViewSet):
         queryset = super().get_queryset()
 
         # ParticipantViewSet handles filtering, but we add explicit check here
-        if hasattr(self.request.user, 'DService_provider_profile'):
-            provider = self.request.user.DService_provider_profile
+        if hasattr(self.request.user, 'service_provider'):
+            provider = self.request.user.service_provider
             queryset = queryset.filter(
                 Q(provider=provider) | Q(client=self.request.user)
             )
@@ -456,7 +456,7 @@ class DServiceContractViewSet(ParticipantViewSet):
         )
 
 
-class DServiceCommentViewSet(SecureTenantViewSet):
+class ServiceReviewViewSet(SecureTenantViewSet):
     """
     API endpoint for service comments/reviews.
 
@@ -467,11 +467,11 @@ class DServiceCommentViewSet(SecureTenantViewSet):
 
     Reviews can only be created after a completed contract between reviewer and provider.
     """
-    queryset = DServiceComment.objects.select_related('reviewer', 'DService', 'provider')
-    serializer_class = DServiceCommentSerializer
+    queryset = ServiceReview.objects.select_related('reviewer', 'provider', 'contract')
+    serializer_class = ServiceReviewSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['DService', 'provider', 'rating']
+    filterset_fields = ['provider', 'rating', 'contract']
     ordering_fields = ['created_at', 'rating']
     tenant_field = None  # Comments linked via reviewer user
 
@@ -481,7 +481,7 @@ class DServiceCommentViewSet(SecureTenantViewSet):
         service = serializer.validated_data.get('DService')
 
         # Verify reviewer has a completed contract with provider
-        has_contract = DServiceContract.objects.filter(
+        has_contract = ServiceContract.objects.filter(
             client=self.request.user,
             provider=provider,
             status='completed'
