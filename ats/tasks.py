@@ -1098,34 +1098,47 @@ def bulk_sync_tenant_jobs(tenant_id):
     autoretry_for=(Exception,),
     retry_backoff=True,
 )
-def sync_job_to_public_catalog(self, job_id):
+def sync_job_to_public_catalog(self, job_id, tenant_schema_name=None):
     """
     Async task to sync JobPosting → PublicJobCatalog.
-    
+
     Workflow:
     1. JobPosting created/updated in tenant schema
     2. Signal triggers this Celery task
     3. Task fetches JobPosting data
     4. Denormalizes and syncs to PublicJobCatalog (public schema)
     5. Makes job browsable by public users across all tenants
-    
+
     Args:
         job_id (str): UUID of the JobPosting to sync
-        
+        tenant_schema_name (str, optional): Tenant schema name to query from
+
     Returns:
         dict: Sync result with status and details
     """
     from ats.models import JobPosting
     from core.sync.job_sync import JobCatalogSyncService
-    
+    from django.db import connection
+    from django_tenants.utils import get_tenant_model
+
     try:
-        logger.info(f"Syncing job {job_id} to PublicJobCatalog")
-        
+        logger.info(f"Syncing job {job_id} to PublicJobCatalog (tenant: {tenant_schema_name})")
+
+        # Switch to tenant schema if provided
+        if tenant_schema_name:
+            try:
+                Tenant = get_tenant_model()
+                tenant = Tenant.objects.get(schema_name=tenant_schema_name)
+                connection.set_tenant(tenant)
+            except Tenant.DoesNotExist:
+                logger.error(f"Tenant with schema {tenant_schema_name} not found")
+                return {'status': 'error', 'reason': 'tenant_not_found'}
+
         # Fetch the job
         try:
             job = JobPosting.objects.get(id=job_id)
         except JobPosting.DoesNotExist:
-            logger.warning(f"Job {job_id} not found, skipping sync")
+            logger.warning(f"Job {job_id} not found in schema {tenant_schema_name}, skipping sync")
             return {'status': 'skipped', 'reason': 'job_not_found'}
         
         # Check if job should be in public catalog
@@ -1159,10 +1172,10 @@ def sync_job_to_public_catalog(self, job_id):
     autoretry_for=(Exception,),
     retry_backoff=True,
 )
-def remove_job_from_public_catalog(self, job_id):
+def remove_job_from_public_catalog(self, job_id, tenant_schema_name=None):
     """
     Async task to remove job from PublicJobCatalog.
-    
+
     Triggered when:
     - Job is deleted
     - Job status changed to non-open (closed, filled, cancelled)
