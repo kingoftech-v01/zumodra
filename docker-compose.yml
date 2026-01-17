@@ -54,9 +54,9 @@ x-common-env: &common-env
   CELERY_RESULT_BACKEND: redis://redis:6379/1
   BASE_DOMAIN: ${BASE_DOMAIN:-localhost}
   ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0,.localhost}
-  SECURE_SSL_REDIRECT: "False"
-  SESSION_COOKIE_SECURE: "False"
-  CSRF_COOKIE_SECURE: "False"
+  SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-False}
+  SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-False}
+  CSRF_COOKIE_SECURE: ${CSRF_COOKIE_SECURE:-False}
 
 x-healthcheck-defaults: &healthcheck-defaults
   interval: 30s

@@ -800,18 +800,20 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
 # Read security settings from environment or use sensible defaults
-SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
-SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=not DEBUG)
-CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=not DEBUG)
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=(not DEBUG))
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=(not DEBUG))
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=(not DEBUG))
 
-if not DEBUG:
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "SAMEORIGIN"
+# HSTS (HTTP Strict Transport Security)  
+# Set to 0 in development (disabled), 1 year in production
+SECURE_HSTS_SECONDS = 0 if DEBUG else 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
+# Additional security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
 # ==================== REST FRAMEWORK CONFIGURATION ====================
 
 REST_FRAMEWORK = {
