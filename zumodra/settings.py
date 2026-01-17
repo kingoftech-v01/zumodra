@@ -123,6 +123,10 @@ SHARED_APPS = [
     'wagtail',
     'modelcluster',
     'taggit',
+
+    # PUBLIC CATALOG APPS (shared - cross-tenant browsing without tenant context)
+    'ats_public',  # Public job catalog for browsing
+    'services_public',  # Public service/provider catalog for marketplace
 ]
 
 TENANT_APPS = [
