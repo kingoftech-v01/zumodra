@@ -27,21 +27,17 @@ class FreelancerOnboardingWizard(LoginRequiredMixin, SessionWizardView):
     """
     template_name = 'custom_account_u/freelancer_onboarding.html'
 
-    def get_form_list(self):
-        """
-        Return form list for wizard.
-        """
-        from custom_account_u.forms import (
-            FreelancerProfileForm,
-            FreelancerPlanForm,
-            StripeConnectForm
-        )
-
-        return [
-            ('profile', FreelancerProfileForm),
-            ('plan', FreelancerPlanForm),
-            ('stripe_connect', StripeConnectForm),
-        ]
+    # Define form list as class attribute (required by SessionWizardView)
+    from custom_account_u.forms import (
+        FreelancerProfileForm,
+        FreelancerPlanForm,
+        StripeConnectForm
+    )
+    form_list = [
+        ('profile', FreelancerProfileForm),
+        ('plan', FreelancerPlanForm),
+        ('stripe_connect', StripeConnectForm),
+    ]
 
     def done(self, form_list, **kwargs):
         """

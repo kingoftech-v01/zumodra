@@ -23,29 +23,36 @@ class CompanySetupWizard(LoginRequiredMixin, SessionWizardView):
     Steps:
     1. company_info - Company name, size, industry, website
     2. plan_selection - Choose subscription plan
-    3. payment - Stripe payment (skipped if FREE plan)
+    3. payment - Stripe payment (for paid plans only)
     """
     template_name = 'tenants/company_setup_wizard.html'
 
+    # Define form list as class attribute (required by SessionWizardView)
+    from tenants.forms import CompanyInfoForm, PlanSelectionForm, StripePaymentForm
+    form_list = [
+        ('company_info', CompanyInfoForm),
+        ('plan_selection', PlanSelectionForm),
+        ('payment', StripePaymentForm),
+    ]
+
     def get_form_list(self):
         """
-        Dynamically adjust form list based on plan selection.
+        Override to conditionally skip payment step for free plans.
         """
-        from tenants.forms import CompanyInfoForm, PlanSelectionForm, StripePaymentForm
+        form_list = super().get_form_list()
 
-        form_list = [
-            ('company_info', CompanyInfoForm),
-            ('plan_selection', PlanSelectionForm),
-        ]
-
-        # Only add payment step if plan requires payment
+        # Check if we should skip payment step (free plan selected)
         plan_data = self.get_cleaned_data_for_step('plan_selection')
         if plan_data:
             from tenants.models import Plan
             try:
                 plan = Plan.objects.get(id=plan_data['plan_id'])
-                if plan.price_monthly > 0:
-                    form_list.append(('payment', StripePaymentForm))
+                if plan.price_monthly == 0:
+                    # Remove payment step for free plan
+                    form_list_dict = dict(form_list)
+                    if 'payment' in form_list_dict:
+                        del form_list_dict['payment']
+                    return list(form_list_dict.items())
             except Plan.DoesNotExist:
                 pass
 
