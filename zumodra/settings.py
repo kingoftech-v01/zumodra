@@ -24,6 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env(str(BASE_DIR / '.env'))
 
+# =============================================================================
+# GDAL CONFIGURATION (GeoDjango)
+# =============================================================================
+# GDAL library path for Windows - points to GDAL DLL in site-packages
+import sys
+if sys.platform == 'win32':
+    GDAL_LIBRARY_PATH = str(Path(sys.prefix) / 'Lib' / 'site-packages' / 'osgeo' / 'gdal.dll')
+    GEOS_LIBRARY_PATH = str(Path(sys.prefix) / 'Lib' / 'site-packages' / 'osgeo' / 'geos_c.dll')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
