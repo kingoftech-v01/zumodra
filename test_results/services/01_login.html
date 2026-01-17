@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="o0ISgaPglGTIL0n26rLm547haiweQVMn4YNqpWjEiEM5fKxfB4lAEjQq1PYLo4em">
+    <!-- Branding updated from Zumodra to Zumodra -->
+    <meta name="description" content="Log in to your FreelanHub account to access your dashboard, manage projects, and connect with clients.">
+    <title>Log In - FreelanHub</title>
+    <link rel="shortcut icon" href="/static/assets/images/fav.png" type="image/x-icon">
+
+    <!-- Zumodra CSS -->
+    <link rel="stylesheet" href="/static/assets/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="/static/assets/css/leaflet.css">
+    <link rel="stylesheet" href="/static/assets/css/slick.css">
+    <link rel="stylesheet" href="/static/assets/css/style.css">
+    <link rel="stylesheet" href="/static/dist/output-tailwind.css">
+    <link rel="stylesheet" href="/static/dist/output-scss.css">
+
+    
+</head>
+<body>
+    <!-- Django Messages (Tailwind-styled toast notifications) -->
+    
+
+    <!-- Header Block -->
+    
+    
+
+<!-- Header -->
+<header id="header" class="header relative">
+    <div class="header_inner absolute flex items-center justify-between top-0 left-0 right-0 z-[1] w-full sm:h-20 h-16 min-[1600px]:px-15 lg:px-9 px-4 bg-white">
+        <div class="header_left flex items-center gap-10 h-full">
+            <h1>
+                <a href="/">
+                    <!-- Branding updated from Zumodra to Zumodra -->
+                    <img src="/static/assets/images/logo.png" alt="Zumodra" class="md:h-[42px] h-8 w-auto" />
+                </a>
+            </h1>
+            <div class="navigator h-full max-[1400px]:hidden">
+                <ul class="list flex items-center gap-5 h-full">
+                    <li class="h-full relative">
+                        <a href="/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">Home</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">Find Work</span>
+                            <span class="ph-bold ph-caret-down"></span>
+                        </a>
+                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
+                            <ul>
+                                <li>
+                                    <a href="/en-us/app/ats/jobs/" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        Browse Jobs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/en-us/services/?type=project" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        Browse Projects
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/en-us/services/" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        Browse Services
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="#!" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">Find Talent</span>
+                            <span class="ph-bold ph-caret-down"></span>
+                        </a>
+                        <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
+                            <ul>
+                                <li>
+                                    <a href="/en-us/services/providers/" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        Browse Freelancers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/en-us/careers/companies/" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                        Browse Companies
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="/en-us/about/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">About</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="/en-us/faq/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">FAQ</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="/en-us/pricing/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">Pricing</span>
+                        </a>
+                    </li>
+                    <li class="h-full relative">
+                        <a href="/en-us/contact/" class="flex items-center gap-1 h-full duration-300 hover:text-primary">
+                            <span class="text-title relative">Contact</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="header_right flex items-center gap-3">
+            <!-- Language Switcher -->
+            <div class="lang-switcher relative max-sm:hidden">
+                <button class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-50 duration-300">
+                    <i class="ph ph-globe text-lg"></i>
+                    <span class="text-sm font-medium uppercase">en-us</span>
+                    <span class="ph-bold ph-caret-down text-xs"></span>
+                </button>
+                <div class="sub_menu absolute right-0 p-2 w-40 bg-white rounded-lg shadow-lg">
+                    <form action="/i18n/setlang/" method="post" id="lang-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="o0ISgaPglGTIL0n26rLm547haiweQVMn4YNqpWjEiEM5fKxfB4lAEjQq1PYLo4em">
+                        <input type="hidden" name="next" value="/en-us/accounts/login/">
+                        
+                        
+                        
+                        <button type="submit" name="language" value="en-us"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 bg-primary/10 text-primary">
+                            <i class="ph ph-check"></i>
+                            English (US)
+                        </button>
+                        
+                        <button type="submit" name="language" value="en"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            English
+                        </button>
+                        
+                        <button type="submit" name="language" value="es"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Spanish
+                        </button>
+                        
+                        <button type="submit" name="language" value="fr"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            French
+                        </button>
+                        
+                        <button type="submit" name="language" value="de"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            German
+                        </button>
+                        
+                        <button type="submit" name="language" value="it"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Italian
+                        </button>
+                        
+                        <button type="submit" name="language" value="pt"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Portuguese
+                        </button>
+                        
+                        <button type="submit" name="language" value="ru"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Russian
+                        </button>
+                        
+                        <button type="submit" name="language" value="zh-hans"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Simplified Chinese
+                        </button>
+                        
+                        <button type="submit" name="language" value="zh-hant"
+                                class="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 duration-300 flex items-center gap-2 ">
+                            
+                            Traditional Chinese
+                        </button>
+                        
+                    </form>
+                </div>
+            </div>
+            
+                <a href="/en-us/accounts/login/" class="max-sm:hidden button-secondary py-2 px-6 rounded-full text-button capitalize duration-300">
+                    Login
+                </a>
+                <a href="/en-us/accounts/signup/" class="button-primary py-2 px-6 rounded-full text-white text-button capitalize duration-300">
+                    Sign Up
+                </a>
+            
+
+            <!-- Mobile Menu Toggle -->
+            <div class="humburger_btn min-[1400px]:hidden cursor-pointer w-5 h-4 flex flex-col justify-between">
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+                <span class="line w-full h-0.5 bg-on-surface rounded duration-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="menu_mobile">
+        <div class="menu_mobile_inner bg-white h-full overflow-y-auto w-4/5 max-w-sm absolute right-0 top-0 px-6 py-1 flex flex-col justify-between">
+            <div>
+                <div class="heading flex items-center justify-between py-4 border-b border-outline">
+                    <div class="flex items-center gap-3">
+                        <!-- Branding updated from Zumodra to Zumodra -->
+                        <img src="/static/assets/images/logo.png" alt="Zumodra" class="h-8 w-auto" />
+                    </div>
+                    <div class="menu_mobile_close cursor-pointer">
+                        <i class="ph-bold ph-x text-xl"></i>
+                    </div>
+                </div>
+                <div class="list-nav mt-3">
+                    <ul>
+                        <li class="nav_item py-2">
+                            <a href="/" class="text-xl font-semibold">Home</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/app/ats/jobs/" class="text-xl font-semibold">Browse Jobs</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/services/providers/" class="text-xl font-semibold">Browse Freelancers</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/careers/companies/" class="text-xl font-semibold">Browse Companies</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/about/" class="text-xl font-semibold">About</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/faq/" class="text-xl font-semibold">FAQ</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/pricing/" class="text-xl font-semibold">Pricing</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/contact/" class="text-xl font-semibold">Contact</a>
+                        </li>
+                        <!-- Mobile Language Switcher -->
+                        <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="ph ph-globe text-lg"></i>
+                                <span class="text-sm font-semibold text-gray-500">Language</span>
+                            </div>
+                            <form action="/i18n/setlang/" method="post">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="o0ISgaPglGTIL0n26rLm547haiweQVMn4YNqpWjEiEM5fKxfB4lAEjQq1PYLo4em">
+                                <input type="hidden" name="next" value="/en-us/accounts/login/">
+                                
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    
+                                    <button type="submit" name="language" value="en-us"
+                                            class="text-left px-3 py-2 text-sm rounded border border-primary bg-primary/10 text-primary duration-300">
+                                        English (US)
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="en"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        English
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="es"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Spanish
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="fr"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        French
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="de"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        German
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="it"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Italian
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="pt"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Portuguese
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="ru"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Russian
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="zh-hans"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Simplified Chinese
+                                    </button>
+                                    
+                                    <button type="submit" name="language" value="zh-hant"
+                                            class="text-left px-3 py-2 text-sm rounded border border-gray-200 hover:bg-gray-50 duration-300">
+                                        Traditional Chinese
+                                    </button>
+                                    
+                                </div>
+                            </form>
+                        </li>
+                        
+                        <li class="nav_item py-2 border-t border-outline mt-3 pt-4">
+                            <a href="/en-us/accounts/login/" class="text-xl font-semibold">Login</a>
+                        </li>
+                        <li class="nav_item py-2">
+                            <a href="/en-us/accounts/signup/" class="text-xl font-semibold text-primary">Sign Up</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuMobile = document.querySelector('.menu_mobile');
+    const humburgerBtn = document.querySelector('.humburger_btn');
+    const menuMobileClose = document.querySelector('.menu_mobile_close');
+
+    if (humburgerBtn && menuMobile) {
+        humburgerBtn.addEventListener('click', function() {
+            menuMobile.classList.add('open');
+            document.body.classList.add('scroll_locked');
+        });
+    }
+
+    if (menuMobileClose && menuMobile) {
+        menuMobileClose.addEventListener('click', function() {
+            menuMobile.classList.remove('open');
+            document.body.classList.remove('scroll_locked');
+        });
+    }
+
+    // Close when clicking outside the menu
+    if (menuMobile) {
+        menuMobile.addEventListener('click', function(e) {
+            if (e.target === menuMobile) {
+                menuMobile.classList.remove('open');
+                document.body.classList.remove('scroll_locked');
+            }
+        });
+    }
+});
+</script>
+
+    
+
+    <!-- Main Content Block -->
+    
+
+<!-- Form Login -->
+<section class="form_login lg:py-20 sm:py-14 py-10">
+    <div class="container flex items-center justify-center">
+        <div class="content sm:w-[448px] w-full">
+            <h3 class="heading3 text-center">Log In</h3>
+
+            <!-- Django-Allauth Login Form -->
+            <form method="post" action="/en-us/accounts/login/" class="form mt-6">
+                <input type="hidden" name="csrfmiddlewaretoken" value="o0ISgaPglGTIL0n26rLm547haiweQVMn4YNqpWjEiEM5fKxfB4lAEjQq1PYLo4em">
+
+                <!-- Display form errors -->
+                
+
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="id_login">Email address*</label>
+                    <input
+                        id="id_login"
+                        type="email"
+                        name="login"
+                        value=""
+                        class="form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg "
+                        placeholder="Email address*"
+                        required
+                        autofocus />
+                    
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group mt-6">
+                    <label for="id_password">Password*</label>
+                    <input
+                        id="id_password"
+                        type="password"
+                        name="password"
+                        class="form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg "
+                        placeholder="Password*"
+                        required />
+                    
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between mt-6">
+                    <div class="sub-input-checkbox flex items-center gap-2">
+                        <input
+                            id="id_remember"
+                            type="checkbox"
+                            name="remember" />
+                        <label for="id_remember" class="text-surface1">
+                            Remember me
+                        </label>
+                    </div>
+                    <a class="text-primary hover:underline" href="/en-us/accounts/password/reset/">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <!-- Login Button -->
+                <div class="block-button mt-6">
+                    <button type="submit" class="button-main bg-primary w-full text-center">
+                        Login
+                    </button>
+                </div>
+
+                <!-- Sign Up Link -->
+                <div class="navigate flex items-center justify-center gap-2 mt-6">
+                    <span class="text-surface1">Not registered yet?</span>
+                    <a class="text-button hover:underline" href="/en-us/accounts/signup/">
+                        Sign Up</a>
+                </div>
+
+                <!-- Social Login (if providers configured) -->
+                
+                
+            </form>
+        </div>
+    </div>
+</section>
+
+
+
+    <!-- Footer Block -->
+    
+    
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer_inner bg-feature">
+        <div class="container">
+            <div class="footer_heading flex flex-wrap items-center justify-between gap-4 w-full md:pt-10 pt-7 md:pb-5 pb-4 border-b border-light">
+                <a href="/" class="footer_logo">
+                    <!-- Branding updated from Zumodra to Zumodra -->
+                    <img src="/static/assets/images/logo-white.png" alt="Zumodra" class="h-[42px] w-auto" />
+                </a>
+                <div class="list_social flex flex-wrap items-center gap-4">
+                    <span class="text-subtitle text-white">Follow Us:</span>
+                    <div class="list flex flex-wrap items-center gap-3">
+                        <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-facebook text-lg"></span>
+                        </a>
+                        <a href="https://www.linkedin.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-linkedin text-lg"></span>
+                        </a>
+                        <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-twitter text-lg"></span>
+                        </a>
+                        <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-instagram text-lg"></span>
+                        </a>
+                        <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-light text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                            <span class="icon-youtube text-lg"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer_content flex max-xl:flex-wrap items-start justify-between gap-y-8 md:py-10 py-7">
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">Categories</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/?category=graphics-design">Graphics & Design</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/?category=digital-marketing">Digital Marketing</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/?category=writing-translation">Writing & Translation</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/?category=video-animation">Video & Animation</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/?category=programming-tech">Programming & Tech</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">For Candidates</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/">Browse Jobs</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">Browse Employers</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/become-seller/">Become a Seller</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">For Employers</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="#">Browse Freelancers</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/services/">Browse Services</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/become-buyer/">Become a Buyer</a></li>
+                    </ul>
+                </div>
+                <div class="footer_nav max-md:w-1/2">
+                    <strong class="nav_heading text-button-sm text-white">Support</strong>
+                    <ul class="list_nav flex flex-col gap-3 mt-4">
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/about/">About Us</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/faq/">FAQs</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/contact/">Contact Us</a></li>
+                        <li><a class="caption1 capitalize line-before line-white text-placehover hover:text-white duration-300" href="/en-us/pricing/">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="flex-shrink-0 max-xl:w-full">
+                    <div class="company-contact sm:w-[340px]">
+                        <strong class="heading block text-button-sm text-white">Subscribe</strong>
+                        <form method="post" action="/en-us/newsletter/subscribe/" class="send-block mt-4 flex items-center h-[46px] rounded-lg overflow-hidden">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="o0ISgaPglGTIL0n26rLm547haiweQVMn4YNqpWjEiEM5fKxfB4lAEjQq1PYLo4em">
+                            <input class="caption1 text-secondary h-full w-full pr-4 pl-3" type="email" name="email" placeholder="Your email address" required />
+                            <button type="submit" class="flex items-center justify-center w-[46px] h-[46px] bg-primary flex-shrink-0">
+                                <span class="ph ph-paper-plane-tilt text-white"></span>
+                            </button>
+                        </form>
+                        <strong class="heading block text-button-sm text-white mt-5">Download App</strong>
+                        <div class="list-download flex items-start gap-3 mt-4">
+                            <a href="https://play.google.com/" target="_blank">
+                                <img src="/static/assets/images/download/gg_play.png" alt="Google Play" />
+                            </a>
+                            <a href="https://www.apple.com/app-store/" target="_blank">
+                                <img src="/static/assets/images/download/app_store.png" alt="App Store" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer_bottom flex items-center justify-between max-sm:flex-col gap-2 py-2 border-t border-light">
+                <div class="left-block flex items-center">
+                    <!-- Branding updated from Zumodra to Zumodra -->
+                    <div class="copyright text-placehover caption1">2026 Zumodra. All Rights Reserved.</div>
+                </div>
+                <div class="nav-link flex items-center gap-2.5">
+                    <a class="text-placehover caption1 hover-underline" href="/en-us/terms/">Terms Of Services</a>
+                    <span class="text-placehover caption1">|</span>
+                    <a class="text-placehover caption1 hover-underline" href="/en-us/privacy/">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+
+    <!-- Zumodra JavaScript -->
+    <script src="/static/assets/js/jquery.min.js"></script>
+    <script src="/static/assets/js/phosphor-icons.js"></script>
+    <script src="/static/assets/js/slick.min.js"></script>
+    <script src="/static/assets/js/leaflet.js"></script>
+    <script src="/static/assets/js/swiper-bundle.min.js"></script>
+    <script src="/static/assets/js/main.js"></script>
+
+    <!-- Django-Required JavaScript (HTMX, Alpine.js) -->
+    <script src="/static/assets/js/vendor/htmx.min.js"></script>
+    <script src="/static/assets/js/vendor/alpine.min.js" defer></script>
+
+    <!-- CSRF Token for HTMX Requests -->
+    <script>
+        document.body.addEventListener('htmx:configRequest', function(evt) {
+            evt.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]').content;
+        });
+    </script>
+
+    
+</body>
+</html>

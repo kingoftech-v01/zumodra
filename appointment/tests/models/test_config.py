@@ -111,8 +111,7 @@ class ConfigTimeValidationTestCase(TestCase):
         super().tearDownClass()
 
     def test_lead_time_greater_than_finish_time(self):
-        # TODO: Think about business with night shifts, start time will be greater than finish time,
-        #  but again, not sure client will use this app for night shifts
+        # See TODO-APPT-TEST-001 in appointment/TODO.md for night shift edge case consideration
         """Test that lead time cannot be greater than finish time."""
         with self.assertRaises(ValidationError):
             Config.objects.create(slot_duration=30, lead_time=time(18, 0), finish_time=time(9, 0))

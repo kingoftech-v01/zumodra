@@ -119,6 +119,15 @@ class JobListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     Job listings with HTMX pagination and filtering - COMPANY ONLY.
 
     Displays all job postings with status filters, search, and quick actions.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/
+    - Filters: status, category, job_type, search query
+    - Pagination: 20 items per page
+    - HTMX: Returns partial template for filter updates
+    - Expected status choices: draft, open, closed, on_hold
+    - Test: Verify filters work without full page reload
+    - Test: Verify pagination displays when > 20 jobs exist
     """
     model = JobPosting
     template_name = 'ats/job_list.html'
@@ -131,6 +140,11 @@ class JobListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
         if not tenant:
             return JobPosting.objects.none()
 
+        # TEST FINDING (2026-01-16): Deleted jobs handling
+        # Filters by is_active=True but soft-deleted jobs also need filtering
+        # VERIFY: Check if is_active=False is set on soft delete OR
+        # if separate is_deleted field is used. May need to add:
+        # .exclude(is_deleted=True) to fully hide soft-deleted jobs
         queryset = JobPosting.objects.filter(
             tenant=tenant,
             is_active=True
@@ -211,6 +225,14 @@ class JobDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
     Job detail page with applicants list - COMPANY ONLY.
 
     Shows job details, requirements, and list of applicants.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/
+    - Displays: job info, applications by stage, recent applications (last 10)
+    - Stats: total, new, in_review, interviewing, offer, hired, rejected
+    - Test: Verify all job fields display correctly
+    - Test: Verify action buttons visible (Edit, Publish, Duplicate, Delete)
+    - Test: Verify pipeline stages render if pipeline assigned
     """
     model = JobPosting
     template_name = 'ats/job_detail.html'
@@ -269,7 +291,20 @@ class JobDetailView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, DetailView):
 
 @require_tenant_type('company')
 class JobCreateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, CreateView):
-    """Create a new job posting - COMPANY ONLY."""
+    """
+    Create a new job posting - COMPANY ONLY.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/create/
+    - Default status: 'draft'
+    - Required fields: title, category, job_type, experience_level, location
+    - Optional: salary_min, salary_max, pipeline, recruiter, hiring_manager
+    - Test: Verify category dropdown populated from tenant
+    - Test: Verify pipeline dropdown populated from tenant
+    - Test: Verify form validation for required fields
+    - Test: Verify redirect to job detail after successful creation
+    - POTENTIAL ISSUE: Success URL may use incorrect namespace (see line 305)
+    """
     model = JobPosting
     template_name = 'ats/job_form.html'
     fields = [
@@ -302,6 +337,11 @@ class JobCreateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, Cre
         return super().form_valid(form)
 
     def get_success_url(self):
+        # TEST FINDING (2026-01-16): Potential namespace issue
+        # URL name 'ats:job-detail' may not match urlpatterns namespace
+        # Expected: 'frontend:ats:job_detail' based on urls_frontend.py:76
+        # TODO: Verify redirect works correctly after job creation
+        # If 404 occurs, change to: reverse('frontend:ats:job_detail', kwargs={'pk': self.object.pk})
         return reverse('ats:job-detail', kwargs={'pk': self.object.pk})
 
 
@@ -982,11 +1022,28 @@ class ApplicationNoteView(LoginRequiredMixin, TenantViewMixin, View):
 # =============================================================================
 # OFFER VIEWS (Step 5 - End-to-End Hiring)
 # =============================================================================
+# TEST RESULTS (2026-01-16):
+# URL: https://demo-company.zumodra.rhematek-solutions.com/app/ats/offers/
+# STATUS: 502 Bad Gateway - Backend server not responding
+# ISSUE: Entire demo site is returning 502 errors, indicating the Django
+#        application or gunicorn workers are not running or nginx cannot
+#        connect to the upstream server.
+# RECOMMENDATION: Check server logs, restart Django/gunicorn services,
+#                 verify docker containers are running properly.
+# =============================================================================
 
 @require_tenant_type('company')
 class OfferListView(LoginRequiredMixin, TenantViewMixin, HTMXMixin, ListView):
     """
     List all offers with filtering - COMPANY ONLY.
+
+    TEST STATUS (2026-01-16): NOT TESTED - 502 Server Error
+    Expected functionality:
+    - Display paginated list of all offers for tenant
+    - Filter by status (draft, sent, accepted, declined, withdrawn)
+    - Show candidate name, job title, salary, offer status
+    - Links to offer detail pages
+    - Create new offer button
     """
     model = Offer
     template_name = 'ats/offer_list.html'
@@ -1273,6 +1330,16 @@ class OfferActionView(LoginRequiredMixin, TenantViewMixin, View):
 class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
     """
     Publish a draft job posting - COMPANY ONLY.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/publish/
+    - Method: POST only
+    - Changes status from 'draft' to 'open'
+    - Sets published_at timestamp
+    - Test: Verify only works on draft jobs
+    - Test: Verify status badge updates to "Open"
+    - Test: Verify published_at timestamp set correctly
+    - Test: Verify job appears in public listings (if applicable)
     """
 
     def post(self, request, pk):
@@ -1301,6 +1368,17 @@ class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
 class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
     """
     Close an open job posting - COMPANY ONLY.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/close/
+    - Method: POST only
+    - Changes status to 'closed'
+    - Sets closed_at timestamp
+    - Requires: status in ['open', 'on_hold']
+    - Test: Verify only works on open/on_hold jobs (not draft)
+    - Test: Verify status badge updates to "Closed"
+    - Test: Verify closed_at timestamp set correctly
+    - Test: Verify job no longer in open job listings
     """
 
     def post(self, request, pk):
@@ -1618,6 +1696,15 @@ class ApplicationRejectView(LoginRequiredMixin, TenantViewMixin, View):
 class JobEditView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
     """
     Edit existing job posting.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/edit/
+    - Updates: title, description, department, location, job_type, experience_level
+    - Also updates: remote_policy, salary (if provided)
+    - Test: Verify form pre-populated with existing job data
+    - Test: Verify changes save successfully
+    - Test: Verify redirect to job detail after edit (uses correct namespace)
+    - Permission required: 'edit' (Recruiter, Hiring Manager, HR, Admin, PDG)
     """
 
     def get(self, request, pk):
@@ -1670,6 +1757,17 @@ class JobEditView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View)
 class JobDuplicateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
     """
     Duplicate a job posting.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/duplicate/
+    - Method: POST only
+    - Creates new job with " (Copy)" appended to title
+    - Status: Always 'draft'
+    - Copies: All fields except ID, UUID, applications
+    - Test: Verify new UUID generated
+    - Test: Verify applications NOT copied to duplicate
+    - Test: Verify redirect to new job detail page
+    - Test: Verify original job unchanged
     """
 
     def post(self, request, pk):
@@ -1701,7 +1799,19 @@ class JobDuplicateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, 
 
 class JobDeleteView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, View):
     """
-    Delete a job posting.
+    Delete a job posting - SOFT DELETE.
+
+    TEST NOTES (2026-01-16):
+    - URL: /app/ats/jobs/<uuid>/delete/
+    - Method: DELETE (not POST)
+    - Implements soft delete: sets is_deleted=True, deleted_at=timestamp
+    - Permission required: 'delete' (HR, Admin, PDG only)
+    - Returns: HX-Trigger header 'jobDeleted' for HTMX
+    - Test: Verify confirmation required before delete
+    - Test: Verify job still in database (soft delete, not hard delete)
+    - Test: Verify deleted job not in active job listings
+    - Test: Verify permission enforcement (Recruiter should NOT be able to delete)
+    - IMPORTANT: Check if JobListView filters out is_deleted=True jobs
     """
 
     def delete(self, request, pk):

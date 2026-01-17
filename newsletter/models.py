@@ -749,7 +749,7 @@ class Submission(models.Model):
         try:
             message.send()
         except Exception as e:
-            # TODO: Test coverage for this branch.
+            # See TODO-NEWSLETTER-TEST-002 in newsletter/TODO.md for test coverage
             logger.error(
                 gettext('Message %(subscription)s failed '
                         'with error: %(error)s'),

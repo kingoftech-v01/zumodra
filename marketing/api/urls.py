@@ -15,7 +15,7 @@ from .viewsets import (
     MarketingAnalyticsView,
 )
 
-app_name = 'marketing-api'
+app_name = 'marketing'
 
 router = DefaultRouter()
 

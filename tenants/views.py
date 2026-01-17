@@ -1338,7 +1338,7 @@ def _verify_ein_with_external_service(ein_number):
             'details': dict (optional)
         }
     """
-    # TODO: Implement actual API call when service becomes available
+    # See TODO-TENANTS-001 in tenants/TODO.md for EIN verification API integration
     # Example implementation:
     #
     # import requests

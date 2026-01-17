@@ -104,6 +104,7 @@ class BaseIntegrationService(ABC):
 
     def _do_token_refresh(self) -> bool:
         """Provider-specific token refresh. Override in subclasses."""
+        # See TODO-INTEGRATIONS-003 in integrations/TODO.md (abstract method by design)
         raise NotImplementedError("Subclasses must implement _do_token_refresh")
 
     def log_event(self, event_type: str, message: str = '', details: dict = None, user=None):
@@ -532,6 +533,7 @@ class CalendarIntegrationService(BaseIntegrationService):
             return self._create_google_event(event_data)
         elif self.integration.provider == 'outlook_calendar':
             return self._create_outlook_event(event_data)
+        # See TODO-INTEGRATIONS-001 in integrations/TODO.md for additional calendar providers
         raise NotImplementedError("Provider not supported")
 
     def update_event(self, event_id: str, event_data: Dict[str, Any]) -> bool:
@@ -1125,6 +1127,7 @@ class ATSIntegrationService(BaseIntegrationService):
             return self._post_linkedin_job(job_data)
         elif self.integration.provider == 'indeed':
             return self._post_indeed_job(job_data)
+        # See TODO-INTEGRATIONS-002 in integrations/TODO.md for additional job board providers
         raise NotImplementedError(f"Provider {self.integration.provider} not supported")
 
     def sync_applications(self) -> List[Dict]:

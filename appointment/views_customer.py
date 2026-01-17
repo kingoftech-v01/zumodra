@@ -153,8 +153,8 @@ def cancel_appointment(request, appointment_id, response_type='html'):
             client=request.user
         )
 
-        # TODO: Implement actual cancellation logic
-        # This might include:
+        # See TODO-APPT-001 in appointment/TODO.md for complete cancellation workflow
+        # This will include:
         # - Checking cancellation policy (24 hours notice, etc.)
         # - Processing refunds
         # - Sending notifications to staff

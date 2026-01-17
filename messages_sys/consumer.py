@@ -1,3 +1,60 @@
+"""
+TEST FINDINGS (2026-01-16):
+===========================
+
+CRITICAL ISSUE: WebSocket Consumer Entirely Commented Out
+----------------------------------------------------------
+
+Status: REAL-TIME MESSAGING NON-FUNCTIONAL
+
+FINDING:
+The entire ChatConsumer class is commented out, which means:
+1. WebSocket connections will FAIL
+2. Real-time messaging is DISABLED
+3. Live typing indicators are NON-FUNCTIONAL
+4. Message read receipts are NON-FUNCTIONAL
+5. File/voice message uploads via WebSocket are NON-FUNCTIONAL
+
+IMPACT:
+- Users cannot send/receive messages in real-time
+- The messages module relies on page refresh for updates
+- All WebSocket URLs (ws://domain/ws/chat/<conversation_id>/) will return errors
+
+EXPECTED FUNCTIONALITY (when uncommented):
+- Real-time text messaging via WebSocket
+- File uploads (max 50MB)
+- Voice message support
+- Typing indicators
+- Message read status tracking
+- Online/offline status updates
+
+FEATURES DOCUMENTED IN COMMENTED CODE:
+1. Text messages with content validation
+2. File upload with base64 encoding (50MB limit)
+3. Voice messages
+4. Typing status updates
+5. Read receipt tracking
+6. Group send for broadcasting to conversation participants
+
+WHY THIS IS COMMENTED:
+Unknown - requires investigation. Possible reasons:
+- Bug in production that caused commenting
+- Incomplete implementation
+- Migration to different real-time solution
+- Performance issues
+
+ACTION REQUIRED:
+- Investigate why consumer is commented out
+- Test consumer functionality in development
+- Uncomment and deploy when stable
+- Update routing.py if needed (check if it's also commented)
+
+RELATED FILES TO CHECK:
+- messages_sys/routing.py - WebSocket URL routing
+- zumodra/asgi.py - ASGI application configuration
+- docker-compose.yml - Channels/Daphne service configuration
+"""
+
 # import json
 # import base64
 # from channels.generic.websocket import AsyncWebsocketConsumer

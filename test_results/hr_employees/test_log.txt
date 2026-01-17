@@ -1,0 +1,158 @@
+2026-01-16 18:41:30,816 - INFO - ================================================================================
+2026-01-16 18:41:30,816 - INFO - HR EMPLOYEES MODULE TESTING
+2026-01-16 18:41:30,816 - INFO - ================================================================================
+2026-01-16 18:41:30,816 - INFO - Base URL: https://demo-company.zumodra.rhematek-solutions.com
+2026-01-16 18:41:30,817 - INFO - Test Date: 2026-01-16 18:41:30
+2026-01-16 18:41:30,817 - INFO - ================================================================================
+2026-01-16 18:41:30,817 - INFO - 
+2026-01-16 18:41:30,817 - INFO - ================================================================================
+2026-01-16 18:41:30,817 - INFO - AUTHENTICATION
+2026-01-16 18:41:30,818 - INFO - ================================================================================
+2026-01-16 18:41:30,818 - INFO - Getting login page: https://demo-company.zumodra.rhematek-solutions.com/accounts/login/
+2026-01-16 18:41:31,147 - INFO - CSRF token obtained: w1i1jInw3G...
+2026-01-16 18:41:31,148 - INFO - Attempting login with admin@demo-company.com...
+2026-01-16 18:41:31,908 - INFO - Attempting login with demo@demo-company.com...
+2026-01-16 18:41:32,036 - INFO - Attempting login with hr@demo-company.com...
+2026-01-16 18:41:32,266 - INFO - Attempting login with test@demo-company.com...
+2026-01-16 18:41:33,045 - ERROR - Authentication failed - proceeding with tests anyway (may get 403/redirects)
+2026-01-16 18:41:33,046 - INFO - 
+2026-01-16 18:41:33,046 - INFO - ================================================================================
+2026-01-16 18:41:33,046 - INFO - URL TESTS
+2026-01-16 18:41:33,046 - INFO - ================================================================================
+2026-01-16 18:41:33,046 - INFO - 
+2026-01-16 18:41:33,046 - INFO - --------------------------------------------------------------------------------
+2026-01-16 18:41:33,046 - INFO - Testing: Employee Directory
+2026-01-16 18:41:33,046 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+2026-01-16 18:41:33,312 - INFO - Status Code: 200
+2026-01-16 18:41:33,312 - INFO - Final URL: https://demo-company.zumodra.rhematek-solutions.com/en-us/accounts/login/?next=/en-us/app/hr/employees/
+2026-01-16 18:41:33,692 - WARNING - Could not extract employee ID for detail test
+2026-01-16 18:41:33,692 - INFO - --------------------------------------------------------------------------------
+2026-01-16 18:41:33,693 - INFO - Testing: Employee Create
+2026-01-16 18:41:33,693 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+2026-01-16 18:41:33,935 - INFO - Status Code: 200
+2026-01-16 18:41:33,936 - INFO - Final URL: https://demo-company.zumodra.rhematek-solutions.com/en-us/accounts/login/?next=/en-us/app/hr/employees/create/
+2026-01-16 18:41:33,954 - WARNING - Could not test employee edit - no ID found
+2026-01-16 18:41:33,955 - INFO - --------------------------------------------------------------------------------
+2026-01-16 18:41:33,955 - INFO - Testing: Organization Chart
+2026-01-16 18:41:33,955 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+2026-01-16 18:41:34,199 - INFO - Status Code: 200
+2026-01-16 18:41:34,199 - INFO - Final URL: https://demo-company.zumodra.rhematek-solutions.com/en-us/accounts/login/?next=/en-us/app/hr/org-chart/
+2026-01-16 18:41:34,254 - INFO - --------------------------------------------------------------------------------
+2026-01-16 18:41:34,254 - INFO - Testing: Organization Chart Data API
+2026-01-16 18:41:34,255 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+2026-01-16 18:41:34,525 - INFO - Status Code: 200
+2026-01-16 18:41:34,525 - INFO - Final URL: https://demo-company.zumodra.rhematek-solutions.com/en-us/accounts/login/?next=/en-us/app/hr/org-chart/data/
+2026-01-16 18:41:43,225 - INFO - 
+2026-01-16 18:41:43,225 - INFO - ================================================================================
+2026-01-16 18:41:43,226 - INFO - TEST REPORT
+2026-01-16 18:41:43,226 - INFO - ================================================================================
+2026-01-16 18:41:43,226 - ERROR - Fatal error during testing: 'charmap' codec can't encode character '\u2713' in position 545: character maps to <undefined>
+2026-01-16 18:41:43,226 - INFO - 
+2026-01-16 18:41:43,226 - INFO - ================================================================================
+2026-01-16 18:41:43,227 - INFO - Testing complete!
+2026-01-16 18:41:43,227 - INFO - ================================================================================
+2026-01-16 19:09:05,435 - INFO - ================================================================================
+2026-01-16 19:09:05,536 - INFO - HR EMPLOYEES MODULE TESTING
+2026-01-16 19:09:05,536 - INFO - ================================================================================
+2026-01-16 19:09:05,537 - INFO - Base URL: https://demo-company.zumodra.rhematek-solutions.com
+2026-01-16 19:09:05,537 - INFO - Test Date: 2026-01-16 19:09:05
+2026-01-16 19:09:05,537 - INFO - ================================================================================
+2026-01-16 19:09:05,537 - INFO - 
+2026-01-16 19:09:05,537 - INFO - ================================================================================
+2026-01-16 19:09:05,537 - INFO - AUTHENTICATION
+2026-01-16 19:09:05,537 - INFO - ================================================================================
+2026-01-16 19:09:05,538 - INFO - Getting login page: https://demo-company.zumodra.rhematek-solutions.com/accounts/login/
+2026-01-16 19:09:07,976 - ERROR - [FAIL] Authentication error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /accounts/login/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:08,136 - ERROR - Authentication failed - proceeding with tests anyway (may get 403/redirects)
+2026-01-16 19:09:08,136 - INFO - 
+2026-01-16 19:09:08,136 - INFO - ================================================================================
+2026-01-16 19:09:08,136 - INFO - URL TESTS
+2026-01-16 19:09:08,137 - INFO - ================================================================================
+2026-01-16 19:09:08,137 - INFO - 
+2026-01-16 19:09:08,137 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:08,137 - INFO - Testing: Employee Directory
+2026-01-16 19:09:08,137 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+2026-01-16 19:09:10,083 - ERROR - [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:12,049 - WARNING - Could not extract employee ID for detail test
+2026-01-16 19:09:12,049 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:12,049 - INFO - Testing: Employee Create
+2026-01-16 19:09:12,049 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+2026-01-16 19:09:14,031 - ERROR - [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:14,031 - WARNING - Could not test employee edit - no ID found
+2026-01-16 19:09:14,031 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:14,031 - INFO - Testing: Organization Chart
+2026-01-16 19:09:14,031 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+2026-01-16 19:09:16,129 - ERROR - [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:16,129 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:16,129 - INFO - Testing: Organization Chart Data API
+2026-01-16 19:09:16,130 - INFO - URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+2026-01-16 19:09:18,156 - ERROR - [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,156 - INFO - 
+2026-01-16 19:09:18,156 - INFO - ================================================================================
+2026-01-16 19:09:18,156 - INFO - TEST REPORT
+2026-01-16 19:09:18,157 - INFO - ================================================================================
+2026-01-16 19:09:18,157 - INFO - ================================================================================
+2026-01-16 19:09:18,157 - INFO - HR EMPLOYEES MODULE TEST REPORT
+2026-01-16 19:09:18,157 - INFO - Test Date: 2026-01-16 19:09:18
+2026-01-16 19:09:18,157 - INFO - Base URL: https://demo-company.zumodra.rhematek-solutions.com
+2026-01-16 19:09:18,157 - INFO - ================================================================================
+2026-01-16 19:09:18,158 - INFO - 
+2026-01-16 19:09:18,158 - INFO - SUMMARY
+2026-01-16 19:09:18,158 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:18,158 - INFO - Total Tests: 5
+2026-01-16 19:09:18,158 - INFO - Passed: 0
+2026-01-16 19:09:18,158 - INFO - Failed: 5
+2026-01-16 19:09:18,158 - INFO - Pass Rate: 0.0%
+2026-01-16 19:09:18,158 - INFO - 
+2026-01-16 19:09:18,159 - INFO - URL TEST RESULTS
+2026-01-16 19:09:18,159 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:18,159 - INFO - [FAIL] FAIL | Employee Directory
+2026-01-16 19:09:18,159 - INFO -        URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+2026-01-16 19:09:18,159 - INFO -        Status: None
+2026-01-16 19:09:18,159 - INFO -        [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,159 - INFO - 
+2026-01-16 19:09:18,160 - INFO - [FAIL] FAIL | Employee Create
+2026-01-16 19:09:18,160 - INFO -        URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+2026-01-16 19:09:18,160 - INFO -        Status: None
+2026-01-16 19:09:18,160 - INFO -        [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,160 - INFO - 
+2026-01-16 19:09:18,160 - INFO - [FAIL] FAIL | Organization Chart
+2026-01-16 19:09:18,160 - INFO -        URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+2026-01-16 19:09:18,160 - INFO -        Status: None
+2026-01-16 19:09:18,161 - INFO -        [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,161 - INFO - 
+2026-01-16 19:09:18,161 - INFO - [FAIL] FAIL | Organization Chart Data API
+2026-01-16 19:09:18,161 - INFO -        URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+2026-01-16 19:09:18,161 - INFO -        Status: None
+2026-01-16 19:09:18,161 - INFO -        [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,161 - INFO - 
+2026-01-16 19:09:18,162 - INFO - ERRORS
+2026-01-16 19:09:18,162 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:18,162 - INFO -   [FAIL] Authentication exception: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /accounts/login/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,162 - INFO -   [FAIL] Employee Directory: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,163 - INFO -   [FAIL] Employee Create: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,163 - INFO -   [FAIL] Organization Chart: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,163 - INFO -   [FAIL] Organization Chart Data API: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))
+2026-01-16 19:09:18,163 - INFO - 
+2026-01-16 19:09:18,163 - INFO - WARNINGS
+2026-01-16 19:09:18,163 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:18,163 - INFO -   [WARN] Employee detail test skipped - no ID found
+2026-01-16 19:09:18,164 - INFO -   [WARN] Employee edit test skipped - no ID found
+2026-01-16 19:09:18,164 - INFO - 
+2026-01-16 19:09:18,164 - INFO - TESTED URLS
+2026-01-16 19:09:18,164 - INFO - --------------------------------------------------------------------------------
+2026-01-16 19:09:18,164 - INFO -   • Employee Directory: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+2026-01-16 19:09:18,164 - INFO -   • Employee Detail: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/<id>/
+2026-01-16 19:09:18,164 - INFO -   • Employee Create: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+2026-01-16 19:09:18,164 - INFO -   • Employee Edit: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/<id>/edit/
+2026-01-16 19:09:18,165 - INFO -   • Organization Chart: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+2026-01-16 19:09:18,165 - INFO -   • Org Chart Data API: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+2026-01-16 19:09:18,165 - INFO - 
+2026-01-16 19:09:18,165 - INFO - ================================================================================
+2026-01-16 19:09:18,167 - INFO - 
+Report saved to: test_results\hr_employees\test_report.txt
+2026-01-16 19:09:18,546 - INFO - JSON results saved to: test_results\hr_employees\test_results.json
+2026-01-16 19:09:18,546 - INFO - 
+2026-01-16 19:09:18,546 - INFO - ================================================================================
+2026-01-16 19:09:18,547 - INFO - Testing complete!
+2026-01-16 19:09:18,547 - INFO - ================================================================================

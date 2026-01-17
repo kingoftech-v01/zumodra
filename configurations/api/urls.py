@@ -23,7 +23,7 @@ from .viewsets import (
     InternalNotificationViewSet,
 )
 
-app_name = 'configurations-api'
+app_name = 'configurations'
 
 router = DefaultRouter()
 

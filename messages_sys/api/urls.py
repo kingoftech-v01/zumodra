@@ -16,7 +16,7 @@ from .viewsets import (
     UserStatusViewSet,
 )
 
-app_name = 'messages_api'
+app_name = 'messages_sys'
 
 router = DefaultRouter()
 

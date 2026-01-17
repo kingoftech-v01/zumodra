@@ -1,0 +1,519 @@
+{
+  "dashboard_widgets": {
+    "metadata": {
+      "test_date": "2026-01-16",
+      "domain": "https://zumodra.rhematek-solutions.com",
+      "test_status": "INCOMPLETE - Site Unavailable (502 Bad Gateway)",
+      "code_analysis_status": "COMPLETE",
+      "dashboard_url": "/dashboard/",
+      "base_template": "templates/base/freelanhub_dashboard_base.html"
+    },
+    "widgets": [
+      {
+        "id": 1,
+        "name": "Quick Stats Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "view_file": "dashboard/template_views.py",
+          "template": "templates/dashboard/index.html",
+          "partial_template": "templates/dashboard/partials/_quick_stats.html",
+          "htmx_endpoint": "/dashboard/htmx/quick-stats/",
+          "htmx_view": "QuickStatsView"
+        },
+        "metrics": [
+          {
+            "name": "Open Jobs",
+            "database_query": "JobPosting.objects.filter(tenant=tenant, status='open').count()",
+            "icon": "briefcase",
+            "color_class": "zu-stats-card__icon--primary",
+            "link_to": "frontend:ats:job_list"
+          },
+          {
+            "name": "Total Candidates",
+            "database_query": "Candidate.objects.filter(tenant=tenant).count()",
+            "icon": "users-three",
+            "color_class": "zu-stats-card__icon--success",
+            "link_to": "frontend:ats:candidate_list",
+            "badge": "new_candidates_week"
+          },
+          {
+            "name": "Active Applications",
+            "database_query": "Application.objects.filter(tenant=tenant, status__in=['in_review', 'interviewing', 'offer']).count()",
+            "icon": "notepad",
+            "color_class": "zu-stats-card__icon--warning",
+            "link_to": "frontend:ats:pipeline_board"
+          },
+          {
+            "name": "Pending Interviews",
+            "database_query": "Interview.objects.filter(application__tenant=tenant, status__in=['scheduled', 'confirmed'], scheduled_start__gt=now).count()",
+            "icon": "video-camera",
+            "color_class": "zu-stats-card__icon--info",
+            "link_to": "frontend:ats:pipeline_board"
+          }
+        ],
+        "expandable_metrics": [
+          {
+            "name": "Total Employees",
+            "database_query": "Employee.objects.filter(user__tenantuser__tenant=tenant, status='active').count()",
+            "link_to": "frontend:hr:employee-directory"
+          },
+          {
+            "name": "Pending Time Off",
+            "database_query": "TimeOffRequest.objects.filter(employee__user__tenantuser__tenant=tenant, status='pending').count()",
+            "link_to": "frontend:hr:my-time-off"
+          },
+          {
+            "name": "New This Week",
+            "database_query": "Candidate.objects.filter(tenant=tenant, created_at__date__gte=week_ago).count()",
+            "link_to": "frontend:ats:candidate_list?filter=new"
+          }
+        ],
+        "features": [
+          "Responsive grid layout (2 cols mobile, 4 cols desktop)",
+          "Color-coded icons",
+          "Direct navigation links",
+          "Alpine.js expandable section for HR metrics",
+          "HTMX refresh support",
+          "Error handling with default values"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 2,
+        "name": "Recent Activity Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "view_file": "dashboard/template_views.py",
+          "template": "templates/dashboard/index.html",
+          "location_in_template": "lines 35-54",
+          "partial_template": "templates/dashboard/partials/_recent_activity.html",
+          "htmx_endpoint": "/dashboard/htmx/recent-activity/",
+          "htmx_view": "RecentActivityView"
+        },
+        "data_source": {
+          "model": "Notification",
+          "query": "Notification.objects.filter(recipient=user, created_at__gte=timezone.now() - timedelta(days=7)).order_by('-created_at')[:10]",
+          "time_range": "Last 7 days",
+          "max_items": 10
+        },
+        "display": {
+          "container_class": "notification",
+          "max_height": "420px",
+          "scrollbar": "custom",
+          "icon": "ph-bell",
+          "timestamp_format": "relative (X ago)"
+        },
+        "features": [
+          "Displays last 7 days of notifications",
+          "Shows up to 10 most recent",
+          "Scrollable with custom scrollbar",
+          "Empty state: 'No new notifications'",
+          "Relative timestamps",
+          "HTML-safe message rendering"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 3,
+        "name": "Upcoming Interviews Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "view_file": "dashboard/template_views.py",
+          "template": "templates/dashboard/index.html",
+          "location_in_template": "lines 57-124",
+          "partial_template": "templates/dashboard/partials/_upcoming_interviews.html",
+          "htmx_endpoint": "/dashboard/htmx/upcoming-interviews/",
+          "htmx_view": "UpcomingInterviewsView"
+        },
+        "data_source": {
+          "model": "Interview",
+          "query": "Interview.objects.filter(application__tenant=tenant, status__in=['scheduled', 'confirmed'], scheduled_start__range=(now, week_from_now)).select_related('application__candidate', 'application__job').order_by('scheduled_start')[:5]",
+          "time_range": "Next 7 days",
+          "max_items": 5
+        },
+        "display": {
+          "format": "table",
+          "columns": [
+            {
+              "name": "Candidate",
+              "content": "Name with profile image or initial avatar"
+            },
+            {
+              "name": "Job",
+              "content": "Job title"
+            },
+            {
+              "name": "Date & Time",
+              "content": "Formatted date and time"
+            },
+            {
+              "name": "Type",
+              "content": "Interview type with color-coded badge"
+            }
+          ],
+          "interview_type_badges": {
+            "video": "bg-blue-100 text-blue-700",
+            "phone": "bg-yellow-100 text-yellow-700",
+            "in_person": "bg-green-100 text-green-700"
+          }
+        },
+        "features": [
+          "Shows interviews for next 7 days",
+          "Table format with responsive design",
+          "Profile images with fallback avatars",
+          "Color-coded interview type badges",
+          "Empty state with calendar icon",
+          "View All link to full interview list",
+          "Database query optimization with select_related()"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 4,
+        "name": "Notifications Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "view_file": "dashboard/template_views.py",
+          "template": "Integrated in header/navigation",
+          "context_variable": "unread_notifications"
+        },
+        "data_source": {
+          "model": "Notification",
+          "query": "Notification.objects.filter(recipient=user, is_read=False).count()",
+          "display": "Unread count badge"
+        },
+        "features": [
+          "Notification bell icon",
+          "Unread count badge",
+          "Integrated with Recent Activity widget",
+          "Real-time updates"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 5,
+        "name": "Overview Chart Widget",
+        "status": "IMPLEMENTED - NEEDS DYNAMIC DATA",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "template": "templates/dashboard/index.html",
+          "location_in_template": "lines 18-32",
+          "javascript": "lines 162-221",
+          "chart_library": "ApexCharts",
+          "chart_container": "#chart-timeline"
+        },
+        "configuration": {
+          "chart_type": "area",
+          "height": 350,
+          "curve": "smooth",
+          "stroke_width": 2,
+          "color": "#6366f1",
+          "gradient": {
+            "opacity_from": 0.7,
+            "opacity_to": 0.2
+          }
+        },
+        "data": {
+          "series_name": "Applications",
+          "current_data": "HARDCODED - [31, 40, 28, 51, 42, 109, 100, 91, 125, 150, 130, 180]",
+          "x_axis_categories": "['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']",
+          "note": "Data is currently hardcoded and needs backend endpoint"
+        },
+        "time_filters": [
+          {
+            "id": "one_week",
+            "label": "Week",
+            "active": false
+          },
+          {
+            "id": "one_month",
+            "label": "Month",
+            "active": false
+          },
+          {
+            "id": "one_year",
+            "label": "Year",
+            "active": true
+          }
+        ],
+        "features": [
+          "Area chart with smooth curves",
+          "Gradient fill",
+          "Time period filters",
+          "Responsive design",
+          "Tooltip on hover",
+          "Hidden toolbar"
+        ],
+        "issues": [
+          "Chart data is hardcoded (not dynamic)",
+          "Time filter buttons don't update data",
+          "No backend endpoint for chart data",
+          "Missing error handling if ApexCharts fails to load"
+        ],
+        "recommendations": [
+          "Create backend endpoint for chart data",
+          "Implement time period filtering",
+          "Add data aggregation queries",
+          "Add loading state",
+          "Add error handling"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 6,
+        "name": "Quick Actions Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "DashboardView",
+          "template": "templates/dashboard/index.html",
+          "location_in_template": "lines 126-158"
+        },
+        "actions": [
+          {
+            "name": "Post New Job",
+            "icon": "ph-plus",
+            "url": "frontend:ats:job_create",
+            "description": "Create a new job posting"
+          },
+          {
+            "name": "View Candidates",
+            "icon": "ph-users-three",
+            "url": "frontend:ats:candidate_list",
+            "description": "Browse all candidates"
+          },
+          {
+            "name": "Pipeline",
+            "icon": "ph-kanban",
+            "url": "frontend:ats:pipeline_board",
+            "description": "View recruitment pipeline"
+          },
+          {
+            "name": "Employees",
+            "icon": "ph-identification-card",
+            "url": "frontend:hr:employee-directory",
+            "description": "Access employee directory"
+          }
+        ],
+        "features": [
+          "Grid layout (2 cols mobile, 4 cols desktop)",
+          "Gradient circle icons",
+          "Hover shadow effects",
+          "Direct navigation links",
+          "Centered layout"
+        ],
+        "test_results": "PENDING - Site unavailable"
+      },
+      {
+        "id": 7,
+        "name": "Global Search Widget",
+        "status": "IMPLEMENTED",
+        "tested": false,
+        "implementation": {
+          "view": "SearchView",
+          "view_file": "dashboard/template_views.py",
+          "url": "/dashboard/search/",
+          "partial_template": "templates/dashboard/partials/_search_results.html"
+        },
+        "search_scope": [
+          {
+            "category": "Jobs",
+            "fields_searched": ["title", "description", "requirements"],
+            "max_results": 5
+          },
+          {
+            "category": "Candidates",
+            "fields_searched": ["first_name", "last_name", "email", "current_title"],
+            "max_results": 5
+          },
+          {
+            "category": "Employees",
+            "fields_searched": ["user__first_name", "user__last_name", "user__email", "job_title", "employee_id"],
+            "max_results": 5
+          },
+          {
+            "category": "Applications",
+            "fields_searched": ["candidate__first_name", "candidate__last_name", "job__title"],
+            "max_results": 5
+          }
+        ],
+        "features": [
+          "HTMX-powered live search",
+          "Minimum 2 characters required",
+          "Multi-category search",
+          "JSON response for API calls",
+          "HTML partial for HTMX requests",
+          "Total count calculation",
+          "Empty state handling"
+        ],
+        "response_format": {
+          "query": "string",
+          "jobs": "array",
+          "candidates": "array",
+          "employees": "array",
+          "applications": "array",
+          "total_count": "integer"
+        },
+        "test_results": "PENDING - Site unavailable"
+      }
+    ],
+    "htmx_endpoints": [
+      {
+        "name": "Quick Stats",
+        "url": "/dashboard/htmx/quick-stats/",
+        "view": "QuickStatsView",
+        "method": "GET",
+        "headers_required": ["HX-Request: true"],
+        "response_status": "200 or 204",
+        "response_type": "text/html",
+        "response_template": "dashboard/partials/_quick_stats.html",
+        "tested": false
+      },
+      {
+        "name": "Recent Activity",
+        "url": "/dashboard/htmx/recent-activity/",
+        "view": "RecentActivityView",
+        "method": "GET",
+        "headers_required": ["HX-Request: true"],
+        "response_status": "200",
+        "response_type": "text/html",
+        "response_template": "dashboard/partials/_recent_activity.html",
+        "tested": false
+      },
+      {
+        "name": "Upcoming Interviews",
+        "url": "/dashboard/htmx/upcoming-interviews/",
+        "view": "UpcomingInterviewsView",
+        "method": "GET",
+        "headers_required": ["HX-Request: true"],
+        "response_status": "200 or 204",
+        "response_type": "text/html",
+        "response_template": "dashboard/partials/_upcoming_interviews.html",
+        "tested": false
+      },
+      {
+        "name": "Global Search",
+        "url": "/dashboard/search/?q={query}",
+        "view": "SearchView",
+        "method": "GET",
+        "headers_required": ["HX-Request: true (optional)"],
+        "response_status": "200",
+        "response_type": "text/html or application/json",
+        "response_template": "dashboard/partials/_search_results.html",
+        "tested": false
+      }
+    ],
+    "javascript_dependencies": [
+      {
+        "name": "HTMX",
+        "path": "/staticfiles/assets/js/vendor/htmx.min.js",
+        "purpose": "Dynamic widget refresh, partial updates",
+        "status": "Should be loaded locally (CSP requirement)",
+        "tested": false
+      },
+      {
+        "name": "Alpine.js",
+        "path": "/staticfiles/assets/js/vendor/alpine.min.js",
+        "purpose": "Interactive UI components, expandable stats",
+        "status": "Should be loaded locally (CSP requirement)",
+        "tested": false
+      },
+      {
+        "name": "ApexCharts",
+        "path": "TBD - verify local path",
+        "purpose": "Timeline chart rendering",
+        "status": "Needs verification for local loading",
+        "tested": false
+      },
+      {
+        "name": "Tailwind CSS",
+        "path": "/staticfiles/dist/css/output.css",
+        "purpose": "Styling framework",
+        "status": "Pre-compiled, served locally",
+        "tested": false
+      }
+    ],
+    "test_summary": {
+      "total_widgets": 7,
+      "implemented": 7,
+      "needs_improvement": 1,
+      "tested": 0,
+      "working": 0,
+      "broken": 0,
+      "warnings": 1,
+      "site_status": "502 Bad Gateway - Site Unavailable",
+      "code_quality": "A- (Excellent with minor improvements needed)",
+      "recommendations": [
+        "Restore site availability (502 error)",
+        "Implement dynamic chart data backend",
+        "Add loading states for HTMX requests",
+        "Add widget refresh buttons",
+        "Run automated tests once site is available",
+        "Implement chart data aggregation",
+        "Add visual feedback for loading states"
+      ]
+    },
+    "code_quality_assessment": {
+      "overall_grade": "A-",
+      "view_implementation": {
+        "grade": "A",
+        "strengths": [
+          "Comprehensive error handling with try-except blocks",
+          "Database query optimization with select_related()",
+          "Proper tenant filtering on all queries",
+          "Logging for debugging",
+          "Support for public users",
+          "Context data properly structured"
+        ],
+        "weaknesses": []
+      },
+      "template_implementation": {
+        "grade": "A",
+        "strengths": [
+          "Proper Django template inheritance",
+          "i18n support (translation tags)",
+          "Responsive design (Tailwind CSS)",
+          "Accessible HTML (semantic markup)",
+          "Empty state handling",
+          "Error state handling"
+        ],
+        "weaknesses": []
+      },
+      "htmx_implementation": {
+        "grade": "A",
+        "strengths": [
+          "Proper HTMX header detection",
+          "Fallback to JSON for API calls",
+          "Partial template separation",
+          "Efficient endpoint structure",
+          "Error handling in views"
+        ],
+        "weaknesses": []
+      },
+      "javascript_implementation": {
+        "grade": "B+",
+        "strengths": [
+          "Local asset loading (CSP compliant)",
+          "ApexCharts configuration",
+          "Event listener setup",
+          "Proper DOMContentLoaded handling"
+        ],
+        "weaknesses": [
+          "Chart data is hardcoded (not dynamic)",
+          "Missing error handling for ApexCharts loading",
+          "No loading states implemented",
+          "Time filter buttons don't update data"
+        ]
+      }
+    }
+  }
+}

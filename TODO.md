@@ -1,11 +1,12 @@
 # Zumodra TODO Index
 
 **Last Updated:** 2026-01-16
-**Total TODOs:** 16
+**Total TODOs:** 17 (16 documented + 1 future audit scheduled)
 **Status:** Active tracking
 
 ## Quick Stats
 
+- **Critical Priority:** 1 item (comprehensive TODO audit - scheduled)
 - **High Priority:** 7 items (critical features, user-facing gaps)
 - **Medium Priority:** 4 items (test coverage, enhancements)
 - **Low Priority:** 5 items (abstract methods, edge cases)
@@ -13,6 +14,11 @@
 ---
 
 ## By Priority
+
+### Critical Priority (Project-Wide)
+
+17. **[Project] Comprehensive TODO Audit** → Scheduled for future
+   _Audit all 429 files with TODO/FIXME comments, filter out dependencies/migrations, document remaining actionable items_
 
 ### High Priority (Core Features)
 
@@ -71,6 +77,10 @@
 ---
 
 ## By Category
+
+### Project Management (1 item)
+
+- **[TODO-PROJECT-001]** Comprehensive TODO audit (429 files) → Critical (scheduled)
 
 ### Features (8 items)
 

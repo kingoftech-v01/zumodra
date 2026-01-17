@@ -73,6 +73,7 @@ class PublicSyncService:
 
     def __init__(self):
         """Initialize sync service with validation."""
+        # See TODO-CORE-001 in core/TODO.md (abstract base class by design)
         if self.public_model is None or self.tenant_model is None:
             raise NotImplementedError(
                 f"{self.__class__.__name__} must define public_model and tenant_model"

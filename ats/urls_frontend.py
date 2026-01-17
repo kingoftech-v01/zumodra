@@ -134,7 +134,8 @@ urlpatterns = [
     # HTMX partial for background check status badge
     path('htmx/applications/<uuid:uuid>/background-check/status-badge/', BackgroundCheckStatusPartialView.as_view(), name='background_check_status_partial'),
 
-    # ===== PLACEHOLDER ROUTES (TODO: Implement these views) =====
+    # ===== PLACEHOLDER ROUTES =====
+    # See TODO-ATS-001 in ats/TODO.md for implementation of these 5 views
     # These URL patterns are referenced in templates but views are not yet implemented
     # Commenting them out to prevent import errors - uncomment when views are ready
 

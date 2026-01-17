@@ -518,7 +518,7 @@ class UpdateSubscriptionView(ActionFormView):
         if self.activation_code:
             return {'user_activation_code': self.activation_code}
         else:
-            # TODO: Test coverage of this branch
+            # See TODO-NEWSLETTER-TEST-001 in newsletter/TODO.md for test coverage
             return None
 
     def get_form_kwargs(self):

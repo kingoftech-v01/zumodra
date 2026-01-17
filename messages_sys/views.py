@@ -19,6 +19,45 @@ def chat_view(request):
     """
     Main chat view with optimized queries for 500K concurrent users.
     Uses prefetch_related and select_related to avoid N+1 queries.
+
+    TEST FINDINGS (2026-01-16):
+    ---------------------------
+    URL: /app/messages/
+
+    CRITICAL ISSUE: Server returned 502 Bad Gateway when attempting to test this view.
+    This indicates that the backend Django application is not running or not reachable
+    through nginx reverse proxy.
+
+    Status: NOT TESTED - Server unavailable
+
+    EXPECTED FUNCTIONALITY (based on code analysis):
+    - Message inbox with conversation list
+    - Active conversation display
+    - User status indicators (online/offline)
+    - Contact list with favorites
+    - Blocked users filtering
+    - Optimized queries with caching (60s cache for user status)
+    - Real-time WebSocket support (consumer.py)
+
+    POTENTIAL ISSUES TO TEST (when server is available):
+    1. Template path: 'message_sys/index.html' - verify template exists
+    2. User profile avatar handling - may break if profile doesn't exist
+    3. Conversation selection - defaults to first conversation if none specified
+    4. Message marking as read - uses bulk update
+    5. WebSocket connection for real-time updates
+
+    URLS THAT NEED TESTING:
+    - /app/messages/ - Main inbox (this view)
+    - /app/messages/?conversation_id=<id> - Specific conversation
+    - WebSocket: ws://domain/ws/chat/ (from routing.py and consumer.py)
+
+    API ENDPOINTS THAT NEED TESTING:
+    - /api/v1/messages/conversations/ - List conversations
+    - /api/v1/messages/messages/ - List messages
+    - /api/v1/messages/contacts/ - List contacts
+    - /api/v1/messages/friend-requests/ - Friend requests
+    - /api/v1/messages/blocked/ - Blocked users
+    - /api/v1/messages/status/ - User status
     """
     user = request.user
 

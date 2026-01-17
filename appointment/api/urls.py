@@ -18,7 +18,7 @@ from .viewsets import (
     AppointmentStatsView,
 )
 
-app_name = 'appointment-api'
+app_name = 'appointment'
 
 router = DefaultRouter()
 

@@ -1371,7 +1371,7 @@ class BrowseCompaniesMapView(TemplateView):
             company.location_city = company.city
             company.location_country = company.country
             # For map markers, we'll need coordinates
-            # TODO: Add geocoding or use existing coordinates if available
+            # See TODO-CAREERS-001 in careers/TODO.md for geocoding implementation
             company.location_coordinates = None
 
         # Get filter parameters for new companies filter
@@ -1542,8 +1542,8 @@ class BrowseProjectsView(TemplateView):
             project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
             project.budget = project.price or 0
             project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
-            project.proposal_count = 0  # TODO: Add actual proposal count
-            project.client_spent = 0  # TODO: Add actual client spent
+            project.proposal_count = 0  # See TODO-CAREERS-002 in careers/TODO.md
+            project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
 
         # Additional filter parameters for new projects filter
         timezone_param = self.request.GET.get('timezone', '').strip()
@@ -1732,8 +1732,8 @@ class BrowseProjectsMapView(TemplateView):
             project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
             project.budget = project.price or 0
             project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
-            project.proposal_count = 0  # TODO: Add actual proposal count
-            project.client_spent = 0  # TODO: Add actual client spent
+            project.proposal_count = 0  # See TODO-CAREERS-002 in careers/TODO.md
+            project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
             # For map markers, use provider's location if available
             project.location_coordinates = project.provider.location if hasattr(project.provider, 'location') else None
 

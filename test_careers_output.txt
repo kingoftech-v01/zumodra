@@ -1,0 +1,124 @@
+================================================================================
+ZUMODRA PUBLIC CAREERS API TEST SUITE
+================================================================================
+Server: https://zumodra.rhematek-solutions.com
+API Base: https://zumodra.rhematek-solutions.com/api/v1/careers
+Time: 2026-01-16 18:14:57
+================================================================================
+
+
+================================================================================
+TEST 1: GET /api/v1/careers/page/ - Career Page Configuration
+================================================================================
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/page/
+[INFO]: Status: 500, Time: 11.90s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 2: GET /api/v1/careers/jobs/ - List All Jobs
+================================================================================
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/
+[INFO]: Status: 500, Time: 1.56s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 3: Job Listings with Filters
+================================================================================
+[INFO]: Testing search filter...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/?search=developer
+[INFO]: Status: 500, Time: 1.62s
+[FAIL]: Expected status 200, got 500
+[INFO]: Testing remote filter...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/?remote=true
+[INFO]: Status: 500, Time: 1.53s
+[FAIL]: Expected status 200, got 500
+[INFO]: Testing job_type filter...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/?job_type=full_time
+[INFO]: Status: 500, Time: 1.41s
+[FAIL]: Expected status 200, got 500
+[INFO]: Testing featured filter...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/?featured=true
+[INFO]: Status: 500, Time: 1.35s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 4: GET /api/v1/careers/jobs/<id>/ - Job Detail
+================================================================================
+[FAIL]: No job ID available from previous test
+
+================================================================================
+TEST 5: GET /api/v1/careers/jobs/slug/<slug>/ - Job Detail by Slug
+================================================================================
+[FAIL]: No job slug available from previous test
+
+================================================================================
+TEST 6: GET /api/v1/careers/categories/ - Job Categories
+================================================================================
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/categories/
+[INFO]: Status: 500, Time: 1.35s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 7: GET /api/v1/careers/locations/ - Job Locations
+================================================================================
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/locations/
+[INFO]: Status: 500, Time: 1.38s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 8: GET /api/v1/careers/stats/ - Career Page Stats
+================================================================================
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/stats/
+[INFO]: Status: 500, Time: 1.34s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 9: Error Handling - Non-existent Resources
+================================================================================
+[INFO]: Testing non-existent job ID...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/99999999/
+[INFO]: Status: 500, Time: 1.36s
+[FAIL]: Expected status 404, got 500
+[INFO]: Testing invalid job slug...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/slug/invalid-nonexistent-slug-12345/
+[INFO]: Status: 500, Time: 1.41s
+[FAIL]: Expected status 404, got 500
+[INFO]: Testing invalid query parameters...
+[INFO]: Testing: GET https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/?page=999999
+[INFO]: Status: 500, Time: 1.37s
+[FAIL]: Expected status 200, got 500
+
+================================================================================
+TEST 10: OPTIONS Requests - CORS Preflight
+================================================================================
+[INFO]: Testing OPTIONS https://zumodra.rhematek-solutions.com/api/v1/careers/page/
+[INFO]: Status: 200
+[PASS]: OPTIONS /page/ - CORS headers correct
+[INFO]: Testing OPTIONS https://zumodra.rhematek-solutions.com/api/v1/careers/jobs/
+[INFO]: Status: 200
+[PASS]: OPTIONS /jobs/ - CORS headers correct
+[INFO]: Testing OPTIONS https://zumodra.rhematek-solutions.com/api/v1/careers/categories/
+[INFO]: Status: 200
+[PASS]: OPTIONS /categories/ - CORS headers correct
+[INFO]: Testing OPTIONS https://zumodra.rhematek-solutions.com/api/v1/careers/locations/
+[INFO]: Status: 200
+[PASS]: OPTIONS /locations/ - CORS headers correct
+
+================================================================================
+TEST 11: Response Time Performance
+================================================================================
+[INFO]: Career Page: 1.475s (acceptable)
+[INFO]: Job List: 1.320s (acceptable)
+[INFO]: Categories: 1.378s (acceptable)
+[INFO]: Locations: 1.411s (acceptable)
+[INFO]: Stats: 1.383s (acceptable)
+
+================================================================================
+CAREERS API TEST SUMMARY
+================================================================================
+Total Tests: 23
+Passed: 9
+Failed: 14
+================================================================================
+
+Detailed results saved to: careers_api_test_results_20260116_181537.json

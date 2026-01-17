@@ -1,0 +1,62 @@
+{
+  "total": 5,
+  "passed": 0,
+  "failed": 5,
+  "errors": [
+    "Authentication exception: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /accounts/login/ (Caused by ResponseError('too many 502 error responses'))",
+    "Employee Directory: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))",
+    "Employee Create: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))",
+    "Organization Chart: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))",
+    "Organization Chart Data API: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))"
+  ],
+  "warnings": [
+    "Employee detail test skipped - no ID found",
+    "Employee edit test skipped - no ID found"
+  ],
+  "url_tests": [
+    {
+      "name": "Employee Directory",
+      "url": "https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/",
+      "status_code": null,
+      "success": false,
+      "errors": [
+        "[FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))"
+      ],
+      "warnings": [],
+      "checks": []
+    },
+    {
+      "name": "Employee Create",
+      "url": "https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/",
+      "status_code": null,
+      "success": false,
+      "errors": [
+        "[FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))"
+      ],
+      "warnings": [],
+      "checks": []
+    },
+    {
+      "name": "Organization Chart",
+      "url": "https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/",
+      "status_code": null,
+      "success": false,
+      "errors": [
+        "[FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))"
+      ],
+      "warnings": [],
+      "checks": []
+    },
+    {
+      "name": "Organization Chart Data API",
+      "url": "https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/",
+      "status_code": null,
+      "success": false,
+      "errors": [
+        "[FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))"
+      ],
+      "warnings": [],
+      "checks": []
+    }
+  ]
+}

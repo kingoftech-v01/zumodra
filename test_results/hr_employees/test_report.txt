@@ -1,0 +1,58 @@
+================================================================================
+HR EMPLOYEES MODULE TEST REPORT
+Test Date: 2026-01-16 19:09:18
+Base URL: https://demo-company.zumodra.rhematek-solutions.com
+================================================================================
+
+SUMMARY
+--------------------------------------------------------------------------------
+Total Tests: 5
+Passed: 0
+Failed: 5
+Pass Rate: 0.0%
+
+URL TEST RESULTS
+--------------------------------------------------------------------------------
+[FAIL] FAIL | Employee Directory
+       URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+       Status: None
+       [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))
+
+[FAIL] FAIL | Employee Create
+       URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+       Status: None
+       [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))
+
+[FAIL] FAIL | Organization Chart
+       URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+       Status: None
+       [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))
+
+[FAIL] FAIL | Organization Chart Data API
+       URL: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+       Status: None
+       [FAIL] Unexpected error: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))
+
+ERRORS
+--------------------------------------------------------------------------------
+  [FAIL] Authentication exception: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /accounts/login/ (Caused by ResponseError('too many 502 error responses'))
+  [FAIL] Employee Directory: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/ (Caused by ResponseError('too many 502 error responses'))
+  [FAIL] Employee Create: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/employees/create/ (Caused by ResponseError('too many 502 error responses'))
+  [FAIL] Organization Chart: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/ (Caused by ResponseError('too many 502 error responses'))
+  [FAIL] Organization Chart Data API: HTTPSConnectionPool(host='demo-company.zumodra.rhematek-solutions.com', port=443): Max retries exceeded with url: /app/hr/org-chart/data/ (Caused by ResponseError('too many 502 error responses'))
+
+WARNINGS
+--------------------------------------------------------------------------------
+  [WARN] Employee detail test skipped - no ID found
+  [WARN] Employee edit test skipped - no ID found
+
+TESTED URLS
+--------------------------------------------------------------------------------
+  • Employee Directory: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/
+  • Employee Detail: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/<id>/
+  • Employee Create: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/create/
+  • Employee Edit: https://demo-company.zumodra.rhematek-solutions.com/app/hr/employees/<id>/edit/
+  • Organization Chart: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/
+  • Org Chart Data API: https://demo-company.zumodra.rhematek-solutions.com/app/hr/org-chart/data/
+
+================================================================================

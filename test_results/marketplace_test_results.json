@@ -1,0 +1,104 @@
+{
+  "timestamp": "2026-01-16T18:59:35.585221",
+  "base_url": "https://zumodra.rhematek-solutions.com",
+  "tests": [
+    {
+      "name": "Authentication - Login",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:37.973642",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/en/accounts/login/",
+        "status_code": 502,
+        "error": "Login page not accessible"
+      }
+    },
+    {
+      "name": "Browse Freelancers - /en/services/providers/",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:38.534455",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/en/services/providers/",
+        "status_code": 502,
+        "error": "Unexpected status code: 502"
+      }
+    },
+    {
+      "name": "Browse Freelancers - /services/providers/",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:38.582199",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/services/providers/",
+        "status_code": 502,
+        "error": "Unexpected status code: 502"
+      }
+    },
+    {
+      "name": "Service Listings - /en/services/",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:39.127897",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/en/services/",
+        "status_code": 502,
+        "error": "Unexpected status code"
+      }
+    },
+    {
+      "name": "Service Listings - /services/",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:39.169237",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/services/",
+        "status_code": 502,
+        "error": "Unexpected status code"
+      }
+    },
+    {
+      "name": "Service Categories Display",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:39.708296",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/en/services/",
+        "status_code": 502,
+        "error": "Service page not accessible"
+      }
+    },
+    {
+      "name": "Escrow Payment Flow - Finance Module",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:42.236308",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/en/finance/",
+        "status_code": 502,
+        "note": "Finance module accessibility check (no transactions created)",
+        "accessible": false
+      }
+    },
+    {
+      "name": "Escrow Payment Flow - API Endpoints",
+      "status": "FAIL",
+      "timestamp": "2026-01-16T18:59:42.292369",
+      "details": {
+        "url": "https://zumodra.rhematek-solutions.com/api/v1/marketplace/",
+        "status_code": 502,
+        "note": "Marketplace API endpoint check",
+        "accessible": false
+      }
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 0,
+    "failed": 8,
+    "working_features": [],
+    "broken_features": [
+      "Authentication - Login",
+      "Browse Freelancers - /en/services/providers/",
+      "Browse Freelancers - /services/providers/",
+      "Service Listings - /en/services/",
+      "Service Listings - /services/",
+      "Service Categories Display",
+      "Escrow Payment Flow - Finance Module",
+      "Escrow Payment Flow - API Endpoints"
+    ]
+  }
+}

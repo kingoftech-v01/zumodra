@@ -1,0 +1,115 @@
+{
+  "test_date": "2026-01-16T18:43:46.668117",
+  "base_url": "https://zumodra.rhematek-solutions.com",
+  "total_tests": 7,
+  "passed": 5,
+  "failed": 2,
+  "results": [
+    {
+      "flow_name": "Login Flow",
+      "success": false,
+      "duration": 31.387261629104614,
+      "errors": [
+        "Timeout error: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://zumodra.rhematek-solutions.com/accounts/login/\", waiting until \"networkidle\"\n"
+      ],
+      "warnings": [],
+      "info": [],
+      "screenshots": []
+    },
+    {
+      "flow_name": "Signup Flow",
+      "success": false,
+      "duration": 30.020637273788452,
+      "errors": [
+        "Timeout error: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://zumodra.rhematek-solutions.com/accounts/signup/\", waiting until \"networkidle\"\n"
+      ],
+      "warnings": [],
+      "info": [],
+      "screenshots": []
+    },
+    {
+      "flow_name": "Password Reset Flow",
+      "success": true,
+      "duration": 99.82098269462585,
+      "errors": [],
+      "warnings": [
+        "Failed to take screenshot: Page.screenshot: Timeout 30000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n",
+        "Email field not found"
+      ],
+      "info": [
+        "Password reset URL: https://zumodra.rhematek-solutions.com/accounts/password/reset/",
+        "HTTP Status: 200",
+        "Submit button found",
+        "Back to login link found"
+      ],
+      "screenshots": []
+    },
+    {
+      "flow_name": "MFA/2FA Flow",
+      "success": true,
+      "duration": 105.6242036819458,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "MFA available at: https://zumodra.rhematek-solutions.com/en/accounts/two-factor/",
+        "MFA enforcement: Based on settings_security.py, MFA is MANDATORY"
+      ],
+      "screenshots": [
+        "test_results\\auth_flows\\screenshots\\20260116_183413_04_mfa_page.png"
+      ]
+    },
+    {
+      "flow_name": "Logout Flow",
+      "success": true,
+      "duration": 16.322651386260986,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Logout URL: https://zumodra.rhematek-solutions.com/accounts/logout/",
+        "HTTP Status: 502",
+        "Logout endpoint accessible"
+      ],
+      "screenshots": [
+        "test_results\\auth_flows\\screenshots\\20260116_183413_05_logout_page.png"
+      ]
+    },
+    {
+      "flow_name": "Session Management",
+      "success": true,
+      "duration": 3.9723267555236816,
+      "errors": [],
+      "warnings": [
+        "\u2717 MIME type sniffing protection header not found",
+        "\u2717 HSTS header not found",
+        "\u2717 CSP header not found"
+      ],
+      "info": [
+        "CSRF cookie: csrftoken",
+        "Clickjacking protection header present",
+        "Session security properly configured in settings"
+      ],
+      "screenshots": []
+    },
+    {
+      "flow_name": "Security Features",
+      "success": true,
+      "duration": 0.08381104469299316,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Django-Axes configuration:",
+        "  - Failure limit: 5 attempts",
+        "  - Cooloff time: 1 hour",
+        "  - Tracking: Username + IP combination",
+        "Password policy:",
+        "  - Minimum length: 10 characters",
+        "  - Must include: uppercase, lowercase, numbers, special chars",
+        "  - Algorithm: Argon2 (recommended)",
+        "HTTPS redirect is active",
+        "Admin honeypot: /admin/ (fake admin panel)",
+        "Real admin: /admin-panel/"
+      ],
+      "screenshots": []
+    }
+  ]
+}

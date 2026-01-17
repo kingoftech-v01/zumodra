@@ -24,7 +24,7 @@ from .viewsets import (
     FinanceAnalyticsViewSet,
 )
 
-app_name = 'finance_api'
+app_name = 'finance'
 
 router = DefaultRouter()
 

@@ -1519,6 +1519,7 @@ class ReportingService:
             return output.getvalue()
 
         except ImportError:
+            # See TODO-ANALYTICS-001 in analytics/TODO.md
             raise NotImplementedError("openpyxl not installed")
 
     def export_to_pdf(self, report: Dict) -> bytes:

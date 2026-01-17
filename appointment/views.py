@@ -218,11 +218,10 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     page_title = f"{service.name} - {get_website_name()}"
     page_description = _("Book an appointment for {s} at {wn}.").format(s=service.name, wn=get_website_name())
 
-    # TODO: The following conditional formatting is ugly (in my opinion) but necessary because Django's built-in
+    # NOTE: The following conditional formatting is necessary because Django's built-in
     #  DATE_FORMAT doesn't include weekdays, and different languages have different
     #  punctuation conventions (French: "jeu 14 août 2025" vs English: "Thu, August 14, 2025").
-    #  Django's FORMAT_MODULE_PATH would be the "official" solution, but this simple dictionary
-    #  approach is much easier for contributors than creating separate format files per language.
+    #  See TODO-APPT-002 in appointment/TODO.md for potential enhancement using Django's FORMAT_MODULE_PATH.
     #  Future contributors: add your language's preferred format in the DATE_FORMATS dictionary in utils.date_time.py
     #  file.
     current_lang = translation.get_language()

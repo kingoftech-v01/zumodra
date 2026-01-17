@@ -17,7 +17,7 @@ from .viewsets import (
     MarketplaceAnalyticsView,
 )
 
-app_name = 'services-api'
+app_name = 'services'
 
 router = DefaultRouter()
 

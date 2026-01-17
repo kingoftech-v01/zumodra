@@ -334,6 +334,28 @@ curl http://localhost:8002/api/v1/ats/jobs/ \
 
 See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for complete API reference.
 
+### API Namespace Convention
+
+All API endpoints follow a consistent namespace pattern: `api_v1:{app_name}:{endpoint_name}`
+
+**Rules:**
+- Namespace matches Django app directory name exactly
+- Use underscores for multi-word apps (e.g., `messages_sys`, `hr_core`)
+- No `-api` or `_api` suffixes
+- All under `api_v1:` parent namespace
+
+**Examples:**
+- `api_v1:dashboard:overview` (NOT `api_v1:dashboard-api:overview`)
+- `api_v1:finance:payment-list` (NOT `api_v1:finance_api:payment-list`)
+- `api_v1:messages_sys:conversation-list` (NOT `api_v1:messages_api:conversation-list`)
+
+**Template References:**
+```python
+# In API reverse() calls
+reverse('api_v1:finance:payment-list')
+reverse('api_v1:messages_sys:conversation-detail', args=[uuid])
+```
+
 ---
 
 ## Management Commands

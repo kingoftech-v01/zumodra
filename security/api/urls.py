@@ -14,7 +14,7 @@ from .viewsets import (
     SecurityAnalyticsView,
 )
 
-app_name = 'security-api'
+app_name = 'security'
 
 router = DefaultRouter()
 

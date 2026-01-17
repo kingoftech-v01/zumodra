@@ -14,7 +14,7 @@ from .viewsets import (
     NewsletterStatsView,
 )
 
-app_name = 'newsletter-api'
+app_name = 'newsletter'
 
 router = DefaultRouter()
 

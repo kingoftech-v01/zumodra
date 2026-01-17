@@ -13,7 +13,7 @@ from .viewsets import (
     BlogStatsView,
 )
 
-app_name = 'blog-api'
+app_name = 'blog'
 
 router = DefaultRouter()
 

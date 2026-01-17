@@ -1,0 +1,62 @@
+
+================================================================================
+API TESTING REPORT - zumodra.rhematek-solutions.com
+================================================================================
+
+[OK] Total endpoints tested: 7
+[OK] Working endpoints: 3
+[X] Broken/Unavailable endpoints: 4
+
+--------------------------------------------------------------------------------
+WORKING ENDPOINTS
+--------------------------------------------------------------------------------
+[OK] /health/
+[OK] /health/ready/
+[OK] /health/live/
+
+--------------------------------------------------------------------------------
+BROKEN/UNAVAILABLE ENDPOINTS
+--------------------------------------------------------------------------------
+[X] /api/ - Status: 401
+  Error: Authentication required
+
+[X] /api/schema/ - Status: 401
+  Error: Authentication required
+
+[X] /api/docs/ - Status: 401
+  Error: Authentication required
+
+[X] /api/redoc/ - Status: 401
+  Error: Authentication required
+
+
+--------------------------------------------------------------------------------
+SAMPLE API RESPONSES (First 3)
+--------------------------------------------------------------------------------
+
+/health/:
+{
+  "status": "healthy",
+  "timestamp": 1768605906.2709875,
+  "version": "1.0.0",
+  "database": "connected",
+  "cache": "connected"
+}...
+
+/health/ready/:
+{
+  "ready": true
+}...
+
+/health/live/:
+{
+  "alive": true
+}...
+
+--------------------------------------------------------------------------------
+RECOMMENDATIONS FOR DEMO
+--------------------------------------------------------------------------------
+[!] CRITICAL: Most endpoints are broken or require authentication.
+  Action required: Verify authentication system and endpoint configuration.
+
+================================================================================

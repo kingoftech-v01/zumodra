@@ -14,7 +14,7 @@ from .viewsets import (
     HRMetricsView,
 )
 
-app_name = 'dashboard-api'
+app_name = 'dashboard'
 
 urlpatterns = [
     # Main dashboard overview
