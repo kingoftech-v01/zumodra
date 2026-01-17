@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('ats', '0001_initial'),
-        ('tenants', '__latest__'),
+        ('tenants', '0005_remove_tenant_geocode_attempted_and_more'),
     ]
 
     operations = [
