@@ -55,7 +55,7 @@ def process_public_applications(self):
 
         # Find unprocessed public applications
         pending_applications = PublicApplication.objects.filter(
-            is_processed=False,
+            status='pending',
             submitted_at__lt=now - timedelta(minutes=1)  # Wait 1 min before processing
         ).select_related('job_listing')[:50]  # Process in batches
 
@@ -69,7 +69,7 @@ def process_public_applications(self):
                     _send_application_confirmation(public_app)
 
                     # Mark as processed
-                    public_app.is_processed = True
+                    public_app.status = 'processed'
                     public_app.processed_at = now
                     public_app.ats_application = ats_application
                     public_app.save()
@@ -201,7 +201,7 @@ def process_single_application(self, application_id):
     try:
         public_app = PublicApplication.objects.get(id=application_id)
 
-        if public_app.is_processed:
+        if public_app.status == 'processed':
             return {
                 'status': 'skipped',
                 'reason': 'Already processed',
@@ -212,7 +212,7 @@ def process_single_application(self, application_id):
         if ats_application:
             _send_application_confirmation(public_app)
 
-            public_app.is_processed = True
+            public_app.status = 'processed'
             public_app.processed_at = timezone.now()
             public_app.ats_application = ats_application
             public_app.save()
