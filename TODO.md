@@ -1,15 +1,16 @@
 # Zumodra TODO Index
 
-**Last Updated:** 2026-01-16
-**Total TODOs:** 17 (16 documented + 1 future audit scheduled)
+**Last Updated:** 2026-01-17
+**Total TODOs:** 16 (15 documented + 1 future audit scheduled)
 **Status:** Active tracking
 
 ## Quick Stats
 
 - **Critical Priority:** 1 item (comprehensive TODO audit - scheduled)
-- **High Priority:** 7 items (critical features, user-facing gaps)
+- **High Priority:** 6 items (critical features, user-facing gaps)
 - **Medium Priority:** 4 items (test coverage, enhancements)
 - **Low Priority:** 5 items (abstract methods, edge cases)
+- **Completed:** 1 item (openpyxl dependency)
 
 ---
 
@@ -40,38 +41,35 @@
 6. **[Tenants] EIN Verification API** → [tenants/TODO.md#TODO-TENANTS-001](tenants/TODO.md#todo-tenants-001)
    _Integrate real EIN verification service (currently stubbed)_
 
-7. **[Analytics] openpyxl Dependency** → [analytics/TODO.md#TODO-ANALYTICS-001](analytics/TODO.md#todo-analytics-001)
-   _Add openpyxl to requirements for Excel export functionality_
-
 ### Medium Priority (Enhancements)
 
-8. **[Newsletter] Subscription Test Coverage** → [newsletter/TODO.md#TODO-NEWSLETTER-TEST-001](newsletter/TODO.md#todo-newsletter-test-001)
+7. **[Newsletter] Subscription Test Coverage** → [newsletter/TODO.md#TODO-NEWSLETTER-TEST-001](newsletter/TODO.md#todo-newsletter-test-001)
    _Test coverage for subscription view else branch_
 
-9. **[Newsletter] Exception Handling Tests** → [newsletter/TODO.md#TODO-NEWSLETTER-TEST-002](newsletter/TODO.md#todo-newsletter-test-002)
+8. **[Newsletter] Exception Handling Tests** → [newsletter/TODO.md#TODO-NEWSLETTER-TEST-002](newsletter/TODO.md#todo-newsletter-test-002)
    _Test coverage for message sending exception handler_
 
-10. **[Appointment] Date Formatting Enhancement** → [appointment/TODO.md#TODO-APPT-002](appointment/TODO.md#todo-appt-002)
+9. **[Appointment] Date Formatting Enhancement** → [appointment/TODO.md#TODO-APPT-002](appointment/TODO.md#todo-appt-002)
     _Consider using Django's FORMAT_MODULE_PATH for better i18n_
 
-11. **[Integrations] Unsupported Calendar Providers** → [integrations/TODO.md#TODO-INTEGRATIONS-001](integrations/TODO.md#todo-integrations-001)
+10. **[Integrations] Unsupported Calendar Providers** → [integrations/TODO.md#TODO-INTEGRATIONS-001](integrations/TODO.md#todo-integrations-001)
     _Add support for additional calendar providers beyond Google/Outlook_
 
 ### Low Priority (Nice-to-Have)
 
-12. **[Newsletter] Abstract Subscription Generator** → [newsletter/TODO.md#TODO-NEWSLETTER-002](newsletter/TODO.md#todo-newsletter-002)
+11. **[Newsletter] Abstract Subscription Generator** → [newsletter/TODO.md#TODO-NEWSLETTER-002](newsletter/TODO.md#todo-newsletter-002)
     _Abstract method - subclasses must implement (by design)_
 
-13. **[Appointment] Night Shift Edge Case** → [appointment/TODO.md#TODO-APPT-TEST-001](appointment/TODO.md#todo-appt-test-001)
+12. **[Appointment] Night Shift Edge Case** → [appointment/TODO.md#TODO-APPT-TEST-001](appointment/TODO.md#todo-appt-test-001)
     _Consider supporting businesses with night shifts (start time > end time)_
 
-14. **[Core] Sync Service Abstract Methods** → [core/TODO.md#TODO-CORE-001](core/TODO.md#todo-core-001)
+13. **[Core] Sync Service Abstract Methods** → [core/TODO.md#TODO-CORE-001](core/TODO.md#todo-core-001)
     _Abstract base class - subclasses must implement (by design)_
 
-15. **[Integrations] Unsupported Job Board Providers** → [integrations/TODO.md#TODO-INTEGRATIONS-002](integrations/TODO.md#todo-integrations-002)
+14. **[Integrations] Unsupported Job Board Providers** → [integrations/TODO.md#TODO-INTEGRATIONS-002](integrations/TODO.md#todo-integrations-002)
     _Add support for job boards beyond LinkedIn and Indeed_
 
-16. **[Integrations] Token Refresh Implementation** → [integrations/TODO.md#TODO-INTEGRATIONS-003](integrations/TODO.md#todo-integrations-003)
+15. **[Integrations] Token Refresh Implementation** → [integrations/TODO.md#TODO-INTEGRATIONS-003](integrations/TODO.md#todo-integrations-003)
     _Provider-specific token refresh (abstract method)_
 
 ---
@@ -82,7 +80,7 @@
 
 - **[TODO-PROJECT-001]** Comprehensive TODO audit (429 files) → Critical (scheduled)
 
-### Features (8 items)
+### Features (7 items)
 
 - **[TODO-APPT-001]** Appointment cancellation logic → High
 - **[TODO-ATS-001]** ATS placeholder views → High
@@ -113,7 +111,6 @@ _No technical debt tracked at this time_
 
 ### Dependencies (3 items)
 
-- **[TODO-ANALYTICS-001]** openpyxl dependency → High
 - **[TODO-NEWSLETTER-002]** Abstract subscription generator → Low (by design)
 - **[TODO-CORE-001]** Sync service abstract methods → Low (by design)
 - **[TODO-INTEGRATIONS-003]** Token refresh abstract method → Low (by design)
@@ -127,7 +124,7 @@ _No technical debt tracked at this time_
 | **accounts** | 0 | 0 | 0 | 0 | [accounts/TODO.md](accounts/TODO.md) |
 | **admin_honeypot** | 0 | 0 | 0 | 0 | [admin_honeypot/TODO.md](admin_honeypot/TODO.md) |
 | **ai_matching** | 0 | 0 | 0 | 0 | [ai_matching/TODO.md](ai_matching/TODO.md) |
-| **analytics** | 1 | 1 | 0 | 0 | [analytics/TODO.md](analytics/TODO.md) |
+| **analytics** | 0 | 0 | 0 | 0 | [analytics/TODO.md](analytics/TODO.md) |
 | **appointment** | 3 | 1 | 1 | 1 | [appointment/TODO.md](appointment/TODO.md) |
 | **ats** | 1 | 1 | 0 | 0 | [ats/TODO.md](ats/TODO.md) |
 | **blog** | 0 | 0 | 0 | 0 | [blog/TODO.md](blog/TODO.md) |
@@ -158,9 +155,9 @@ _No technical debt tracked at this time_
 [████████████████░░░░] 80% (18/23 apps fully documented)
 ```
 
-- **Apps with TODOs:** 9 apps
-- **Apps without TODOs:** 14 apps
-- **Total Items:** 16 across all apps
+- **Apps with TODOs:** 8 apps
+- **Apps without TODOs:** 15 apps
+- **Total Items:** 15 across all apps
 
 ---
 
