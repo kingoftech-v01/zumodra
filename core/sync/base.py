@@ -351,8 +351,14 @@ class PublicSyncService:
             return None
 
         # Add required sync metadata
+        # Get tenant_id safely - handle case where tenant relationship might be None
+        tenant_id = getattr(instance, 'tenant_id', None)
+        if tenant_id is None and hasattr(instance, 'tenant'):
+            tenant = getattr(instance, 'tenant', None)
+            tenant_id = tenant.id if tenant else None
+
         catalog_data.update({
-            'tenant_id': instance.tenant_id,
+            'tenant_id': tenant_id,
             'tenant_schema_name': connection.schema_name,
             'synced_at': timezone.now(),
         })

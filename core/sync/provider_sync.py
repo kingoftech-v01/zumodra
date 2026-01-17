@@ -70,7 +70,7 @@ class ProviderPublicSyncService(PublicSyncService):
             'provider_uuid': 'uuid',
 
             # Profile
-            'display_name': lambda p: p.business_name or p.user.get_full_name() or p.user.email.split('@')[0],
+            'display_name': lambda p: p.display_name or p.user.get_full_name() or p.user.email.split('@')[0],
             'provider_type': 'provider_type',
             'bio': lambda p: self.sanitize_html(p.bio) if p.bio else '',
             'tagline': 'tagline',
@@ -148,18 +148,18 @@ class ProviderPublicSyncService(PublicSyncService):
         return ''
 
     def _get_location_data(self, provider) -> Optional[Dict[str, Any]]:
-        """Get full location data as JSON."""
+        """Get full location data as GeoJSON Point or None for PostGIS field."""
         try:
-            location = {}
-            if hasattr(provider, 'city') and provider.city:
-                location['city'] = provider.city
-            if hasattr(provider, 'state') and provider.state:
-                location['state'] = provider.state
-            if hasattr(provider, 'country') and provider.country:
-                location['country'] = provider.country
-            if hasattr(provider, 'coordinates') and provider.coordinates:
-                location['coordinates'] = provider.coordinates
-            return location if location else None
+            # For PostGIS PointField, return the Point object directly (not dict)
+            # PublicProviderCatalog.location expects a Point, not a dict
+            if hasattr(provider, 'location') and provider.location:
+                return provider.location
+            # Fallback: try to construct Point from lat/lng if available
+            elif hasattr(provider, 'location_lat') and hasattr(provider, 'location_lng'):
+                if provider.location_lat and provider.location_lng:
+                    from django.contrib.gis.geos import Point
+                    return Point(provider.location_lng, provider.location_lat, srid=4326)
+            return None
         except Exception as e:
             logger.debug(f"Could not get location data for provider {provider.uuid}: {e}")
             return None
