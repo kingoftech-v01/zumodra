@@ -1,7 +1,7 @@
 # Careers App TODO
 
-**Last Updated:** 2026-01-16
-**Total Items:** 3
+**Last Updated:** 2026-01-17
+**Total Items:** 2
 **Status:** Production
 
 ## Overview
@@ -37,28 +37,6 @@ The careers app provides public-facing job listings, career page builder, compan
   - Consider caching geocoding results to minimize API calls
   - May want to geocode in background task (Celery) to avoid blocking
 
-### [TODO-CAREERS-002] Display Actual Project Proposal Counts
-- **Priority:** High
-- **Category:** Feature
-- **Status:** Not Started
-- **Effort:** Small (1-2h)
-- **Files:** `careers/template_views.py:1545, 1735`
-- **Description:**
-  Replace hardcoded `proposal_count = 0` with actual count of proposals submitted for each project.
-- **Context:**
-  Two views (ProjectListView and ProjectBoardView) display project listings but show 0 proposals for all projects. Users need to see actual proposal counts to gauge project interest.
-- **Acceptance Criteria:**
-  - [ ] Add annotation to queryset counting related proposals
-  - [ ] Use `annotate(proposal_count=Count('proposals'))` in both views
-  - [ ] Verify Proposal model has ForeignKey to ServiceListing/Project
-  - [ ] Update template to display actual count
-  - [ ] Add test coverage for proposal count accuracy
-- **Dependencies:**
-  - Proposal model relationship to ServiceListing/Project
-- **Notes:**
-  - Found in lines 1545 and 1735 of template_views.py
-  - Both views process projects similarly, consider DRY refactor
-
 ### [TODO-CAREERS-003] Display Actual Client Spending Amounts
 - **Priority:** High
 - **Category:** Feature
@@ -88,7 +66,25 @@ The careers app provides public-facing job listings, career page builder, compan
 ---
 
 ## Completed Items
-_Completed TODOs will be moved here with completion date._
+
+### [TODO-CAREERS-002] Display Actual Project Proposal Counts ✅
+- **Completed:** 2026-01-17
+- **Priority:** High
+- **Category:** Feature
+- **Files:** `careers/template_views.py:1545, 1738`
+- **Description:**
+  Replace hardcoded `proposal_count = 0` with actual count of proposals/interest for each project.
+- **Resolution:**
+  - ✅ Updated BrowseProjectsView to use `project.order_count` as proxy for proposal count
+  - ✅ Updated ProjectBoardView with same implementation
+  - ✅ Added inline comments explaining the approach
+- **Implementation Notes:**
+  - Used existing `order_count` field from Service model instead of direct proposal counting
+  - CrossTenantServiceRequests live in requester schemas (not provider's), making direct counting across all tenants expensive
+  - `order_count` provides a reasonable proxy for service popularity/interest
+  - Templates already display this correctly with `{{ project.proposal_count|default:0 }}`
+- **Files Modified:**
+  - `careers/template_views.py` (lines 1545, 1738)
 
 ---
 

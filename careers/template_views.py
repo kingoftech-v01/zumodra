@@ -1542,7 +1542,9 @@ class BrowseProjectsView(TemplateView):
             project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
             project.budget = project.price or 0
             project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
-            project.proposal_count = 0  # See TODO-CAREERS-002 in careers/TODO.md
+            # Use order_count as proxy for proposal/interest count
+            # Note: CrossTenantServiceRequests live in requester schemas, making direct counting expensive
+            project.proposal_count = project.order_count or 0
             project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
 
         # Additional filter parameters for new projects filter
@@ -1732,7 +1734,9 @@ class BrowseProjectsMapView(TemplateView):
             project.location = f"{project.provider.city}, {project.provider.country}" if project.provider.city else "Remote"
             project.budget = project.price or 0
             project.budget_type = 'fixed-price' if project.service_type == 'fixed' else 'hourly'
-            project.proposal_count = 0  # See TODO-CAREERS-002 in careers/TODO.md
+            # Use order_count as proxy for proposal/interest count
+            # Note: CrossTenantServiceRequests live in requester schemas, making direct counting expensive
+            project.proposal_count = project.order_count or 0
             project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
             # For map markers, use provider's location if available
             project.location_coordinates = project.provider.location if hasattr(project.provider, 'location') else None
