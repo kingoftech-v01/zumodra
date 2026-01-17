@@ -124,7 +124,7 @@ def analyze_failed_logins(self):
 
         # Find IPs with multiple failures
         ip_failures = FailedLoginAttempt.objects.filter(
-            created_at__gte=check_window
+            attempted_at__gte=check_window
         ).values('ip_address').annotate(
             count=Count('id')
         ).filter(count__gte=10)  # 10+ failures in an hour
@@ -163,8 +163,8 @@ def analyze_failed_logins(self):
 
         # Find targeted accounts
         account_targets = FailedLoginAttempt.objects.filter(
-            created_at__gte=check_window
-        ).values('username').annotate(
+            attempted_at__gte=check_window
+        ).values('username_entered').annotate(
             count=Count('id'),
             unique_ips=Count('ip_address', distinct=True)
         ).filter(
@@ -173,7 +173,7 @@ def analyze_failed_logins(self):
         )
 
         for account_data in account_targets:
-            username = account_data['username']
+            username = account_data['username_entered']
 
             try:
                 SecurityEvent.objects.create(
@@ -336,11 +336,11 @@ def generate_security_report(self):
         )
 
         failed_logins = FailedLoginAttempt.objects.filter(
-            created_at__date=yesterday.date()
+            attempted_at__date=yesterday.date()
         ).count()
 
         unique_ips_failed = FailedLoginAttempt.objects.filter(
-            created_at__date=yesterday.date()
+            attempted_at__date=yesterday.date()
         ).values('ip_address').distinct().count()
 
         # Audit log stats
@@ -647,7 +647,7 @@ def update_ip_reputation(self):
 
         # Get IP activity summary
         ip_activity = FailedLoginAttempt.objects.filter(
-            created_at__gte=check_window
+            attempted_at__gte=check_window
         ).values('ip_address').annotate(
             failure_count=Count('id')
         )
