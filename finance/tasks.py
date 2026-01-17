@@ -242,10 +242,10 @@ def process_pending_refunds(self):
     try:
         now = timezone.now()
 
-        # Find pending refunds
+        # Find approved but not yet processed refunds
         pending_refunds = RefundRequest.objects.filter(
-            succeeded=False,
-            approved_at__isnull=False
+            approved=True,
+            processed_at__isnull=True
         )
 
         processed = 0
