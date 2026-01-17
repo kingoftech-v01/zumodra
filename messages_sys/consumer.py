@@ -271,7 +271,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "timestamp": message.timestamp.isoformat(),
             "file": message.file.url if message.file else (message.voice_message.url if message.is_voice else ""),
             "is_voice": message.is_voice,
-            "is_read": False,
+            "is_read": message.is_read,  # Use actual read status from database
             "conversation_id": self.conversation_id,
         }
 
@@ -318,11 +318,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             contact=new_contact_user,
         )
         # Create friend request
+        # NOTE: FriendRequest model doesn't have 'message' field - removed invalid parameter
         await database_sync_to_async(FriendRequest.objects.get_or_create)(
             sender=self.user,
             receiver=new_contact_user,
-            message=invitation_message,
         )
+        # invitation_message is ignored - if needed, send as separate Message object
 
         # Notify user
         await self.send_json({"type": "contact_added", "contact": {"username": new_contact_user.username}})
