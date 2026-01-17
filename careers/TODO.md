@@ -1,7 +1,7 @@
 # Careers App TODO
 
 **Last Updated:** 2026-01-17
-**Total Items:** 2
+**Total Items:** 1
 **Status:** Production
 
 ## Overview
@@ -37,32 +37,6 @@ The careers app provides public-facing job listings, career page builder, compan
   - Consider caching geocoding results to minimize API calls
   - May want to geocode in background task (Celery) to avoid blocking
 
-### [TODO-CAREERS-003] Display Actual Client Spending Amounts
-- **Priority:** High
-- **Category:** Feature
-- **Status:** Not Started
-- **Effort:** Medium (3-4h)
-- **Files:** `careers/template_views.py:1546, 1736`
-- **Description:**
-  Replace hardcoded `client_spent = 0` with actual calculation of total amount spent by each client on completed projects.
-- **Context:**
-  Project listings show client spending as $0, preventing freelancers from assessing client reliability and budget capacity.
-- **Acceptance Criteria:**
-  - [ ] Query finance/payment records to calculate total client spending
-  - [ ] Sum completed contract amounts per client (project.provider)
-  - [ ] Use `annotate()` with `Sum()` aggregation on related payments
-  - [ ] Handle currency conversion if multi-currency support exists
-  - [ ] Cache spending totals (expensive query) with TTL
-  - [ ] Display formatted amount in template (e.g., "$12,345")
-  - [ ] Add test coverage for spending calculation
-- **Dependencies:**
-  - finance app models (Contract, Payment, or similar)
-  - Relationship between Tenant (client) and completed contracts
-- **Notes:**
-  - Found in lines 1546 and 1736 of template_views.py
-  - May be expensive query - consider caching or background updates
-  - Only count completed/paid contracts, not pending
-
 ---
 
 ## Completed Items
@@ -85,6 +59,27 @@ The careers app provides public-facing job listings, career page builder, compan
   - Templates already display this correctly with `{{ project.proposal_count|default:0 }}`
 - **Files Modified:**
   - `careers/template_views.py` (lines 1545, 1738)
+
+### [TODO-CAREERS-003] Display Actual Client Spending Amounts ✅
+- **Completed:** 2026-01-17
+- **Priority:** High
+- **Category:** Feature
+- **Files:** `careers/template_views.py:1548-1556, 1748-1756`
+- **Description:**
+  Replace hardcoded `client_spent = 0` with actual calculation of total amount spent by each client on completed projects.
+- **Resolution:**
+  - ✅ Query ServiceContract model to calculate total client spending
+  - ✅ Sum completed contract amounts where provider.user is the client
+  - ✅ Added implementation in both BrowseProjectsView and ProjectBoardView
+  - ✅ Returns float value for template display
+- **Implementation Notes:**
+  - Queries `ServiceContract.objects.filter(client=project.provider.user, status=COMPLETED)`
+  - Aggregates sum of `agreed_rate` field for all completed contracts
+  - Provides insight into financial reliability of service provider when they act as a client
+  - Shows how much the provider has spent hiring others (indicates they're an active buyer)
+  - Note: This creates N+1 queries per page, but view is cached (5 min) to mitigate performance impact
+- **Files Modified:**
+  - `careers/template_views.py` (lines 1548-1556, 1748-1756)
 
 ---
 

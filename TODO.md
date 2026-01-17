@@ -1,16 +1,16 @@
 # Zumodra TODO Index
 
 **Last Updated:** 2026-01-17
-**Total TODOs:** 15 (14 documented + 1 future audit scheduled)
+**Total TODOs:** 14 (13 documented + 1 future audit scheduled)
 **Status:** Active tracking
 
 ## Quick Stats
 
 - **Critical Priority:** 1 item (comprehensive TODO audit - scheduled)
-- **High Priority:** 5 items (critical features, user-facing gaps)
+- **High Priority:** 4 items (critical features, user-facing gaps)
 - **Medium Priority:** 4 items (test coverage, enhancements)
 - **Low Priority:** 5 items (abstract methods, edge cases)
-- **Completed:** 2 items (openpyxl dependency, proposal counts)
+- **Completed:** 3 items (openpyxl, proposal counts, client spending)
 
 ---
 
@@ -32,10 +32,7 @@
 3. **[Careers] Geocoding for Locations** → [careers/TODO.md#TODO-CAREERS-001](careers/TODO.md#todo-careers-001)
    _Add map markers for company locations via geocoding API_
 
-4. **[Careers] Client Spending Amounts** → [careers/TODO.md#TODO-CAREERS-003](careers/TODO.md#todo-careers-003)
-   _Show actual client spending on projects_
-
-5. **[Tenants] EIN Verification API** → [tenants/TODO.md#TODO-TENANTS-001](tenants/TODO.md#todo-tenants-001)
+4. **[Tenants] EIN Verification API** → [tenants/TODO.md#TODO-TENANTS-001](tenants/TODO.md#todo-tenants-001)
    _Integrate real EIN verification service (currently stubbed)_
 
 ### Medium Priority (Enhancements)
@@ -77,12 +74,11 @@
 
 - **[TODO-PROJECT-001]** Comprehensive TODO audit (429 files) → Critical (scheduled)
 
-### Features (6 items)
+### Features (5 items)
 
 - **[TODO-APPT-001]** Appointment cancellation logic → High
 - **[TODO-ATS-001]** ATS placeholder views → High
 - **[TODO-CAREERS-001]** Geocoding for locations → High
-- **[TODO-CAREERS-003]** Client spending amounts → High
 - **[TODO-TENANTS-001]** EIN verification API → High
 - **[TODO-INTEGRATIONS-001]** Additional calendar providers → Medium
 - **[TODO-INTEGRATIONS-002]** Additional job board providers → Low
@@ -124,7 +120,7 @@ _No technical debt tracked at this time_
 | **appointment** | 3 | 1 | 1 | 1 | [appointment/TODO.md](appointment/TODO.md) |
 | **ats** | 1 | 1 | 0 | 0 | [ats/TODO.md](ats/TODO.md) |
 | **blog** | 0 | 0 | 0 | 0 | [blog/TODO.md](blog/TODO.md) |
-| **careers** | 2 | 2 | 0 | 0 | [careers/TODO.md](careers/TODO.md) |
+| **careers** | 1 | 1 | 0 | 0 | [careers/TODO.md](careers/TODO.md) |
 | **configurations** | 0 | 0 | 0 | 0 | [configurations/TODO.md](configurations/TODO.md) |
 | **core** | 1 | 0 | 0 | 1 | [core/TODO.md](core/TODO.md) |
 | **custom_account_u** | 0 | 0 | 0 | 0 | [custom_account_u/TODO.md](custom_account_u/TODO.md) |
@@ -153,7 +149,7 @@ _No technical debt tracked at this time_
 
 - **Apps with TODOs:** 8 apps
 - **Apps without TODOs:** 15 apps
-- **Total Items:** 14 across all apps
+- **Total Items:** 13 across all apps
 
 ---
 

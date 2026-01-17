@@ -1545,7 +1545,15 @@ class BrowseProjectsView(TemplateView):
             # Use order_count as proxy for proposal/interest count
             # Note: CrossTenantServiceRequests live in requester schemas, making direct counting expensive
             project.proposal_count = project.order_count or 0
-            project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
+            # Calculate client spending: sum of completed contracts where provider's user is the client
+            # This shows the financial reliability of the service provider as a client
+            from services.models import ServiceContract
+            from django.db.models import Sum
+            provider_spending = ServiceContract.objects.filter(
+                client=project.provider.user,
+                status=ServiceContract.ContractStatus.COMPLETED
+            ).aggregate(total=Sum('agreed_rate'))['total'] or Decimal('0.00')
+            project.client_spent = float(provider_spending)
 
         # Additional filter parameters for new projects filter
         timezone_param = self.request.GET.get('timezone', '').strip()
@@ -1737,7 +1745,15 @@ class BrowseProjectsMapView(TemplateView):
             # Use order_count as proxy for proposal/interest count
             # Note: CrossTenantServiceRequests live in requester schemas, making direct counting expensive
             project.proposal_count = project.order_count or 0
-            project.client_spent = 0  # See TODO-CAREERS-003 in careers/TODO.md
+            # Calculate client spending: sum of completed contracts where provider's user is the client
+            # This shows the financial reliability of the service provider as a client
+            from services.models import ServiceContract
+            from django.db.models import Sum
+            provider_spending = ServiceContract.objects.filter(
+                client=project.provider.user,
+                status=ServiceContract.ContractStatus.COMPLETED
+            ).aggregate(total=Sum('agreed_rate'))['total'] or Decimal('0.00')
+            project.client_spent = float(provider_spending)
             # For map markers, use provider's location if available
             project.location_coordinates = project.provider.location if hasattr(project.provider, 'location') else None
 
