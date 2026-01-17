@@ -26,8 +26,41 @@
                 </div>
                 {% endif %}
 
-                <!-- Email Field -->
+                <!-- First Name Field -->
                 <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">{% trans "First Name" %}*</label>
+                    <input
+                        id="{{ form.first_name.id_for_label }}"
+                        type="text"
+                        name="{{ form.first_name.name }}"
+                        value="{{ form.first_name.value|default:'' }}"
+                        class="form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg {% if form.first_name.errors %}border-red-500{% endif %}"
+                        placeholder="{% trans 'First Name' %}*"
+                        required
+                        autofocus />
+                    {% if form.first_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name Field -->
+                <div class="form-group mt-6">
+                    <label for="{{ form.last_name.id_for_label }}">{% trans "Last Name" %}*</label>
+                    <input
+                        id="{{ form.last_name.id_for_label }}"
+                        type="text"
+                        name="{{ form.last_name.name }}"
+                        value="{{ form.last_name.value|default:'' }}"
+                        class="form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg {% if form.last_name.errors %}border-red-500{% endif %}"
+                        placeholder="{% trans 'Last Name' %}*"
+                        required />
+                    {% if form.last_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group mt-6">
                     <label for="{{ form.email.id_for_label }}">{% trans "Email address" %}*</label>
                     <input
                         id="{{ form.email.id_for_label }}"
@@ -36,8 +69,7 @@
                         value="{{ form.email.value|default:'' }}"
                         class="form-control w-full mt-3 border border-line px-4 h-[50px] rounded-lg {% if form.email.errors %}border-red-500{% endif %}"
                         placeholder="{% trans 'Email address' %}*"
-                        required
-                        autofocus />
+                        required />
                     {% if form.email.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
                     {% endif %}
