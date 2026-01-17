@@ -29,7 +29,7 @@ from core.serializers import SensitiveFieldMixin, AuditedSerializerMixin
 
 # ==================== USER SERIALIZERS ====================
 
-class UserMinimalSerializer(serializers.ModelSerializer):
+class FinanceUserMinimalSerializer(serializers.ModelSerializer):
     """Minimal user information for nested representations"""
     full_name = serializers.SerializerMethodField()
 
@@ -78,7 +78,7 @@ class PaymentTransactionDetailSerializer(SensitiveFieldMixin, serializers.ModelS
     Full payment transaction detail serializer.
     Includes Stripe payment intent ID (sensitive).
     """
-    user = UserMinimalSerializer(read_only=True)
+    user = FinanceUserMinimalSerializer(read_only=True)
     status_display = serializers.SerializerMethodField()
     has_refund_request = serializers.SerializerMethodField()
     refund_status = serializers.SerializerMethodField()
@@ -185,7 +185,7 @@ class SubscriptionPlanAdminSerializer(serializers.ModelSerializer):
 
 class UserSubscriptionSerializer(serializers.ModelSerializer):
     """Serializer for user subscription status"""
-    user = UserMinimalSerializer(read_only=True)
+    user = FinanceUserMinimalSerializer(read_only=True)
     plan = SubscriptionPlanSerializer(read_only=True)
     is_active = serializers.SerializerMethodField()
     days_remaining = serializers.SerializerMethodField()
@@ -294,7 +294,7 @@ class InvoiceListSerializer(serializers.ModelSerializer):
 
 class InvoiceDetailSerializer(SensitiveFieldMixin, serializers.ModelSerializer):
     """Full invoice detail serializer"""
-    user = UserMinimalSerializer(read_only=True)
+    user = FinanceUserMinimalSerializer(read_only=True)
     status_display = serializers.SerializerMethodField()
     is_overdue = serializers.SerializerMethodField()
     balance_due = serializers.SerializerMethodField()
@@ -452,7 +452,7 @@ class SetDefaultPaymentMethodSerializer(serializers.Serializer):
 class RefundRequestSerializer(serializers.ModelSerializer):
     """Serializer for refund requests"""
     payment = PaymentTransactionListSerializer(read_only=True)
-    processed_by = UserMinimalSerializer(read_only=True)
+    processed_by = FinanceUserMinimalSerializer(read_only=True)
     status_display = serializers.SerializerMethodField()
     can_approve = serializers.SerializerMethodField()
 
@@ -553,8 +553,8 @@ class EscrowTransactionDetailSerializer(
     serializers.ModelSerializer
 ):
     """Full escrow transaction detail serializer"""
-    buyer = UserMinimalSerializer(read_only=True)
-    seller = UserMinimalSerializer(read_only=True)
+    buyer = FinanceUserMinimalSerializer(read_only=True)
+    seller = FinanceUserMinimalSerializer(read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     disputes = serializers.SerializerMethodField()
     audit_logs = serializers.SerializerMethodField()
@@ -721,7 +721,7 @@ class DisputeListSerializer(serializers.ModelSerializer):
 
 class DisputeDetailSerializer(serializers.ModelSerializer):
     """Full dispute detail serializer"""
-    raised_by = UserMinimalSerializer(read_only=True)
+    raised_by = FinanceUserMinimalSerializer(read_only=True)
     escrow = EscrowTransactionListSerializer(read_only=True)
     can_respond = serializers.SerializerMethodField()
     can_resolve = serializers.SerializerMethodField()
@@ -883,7 +883,7 @@ class ConnectedAccountDetailSerializer(
     serializers.ModelSerializer
 ):
     """Full connected account detail serializer"""
-    user = UserMinimalSerializer(read_only=True)
+    user = FinanceUserMinimalSerializer(read_only=True)
     status_display = serializers.CharField(source='get_account_status_display', read_only=True)
     business_type_display = serializers.CharField(
         source='get_business_type_display', read_only=True
