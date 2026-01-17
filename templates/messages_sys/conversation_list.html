@@ -59,7 +59,7 @@
     <!-- Conversations List -->
     <div class="space-y-3">
         {% for conversation in conversations %}
-        <a href="{% url 'frontend:messages:chat' conversation.uuid %}"
+        <a href="{% url 'frontend:messages:chat' conversation.id %}"
            class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface transition-colors">
             <div class="relative flex-shrink-0">
                 <div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center">
@@ -74,7 +74,7 @@
             <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-1">
                     <h6 class="text-button text-title {% if conversation.unread_count %}font-bold{% endif %}">
-                        {{ conversation.title|default:"Conversation" }}
+                        {{ conversation.name|default:"Conversation" }}
                     </h6>
                     <span class="caption2 text-secondary">{{ conversation.updated_at|timesince }} {% trans "ago" %}</span>
                 </div>

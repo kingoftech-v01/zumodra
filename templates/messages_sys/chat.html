@@ -12,7 +12,7 @@
         {% trans "Messages" %}
     </a>
     <span class="ph ph-caret-right text-secondary"></span>
-    <span class="caption1 text-title">{{ conversation.title|default:"Chat"|truncatewords:3 }}</span>
+    <span class="caption1 text-title">{{ conversation.name|default:"Chat"|truncatewords:3 }}</span>
 </div>
 
 <!-- Tenant Type Badge -->
@@ -52,7 +52,7 @@
         <!-- Conversation Items -->
         <div class="space-y-2 overflow-y-auto" style="max-height: calc(100% - 150px);">
             {% for conv in conversations %}
-            <a href="{% url 'frontend:messages:chat' conv.uuid %}"
+            <a href="{% url 'frontend:messages:chat' conv.id %}"
                class="flex items-start gap-3 p-3 rounded-lg transition-colors {% if conv == conversation %}bg-surface{% else %}hover:bg-surface{% endif %}">
                 <div class="relative flex-shrink-0">
                     <div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
@@ -64,7 +64,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-button text-title">{{ conv.title|default:"Conversation"|truncatewords:3 }}</span>
+                        <span class="text-button text-title">{{ conv.name|default:"Conversation"|truncatewords:3 }}</span>
                         <span class="caption2 text-secondary">{{ conv.updated_at|timesince|truncatewords:1 }}</span>
                     </div>
                     <p class="caption1 text-secondary truncate">{{ conv.last_message.content|default:"No messages yet" }}</p>
@@ -89,7 +89,7 @@
                     <span class="ph ph-user text-xl text-secondary"></span>
                 </div>
                 <div>
-                    <h5 class="heading6">{{ conversation.title|default:"Conversation" }}</h5>
+                    <h5 class="heading6">{{ conversation.name|default:"Conversation" }}</h5>
                     <div class="caption2 text-secondary">
                         {% for participant in conversation.participants.all %}
                         {{ participant.get_full_name|default:participant.email }}{% if not forloop.last %}, {% endif %}
@@ -121,7 +121,7 @@
                     <p class="caption1">{{ message.content }}</p>
                     <div class="flex items-center gap-2 mt-2">
                         <span class="caption2 {% if message.sender == request.user %}text-white opacity-70{% else %}text-secondary{% endif %}">
-                            {{ message.sender.get_full_name|default:message.sender.email }} &middot; {{ message.created_at|time:"g:i A" }}
+                            {{ message.sender.get_full_name|default:message.sender.email }} &middot; {{ message.timestamp|time:"g:i A" }}
                         </span>
                         {% if message.is_read and message.sender == request.user %}
                         <span class="ph ph-checks {% if message.sender == request.user %}text-white{% endif %}"></span>
@@ -139,7 +139,7 @@
         </div>
 
         <!-- Message Input -->
-        <form id="messageForm" method="post" action="{% url 'frontend:messages:send_message' conversation.uuid %}" class="flex items-center gap-3">
+        <form id="messageForm" method="post" action="{% url 'frontend:messages:send_message' conversation.id %}" class="flex items-center gap-3">
             {% csrf_token %}
             <input type="text" name="content" placeholder="{% trans 'Type a message...' %}" autocomplete="off" required
                    class="flex-1 h-12 px-4 border border-line rounded-lg caption1">
@@ -219,7 +219,7 @@ if (messagesContainer) {
 
 // WebSocket connection for real-time messages
 {% if conversation %}
-const conversationId = '{{ conversation.uuid }}';
+const conversationId = '{{ conversation.id }}';
 {% if websocket_enabled %}
 const wsUrl = '{{ websocket_url }}';
 {% endif %}
