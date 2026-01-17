@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.conf import settings
 from .models import Conversation, Message, Contact, FriendRequest, BlockList, UserStatus
 from django.utils import timezone
 from django.db.models import Q, Prefetch
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def files_render(request, filename):
@@ -17,49 +21,28 @@ def js_dir_view(request, file_name):
 @login_required
 def chat_view(request):
     """
-    Main chat view with optimized queries for 500K concurrent users.
-    Uses prefetch_related and select_related to avoid N+1 queries.
+    Main chat view with WebSocket support for real-time messaging.
 
-    TEST FINDINGS (2026-01-16):
-    ---------------------------
-    URL: /app/messages/
-
-    CRITICAL ISSUE: Server returned 502 Bad Gateway when attempting to test this view.
-    This indicates that the backend Django application is not running or not reachable
-    through nginx reverse proxy.
-
-    Status: NOT TESTED - Server unavailable
-
-    EXPECTED FUNCTIONALITY (based on code analysis):
+    Features:
+    - Optimized queries for 500K concurrent users
+    - Real-time WebSocket support with graceful fallback
+    - Prefetch and select_related to avoid N+1 queries
     - Message inbox with conversation list
-    - Active conversation display
     - User status indicators (online/offline)
-    - Contact list with favorites
+    - Contact management with favorites
     - Blocked users filtering
-    - Optimized queries with caching (60s cache for user status)
-    - Real-time WebSocket support (consumer.py)
 
-    POTENTIAL ISSUES TO TEST (when server is available):
-    1. Template path: 'message_sys/index.html' - verify template exists
-    2. User profile avatar handling - may break if profile doesn't exist
-    3. Conversation selection - defaults to first conversation if none specified
-    4. Message marking as read - uses bulk update
-    5. WebSocket connection for real-time updates
-
-    URLS THAT NEED TESTING:
-    - /app/messages/ - Main inbox (this view)
-    - /app/messages/?conversation_id=<id> - Specific conversation
-    - WebSocket: ws://domain/ws/chat/ (from routing.py and consumer.py)
-
-    API ENDPOINTS THAT NEED TESTING:
-    - /api/v1/messages/conversations/ - List conversations
-    - /api/v1/messages/messages/ - List messages
-    - /api/v1/messages/contacts/ - List contacts
-    - /api/v1/messages/friend-requests/ - Friend requests
-    - /api/v1/messages/blocked/ - Blocked users
-    - /api/v1/messages/status/ - User status
+    WebSocket Support:
+    - Checks if CHANNEL_LAYERS is configured
+    - Provides WebSocket URL for active conversation
+    - Falls back to HTTP polling if WebSocket unavailable
     """
     user = request.user
+
+    # Check WebSocket availability
+    websocket_enabled = hasattr(settings, 'CHANNEL_LAYERS') and bool(settings.CHANNEL_LAYERS)
+    if not websocket_enabled:
+        logger.warning("WebSocket support is disabled - CHANNEL_LAYERS not configured")
 
     # Get user status with caching
     user_status_cache_key = f"user_status_{user.id}"
@@ -107,7 +90,7 @@ def chat_view(request):
         .select_related('contact')
     )
 
-    # Active chat with optimized query
+    # Active chat with optimized query and error handling
     active_conversation = None
     conv_id = request.GET.get('conversation_id')
     if conv_id:
@@ -119,23 +102,37 @@ def chat_view(request):
                 .get(id=conv_id, participants=user)
             )
         except Conversation.DoesNotExist:
+            logger.warning(f"User {user.id} attempted to access non-existent conversation {conv_id}")
+            active_conversation = conversations[0] if conversations else None
+        except Exception as e:
+            logger.error(f"Error loading conversation {conv_id}: {e}")
             active_conversation = conversations[0] if conversations else None
     else:
         active_conversation = conversations[0] if conversations else None
 
-    # Messages with optimized cursor-based query
+    # Messages with optimized cursor-based query and error handling
     messages = []
     if active_conversation:
-        # Use the optimized manager method with select_related
-        messages = list(
-            Message.objects
-            .for_conversation(active_conversation.id, limit=50)
-        )
-        # Reverse to show oldest first in template
-        messages.reverse()
+        try:
+            # Use the optimized manager method with select_related
+            messages = list(
+                Message.objects
+                .for_conversation(active_conversation.id, limit=50)
+            )
+            # Reverse to show oldest first in template
+            messages.reverse()
 
-        # Mark messages as read (bulk update for efficiency)
-        Message.objects.mark_conversation_read(user, active_conversation.id)
+            # Mark messages as read (bulk update for efficiency)
+            Message.objects.mark_conversation_read(user, active_conversation.id)
+        except Exception as e:
+            logger.error(f"Error loading messages for conversation {active_conversation.id}: {e}")
+            messages = []
+
+    # Determine WebSocket protocol (ws:// or wss://)
+    websocket_protocol = 'wss' if request.is_secure() else 'ws'
+    websocket_url = None
+    if websocket_enabled and active_conversation:
+        websocket_url = f"{websocket_protocol}://{request.get_host()}/ws/chat/{active_conversation.id}/"
 
     context = {
         'user_profile': user_profile,
@@ -145,6 +142,8 @@ def chat_view(request):
         'active_conversation': active_conversation,
         'messages': messages,
         'blocked_users': blocked_user_ids,
+        'websocket_enabled': websocket_enabled,
+        'websocket_url': websocket_url,
     }
 
     return render(request, 'message_sys/index.html', context)

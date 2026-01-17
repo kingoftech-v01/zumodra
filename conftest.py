@@ -1287,6 +1287,34 @@ def create_tenant_with_schema(name, slug, plan=None, create_schema=False):
 
 
 # ============================================================================
+# MESSAGE FACTORIES
+# ============================================================================
+
+class ConversationFactory(DjangoModelFactory):
+    """Factory for Conversation model."""
+
+    class Meta:
+        model = 'messages_sys.Conversation'
+
+    name = factory.Faker('catch_phrase')
+
+    @factory.post_generation
+    def participants(self, create, extracted, **kwargs):
+        """Handle many-to-many participants relationship."""
+        if not create:
+            return
+
+        if extracted:
+            # If participants were passed, add them
+            for user in extracted:
+                self.participants.add(user)
+        else:
+            # Default: create one participant
+            user = UserFactory()
+            self.participants.add(user)
+
+
+# ============================================================================
 # ROLE-BASED USER FACTORIES
 # ============================================================================
 
@@ -1685,6 +1713,12 @@ def full_career_page(db):
     ]
 
     return career_page, jobs
+
+
+@pytest.fixture
+def conversation_factory(db):
+    """Provide ConversationFactory for tests."""
+    return ConversationFactory
 
 
 # ============================================================================
