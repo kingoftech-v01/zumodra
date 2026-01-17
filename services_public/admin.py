@@ -12,27 +12,26 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
     """Admin interface for public service catalog."""
 
     list_display = [
-        'business_name',
+        'provider_name',
         'service_category_display',
         'location_display_admin',
         'rating_display',
-        'is_active',
         'is_verified',
-        'completed_jobs',
+        'completed_jobs_count',
         'tenant_link',
     ]
     list_filter = [
-        'is_active',
         'is_verified',
-        'is_mobile',
-        'accepts_online_payment',
+        'can_work_remotely',
+        'can_work_onsite',
+        'provider_type',
         'location_country',
         'published_at',
     ]
     search_fields = [
-        'business_name',
-        'description_html',
-        'service_category_names',
+        'provider_name',
+        'bio',
+        'category_names',
         'location_city',
         'location_country',
         'tenant_schema_name',
@@ -42,12 +41,10 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
         'provider_uuid',
         'tenant_id',
         'tenant_schema_name',
-        'rating',
-        'rating_count',
-        'completed_jobs',
-        'view_count',
-        'created_at',
-        'updated_at',
+        'rating_avg',
+        'total_reviews',
+        'completed_jobs_count',
+        'synced_at',
         'booking_url',
     ]
     fieldsets = (
@@ -61,16 +58,18 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
         }),
         (_('Provider Details'), {
             'fields': (
-                'business_name',
-                'avatar_url',
-                'description_html',
+                'provider_name',
+                'provider_avatar_url',
+                'bio',
+                'tagline',
+                'provider_type',
             )
         }),
         (_('Service Information'), {
             'fields': (
-                'service_category_names',
-                'service_category_slugs',
-                'skills',
+                'category_names',
+                'category_slugs',
+                'skills_data',
             )
         }),
         (_('Location'), {
@@ -79,23 +78,24 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
                 'location_state',
                 'location_country',
                 'location',
-                'is_mobile',
-                'service_radius_km',
+                'can_work_remotely',
+                'can_work_onsite',
             )
         }),
         (_('Pricing'), {
             'fields': (
                 'hourly_rate',
+                'minimum_budget',
                 'currency',
-                'accepts_online_payment',
             )
         }),
         (_('Ratings & Stats'), {
             'fields': (
-                'rating',
-                'rating_count',
-                'completed_jobs',
-                'view_count',
+                'rating_avg',
+                'total_reviews',
+                'completed_jobs_count',
+                'response_rate',
+                'avg_response_time_hours',
             )
         }),
         (_('Booking'), {
@@ -105,30 +105,31 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
         }),
         (_('Status & Visibility'), {
             'fields': (
-                'is_active',
                 'is_verified',
+                'is_featured',
+                'is_accepting_projects',
+                'availability_status',
                 'published_at',
             )
         }),
         (_('Metadata'), {
             'fields': (
-                'created_at',
-                'updated_at',
+                'synced_at',
             ),
             'classes': ('collapse',)
         }),
     )
     date_hierarchy = 'published_at'
-    ordering = ['-rating', '-published_at']
-    actions = ['mark_as_verified', 'mark_as_unverified', 'mark_as_inactive']
+    ordering = ['-rating_avg', '-published_at']
+    actions = ['mark_as_verified', 'mark_as_unverified', 'mark_as_featured']
 
     def service_category_display(self, obj):
         """Display service categories."""
-        if obj.service_category_names:
-            categories = obj.service_category_names[:2]  # Show first 2
+        if obj.category_names:
+            categories = obj.category_names[:2]  # Show first 2
             display = ", ".join(categories)
-            if len(obj.service_category_names) > 2:
-                display += f" (+{len(obj.service_category_names) - 2})"
+            if len(obj.category_names) > 2:
+                display += f" (+{len(obj.category_names) - 2})"
             return display
         return _('N/A')
     service_category_display.short_description = _('Categories')
@@ -137,20 +138,20 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
         """Display location in admin list."""
         parts = [obj.location_city, obj.location_state, obj.location_country]
         location = ", ".join(filter(None, parts)) or _('Location not specified')
-        if obj.is_mobile and obj.service_radius_km:
-            location += f" (+{obj.service_radius_km}km)"
+        if obj.can_work_remotely:
+            location += " (Remote available)"
         return location
     location_display_admin.short_description = _('Location')
 
     def rating_display(self, obj):
         """Display rating with stars."""
-        if obj.rating_count == 0:
+        if not obj.rating_avg or obj.total_reviews == 0:
             return _('No ratings')
-        stars = '★' * int(obj.rating) + '☆' * (5 - int(obj.rating))
+        stars = '★' * int(obj.rating_avg) + '☆' * (5 - int(obj.rating_avg))
         return format_html(
             '<span title="{:.1f} ({} reviews)">{}</span>',
-            obj.rating,
-            obj.rating_count,
+            obj.rating_avg,
+            obj.total_reviews,
             stars
         )
     rating_display.short_description = _('Rating')
@@ -175,8 +176,8 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
         count = queryset.update(is_verified=False)
         self.message_user(request, _(f'{count} providers unmarked as verified.'))
 
-    @admin.action(description=_('Mark selected providers as inactive'))
-    def mark_as_inactive(self, request, queryset):
-        """Mark providers as inactive."""
-        count = queryset.update(is_active=False)
-        self.message_user(request, _(f'{count} providers marked as inactive.'))
+    @admin.action(description=_('Mark selected providers as featured'))
+    def mark_as_featured(self, request, queryset):
+        """Mark providers as featured."""
+        count = queryset.update(is_featured=True)
+        self.message_user(request, _(f'{count} providers marked as featured.'))
