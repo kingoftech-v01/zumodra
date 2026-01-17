@@ -27,6 +27,7 @@ from .models import (
     PublicApplication, TalentPool, TalentPoolMember
 )
 from ats.models import JobPosting, JobCategory, Candidate
+from tenants.models import PublicJobCatalog
 
 
 # ==================== PUBLIC CAREER SITE SERIALIZERS ====================
@@ -1192,3 +1193,100 @@ class TalentPoolDetailSerializer(TalentPoolSerializer):
 
     class Meta(TalentPoolSerializer.Meta):
         fields = TalentPoolSerializer.Meta.fields + ['members']
+
+
+# =============================================================================
+# PUBLIC JOB CATALOG SERIALIZERS
+# =============================================================================
+
+class PublicJobCatalogListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for public job catalog list view.
+    Lightweight for browse/search performance.
+    """
+    
+    tenant_url = serializers.SerializerMethodField()
+    public_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PublicJobCatalog
+        fields = [
+            'job_id',
+            'title',
+            'company_name',
+            'location',
+            'job_type',
+            'is_remote',
+            'salary_min',
+            'salary_max',
+            'salary_currency',
+            'show_salary',
+            'category_name',
+            'category_slug',
+            'is_featured',
+            'published_at',
+            'expires_at',
+            'view_count',
+            'application_count',
+            'tenant_url',
+            'public_url',
+        ]
+        
+    def get_tenant_url(self, obj):
+        """Get URL to view job on tenant subdomain"""
+        return obj.get_tenant_job_url()
+    
+    def get_public_url(self, obj):
+        """Get public URL to view job"""
+        return obj.get_public_url()
+
+
+class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for public job catalog detail view.
+    Includes full description and all details.
+    """
+    
+    tenant_url = serializers.SerializerMethodField()
+    public_url = serializers.SerializerMethodField()
+    tenant_name = serializers.CharField(source='tenant.name', read_only=True)
+    tenant_schema = serializers.CharField(source='tenant_schema_name', read_only=True)
+    
+    class Meta:
+        model = PublicJobCatalog
+        fields = [
+            'job_id',
+            'tenant_schema',
+            'tenant_name',
+            'title',
+            'description',
+            'company_name',
+            'company_logo',
+            'location',
+            'job_type',
+            'is_remote',
+            'salary_min',
+            'salary_max',
+            'salary_currency',
+            'show_salary',
+            'category_name',
+            'category_slug',
+            'is_featured',
+            'is_active',
+            'published_at',
+            'expires_at',
+            'view_count',
+            'application_count',
+            'created_at',
+            'updated_at',
+            'tenant_url',
+            'public_url',
+        ]
+        
+    def get_tenant_url(self, obj):
+        """Get URL to view job on tenant subdomain"""
+        return obj.get_tenant_job_url()
+    
+    def get_public_url(self, obj):
+        """Get public URL to view job"""
+        return obj.get_public_url()

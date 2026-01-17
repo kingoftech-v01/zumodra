@@ -1086,3 +1086,187 @@ def bulk_sync_tenant_jobs(tenant_id):
             'errors': error_count,
             'total': jobs.count(),
         }
+
+
+# ==================== PUBLIC JOB CATALOG SYNC ====================
+
+@shared_task(
+    bind=True,
+    name='ats.tasks.sync_job_to_public_catalog',
+    max_retries=3,
+    default_retry_delay=60,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+)
+def sync_job_to_public_catalog(self, job_id):
+    """
+    Async task to sync JobPosting → PublicJobCatalog.
+    
+    Workflow:
+    1. JobPosting created/updated in tenant schema
+    2. Signal triggers this Celery task
+    3. Task fetches JobPosting data
+    4. Denormalizes and syncs to PublicJobCatalog (public schema)
+    5. Makes job browsable by public users across all tenants
+    
+    Args:
+        job_id (str): UUID of the JobPosting to sync
+        
+    Returns:
+        dict: Sync result with status and details
+    """
+    from ats.models import JobPosting
+    from core.sync.job_sync import JobCatalogSyncService
+    
+    try:
+        logger.info(f"Syncing job {job_id} to PublicJobCatalog")
+        
+        # Fetch the job
+        try:
+            job = JobPosting.objects.get(id=job_id)
+        except JobPosting.DoesNotExist:
+            logger.warning(f"Job {job_id} not found, skipping sync")
+            return {'status': 'skipped', 'reason': 'job_not_found'}
+        
+        # Check if job should be in public catalog
+        if not job.published_on_career_page or job.status != 'open':
+            logger.info(f"Job {job_id} is not published or not open, removing from catalog")
+            JobCatalogSyncService.remove_job(job_id)
+            return {'status': 'removed', 'reason': 'not_publishable'}
+        
+        # Sync to public catalog
+        catalog_entry = JobCatalogSyncService.sync_job(job)
+        
+        logger.info(f"Successfully synced job {job_id} to PublicJobCatalog (entry_id={catalog_entry.id})")
+        
+        return {
+            'status': 'success',
+            'job_id': str(job_id),
+            'catalog_entry_id': catalog_entry.id,
+            'title': job.title,
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to sync job {job_id} to PublicJobCatalog: {e}", exc_info=True)
+        raise
+
+
+@shared_task(
+    bind=True,
+    name='ats.tasks.remove_job_from_public_catalog',
+    max_retries=3,
+    default_retry_delay=60,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+)
+def remove_job_from_public_catalog(self, job_id):
+    """
+    Async task to remove job from PublicJobCatalog.
+    
+    Triggered when:
+    - Job is deleted
+    - Job status changed to non-open (closed, filled, cancelled)
+    - Job unpublished from career page
+    
+    Args:
+        job_id (str): UUID of the job to remove
+        
+    Returns:
+        dict: Removal result
+    """
+    from core.sync.job_sync import JobCatalogSyncService
+    
+    try:
+        logger.info(f"Removing job {job_id} from PublicJobCatalog")
+        
+        deleted_count = JobCatalogSyncService.remove_job(job_id)
+        
+        if deleted_count > 0:
+            logger.info(f"Successfully removed job {job_id} from PublicJobCatalog")
+            return {'status': 'success', 'job_id': str(job_id), 'deleted_count': deleted_count}
+        else:
+            logger.warning(f"Job {job_id} not found in PublicJobCatalog")
+            return {'status': 'not_found', 'job_id': str(job_id)}
+            
+    except Exception as e:
+        logger.error(f"Failed to remove job {job_id} from PublicJobCatalog: {e}", exc_info=True)
+        raise
+
+
+@shared_task(
+    bind=True,
+    name='ats.tasks.sync_all_jobs_to_public_catalog',
+    max_retries=2,
+    default_retry_delay=300,
+    soft_time_limit=3600,
+)
+def sync_all_jobs_to_public_catalog(self, tenant_schema_name=None):
+    """
+    Bulk sync all jobs to PublicJobCatalog.
+    
+    This task can be run:
+    - For a specific tenant (provide tenant_schema_name)
+    - For all tenants (leave tenant_schema_name=None)
+    
+    Used for:
+    - Initial migration/setup
+    - Periodic full sync (scheduled via celery beat)
+    - Manual reconciliation after data issues
+    
+    Args:
+        tenant_schema_name (str, optional): Specific tenant to sync, or None for all tenants
+        
+    Returns:
+        dict: Aggregate statistics across all tenants synced
+    """
+    from django_tenants.utils import get_tenant_model
+    from core.sync.job_sync import JobCatalogSyncService
+    
+    try:
+        if tenant_schema_name:
+            # Sync specific tenant
+            logger.info(f"Starting bulk sync for tenant: {tenant_schema_name}")
+            stats = JobCatalogSyncService.sync_all_jobs_for_tenant(tenant_schema_name)
+            logger.info(f"Bulk sync complete for {tenant_schema_name}: {stats}")
+            return {tenant_schema_name: stats}
+        else:
+            # Sync all tenants
+            logger.info("Starting bulk sync for ALL tenants")
+            
+            tenants = get_tenant_model().objects.exclude(schema_name='public')
+            all_stats = {}
+            
+            for tenant in tenants:
+                try:
+                    logger.info(f"Syncing tenant: {tenant.schema_name}")
+                    stats = JobCatalogSyncService.sync_all_jobs_for_tenant(tenant.schema_name)
+                    all_stats[tenant.schema_name] = stats
+                except Exception as e:
+                    logger.error(f"Failed to sync tenant {tenant.schema_name}: {e}")
+                    all_stats[tenant.schema_name] = {'error': str(e)}
+            
+            # Calculate totals
+            total_synced = sum(s.get('synced', 0) for s in all_stats.values())
+            total_failed = sum(s.get('failed', 0) for s in all_stats.values())
+            total_removed = sum(s.get('removed', 0) for s in all_stats.values())
+            
+            logger.info(
+                f"Bulk sync complete for all tenants: "
+                f"{total_synced} synced, {total_failed} failed, {total_removed} removed"
+            )
+            
+            return {
+                'tenants': all_stats,
+                'totals': {
+                    'synced': total_synced,
+                    'failed': total_failed,
+                    'removed': total_removed,
+                }
+            }
+            
+    except SoftTimeLimitExceeded:
+        logger.error("Bulk sync task exceeded time limit")
+        raise
+    except Exception as e:
+        logger.error(f"Bulk sync task failed: {e}", exc_info=True)
+        raise

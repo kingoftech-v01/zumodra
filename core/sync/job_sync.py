@@ -1,180 +1,177 @@
 """
-Job sync service for PublicJobCatalog.
+Job Catalog Sync Service
 
-Handles bidirectional synchronization between JobPosting (tenant schemas)
-and PublicJobCatalog (public schema) for the careers page.
+Synchronizes JobPosting data from tenant schemas to PublicJobCatalog (public schema).
 """
 
 import logging
-from typing import Optional
-
-from core.sync.base import PublicSyncService
+from django.db import connection
+from django_tenants.utils import get_tenant_model
 
 logger = logging.getLogger(__name__)
 
 
-class JobPublicSyncService(PublicSyncService):
+class JobCatalogSyncService:
     """
     Sync service for JobPosting → PublicJobCatalog.
 
-    Sync Conditions:
-        - published_on_career_page = True
-        - is_internal_only = False
-        - status = 'open'
-
-    Field Mapping:
-        - Denormalizes 26 safe fields from JobPosting
-        - Conditionally includes salary (only if show_salary=True)
-        - Excludes sensitive fields (hiring manager, internal notes, etc.)
-        - Sanitizes HTML in description fields
-
-    Usage:
-        sync_service = JobPublicSyncService()
-
-        # Check if job should sync
-        if sync_service.should_sync(job):
-            # Sync to public catalog
-            catalog_entry = sync_service.sync_to_public(job)
-
-        # Remove from catalog
-        sync_service.remove_from_public(job)
+    Handles denormalization of tenant job data to public catalog for
+    cross-tenant browsing without schema context.
     """
 
-    def __init__(self):
-        """Initialize with model and mapping configuration."""
-        # Import here to avoid circular imports
+    @classmethod
+    def sync_job(cls, job_posting):
+        """
+        Sync a single JobPosting to PublicJobCatalog.
+
+        Args:
+            job_posting: JobPosting instance from tenant schema
+
+        Returns:
+            PublicJobCatalog instance (created or updated)
+        """
         from tenants.models import PublicJobCatalog
+
+        try:
+            # Get current tenant
+            tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+
+            # Prepare denormalized data
+            data = {
+                'tenant_schema_name': tenant.schema_name,
+                'tenant': tenant,
+                'title': job_posting.title,
+                'description': job_posting.description,
+                'location': job_posting.location or '',
+                'job_type': job_posting.job_type or 'full_time',
+                'is_remote': job_posting.remote_work_allowed if hasattr(job_posting, 'remote_work_allowed') else False,
+                'salary_min': job_posting.salary_min,
+                'salary_max': job_posting.salary_max,
+                'salary_currency': job_posting.salary_currency if hasattr(job_posting, 'salary_currency') else 'USD',
+                'show_salary': job_posting.show_salary if hasattr(job_posting, 'show_salary') else True,
+                'company_name': tenant.name,
+                'is_active': job_posting.status == 'open',
+                'published_at': job_posting.created_at,
+                'expires_at': job_posting.expires_at if hasattr(job_posting, 'expires_at') else None,
+            }
+
+            # Add category information if available
+            if hasattr(job_posting, 'category') and job_posting.category:
+                data['category_name'] = job_posting.category.name
+                data['category_slug'] = job_posting.category.slug
+
+            # Check if job has public_listing relationship
+            if hasattr(job_posting, 'public_listing'):
+                listing = job_posting.public_listing
+                data['is_featured'] = listing.is_featured if hasattr(listing, 'is_featured') else False
+
+            # Update or create in public catalog
+            catalog_entry, created = PublicJobCatalog.objects.update_or_create(
+                job_id=job_posting.id,
+                defaults=data
+            )
+
+            action = "created" if created else "updated"
+            logger.info(
+                f"PublicJobCatalog {action}: {job_posting.title} "
+                f"(job_id={job_posting.id}, tenant={tenant.schema_name})"
+            )
+
+            return catalog_entry
+
+        except Exception as e:
+            logger.error(
+                f"Failed to sync job {job_posting.id} to PublicJobCatalog: {e}",
+                exc_info=True
+            )
+            raise
+
+    @classmethod
+    def remove_job(cls, job_id):
+        """
+        Remove a job from PublicJobCatalog.
+
+        Args:
+            job_id: UUID of the job to remove
+
+        Returns:
+            int: Number of entries deleted
+        """
+        from tenants.models import PublicJobCatalog
+
+        try:
+            deleted_count, _ = PublicJobCatalog.objects.filter(job_id=job_id).delete()
+
+            if deleted_count > 0:
+                logger.info(f"Removed job {job_id} from PublicJobCatalog")
+            else:
+                logger.warning(f"Job {job_id} not found in PublicJobCatalog")
+
+            return deleted_count
+
+        except Exception as e:
+            logger.error(
+                f"Failed to remove job {job_id} from PublicJobCatalog: {e}",
+                exc_info=True
+            )
+            raise
+
+    @classmethod
+    def sync_all_jobs_for_tenant(cls, tenant_schema_name):
+        """
+        Sync all active jobs for a specific tenant.
+
+        Args:
+            tenant_schema_name: Schema name of the tenant
+
+        Returns:
+            dict: Statistics (synced, failed, removed)
+        """
         from ats.models import JobPosting
+        from django_tenants.utils import schema_context
 
-        self.public_model = PublicJobCatalog
-        self.tenant_model = JobPosting
+        stats = {'synced': 0, 'failed': 0, 'removed': 0}
 
-        # Field mapping: public_field -> source (field name or callable)
-        self.field_mapping = {
-            # Identity
-            'uuid': 'uuid',
-            'job_uuid': 'uuid',
-
-            # Basic Job Info
-            'title': 'title',
-            'slug': 'slug',
-            'reference_code': 'reference_code',
-
-            # Category (denormalized)
-            'category_name': lambda job: job.category.name if job.category else '',
-            'category_slug': lambda job: job.category.slug if job.category else '',
-
-            # Classification
-            'job_type': 'job_type',
-            'experience_level': 'experience_level',
-            'remote_policy': 'remote_policy',
-
-            # Location
-            'location_city': 'location_city',
-            'location_state': 'location_state',
-            'location_country': 'location_country',
-            'location_coordinates': 'location_coordinates',
-
-            # Descriptions (will be HTML sanitized)
-            'description': 'description',
-            'responsibilities': 'responsibilities',
-            'requirements': 'requirements',
-            'nice_to_have': 'nice_to_have',
-            'benefits': 'benefits',
-
-            # Compensation (conditional on show_salary)
-            'salary_min': lambda job: job.salary_min if job.show_salary else None,
-            'salary_max': lambda job: job.salary_max if job.show_salary else None,
-            'salary_currency': 'salary_currency',
-            'salary_period': 'salary_period',
-            'show_salary': 'show_salary',
-
-            # Skills (ArrayField in JobPosting, JSONField in catalog)
-            'required_skills': lambda job: list(job.required_skills) if job.required_skills else [],
-            'preferred_skills': lambda job: list(job.preferred_skills) if job.preferred_skills else [],
-
-            # Hiring Details
-            'positions_count': 'positions_count',
-            'team': 'team',
-
-            # Company Info (from tenant)
-            'company_name': lambda job: job.tenant.name if job.tenant else '',
-            'company_logo_url': lambda job: job.tenant.logo.url if (job.tenant and job.tenant.logo) else '',
-
-            # Visibility
-            'is_featured': 'is_featured',
-
-            # Deadlines
-            'application_deadline': 'application_deadline',
-            'published_at': lambda job: job.published_at or job.created_at,
-
-            # SEO
-            'meta_title': 'meta_title',
-            'meta_description': 'meta_description',
-        }
-
-        # Sync conditions - ALL must be True for sync to happen
-        self.sync_conditions = [
-            lambda job: getattr(job, 'published_on_career_page', False) == True,
-            lambda job: getattr(job, 'is_internal_only', True) == False,
-            lambda job: getattr(job, 'status', None) == 'open',
-        ]
-
-        # Call parent init for validation
-        super().__init__()
-
-    def sync_to_public(self, instance, created: bool = False):
-        """
-        Override to add custom post-sync actions.
-
-        Updates JobPosting with sync status metadata after successful sync.
-        """
-        catalog_entry = super().sync_to_public(instance, created)
-
-        if catalog_entry:
-            # Update source JobPosting with sync metadata
-            # Use update() instead of save() to avoid triggering signals again
-            try:
-                from ats.models import JobPosting
-                from django.utils import timezone
-
-                JobPosting.objects.filter(pk=instance.pk).update(
-                    # Assuming these fields exist (will be added in migration)
-                    # published_to_catalog=True,
-                    # catalog_synced_at=timezone.now(),
-                )
-                logger.debug(f"Updated sync metadata for job {instance.uuid}")
-
-            except Exception as e:
-                # Non-critical - sync was successful even if metadata update failed
-                logger.warning(
-                    f"Failed to update sync metadata for job {instance.uuid}: {e}"
+        try:
+            with schema_context(tenant_schema_name):
+                # Get all jobs that should be in public catalog
+                active_jobs = JobPosting.objects.filter(
+                    status='open',
+                    published_on_career_page=True
                 )
 
-        return catalog_entry
+                for job in active_jobs:
+                    try:
+                        cls.sync_job(job)
+                        stats['synced'] += 1
+                    except Exception as e:
+                        logger.error(f"Failed to sync job {job.id}: {e}")
+                        stats['failed'] += 1
 
-    def remove_from_public(self, instance) -> int:
-        """
-        Override to add custom post-removal actions.
+                # Get IDs of jobs that should be in catalog
+                active_job_ids = set(active_jobs.values_list('id', flat=True))
 
-        Updates JobPosting sync status after successful removal.
-        """
-        deleted_count = super().remove_from_public(instance)
-
-        if deleted_count > 0:
-            # Update source JobPosting
-            try:
-                from ats.models import JobPosting
-
-                JobPosting.objects.filter(pk=instance.pk).update(
-                    # published_to_catalog=False,
-                    # catalog_synced_at=None,
-                )
-                logger.debug(f"Cleared sync metadata for job {instance.uuid}")
-
-            except Exception as e:
-                logger.warning(
-                    f"Failed to clear sync metadata for job {instance.uuid}: {e}"
+                # Remove jobs that are no longer active/published
+                from tenants.models import PublicJobCatalog
+                catalog_entries = PublicJobCatalog.objects.filter(
+                    tenant_schema_name=tenant_schema_name
                 )
 
-        return deleted_count
+                for entry in catalog_entries:
+                    if entry.job_id not in active_job_ids:
+                        entry.delete()
+                        stats['removed'] += 1
+
+            logger.info(
+                f"Sync complete for tenant {tenant_schema_name}: "
+                f"{stats['synced']} synced, {stats['failed']} failed, {stats['removed']} removed"
+            )
+
+        except Exception as e:
+            logger.error(
+                f"Failed to sync jobs for tenant {tenant_schema_name}: {e}",
+                exc_info=True
+            )
+            raise
+
+        return stats

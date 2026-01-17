@@ -139,71 +139,89 @@ class CareerPagePublicView(CORSMixin, generics.RetrieveAPIView):
 class PublicJobListingListView(CORSMixin, generics.ListAPIView):
     """
     Public job listing list view.
-    Lists all active, published job listings.
+    Lists all active, published jobs from PublicJobCatalog.
 
     GET /api/careers/jobs/
-    GET /api/careers/jobs/?category=1&location=Montreal&job_type=full_time
+    GET /api/careers/jobs/?category=engineering&location=Remote&job_type=full_time
     """
-    serializer_class = JobListingPublicSerializer
+    from tenants.models import PublicJobCatalog
+    from careers.serializers import PublicJobCatalogListSerializer
+
+    serializer_class = PublicJobCatalogListSerializer
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_class = PublicJobListingFilter
-    search_fields = ['job__title', 'job__description']
-    ordering_fields = ['published_at', 'is_featured']
-    ordering = ['-is_featured', '-feature_priority', '-published_at']
+    search_fields = ['title', 'description', 'company_name']
+    ordering_fields = ['published_at', 'is_featured', 'view_count']
+    ordering = ['-is_featured', '-published_at']
     allow_cors = True
 
     def get_queryset(self):
-        """Return only active, published job listings."""
+        """Return only active, published jobs from public catalog."""
+        from tenants.models import PublicJobCatalog
         now = timezone.now()
-        return JobListing.objects.filter(
-            job__status='open',
-            job__published_on_career_page=True,
-            published_at__isnull=False,
+
+        queryset = PublicJobCatalog.objects.filter(
+            is_active=True,
+            published_at__lte=now
         ).exclude(
             expires_at__lt=now
-        ).select_related(
-            'job', 'job__category'
-        )
+        ).select_related('tenant')
+
+        # Apply filters from query params
+        job_type = self.request.query_params.get('job_type')
+        if job_type:
+            queryset = queryset.filter(job_type=job_type)
+
+        location = self.request.query_params.get('location')
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category_slug=category)
+
+        is_remote = self.request.query_params.get('remote')
+        if is_remote and is_remote.lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(is_remote=True)
+
+        return queryset
 
 
 class PublicJobListingDetailView(CORSMixin, generics.RetrieveAPIView):
     """
     Public job listing detail view.
-    Returns detailed job information with application form config.
+    Returns detailed job information from PublicJobCatalog.
     Increments view count on access.
 
-    GET /api/careers/jobs/<id>/
-    GET /api/careers/jobs/slug/<custom_slug>/
+    GET /api/careers/jobs/<job_id>/
     """
-    serializer_class = JobListingDetailPublicSerializer
+    from tenants.models import PublicJobCatalog
+    from careers.serializers import PublicJobCatalogDetailSerializer
+
+    serializer_class = PublicJobCatalogDetailSerializer
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PublicViewThrottle]
-    lookup_field = 'pk'
+    lookup_field = 'job_id'
     allow_cors = True
 
     def get_queryset(self):
-        """Return only active, published job listings."""
+        """Return only active, published jobs from public catalog."""
+        from tenants.models import PublicJobCatalog
         now = timezone.now()
-        return JobListing.objects.filter(
-            job__status='open',
-            job__published_on_career_page=True,
-            published_at__isnull=False,
+        return PublicJobCatalog.objects.filter(
+            is_active=True,
+            published_at__lte=now
         ).exclude(
             expires_at__lt=now
-        ).select_related(
-            'job', 'job__category'
-        )
+        ).select_related('tenant')
 
     def retrieve(self, request, *args, **kwargs):
         """Increment view count on job detail access."""
         instance = self.get_object()
 
-        # Increment view count (using F() to avoid race conditions)
-        JobListing.objects.filter(pk=instance.pk).update(
-            view_count=F('view_count') + 1
-        )
+        # Increment view count atomically
+        instance.increment_view_count()
         instance.refresh_from_db()
 
         # Track UTM parameters if provided

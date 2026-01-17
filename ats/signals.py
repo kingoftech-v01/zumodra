@@ -1,159 +1,104 @@
 """
-ATS Signals - Automatic actions for ATS events.
+ATS Signals
+
+Django signals for ATS models to trigger async tasks and sync operations.
 """
 
+import logging
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
-from django.utils import timezone
-from django.utils.text import slugify
-import uuid
-
-from .models import JobPosting, Application, ApplicationActivity, Interview
-
-
-@receiver(pre_save, sender=JobPosting)
-def generate_job_reference_code(sender, instance, **kwargs):
-    """Generate unique reference code for new jobs."""
-    if not instance.reference_code:
-        # Format: JOB-YYYYMM-XXXX
-        date_part = timezone.now().strftime('%Y%m')
-        random_part = uuid.uuid4().hex[:4].upper()
-        instance.reference_code = f"JOB-{date_part}-{random_part}"
-
-    if not instance.slug:
-        base_slug = slugify(instance.title)[:200]
-        instance.slug = f"{base_slug}-{instance.reference_code.lower()}"
-
-
-@receiver(post_save, sender=Application)
-def log_application_created(sender, instance, created, **kwargs):
-    """Log when a new application is created."""
-    if created:
-        ApplicationActivity.objects.create(
-            application=instance,
-            activity_type=ApplicationActivity.ActivityType.CREATED,
-            notes=f"Applied via {instance.candidate.source or 'direct'}"
-        )
-
-
-@receiver(post_save, sender=Application)
-def update_candidate_last_activity(sender, instance, **kwargs):
-    """Update candidate's last activity timestamp."""
-    instance.candidate.last_activity_at = timezone.now()
-    instance.candidate.save(update_fields=['last_activity_at'])
-
-
-@receiver(post_save, sender=Interview)
-def log_interview_scheduled(sender, instance, created, **kwargs):
-    """Log when an interview is scheduled."""
-    if created:
-        ApplicationActivity.objects.create(
-            application=instance.application,
-            activity_type=ApplicationActivity.ActivityType.INTERVIEW_SCHEDULED,
-            performed_by=instance.organizer,
-            new_value=instance.title,
-            metadata={
-                'interview_type': instance.interview_type,
-                'scheduled_start': instance.scheduled_start.isoformat(),
-                'scheduled_end': instance.scheduled_end.isoformat(),
-            }
-        )
-
-
-# ==================== Public Catalog Sync Signals ====================
-
-from django.db import connection
-import logging
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=JobPosting)
-def sync_job_to_public_catalog(sender, instance, created, **kwargs):
+# ==================== JOB POSTING SIGNALS ====================
+
+@receiver(post_save, sender='ats.JobPosting')
+def sync_job_to_public_catalog_on_save(sender, instance, created, **kwargs):
     """
     Trigger async Celery task to sync JobPosting to PublicJobCatalog.
-
-    This signal fires every time a JobPosting is saved. It queues an async
-    task that will:
-    1. Check if job meets sync conditions (published, not internal, open)
-    2. Extract safe fields and denormalize data
-    3. Update or create entry in PublicJobCatalog (public schema)
-
-    Args:
-        sender: JobPosting model class
-        instance: JobPosting instance being saved
-        created: Boolean indicating if this is a new record
-        **kwargs: Additional signal arguments
+    
+    Workflow:
+    1. JobPosting created/updated in tenant schema  
+    2. Signal fires after save
+    3. Celery task queued to sync data
+    4. Update or create entry in PublicJobCatalog (public schema)
+    5. Job now browsable by public users
+    
+    Only syncs if:
+    - Job is open (status='open')
+    - Job is published on career page (published_on_career_page=True)
     """
-    # Prevent infinite loops from update_fields
-    if kwargs.get('update_fields') and 'synced_at' in kwargs.get('update_fields', []):
-        return
-
-    # Get schema name (default to 'public' when django-tenants not active)
-    schema_name = getattr(connection, 'schema_name', 'public')
-
-    # Validate schema (prevent triggering from public schema)
-    if schema_name == 'public':
-        logger.warning(
-            "JobPosting signal fired in public schema - skipping sync. "
-            "This should not happen in normal operation."
-        )
-        return
-
-    # Import here to avoid circular imports
-    from ats.tasks import sync_job_to_catalog_task
-
-    # Queue async Celery task
-    try:
-        sync_job_to_catalog_task.delay(
-            job_uuid=str(instance.uuid),
-            tenant_schema=schema_name,
-            tenant_id=instance.tenant_id,
-        )
-        logger.debug(
-            f"Queued sync task for job {instance.uuid} from {schema_name}"
-        )
-    except Exception as e:
-        logger.error(
-            f"Failed to queue sync task for job {instance.uuid}: {e}",
-            exc_info=True
-        )
+    from ats.tasks import sync_job_to_public_catalog, remove_job_from_public_catalog
+    
+    # Use on_commit to ensure transaction completes before triggering task
+    def trigger_sync():
+        try:
+            # Check if job should be in public catalog
+            should_publish = (
+                instance.published_on_career_page and 
+                instance.status == 'open'
+            )
+            
+            if should_publish:
+                logger.info(
+                    f"Queuing sync for job {instance.id} ({instance.title}) to PublicJobCatalog"
+                )
+                sync_job_to_public_catalog.delay(str(instance.id))
+            else:
+                logger.info(
+                    f"Job {instance.id} not publishable, removing from PublicJobCatalog if present"
+                )
+                remove_job_from_public_catalog.delay(str(instance.id))
+                
+        except Exception as e:
+            logger.error(f"Failed to queue job sync task: {e}", exc_info=True)
+    
+    transaction.on_commit(trigger_sync)
 
 
-@receiver(post_delete, sender=JobPosting)
-def remove_job_from_catalog(sender, instance, **kwargs):
+@receiver(post_delete, sender='ats.JobPosting')
+def remove_job_from_public_catalog_on_delete(sender, instance, **kwargs):
     """
     Trigger async Celery task to remove job from PublicJobCatalog.
-
-    Called when a JobPosting is deleted from tenant schema.
-    Ensures corresponding entry is removed from public catalog.
-
-    Args:
-        sender: JobPosting model class
-        instance: JobPosting instance being deleted
-        **kwargs: Additional signal arguments
+    
+    When a JobPosting is deleted from tenant schema, remove it from
+    the public catalog so it's no longer browsable.
     """
-    # Import here to avoid circular imports
-    from ats.tasks import remove_job_from_catalog_task
-
-    # Get schema name (default to 'public' when django-tenants not active)
-    schema_name = getattr(connection, 'schema_name', 'public')
-
-    # Skip if in public schema (shouldn't happen normally)
-    if schema_name == 'public':
-        return
-
-    # Queue async removal task
+    from ats.tasks import remove_job_from_public_catalog
+    
     try:
-        remove_job_from_catalog_task.delay(
-            job_uuid=str(instance.uuid),
-            tenant_schema=schema_name,
-        )
-        logger.debug(
-            f"Queued removal task for job {instance.uuid} from {schema_name}"
-        )
+        logger.info(f"Queuing removal of job {instance.id} from PublicJobCatalog")
+        remove_job_from_public_catalog.delay(str(instance.id))
     except Exception as e:
-        logger.error(
-            f"Failed to queue removal task for job {instance.uuid}: {e}",
-            exc_info=True
-        )
+        logger.error(f"Failed to queue job removal task: {e}", exc_info=True)
+
+
+# ==================== APPLICATION SIGNALS ====================
+
+@receiver(post_save, sender='ats.Application')
+def increment_public_job_application_count(sender, instance, created, **kwargs):
+    """
+    Increment application_count on PublicJobCatalog when new application created.
+    
+    This keeps the public catalog metrics in sync with actual application activity.
+    """
+    if created:
+        def update_count():
+            try:
+                from tenants.models import PublicJobCatalog
+                
+                # Find the catalog entry for this job
+                catalog_entry = PublicJobCatalog.objects.filter(
+                    job_id=instance.job_id
+                ).first()
+                
+                if catalog_entry:
+                    catalog_entry.increment_application_count()
+                    logger.debug(f"Incremented application count for job {instance.job_id}")
+                    
+            except Exception as e:
+                logger.error(f"Failed to update public catalog application count: {e}")
+        
+        transaction.on_commit(update_count)

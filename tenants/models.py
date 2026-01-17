@@ -1651,3 +1651,121 @@ class PublicProviderCatalog(models.Model):
         if not self.skills_data:
             return []
         return [skill.get('name', '') for skill in self.skills_data if skill.get('name')]
+
+# =============================================================================
+# PUBLIC JOB CATALOG
+# =============================================================================
+
+class PublicJobCatalog(models.Model):
+    """
+    Denormalized public job catalog for cross-tenant browsing.
+    Synced from tenant JobPostings via Celery tasks.
+    
+    This model exists in the public schema and aggregates jobs from all tenants,
+    enabling public users to browse jobs without tenant context.
+    """
+    
+    # Reference to tenant schema job
+    job_id = models.UUIDField(unique=True, db_index=True, help_text=_('UUID of JobPosting in tenant schema'))
+    tenant_schema_name = models.CharField(max_length=100, db_index=True, help_text=_('Tenant schema where job originates'))
+    tenant = models.ForeignKey(
+        'Tenant',
+        on_delete=models.CASCADE,
+        related_name='public_jobs',
+        help_text=_('Tenant that owns this job')
+    )
+    
+    # Denormalized job fields
+    title = models.CharField(max_length=200, db_index=True)
+    description = models.TextField()
+    location = models.CharField(max_length=200, blank=True, db_index=True)
+    
+    # Job type
+    job_type = models.CharField(
+        max_length=50,
+        db_index=True,
+        default='full_time',
+        help_text=_('full_time, part_time, contract, temporary, internship')
+    )
+    
+    # Remote work
+    is_remote = models.BooleanField(default=False, db_index=True)
+    
+    # Salary information
+    salary_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    salary_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    salary_currency = models.CharField(max_length=3, default='USD')
+    show_salary = models.BooleanField(default=True)
+    
+    # Company information
+    company_name = models.CharField(max_length=200, db_index=True)
+    company_logo = models.CharField(max_length=200, blank=True)
+    
+    # Category/Department
+    category_name = models.CharField(max_length=100, blank=True, db_index=True)
+    category_slug = models.SlugField(max_length=100, blank=True, db_index=True)
+    
+    # Publishing control
+    is_active = models.BooleanField(default=True, db_index=True)
+    is_featured = models.BooleanField(default=False, db_index=True)
+    published_at = models.DateTimeField(db_index=True)
+    expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    
+    # Engagement metrics
+    view_count = models.PositiveIntegerField(default=0)
+    application_count = models.PositiveIntegerField(default=0)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    synced_at = models.DateTimeField(auto_now=True, help_text=_('Last sync from tenant schema'))
+    
+    class Meta:
+        verbose_name = _('Public Job Catalog Entry')
+        verbose_name_plural = _('Public Job Catalog')
+        db_table = 'tenants_publicjobcatalog'
+        ordering = ['-is_featured', '-published_at']
+        indexes = [
+            models.Index(fields=['is_active', 'published_at'], name='pjcat_active_pub'),
+            models.Index(fields=['tenant_schema_name', 'is_active'], name='pjcat_tenant_active'),
+            models.Index(fields=['job_type', 'is_active'], name='pjcat_type_active'),
+            models.Index(fields=['location', 'is_active'], name='pjcat_loc_active'),
+            models.Index(fields=['is_remote', 'is_active'], name='pjcat_remote_active'),
+            models.Index(fields=['category_slug', 'is_active'], name='pjcat_cat_active'),
+            models.Index(fields=['-is_featured', '-published_at'], name='pjcat_featured'),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tenant_schema_name', 'job_id'],
+                name='unique_job_per_tenant_schema'
+            )
+        ]
+    
+    def __str__(self):
+        return f"{self.title} - {self.company_name}"
+    
+    def get_tenant_job_url(self):
+        """
+        Generate URL to view job in tenant context.
+        Returns absolute URL to job detail page on tenant subdomain.
+        """
+        domain = self.tenant.get_primary_domain()
+        if domain:
+            return f"https://{domain.domain}/careers/jobs/{self.job_id}/"
+        return None
+    
+    def get_public_url(self):
+        """
+        Generate public URL to view job details.
+        """
+        return f"/careers/jobs/{self.job_id}/"
+    
+    def increment_view_count(self):
+        """Increment view count atomically"""
+        from django.db.models import F
+        PublicJobCatalog.objects.filter(pk=self.pk).update(view_count=F('view_count') + 1)
+    
+    def increment_application_count(self):
+        """Increment application count atomically"""
+        from django.db.models import F
+        PublicJobCatalog.objects.filter(pk=self.pk).update(application_count=F('application_count') + 1)
