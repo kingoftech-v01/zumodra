@@ -200,6 +200,9 @@ def process_single_application(self, application_id):
     """
     Process a single public application immediately.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Args:
         application_id: ID of the PublicApplication
 
@@ -207,6 +210,12 @@ def process_single_application(self, application_id):
         dict: Processing result
     """
     from careers.models import PublicApplication
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping single application processing in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         public_app = PublicApplication.objects.get(id=application_id)
@@ -260,6 +269,9 @@ def update_job_view_counts(self):
     """
     Aggregate and update job view counts.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Processes view tracking data and updates
     JobListing view counts for analytics.
 
@@ -268,6 +280,12 @@ def update_job_view_counts(self):
     """
     from careers.models import JobListing, JobView
     from django.db.models import Count
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping job view counts update in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()
@@ -321,6 +339,9 @@ def track_job_view(self, job_listing_id, visitor_data=None):
     """
     Track a single job view asynchronously.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Args:
         job_listing_id: ID of the JobListing
         visitor_data: Optional dict with visitor information
@@ -329,6 +350,12 @@ def track_job_view(self, job_listing_id, visitor_data=None):
         dict: Tracking result
     """
     from careers.models import JobListing, JobView
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping job view tracking in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         visitor_data = visitor_data or {}
@@ -367,6 +394,10 @@ def sync_job_listings(self):
     """
     Sync job listings with ATS job postings.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, ATS is in TENANT_APPS.
+    Tables only exist in tenant schemas.
+
     Ensures:
     - New open jobs have listings
     - Closed jobs have listings unpublished
@@ -377,6 +408,12 @@ def sync_job_listings(self):
     """
     from careers.models import JobListing, CareerPage
     from ats.models import JobPosting
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping job listings sync in public schema (careers and ats are TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()
@@ -457,6 +494,9 @@ def generate_sitemap(self):
     """
     Regenerate career page sitemap.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Creates an XML sitemap for all public job listings
     to improve SEO.
 
@@ -466,7 +506,13 @@ def generate_sitemap(self):
     from careers.models import JobListing, CareerPage
     from django.contrib.sitemaps import Sitemap
     from django.urls import reverse
+    from django.db import connection
     import os
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping sitemap generation in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()
@@ -549,6 +595,9 @@ def update_career_page_stats(self, career_page_id=None):
     """
     Update career page statistics.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Args:
         career_page_id: Optional specific career page ID
 
@@ -556,6 +605,12 @@ def update_career_page_stats(self, career_page_id=None):
         dict: Update result
     """
     from careers.models import CareerPage, JobListing
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping career page stats update in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()
@@ -607,10 +662,19 @@ def expire_job_listings(self):
     """
     Expire job listings past their expiration date.
 
+    NOTE: This task must run within tenant schema context.
+    Careers app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     Returns:
         dict: Summary of expired listings.
     """
     from careers.models import JobListing
+    from django.db import connection
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping job listings expiration in public schema (careers is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     try:
         now = timezone.now()

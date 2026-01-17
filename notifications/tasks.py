@@ -213,10 +213,22 @@ def process_scheduled_notifications():
     """
     Process all scheduled notifications that are due.
 
+    NOTE: This task must run within tenant schema context.
+    Notifications app is in TENANT_APPS, so tables only exist in tenant schemas.
+
     This task should be run periodically (e.g., every minute) via Celery Beat.
     """
     from .models import ScheduledNotification
     from .services import notification_service
+    from django.db import connection
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # Skip if running in public schema
+    if connection.schema_name == 'public':
+        logger.info("Skipping scheduled notifications processing in public schema (notifications is TENANT_APPS)")
+        return {'status': 'skipped', 'reason': 'public schema'}
 
     now = timezone.now()
 
