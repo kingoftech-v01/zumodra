@@ -1204,10 +1204,12 @@ class PublicJobCatalogListSerializer(serializers.ModelSerializer):
     Serializer for public job catalog list view.
     Lightweight for browse/search performance.
     """
-    
+
     tenant_url = serializers.SerializerMethodField()
     public_url = serializers.SerializerMethodField()
-    
+    location = serializers.SerializerMethodField()
+    is_remote = serializers.SerializerMethodField()
+
     class Meta:
         model = PublicJobCatalog
         fields = [
@@ -1215,30 +1217,53 @@ class PublicJobCatalogListSerializer(serializers.ModelSerializer):
             'title',
             'company_name',
             'location',
+            'location_city',
+            'location_state',
+            'location_country',
             'job_type',
+            'experience_level',
+            'remote_policy',
             'is_remote',
             'salary_min',
             'salary_max',
             'salary_currency',
+            'salary_period',
             'show_salary',
             'category_name',
             'category_slug',
             'is_featured',
             'published_at',
-            'expires_at',
-            'view_count',
-            'application_count',
+            'application_deadline',
             'tenant_url',
             'public_url',
         ]
-        
+
+    def get_location(self, obj):
+        """Get formatted location string"""
+        parts = []
+        if obj.location_city:
+            parts.append(obj.location_city)
+        if obj.location_state:
+            parts.append(obj.location_state)
+        if obj.location_country:
+            parts.append(obj.location_country)
+        return ', '.join(parts) if parts else ''
+
+    def get_is_remote(self, obj):
+        """Check if job is remote-friendly"""
+        return obj.remote_policy in ['remote', 'hybrid', 'flexible']
+
     def get_tenant_url(self, obj):
         """Get URL to view job on tenant subdomain"""
-        return obj.get_tenant_job_url()
-    
+        if hasattr(obj, 'get_tenant_job_url'):
+            return obj.get_tenant_job_url()
+        return None
+
     def get_public_url(self, obj):
         """Get public URL to view job"""
-        return obj.get_public_url()
+        if hasattr(obj, 'get_public_url'):
+            return obj.get_public_url()
+        return f"/careers/jobs/{obj.uuid}/"
 
 
 class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
@@ -1246,47 +1271,83 @@ class PublicJobCatalogDetailSerializer(serializers.ModelSerializer):
     Serializer for public job catalog detail view.
     Includes full description and all details.
     """
-    
+
     tenant_url = serializers.SerializerMethodField()
     public_url = serializers.SerializerMethodField()
     tenant_name = serializers.CharField(source='tenant.name', read_only=True)
     tenant_schema = serializers.CharField(source='tenant_schema_name', read_only=True)
-    
+    location = serializers.SerializerMethodField()
+    is_remote = serializers.SerializerMethodField()
+
     class Meta:
         model = PublicJobCatalog
         fields = [
             'uuid',
+            'job_uuid',
             'tenant_schema',
             'tenant_name',
             'title',
+            'slug',
+            'reference_code',
             'description',
+            'responsibilities',
+            'requirements',
+            'nice_to_have',
+            'benefits',
             'company_name',
-            'company_logo',
+            'company_logo_url',
             'location',
+            'location_city',
+            'location_state',
+            'location_country',
             'job_type',
+            'experience_level',
+            'remote_policy',
             'is_remote',
             'salary_min',
             'salary_max',
             'salary_currency',
+            'salary_period',
             'show_salary',
+            'required_skills',
+            'preferred_skills',
+            'positions_count',
+            'team',
             'category_name',
             'category_slug',
             'is_featured',
-            'is_active',
             'published_at',
-            'expires_at',
-            'view_count',
-            'application_count',
-            'created_at',
-            'updated_at',
+            'application_deadline',
+            'synced_at',
+            'meta_title',
+            'meta_description',
             'tenant_url',
             'public_url',
         ]
-        
+
+    def get_location(self, obj):
+        """Get formatted location string"""
+        parts = []
+        if obj.location_city:
+            parts.append(obj.location_city)
+        if obj.location_state:
+            parts.append(obj.location_state)
+        if obj.location_country:
+            parts.append(obj.location_country)
+        return ', '.join(parts) if parts else ''
+
+    def get_is_remote(self, obj):
+        """Check if job is remote-friendly"""
+        return obj.remote_policy in ['remote', 'hybrid', 'flexible']
+
     def get_tenant_url(self, obj):
         """Get URL to view job on tenant subdomain"""
-        return obj.get_tenant_job_url()
-    
+        if hasattr(obj, 'get_tenant_job_url'):
+            return obj.get_tenant_job_url()
+        return None
+
     def get_public_url(self, obj):
         """Get public URL to view job"""
-        return obj.get_public_url()
+        if hasattr(obj, 'get_public_url'):
+            return obj.get_public_url()
+        return f"/careers/jobs/{obj.uuid}/"
