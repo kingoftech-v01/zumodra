@@ -73,6 +73,10 @@ SHARED_APPS = [
 
     # Blog app (shared - only system admin publishes blog posts)
     'blog',
+
+    # PUBLIC CATALOG APPS (shared - cross-tenant browsing without tenant context)
+    'ats_public',  # Public job catalog for browsing
+    'services_public',  # Public service/provider catalog for marketplace
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)

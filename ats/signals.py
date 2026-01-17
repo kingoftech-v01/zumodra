@@ -30,8 +30,8 @@ def sync_job_to_public_catalog_on_save(sender, instance, created, **kwargs):
     - Job is open (status='open')
     - Job is published on career page (published_on_career_page=True)
     """
-    from ats.tasks import sync_job_to_public_catalog, remove_job_from_public_catalog
-    
+    from ats_public.tasks import sync_job_to_public, remove_job_from_public
+
     # Use on_commit to ensure transaction completes before triggering task
     def trigger_sync():
         try:
@@ -49,12 +49,12 @@ def sync_job_to_public_catalog_on_save(sender, instance, created, **kwargs):
                 logger.info(
                     f"Queuing sync for job {instance.id} ({instance.title}) to PublicJobCatalog (schema: {tenant_schema})"
                 )
-                sync_job_to_public_catalog.delay(str(instance.id), tenant_schema)
+                sync_job_to_public.delay(str(instance.id), tenant_schema)
             else:
                 logger.info(
                     f"Job {instance.id} not publishable, removing from PublicJobCatalog if present (schema: {tenant_schema})"
                 )
-                remove_job_from_public_catalog.delay(str(instance.id), tenant_schema)
+                remove_job_from_public.delay(str(instance.id), tenant_schema)
                 
         except Exception as e:
             logger.error(f"Failed to queue job sync task: {e}", exc_info=True)
@@ -70,13 +70,13 @@ def remove_job_from_public_catalog_on_delete(sender, instance, **kwargs):
     When a JobPosting is deleted from tenant schema, remove it from
     the public catalog so it's no longer browsable.
     """
-    from ats.tasks import remove_job_from_public_catalog
+    from ats_public.tasks import remove_job_from_public
     from django.db import connection
 
     try:
         tenant_schema = connection.schema_name
         logger.info(f"Queuing removal of job {instance.id} from PublicJobCatalog (schema: {tenant_schema})")
-        remove_job_from_public_catalog.delay(str(instance.id), tenant_schema)
+        remove_job_from_public.delay(str(instance.id), tenant_schema)
     except Exception as e:
         logger.error(f"Failed to queue job removal task: {e}", exc_info=True)
 
