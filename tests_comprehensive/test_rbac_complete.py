@@ -26,7 +26,7 @@ from rest_framework import status
 from accounts.models import TenantUser, KYCVerification
 from tenants.models import Tenant
 from configurations.models import Department
-from ats.models import Job, Candidate, Interview
+from ats.models import JobPosting as Job, Candidate, Interview
 from hr_core.models import Employee, TimeOff
 from finance.models import Subscription, Payment
 

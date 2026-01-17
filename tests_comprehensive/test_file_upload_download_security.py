@@ -33,7 +33,7 @@ from rest_framework import status
 
 from tenants.models import Tenant
 from accounts.models import PublicProfile, KYCVerification, Education
-from ats.models import Candidate, Job, Application
+from ats.models import Candidate, JobPosting as Job, Application
 
 User = get_user_model()
 

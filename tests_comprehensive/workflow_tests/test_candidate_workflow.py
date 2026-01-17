@@ -26,8 +26,6 @@ from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 
-from ats.models import (
-    Candidate, Application, Job, Pipeline, PipelineStage,
     Interview, InterviewFeedback, Offer
 )
 from ats.forms import CandidateForm, CandidateBulkImportForm
