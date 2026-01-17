@@ -593,8 +593,8 @@ def send_interview_reminders(self):
 
         for max_ahead, min_ahead, reminder_type in intervals:
             upcoming_interviews = Interview.objects.filter(
-                scheduled_at__gte=now + min_ahead,
-                scheduled_at__lt=now + max_ahead,
+                scheduled_start__gte=now + min_ahead,
+                scheduled_start__lt=now + max_ahead,
                 status='scheduled'
             ).select_related('application', 'application__job')
 
@@ -648,9 +648,9 @@ def _send_interview_reminder(interview, recipient_type, reminder_type, user=None
 
     try:
         html_content = render_to_string(f'emails/interview_reminder_{recipient_type}.html', context)
-        text_content = f"Interview reminder for {job.title} at {interview.scheduled_at}."
+        text_content = f"Interview reminder for {job.title} at {interview.scheduled_start}."
     except Exception:
-        text_content = f"Interview reminder for {job.title} at {interview.scheduled_at}."
+        text_content = f"Interview reminder for {job.title} at {interview.scheduled_start}."
         html_content = f"<p>{text_content}</p>"
 
     send_mail(
