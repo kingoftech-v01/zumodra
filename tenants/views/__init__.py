@@ -18,6 +18,8 @@ from ..tenant_views import (
     BillingPortalView,
     StripeWebhookView,
     FeatureFlagView,
+    submit_ein_verification,
+    get_ein_verification_status,
 )
 
 # Import new wizard views
@@ -37,6 +39,9 @@ __all__ = [
     'BillingPortalView',
     'StripeWebhookView',
     'FeatureFlagView',
+    # View functions
+    'submit_ein_verification',
+    'get_ein_verification_status',
     # New wizard views
     'CompanySetupWizard',
 ]
