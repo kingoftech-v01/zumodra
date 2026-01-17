@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.db.models import Count, Max, Q
+from django.db.models import Count, Max, Q, F
 from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
@@ -49,57 +49,27 @@ def cleanup_old_messages(self):
     Returns:
         dict: Summary of cleanup.
     """
-    from messages_sys.models import Message, Attachment
+    from messages_sys.models import Message
+    # NOTE: Attachment model removed - no longer exists in schema
 
     try:
         now = timezone.now()
-        archive_threshold = now - timedelta(days=730)  # 2 years
-        delete_threshold = now - timedelta(days=1825)  # 5 years
 
-        # Archive old messages
-        messages_to_archive = Message.objects.filter(
-            created_at__lt=archive_threshold,
-            is_archived=False
-        )
+        # DISABLED: Archive feature requires fields that don't exist in Message model
+        # Missing fields: is_archived, archived_at
+        # Attachment model also doesn't exist
+        #
+        # TODO: If archival is needed in the future:
+        # 1. Add is_archived (BooleanField) and archived_at (DateTimeField) to Message model
+        # 2. Create Attachment model or use the existing 'file' FileField
+        # 3. Create and run migration
+        # 4. Then uncomment and update the code below
 
-        archived_count = messages_to_archive.count()
-        messages_to_archive.update(is_archived=True, archived_at=now)
-
-        # Delete very old archived messages
-        messages_to_delete = Message.objects.filter(
-            created_at__lt=delete_threshold,
-            is_archived=True
-        )
-
-        deleted_count = messages_to_delete.count()
-
-        # Log before deletion for audit
-        for msg in messages_to_delete[:100]:  # Log first 100
-            security_logger.info(
-                f"MESSAGE_DELETE: id={msg.id} conversation={msg.conversation_id} "
-                f"created={msg.created_at.isoformat()}"
-            )
-
-        messages_to_delete.delete()
-
-        # Clean up orphaned attachments
-        orphaned_attachments = Attachment.objects.filter(
-            message__isnull=True,
-            created_at__lt=archive_threshold
-        )
-        orphaned_count = orphaned_attachments.count()
-        orphaned_attachments.delete()
-
-        logger.info(
-            f"Message cleanup: archived={archived_count}, deleted={deleted_count}, "
-            f"orphaned_attachments={orphaned_count}"
-        )
+        logger.info("Message cleanup task skipped - archive fields not implemented in model")
 
         return {
-            'status': 'success',
-            'archived_count': archived_count,
-            'deleted_count': deleted_count,
-            'orphaned_attachments_cleaned': orphaned_count,
+            'status': 'skipped',
+            'reason': 'Archive feature not implemented - Message model lacks is_archived/archived_at fields',
             'timestamp': now.isoformat(),
         }
 
@@ -141,14 +111,21 @@ def send_unread_notifications(self):
         unread_threshold = now - timedelta(hours=1)
         notify_cooldown = now - timedelta(hours=24)
 
-        # Find users with unread messages
+        # Find users who have unread messages in their conversations
+        # Note: Message.sender has related_name='sent_messages', so we access via conversations
+        # We exclude messages the user sent themselves
         users_with_unread = User.objects.filter(
-            received_messages__read_at__isnull=True,
-            received_messages__created_at__lt=unread_threshold,
+            conversations__messages__is_read=False,
+            conversations__messages__timestamp__lt=unread_threshold,
+        ).exclude(
+            conversations__messages__sender_id=F('id')  # Exclude messages sent by this user
         ).annotate(
             unread_count=Count(
-                'received_messages',
-                filter=Q(received_messages__read_at__isnull=True)
+                'conversations__messages',
+                filter=Q(
+                    conversations__messages__is_read=False,
+                    conversations__messages__timestamp__lt=unread_threshold
+                ) & ~Q(conversations__messages__sender_id=F('id'))
             )
         ).filter(
             unread_count__gt=0
@@ -247,25 +224,24 @@ def update_conversation_stats(self):
         updated = 0
         for conversation in conversations:
             try:
-                # Calculate message count
+                # Calculate message count (stored in cache, not model field)
                 message_count = conversation.messages.count()
 
                 # Get last message time
-                last_message = conversation.messages.order_by('-created_at').first()
+                last_message = conversation.messages.order_by('-timestamp').first()
 
-                # Update conversation stats
-                conversation.message_count = message_count
+                # Update conversation last_message_at field
+                # NOTE: message_count field removed - doesn't exist in Conversation model
                 if last_message:
-                    conversation.last_message_at = last_message.created_at
+                    conversation.last_message_at = last_message.timestamp
+                    conversation.save(update_fields=['last_message_at', 'updated_at'])
 
-                conversation.save(update_fields=['message_count', 'last_message_at', 'updated_at'])
-
-                # Cache conversation metadata
+                # Cache conversation metadata (message_count stored here instead)
                 cache.set(
                     f"conversation_{conversation.id}:stats",
                     {
                         'message_count': message_count,
-                        'last_message_at': last_message.created_at.isoformat() if last_message else None,
+                        'last_message_at': last_message.timestamp.isoformat() if last_message else None,
                     },
                     timeout=3600
                 )
@@ -536,7 +512,7 @@ def detect_spam_messages(self):
         high_volume_senders = User.objects.annotate(
             recent_message_count=Count(
                 'sent_messages',
-                filter=Q(sent_messages__created_at__gte=check_window)
+                filter=Q(sent_messages__timestamp__gte=check_window)
             )
         ).filter(recent_message_count__gt=50)
 
@@ -548,22 +524,28 @@ def detect_spam_messages(self):
                     f"SPAM_DETECTION: user={sender.id} messages_in_hour={sender.recent_message_count}"
                 )
 
-                # Flag recent messages for review
-                Message.objects.filter(
-                    sender=sender,
-                    created_at__gte=check_window
-                ).update(is_flagged=True, flagged_reason='high_volume')
+                # DISABLED: Flag messages for review
+                # Missing fields: is_flagged, flagged_reason (don't exist in Message model)
+                # TODO: If spam flagging is needed:
+                # 1. Add is_flagged (BooleanField) and flagged_reason (CharField) to Message model
+                # 2. Create and run migration
+                # 3. Then uncomment the code below:
+                # Message.objects.filter(
+                #     sender=sender,
+                #     timestamp__gte=check_window
+                # ).update(is_flagged=True, flagged_reason='high_volume')
 
                 flagged += 1
 
             except Exception as e:
-                logger.error(f"Error flagging spam from user {sender.id}: {e}")
+                logger.error(f"Error logging spam activity from user {sender.id}: {e}")
 
-        logger.info(f"Flagged {flagged} potential spam senders")
+        logger.info(f"Logged {flagged} potential spam senders (flagging disabled - fields not in model)")
 
         return {
-            'status': 'success',
-            'flagged_senders': flagged,
+            'status': 'partial',
+            'logged_senders': flagged,
+            'note': 'Spam detection logged but not flagged - is_flagged/flagged_reason fields not in model',
             'timestamp': now.isoformat(),
         }
 
