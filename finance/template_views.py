@@ -399,25 +399,51 @@ class InvoiceListTemplateView(LoginRequiredMixin, TenantViewMixin, TemplateView)
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        invoices = Invoice.objects.filter(user=user)
+        # Return empty context for public schema users (no tenant)
+        if connection.schema_name == 'public':
+            context.update({
+                'total_invoiced': Decimal('0.00'),
+                'total_paid': Decimal('0.00'),
+                'outstanding': Decimal('0.00'),
+                'current_filters': {
+                    'paid': self.request.GET.get('paid', ''),
+                    'start_date': self.request.GET.get('start_date', ''),
+                    'end_date': self.request.GET.get('end_date', ''),
+                },
+            })
+            return context
 
-        # Summary stats
-        context['total_invoiced'] = invoices.aggregate(
-            total=Sum('amount_due')
-        )['total'] or Decimal('0.00')
-        context['total_paid'] = invoices.filter(paid=True).aggregate(
-            total=Sum('amount_paid')
-        )['total'] or Decimal('0.00')
-        context['outstanding'] = invoices.filter(paid=False).aggregate(
-            total=Sum('amount_due')
-        )['total'] or Decimal('0.00')
+        try:
+            invoices = Invoice.objects.filter(user=user)
 
-        # Filter options
-        context['current_filters'] = {
-            'paid': self.request.GET.get('paid', ''),
-            'start_date': self.request.GET.get('start_date', ''),
-            'end_date': self.request.GET.get('end_date', ''),
-        }
+            # Summary stats
+            context['total_invoiced'] = invoices.aggregate(
+                total=Sum('amount_due')
+            )['total'] or Decimal('0.00')
+            context['total_paid'] = invoices.filter(paid=True).aggregate(
+                total=Sum('amount_paid')
+            )['total'] or Decimal('0.00')
+            context['outstanding'] = invoices.filter(paid=False).aggregate(
+                total=Sum('amount_due')
+            )['total'] or Decimal('0.00')
+
+            # Filter options
+            context['current_filters'] = {
+                'paid': self.request.GET.get('paid', ''),
+                'start_date': self.request.GET.get('start_date', ''),
+                'end_date': self.request.GET.get('end_date', ''),
+            }
+        except ProgrammingError:
+            context.update({
+                'total_invoiced': Decimal('0.00'),
+                'total_paid': Decimal('0.00'),
+                'outstanding': Decimal('0.00'),
+                'current_filters': {
+                    'paid': self.request.GET.get('paid', ''),
+                    'start_date': self.request.GET.get('start_date', ''),
+                    'end_date': self.request.GET.get('end_date', ''),
+                },
+            })
 
         return context
 
