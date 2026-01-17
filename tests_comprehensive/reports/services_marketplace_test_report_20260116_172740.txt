@@ -1,0 +1,85 @@
+SERVICES MARKETPLACE TEST REPORT
+======================================================================
+
+Server: https://zumodra.rhematek-solutions.com
+Test Date: 2026-01-16 17:27:40
+
+SUMMARY:
+Total Tests: 23
+PASS: 16
+FAIL: 0
+WARN: 3
+SKIP: 4
+
+DETAILED RESULTS:
+======================================================================
+
+✅ PASS: GET /services/ - Status Code
+   Details: Status: 200
+
+✅ PASS: Services page content
+   Details: Page contains service-related content
+
+✅ PASS: Search functionality
+   Details: Search form/input detected
+
+✅ PASS: Filter options
+   Details: Found filters: filter, category, price, sort
+
+✅ PASS: Pagination
+   Details: Found pagination indicator: pagination
+
+⚠️ WARN: Service listings
+   Details: No services found (PublicServiceCatalog may be empty)
+
+⏭️ SKIP: Service Detail Test
+   Details: No service UUIDs available to test
+
+✅ PASS: GET /services/providers/ - Status Code
+   Details: Status: 200
+
+✅ PASS: Provider listings page
+   Details: Provider content detected
+
+✅ PASS: Provider search
+   Details: Search functionality detected
+
+✅ PASS: Provider filters
+   Details: Found filters: filter, skill, rating, verified
+
+⚠️ WARN: Provider listings
+   Details: No providers found (PublicProviderCatalog may be empty)
+
+⏭️ SKIP: Provider Profile Test
+   Details: No provider UUIDs available to test
+
+✅ PASS: Service search query
+   Details: Search parameter accepted
+
+✅ PASS: Category filter
+   Details: Category filter accepted
+
+✅ PASS: Price range filter
+   Details: Price filter accepted
+
+✅ PASS: Service sorting
+   Details: Sort parameter accepted
+
+✅ PASS: Provider search query
+   Details: Provider search accepted
+
+✅ PASS: Provider rating filter
+   Details: Rating filter accepted
+
+⚠️ WARN: PublicServiceCatalog populated
+   Details: No services found - catalog may be empty or not synced
+
+⏭️ SKIP: Tenant isolation check
+   Details: Cannot verify without services
+
+✅ PASS: Public browsing (no auth)
+   Details: Services browsable without authentication
+
+⏭️ SKIP: Authentication boundary test
+   Details: Cannot test login redirects without session
+

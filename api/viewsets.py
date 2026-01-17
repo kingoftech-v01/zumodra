@@ -522,13 +522,13 @@ class AppointmentViewSet(SecureTenantViewSet):
 
     Users can only see and manage their own appointments.
     """
-    queryset = Appointment.objects.select_related('user')
+    queryset = Appointment.objects.select_related('client', 'appointment_request')
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated, IsTenantUser, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['status']
-    ordering_fields = ['start_time', 'created_at']
-    search_fields = ['title', 'description']
+    filterset_fields = ['paid']
+    ordering_fields = ['created_at']
+    search_fields = ['address', 'additional_info']
     tenant_field = None  # Appointments linked via user
 
     def get_queryset(self):

@@ -1,0 +1,53 @@
+
+================================================================================
+ZUMODRA LOAD TEST REPORT
+================================================================================
+Test Date: 2026-01-16 19:07:05
+Target URL: https://zumodra.rhematek-solutions.com
+================================================================================
+
+1. CONCURRENT HOMEPAGE ACCESS
+--------------------------------------------------------------------------------
+   Total Requests: 10
+   Success Rate: 0.0%
+   Mean Response: 5.469s
+   P95 Response: 5.709s
+
+2. SUSTAINED LOAD TEST
+--------------------------------------------------------------------------------
+   Total Requests: 377
+   Throughput: 6.24 req/s
+   Success Rate: 0.0%
+   Mean Response: 0.289s
+
+3. ENDPOINT HEALTH
+--------------------------------------------------------------------------------
+   FAIL Homepage: 0.186s
+   FAIL Health Check: 0.189s
+   FAIL About Page: 0.202s
+   FAIL Pricing Page: 0.175s
+   FAIL Contact Page: 0.163s
+   FAIL FAQ Page: 0.182s
+
+4. DATABASE CONNECTION POOL
+--------------------------------------------------------------------------------
+   Requests Processed: 50
+   Success Rate: 0.0%
+   Mean Response: 0.213s
+
+5. RECOMMENDATIONS
+--------------------------------------------------------------------------------
+   CRITICAL: Success rate is very low (<50%). Investigation required:
+      - Check if the server is running
+      - Verify domain DNS resolution
+      - Check firewall rules
+      - Review application error logs
+   SUCCESS: Response times are excellent (<1s)
+
+6. DEMO READINESS ASSESSMENT
+--------------------------------------------------------------------------------
+   WARNING: SYSTEM NEEDS ATTENTION BEFORE DEMO
+   Issues identified:
+      - CRITICAL: Most requests are failing
+
+================================================================================

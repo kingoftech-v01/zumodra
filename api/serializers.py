@@ -156,15 +156,16 @@ class DServiceCommentSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     """Appointment serializer"""
-    user = UserSerializer(read_only=True)
+    client = UserSerializer(read_only=True)
 
     class Meta:
         model = Appointment
         fields = [
-            'id', 'user', 'title', 'description', 'start_time',
-            'end_time', 'status', 'created_at'
+            'id', 'client', 'phone', 'address', 'want_reminder',
+            'additional_info', 'paid', 'amount_to_pay',
+            'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
 
 # ==================== COMPANY SERIALIZERS ====================
