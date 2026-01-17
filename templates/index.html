@@ -229,7 +229,7 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'frontend:dashboard:index' %}" class="button-main bg-white">{% trans "Go to Dashboard" %}</a>
                 {% else %}
-                    <a href="{% url 'account_signup' %}" class="button-main bg-white">{% trans "Sign Up Now" %}</a>
+                    <a href="{% url 'custom_account_u:signup_type_selection' %}" class="button-main bg-white">{% trans "Sign Up Now" %}</a>
                     <a href="{% url 'account_login' %}" class="button-secondary border-white text-white hover:bg-white hover:text-primary">{% trans "Sign In" %}</a>
                 {% endif %}
             </div>

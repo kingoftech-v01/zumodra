@@ -1,0 +1,155 @@
+{
+  "timestamp": "2026-01-16T22:57:20.772590",
+  "tests": [
+    {
+      "test_name": "MailHog Connectivity",
+      "status": "failed",
+      "timestamp": "2026-01-16T22:57:26.146786",
+      "details": {},
+      "error": "MailHog error: HTTPConnectionPool(host='localhost', port=8026): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "MailHog Email Retrieval",
+      "status": "failed",
+      "timestamp": "2026-01-16T22:57:31.160955",
+      "details": {},
+      "error": "HTTPConnectionPool(host='localhost', port=8026): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "MailHog Message Details",
+      "status": "failed",
+      "timestamp": "2026-01-16T22:57:36.164746",
+      "details": {},
+      "error": "HTTPConnectionPool(host='localhost', port=8026): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "MailHog Clear Messages",
+      "status": "warning",
+      "timestamp": "2026-01-16T22:57:41.170857",
+      "details": {},
+      "error": "HTTPConnectionPool(host='localhost', port=8026): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "Django Web Service Connectivity",
+      "status": "failed",
+      "timestamp": "2026-01-16T22:57:46.180716",
+      "details": {},
+      "error": "HTTPConnectionPool(host='localhost', port=8002): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "SMTP Configuration",
+      "status": "warning",
+      "timestamp": "2026-01-16T22:57:51.194201",
+      "details": {},
+      "error": "Could not verify SMTP: HTTPConnectionPool(host='localhost', port=8002): Read timed out. (read timeout=5)"
+    },
+    {
+      "test_name": "Notification API Endpoints",
+      "status": "warning",
+      "timestamp": "2026-01-16T22:58:00.236631",
+      "details": {
+        "message": "Could not verify specific endpoints",
+        "checked": 3
+      }
+    },
+    {
+      "test_name": "Email Backend Verification",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:00.236631",
+      "details": {
+        "supported_backends": [
+          "console",
+          "locmem",
+          "smtp",
+          "filebased"
+        ],
+        "primary_backend": "smtp or console (depends on environment)"
+      }
+    },
+    {
+      "test_name": "Email Content Type Support",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:00.236631",
+      "details": {
+        "supported_types": [
+          "plain_text",
+          "html",
+          "multipart",
+          "with_attachments"
+        ],
+        "content_types": [
+          "text/plain",
+          "text/html",
+          "multipart/alternative",
+          "multipart/mixed"
+        ]
+      }
+    },
+    {
+      "test_name": "Email Tracking Pixels",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:00.236631",
+      "details": {
+        "tracking_features": [
+          "open_tracking",
+          "click_tracking",
+          "unsubscribe_link"
+        ],
+        "url_patterns": [
+          "tracking/pixel/{id}",
+          "tracking/click/{id}",
+          "unsubscribe/{token}"
+        ]
+      }
+    },
+    {
+      "test_name": "Unsubscribe Mechanism",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:06.257161",
+      "details": {
+        "unsubscribe_endpoints_found": false,
+        "endpoints": [
+          "/notifications/unsubscribe",
+          "/api/v1/notifications/unsubscribe"
+        ]
+      }
+    },
+    {
+      "test_name": "Bounce Handling Configuration",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:06.257161",
+      "details": {
+        "bounce_types_supported": [
+          "permanent_bounce",
+          "transient_bounce",
+          "complaint"
+        ],
+        "bounce_handling_configured": true
+      }
+    },
+    {
+      "test_name": "Email Header Support",
+      "status": "passed",
+      "timestamp": "2026-01-16T22:58:06.257161",
+      "details": {
+        "supported_headers": [
+          "from",
+          "to",
+          "subject",
+          "cc",
+          "bcc",
+          "reply_to",
+          "content_type",
+          "list_unsubscribe"
+        ],
+        "total_headers": 8
+      }
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "passed": 6,
+    "failed": 4,
+    "warnings": 3
+  }
+}
