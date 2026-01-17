@@ -68,7 +68,9 @@ python manage.py setup_demo_data --num-jobs 20 --num-candidates 100
 ### Core Apps
 - `accounts/` - Users, KYC, trust scores, authentication
 - `ats/` - **Complete ATS**: jobs (create/edit/duplicate/delete), candidates (profiles/CVs), interviews (schedule/reschedule/cancel/feedback), offers, pipelines, application workflows
+- `ats_public/` - **Public job catalog**: Cross-tenant job browsing (no auth), synced from tenant jobs via signals + Celery
 - `services/` - Marketplace listings, proposals, contracts, escrow
+- `services_public/` - **Public service catalog**: Cross-tenant provider browsing (no auth), synced from tenant services via signals + Celery
 - `hr_core/` - Employees, time-off, onboarding, org charts
 - `finance/` - Payments, subscriptions (Stripe)
 - `messages_sys/` - WebSocket real-time chat
@@ -127,6 +129,15 @@ All URLs use nested namespaces for organization:
 ### Real-Time
 - Django Channels with Redis channel layer
 - WebSocket consumers in `messages_sys/consumers.py`
+
+### Public Catalogs
+- **ats_public** and **services_public** apps in SHARED_APPS (public schema)
+- Denormalized data for fast cross-tenant browsing without authentication
+- Automatic sync from tenant jobs/services via Django signals → Celery tasks
+- Public APIs: `/api/v1/public/jobs/` and `/api/v1/public/providers/`
+- Features: Filters, full-text search, geographic queries (PostGIS), pagination
+- Security: HTML sanitization (nh3), read-only access, redirects to tenant domains for actions
+- See `PUBLIC_CATALOG_IMPLEMENTATION.md` for full documentation
 
 ## Code Conventions
 
