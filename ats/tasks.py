@@ -886,7 +886,7 @@ bulk_move_applications = BulkMoveApplicationsTask()
 
 from celery import shared_task
 from tenants.context import tenant_context, public_schema_context
-from core.sync.job_sync import JobPublicSyncService
+from core.sync.base import JobPublicSyncService
 
 
 @shared_task(
