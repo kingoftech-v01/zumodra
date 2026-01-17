@@ -43,9 +43,23 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
         """
         Ensure UserProfile exists for the user.
         This is also handled by signals, but we ensure it here.
+
+        Note: UserProfile is a tenant-specific model and only exists
+        in tenant schemas, not in the public schema.
         """
         from accounts.models import UserProfile
-        UserProfile.objects.get_or_create(user=user)
+        from django.db import connection
+        from django.db.utils import ProgrammingError
+
+        # Skip if on public schema (UserProfile table only exists in tenant schemas)
+        if connection.schema_name == 'public':
+            return
+
+        try:
+            UserProfile.objects.get_or_create(user=user)
+        except ProgrammingError:
+            # UserProfile table doesn't exist in public schema, that's okay
+            pass
 
     def _assign_to_default_tenant(self, request, user):
         """
