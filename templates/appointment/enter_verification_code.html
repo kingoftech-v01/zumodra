@@ -1,0 +1,149 @@
+{% extends 'base/unified_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Email Verification" %} - {% trans "Book Appointment" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__body text-center">
+                    <!-- Email Icon -->
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+
+                    <h4 class="mb-3">{% trans "Verify Your Email" %}</h4>
+                    <p class="text-muted mb-4">
+                        {% trans "We've sent a verification code to" %}<br>
+                        <strong>{{ email }}</strong>
+                    </p>
+
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'frontend:appointment:enter_verification_code' appointment_request_id id_request %}">
+                        {% csrf_token %}
+
+                        <div class="zu-form-group mb-4">
+                            <label class="zu-label">{% trans "Verification Code" %}</label>
+                            <input type="text"
+                                   name="verification_code"
+                                   class="zu-input text-center"
+                                   style="font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 600;"
+                                   placeholder="000000"
+                                   maxlength="6"
+                                   pattern="[0-9]{6}"
+                                   required
+                                   autofocus>
+                            <small class="form-text text-muted">{% trans "Enter the 6-digit code from your email" %}</small>
+                        </div>
+
+                        <button type="submit" class="zu-btn zu-btn--primary w-100 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            {% trans "Verify & Continue" %}
+                        </button>
+                    </form>
+
+                    <div class="text-muted small">
+                        <p class="mb-2">{% trans "Didn't receive the code?" %}</p>
+                        <button type="button" class="btn btn-link p-0" id="resendBtn">
+                            {% trans "Resend Code" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    {% trans "Check your spam folder if you don't see the email in your inbox." %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Auto-submit on 6 digits */
+input[name="verification_code"] {
+    text-transform: uppercase;
+}
+</style>
+
+<script>
+// Auto-submit form when 6 digits are entered
+const codeInput = document.querySelector('input[name="verification_code"]');
+codeInput.addEventListener('input', function() {
+    if (this.value.length === 6) {
+        this.closest('form').submit();
+    }
+});
+
+// Only allow numbers
+codeInput.addEventListener('keypress', function(e) {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+        e.preventDefault();
+    }
+});
+
+// Resend code
+document.getElementById('resendBtn').addEventListener('click', function() {
+    this.disabled = true;
+    this.textContent = '{% trans "Sending..." %}';
+
+    fetch('{% url "frontend:appointment:resend_verification_code" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            appointment_request_id: '{{ appointment_request_id }}',
+            id_request: '{{ id_request }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('{% trans "A new verification code has been sent to your email." %}');
+            this.textContent = '{% trans "Code Sent!" %}';
+            setTimeout(() => {
+                this.disabled = false;
+                this.textContent = '{% trans "Resend Code" %}';
+            }, 30000); // Re-enable after 30 seconds
+        } else {
+            alert(data.message || '{% trans "Failed to resend code. Please try again." %}');
+            this.disabled = false;
+            this.textContent = '{% trans "Resend Code" %}';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "An error occurred. Please try again." %}');
+        this.disabled = false;
+        this.textContent = '{% trans "Resend Code" %}';
+    });
+});
+</script>
+{% endblock %}
