@@ -148,22 +148,65 @@ def cancel_appointment(request, appointment_id, response_type='html'):
 
     try:
         # Get appointment and verify ownership
-        appointment = Appointment.objects.select_related('appointment_request').get(
+        appointment = Appointment.objects.select_related(
+            'appointment_request__service',
+            'appointment_request__staff_member'
+        ).get(
             id=appointment_id,
             client=request.user
         )
 
-        # See TODO-APPT-001 in appointment/TODO.md for complete cancellation workflow
-        # This will include:
-        # - Checking cancellation policy (24 hours notice, etc.)
-        # - Processing refunds
-        # - Sending notifications to staff
-        # - Updating appointment status
+        # Get optional cancellation reason from request
+        cancellation_reason = request.POST.get('reason', '')
+
+        # Check if appointment can be cancelled
+        can_cancel, reason = appointment.can_be_cancelled()
+
+        if not can_cancel:
+            return json_response(
+                message=reason,
+                status=400,
+                success=False,
+                error_code=ErrorCode.INVALID_DATA
+            )
+
+        # Calculate refund amount to show user
+        refund_amount = appointment.calculate_refund_amount()
+
+        # Queue cancellation task for async processing
+        # Imports TODO-APPT-001 implementation from appointment/tasks.py
+        from appointment.tasks import process_appointment_cancellation
+
+        task_result = process_appointment_cancellation.apply_async(
+            args=[appointment.id, request.user.id, cancellation_reason],
+            countdown=2  # 2-second delay to allow transaction to commit
+        )
+
+        # Prepare response message
+        if refund_amount > 0:
+            message = _(
+                f"Appointment cancelled successfully. "
+                f"A refund of {refund_amount:.2f} {appointment.get_appointment_currency()} "
+                f"will be processed within 5-7 business days."
+            )
+        else:
+            hours_until = appointment.get_hours_until_appointment()
+            if hours_until < 12:
+                message = _(
+                    "Appointment cancelled. No refund available due to short notice "
+                    "(less than 12 hours before appointment)."
+                )
+            else:
+                message = _("Appointment cancelled successfully.")
 
         return json_response(
-            message=_("Appointment cancellation requested. Contact support to complete."),
+            message=message,
             success=True,
-            data={'appointment_id': appointment.id}
+            data={
+                'appointment_id': appointment.id,
+                'refund_amount': float(refund_amount),
+                'task_id': task_result.id,
+            }
         )
 
     except Appointment.DoesNotExist:

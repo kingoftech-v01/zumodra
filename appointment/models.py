@@ -603,6 +603,79 @@ class Appointment(models.Model):
     )
     id_request = models.CharField(max_length=100, blank=True, null=True, verbose_name=_("Request ID"))
 
+    # Status and Cancellation fields - See TODO-APPT-001 in appointment/TODO.md
+    STATUS_CHOICES = (
+        ('pending', _('Pending')),
+        ('confirmed', _('Confirmed')),
+        ('completed', _('Completed')),
+        ('cancelled', _('Cancelled')),
+        ('no_show', _('No Show')),
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='confirmed',
+        verbose_name=_("Status"),
+        help_text=_("Current status of the appointment.")
+    )
+
+    # Cancellation tracking
+    cancelled_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Cancelled At"),
+        help_text=_("Timestamp when the appointment was cancelled.")
+    )
+
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cancelled_appointments',
+        verbose_name=_("Cancelled By"),
+        help_text=_("User who cancelled the appointment.")
+    )
+
+    cancellation_reason = models.TextField(
+        blank=True,
+        verbose_name=_("Cancellation Reason"),
+        help_text=_("Optional reason provided by user for cancellation.")
+    )
+
+    # Refund tracking
+    REFUND_STATUS_CHOICES = (
+        ('none', _('No Refund')),
+        ('pending', _('Refund Pending')),
+        ('processed', _('Refund Processed')),
+        ('failed', _('Refund Failed')),
+    )
+
+    refund_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name=_("Refund Amount"),
+        help_text=_("Amount to be refunded based on cancellation policy.")
+    )
+
+    refund_status = models.CharField(
+        max_length=20,
+        choices=REFUND_STATUS_CHOICES,
+        default='none',
+        verbose_name=_("Refund Status"),
+        help_text=_("Status of refund processing.")
+    )
+
+    refund_processed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Refund Processed At"),
+        help_text=_("Timestamp when refund was successfully processed.")
+    )
+
     # meta datas
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created At"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated At"))
@@ -790,6 +863,98 @@ class Appointment(models.Model):
             "amount_to_pay": self.amount_to_pay,
             "id_request": self.id_request,
         }
+
+    # Cancellation helper methods - See TODO-APPT-001 in appointment/TODO.md
+
+    def is_cancelled(self):
+        """Check if appointment is cancelled."""
+        return self.status == 'cancelled'
+
+    def can_be_cancelled(self, policy_hours=24):
+        """
+        Check if appointment can be cancelled based on cancellation policy.
+
+        Args:
+            policy_hours: Minimum hours notice required for cancellation (default 24)
+
+        Returns:
+            tuple: (can_cancel: bool, reason: str)
+        """
+        if self.is_cancelled():
+            return False, _("Appointment is already cancelled.")
+
+        if self.status == 'completed':
+            return False, _("Cannot cancel a completed appointment.")
+
+        if self.status == 'no_show':
+            return False, _("Cannot cancel a no-show appointment.")
+
+        # Get appointment start datetime
+        appointment_start = self.get_start_time()
+
+        # Calculate time until appointment
+        now = timezone.now()
+        time_until = appointment_start - now
+
+        # Check if appointment is in the past
+        if time_until.total_seconds() < 0:
+            return False, _("Cannot cancel a past appointment.")
+
+        # Check if within cancellation notice period
+        hours_until = time_until.total_seconds() / 3600
+        if hours_until < policy_hours:
+            return False, _(
+                f"Cancellation requires at least {policy_hours} hours notice. "
+                f"Only {hours_until:.1f} hours remaining."
+            )
+
+        return True, ""
+
+    def calculate_refund_amount(self, policy_hours=24):
+        """
+        Calculate refund amount based on cancellation policy and timing.
+
+        Refund policy:
+        - More than 24 hours: 100% refund
+        - 12-24 hours: 50% refund
+        - Less than 12 hours: No refund
+
+        Args:
+            policy_hours: Hours notice for full refund (default 24)
+
+        Returns:
+            Decimal: Refund amount
+        """
+        from decimal import Decimal
+
+        # No refund if free appointment
+        if self.amount_to_pay == 0:
+            return Decimal('0.00')
+
+        # Get appointment start datetime
+        appointment_start = self.get_start_time()
+        now = timezone.now()
+        time_until = appointment_start - now
+        hours_until = time_until.total_seconds() / 3600
+
+        # Full refund if more than policy hours notice
+        if hours_until >= policy_hours:
+            return self.amount_to_pay
+
+        # Partial refund (50%) if 12-24 hours notice
+        elif hours_until >= 12:
+            return self.amount_to_pay * Decimal('0.5')
+
+        # No refund if less than 12 hours
+        else:
+            return Decimal('0.00')
+
+    def get_hours_until_appointment(self):
+        """Get hours until appointment starts."""
+        appointment_start = self.get_start_time()
+        now = timezone.now()
+        time_until = appointment_start - now
+        return max(0, time_until.total_seconds() / 3600)
 
 
 class Config(models.Model):

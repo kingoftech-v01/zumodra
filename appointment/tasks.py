@@ -74,3 +74,244 @@ def notify_admin_task(subject, message, html_message):
         mail_admins(subject=subject, message=message, html_message=html_message, fail_silently=False)
     except Exception as e:
         logger.error(f"Error sending admin email from task: {e}")
+
+
+# ==================== CANCELLATION & REFUND TASKS ====================
+# Implements TODO-APPT-001 from appointment/TODO.md
+
+from celery import shared_task
+from decimal import Decimal
+
+
+@shared_task(
+    bind=True,
+    name='appointment.tasks.process_appointment_cancellation',
+    max_retries=3,
+    default_retry_delay=300,  # 5 minutes
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+)
+def process_appointment_cancellation(self, appointment_id, user_id, reason=''):
+    """
+    Process appointment cancellation including refund calculation and notifications.
+
+    This task handles:
+    - Calculating refund amount based on cancellation policy
+    - Updating appointment status
+    - Processing refund via finance app (if applicable)
+    - Sending notifications to customer and staff
+
+    Args:
+        appointment_id: ID of appointment to cancel
+        user_id: ID of user who initiated cancellation
+        reason: Optional cancellation reason
+
+    Returns:
+        dict: Cancellation result with refund info
+
+    Raises:
+        Appointment.DoesNotExist: If appointment not found
+    """
+    from django.utils import timezone
+    from django.contrib.auth import get_user_model
+    from appointment.models import Appointment
+
+    User = get_user_model()
+
+    try:
+        appointment = Appointment.objects.select_related(
+            'client',
+            'appointment_request__service',
+            'appointment_request__staff_member'
+        ).get(pk=appointment_id)
+
+        user = User.objects.get(pk=user_id)
+
+        logger.info(f"Processing cancellation for appointment {appointment_id} by user {user_id}")
+
+        # Check if can be cancelled
+        can_cancel, cancel_reason = appointment.can_be_cancelled()
+        if not can_cancel:
+            logger.warning(f"Cannot cancel appointment {appointment_id}: {cancel_reason}")
+            return {
+                'status': 'error',
+                'error': cancel_reason,
+                'appointment_id': appointment_id,
+            }
+
+        # Calculate refund amount
+        refund_amount = appointment.calculate_refund_amount()
+
+        # Update appointment status
+        appointment.status = 'cancelled'
+        appointment.cancelled_at = timezone.now()
+        appointment.cancelled_by = user
+        appointment.cancellation_reason = reason
+        appointment.refund_amount = refund_amount
+
+        # Set refund status
+        if refund_amount > 0:
+            appointment.refund_status = 'pending'
+        else:
+            appointment.refund_status = 'none'
+
+        appointment.save(update_fields=[
+            'status',
+            'cancelled_at',
+            'cancelled_by',
+            'cancellation_reason',
+            'refund_amount',
+            'refund_status'
+        ])
+
+        logger.info(
+            f"Appointment {appointment_id} cancelled successfully. "
+            f"Refund amount: {refund_amount}"
+        )
+
+        # Process refund if applicable
+        refund_result = {}
+        if refund_amount > 0:
+            refund_result = _process_refund(appointment)
+
+        # Send notifications
+        _send_cancellation_notifications(appointment)
+
+        return {
+            'status': 'success',
+            'appointment_id': appointment_id,
+            'refund_amount': float(refund_amount),
+            'refund_status': appointment.refund_status,
+            'refund_result': refund_result,
+        }
+
+    except Appointment.DoesNotExist:
+        error_msg = f"Appointment {appointment_id} not found"
+        logger.error(error_msg)
+        return {
+            'status': 'error',
+            'error': error_msg,
+            'appointment_id': appointment_id,
+        }
+
+    except User.DoesNotExist:
+        error_msg = f"User {user_id} not found"
+        logger.error(error_msg)
+        return {
+            'status': 'error',
+            'error': error_msg,
+            'appointment_id': appointment_id,
+        }
+
+    except Exception as e:
+        logger.error(f"Error processing cancellation for appointment {appointment_id}: {e}")
+        raise self.retry(exc=e)
+
+
+def _process_refund(appointment):
+    """
+    Process refund through finance app.
+
+    Args:
+        appointment: Appointment instance
+
+    Returns:
+        dict: Refund processing result
+    """
+    from django.utils import timezone
+
+    try:
+        # Check if finance app is available
+        try:
+            from finance.services import process_refund
+        except ImportError:
+            logger.warning("Finance app not available for refund processing")
+            # Mark as pending for manual processing
+            appointment.refund_status = 'pending'
+            appointment.save(update_fields=['refund_status'])
+            return {
+                'status': 'manual_review',
+                'message': 'Refund requires manual processing',
+            }
+
+        # Process refund via finance app
+        result = process_refund(
+            appointment_id=appointment.id,
+            amount=appointment.refund_amount,
+            reason=f"Appointment cancellation: {appointment.cancellation_reason[:100]}"
+        )
+
+        if result.get('status') == 'success':
+            appointment.refund_status = 'processed'
+            appointment.refund_processed_at = timezone.now()
+            appointment.save(update_fields=['refund_status', 'refund_processed_at'])
+            logger.info(f"Refund processed successfully for appointment {appointment.id}")
+        else:
+            appointment.refund_status = 'failed'
+            appointment.save(update_fields=['refund_status'])
+            logger.error(f"Refund failed for appointment {appointment.id}: {result.get('error')}")
+
+        return result
+
+    except Exception as e:
+        logger.error(f"Error processing refund for appointment {appointment.id}: {e}")
+        appointment.refund_status = 'failed'
+        appointment.save(update_fields=['refund_status'])
+        return {
+            'status': 'error',
+            'error': str(e),
+        }
+
+
+def _send_cancellation_notifications(appointment):
+    """
+    Send cancellation notifications to customer and staff.
+
+    Args:
+        appointment: Appointment instance
+    """
+    try:
+        # Send notification to customer
+        email_context = {
+            'appointment': appointment,
+            'client_name': appointment.get_client_name(),
+            'service_name': appointment.get_service_name(),
+            'appointment_date': appointment.get_appointment_date(),
+            'refund_amount': appointment.refund_amount,
+            'refund_status': appointment.get_refund_status_display(),
+        }
+
+        send_email(
+            recipient_list=[appointment.client.email],
+            subject=_("Appointment Cancellation Confirmation"),
+            template_url='email_sender/cancellation_confirmation.html',
+            context=email_context
+        )
+
+        logger.info(f"Cancellation confirmation sent to {appointment.client.email}")
+
+        # Send notification to staff member
+        if appointment.appointment_request.staff_member:
+            staff_member = appointment.appointment_request.staff_member
+            if staff_member.user and staff_member.user.email:
+                staff_context = {
+                    'appointment': appointment,
+                    'staff_name': staff_member.get_staff_member_name(),
+                    'client_name': appointment.get_client_name(),
+                    'service_name': appointment.get_service_name(),
+                    'appointment_date': appointment.get_appointment_date(),
+                    'cancellation_reason': appointment.cancellation_reason,
+                }
+
+                send_email(
+                    recipient_list=[staff_member.user.email],
+                    subject=_("Appointment Cancelled by Customer"),
+                    template_url='email_sender/staff_cancellation_notice.html',
+                    context=staff_context
+                )
+
+                logger.info(f"Staff cancellation notice sent to {staff_member.user.email}")
+
+    except Exception as e:
+        logger.error(f"Error sending cancellation notifications for appointment {appointment.id}: {e}")
+        # Don't fail the cancellation if notifications fail
