@@ -60,7 +60,7 @@ def sync_stripe_payments(self):
 
         # Find pending payments needing sync
         pending_payments = PaymentTransaction.objects.filter(
-            status='pending',
+            succeeded=False,
             stripe_payment_intent_id__isnull=False,
             created_at__lt=now - timedelta(minutes=5)
         )[:50]  # Batch size
@@ -140,7 +140,7 @@ def generate_monthly_invoices(self):
                     currency=subscription.plan.currency,
                     billing_period_start=subscription.current_period_start,
                     billing_period_end=subscription.current_period_end,
-                    status='pending',
+                    succeeded=False,
                     due_date=now + timedelta(days=14),
                 )
 
@@ -244,7 +244,7 @@ def process_pending_refunds(self):
 
         # Find pending refunds
         pending_refunds = RefundRequest.objects.filter(
-            status='pending',
+            succeeded=False,
             approved_at__isnull=False
         )
 
@@ -319,7 +319,7 @@ def retry_failed_payments(self):
 
         # Find payments eligible for retry
         failed_payments = PaymentTransaction.objects.filter(
-            status='failed',
+            succeeded=False,
             retry_count__lt=3,
             last_retry_at__lt=now - timedelta(hours=24)
         )
@@ -395,7 +395,7 @@ def update_subscription_status(self):
             try:
                 # Check if there's a pending payment
                 has_pending_payment = hasattr(subscription, 'payments') and \
-                    subscription.payments.filter(status='pending').exists()
+                    subscription.payments.filter(succeeded=False).exists()
 
                 if not has_pending_payment:
                     subscription.status = 'past_due'
@@ -625,17 +625,17 @@ def generate_daily_financial_report(self):
 
         # Calculate daily metrics
         daily_revenue = PaymentTransaction.objects.filter(
-            status='succeeded',
+            succeeded=True,
             created_at__date=yesterday.date()
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
         daily_refunds = RefundRequest.objects.filter(
-            status='processed',
+            approved=True,
             processed_at__date=yesterday.date()
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
         outstanding_invoices = Invoice.objects.filter(
-            status='pending'
+            succeeded=False
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
         active_subscriptions = UserSubscription.objects.filter(status='active').count()
