@@ -82,6 +82,12 @@ urlpatterns = [
     # /api/v1/careers/ - Public job listings and admin management
     path('careers/', include('careers.urls')),
 
+    # ==================== Public Catalogs ====================
+    # /api/v1/public/jobs/ - Public job catalog (cross-tenant browsing, no auth)
+    # /api/v1/public/providers/ - Public service provider catalog (cross-tenant, no auth)
+    path('public/', include('ats_public.api.urls')),
+    path('public/', include('services_public.api.urls')),
+
     # ==================== Analytics & Reporting ====================
     # /api/v1/analytics/ - Dashboards, reports, metrics
     path('analytics/', include('analytics.urls')),
@@ -174,6 +180,18 @@ Careers (/api/v1/careers/):
 - Public: Job listings, applications (no auth required)
 - Admin: Career pages, listings management
 - See careers.urls for full endpoint list
+
+Public Catalogs (/api/v1/public/):
+- GET /api/v1/public/jobs/ - Browse public job listings (cross-tenant, no auth)
+- GET /api/v1/public/jobs/{id}/ - Get job details
+- GET /api/v1/public/jobs/featured/ - Featured jobs
+- GET /api/v1/public/jobs/search/?q=keyword - Search jobs
+- GET /api/v1/public/providers/ - Browse service providers (cross-tenant, no auth)
+- GET /api/v1/public/providers/{id}/ - Get provider details
+- GET /api/v1/public/providers/verified/ - Verified providers
+- GET /api/v1/public/providers/top_rated/ - Top-rated providers
+- GET /api/v1/public/providers/nearby/?lat=x&lng=y&radius=50 - Geographic search
+- GET /api/v1/public/providers/search/?q=keyword - Search providers
 
 Analytics (/api/v1/analytics/):
 - Dashboard, provider analytics, client analytics
