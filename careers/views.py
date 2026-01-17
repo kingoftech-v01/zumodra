@@ -159,13 +159,14 @@ class PublicJobListingListView(CORSMixin, generics.ListAPIView):
     def get_queryset(self):
         """Return only active, published jobs from public catalog."""
         from tenants.models import PublicJobCatalog
+        from django.db.models import Q
         now = timezone.now()
 
+        # Base queryset: jobs that have been published, excluding those past deadline
         queryset = PublicJobCatalog.objects.filter(
-            is_active=True,
             published_at__lte=now
-        ).exclude(
-            expires_at__lt=now
+        ).filter(
+            Q(application_deadline__isnull=True) | Q(application_deadline__gte=now)
         ).select_related('tenant')
 
         # Apply filters from query params
@@ -175,7 +176,12 @@ class PublicJobListingListView(CORSMixin, generics.ListAPIView):
 
         location = self.request.query_params.get('location')
         if location:
-            queryset = queryset.filter(location__icontains=location)
+            # Search across city, state, and country
+            queryset = queryset.filter(
+                Q(location_city__icontains=location) |
+                Q(location_state__icontains=location) |
+                Q(location_country__icontains=location)
+            )
 
         category = self.request.query_params.get('category')
         if category:
@@ -183,7 +189,8 @@ class PublicJobListingListView(CORSMixin, generics.ListAPIView):
 
         is_remote = self.request.query_params.get('remote')
         if is_remote and is_remote.lower() in ['true', '1', 'yes']:
-            queryset = queryset.filter(is_remote=True)
+            # Filter for remote or hybrid positions
+            queryset = queryset.filter(remote_policy__in=['remote', 'hybrid', 'flexible'])
 
         return queryset
 
@@ -208,12 +215,12 @@ class PublicJobListingDetailView(CORSMixin, generics.RetrieveAPIView):
     def get_queryset(self):
         """Return only active, published jobs from public catalog."""
         from tenants.models import PublicJobCatalog
+        from django.db.models import Q
         now = timezone.now()
         return PublicJobCatalog.objects.filter(
-            is_active=True,
             published_at__lte=now
-        ).exclude(
-            expires_at__lt=now
+        ).filter(
+            Q(application_deadline__isnull=True) | Q(application_deadline__gte=now)
         ).select_related('tenant')
 
     def retrieve(self, request, *args, **kwargs):
