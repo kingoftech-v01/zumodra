@@ -304,53 +304,25 @@ def update_delivery_status(self):
     """
     Update delivery status for sent messages.
 
-    Checks:
-    - Pending deliveries
-    - Failed deliveries for retry
-    - Delivery confirmations
+    NOTE: This feature is not implemented.
+    Message model doesn't have delivery_status or delivered_at fields.
+    Only read status is tracked via MessageStatus model.
+
+    TODO: If delivery tracking is needed:
+    1. Add delivery_status and delivered_at fields to Message model
+    2. Create migration
+    3. Implement WebSocket delivery confirmation
 
     Returns:
-        dict: Summary of status updates.
+        dict: Status indicating feature not implemented.
     """
-    from messages_sys.models import Message
+    logger.info("Skipping delivery status update - feature not implemented (Message model has no delivery_status field)")
 
-    try:
-        now = timezone.now()
-
-        # Find messages pending delivery confirmation
-        pending_messages = Message.objects.filter(
-            delivery_status='pending',
-            timestamp__lt=now - timedelta(minutes=5)
-        )
-
-        # Update status based on WebSocket delivery
-        # In production, this would check against Redis/WebSocket tracking
-
-        confirmed = 0
-        for message in pending_messages[:100]:
-            try:
-                # Check if recipient was online (simplified)
-                if hasattr(message, 'recipient'):
-                    # Would check WebSocket connection status
-                    message.delivery_status = 'delivered'
-                    message.delivered_at = now
-                    message.save(update_fields=['delivery_status', 'delivered_at'])
-                    confirmed += 1
-
-            except Exception as e:
-                logger.error(f"Error updating delivery status for message {message.id}: {e}")
-
-        logger.info(f"Updated delivery status for {confirmed} messages")
-
-        return {
-            'status': 'success',
-            'confirmed_count': confirmed,
-            'timestamp': now.isoformat(),
-        }
-
-    except Exception as e:
-        logger.error(f"Error updating delivery status: {str(e)}")
-        raise self.retry(exc=e)
+    return {
+        'status': 'skipped',
+        'reason': 'Feature not implemented - Message model lacks delivery tracking fields',
+        'timestamp': timezone.now().isoformat(),
+    }
 
 
 # ==================== CONTACT SUGGESTIONS ====================
