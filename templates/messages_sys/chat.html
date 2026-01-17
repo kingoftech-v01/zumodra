@@ -219,22 +219,209 @@ if (messagesContainer) {
 
 // WebSocket connection for real-time messages
 {% if conversation %}
-const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws/chat/{{ conversation.uuid }}/`);
+const conversationId = '{{ conversation.uuid }}';
+{% if websocket_enabled %}
+const wsUrl = '{{ websocket_url }}';
+{% endif %}
+let socket = null;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+const reconnectDelay = 3000;
 
-ws.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    // Handle incoming message - reload for now (can be improved with dynamic insertion)
-    location.reload();
-};
+function connectWebSocket() {
+    {% if not websocket_enabled %}
+    console.log('WebSocket disabled, using polling fallback');
+    startPolling();
+    return;
+    {% endif %}
 
-ws.onclose = function(event) {
-    console.log('WebSocket closed');
-};
+    console.log('Connecting to WebSocket:', wsUrl);
+    socket = new WebSocket(wsUrl);
 
-ws.onerror = function(error) {
-    console.error('WebSocket error:', error);
-};
+    socket.onopen = function(e) {
+        console.log('WebSocket connected');
+        reconnectAttempts = 0;
+        updateConnectionStatus('online');
+    };
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Received:', data);
+
+        if (data.type === 'message') {
+            displayMessage(data);
+        } else if (data.type === 'typing') {
+            showTypingIndicator(data.typing_user, data.is_typing);
+        } else if (data.type === 'read') {
+            updateReadReceipt(data.message_id, data.user);
+        } else if (data.type === 'status') {
+            console.log('Status:', data.message);
+        }
+    };
+
+    socket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+        updateConnectionStatus('error');
+    };
+
+    socket.onclose = function(event) {
+        console.log('WebSocket closed:', event.code, event.reason);
+        updateConnectionStatus('offline');
+
+        // Attempt to reconnect
+        if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Reconnecting... Attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
+            setTimeout(connectWebSocket, reconnectDelay);
+        } else {
+            console.log('Max reconnect attempts reached, falling back to polling');
+            startPolling();
+        }
+    };
+}
+
+function sendMessage(content, fileData = null) {
+    const messageData = {
+        type: 'send_message',
+        content: content
+    };
+
+    if (fileData) {
+        messageData.file = fileData;
+    }
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(messageData));
+    } else {
+        // Fallback to HTTP POST
+        sendMessageHTTP(content, fileData);
+    }
+}
+
+function sendTypingIndicator(isTyping) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: 'typing',
+            is_typing: isTyping
+        }));
+    }
+}
+
+function sendReadReceipt(messageId) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: 'read',
+            message_id: messageId
+        }));
+    }
+}
+
+function displayMessage(data) {
+    const isSentByCurrentUser = data.sender === '{{ request.user.username }}';
+    const messageHtml = `
+        <div class="flex ${isSentByCurrentUser ? 'justify-end' : ''}">
+            <div class="max-w-[70%] p-4 rounded-lg ${isSentByCurrentUser ? 'bg-primary text-white' : 'bg-surface'}">
+                <p class="caption1">${escapeHtml(data.content)}</p>
+                ${data.file ? `<a href="${data.file}" class="block mt-2 underline">📎 File</a>` : ''}
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="caption2 ${isSentByCurrentUser ? 'text-white opacity-70' : 'text-secondary'}">
+                        ${data.sender} &middot; ${formatTime(data.timestamp)}
+                    </span>
+                    ${data.is_read && isSentByCurrentUser ? '<span class="ph ph-checks"></span>' : ''}
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function showTypingIndicator(user, isTyping) {
+    const indicatorId = 'typing-indicator';
+    const existingIndicator = document.getElementById(indicatorId);
+
+    if (isTyping && !existingIndicator) {
+        const indicatorHtml = `
+            <div id="${indicatorId}" class="flex">
+                <div class="max-w-[70%] p-4 rounded-lg bg-surface">
+                    <p class="caption1 text-secondary">${escapeHtml(user)} is typing...</p>
+                </div>
+            </div>
+        `;
+        messagesContainer.insertAdjacentHTML('beforeend', indicatorHtml);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } else if (!isTyping && existingIndicator) {
+        existingIndicator.remove();
+    }
+}
+
+function updateReadReceipt(messageId, user) {
+    console.log(`Message ${messageId} read by ${user}`);
+    // Update UI to show read receipt
+}
+
+function updateConnectionStatus(status) {
+    // Could add a status indicator in the UI
+    console.log('Connection status:', status);
+}
+
+function sendMessageHTTP(content, fileData) {
+    // Fallback to traditional form submission
+    const form = document.getElementById('messageForm');
+    if (form) {
+        form.submit();
+    }
+}
+
+function startPolling() {
+    // Poll for new messages every 3 seconds as fallback
+    setInterval(() => {
+        location.reload();
+    }, 3000);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+// Initialize WebSocket connection
+connectWebSocket();
+
+// Handle form submission via WebSocket
+const messageForm = document.getElementById('messageForm');
+if (messageForm) {
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = this.querySelector('input[name="content"]');
+        const content = input.value.trim();
+
+        if (content) {
+            sendMessage(content);
+            input.value = '';
+        }
+    });
+
+    // Typing indicator
+    let typingTimeout;
+    const contentInput = messageForm.querySelector('input[name="content"]');
+    if (contentInput) {
+        contentInput.addEventListener('input', function() {
+            sendTypingIndicator(true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                sendTypingIndicator(false);
+            }, 1000);
+        });
+    }
+}
 {% endif %}
 </script>
 {% endblock %}
