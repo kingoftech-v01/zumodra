@@ -284,7 +284,7 @@
                            :class="{ 'text-gray-700 hover:bg-gray-100': scrolled }">
                             {% trans 'Sign In' %}
                         </a>
-                        <a href="{% url 'account_signup' %}"
+                        <a href="{% url 'custom_account_u:signup_type_selection' %}"
                            class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium shadow-sm">
                             <span>{% trans 'Get Started' %}</span>
                             <span class="ph-bold ph-arrow-right"></span>
@@ -475,7 +475,7 @@
                    @click="mobileMenuOpen = false">
                     {% trans 'Sign In' %}
                 </a>
-                <a href="{% url 'account_signup' %}"
+                <a href="{% url 'custom_account_u:signup_type_selection' %}"
                    class="block w-full px-4 py-3 text-center rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-all"
                    @click="mobileMenuOpen = false">
                     {% trans 'Get Started' %}

@@ -59,7 +59,7 @@
                        class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium transition-colors">
                         {% trans "Sign In" %}
                     </a>
-                    <a href="{% url 'account_signup' %}"
+                    <a href="{% url 'custom_account_u:signup_type_selection' %}"
                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
                         {% trans "Get Started" %}
                     </a>
@@ -115,7 +115,7 @@
                         <a href="{% url 'account_login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                             {% trans "Sign In" %}
                         </a>
-                        <a href="{% url 'account_signup' %}" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary-600 hover:bg-primary-700">
+                        <a href="{% url 'custom_account_u:signup_type_selection' %}" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary-600 hover:bg-primary-700">
                             {% trans "Get Started" %}
                         </a>
                     </div>
