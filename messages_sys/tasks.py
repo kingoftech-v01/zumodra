@@ -320,7 +320,7 @@ def update_delivery_status(self):
         # Find messages pending delivery confirmation
         pending_messages = Message.objects.filter(
             delivery_status='pending',
-            created_at__lt=now - timedelta(minutes=5)
+            timestamp__lt=now - timedelta(minutes=5)
         )
 
         # Update status based on WebSocket delivery
