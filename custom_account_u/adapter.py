@@ -53,11 +53,22 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
 
         Logic:
         1. If signing up on a tenant subdomain, assign to that tenant
-        2. If signing up on public domain, check for default tenant
-        3. If no tenant context, user remains unassigned (admin must assign)
+        2. If signing up on public domain, users are NOT auto-assigned
+        3. Multi-tier signup wizards will handle tenant creation
+
+        Note: This method is now deprecated for multi-tier signup.
+        The signup wizards (CompanySetupWizard, FreelancerOnboardingWizard)
+        handle tenant creation and user assignment.
         """
         from tenants.models import Tenant
         from accounts.models import TenantUser
+        from django.db import connection
+        from django.db.utils import ProgrammingError
+
+        # Skip auto-assignment if on public schema
+        # Let the multi-tier signup wizard handle it
+        if connection.schema_name == 'public':
+            return
 
         tenant = None
 
@@ -87,14 +98,18 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
 
         # Create TenantUser if we have a tenant
         if tenant:
-            TenantUser.objects.get_or_create(
-                user=user,
-                tenant=tenant,
-                defaults={
-                    'role': 'employee',  # Default role for new signups
-                    'is_active': True,
-                }
-            )
+            try:
+                TenantUser.objects.get_or_create(
+                    user=user,
+                    tenant=tenant,
+                    defaults={
+                        'role': 'employee',  # Default role for new signups
+                        'is_active': True,
+                    }
+                )
+            except ProgrammingError:
+                # TenantUser table doesn't exist in public schema
+                pass
 
     def get_login_redirect_url(self, request):
         """
@@ -102,19 +117,28 @@ class ZumodraAccountAdapter(DefaultAccountAdapter):
         """
         # Check if user has any tenant assignments
         from accounts.models import TenantUser
+        from django.db import connection
+        from django.db.utils import ProgrammingError
 
         if request.user.is_authenticated:
-            tenant_user = TenantUser.objects.filter(
-                user=request.user,
-                is_active=True
-            ).first()
+            try:
+                # Only query TenantUser if we're not in public schema
+                # TenantUser table only exists in tenant schemas
+                if connection.schema_name != 'public':
+                    tenant_user = TenantUser.objects.filter(
+                        user=request.user,
+                        is_active=True
+                    ).first()
 
-            if tenant_user:
-                # Redirect to tenant dashboard
-                return f'/dashboard/'
+                    if tenant_user:
+                        # Redirect to tenant dashboard
+                        return f'/dashboard/'
+            except ProgrammingError:
+                # Table doesn't exist in public schema, that's okay
+                pass
 
-        # Default redirect
-        return super().get_login_redirect_url(request)
+        # Default redirect (dashboard will handle public users)
+        return '/dashboard/'
 
     def get_signup_redirect_url(self, request):
         """
