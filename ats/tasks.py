@@ -63,10 +63,9 @@ def calculate_match_scores(self):
         now = timezone.now()
 
         # Find applications needing score calculation
-        # Those without a match score or updated recently
+        # Those without an AI match score
         applications = Application.objects.filter(
-            Q(match_score__isnull=True) |
-            Q(match_score_updated_at__lt=now - timedelta(days=1))
+            Q(ai_match_score__isnull=True)
         ).select_related('job', 'candidate')[:100]  # Process in batches
 
         calculated = 0
@@ -75,10 +74,9 @@ def calculate_match_scores(self):
             try:
                 score = _calculate_application_match_score(application)
 
-                # Update application with score
+                # Update application with AI match score
                 Application.objects.filter(id=application.id).update(
-                    match_score=score,
-                    match_score_updated_at=now
+                    ai_match_score=score
                 )
 
                 calculated += 1
@@ -262,9 +260,8 @@ def calculate_single_match_score(self, application_id):
         application = Application.objects.select_related('job', 'candidate').get(id=application_id)
         score = _calculate_application_match_score(application)
 
-        application.match_score = score
-        application.match_score_updated_at = timezone.now()
-        application.save(update_fields=['match_score', 'match_score_updated_at'])
+        application.ai_match_score = score
+        application.save(update_fields=['ai_match_score'])
 
         return {
             'status': 'success',
@@ -745,8 +742,7 @@ def process_candidate_application(self, application_id):
 
         # Calculate match score
         score = _calculate_application_match_score(application)
-        application.match_score = score
-        application.match_score_updated_at = timezone.now()
+        application.ai_match_score = score
 
         # Check for duplicates
         # (Simplified - would check for same email applying to same job)
