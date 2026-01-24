@@ -159,7 +159,7 @@ def require_tenant_user(view_func: Callable) -> Callable:
             )
 
         # Check tenant membership
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         is_member = TenantUser.objects.filter(
             user=request.user,
@@ -208,7 +208,7 @@ def require_role(allowed_roles: List[str]) -> Callable:
                 )
 
             # Check role
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
 
             has_role = TenantUser.objects.filter(
                 user=request.user,
@@ -317,7 +317,7 @@ def require_permission(permission_codename: str) -> Callable:
                 )
 
             # Get tenant user and check permission
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
 
             try:
                 tenant_user = TenantUser.objects.get(
@@ -365,7 +365,7 @@ def require_any_permission(*permission_codenames: str) -> Callable:
                     "This resource requires a tenant context."
                 )
 
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
 
             try:
                 tenant_user = TenantUser.objects.get(

@@ -195,7 +195,7 @@ class TestTenantIsolation:
         with patch('core.db.managers.get_current_tenant') as mock:
             mock.return_value = tenant_a
 
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
             jobs = JobPosting.objects.for_tenant(tenant_a).all()
 
             # Should only see tenant A's jobs
@@ -505,7 +505,7 @@ class TestObjectLevelPermissions:
         tenant_user_factory(user=recruiter2, tenant=tenant, role='recruiter')
 
         # Create private note
-        from ats.models import ApplicationNote
+        from jobs.models import ApplicationNote
         note = Mock(spec=ApplicationNote)
         note.is_private = True
         note.author = recruiter1

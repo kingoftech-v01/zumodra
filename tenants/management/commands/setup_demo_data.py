@@ -174,7 +174,7 @@ class Command(BaseCommand):
 
     def _create_sample_data(self, tenant, admin, num_jobs, num_candidates, num_employees):
         """Create sample data for the demo tenant."""
-        from ats.models import (
+        from jobs.models import (
             JobPosting, JobCategory, Pipeline, PipelineStage,
             Candidate, Application
         )

@@ -95,10 +95,8 @@ from core.cache.tenant_cache import (
     invalidate_blog_cache,
     invalidate_blog_post_cache,
     invalidate_blog_category_cache,
-    invalidate_newsletter_cache,
-    invalidate_newsletter_stats_cache,
-    invalidate_appointment_cache,
-    invalidate_appointment_stats_cache,
+    invalidate_interviews_cache,  # Renamed from invalidate_appointment_cache (Phase 9)
+    invalidate_interviews_stats_cache,  # Renamed from invalidate_appointment_stats_cache (Phase 9)
     invalidate_dashboard_cache,
     invalidate_ats_cache,
     invalidate_hr_cache,
@@ -108,8 +106,7 @@ from core.cache.tenant_cache import (
     connect_cache_signals,
     connect_services_cache_signals,
     connect_blog_cache_signals,
-    connect_newsletter_cache_signals,
-    connect_appointment_cache_signals,
+    connect_interviews_cache_signals,  # Renamed from connect_appointment_cache_signals (Phase 9)
     connect_dashboard_cache_signals,
     connect_configurations_cache_signals,
     connect_all_cache_signals,
@@ -164,10 +161,8 @@ __all__ = [
     'invalidate_blog_cache',
     'invalidate_blog_post_cache',
     'invalidate_blog_category_cache',
-    'invalidate_newsletter_cache',
-    'invalidate_newsletter_stats_cache',
-    'invalidate_appointment_cache',
-    'invalidate_appointment_stats_cache',
+    'invalidate_interviews_cache',  # Renamed from invalidate_appointment_cache (Phase 9)
+    'invalidate_interviews_stats_cache',  # Renamed from invalidate_appointment_stats_cache (Phase 9)
     'invalidate_dashboard_cache',
     'invalidate_ats_cache',
     'invalidate_hr_cache',
@@ -175,8 +170,7 @@ __all__ = [
     'connect_cache_signals',
     'connect_services_cache_signals',
     'connect_blog_cache_signals',
-    'connect_newsletter_cache_signals',
-    'connect_appointment_cache_signals',
+    'connect_interviews_cache_signals',  # Renamed from connect_appointment_cache_signals (Phase 9)
     'connect_dashboard_cache_signals',
     'connect_configurations_cache_signals',
     'connect_all_cache_signals',

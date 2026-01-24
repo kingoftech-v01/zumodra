@@ -27,9 +27,9 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.core.cache import cache
 
-from ats.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
+from jobs.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
 from hr_core.models import Employee, Department
-from accounts.models import UserProfile
+from tenant_profiles.models import UserProfile
 from tenants.models import Tenant, TenantUser, Domain
 
 User = get_user_model()

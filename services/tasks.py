@@ -712,7 +712,7 @@ def notify_cross_tenant_request(self, target_schema, request_uuid, requesting_te
         with schema_context(target_schema):
             # Import here to avoid circular imports
             from notifications.models import Notification, NotificationChannel
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             from django.contrib.auth import get_user_model
 
             User = get_user_model()

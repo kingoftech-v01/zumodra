@@ -25,7 +25,7 @@
                         <div class="sub_menu absolute p-3 -left-10 w-max bg-white rounded-lg shadow-lg">
                             <ul>
                                 <li>
-                                    <a href="{% url 'frontend:ats:job_list' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
+                                    <a href="{% url 'frontend:jobs:job_list' %}" class="link block text-button py-[11px] pl-6 pr-[45px] rounded duration-300 hover:bg-gray-50">
                                         {% trans "Browse Jobs" %}
                                     </a>
                                 </li>
@@ -194,7 +194,7 @@
                             <a href="/" class="text-xl font-semibold">{% trans "Home" %}</a>
                         </li>
                         <li class="nav_item py-2">
-                            <a href="{% url 'frontend:ats:job_list' %}" class="text-xl font-semibold">{% trans "Browse Jobs" %}</a>
+                            <a href="{% url 'frontend:jobs:job_list' %}" class="text-xl font-semibold">{% trans "Browse Jobs" %}</a>
                         </li>
                         <li class="nav_item py-2">
                             <a href="{% url 'services:browse_providers' %}" class="text-xl font-semibold">{% trans "Browse Freelancers" %}</a>

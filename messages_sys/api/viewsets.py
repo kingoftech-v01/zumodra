@@ -148,7 +148,7 @@ class ConversationViewSet(
         serializer = ConversationParticipantSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser  # Renamed from custom_account_u (Phase 10)
         users = CustomUser.objects.filter(
             id__in=serializer.validated_data['user_ids']
         )
@@ -178,7 +178,7 @@ class ConversationViewSet(
         serializer = ConversationParticipantSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser  # Renamed from custom_account_u (Phase 10)
         user_ids = serializer.validated_data['user_ids']
 
         for user_id in user_ids:
@@ -558,7 +558,7 @@ class BlockListViewSet(
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser  # Renamed from custom_account_u (Phase 10)
         try:
             user = CustomUser.objects.get(id=user_id)
         except CustomUser.DoesNotExist:

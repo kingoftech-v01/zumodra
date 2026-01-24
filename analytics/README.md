@@ -2,145 +2,69 @@
 
 ## Overview
 
-Provides comprehensive analytics and reporting across ATS, HR, marketplace, and business operations with customizable dashboards and data visualization.
+Analytics dashboards and reporting for recruitment, finance, and services.
 
-## Key Features
+**Schema**: TENANT
 
-- **Recruitment Analytics**: Time-to-hire, source quality, pipeline metrics
-- **HR Analytics**: Turnover, diversity, absence trends
-- **Marketplace Analytics**: Contract value, provider performance
-- **Custom Dashboards**: Drag-and-drop dashboard builder
-- **Scheduled Reports**: Automated report generation
-- **Data Export**: CSV, Excel, PDF exports
+## Features
 
-## Analytics Modules
+- Recruitment analytics (time-to-hire, source effectiveness)
+- Financial analytics (revenue, MRR, churn)
+- Services analytics (provider performance)
+- HR analytics (turnover, time-off trends)
+- Custom report generation (PDF, CSV, Excel)
 
-### ATS Analytics
-- Time-to-hire by role
+## API Endpoints
+
+### Dashboards
+- **GET** `/api/v1/analytics/recruitment/` - Recruitment metrics
+- **GET** `/api/v1/analytics/financial/` - Financial metrics
+- **GET** `/api/v1/analytics/services/` - Services metrics
+- **GET** `/api/v1/analytics/hr/` - HR metrics
+
+### Reports
+- **POST** `/api/v1/analytics/reports/generate/` - Generate report
+- **GET** `/api/v1/analytics/reports/` - List reports
+- **GET** `/api/v1/analytics/reports/<id>/download/` - Download report
+
+## Metrics Tracked
+
+**Recruitment**:
+- Time-to-hire
 - Source effectiveness
-- Pipeline conversion rates
-- Interview-to-offer ratios
-- Candidate quality scores
-- Recruiter performance
+- Candidate pipeline conversion
+- Interview-to-offer ratio
 
-### HR Analytics
-- Headcount trends
-- Turnover rate by department
-- Diversity metrics (gender, age, seniority)
-- Absence rate and patterns
-- Time-to-onboard
-- Employee satisfaction
-
-### Marketplace Analytics
-- Contract volume and value
-- Provider earnings
-- Client spend
-- Service category performance
-- Dispute rate
-- Completion rate
-
-### Financial Analytics
-- Revenue by product
-- Subscription MRR/ARR
+**Financial**:
+- MRR (Monthly Recurring Revenue)
+- ARR (Annual Recurring Revenue)
 - Churn rate
-- Customer lifetime value
-- Payment trends
-- Escrow balances
+- Revenue by service/product
 
-## Models
+**Services**:
+- Provider performance
+- Service completion rate
+- Average ratings
+- Revenue per provider
 
-| Model | Description |
-|-------|-------------|
-| **AnalyticsDashboard** | Custom dashboards |
-| **Widget** | Dashboard widgets |
-| **Report** | Saved reports |
-| **ReportSchedule** | Scheduled reports |
-| **Metric** | Tracked metrics |
-| **DataExport** | Export requests |
+**HR**:
+- Employee turnover
+- Time-off utilization
+- Department headcount
+- Compensation trends
 
-## Views
+## Permissions
 
-- `AnalyticsDashboardView` - Main analytics page
-- `RecruitmentAnalyticsView` - ATS metrics
-- `HRAnalyticsView` - HR metrics
-- `MarketplaceAnalyticsView` - Marketplace metrics
-- `CustomReportView` - Custom report builder
+- `IsAnalyticsAdmin`: Full access to all analytics
+- Standard users: Limited to their own data
 
-## Chart Types
+## Tasks (Celery)
 
-- Line charts (trends)
-- Bar charts (comparisons)
-- Pie charts (distributions)
-- Heatmaps (patterns)
-- Funnels (conversion)
-- Tables (detailed data)
+- `sync_analytics_data`: Update analytics aggregations
+- `daily_analytics_cleanup`: Archive old reports
 
-## Future Improvements
+## Testing
 
-### High Priority
-
-1. **Predictive Analytics**
-   - Turnover prediction
-   - Hiring demand forecasting
-   - Revenue forecasting
-   - Churn prediction
-
-2. **AI Insights**
-   - Anomaly detection
-   - Trend identification
-   - Automated recommendations
-   - Natural language insights
-
-3. **Advanced Visualization**
-   - Interactive charts
-   - Real-time updates
-   - 3D visualizations
-   - Geo-maps
-
-4. **Benchmarking**
-   - Industry benchmarks
-   - Peer comparison
-   - Best practice insights
-   - Competitive analysis
-
-5. **Report Builder**
-   - Drag-and-drop report designer
-   - Custom KPIs
-   - Calculated fields
-   - Report templates
-
-### Medium Priority
-
-6. **Data Warehouse**: Separate analytics database
-7. **BI Tool Integration**: Tableau, Power BI connectors
-8. **API Analytics**: Usage analytics, performance metrics
-9. **Cohort Analysis**: User cohort tracking
-10. **A/B Testing**: Experiment analysis
-
-## Technology
-
-- **Charts**: Chart.js (frontend)
-- **Processing**: Pandas (backend)
-- **Storage**: PostgreSQL + TimescaleDB (planned)
-- **Cache**: Redis for computed metrics
-- **Jobs**: Celery for report generation
-
-## Security
-
-- Role-based data access
-- Data anonymization options
-- Export audit trail
-- GDPR-compliant exports
-
-## Performance
-
-- Pre-computed aggregations
-- Redis caching
-- Background processing
-- Query optimization
-- Data sampling for large datasets
-
----
-
-**Status:** In Development
-**Target:** Q2 2026
+```bash
+pytest analytics/tests/
+```

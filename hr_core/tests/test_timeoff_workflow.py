@@ -22,7 +22,7 @@ from django.test import Client
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
-from accounts.models import TenantUser
+from tenant_profiles.models import TenantUser
 from tenants.models import Tenant
 from hr_core.models import (
     Employee, TimeOffType, TimeOffRequest, TimeOffBalance,

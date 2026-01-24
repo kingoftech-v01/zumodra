@@ -1,6 +1,6 @@
 """
 Django-Tenants Configuration for Zumodra
-Multi-Tenant ATS/HR SaaS Platform
+Multi-Tenant Jobs/HR SaaS Platform
 
 This file contains the tenant-specific settings that override/extend base settings.
 Import this at the end of settings.py when multi-tenancy is enabled.
@@ -36,8 +36,8 @@ SHARED_APPS = [
     'analytical',  # Analytics tracking
     'django_celery_beat',  # Scheduled tasks
 
-    # Custom user model (shared across tenants)
-    'custom_account_u',
+    # Core identity & verification (shared across tenants - PUBLIC schema)
+    'core_identity',
 
     # Integrations (shared - webhooks dispatched from public schema)
     'integrations',
@@ -46,10 +46,12 @@ SHARED_APPS = [
     'core',
     'security',
     'ai_matching',  # AI matching engine
-    'marketing',  # Marketing/tracking
+    # REMOVED (2026-01-17): 'marketing' merged into 'marketing_campaigns' (now in TENANT_APPS)
 
-    # Newsletter (shared for public pages footer)
-    'newsletter',
+    # REMOVED (2026-01-17): 'newsletter' merged into 'marketing_campaigns' (now in TENANT_APPS)
+
+    # Platform Billing (PUBLIC schema - Zumodra charges tenants)
+    'billing',  # Platform subscription management
 
     # MULTI-TENANT CONFIGURATION (2026-01-16):
     # Wagtail CMS apps are in SHARED_APPS (public schema only) because:
@@ -75,8 +77,9 @@ SHARED_APPS = [
     'blog',
 
     # PUBLIC CATALOG APPS (shared - cross-tenant browsing without tenant context)
-    'ats_public',  # Public job catalog for browsing
+    'jobs_public',  # Public job catalog for browsing
     'services_public',  # Public service/provider catalog for marketplace
+    'projects_public',  # Public project catalog for cross-tenant project browsing
 ]
 
 # Tenant-specific apps (each tenant gets their own tables)
@@ -92,11 +95,6 @@ TENANT_APPS = [
     'django.contrib.gis',
 
     # Authentication & 2FA
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_hotp',
-    'django_otp.plugins.otp_email',
-    'django_otp.plugins.otp_static',
     'allauth',
     'allauth.mfa',  # Built-in MFA support (TOTP, WebAuthn) in allauth 65.3.0+
     'allauth.account',
@@ -133,22 +131,33 @@ TENANT_APPS = [
 
     # Existing Zumodra apps (tenant-scoped)
     'main',
-    # REMOVED (2026-01-16): 'blog' moved to SHARED_APPS - tenants don't publish blog posts
-    'finance',
     'messages_sys',
     'configurations',
-    'dashboard_service',
     'dashboard',
-    'services',
-    'appointment.apps.AppointmentConfig',
+    'services',  # Ongoing service offerings (marketplace)
+    'projects',  # Time-bound project missions with deliverables
     'api',
     'notifications',
     'analytics',
-    'newsletter',
+    'marketing_campaigns',  # Unified marketing & campaigns (tenant-aware, replaces marketing + newsletter)
 
-    # NEW ATS/HR Apps
-    'accounts',  # KYC, progressive revelation, RBAC
-    'ats',  # Applicant Tracking System
+    # Finance Apps (TENANT schema - tenant payment processing)
+    'payments',          # Tenant payment processing with multi-currency
+    'subscriptions',     # Tenant's own subscription products (SaaS tenants selling to their clients)
+    'escrow',           # Marketplace escrow for services/projects
+    'stripe_connect',   # Stripe Connect for freelancer payouts
+    'payroll',          # Employee payroll processing
+    'expenses',         # Business expense tracking
+    'tax',              # Tax calculation and Avalara integration
+    'accounting',       # QuickBooks/Xero integration
+    'finance_webhooks', # Webhook handling for finance integrations
+
+    # Interview Scheduling (renamed from appointment)
+    'interviews',  # Interview scheduling and appointment booking system
+
+    # NEW JOBS/HR Apps
+    'tenant_profiles',  # Tenant-specific user profiles & membership (renamed from accounts - Phase 10)
+    'jobs',  # Jobs & Recruitment (renamed from ats - Phase 7)
     'hr_core',  # HR operations
     'careers',  # Career pages (tenant-specific, TODO: PublicJobCatalog needed for cross-tenant public API)
 ]
@@ -201,12 +210,11 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'custom_account_u.middleware.Require2FAMiddleware',
+    'core_identity.middleware.UnifiedMFAEnforcementMiddleware',  # 30-day MFA grace period
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'custom_account_u.middleware.AuthSecurityMiddleware',
+    'core_identity.middleware.AuthSecurityMiddleware',  # Brute force protection
     'auditlog.middleware.AuditlogMiddleware',
     'csp.middleware.CSPMiddleware',
     'axes.middleware.AxesMiddleware',
@@ -311,7 +319,7 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'INFO',
         },
-        'ats': {
+        'jobs': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
         },

@@ -57,7 +57,7 @@ def public_user_with_mfa(db):
 @pytest.fixture
 def public_user_with_profile(db, public_user):
     """Create a public user with complete profile."""
-    from accounts.models import UserProfile
+    from tenant_profiles.models import UserProfile
 
     # Create or update profile
     profile, created = UserProfile.objects.get_or_create(user=public_user)
@@ -259,7 +259,7 @@ class TestProfileCompletionWidget:
 
     def test_profile_completion_partial_profile(self, client, public_user, db):
         """Partial profile should show correct percentage."""
-        from accounts.models import UserProfile
+        from tenant_profiles.models import UserProfile
 
         # Create profile with 2 out of 4 fields
         profile, created = UserProfile.objects.get_or_create(user=public_user)

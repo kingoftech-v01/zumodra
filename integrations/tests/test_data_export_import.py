@@ -39,13 +39,13 @@ from rest_framework import status
 
 from tenants.models import Tenant
 from tenants.utils import tenant_context
-from accounts.models import TenantUser, UserProfile
-from ats.models import (
+from tenant_profiles.models import TenantUser, UserProfile
+from jobs.models import (
     JobPosting, Candidate, Application, Interview,
     InterviewFeedback, Offer, Pipeline, JobCategory
 )
-from ats.serializers import CandidateBulkImportSerializer
-from ats.views import CandidateViewSet
+from jobs.serializers import CandidateBulkImportSerializer
+from jobs.views import CandidateViewSet
 from hr_core.models import Employee, TimeOff
 from finance.models import Subscription
 from integrations.models import OutboundWebhook, WebhookEvent
@@ -95,7 +95,7 @@ class TestCSVExport(TransactionTestCase):
                 candidates.append(candidate)
 
             # Export to CSV
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 
@@ -127,7 +127,7 @@ class TestCSVExport(TransactionTestCase):
                 jobs.append(job)
 
             # Export to CSV
-            response = self.client.post('/api/v1/ats/jobs/export/', {
+            response = self.client.post('/api/v1/jobs/jobs/export/', {
                 'format': 'csv'
             })
 
@@ -152,7 +152,7 @@ class TestCSVExport(TransactionTestCase):
                 )
 
             # Export filtered candidates
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv',
                 'filters': {'source': 'linkedin'}
             })
@@ -210,7 +210,7 @@ class TestExcelExport(TransactionTestCase):
                 )
 
             # Request Excel export
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'excel'
             })
 
@@ -300,7 +300,7 @@ class TestPDFGeneration(TransactionTestCase):
                 )
 
             # Request PDF report
-            response = self.client.get('/api/v1/ats/jobs/{}/report/'.format(job.id), {
+            response = self.client.get('/api/v1/jobs/jobs/{}/report/'.format(job.id), {
                 'format': 'pdf'
             })
 
@@ -575,7 +575,7 @@ class TestExportImportDataIntegrity(TransactionTestCase):
             )
 
             # Export
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 
@@ -643,7 +643,7 @@ class TestAuditLogging(TransactionTestCase):
                 )
 
             # Export
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 
@@ -740,7 +740,7 @@ class TestMultiTenantIsolation(TransactionTestCase):
 
         # User 1 exports should only see tenant 1 data
         with tenant_context(self.tenant1):
-            response = self.client1.post('/api/v1/ats/candidates/export/', {
+            response = self.client1.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 
@@ -849,7 +849,7 @@ John,Döe,john@example.com"""
         client.force_authenticate(user=unprivileged_user)
 
         with tenant_context(self.tenant):
-            response = client.post('/api/v1/ats/candidates/export/', {
+            response = client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 
@@ -892,7 +892,7 @@ John,Doe,john@example.com"""
 
             # Make multiple rapid import requests
             for i in range(10):
-                response = self.client.post('/api/v1/ats/candidates/bulk-import/', {
+                response = self.client.post('/api/v1/jobs/candidates/bulk-import/', {
                     'csv_data': csv_content
                 }, format='json')
 
@@ -914,7 +914,7 @@ John,Doe,john@example.com"""
             # Make rapid export requests
             responses = []
             for i in range(20):
-                response = self.client.post('/api/v1/ats/candidates/export/', {
+                response = self.client.post('/api/v1/jobs/candidates/export/', {
                     'format': 'csv'
                 })
                 responses.append(response.status_code)
@@ -968,7 +968,7 @@ class TestExportPerformance(TransactionTestCase):
             import time
             start = time.time()
 
-            response = self.client.post('/api/v1/ats/candidates/export/', {
+            response = self.client.post('/api/v1/jobs/candidates/export/', {
                 'format': 'csv'
             })
 

@@ -35,7 +35,7 @@ def require_tenant_type(*allowed_types):
     Example:
         @require_tenant_type('company')  # Only companies can create jobs
         def create_job_posting(request):
-            return render(request, 'ats/job_create.html')
+            return render(request, 'jobs/job_create.html')
     """
     def decorator(view_func_or_class):
         # Check if it's a class-based view

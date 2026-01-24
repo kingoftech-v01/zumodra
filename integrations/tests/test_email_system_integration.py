@@ -48,7 +48,7 @@ from notifications.models import (
 )
 from notifications.services import EmailNotificationService, NotificationResult
 from integrations.models import Integration
-from accounts.models import User, UserProfile
+from tenant_profiles.models import User, UserProfile
 from tenants.models import Tenant
 from django.test.utils import override_settings
 from django.core.mail import outbox

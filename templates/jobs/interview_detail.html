@@ -1,0 +1,202 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block page_title %}{% trans "Interview Details" %}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:jobs:pipeline_board' %}" class="text-secondary hover:text-primary caption1">{% trans "Pipeline" %}</a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">{% trans "Interview Details" %}</span>
+</div>
+
+<!-- Page Header -->
+<div class="heading flex items-center justify-between mb-6">
+    <div>
+        <h3 class="heading3 text-title">
+            {{ interview.interview_type|title }} {% trans "Interview" %}
+        </h3>
+        <div class="flex items-center gap-4 caption1 text-secondary mt-2">
+            <span class="flex items-center gap-1.5">
+                <i class="ph ph-calendar"></i>
+                {{ interview.scheduled_start|date:"F j, Y" }}
+            </span>
+            <span class="flex items-center gap-1.5">
+                <i class="ph ph-clock"></i>
+                {{ interview.scheduled_start|time:"g:i A" }} - {{ interview.scheduled_end|time:"g:i A" }}
+            </span>
+            <span class="tag bg-{{ interview.status }} bg-opacity-10 text-{{ interview.status }}">
+                {{ interview.get_status_display }}
+            </span>
+        </div>
+    </div>
+    <div class="flex gap-3">
+        {% if interview.status == 'scheduled' or interview.status == 'confirmed' %}
+        <button hx-get="{% url 'frontend:jobs:interview_reschedule' interview.pk %}"
+                hx-target="#reschedule-modal"
+                hx-swap="innerHTML"
+                class="button-main -border flex items-center gap-2">
+            <i class="ph ph-clock"></i>
+            {% trans "Reschedule" %}
+        </button>
+        <button hx-post="{% url 'frontend:jobs:interview_cancel' interview.pk %}"
+                hx-confirm="Are you sure you want to cancel this interview?"
+                class="button-main -border flex items-center gap-2 text-red border-red hover:bg-red hover:bg-opacity-10">
+            {% trans "Cancel Interview" %}
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Interview Header Card -->
+<div class="p-8 rounded-lg bg-white mb-7.5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Candidate Info -->
+        <div>
+            <h4 class="caption1 font-medium text-secondary mb-3">{% trans "Candidate" %}</h4>
+            <a href="{% url 'frontend:jobs:candidate_detail' interview.application.candidate.pk %}" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                    <span class="heading6 text-white">{{ interview.application.candidate.initials }}</span>
+                </div>
+                <div>
+                    <p class="heading6 text-title group-hover:text-primary">
+                        {{ interview.application.candidate.full_name }}
+                    </p>
+                    <p class="caption2 text-secondary">{{ interview.application.candidate.email }}</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Job Info -->
+        <div>
+            <h4 class="caption1 font-medium text-secondary mb-3">{% trans "Position" %}</h4>
+            <a href="{% url 'frontend:jobs:job_detail' interview.application.job_posting.pk %}" class="heading6 text-title hover:text-primary">
+                {{ interview.application.job_posting.title }}
+            </a>
+            <p class="caption1 text-secondary">{{ interview.application.job_posting.department }}</p>
+        </div>
+
+        <!-- Interviewer Info -->
+        <div>
+            <h4 class="caption1 font-medium text-secondary mb-3">{% trans "Interviewer" %}</h4>
+            {% if interview.interviewer %}
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                    <span class="caption1 font-medium text-white">{{ interview.interviewer.first_name.0 }}{{ interview.interviewer.last_name.0 }}</span>
+                </div>
+                <div>
+                    <p class="heading6 text-title">
+                        {{ interview.interviewer.get_full_name }}
+                    </p>
+                    <p class="caption2 text-secondary">{{ interview.interviewer.email }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="caption1 text-secondary">{% trans "Not assigned" %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if interview.meeting_link %}
+    <div class="mt-6 p-4 bg-blue bg-opacity-10 rounded-lg border border-blue">
+        <div class="flex items-center justify-between">
+            <div>
+                <h4 class="heading6 text-blue">{% trans "Meeting Link" %}</h4>
+                <p class="caption1 text-blue mt-1">{{ interview.meeting_link }}</p>
+            </div>
+            <a href="{{ interview.meeting_link }}" target="_blank" class="button-main flex items-center gap-2">
+                <i class="ph ph-video-camera"></i>
+                {% trans "Join Meeting" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if interview.notes %}
+    <div class="mt-6">
+        <h4 class="caption1 font-medium text-secondary mb-2">{% trans "Notes" %}</h4>
+        <p class="caption1 text-title">{{ interview.notes }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Feedback Section -->
+<div class="p-8 rounded-lg bg-white">
+    <div class="flex items-center justify-between mb-6">
+        <h4 class="heading5 text-title">{% trans "Interview Feedback" %}</h4>
+        {% if can_provide_feedback %}
+        <button hx-get="{% url 'frontend:jobs:interview_feedback' interview_pk=interview.pk %}"
+                hx-target="#feedback-modal"
+                hx-swap="innerHTML"
+                class="button-main flex items-center gap-2">
+            <i class="ph ph-plus"></i>
+            {% trans "Add Feedback" %}
+        </button>
+        {% endif %}
+    </div>
+
+    {% if feedback_list %}
+        {% for feedback in feedback_list %}
+        <div class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:pb-0 last:mb-0">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                        <span class="caption1 font-medium text-white">{{ feedback.interviewer.first_name.0 }}{{ feedback.interviewer.last_name.0 }}</span>
+                    </div>
+                    <div>
+                        <p class="heading6 text-title">{{ feedback.interviewer.get_full_name }}</p>
+                        <p class="caption2 text-secondary">{{ feedback.created_at|naturaltime }}</p>
+                    </div>
+                </div>
+                <span class="tag bg-{{ feedback.recommendation }} bg-opacity-10 text-{{ feedback.recommendation }}">
+                    {{ feedback.get_recommendation_display }}
+                </span>
+            </div>
+
+            {% if feedback.overall_rating %}
+            <div class="mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="caption1 text-secondary">{% trans "Overall Rating:" %}</span>
+                    <div class="flex">
+                        {% for i in "12345" %}
+                        <i class="ph-fill ph-star {% if forloop.counter <= feedback.overall_rating %}text-yellow{% else %}text-gray-300{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <p class="caption1 text-title">{{ feedback.comments }}</p>
+
+            {% if feedback.strengths or feedback.areas_for_improvement %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {% if feedback.strengths %}
+                <div>
+                    <h5 class="caption1 font-medium text-green mb-2">{% trans "Strengths" %}</h5>
+                    <p class="caption1 text-secondary">{{ feedback.strengths }}</p>
+                </div>
+                {% endif %}
+                {% if feedback.areas_for_improvement %}
+                <div>
+                    <h5 class="caption1 font-medium text-orange mb-2">{% trans "Areas for Improvement" %}</h5>
+                    <p class="caption1 text-secondary">{{ feedback.areas_for_improvement }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-12">
+            <i class="ph ph-file-text text-6xl text-secondary mb-4"></i>
+            <h5 class="heading6 text-title mb-2">{% trans "No feedback yet" %}</h5>
+            <p class="caption1 text-secondary">{% trans "Feedback will appear here after the interview." %}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modals -->
+<div id="reschedule-modal"></div>
+<div id="feedback-modal"></div>
+{% endblock %}

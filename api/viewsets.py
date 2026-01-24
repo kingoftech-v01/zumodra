@@ -25,7 +25,7 @@ from services.models import (
     ClientRequest, ServiceProposal, ServiceContract,
     ServiceReview
 )
-from appointment.models import Appointment
+from interviews.models import Appointment
 from configurations.models import Skill, Company
 
 # Import secure base classes and permissions
@@ -184,7 +184,7 @@ class ServiceViewSet(SecureTenantViewSet):
 
     def _is_tenant_admin(self, request):
         """Check if user is tenant admin."""
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         tenant = getattr(request, 'tenant', None)
         if not tenant:
             return False
@@ -249,7 +249,7 @@ class ClientRequestViewSet(SecureTenantViewSet):
         return queryset
 
     def _is_tenant_admin(self, request):
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         tenant = getattr(request, 'tenant', None)
         if not tenant:
             return False
@@ -600,7 +600,7 @@ class CompanyViewSet(SecureTenantViewSet):
 
     def _is_tenant_admin(self, request):
         """Check if user is tenant admin."""
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         tenant = getattr(request, 'tenant', None)
         if not tenant:
             return False

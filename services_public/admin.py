@@ -107,7 +107,7 @@ class PublicServiceCatalogAdmin(admin.ModelAdmin):
             'fields': (
                 'is_verified',
                 'is_featured',
-                'is_accepting_projects',
+                'is_accepting_work',
                 'availability_status',
                 'published_at',
             )

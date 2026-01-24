@@ -17,7 +17,7 @@ from django.test import RequestFactory
 from django.utils import timezone
 
 from tenants.models import Tenant, Domain, TenantInvitation, AuditLog
-from accounts.models import TenantUser
+from tenant_profiles.models import TenantUser
 
 
 # ============================================================================

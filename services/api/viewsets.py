@@ -24,7 +24,7 @@ from django_filters import rest_framework as django_filters
 
 from core.cache import TenantCache, RATING_CACHE_TIMEOUT
 from core.viewsets import SecureTenantViewSet, SecureReadOnlyViewSet
-from accounts.permissions import (
+from tenant_profiles.permissions import (
     IsTenantUser,
     IsOwnerOrReadOnly,
     HasKYCVerification,
@@ -45,7 +45,7 @@ from ..models import (
     ServiceReview,
     ContractMessage,
 )
-from ..serializers import (
+from .serializers import (
     ServiceCategorySerializer,
     ServiceCategoryListSerializer,
     ServiceTagSerializer,

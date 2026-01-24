@@ -1,0 +1,262 @@
+{% extends 'base/unified_base.html' %}
+{% load static %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header">
+                    <h4 class="mb-0">Book an Appointment</h4>
+                </div>
+                <div class="zu-card__body">
+                    <form method="post" action="{% url 'frontend:interviews:book' %}" id="bookingForm">
+                        {% csrf_token %}
+
+                        <!-- Step 1: Select Service -->
+                        <div class="booking-step" id="step1">
+                            <h5 class="mb-3">1. Select a Service</h5>
+                            <div class="row">
+                                {% for service in services %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-card h-100 service-card" data-service-id="{{ service.id }}"
+                                         data-duration="{{ service.duration.total_seconds }}" style="cursor: pointer;">
+                                        <div class="zu-card__body">
+                                            <h6 class="zu-card__title">{{ service.name }}</h6>
+                                            <p class="zu-card__text text-muted small">{{ service.description|truncatewords:20 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge bg-primary">${{ service.price }}</span>
+                                                <small class="text-muted">{{ service.duration }} min</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="service" id="selectedService">
+                        </div>
+
+                        <!-- Step 2: Select Staff (if applicable) -->
+                        <div class="booking-step d-none" id="step2">
+                            <h5 class="mb-3">2. Select Staff Member</h5>
+                            <div class="row" id="staffList">
+                                {% for staff in staff_members %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="zu-card h-100 staff-card" data-staff-id="{{ staff.id }}" style="cursor: pointer;">
+                                        <div class="zu-card__body text-center">
+                                            {% if staff.photo %}
+                                            <img src="{{ staff.photo.url }}" class="rounded-circle mb-2" width="60" height="60">
+                                            {% else %}
+                                            <div class="bg-secondary rounded-circle d-inline-block mb-2"
+                                                 style="width: 60px; height: 60px; line-height: 60px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            </div>
+                                            {% endif %}
+                                            <h6 class="mb-1">{{ staff.user.get_full_name }}</h6>
+                                            <small class="text-muted">{{ staff.title }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="staff_member" id="selectedStaff">
+                        </div>
+
+                        <!-- Step 3: Select Date & Time -->
+                        <div class="booking-step d-none" id="step3">
+                            <h5 class="mb-3">3. Select Date & Time</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Date</label>
+                                        <input type="date" name="date" id="appointmentDate" class="zu-input"
+                                               min="{{ today|date:'Y-m-d' }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="timeSlots" class="mb-3">
+                                <label class="zu-label">Available Time Slots</label>
+                                <div class="row" id="timeSlotsContainer">
+                                    <p class="text-muted">Select a date to see available slots</p>
+                                </div>
+                            </div>
+                            <input type="hidden" name="time_slot" id="selectedTimeSlot">
+                        </div>
+
+                        <!-- Step 4: Your Details -->
+                        <div class="booking-step d-none" id="step4">
+                            <h5 class="mb-3">4. Your Details</h5>
+                            {% if user.is_authenticated %}
+                            <div class="alert alert-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                Booking as {{ user.get_full_name|default:user.email }}
+                            </div>
+                            {% else %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">First Name</label>
+                                        <input type="text" name="first_name" class="zu-input" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Last Name</label>
+                                        <input type="text" name="last_name" class="zu-input" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Email</label>
+                                        <input type="email" name="email" class="zu-input" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="zu-form-group">
+                                        <label class="zu-label">Phone</label>
+                                        <input type="tel" name="phone" class="zu-input" required>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="zu-form-group mb-3">
+                                <label class="zu-label">Notes (optional)</label>
+                                <textarea name="notes" class="zu-input" rows="3"
+                                          placeholder="Any special requests or information"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="zu-btn zu-btn--outline" id="prevBtn" style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                Previous
+                            </button>
+                            <button type="button" class="zu-btn zu-btn--primary" id="nextBtn">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
+                            <button type="submit" class="zu-btn zu-btn--primary d-none" id="submitBtn" style="background-color: var(--zu-success, #198754); border-color: var(--zu-success, #198754);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="zu-card shadow-sm sticky-top" style="top: 20px;">
+                <div class="zu-card__header">
+                    <h5 class="mb-0">Booking Summary</h5>
+                </div>
+                <div class="zu-card__body">
+                    <div id="summaryContent">
+                        <p class="text-muted">Select a service to begin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+
+document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('border-primary'));
+        this.classList.add('border-primary');
+        document.getElementById('selectedService').value = this.dataset.serviceId;
+        updateSummary();
+    });
+});
+
+document.querySelectorAll('.staff-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.staff-card').forEach(c => c.classList.remove('border-primary'));
+        this.classList.add('border-primary');
+        document.getElementById('selectedStaff').value = this.dataset.staffId;
+        updateSummary();
+    });
+});
+
+document.getElementById('appointmentDate').addEventListener('change', function() {
+    loadTimeSlots(this.value);
+});
+
+document.getElementById('nextBtn').addEventListener('click', function() {
+    if (validateStep(currentStep)) {
+        showStep(currentStep + 1);
+    }
+});
+
+document.getElementById('prevBtn').addEventListener('click', function() {
+    showStep(currentStep - 1);
+});
+
+function showStep(step) {
+    document.querySelectorAll('.booking-step').forEach(el => el.classList.add('d-none'));
+    document.getElementById('step' + step).classList.remove('d-none');
+    currentStep = step;
+
+    document.getElementById('prevBtn').style.display = step > 1 ? 'block' : 'none';
+    document.getElementById('nextBtn').classList.toggle('d-none', step === totalSteps);
+    document.getElementById('submitBtn').classList.toggle('d-none', step !== totalSteps);
+}
+
+function validateStep(step) {
+    if (step === 1 && !document.getElementById('selectedService').value) {
+        alert('Please select a service');
+        return false;
+    }
+    if (step === 3 && !document.getElementById('selectedTimeSlot').value) {
+        alert('Please select a time slot');
+        return false;
+    }
+    return true;
+}
+
+function loadTimeSlots(date) {
+    const serviceId = document.getElementById('selectedService').value;
+    const staffId = document.getElementById('selectedStaff').value;
+
+    fetch(`{% url 'frontend:interviews:available_slots' %}?date=${date}&service=${serviceId}&staff=${staffId}`)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = '';
+            data.slots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'zu-btn zu-btn--outline m-1 time-slot-btn';
+                btn.textContent = slot.time;
+                btn.dataset.slot = slot.id;
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('selectedTimeSlot').value = slot.id;
+                    updateSummary();
+                });
+                container.appendChild(btn);
+            });
+            if (data.slots.length === 0) {
+                container.innerHTML = '<p class="text-muted">No available slots for this date</p>';
+            }
+        });
+}
+
+function updateSummary() {
+    // Update summary sidebar with selected options
+}
+</script>
+{% endblock %}

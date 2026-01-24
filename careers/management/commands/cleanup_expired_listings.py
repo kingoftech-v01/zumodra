@@ -9,7 +9,7 @@ from django.db import connection
 from django.utils import timezone
 from tenants.models import Tenant
 from careers.models import JobListing, PublicApplication
-from ats.models import JobPosting
+from jobs.models import JobPosting
 
 
 class Command(BaseCommand):

@@ -224,10 +224,10 @@ class PublicServiceCatalog(gis_models.Model):
         help_text="Whether provider is featured in marketplace"
     )
 
-    is_accepting_projects = models.BooleanField(
+    is_accepting_work = models.BooleanField(
         default=True,
         db_index=True,
-        help_text="Whether provider is accepting new projects"
+        help_text="Whether provider is accepting new service requests and contracts"
     )
 
     # ===== Metadata =====
@@ -257,7 +257,7 @@ class PublicServiceCatalog(gis_models.Model):
             models.Index(fields=['location_city', 'location_state'], name='svc_pub_location_idx'),
             models.Index(fields=['-rating_avg', '-total_reviews'], name='svc_pub_rating_idx'),
             models.Index(fields=['-published_at'], name='svc_pub_published_idx'),
-            models.Index(fields=['availability_status', 'is_accepting_projects'], name='svc_pub_availability_idx'),
+            models.Index(fields=['availability_status', 'is_accepting_work'], name='svc_pub_availability_idx'),
         ]
 
         ordering = ['-published_at']

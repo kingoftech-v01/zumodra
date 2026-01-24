@@ -291,7 +291,7 @@ def build_api_url(endpoint: str, version: str = 'v1') -> str:
     Build a full API URL for an endpoint.
 
     Args:
-        endpoint: API endpoint path (e.g., 'jobs/', 'ats/applications/')
+        endpoint: API endpoint path (e.g., 'jobs/', 'jobs/applications/')
         version: API version (default: 'v1')
 
     Returns:

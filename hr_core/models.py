@@ -354,7 +354,7 @@ class Employee(TenantAwareModel):
 
     # Linked to ATS
     from_application = models.ForeignKey(
-        'ats.Application',
+        'jobs.Application',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

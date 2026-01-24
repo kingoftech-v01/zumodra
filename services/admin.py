@@ -126,7 +126,7 @@ class ServiceProviderAdmin(admin.ModelAdmin):
             'fields': ('rating_avg', 'total_reviews', 'completed_jobs_count', 'total_earnings', 'response_rate')
         }),
         (_('Status'), {
-            'fields': ('availability_status', 'is_verified', 'is_featured', 'is_private', 'is_accepting_projects')
+            'fields': ('availability_status', 'is_verified', 'is_featured', 'is_private', 'is_accepting_work')
         }),
         (_('Stripe Connect'), {
             'fields': ('stripe_account_id', 'stripe_onboarding_complete', 'stripe_payouts_enabled'),

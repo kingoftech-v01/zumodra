@@ -4,7 +4,7 @@ Management command to geocode existing tenants, jobs, and services.
 
 from django.core.management.base import BaseCommand
 from tenants.models import Tenant
-from ats.models import JobPosting
+from jobs.models import JobPosting
 from services.models import Service
 from core.geocoding import GeocodingService
 

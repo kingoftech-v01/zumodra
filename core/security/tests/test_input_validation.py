@@ -494,7 +494,7 @@ class TestSQLInjection:
         # This would cause SQL injection if not parameterized
         search_term = "'; DROP TABLE users; --"
 
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         # The ORM should safely escape this
         with patch.object(JobPosting.objects, 'filter') as mock_filter:
             JobPosting.objects.filter(title__icontains=search_term)

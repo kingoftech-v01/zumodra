@@ -57,7 +57,7 @@
                 <ul class="zu-search-results__list">
                     {% for job in jobs %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'frontend:ats:job_detail' job.uuid %}"
+                        <a href="{% url 'frontend:jobs:job_detail' job.uuid %}"
                            data-index="{{ forloop.counter0 }}"
                            class="zu-search-results__link"
                            :class="{ 'zu-search-results__link--active': activeIndex === {{ forloop.counter0 }} }">
@@ -87,7 +87,7 @@
                 <ul class="zu-search-results__list">
                     {% for candidate in candidates %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'frontend:ats:candidate_detail' candidate.uuid %}"
+                        <a href="{% url 'frontend:jobs:candidate_detail' candidate.uuid %}"
                            data-index="{{ forloop.counter0|add:jobs|length }}"
                            class="zu-search-results__link">
                             <div class="zu-avatar zu-avatar--sm zu-avatar--neutral">
@@ -155,7 +155,7 @@
                 <ul class="zu-search-results__list">
                     {% for application in applications %}
                     <li class="zu-search-results__item">
-                        <a href="{% url 'frontend:ats:application_detail' application.uuid %}"
+                        <a href="{% url 'frontend:jobs:application_detail' application.uuid %}"
                            class="zu-search-results__link">
                             <div class="zu-search-results__item-content">
                                 <p class="zu-search-results__item-title">{{ application.candidate_name }}</p>

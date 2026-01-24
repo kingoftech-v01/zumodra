@@ -22,8 +22,8 @@ router.register(r'proposals', ServiceProposalViewSet, basename='proposal')
 router.register(r'contracts', ServiceContractViewSet, basename='contract')
 router.register(r'comments', ServiceReviewViewSet, basename='comment')
 
-# Appointment endpoints
-router.register(r'appointments', AppointmentViewSet, basename='appointment')
+# Interview scheduling endpoints
+router.register(r'appointments', AppointmentViewSet, basename='interviews')
 
 # Company endpoints
 router.register(r'companies', CompanyViewSet, basename='company')
@@ -96,7 +96,7 @@ Comments/Reviews:
 - POST /api/comments/ - Create comment
 - GET /api/comments/{id}/ - Get comment detail
 
-Appointments:
+Interview Scheduling (Appointments):
 - GET /api/appointments/ - List my appointments
 - POST /api/appointments/ - Create appointment
 - GET /api/appointments/{id}/ - Get appointment detail

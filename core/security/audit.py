@@ -66,6 +66,21 @@ class AuditAction(str, Enum):
     CONFIGURATION_CHANGE = 'configuration_change'
     SECURITY_EVENT = 'security_event'
     SYSTEM_EVENT = 'system_event'
+    # Enhanced audit actions for authentication and security
+    MFA_ENABLED = 'mfa_enabled'
+    MFA_DISABLED = 'mfa_disabled'
+    SOCIAL_LOGIN = 'social_login'
+    IMPERSONATION_START = 'impersonation_start'
+    IMPERSONATION_END = 'impersonation_end'
+    # Enhanced audit actions for sensitive data access
+    KYC_VIEWED = 'kyc_viewed'
+    FINANCIAL_DATA_VIEWED = 'financial_data_viewed'
+    SENSITIVE_DATA_EXPORT = 'sensitive_data_export'
+    # Enhanced audit actions for configuration changes
+    TENANT_SETTING_CHANGED = 'tenant_setting_changed'
+    INTEGRATION_ENABLED = 'integration_enabled'
+    INTEGRATION_DISABLED = 'integration_disabled'
+    FEATURE_FLAG_CHANGED = 'feature_flag_changed'
 
 
 class AuditSeverity(str, Enum):
@@ -760,6 +775,18 @@ class AuditLogger:
             'login_failed': "Failed login attempt",
             'password_change': "Changed password",
             'password_reset': "Reset password",
+            'mfa_enabled': "Enabled MFA",
+            'mfa_disabled': "Disabled MFA",
+            'social_login': "Logged in via social provider",
+            'impersonation_start': "Started impersonating user",
+            'impersonation_end': "Stopped impersonating user",
+            'kyc_viewed': f"Viewed KYC document",
+            'financial_data_viewed': f"Viewed financial data",
+            'sensitive_data_export': f"Exported sensitive data",
+            'tenant_setting_changed': f"Changed tenant setting",
+            'integration_enabled': f"Enabled integration",
+            'integration_disabled': f"Disabled integration",
+            'feature_flag_changed': f"Changed feature flag",
         }
 
         display = action_displays.get(action, f"{action.title()} {resource_type}")
@@ -918,6 +945,82 @@ def audit_model_changes(
     else:
         # Called as decorator
         return setup_signals
+
+
+def audit_data_access(
+    resource_type: str,
+    get_resource_id: Callable = None,
+    action: AuditAction = AuditAction.READ,
+    is_sensitive: bool = True
+):
+    """
+    Decorator for views/functions that access sensitive data.
+
+    Automatically logs when sensitive data is accessed, including:
+    - KYC documents
+    - Financial information
+    - Personal identifiable information (PII)
+    - Export operations
+
+    Args:
+        resource_type: Type of resource being accessed
+        get_resource_id: Function to extract resource ID from args/kwargs
+        action: The action being performed (default: READ)
+        is_sensitive: Whether the data is sensitive (default: True)
+
+    Usage:
+        @audit_data_access('kyc_document', lambda request, pk: pk)
+        def view_kyc_document(request, pk):
+            document = KYCDocument.objects.get(pk=pk)
+            return render(request, 'kyc/view.html', {'document': document})
+
+        @audit_data_access('financial_report', lambda request, *args, **kwargs: kwargs.get('user_id'))
+        def export_financial_data(request, user_id):
+            ...
+    """
+    def decorator(view_func: Callable):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            # Extract request and user
+            request = None
+            user = None
+
+            for arg in args:
+                if isinstance(arg, HttpRequest):
+                    request = arg
+                    user = getattr(request, 'user', None)
+                    if user and not user.is_authenticated:
+                        user = None
+                    break
+
+            # Get resource ID
+            resource_id = None
+            if get_resource_id:
+                try:
+                    resource_id = get_resource_id(*args, **kwargs)
+                except Exception as e:
+                    logger.warning(f"Failed to extract resource ID: {e}")
+
+            # Log the data access
+            AuditLogger.log(
+                action=action,
+                user=user,
+                resource_type=resource_type,
+                resource_id=str(resource_id) if resource_id else None,
+                request=request,
+                is_sensitive=is_sensitive,
+                severity=AuditSeverity.INFO,
+                extra_data={
+                    'function': view_func.__name__,
+                    'module': view_func.__module__,
+                }
+            )
+
+            # Execute the view
+            return view_func(*args, **kwargs)
+
+        return wrapper
+    return decorator
 
 
 # =============================================================================

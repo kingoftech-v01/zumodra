@@ -2,144 +2,71 @@
 
 ## Overview
 
-Manages all third-party integrations including payment processors, communication services, calendar systems, KYC providers, and webhooks.
+Third-party service integrations (LinkedIn, Stripe, Avalara, QuickBooks, Xero).
 
-## Supported Integrations
+**Schema**: TENANT (each tenant has own integration configs)
 
-### Payment & Finance
-- **Stripe**: Payment processing and Connect
-- **Stripe Connect**: Marketplace payouts
-- **Tax Services**: Avalara (planned)
+## Integrations Supported
+
+### Recruitment
+- **LinkedIn**: Job posting, candidate search
+
+### Finance
+- **Stripe**: Payment processing (managed via stripe_connect)
+- **Avalara**: Tax calculation (managed via tax app)
+- **QuickBooks**: Accounting sync (managed via accounting app)
+- **Xero**: Accounting sync (managed via accounting app)
 
 ### Communication
-- **SendGrid**: Email delivery
-- **Twilio**: SMS notifications
-- **Twilio Verify**: 2FA codes
+- **Mailchimp**: Email campaigns (managed via marketing_campaigns)
 
-### Calendar & Scheduling
-- **Google Calendar**: Calendar sync (planned)
-- **Microsoft 365**: Calendar sync (planned)
-- **Calendly**: Interview scheduling (planned)
+## API Endpoints
 
-### KYC & Verification
-- **Sumsub**: Identity verification (planned)
-- **Onfido**: Identity verification (planned)
-- **Checkr**: Background checks (planned)
+### Configuration
+- **GET/POST** `/api/v1/integrations/configs/` - Integration configs
+- **PUT/PATCH** `/api/v1/integrations/configs/<id>/` - Update config
+- **POST** `/api/v1/integrations/configs/<id>/test/` - Test connection
 
-### Document Signing
-- **DocuSign**: E-signatures (planned)
-- **HelloSign**: E-signatures (planned)
+### Webhooks
+- **GET/POST** `/api/v1/integrations/webhooks/` - Outbound webhooks
+- **POST** `/api/v1/integrations/webhooks/<id>/test/` - Test webhook
 
-### HR & Payroll
-- **Silae**: French payroll (planned)
-- **Papaya Global**: Global payroll (planned)
-- **Lucca**: HR software (planned)
+### OAuth
+- **GET** `/api/v1/integrations/oauth/authorize/?provider=linkedin` - OAuth flow
+- **GET** `/api/v1/integrations/oauth/callback/?provider=linkedin` - OAuth callback
 
-## Architecture
+## Features
 
-### Webhook System
+- OAuth 2.0 authentication
+- API key management (encrypted)
+- Webhook configuration
+- Connection testing
+- Sync status tracking
+- Error logging
 
-Located in `integrations/webhooks/`:
+## Permissions
 
-```python
-# Inbound webhooks
-/webhooks/stripe/
-/webhooks/twilio/
-/webhooks/sendgrid/
+- `IsIntegrationsAdmin`: Manage integrations
+- Only PDG/Supervisor can configure integrations
 
-# Outbound webhooks
-integrations.send_webhook(
-    tenant=tenant,
-    event='application.created',
-    payload=data
-)
-```
+## Tasks (Celery)
 
-### Webhook Security
-- HMAC-SHA256 signature verification
-- Request IP validation
-- Replay attack prevention
-- Rate limiting
+- `sync_integrations_data`: Sync with external services
+- `daily_integrations_cleanup`: Clean old logs
 
-## Models
+## Signals
 
-| Model | Description |
-|-------|-------------|
-| **Integration** | Integration configurations |
-| **WebhookEndpoint** | Tenant webhook URLs |
-| **WebhookEvent** | Event log |
-| **WebhookDelivery** | Delivery tracking |
-| **APIKey** | Integration API keys |
-
-## Views
-
-- `IntegrationListView` - Available integrations
-- `IntegrationConfigureView` - Configure integration
-- `WebhookManageView` - Manage webhooks
-- `WebhookLogView` - Webhook delivery logs
-
-## Future Improvements
-
-### High Priority
-
-1. **Calendar Integration**
-   - Google Calendar sync
-   - Microsoft 365 sync
-   - Auto-create interview events
-   - Availability checking
-
-2. **Complete KYC Integration**
-   - Sumsub API integration
-   - Onfido API integration
-   - Document upload
-   - Verification workflows
-
-3. **E-Signature Integration**
-   - DocuSign API
-   - HelloSign API
-   - Template management
-   - Signature tracking
-
-4. **Job Board Posting**
-   - Indeed integration
-   - LinkedIn Jobs
-   - Glassdoor
-   - Auto-posting
-
-5. **ATS Data Import**
-   - LinkedIn Recruiter
-   - Greenhouse import
-   - Lever import
-   - CSV/Excel import
-
-### Medium Priority
-
-6. **Payroll Integration**: Silae, Papaya Global
-7. **HRIS Integration**: Lucca, BambooHR
-8. **Video Interview**: Zoom, Google Meet
-9. **Background Checks**: Checkr, Sterling
-10. **Slack Integration**: Notifications to Slack
-
-## Security
-
-- Encrypted API keys
-- Webhook signature verification
-- IP whitelist support
-- Audit logging
-- Secret rotation
+- `integration_connected`: Trigger initial sync
+- `integration_disconnected`: Clean up webhooks
 
 ## Testing
 
-```
-tests/
-├── test_stripe_integration.py
-├── test_webhooks.py
-├── test_sendgrid.py
-├── test_twilio.py
-└── test_webhook_security.py
+```bash
+pytest integrations/tests/
 ```
 
----
+## Security
 
-**Status:** Production (core integrations)
-**In Development:** Calendar, KYC, E-signature
+- API keys encrypted at rest
+- OAuth tokens refreshed automatically
+- Webhook signatures verified (HMAC-SHA256)

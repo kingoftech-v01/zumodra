@@ -1,0 +1,454 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Pipeline" %} - Zumodra{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* Kanban Column Styles */
+    .kanban-column {
+        min-height: 500px;
+        max-height: calc(100vh - 320px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+    }
+
+    .kanban-column::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .kanban-column::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .kanban-column::-webkit-scrollbar-thumb {
+        background-color: rgba(156, 163, 175, 0.5);
+        border-radius: 3px;
+    }
+
+    .kanban-column::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(156, 163, 175, 0.7);
+    }
+
+    /* Drag and Drop Styles */
+    .candidate-card {
+        cursor: grab;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-1px);
+    }
+
+    .candidate-card:active {
+        cursor: grabbing;
+        transform: rotate(2deg);
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        background: rgb(59 130 246 / 0.1) !important;
+    }
+
+    .sortable-chosen {
+        transform: rotate(3deg);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    .sortable-drag {
+        opacity: 0;
+    }
+
+    /* Drop zone highlight */
+    .kanban-column.drag-over {
+        background-color: rgba(59, 130, 246, 0.05);
+        border: 2px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 0.5rem;
+    }
+
+    /* Stage count animation */
+    .stage-count {
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .stage-count.updated {
+        transform: scale(1.2);
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}
+<div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+        <h4 class="heading4 max-lg:mt-3">{% trans "Hiring Pipeline" %}</h4>
+        <p class="caption1 text-secondary mt-1">{% trans "Drag and drop candidates through your hiring stages" %}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+            <span class="ph ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl text-secondary"></span>
+            <input type="text"
+                   id="pipeline-search"
+                   class="w-64 h-12 pl-10 pr-4 border-line rounded-lg"
+                   placeholder="{% trans 'Search candidates...' %}"
+                   @input="filterCards($event.target.value)">
+        </div>
+
+        <!-- Job Filter -->
+        <div class="select_block flex items-center w-48 h-12 pr-10 pl-4 border border-line rounded-lg">
+            <div class="select">
+                <span class="selected" data-title="{% trans 'All Jobs' %}">
+                    {% if job %}{{ job.title|truncatewords:3 }}{% else %}{% trans "All Jobs" %}{% endif %}
+                </span>
+                <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                    <li data-item="" data-url="{% url 'frontend:jobs:pipeline_board' %}">{% trans "All Jobs" %}</li>
+                    {% for job_item in jobs %}
+                    <li data-item="{{ job_item.id }}" data-url="{% url 'frontend:jobs:pipeline_board' %}?job={{ job_item.id }}">
+                        {{ job_item.title }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <span class="icon_down ph ph-caret-down right-3"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="main-content" x-data="pipelineBoard()">
+    <!-- Pipeline Stats Summary -->
+    {% if pipeline %}
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-7.5">
+        {% for stage_data in stages_data %}
+        <div class="p-6 rounded-lg bg-white">
+            <div class="flex items-center justify-between mb-2">
+                <span class="w-3 h-3 rounded-full" style="background-color: {{ stage_data.stage.color|default:'#6b7280' }};"></span>
+                <span class="heading4 font-bold">{{ stage_data.count }}</span>
+            </div>
+            <p class="caption1 text-secondary truncate" title="{{ stage_data.stage.name }}">{{ stage_data.stage.name }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Pipeline Board Container -->
+    <div id="pipeline-container">
+        <div id="pipeline-board" class="flex gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
+            {% for stage_data in stages_data %}
+            <div class="flex-shrink-0 w-80">
+                <!-- Column Header -->
+                <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 rounded-t-lg border-b-2"
+                     style="border-color: {{ stage_data.stage.color|default:'#6b7280' }}; background: #f5f5f5;">
+                    <div class="flex items-center min-w-0 gap-2">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: {{ stage_data.stage.color|default:'#6b7280' }};"></span>
+                        <h3 class="text-button truncate" title="{{ stage_data.stage.name }}">
+                            {{ stage_data.stage.name }}
+                        </h3>
+                        <span class="stage-count flex items-center justify-center w-6 h-6 rounded-full bg-white text-xs font-medium"
+                              id="stage-count-{{ stage_data.stage.id }}">
+                            {{ stage_data.count }}
+                        </span>
+                    </div>
+
+                    <!-- Column Actions -->
+                    <div class="relative flex-shrink-0" x-data="{ open: false }">
+                        <button @click="open = !open"
+                                class="p-1 rounded-md hover:bg-white transition-colors">
+                            <span class="ph ph-dots-three-vertical text-xl"></span>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                             class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <div class="py-1">
+                                <button @click="selectAllInStage('{{ stage_data.stage.id }}')"
+                                        class="block w-full text-left px-4 py-2 text-sm hover:bg-surface">
+                                    <span class="ph ph-checks text-lg mr-2"></span>
+                                    {% trans "Select All" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanban Column Body -->
+                <div class="kanban-column rounded-b-lg p-2 space-y-2 bg-surface"
+                     data-stage-id="{{ stage_data.stage.id }}"
+                     data-stage-name="{{ stage_data.stage.name }}"
+                     id="stage-{{ stage_data.stage.id }}">
+
+                    {% for application in stage_data.applications %}
+                    <div class="candidate-card p-4 rounded-lg bg-white cursor-grab hover:shadow-md transition-shadow"
+                         data-application-id="{{ application.id }}">
+                        <div class="flex items-start gap-3">
+                            {% if application.candidate.photo %}
+                            <img src="{{ application.candidate.photo.url }}"
+                                 alt="{{ application.candidate.full_name }}"
+                                 class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+                                {{ application.candidate.first_name|slice:":1" }}{{ application.candidate.last_name|slice:":1" }}
+                            </div>
+                            {% endif %}
+
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-button truncate">{{ application.candidate.full_name }}</h4>
+                                <p class="caption1 text-secondary truncate mt-1">{{ application.job.title }}</p>
+
+                                {% if application.match_score %}
+                                <div class="flex items-center gap-2 mt-2">
+                                    <div class="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-300
+                                            {% if application.match_score.overall >= 85 %}bg-green-500
+                                            {% elif application.match_score.overall >= 70 %}bg-blue-500
+                                            {% elif application.match_score.overall >= 50 %}bg-yellow-500
+                                            {% else %}bg-red-500{% endif %}"
+                                            style="width: {{ application.match_score.overall }}%"></div>
+                                    </div>
+                                    <span class="caption2 text-secondary">{{ application.match_score.overall|floatformat:0 }}%</span>
+                                </div>
+                                {% endif %}
+
+                                <div class="flex items-center justify-between mt-3">
+                                    <span class="caption2 text-secondary">
+                                        <span class="ph ph-clock text-sm"></span>
+                                        {{ application.created_at|naturaltime }}
+                                    </span>
+                                    <a href="{% url 'frontend:jobs:application_detail' application.id %}"
+                                       class="caption2 text-primary hover:underline">
+                                        {% trans "View" %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-placeholder p-8 text-center border-2 border-dashed border-line rounded-lg transition-colors">
+                        <span class="ph ph-users text-4xl text-secondary block mb-2"></span>
+                        <p class="caption1 text-secondary">{% trans "No candidates" %}</p>
+                        <p class="caption2 text-secondary mt-1">{% trans "Drag candidates here" %}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="flex-1 flex items-center justify-center py-12">
+                <div class="text-center">
+                    <span class="ph ph-kanban text-6xl text-secondary block mb-4"></span>
+                    <h3 class="text-button">{% trans "No pipeline configured" %}</h3>
+                    <p class="caption1 text-secondary mt-2">{% trans "Create a pipeline with stages to start tracking candidates" %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"
+     x-data="{ toasts: [] }"
+     @toast.window="toasts.push($event.detail); setTimeout(() => toasts.shift(), 5000)">
+    <template x-for="(toast, index) in toasts" :key="index">
+        <div x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <template x-if="toast.type === 'success'">
+                            <span class="ph ph-check-circle text-2xl text-green-400"></span>
+                        </template>
+                        <template x-if="toast.type === 'error'">
+                            <span class="ph ph-x-circle text-2xl text-red-400"></span>
+                        </template>
+                    </div>
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p class="text-sm font-medium" x-text="toast.message"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button @click="toasts.splice(index, 1)" class="inline-flex text-secondary hover:text-black">
+                            <span class="ph ph-x text-xl"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<!-- Local SortableJS for drag and drop -->
+<script src="{% static 'assets/js/vendor/Sortable.min.js' %}"></script>
+<script>
+// Pipeline Board Alpine.js Component
+function pipelineBoard() {
+    return {
+        selectedApplications: [],
+
+        init() {
+            this.initSortable();
+        },
+
+        initSortable() {
+            document.querySelectorAll('.kanban-column').forEach((column) => {
+                new Sortable(column, {
+                    group: 'pipeline',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    filter: '.empty-placeholder',
+                    handle: '.candidate-card',
+                    delay: 100,
+                    delayOnTouchOnly: true,
+                    forceFallback: true,
+
+                    onStart: (evt) => {
+                        document.querySelectorAll('.kanban-column').forEach(col => {
+                            if (col !== evt.from) {
+                                col.classList.add('drag-over');
+                            }
+                        });
+                        document.querySelectorAll('.empty-placeholder').forEach(el => {
+                            el.style.display = 'none';
+                        });
+                    },
+
+                    onEnd: (evt) => {
+                        document.querySelectorAll('.kanban-column').forEach(col => {
+                            col.classList.remove('drag-over');
+                        });
+                        document.querySelectorAll('.empty-placeholder').forEach(el => {
+                            el.style.display = '';
+                        });
+
+                        if (evt.from === evt.to && evt.oldIndex === evt.newIndex) {
+                            return;
+                        }
+
+                        const applicationId = evt.item.dataset.applicationId;
+                        const newStageId = evt.to.dataset.stageId;
+                        const oldStageId = evt.from.dataset.stageId;
+                        const newPosition = evt.newIndex;
+
+                        this.moveApplication(applicationId, newStageId, oldStageId, newPosition, evt);
+                    }
+                });
+            });
+        },
+
+        moveApplication(applicationId, newStageId, oldStageId, position, sortableEvt) {
+            const csrfToken = '{{ csrf_token }}';
+
+            fetch('{% url "frontend:jobs:application_move" 0 %}'.replace('0', applicationId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                    'HX-Request': 'true'
+                },
+                body: new URLSearchParams({
+                    stage_id: newStageId,
+                    position: position
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to move application');
+                }
+                return response.text();
+            })
+            .then(() => {
+                this.updateStageCount(oldStageId, -1);
+                this.updateStageCount(newStageId, 1);
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: {
+                        message: '{% trans "Candidate moved successfully" %}',
+                        type: 'success'
+                    }
+                }));
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+
+                if (sortableEvt) {
+                    sortableEvt.from.insertBefore(sortableEvt.item, sortableEvt.from.children[sortableEvt.oldIndex]);
+                }
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: {
+                        message: '{% trans "Failed to move candidate. Please try again." %}',
+                        type: 'error'
+                    }
+                }));
+            });
+        },
+
+        updateStageCount(stageId, delta) {
+            const countEl = document.getElementById(`stage-count-${stageId}`);
+            if (countEl) {
+                const currentCount = parseInt(countEl.textContent) || 0;
+                countEl.textContent = Math.max(0, currentCount + delta);
+                countEl.classList.add('updated');
+                setTimeout(() => countEl.classList.remove('updated'), 300);
+            }
+
+            const column = document.getElementById(`stage-${stageId}`);
+            if (column) {
+                const cards = column.querySelectorAll('.candidate-card');
+                const placeholder = column.querySelector('.empty-placeholder');
+                if (placeholder) {
+                    placeholder.style.display = cards.length > 0 ? 'none' : '';
+                }
+            }
+        },
+
+        filterCards(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(term) ? '' : 'none';
+            });
+        },
+
+        selectAllInStage(stageId) {
+            const column = document.getElementById(`stage-${stageId}`);
+            if (column) {
+                column.querySelectorAll('.candidate-card').forEach(card => {
+                    const id = card.dataset.applicationId;
+                    if (!this.selectedApplications.includes(id)) {
+                        this.selectedApplications.push(id);
+                        card.classList.add('ring-2', 'ring-primary');
+                    }
+                });
+            }
+        }
+    };
+}
+
+// Job filter handling
+document.addEventListener('DOMContentLoaded', function() {
+    const jobFilter = document.querySelector('.select_block .list_option');
+    if (jobFilter) {
+        jobFilter.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

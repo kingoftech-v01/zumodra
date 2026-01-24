@@ -1,0 +1,172 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% if offer %}{% trans "Edit Offer" %}{% else %}{% trans "Create Offer" %}{% endif %} - Zumodra{% endblock %}
+
+{% block dashboard_content %}
+<form method="post" class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+    {% csrf_token %}
+
+    <button type="button" class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+        <span class="ph ph-squares-four text-xl"></span>
+        <strong class="text-button">{% trans "Menu" %}</strong>
+    </button>
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h4 class="heading4 max-lg:mt-3">{% if offer %}{% trans "Edit Job Offer" %}{% else %}{% trans "Create Job Offer" %}{% endif %}</h4>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'frontend:jobs:application_detail' application.pk %}" class="button-main -border">{% trans "Cancel" %}</a>
+            <button class="button-main gap-2" type="submit" name="action" value="save_draft">
+                <span class="ph ph-floppy-disk"></span>
+                {% trans "Save as Draft" %}
+            </button>
+            <button class="button-main gap-2" type="submit" name="action" value="send">
+                <span class="ph ph-paper-plane-tilt"></span>
+                {% trans "Create & Send" %}
+            </button>
+        </div>
+    </div>
+
+    <!-- Candidate Header -->
+    <div class="bg-white p-6 mt-7.5 rounded-lg border border-line">
+        <div class="flex items-center gap-4">
+            <div class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
+                {% if application.candidate.photo %}
+                <img src="{{ application.candidate.photo.url }}" alt="{{ application.candidate.full_name }}" class="w-full h-full object-cover" />
+                {% else %}
+                <span class="text-2xl font-semibold text-primary">{{ application.candidate.full_name|slice:":1"|upper }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <h2 class="heading5">{{ application.candidate.full_name }}</h2>
+                <p class="text-secondary caption1 mt-1">
+                    {% trans "for" %}
+                    <a href="{% url 'frontend:jobs:job_detail' application.job.pk %}" class="text-primary hover:underline">
+                        {{ application.job.title }}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer Information -->
+    <div class="infomation p-8 mt-7.5 rounded-lg bg-white">
+        <h5 class="heading5">{% trans "Offer Information" %}</h5>
+        <div class="form grid sm:grid-cols-2 gap-5 mt-5">
+            <!-- Salary -->
+            <div class="salary">
+                <label for="salary">{% trans "Annual Salary" %}: <span class="text-red">*</span></label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">$</span>
+                    <input class="w-full h-12 pl-8 pr-4 mt-2 border-line rounded-lg"
+                           id="salary"
+                           type="number"
+                           name="salary"
+                           value="{{ form.salary.value|default:'' }}"
+                           min="0"
+                           step="1000"
+                           placeholder="75000"
+                           required />
+                </div>
+                {% if form.salary.errors %}
+                <p class="text-red caption1 mt-1">{{ form.salary.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Job Title (read-only display) -->
+            <div class="job_title">
+                <label for="job_title">{% trans "Position" %}:</label>
+                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg bg-surface"
+                       id="job_title"
+                       type="text"
+                       value="{{ application.job.title }}"
+                       readonly />
+            </div>
+
+            <!-- Start Date -->
+            <div class="start_date">
+                <label for="start_date">{% trans "Start Date" %}:</label>
+                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg"
+                       id="start_date"
+                       type="date"
+                       name="start_date"
+                       value="{% if form.start_date.value %}{{ form.start_date.value|date:'Y-m-d' }}{% endif %}" />
+                <p class="text-secondary caption1 mt-1">{% trans "When the candidate is expected to start." %}</p>
+                {% if form.start_date.errors %}
+                <p class="text-red caption1 mt-1">{{ form.start_date.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Expiration Date -->
+            <div class="expiration_date">
+                <label for="expiration_date">{% trans "Offer Expiration" %}:</label>
+                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg"
+                       id="expiration_date"
+                       type="date"
+                       name="expiration_date"
+                       value="{% if form.expiration_date.value %}{{ form.expiration_date.value|date:'Y-m-d' }}{% endif %}" />
+                <p class="text-secondary caption1 mt-1">{% trans "Date by which the candidate must respond." %}</p>
+                {% if form.expiration_date.errors %}
+                <p class="text-red caption1 mt-1">{{ form.expiration_date.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Benefits -->
+            <div class="benefits col-span-full">
+                <label for="benefits">{% trans "Benefits Package" %}:</label>
+                <textarea id="benefits"
+                          name="benefits"
+                          rows="4"
+                          class="w-full px-4 py-3 mt-2 border-line rounded-lg"
+                          placeholder="{% trans 'e.g., Health insurance, 401k matching, PTO, etc.' %}">{{ form.benefits.value|default:'' }}</textarea>
+                <p class="text-secondary caption1 mt-1">{% trans "List the benefits and perks included with this position." %}</p>
+                {% if form.benefits.errors %}
+                <p class="text-red caption1 mt-1">{{ form.benefits.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Internal Notes -->
+            <div class="notes col-span-full">
+                <label for="notes">{% trans "Internal Notes" %}:</label>
+                <textarea id="notes"
+                          name="notes"
+                          rows="3"
+                          class="w-full px-4 py-3 mt-2 border-line rounded-lg"
+                          placeholder="{% trans 'Notes visible only to hiring team...' %}">{{ form.notes.value|default:'' }}</textarea>
+                <p class="text-secondary caption1 mt-1">{% trans "These notes will not be visible to the candidate." %}</p>
+                {% if form.notes.errors %}
+                <p class="text-red caption1 mt-1">{{ form.notes.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="tips p-8 mt-7.5 rounded-lg bg-blue/5 border border-blue/20">
+        <div class="flex items-start gap-3">
+            <span class="ph-fill ph-lightbulb text-2xl text-blue flex-shrink-0 mt-1"></span>
+            <div>
+                <h5 class="heading6 text-blue">{% trans "Tips for a Great Offer" %}</h5>
+                <ul class="mt-3 space-y-2 text-secondary">
+                    <li class="flex items-start gap-2">
+                        <span class="ph-fill ph-check-circle text-blue mt-0.5"></span>
+                        <span>{% trans "Research market rates for the position and location" %}</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="ph-fill ph-check-circle text-blue mt-0.5"></span>
+                        <span>{% trans "Be specific about benefits and perks" %}</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="ph-fill ph-check-circle text-blue mt-0.5"></span>
+                        <span>{% trans "Give candidates adequate time to consider (typically 1-2 weeks)" %}</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="ph-fill ph-check-circle text-blue mt-0.5"></span>
+                        <span>{% trans "Consider the candidate's current compensation and expectations" %}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

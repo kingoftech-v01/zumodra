@@ -392,7 +392,7 @@ class TestNotificationCreation:
 
     def test_notification_with_generic_relation(self, user_factory, channel_and_template):
         """Test notification with generic foreign key to related object."""
-        from ats.models import JobPosting, Pipeline, PipelineStage, JobCategory
+        from jobs.models import JobPosting, Pipeline, PipelineStage, JobCategory
         from tenants.models import Tenant, Plan
 
         # Create necessary objects
@@ -1032,7 +1032,7 @@ class TestNotificationIntegration:
 
     def test_notification_with_all_features(self, user_factory):
         """Test notification with all optional features enabled."""
-        from ats.models import JobPosting, Pipeline, PipelineStage, JobCategory
+        from jobs.models import JobPosting, Pipeline, PipelineStage, JobCategory
         from tenants.models import Tenant, Plan
 
         # Create dependencies

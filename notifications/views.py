@@ -39,7 +39,7 @@ from .models import (
     NotificationPreference,
     ScheduledNotification,
 )
-from .serializers import (
+from .api.serializers import (
     NotificationListSerializer,
     NotificationSerializer,
     NotificationDetailSerializer,

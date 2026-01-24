@@ -142,7 +142,7 @@ class JobCatalogSyncService:
         Returns:
             dict: Statistics (synced, failed, removed)
         """
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         from django_tenants.utils import schema_context
 
         stats = {'synced': 0, 'failed': 0, 'removed': 0}

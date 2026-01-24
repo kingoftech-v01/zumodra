@@ -616,7 +616,7 @@ class TenantPermissionMixin:
 
     def get_tenant_user(self, request):
         """Get TenantUser for current user in current tenant."""
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         if not request.user.is_authenticated:
             return None

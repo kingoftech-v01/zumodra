@@ -574,7 +574,7 @@ class JobListing(models.Model):
     """
 
     job = models.OneToOneField(
-        'ats.JobPosting',
+        'jobs.JobPosting',
         on_delete=models.CASCADE,
         related_name='public_listing'
     )
@@ -764,13 +764,13 @@ class PublicApplication(models.Model):
     )
     processed_at = models.DateTimeField(null=True, blank=True)
     ats_candidate = models.ForeignKey(
-        'ats.Candidate',
+        'jobs.Candidate',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     ats_application = models.ForeignKey(
-        'ats.Application',
+        'jobs.Application',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -838,7 +838,7 @@ class PublicApplication(models.Model):
         Process public application into ATS system.
         Creates or updates Candidate and creates Application.
         """
-        from ats.models import Candidate, Application
+        from jobs.models import Candidate, Application
 
         try:
             # Check for spam
@@ -1152,7 +1152,7 @@ class TalentPoolMember(models.Model):
         related_name='members'
     )
     candidate = models.ForeignKey(
-        'ats.Candidate',
+        'jobs.Candidate',
         on_delete=models.CASCADE,
         related_name='talent_pools'
     )

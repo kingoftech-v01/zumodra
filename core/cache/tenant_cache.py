@@ -309,13 +309,9 @@ BLOG_FEATURED_CACHE_KEY = "blog:featured"
 BLOG_CATEGORIES_CACHE_KEY = "blog:categories:list"
 BLOG_TAGS_POPULAR_CACHE_KEY = "blog:tags:popular"
 
-# Newsletter App Cache Keys
-NEWSLETTER_LIST_CACHE_KEY = "newsletters:list"
-NEWSLETTER_STATS_CACHE_KEY = "newsletter:stats"
-
-# Appointment App Cache Keys
-APPOINTMENT_SERVICES_CACHE_KEY = "appointment:services:list"
-APPOINTMENT_STATS_CACHE_KEY = "appointment:stats"
+# Interviews App Cache Keys
+INTERVIEWS_SERVICES_CACHE_KEY = "interviews:services:list"
+INTERVIEWS_STATS_CACHE_KEY = "interviews:stats"
 
 # Dashboard App Cache Keys
 DASHBOARD_OVERVIEW_CACHE_KEY = "dashboard:overview"
@@ -405,52 +401,28 @@ def invalidate_blog_category_cache(tenant_id: Optional[int] = None) -> None:
     logger.info(f"CACHE_INVALIDATED: type=blog_categories tenant={tenant_id}")
 
 
-def invalidate_newsletter_cache(tenant_id: Optional[int] = None) -> None:
+def invalidate_interviews_cache(tenant_id: Optional[int] = None) -> None:
     """
-    Invalidate all newsletter-related caches.
-
-    Called when:
-    - Newsletter created/updated/deleted
-    - Subscription created/updated/deleted
-    - Message sent
-    """
-    tenant_cache = TenantCache(tenant_id)
-    tenant_cache.delete_pattern(NEWSLETTER_LIST_CACHE_KEY)
-    tenant_cache.delete(NEWSLETTER_STATS_CACHE_KEY)
-
-    logger.info(f"CACHE_INVALIDATED: type=newsletter tenant={tenant_id}")
-
-
-def invalidate_newsletter_stats_cache(tenant_id: Optional[int] = None) -> None:
-    """Invalidate newsletter stats cache."""
-    tenant_cache = TenantCache(tenant_id)
-    tenant_cache.delete(NEWSLETTER_STATS_CACHE_KEY)
-
-    logger.info(f"CACHE_INVALIDATED: type=newsletter_stats tenant={tenant_id}")
-
-
-def invalidate_appointment_cache(tenant_id: Optional[int] = None) -> None:
-    """
-    Invalidate all appointment-related caches.
+    Invalidate all interview scheduling-related caches.
 
     Called when:
     - Service created/updated/deleted
     - StaffMember created/updated/deleted
-    - Appointment created/updated/deleted
+    - Interview appointment created/updated/deleted
     """
     tenant_cache = TenantCache(tenant_id)
-    tenant_cache.delete(APPOINTMENT_SERVICES_CACHE_KEY)
-    tenant_cache.delete(APPOINTMENT_STATS_CACHE_KEY)
+    tenant_cache.delete(INTERVIEWS_SERVICES_CACHE_KEY)
+    tenant_cache.delete(INTERVIEWS_STATS_CACHE_KEY)
 
-    logger.info(f"CACHE_INVALIDATED: type=appointment tenant={tenant_id}")
+    logger.info(f"CACHE_INVALIDATED: type=interviews tenant={tenant_id}")
 
 
-def invalidate_appointment_stats_cache(tenant_id: Optional[int] = None) -> None:
-    """Invalidate appointment stats cache."""
+def invalidate_interviews_stats_cache(tenant_id: Optional[int] = None) -> None:
+    """Invalidate interview scheduling stats cache."""
     tenant_cache = TenantCache(tenant_id)
-    tenant_cache.delete(APPOINTMENT_STATS_CACHE_KEY)
+    tenant_cache.delete(INTERVIEWS_STATS_CACHE_KEY)
 
-    logger.info(f"CACHE_INVALIDATED: type=appointment_stats tenant={tenant_id}")
+    logger.info(f"CACHE_INVALIDATED: type=interviews_stats tenant={tenant_id}")
 
 
 def invalidate_dashboard_cache(tenant_id: Optional[int] = None, user_id: Optional[int] = None) -> None:
@@ -536,7 +508,7 @@ def invalidate_configurations_cache(tenant_id: Optional[int] = None) -> None:
 def connect_cache_signals():
     """Connect signal handlers for automatic cache invalidation."""
     try:
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         @receiver(post_save, sender=TenantUser)
         def invalidate_on_tenant_user_change(sender, instance, **kwargs):
@@ -632,71 +604,42 @@ def connect_blog_cache_signals():
         logger.warning(f"Could not connect blog cache signals: {e}")
 
 
-def connect_newsletter_cache_signals():
-    """Connect signal handlers for newsletter app cache invalidation."""
+def connect_interviews_cache_signals():
+    """Connect signal handlers for interviews app cache invalidation."""
     try:
-        from newsletter.models import Newsletter, Subscription, Message, Submission
-
-        @receiver(post_save, sender=Newsletter)
-        @receiver(post_delete, sender=Newsletter)
-        def invalidate_on_newsletter_change(sender, instance, **kwargs):
-            """Invalidate newsletter cache when newsletter changes."""
-            invalidate_newsletter_cache(None)
-
-        @receiver(post_save, sender=Subscription)
-        @receiver(post_delete, sender=Subscription)
-        def invalidate_on_subscription_change(sender, instance, **kwargs):
-            """Invalidate newsletter stats when subscription changes."""
-            invalidate_newsletter_stats_cache(None)
-
-        @receiver(post_save, sender=Message)
-        @receiver(post_save, sender=Submission)
-        def invalidate_on_message_change(sender, instance, **kwargs):
-            """Invalidate newsletter stats when message/submission sent."""
-            invalidate_newsletter_stats_cache(None)
-
-        logger.info("Newsletter cache invalidation signals connected")
-
-    except ImportError as e:
-        logger.warning(f"Could not connect newsletter cache signals: {e}")
-
-
-def connect_appointment_cache_signals():
-    """Connect signal handlers for appointment app cache invalidation."""
-    try:
-        from appointment.models import Service, StaffMember, Appointment
+        from interviews.models import Service, StaffMember, Appointment
 
         @receiver(post_save, sender=Service)
         @receiver(post_delete, sender=Service)
-        def invalidate_on_appointment_service_change(sender, instance, **kwargs):
-            """Invalidate appointment cache when service changes."""
+        def invalidate_on_interviews_service_change(sender, instance, **kwargs):
+            """Invalidate interviews cache when service changes."""
             tenant_id = getattr(instance, 'tenant_id', None)
-            invalidate_appointment_cache(tenant_id)
+            invalidate_interviews_cache(tenant_id)
 
         @receiver(post_save, sender=StaffMember)
         @receiver(post_delete, sender=StaffMember)
         def invalidate_on_staff_change(sender, instance, **kwargs):
-            """Invalidate appointment cache when staff changes."""
+            """Invalidate interviews cache when staff changes."""
             tenant_id = getattr(instance, 'tenant_id', None)
-            invalidate_appointment_cache(tenant_id)
+            invalidate_interviews_cache(tenant_id)
 
         @receiver(post_save, sender=Appointment)
         @receiver(post_delete, sender=Appointment)
-        def invalidate_on_appointment_change(sender, instance, **kwargs):
-            """Invalidate appointment stats when appointment changes."""
+        def invalidate_on_interviews_appointment_change(sender, instance, **kwargs):
+            """Invalidate interviews stats when appointment changes."""
             tenant_id = getattr(instance, 'tenant_id', None)
-            invalidate_appointment_stats_cache(tenant_id)
+            invalidate_interviews_stats_cache(tenant_id)
 
-        logger.info("Appointment cache invalidation signals connected")
+        logger.info("Interviews cache invalidation signals connected")
 
     except ImportError as e:
-        logger.warning(f"Could not connect appointment cache signals: {e}")
+        logger.warning(f"Could not connect interviews cache signals: {e}")
 
 
 def connect_dashboard_cache_signals():
     """Connect signal handlers for dashboard-related cache invalidation."""
     try:
-        from ats.models import JobPosting, Candidate, Application, Interview
+        from jobs.models import JobPosting, Candidate, Application, Interview
         from hr_core.models import Employee, TimeOffRequest
 
         # ATS model signals
@@ -797,8 +740,7 @@ def connect_all_cache_signals():
     connect_cache_signals()
     connect_services_cache_signals()
     connect_blog_cache_signals()
-    connect_newsletter_cache_signals()
-    connect_appointment_cache_signals()
+    connect_interviews_cache_signals()
     connect_dashboard_cache_signals()
     connect_configurations_cache_signals()
     logger.info("All cache invalidation signals connected")

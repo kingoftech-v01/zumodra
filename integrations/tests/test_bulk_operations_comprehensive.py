@@ -40,12 +40,12 @@ from rest_framework import status
 
 from tenants.models import Tenant
 from tenants.utils import tenant_context
-from accounts.models import TenantUser, UserProfile
-from ats.models import (
+from tenant_profiles.models import TenantUser, UserProfile
+from jobs.models import (
     JobPosting, Candidate, Application, Interview,
     Pipeline, JobCategory, ApplicationActivity
 )
-from ats.serializers import CandidateBulkImportSerializer
+from jobs.serializers import CandidateBulkImportSerializer
 from hr_core.models import Employee
 from core.audit_logging import log_bulk_operation, get_audit_logs
 

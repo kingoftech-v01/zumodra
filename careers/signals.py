@@ -105,7 +105,7 @@ def tenant_saved(sender, instance, created, **kwargs):
 
     # Try to get open jobs count
     try:
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         company_data['open_jobs_count'] = JobPosting.objects.filter(
             tenant=instance,
             status='open'

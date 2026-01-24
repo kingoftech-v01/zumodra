@@ -600,8 +600,8 @@ def _handle_background_check_complete(integration, result: Dict):
         integration: Integration instance (Checkr/Sterling)
         result: Parsed webhook result containing report data
     """
-    from ats.background_checks import BackgroundCheckService
-    from ats.models import BackgroundCheck
+    from jobs.background_checks import BackgroundCheckService
+    from jobs.models import BackgroundCheck
 
     logger.info(f"Processing background check completion webhook from {integration.provider}")
 

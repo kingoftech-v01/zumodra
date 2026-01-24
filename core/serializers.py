@@ -464,7 +464,7 @@ class TenantAwareSerializer(serializers.ModelSerializer):
         elif hasattr(model, 'user'):
             # Filter by user's tenant membership
             try:
-                from accounts.models import TenantUser
+                from tenant_profiles.models import TenantUser
                 user_ids = TenantUser.objects.filter(
                     tenant=tenant,
                     is_active=True

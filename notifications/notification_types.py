@@ -22,7 +22,7 @@ class NotificationType(models.Model):
     """
     CATEGORY_CHOICES = [
         ('hr', _('HR & Recruitment')),
-        ('finance', _('Payments & Finance')),
+        ('payments', _('Payments & Finance')),
         ('services', _('Services & Contracts')),
         ('appointments', _('Appointments')),
         ('messages', _('Messages & Communication')),

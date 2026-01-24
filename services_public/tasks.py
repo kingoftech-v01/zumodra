@@ -89,7 +89,7 @@ def sync_provider_to_public(self, provider_id: str, tenant_schema_name: str) -> 
             'availability_status': provider.availability_status if hasattr(provider, 'availability_status') else 'available',
             'is_verified': provider.user.is_verified if hasattr(provider.user, 'is_verified') else False,
             'is_featured': provider.is_featured if hasattr(provider, 'is_featured') else False,
-            'is_accepting_projects': provider.is_accepting_projects if hasattr(provider, 'is_accepting_projects') else True,
+            'is_accepting_work': provider.is_accepting_work if hasattr(provider, 'is_accepting_work') else True,
             'published_at': provider.created_at if hasattr(provider, 'created_at') else timezone.now(),
             'booking_url': f"https://{tenant.domain_url}/services/{provider.uuid}/book/",
         }

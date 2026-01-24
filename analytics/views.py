@@ -33,7 +33,7 @@ from .models import (
     TimeToHireMetric, SourceEffectivenessMetric, EmployeeRetentionMetric,
     TimeOffAnalytics, PerformanceDistribution, DashboardCache
 )
-from .serializers import (
+from .api.serializers import (
     DateRangeSerializer, RecruitmentDashboardSerializer,
     HRDashboardSerializer, ExecutiveSummarySerializer,
     AnonymizedDiversitySerializer, RecruitmentMetricSerializer,
@@ -823,7 +823,7 @@ class PerformanceDistributionListView(generics.ListAPIView):
 # ==================== CYCLE 7 - ENHANCED DASHBOARD VIEWS ====================
 
 from django.core.cache import cache
-from .serializers import (
+from .api.serializers import (
     DashboardMetricDisplaySerializer, TimeToHireDetailSerializer,
     SourceEffectivenessDetailSerializer, RecruitingFunnelDetailSerializer,
     TrendDataSerializer, ReportSerializer, ReportListSerializer,

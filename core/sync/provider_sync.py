@@ -106,7 +106,7 @@ class ProviderPublicSyncService(PublicSyncService):
             'availability_status': lambda p: getattr(p, 'availability_status', 'available'),
             'is_verified': lambda p: getattr(p.user, 'is_verified', False) if hasattr(p, 'user') else False,
             'is_featured': lambda p: getattr(p, 'is_featured', False),
-            'is_accepting_projects': lambda p: getattr(p, 'is_accepting_projects', True),
+            'is_accepting_work': lambda p: getattr(p, 'is_accepting_work', True),
 
             # Work Preferences
             'can_work_remotely': lambda p: getattr(p, 'can_work_remotely', True),

@@ -1,0 +1,238 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block title %}{% trans "Offer for" %} {{ offer.application.candidate.full_name }} - Zumodra{% endblock %}
+
+{% block page_title %}{% trans "Offer Details" %}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb flex items-center gap-2 mb-6">
+    <a href="{% url 'frontend:jobs:offer_list' %}" class="text-secondary hover:text-primary caption1">
+        {% trans "Offers" %}
+    </a>
+    <span class="ph ph-caret-right text-secondary"></span>
+    <span class="text-title caption1">{{ offer.application.candidate.full_name }}</span>
+</div>
+
+<!-- Page Header -->
+<div class="heading flex items-center justify-between mb-6">
+    <div>
+        <h3 class="heading3 text-title">{% trans "Offer Details" %}</h3>
+        <div class="flex items-center gap-3 mt-2">
+            <span class="tag
+                {% if offer.status == 'pending' or offer.status == 'sent' %}bg-yellow bg-opacity-10 text-yellow
+                {% elif offer.status == 'accepted' %}bg-green bg-opacity-10 text-green
+                {% elif offer.status == 'declined' %}bg-red bg-opacity-10 text-red
+                {% elif offer.status == 'withdrawn' %}bg-gray-200 text-secondary
+                {% else %}bg-blue bg-opacity-10 text-blue{% endif %}">
+                {{ offer.get_status_display }}
+            </span>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        {% if offer.status == 'draft' %}
+        <form method="post" action="{% url 'frontend:jobs:offer_action' offer.pk 'send' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="button-main flex items-center gap-2">
+                <i class="ph ph-envelope-simple"></i>
+                {% trans "Send Offer" %}
+            </button>
+        </form>
+        {% endif %}
+
+        {% if offer.status == 'sent' %}
+        <form method="post" action="{% url 'frontend:jobs:offer_action' offer.pk 'accept' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="button-main flex items-center gap-2 bg-green">
+                <i class="ph ph-check-circle"></i>
+                {% trans "Mark Accepted" %}
+            </button>
+        </form>
+        <form method="post" action="{% url 'frontend:jobs:offer_action' offer.pk 'decline' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="button-main -border flex items-center gap-2 text-red border-red hover:bg-red hover:bg-opacity-10">
+                <i class="ph ph-x-circle"></i>
+                {% trans "Mark Declined" %}
+            </button>
+        </form>
+        {% endif %}
+
+        {% if offer.status == 'draft' or offer.status == 'sent' %}
+        <form method="post" action="{% url 'frontend:jobs:offer_action' offer.pk 'withdraw' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="button-main -border">
+                {% trans "Withdraw Offer" %}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-7.5">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-7.5">
+        <!-- Offer Details -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 text-title mb-6">{% trans "Offer Terms" %}</h4>
+
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <dt class="caption1 text-secondary">{% trans "Position" %}</dt>
+                    <dd class="mt-1 heading5 text-title">
+                        <a href="{% url 'frontend:jobs:job_detail' offer.application.job.pk %}"
+                           class="hover:text-primary">
+                            {{ offer.application.job.title }}
+                        </a>
+                    </dd>
+                </div>
+
+                <div>
+                    <dt class="caption1 text-secondary">{% trans "Annual Salary" %}</dt>
+                    <dd class="mt-1 heading3 font-bold text-title">${{ offer.salary|intcomma }}</dd>
+                </div>
+
+                <div>
+                    <dt class="caption1 text-secondary">{% trans "Start Date" %}</dt>
+                    <dd class="mt-1 heading5 text-title">
+                        {% if offer.start_date %}{{ offer.start_date|date:"F d, Y" }}{% else %}<span class="text-secondary">{% trans "TBD" %}</span>{% endif %}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt class="caption1 text-secondary">{% trans "Expiration Date" %}</dt>
+                    <dd class="mt-1 heading5 text-title">
+                        {% if offer.expiration_date %}{{ offer.expiration_date|date:"F d, Y" }}{% else %}<span class="text-secondary">{% trans "None" %}</span>{% endif %}
+                    </dd>
+                </div>
+            </dl>
+
+            {% if offer.benefits %}
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h5 class="heading6 text-title mb-3">{% trans "Benefits" %}</h5>
+                <div class="caption1 text-title whitespace-pre-line">
+                    {{ offer.benefits }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if offer.notes %}
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h5 class="heading6 text-title mb-3">{% trans "Notes" %}</h5>
+                <div class="caption1 text-title whitespace-pre-line">
+                    {{ offer.notes }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="p-8 rounded-lg bg-white">
+            <h4 class="heading5 text-title mb-6">{% trans "Timeline" %}</h4>
+
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green bg-opacity-10 flex items-center justify-center">
+                        <i class="ph ph-check-circle text-green"></i>
+                    </div>
+                    <div>
+                        <p class="caption1 font-medium text-title">{% trans "Offer Created" %}</p>
+                        <p class="caption2 text-secondary">{{ offer.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+
+                {% if offer.sent_at %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue bg-opacity-10 flex items-center justify-center">
+                        <i class="ph ph-envelope-simple text-blue"></i>
+                    </div>
+                    <div>
+                        <p class="caption1 font-medium text-title">{% trans "Offer Sent" %}</p>
+                        <p class="caption2 text-secondary">{{ offer.sent_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if offer.status == 'accepted' %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green bg-opacity-10 flex items-center justify-center">
+                        <i class="ph ph-check-circle text-green"></i>
+                    </div>
+                    <div>
+                        <p class="caption1 font-medium text-title">{% trans "Offer Accepted" %}</p>
+                        <p class="caption2 text-secondary">{{ offer.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                {% elif offer.status == 'declined' %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-red bg-opacity-10 flex items-center justify-center">
+                        <i class="ph ph-x-circle text-red"></i>
+                    </div>
+                    <div>
+                        <p class="caption1 font-medium text-title">{% trans "Offer Declined" %}</p>
+                        <p class="caption2 text-secondary">{{ offer.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-7.5">
+            <!-- Candidate Card -->
+            <div class="p-8 rounded-lg bg-white">
+                <h5 class="heading6 text-title mb-4">{% trans "Candidate" %}</h5>
+
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                        <span class="heading5 text-white">
+                            {{ offer.application.candidate.full_name|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="heading6 text-title">{{ offer.application.candidate.full_name }}</p>
+                        <p class="caption1 text-secondary">{{ offer.application.candidate.email }}</p>
+                    </div>
+                </div>
+
+                {% if offer.application.candidate.phone %}
+                <div class="flex items-center gap-2 caption1 text-secondary">
+                    <i class="ph ph-phone"></i>
+                    {{ offer.application.candidate.phone }}
+                </div>
+                {% endif %}
+
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <a href="{% url 'frontend:jobs:application_detail' offer.application.pk %}"
+                       class="caption1 text-primary hover:underline flex items-center gap-1">
+                        {% trans "View Application" %} <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="p-8 rounded-lg bg-white">
+                <h5 class="heading6 text-title mb-4">{% trans "Quick Actions" %}</h5>
+                <div class="space-y-2">
+                    <a href="{% url 'frontend:jobs:job_detail' offer.application.job.pk %}"
+                       class="flex items-center gap-2 p-2 caption1 text-title hover:bg-gray-50 rounded-lg transition-colors">
+                        <i class="ph ph-briefcase text-secondary"></i>
+                        {% trans "View Job Posting" %}
+                    </a>
+                    <a href="{% url 'frontend:jobs:offer_list' %}"
+                       class="flex items-center gap-2 p-2 caption1 text-title hover:bg-gray-50 rounded-lg transition-colors">
+                        <i class="ph ph-file-text text-secondary"></i>
+                        {% trans "All Offers" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

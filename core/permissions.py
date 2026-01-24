@@ -13,7 +13,7 @@ USAGE:
 
 PERMISSION CATEGORIES:
 
-1. BASIC TENANT PERMISSIONS (from accounts.permissions):
+1. BASIC TENANT PERMISSIONS (from tenant_profiles.permissions):
    - IsTenantUser: Basic tenant membership
    - IsTenantAdmin: Admin or Owner role
    - IsTenantOwner: Owner-only access
@@ -85,10 +85,10 @@ from django.utils import timezone
 logger = logging.getLogger('security.permissions')
 
 # =============================================================================
-# RE-EXPORT FROM accounts.permissions
+# RE-EXPORT FROM tenant_profiles.permissions
 # =============================================================================
 
-from accounts.permissions import (
+from tenant_profiles.permissions import (
     # Basic tenant permissions
     IsTenantUser,
     IsTenantAdmin,
@@ -382,7 +382,7 @@ class SensitiveDataPermission(permissions.BasePermission):
         )
 
         # Import here to avoid circular imports
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         return TenantUser.objects.filter(
             user=request.user,
@@ -482,7 +482,7 @@ class IsParticipant(permissions.BasePermission):
         # Admins always have access
         tenant = getattr(request, 'tenant', None)
         if tenant:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             is_admin = TenantUser.objects.filter(
                 user=request.user,
                 tenant=tenant,
@@ -586,7 +586,7 @@ AuditedTenantObjectPermission = audited(TenantObjectPermission)
 
 # Import role definitions for easy access
 try:
-    from accounts.models import TenantUser
+    from tenant_profiles.models import TenantUser
 
     ROLE_OWNER = TenantUser.UserRole.OWNER
     ROLE_ADMIN = TenantUser.UserRole.ADMIN
@@ -611,7 +611,7 @@ except ImportError:
 # =============================================================================
 
 __all__ = [
-    # From accounts.permissions
+    # From tenant_profiles.permissions
     'IsTenantUser',
     'IsTenantAdmin',
     'IsTenantOwner',

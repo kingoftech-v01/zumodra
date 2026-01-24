@@ -4,7 +4,7 @@ API v1 URL Configuration for Zumodra
 This module consolidates all API v1 endpoints with proper namespacing:
 - /api/v1/tenants/ - Multi-tenant management
 - /api/v1/accounts/ - User accounts and authentication
-- /api/v1/ats/ - Applicant Tracking System
+- /api/v1/jobs/ - Applicant Tracking System
 - /api/v1/hr/ - Human Resources core
 - /api/v1/careers/ - Public career pages and admin
 - /api/v1/analytics/ - Analytics and reporting
@@ -48,7 +48,7 @@ services_router.register(r'requests', ClientRequestViewSet, basename='service-re
 services_router.register(r'proposals', ServiceProposalViewSet, basename='service-proposal')
 services_router.register(r'contracts', ServiceContractViewSet, basename='service-contract')
 services_router.register(r'comments', ServiceReviewViewSet, basename='service-comment')
-services_router.register(r'appointments', AppointmentViewSet, basename='appointment')
+services_router.register(r'appointments', AppointmentViewSet, basename='interviews')
 services_router.register(r'companies', CompanyViewSet, basename='company')
 
 
@@ -68,15 +68,15 @@ urlpatterns = [
 
     # ==================== User Accounts ====================
     # /api/v1/accounts/ - User registration, profiles, KYC, consent
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('tenant_profiles.api.urls')),
 
     # ==================== Applicant Tracking System ====================
-    # /api/v1/ats/ - Jobs, candidates, applications, interviews, offers
-    path('ats/', include('ats.urls')),
+    # /api/v1/jobs/ - Jobs, candidates, applications, interviews, offers
+    path('jobs/', include('jobs.api.urls')),  # Renamed from ats (Phase 7), API moved to api/ (Phase 12)
 
     # ==================== Human Resources Core ====================
     # /api/v1/hr/ - Employees, time-off, onboarding, documents, reviews
-    path('hr/', include('hr_core.urls')),
+    path('hr/', include('hr_core.api.urls')),  # API moved to api/ (Phase 12)
 
     # ==================== Careers (Public + Admin) ====================
     # /api/v1/careers/ - Public job listings and admin management
@@ -85,20 +85,20 @@ urlpatterns = [
     # ==================== Public Catalogs ====================
     # /api/v1/public/jobs/ - Public job catalog (cross-tenant browsing, no auth)
     # /api/v1/public/providers/ - Public service provider catalog (cross-tenant, no auth)
-    path('public/', include('ats_public.api.urls')),
+    path('public/', include('jobs_public.api.urls')),  # Renamed from ats_public (Phase 7)
     path('public/', include('services_public.api.urls')),
 
     # ==================== Analytics & Reporting ====================
     # /api/v1/analytics/ - Dashboards, reports, metrics
-    path('analytics/', include('analytics.urls')),
+    path('analytics/', include('analytics.api.urls')),
 
     # ==================== Third-Party Integrations ====================
     # /api/v1/integrations/ - External service integrations
-    path('integrations/', include('integrations.urls')),
+    path('integrations/', include('integrations.api.urls')),
 
     # ==================== Notifications ====================
     # /api/v1/notifications/ - In-app and push notifications
-    path('notifications/', include('notifications.urls')),
+    path('notifications/', include('notifications.api.urls')),
 
     # ==================== AI Matching ====================
     # /api/v1/ai/ - AI-powered matching and recommendations
@@ -108,9 +108,46 @@ urlpatterns = [
     # /api/v1/marketplace/ - Original services marketplace endpoints
     path('marketplace/', include(services_router.urls)),
 
-    # ==================== Finance & Payments ====================
-    # /api/v1/finance/ - Payments, subscriptions, invoices, escrow, Stripe Connect
-    path('finance/', include('finance.api.urls')),
+    # ==================== Finance Apps - NEW MODULAR STRUCTURE (Phase 11 Refactoring) ====================
+    # Payment Processing (Tenant payment transactions)
+    # /api/v1/payments/ - Payment transactions, methods, refunds, intents, currency
+    path('payments/', include('payments.api.urls')),
+
+    # Escrow (Secure funds holding for marketplace contracts)
+    # /api/v1/escrow/ - Escrow transactions, milestone payments, releases, disputes, payouts, audits
+    path('escrow/', include('escrow.api.urls')),
+
+    # Payroll (Employee payroll processing)
+    # /api/v1/payroll/ - Payroll runs, employee payments, direct deposits, pay stubs, deductions, taxes
+    path('payroll/', include('payroll.api.urls')),
+
+    # Expenses (Business expense tracking and reimbursement)
+    # /api/v1/expenses/ - Expense categories, reports, line items, approvals, reimbursements, mileage rates
+    path('expenses/', include('expenses.api.urls')),
+
+    # Subscriptions (Tenant's own subscription products)
+    # /api/v1/subscriptions/ - Products, tiers, customer subscriptions, invoices, usage records
+    path('subscriptions/', include('subscriptions.api.urls')),
+
+    # Stripe Connect (Marketplace payment infrastructure)
+    # /api/v1/stripe-connect/ - Connected accounts, onboarding, fees, payout schedules, transfers, balance
+    path('stripe-connect/', include('stripe_connect.api.urls')),
+
+    # Tax (Tax calculation and compliance)
+    # /api/v1/tax/ - Avalara config, tax rates, calculations, exemptions, remittances, reports
+    path('tax/', include('tax.api.urls')),
+
+    # Billing (Platform subscription management - PUBLIC schema)
+    # /api/v1/billing/ - Subscription plans, tenant subscriptions, platform invoices, billing history
+    path('billing/', include('billing.api.urls')),
+
+    # Accounting (Accounting integration - QuickBooks/Xero)
+    # /api/v1/accounting/ - Providers, chart of accounts, journal entries, sync logs, financial reports, reconciliation
+    path('accounting/', include('accounting.api.urls')),
+
+    # Finance Webhooks (Webhook event monitoring)
+    # /api/v1/finance-webhooks/ - Webhook events, retries, signatures, event types
+    path('finance-webhooks/', include('finance_webhooks.api.urls')),
 
     # ==================== Messages ====================
     # /api/v1/messages/ - Conversations, messages, contacts (REST complement to WebSocket)
@@ -120,10 +157,6 @@ urlpatterns = [
     # /api/v1/configurations/ - Skills, companies, sites, departments, roles, FAQs
     path('configurations/', include('configurations.api.urls')),
 
-    # ==================== Marketing ====================
-    # /api/v1/marketing/ - Visit tracking, prospects, newsletters, analytics
-    path('marketing/', include('marketing.api.urls')),
-
     # ==================== Security ====================
     # /api/v1/security/ - Audit logs, security events, sessions, failed logins
     path('security/', include('security.api.urls')),
@@ -132,17 +165,21 @@ urlpatterns = [
     # /api/v1/services/ - Full services marketplace CRUD with filters
     path('services/', include('services.api.urls')),
 
+    # ==================== Projects (Project Missions) ====================
+    # /api/v1/projects/ - Project missions with deliverables and milestones
+    path('projects/', include('projects.api.urls')),
+
+    # ==================== Marketing Campaigns ====================
+    # /api/v1/marketing-campaigns/ - Marketing campaigns, contacts, tracking, analytics
+    path('marketing-campaigns/', include('marketing_campaigns.api.urls')),
+
     # ==================== Blog ====================
     # /api/v1/blog/ - Blog posts, categories, comments, tags
     path('blog/', include('blog.api.urls')),
 
-    # ==================== Newsletter ====================
-    # /api/v1/newsletter/ - Newsletters, subscriptions, campaigns
-    path('newsletter/', include('newsletter.api.urls')),
-
-    # ==================== Appointment ====================
-    # /api/v1/appointment/ - Appointment booking system
-    path('appointment/', include('appointment.api.urls')),
+    # ==================== Interview Scheduling ====================
+    # /api/v1/appointment/ - Interview scheduling and appointment booking system
+    path('appointment/', include('interviews.api.urls')),
 
     # ==================== Dashboard ====================
     # /api/v1/dashboard/ - Dashboard widgets and metrics
@@ -168,7 +205,7 @@ Accounts (/api/v1/accounts/):
 - User registration, login, profiles, KYC, consent
 - See accounts.urls for full endpoint list
 
-ATS (/api/v1/ats/):
+ATS (/api/v1/jobs/):
 - Job postings, candidates, applications, interviews, offers
 - See ats.urls for full endpoint list
 
@@ -259,11 +296,11 @@ Newsletter (/api/v1/newsletter/):
 - Campaign management
 - See newsletter.api.urls for full endpoint list
 
-Appointment (/api/v1/appointment/):
+Interview Scheduling (/api/v1/appointment/):
 - Services, staff members
 - Appointments, bookings
 - Working hours, days off, config
-- See appointment.api.urls for full endpoint list
+- See interviews.api.urls for full endpoint list
 
 Dashboard (/api/v1/dashboard/):
 - Overview, quick stats

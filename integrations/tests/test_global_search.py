@@ -27,9 +27,9 @@ from django.db.models import Q
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework import status
 
-from ats.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
+from jobs.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
 from hr_core.models import Employee, Department
-from accounts.models import UserProfile
+from tenant_profiles.models import UserProfile
 from services.models import Service, ServiceListing
 from tenants.models import Tenant, TenantUser, Domain
 from dashboard.views import SearchView

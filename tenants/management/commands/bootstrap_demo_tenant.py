@@ -421,7 +421,7 @@ class Command(BaseCommand):
 
     def _create_demo_users(self, tenant):
         """Create demo users with various roles."""
-        from accounts.models import TenantUser, TenantProfile
+        from tenant_profiles.models import TenantUser, TenantProfile
         from custom_account_u.models import PublicProfile
 
         users = {}
@@ -502,7 +502,7 @@ class Command(BaseCommand):
 
     def _create_ats_data(self, tenant, users):
         """Create ATS-related demo data."""
-        from ats.models import (
+        from jobs.models import (
             JobPosting, JobCategory, Pipeline, PipelineStage,
             Candidate, Application, Interview, InterviewFeedback, Offer
         )
@@ -1734,14 +1734,14 @@ class Command(BaseCommand):
         self._log_section('Notifications Data Created', counts)
 
     def _create_appointments_data(self, tenant, users):
-        """Create appointment system demo data (minimum 10 each)."""
+        """Create interview scheduling system demo data (minimum 10 each)."""
         try:
-            from appointment.models import (
-                Service as AppointmentService, StaffMember, WorkingHours,
+            from interviews.models import (
+                Service as InterviewsService, StaffMember, WorkingHours,
                 Appointment, AppointmentRequest
             )
         except ImportError:
-            self.stdout.write(self.style.WARNING("   Appointment models not available, skipping"))
+            self.stdout.write(self.style.WARNING("   Interviews models not available, skipping"))
             return
 
         counts = {
@@ -1772,8 +1772,8 @@ class Command(BaseCommand):
         for i, service_config in enumerate(appointment_services_config):
             try:
                 service = self._safe_create(
-                    f"AppointmentService '{service_config['name']}'",
-                    AppointmentService.objects.get_or_create,
+                    f"InterviewsService '{service_config['name']}'",
+                    InterviewsService.objects.get_or_create,
                     tenant=tenant,
                     name=service_config['name'],
                     defaults={
@@ -1961,7 +1961,7 @@ class Command(BaseCommand):
     def _create_verification_data(self, users):
         """Create verification and trust score demo data."""
         try:
-            from accounts.models import KYCVerification, TrustScore, EmploymentVerification
+            from tenant_profiles.models import KYCVerification, TrustScore, EmploymentVerification
         except ImportError:
             self.stdout.write(self.style.WARNING("   Verification models not available, skipping"))
             return
@@ -2001,7 +2001,7 @@ class Command(BaseCommand):
 
         # Create user reviews (at least 10)
         try:
-            from accounts.models import Review
+            from tenant_profiles.models import Review
 
             reviews_count = 0
             user_list = list(users.values())
@@ -2078,7 +2078,7 @@ class Command(BaseCommand):
 
         # Create education verifications (at least 10)
         try:
-            from accounts.models import EducationVerification
+            from tenant_profiles.models import EducationVerification
 
             education_verifications = 0
             universities = [
@@ -2345,7 +2345,7 @@ class Command(BaseCommand):
 
     def _refresh_demo_data(self, tenant):
         """Refresh existing demo tenant data without recreating users."""
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         # Get existing users
         users = {}

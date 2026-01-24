@@ -60,7 +60,7 @@ class DashboardView(LoginRequiredMixin, TenantViewMixin, TemplateView):
             return context
 
         # Import models here to avoid circular imports
-        from ats.models import JobPosting, Candidate, Application, Interview
+        from jobs.models import JobPosting, Candidate, Application, Interview
         from hr_core.models import Employee, TimeOffRequest
         from notifications.models import Notification
 
@@ -176,7 +176,7 @@ class DashboardView(LoginRequiredMixin, TenantViewMixin, TemplateView):
 
         Checks key profile fields and returns percentage complete.
         """
-        from accounts.models import UserProfile
+        from tenant_profiles.models import UserProfile
 
         try:
             profile = user.userprofile
@@ -248,7 +248,7 @@ class SearchView(LoginRequiredMixin, TenantViewMixin, View):
             return JsonResponse(results)
 
         # Import models
-        from ats.models import JobPosting, Candidate, Application
+        from jobs.models import JobPosting, Candidate, Application
         from hr_core.models import Employee
 
         # Search jobs
@@ -353,7 +353,7 @@ class QuickStatsView(LoginRequiredMixin, TenantViewMixin, View):
         if not tenant:
             return HttpResponse(status=204)
 
-        from ats.models import JobPosting, Candidate, Application, Interview
+        from jobs.models import JobPosting, Candidate, Application, Interview
         from hr_core.models import Employee, TimeOffRequest
 
         now = timezone.now()
@@ -406,7 +406,7 @@ class UpcomingInterviewsView(LoginRequiredMixin, TenantViewMixin, View):
         if not tenant:
             return HttpResponse(status=204)
 
-        from ats.models import Interview
+        from jobs.models import Interview
 
         now = timezone.now()
         week_from_now = now + timedelta(days=7)

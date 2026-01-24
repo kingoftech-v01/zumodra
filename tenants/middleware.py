@@ -601,7 +601,7 @@ class ZumodraTenantMiddleware(TenantMainMiddleware):
             return {}
 
         return {
-            'ats': plan.feature_ats,
+            'jobs': plan.feature_ats,
             'hr_core': plan.feature_hr_core,
             'analytics': plan.feature_analytics,
             'api_access': plan.feature_api_access,

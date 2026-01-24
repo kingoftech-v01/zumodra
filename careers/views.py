@@ -671,7 +671,7 @@ class TalentPoolViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        from ats.models import Candidate
+        from jobs.models import Candidate
         try:
             candidate = Candidate.objects.get(pk=candidate_id)
         except Candidate.DoesNotExist:
@@ -767,7 +767,7 @@ class JobCategoriesListView(CORSMixin, generics.ListAPIView):
             ])
 
         # Otherwise, query from tenant schema
-        from ats.models import JobCategory
+        from jobs.models import JobCategory
         categories = JobCategory.objects.filter(is_active=True).values(
             'id', 'name', 'slug', 'icon', 'color'
         )
@@ -809,7 +809,7 @@ class JobLocationsListView(CORSMixin, generics.ListAPIView):
             })
 
         # Otherwise, query from tenant schema
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
 
         # Get unique locations from open jobs
         cities = JobPosting.objects.filter(

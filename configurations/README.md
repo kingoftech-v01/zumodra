@@ -349,7 +349,7 @@ pytest -m security configurations/tests/
 
 ## Related Documentation
 
-- [ATS App README](../ats/README.md) - Enterprise recruitment features
+- [ATS App README](../jobs/README.md) - Enterprise recruitment features
 - [HR Core App README](../hr_core/README.md) - Advanced HR operations
 - [Services App README](../services/README.md) - Freelance marketplace
 - [Tenants App README](../tenants/README.md) - Multi-tenancy architecture

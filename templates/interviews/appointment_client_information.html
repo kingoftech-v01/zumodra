@@ -1,0 +1,232 @@
+{% extends 'base/unified_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Your Information" %} - {% trans "Book Appointment" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Progress Indicator -->
+            <div class="mb-5">
+                <ul class="booking-progress p-0">
+                    <li class="completed"><small>{% trans "Select Time" %}</small></li>
+                    <li class="active"><small>{% trans "Your Details" %}</small></li>
+                    <li><small>{% trans "Confirmation" %}</small></li>
+                </ul>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="zu-card shadow-sm mb-4">
+                <div class="zu-card__body">
+                    <h5 class="mb-3">{% trans "Appointment Summary" %}</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>{% trans "Service" %}:</strong><br>
+                                {{ appointment_request.service.name }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>{% trans "Date" %}:</strong><br>
+                                {{ appointment_request.date|date:"l, F j, Y" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>{% trans "Time" %}:</strong><br>
+                                {{ appointment_request.start_time|time:"g:i A" }} - {{ appointment_request.end_time|time:"g:i A" }}
+                            </p>
+                            {% if appointment_request.staff_member %}
+                            <p class="mb-2">
+                                <strong>{% trans "Staff Member" %}:</strong><br>
+                                {{ appointment_request.staff_member.user.get_full_name }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Information Form -->
+            <div class="zu-card shadow-sm">
+                <div class="zu-card__header">
+                    <h5 class="mb-0">{% trans "Your Information" %}</h5>
+                </div>
+                <div class="zu-card__body">
+                    <form method="post" action="{% url 'frontend:interviews:appointment_client_information' appointment_request.id appointment_request.id_request %}">
+                        {% csrf_token %}
+
+                        {% if user.is_authenticated %}
+                        <!-- Authenticated User -->
+                        <div class="alert alert-info mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            {% trans "Booking as" %} <strong>{{ user.get_full_name|default:user.email }}</strong>
+                        </div>
+                        {% else %}
+                        <!-- Guest User -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">{% trans "First Name" %} <span class="text-danger">*</span></label>
+                                    <input type="text" name="first_name" class="zu-input" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">{% trans "Last Name" %} <span class="text-danger">*</span></label>
+                                    <input type="text" name="last_name" class="zu-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">{% trans "Email" %} <span class="text-danger">*</span></label>
+                                    <input type="email" name="email" class="zu-input" required>
+                                    <small class="form-text text-muted">{% trans "Confirmation will be sent to this email" %}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="zu-form-group">
+                                    <label class="zu-label">{% trans "Phone Number" %} <span class="text-danger">*</span></label>
+                                    <input type="tel" name="phone" class="zu-input" required>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="zu-form-group mb-3">
+                            <label class="zu-label">{% trans "Address" %}</label>
+                            <textarea name="address" class="zu-input" rows="2" placeholder="{% trans 'Street address (optional)' %}"></textarea>
+                        </div>
+
+                        <div class="zu-form-group mb-3">
+                            <label class="zu-label">{% trans "Additional Information" %}</label>
+                            <textarea name="additional_info" class="zu-input" rows="3" placeholder="{% trans 'Any special requests or notes for your appointment' %}"></textarea>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" name="want_reminder" class="form-check-input" id="wantReminder" checked>
+                            <label class="form-check-label" for="wantReminder">
+                                {% trans "Send me a reminder 24 hours before my appointment" %}
+                            </label>
+                        </div>
+
+                        <!-- Payment Information -->
+                        {% if appointment_request.service.price > 0 %}
+                        <div class="zu-card bg-light mb-4">
+                            <div class="zu-card__body">
+                                <h6 class="mb-3">{% trans "Payment" %}</h6>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>{% trans "Service Fee" %}:</span>
+                                    <strong>{{ appointment_request.service.price }} {{ appointment_request.service.currency|default:"CAD" }}</strong>
+                                </div>
+                                {% if appointment_request.service.down_payment %}
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>{% trans "Down Payment Required" %}:</span>
+                                    <strong>{{ appointment_request.service.down_payment }} {{ appointment_request.service.currency|default:"CAD" }}</strong>
+                                </div>
+                                {% endif %}
+                                <div class="alert alert-info mb-0">
+                                    <small>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        {% if appointment_request.service.down_payment %}
+                                        {% trans "You will be redirected to payment after confirming your booking." %}
+                                        {% else %}
+                                        {% trans "Payment can be made at the time of your appointment." %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'frontend:interviews:appointment_request' appointment_request.service.id %}" class="zu-btn zu-btn--outline">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-1">
+                                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                                    <polyline points="12 19 5 12 12 5"></polyline>
+                                </svg>
+                                {% trans "Back" %}
+                            </a>
+                            <button type="submit" class="zu-btn zu-btn--primary">
+                                {% trans "Confirm Booking" %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="ms-1">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.booking-progress {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+.booking-progress li {
+    display: inline-block;
+    width: 30%;
+    position: relative;
+    text-align: center;
+}
+.booking-progress li:before {
+    content: counter(step);
+    counter-increment: step;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 2px solid #ddd;
+    display: block;
+    text-align: center;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background-color: white;
+}
+.booking-progress li.active:before {
+    border-color: #0066cc;
+    background-color: #0066cc;
+    color: white;
+}
+.booking-progress li.completed:before {
+    border-color: #28a745;
+    background-color: #28a745;
+    color: white;
+    content: "✓";
+}
+.booking-progress li:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ddd;
+    top: 15px;
+    left: -50%;
+    z-index: -1;
+}
+.booking-progress li:first-child:after {
+    content: none;
+}
+.booking-progress li.active:after,
+.booking-progress li.completed:after {
+    background-color: #28a745;
+}
+</style>
+{% endblock %}

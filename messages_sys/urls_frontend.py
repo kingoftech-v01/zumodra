@@ -10,7 +10,7 @@ This module provides frontend URL routing for the messaging system:
 from django.urls import path
 from .views import chat_view
 
-app_name = 'messages'
+app_name = 'messages_sys'  # Changed from 'messages' to match API namespace (2026-01-18)
 
 urlpatterns = [
     path('', chat_view, name='index'),

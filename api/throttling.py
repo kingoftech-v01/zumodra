@@ -126,7 +126,7 @@ def get_user_role(request: Request) -> str:
 
     # Try to get TenantUser role
     try:
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         tenant_user = TenantUser.objects.get(
             user=request.user,
             tenant=tenant,

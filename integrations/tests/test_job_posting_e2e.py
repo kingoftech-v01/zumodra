@@ -83,7 +83,7 @@ class TestJobPostingCreation:
     def test_create_job_posting_minimal_fields(self):
         """Test creating job posting with minimal required fields."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job = JobPosting.objects.create(
                 tenant=self.tenant,
@@ -109,7 +109,7 @@ class TestJobPostingCreation:
     def test_create_job_posting_full_fields(self):
         """Test creating job posting with all available fields."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job = JobPosting.objects.create(
                 tenant=self.tenant,
@@ -147,7 +147,7 @@ class TestJobPostingCreation:
     def test_job_posting_validation_salary_range(self):
         """Test validation of salary range."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             # This should work (min < max)
             job = JobPosting.objects.create(
@@ -186,7 +186,7 @@ class TestJobPostingCreation:
     def test_job_posting_unique_reference_code(self):
         """Test that reference codes are generated and unique."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job1 = JobPosting.objects.create(
                 tenant=self.tenant,
@@ -218,7 +218,7 @@ class TestJobPostingCreation:
     def test_job_posting_form_validation_xss(self):
         """Test XSS protection in job posting form."""
         try:
-            from ats.forms import JobPostingForm
+            from jobs.forms import JobPostingForm
 
             xss_payload = '<script>alert("XSS")</script>'
 
@@ -252,7 +252,7 @@ class TestJobPostingCreation:
     def test_job_posting_form_validation_sql_injection(self):
         """Test SQL injection protection in job posting form."""
         try:
-            from ats.forms import JobPostingForm
+            from jobs.forms import JobPostingForm
 
             sql_payload = "'; DROP TABLE ats_jobposting; --"
 
@@ -558,7 +558,7 @@ class TestJobDuplication:
     def test_duplicate_job_posting(self):
         """Test duplicating a job posting."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             # Get original job details
             original_title = self.job.title
@@ -594,7 +594,7 @@ class TestJobDuplication:
     def test_duplicate_preserves_all_fields(self):
         """Test that duplication preserves all job details."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             # Set specific values
             self.job.salary_min = Decimal('100000.00')
@@ -652,7 +652,7 @@ class TestJobDeletionAndArchiving:
     def test_delete_draft_job(self):
         """Test deleting a draft job posting."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job = JobPostingFactory(
                 tenant=self.tenant,
@@ -678,7 +678,7 @@ class TestJobDeletionAndArchiving:
     def test_archive_job(self):
         """Test archiving a job posting."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job = JobPostingFactory(
                 tenant=self.tenant,
@@ -707,7 +707,7 @@ class TestJobDeletionAndArchiving:
     def test_archived_job_not_visible_in_active_list(self):
         """Test that archived jobs don't appear in active listings."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             # Create archived job
             archived_job = JobPostingFactory(
@@ -784,7 +784,7 @@ class TestJobSearchAndFiltering:
     def test_search_by_keyword(self):
         """Test searching jobs by keyword."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             # Search for Python
             results = JobPosting.objects.filter(
@@ -805,7 +805,7 @@ class TestJobSearchAndFiltering:
     def test_search_by_location(self):
         """Test searching jobs by location."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             results = JobPosting.objects.filter(location__icontains='Toronto')
 
@@ -821,7 +821,7 @@ class TestJobSearchAndFiltering:
     def test_search_by_remote_policy(self):
         """Test searching by remote policy."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             results = JobPosting.objects.filter(remote_policy='remote')
 
@@ -837,7 +837,7 @@ class TestJobSearchAndFiltering:
     def test_search_by_category(self):
         """Test searching by category."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             results = JobPosting.objects.filter(category=self.category)
 
@@ -853,7 +853,7 @@ class TestJobSearchAndFiltering:
     def test_search_by_status(self):
         """Test searching by job status."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             results = JobPosting.objects.filter(status='open')
 
@@ -870,7 +870,7 @@ class TestJobSearchAndFiltering:
     def test_combined_search_filters(self):
         """Test combining multiple search filters."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             results = JobPosting.objects.filter(
                 status='open',
@@ -889,7 +889,7 @@ class TestJobSearchAndFiltering:
     def test_search_form_validation(self):
         """Test job search form validation."""
         try:
-            from ats.forms import JobPostingSearchForm
+            from jobs.forms import JobPostingSearchForm
 
             form_data = {
                 'query': 'Python',
@@ -927,7 +927,7 @@ class TestJobApplicationFlow:
         )
 
         # Create pipeline stage
-        from ats.models import PipelineStage
+        from jobs.models import PipelineStage
         self.initial_stage = PipelineStage.objects.create(
             pipeline=self.pipeline,
             name='New',
@@ -940,7 +940,7 @@ class TestJobApplicationFlow:
     def test_submit_job_application(self):
         """Test submitting a job application."""
         try:
-            from ats.models import Application
+            from jobs.models import Application
 
             application = Application.objects.create(
                 job=self.job,
@@ -964,7 +964,7 @@ class TestJobApplicationFlow:
     def test_application_unique_per_candidate_per_job(self):
         """Test that a candidate can only apply once per job."""
         try:
-            from ats.models import Application
+            from jobs.models import Application
             from django.db import IntegrityError
 
             # Create first application
@@ -995,7 +995,7 @@ class TestJobApplicationFlow:
     def test_application_form_validation(self):
         """Test application form validation."""
         try:
-            from ats.forms import ApplicationForm
+            from jobs.forms import ApplicationForm
 
             form_data = {
                 'cover_letter': 'This is my cover letter for this amazing position.',
@@ -1013,7 +1013,7 @@ class TestJobApplicationFlow:
     def test_application_moves_through_stages(self):
         """Test moving application through pipeline stages."""
         try:
-            from ats.models import Application, PipelineStage
+            from jobs.models import Application, PipelineStage
 
             # Create application
             application = Application.objects.create(

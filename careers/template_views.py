@@ -380,7 +380,7 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
         ).data
 
         # Get filter options
-        from ats.models import JobCategory
+        from jobs.models import JobCategory
         categories = JobCategory.objects.filter(
             is_active=True
         ).annotate(
@@ -405,7 +405,7 @@ class CareerSiteHomeView(CareerSiteContextMixin, TemplateView):
         radius = self.request.GET.get('radius', '100')
 
         # Get unique industries for filter dropdown
-        from ats.models import Job
+        from jobs.models import Job
         industries = Job.objects.filter(
             status='open'
         ).exclude(
@@ -564,7 +564,7 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
         ).data
 
         # Get filter options
-        from ats.models import JobCategory
+        from jobs.models import JobCategory
         categories = JobCategory.objects.filter(
             is_active=True
         ).annotate(
@@ -589,7 +589,7 @@ class BrowseJobsMapView(CareerSiteContextMixin, TemplateView):
         radius = self.request.GET.get('radius', '100')
 
         # Get unique industries for filter dropdown
-        from ats.models import Job
+        from jobs.models import Job
         industries = Job.objects.filter(
             status='open'
         ).exclude(
@@ -838,7 +838,7 @@ class JobAlertSubscribeView(CareerSiteContextMixin, FormView):
         form = super().get_form(form_class)
 
         # Populate department choices from categories
-        from ats.models import JobCategory
+        from jobs.models import JobCategory
         categories = JobCategory.objects.filter(is_active=True).values_list('slug', 'name')
         form.fields['departments'].choices = list(categories)
 
@@ -1178,7 +1178,7 @@ class BrowseCompaniesView(TemplateView):
         ).select_related('plan')
 
         # Annotate with open jobs count
-        from ats.models import Job
+        from jobs.models import Job
         companies = companies.annotate(
             open_jobs_count=Count(
                 'jobs',
@@ -1303,7 +1303,7 @@ class BrowseCompaniesMapView(TemplateView):
         ).select_related('plan')
 
         # Annotate with open jobs count
-        from ats.models import Job
+        from jobs.models import Job
         companies = companies.annotate(
             open_jobs_count=Count(
                 'jobs',

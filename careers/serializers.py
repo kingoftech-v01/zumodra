@@ -28,7 +28,7 @@ from .models import (
     CareerPage, CareerPageSection, JobListing,
     PublicApplication, TalentPool, TalentPoolMember
 )
-from ats.models import JobPosting, JobCategory, Candidate
+from jobs.models import JobPosting, JobCategory, Candidate
 from tenants.models import PublicJobCatalog
 
 

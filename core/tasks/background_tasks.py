@@ -840,7 +840,7 @@ def _warm_user_preferences_cache(tenant_id: Optional[int] = None) -> List[str]:
 
     try:
         from django.contrib.auth import get_user_model
-        from accounts.models import UserPreference
+        from tenant_profiles.models import UserPreference
 
         User = get_user_model()
 

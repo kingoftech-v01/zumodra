@@ -1877,7 +1877,7 @@ class CandidateMatchingService:
         Returns:
             List of MatchResult instances sorted by score
         """
-        from ats.models import Candidate
+        from jobs.models import Candidate
         from .models import MatchResult
 
         filters = filters or {}
@@ -1938,7 +1938,7 @@ class CandidateMatchingService:
         Returns:
             List of MatchResult instances sorted by score
         """
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         from .models import MatchResult
 
         filters = filters or {}
@@ -2783,7 +2783,7 @@ class HybridRankingEngine:
         Returns:
             List of CandidateRanking instances sorted by overall_score desc
         """
-        from ats.models import Candidate
+        from jobs.models import Candidate
         from .models import CandidateRanking
 
         if candidates is None:
@@ -3034,7 +3034,7 @@ class HybridRankingEngine:
                 return 0.3  # Default for candidates without user link
 
             # Get TrustScore from accounts app
-            from accounts.models import TrustScore
+            from tenant_profiles.models import TrustScore
 
             try:
                 trust_score = TrustScore.objects.get(user=user)

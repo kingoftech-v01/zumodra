@@ -85,7 +85,7 @@ class Command(BaseCommand):
             else:
                 # Dry run - just count
                 with schema_context(tenant.schema_name):
-                    from ats.models import JobPosting
+                    from jobs.models import JobPosting
                     job_count = JobPosting.objects.filter(
                         status='open',
                         published_on_career_page=True

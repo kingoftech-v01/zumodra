@@ -350,7 +350,10 @@ class ServiceProvider(TenantAwareModel):
         help_text=_("DEPRECATED: Use marketplace_enabled instead. Only visible via direct link")
     )
 
-    is_accepting_projects = models.BooleanField(default=True)
+    is_accepting_work = models.BooleanField(
+        default=True,
+        help_text=_("Provider is currently accepting new service requests and contracts")
+    )
     can_work_remotely = models.BooleanField(default=True)
     can_work_onsite = models.BooleanField(default=False)
 
@@ -993,7 +996,7 @@ class ServiceContract(TenantAwareModel):
     """
     A contract between client and provider with escrow integration.
 
-    Linked to finance.EscrowTransaction for secure payment handling.
+    Linked to escrow.EscrowTransaction for secure payment handling.
     """
     class ContractStatus(models.TextChoices):
         DRAFT = 'draft', _('Draft')
@@ -1073,7 +1076,7 @@ class ServiceContract(TenantAwareModel):
 
     # Escrow Integration
     escrow_transaction = models.OneToOneField(
-        'finance.EscrowTransaction',
+        'escrow.EscrowTransaction',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

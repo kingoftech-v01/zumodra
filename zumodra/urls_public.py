@@ -184,7 +184,7 @@ urlpatterns += i18n_patterns(
     path('auth-test/', auth_test_view, name='auth_test'),
 
     # Services Marketplace (included with namespace for template compatibility)
-    path('services/', include('services.urls', namespace='services')),
+    path('services/', include('services.urls_frontend', namespace='services')),  # Phase 12
 
     # Careers - Public Landing Pages (aggregated from all tenants)
     # Note: The careers app is in TENANT_APPS, so its database tables only exist
