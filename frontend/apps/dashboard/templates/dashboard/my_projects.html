@@ -1,0 +1,857 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_alert scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">My Projects</h4>
+                        <a href="employers-choose-project-package.html" class="button-main">Submit new Project</a>
+                    </div>
+                    <div class="mt-7.5 rounded-lg bg-white">
+                        <div class="list_category flex items-center h-20 p-6 border-b border-line">
+                            <div class="menu_tab overflow-unset max-w-none">
+                                <ul class="menu flex gap-7" role="tablist">
+                                    <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300 active" id="posted_jobs_tab01" role="tab" aria-controls="posted_jobs01" aria-selected="true">Posted Projects</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="ongoing_jobs_tab02" role="tab" aria-controls="ongoing_jobs02" aria-selected="false">Ongoing Projects</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="completed_jobs_tab03" role="tab" aria-controls="completed_jobs03" aria-selected="false">Completed Projects</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="cancelled_jobs_tab04" role="tab" aria-controls="cancelled_jobs04" aria-selected="false">Cancelled Projects</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-5 pt-5 px-6">
+                            <form class="relative w-[340px] h-12">
+                                <input type="text" class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden" placeholder="Search by keyword" required />
+                                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                                    <span class="ph ph-magnifying-glass text-xl block"></span>
+                                </button>
+                            </form>
+                            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                                <div class="select">
+                                    <span class="selected caption1 capitalize" data-title="sort by (default)">sort by (default)</span>
+                                    <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                                        <li class="capitalize" data-item="default">sort by (default)</li>
+                                        <li class="capitalize" data-item="candidate name (a -> z)">candidate name (a -> z)</li>
+                                        <li class="capitalize" data-item="candidate name (z -> a)">candidate name (z -> a)</li>
+                                        <li class="capitalize" data-item="job title (a -> z)">job title (a -> z)</li>
+                                        <li class="capitalize" data-item="job title (z -> a)">job title (z -> a)</li>
+                                        <li class="capitalize" data-item="status (on hold)">status (on hold)</li>
+                                        <li class="capitalize" data-item="status (interviewed)">status (interviewed)</li>
+                                        <li class="capitalize" data-item="status (rejected)">status (rejected)</li>
+                                        <li class="capitalize" data-item="status (hired)">status (hired)</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div id="posted_jobs01" class="tab_list active" role="tabpanel" aria-labelledby="posted_jobs_tab01" aria-hidden="false">
+                            <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                                <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                    <thead class="border-b border-line">
+                                        <tr>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">My jobs</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Created & expiry</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Applicants</th>
+                                            <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Website Design for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Website Design for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web Designer to Redesign the First Screen of the Main Page</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web & Responsive for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">I need you to design a email confirming for a ticket...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="ongoing_jobs02" class="tab_list" role="tabpanel" aria-labelledby="ongoing_jobs_tab02" aria-hidden="true">
+                            <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                                <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                    <thead class="border-b border-line">
+                                        <tr>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">My jobs</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Created & expiry</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Applicants</th>
+                                            <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Website Design for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Website Design for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="completed_jobs03" class="tab_list" role="tabpanel" aria-labelledby="completed_jobs_tab03" aria-hidden="true">
+                            <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                                <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                    <thead class="border-b border-line">
+                                        <tr>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">My jobs</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Created & expiry</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Applicants</th>
+                                            <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web Designer to Redesign the First Screen of the Main Page</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web & Responsive for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">I need you to design a email confirming for a ticket...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="cancelled_jobs04" class="tab_list" role="tabpanel" aria-labelledby="cancelled_jobs_tab04" aria-hidden="true">
+                            <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                                <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                    <thead class="border-b border-line">
+                                        <tr>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">My jobs</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Created & expiry</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                            <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Applicants</th>
+                                            <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web Designer to Redesign the First Screen of the Main Page</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: April 30, 2024</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-red text-red text-button">Expried</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Web & Responsive for an Online Tutoring Website</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">I need you to design a email confirming for a ticket...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item duration-300 hover:bg-background">
+                                            <th scope="row" class="p-5 text-left">
+                                                <h6 class="heading6">Figma mockup needed for a new website for Electrical...</h6>
+                                            </th>
+                                            <td class="p-5">
+                                                <p class="whitespace-nowrap">Created date: March 18, 2024</p>
+                                                <p class="whitespace-nowrap">Expiry date: March 30, 2025</p>
+                                            </td>
+                                            <td class="p-5">
+                                                <span class="tag bg-opacity-10 bg-success text-success text-button">Published</span>
+                                            </td>
+                                            <td class="p-5 whitespace-nowrap">
+                                                <a href="employers-view-proposals-projects.html" class="button-main -border -small text-button-sm">view Proposals (4)</a>
+                                            </td>
+                                            <td class="p-5">
+                                                <div class="flex justify-end gap-2">
+                                                    <button class="btn_action btn_open_popup btn_view_job flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_project">
+                                                        <span class="ph ph-eye text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_filled_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_filled_project">
+                                                        <span class="ph ph-lock text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Filled Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_edit_project flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_project">
+                                                        <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Job</span>
+                                                    </button>
+                                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                        <span class="ph ph-trash text-xl"></span>
+                                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                            <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                </li>
+                            </ul>
+                            <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">6</span> of <span class="total">24</span> entries</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_project_my_projects.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_my_projects.html' %}
+{% endblock %}

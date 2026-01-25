@@ -1,0 +1,454 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_alert scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">Applicants Jobs</h4>
+                        <div class="flex items-center gap-3">
+                            <a href="#!" class="button-main gap-2">
+                                <span class="ph ph-box-arrow-down"></span>
+                                excel sheet
+                            </a>
+                            <a href="#!" class="button-main gap-2">
+                                <span class="ph ph-box-arrow-down"></span>
+                                All CV
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-7.5 rounded-lg bg-white">
+                        <div class="flex flex-wrap items-center justify-between gap-5 pt-5 px-6">
+                            <form class="relative w-[340px] h-12">
+                                <input type="text" class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden" placeholder="Search by keyword" required />
+                                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                                    <span class="ph ph-magnifying-glass text-xl block"></span>
+                                </button>
+                            </form>
+                            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                                <div class="select">
+                                    <span class="selected caption1 capitalize" data-title="sort by (default)">sort by (default)</span>
+                                    <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                                        <li class="capitalize" data-item="default">sort by (default)</li>
+                                        <li class="capitalize" data-item="candidate name (a -> z)">candidate name (a -> z)</li>
+                                        <li class="capitalize" data-item="candidate name (z -> a)">candidate name (z -> a)</li>
+                                        <li class="capitalize" data-item="job title (a -> z)">job title (a -> z)</li>
+                                        <li class="capitalize" data-item="job title (z -> a)">job title (z -> a)</li>
+                                        <li class="capitalize" data-item="status (on hold)">status (on hold)</li>
+                                        <li class="capitalize" data-item="status (interviewed)">status (interviewed)</li>
+                                        <li class="capitalize" data-item="status (rejected)">status (rejected)</li>
+                                        <li class="capitalize" data-item="status (hired)">status (hired)</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                            <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Candidates</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Job Title</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date Applied</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="avatar/IMG-1" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Kelemen Krisztina</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Senior UI/UX Designer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">On Hold</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_approved_application flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_approved_application">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Approved Application</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="avatar/IMG-2" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Sara Smith</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Paris, France</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Senior UI/UX Designer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 10, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">On Hold</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_approved_application flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_approved_application">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Approved Application</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="avatar/IMG-3" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Katona Beatrix</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Brasilla, Brazil</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Full Stack Development</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 06, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">Interviewed</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-repeat text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Undo Approved</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-4.webp' %}" alt="avatar/IMG-4" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Kende Lili</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Berlin, Germany</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Mobile App Developer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 01, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-red text-red text-button">Rejected</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-repeat text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Undo Approved</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-5.webp' %}" alt="avatar/IMG-5" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Kelemen Krisztina</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Senior UI/UX Designer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">On Hold</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_approved_application flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_approved_application">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Approved Application</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-6.webp' %}" alt="avatar/IMG-6" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Sara Smith</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Paris, France</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Senior UI/UX Designer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 10, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">On Hold</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_approved_application flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_approved_application">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Approved Application</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-7.webp' %}" alt="avatar/IMG-7" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Katona Beatrix</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Brasilla, Brazil</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Full Stack Development</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 06, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">Interviewed</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-repeat text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Undo Approved</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info flex items-center gap-3">
+                                                <a href="candidates-detail1.html" class="avatar flex-shrink-0 w-15 h-15 rounded-full overflow-hidden">
+                                                    <img src="{% static 'assets/images/avatar/IMG-8.webp' %}" alt="avatar/IMG-8" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="candidates-detail1.html" class="block">
+                                                    <strong class="candidates_name -style-1 heading6 duration-300 hover:text-primary">Kende Lili</strong>
+                                                    <div class="address flex items-center gap-2 mt-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Berlin, Germany</span>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 heading6">Mobile App Developer</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 01, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-red text-red text-button">Rejected</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_create_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_create_meeting">
+                                                    <span class="ph ph-video-camera text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Create Metting</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-repeat text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Undo Approved</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_undo_approved flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_undo_approved">
+                                                    <span class="ph ph-box-arrow-down text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Download CV</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_reject flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_reject">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Reject</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                            <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                </li>
+                            </ul>
+                            <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">6</span> of <span class="total">24</span> entries</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_create_meeting_applicants_jobs.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_applicants_jobs.html' %}
+{% endblock %}

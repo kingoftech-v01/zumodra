@@ -1,0 +1,678 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<section class="services_detail lg:pb-20 sm:pb-14 pb-10">
+            <div class="container flex max-lg:flex-col gap-y-10">
+                <div class="services_content w-full overflow-hidden lg:pr-15 lg:pt-40 sm:pt-32 pt-24">
+                    <div class="flex max-xl:flex-col xl:items-center justify-between gap-7 gap-y-2 w-full md:pb-10 pb-7 border-b border-line">
+                        <div class="services_info flex max-md:flex-wrap sm:gap-7 gap-4 w-full">
+                            <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                                <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="services_avatar w-full h-full object-cover" />
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <h3 class="services_name heading3">I will design wordpress website with elementor pro</h3>
+                                <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                                    <div class="services_review flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-xl text-yellow"></span>
+                                        <strong class="text-button">4.8</strong>
+                                        <span class="review text-secondary">(751 review)</span>
+                                    </div>
+                                    <div class="services_date flex items-center gap-1">
+                                        <span class="ph-fill ph-crown-simple text-xl text-primary"></span>
+                                        <span>Top Rated</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="breadcrumb_action flex flex-col max-xl:flex-col-reverse gap-2">
+                            <div class="flex max-sm:flex-wrap xl:justify-end gap-3">
+                                <button class="button_share flex items-center justify-center w-12 h-12 border border-line rounded-full bg-white duration-300 hover:border-black">
+                                    <span class="ph ph-share-network text-2xl"></span>
+                                    <ul class="social">
+                                        <li class="social_item">
+                                            <a href="https://www.facebook.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-facebook"></span>
+                                            </a>
+                                        </li>
+                                        <li class="social_item">
+                                            <a href="https://www.linkedin.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-linkedin"></span>
+                                            </a>
+                                        </li>
+                                        <li class="social_item">
+                                            <a href="https://www.twitter.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-twitter"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </button>
+                                <button class="add_wishlist_btn -relative -border w-12">
+                                    <span class="ph ph-heart text-2xl"></span>
+                                    <span class="ph-fill ph-heart text-2xl"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="body2 text-secondary">From:</span>
+                                <h5 class="heading5">$50</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="images overflow-hidden w-full md:mt-10 mt-7">
+                        <div class="swiper swiper-thumb-images section-swiper-navigation rounded-xl">
+                            <button class="custom-button-prev -border lg:left-6 left-4">
+                                <span class="ph-bold ph-arrow-left text-xl"></span>
+                            </button>
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/1.webp' %}" alt="blog/1" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/2.webp' %}" alt="blog/2" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/3.webp' %}" alt="blog/3" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/4.webp' %}" alt="blog/4" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/5.webp' %}" alt="blog/5" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/6.webp' %}" alt="blog/6" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/7.webp' %}" alt="blog/7" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="{% static 'assets/images/blog/8.webp' %}" alt="blog/8" class="w-full h-full object-cover" />
+                                </div>
+                            </div>
+                            <button class="custom-button-next -border lg:right-6 right-4">
+                                <span class="ph-bold ph-arrow-right text-xl"></span>
+                            </button>
+                        </div>
+                        <div thumbsSlider="" class="swiper swiper-list-images mt-4">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/1.webp' %}" alt="blog/1" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/2.webp' %}" alt="blog/2" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/3.webp' %}" alt="blog/3" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/4.webp' %}" alt="blog/4" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/5.webp' %}" alt="blog/5" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/6.webp' %}" alt="blog/6" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/7.webp' %}" alt="blog/7" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/blog/8.webp' %}" alt="blog/8" class="w-full h-full object-cover" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="description md:mt-10 mt-7">
+                        <h6 class="heading6">About service</h6>
+                        <div class="flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Hi, I am a front-end website designer. If you need any kind of Figma to HTML, PSD to HTML, Xd to HTML, Sketch to HTML, inVision to HTML, Zeplin to HTML, or anything to HTML CSS website design you can hire me because I professionally work with HTML CSS, bootstrap, tailwind CSS, jQuery, and JavaScript, with all browser – responsive website designs.</p>
+                            <p class="body2 text-secondary">I have 3+ years of experience creating HTML CSS web pages with fully responsive website design. You can give me any kind of design and I will create the page exactly as you need the design.</p>
+                        </div>
+                    </div>
+                    <div class="services md:mt-10 mt-7">
+                        <h6 class="heading6">My Services:</h6>
+                        <ul class="list_services w-full mt-3">
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>Figma to HTML</p>
+                            </li>
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>PSD to HTML</p>
+                            </li>
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>XD to HTML</p>
+                            </li>
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>AI to HTML</p>
+                            </li>
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>PDF to HTML</p>
+                            </li>
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>Sketch to HTML</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tags md:mt-10 mt-7">
+                        <h6 class="heading6">Tags:</h6>
+                        <ul class="list_tags flex flex-wrap gap-3 gap-y-5 mt-4">
+                            <li>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Website Design </a>
+                            </li>
+                            <li>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Mobile App </a>
+                            </li>
+                            <li>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Animation </a>
+                            </li>
+                            <li>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Adobe Photoshop </a>
+                            </li>
+                            <li>
+                                <a href="services-default.html" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Figma </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="about md:mt-15 mt-8">
+                        <div class="introduce">
+                            <h5 class="heading5">About me</h5>
+                            <div class="flex flex-wrap gap-5 items-center justify-between mt-4">
+                                <a href="candidates-detail1.html" class="info flex items-center gap-5">
+                                    <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="flex-shrink-0 w-[100px] h-[100px] rounded-lg" />
+                                    <div class="flex flex-col gap-2">
+                                        <span class="tag w-fit caption1 bg-background text-success">Available now</span>
+                                        <div class="flex items-center gap-2">
+                                            <strong class="heading6 duration-300 hover:text-primary">Devon Lane</strong>
+                                            <span class="ph-fill ph-crown-simple text-primary text-2xl"></span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                            <span class="address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="group_btn flex flex-col gap-3">
+                                    <a href="#!" class="button-main whitespace-nowrap">Contact me</a>
+                                    <a href="candidates-detail1.html" class="button-main -border whitespace-nowrap">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio md:mt-10 mt-7">
+                            <h6 class="heading6">Portfolio</h6>
+                            <ul class="list_portfolio grid sm:grid-cols-3 grid-cols-2 gap-5 mt-4">
+                                <li class="col-span-2 row-span-2 overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/service/2.webp' %}" alt="service/2" class="w-full h-full object-cover" />
+                                </li>
+                                <li class="col-span-1 row-span-1 overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/service/3.webp' %}" alt="service/3" class="w-full h-full object-cover" />
+                                </li>
+                                <li class="col-span-1 row-span-1 overflow-hidden rounded-lg">
+                                    <img src="{% static 'assets/images/service/4.webp' %}" alt="service/4" class="w-full h-full object-cover" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="compare_pricing md:mt-15 mt-8">
+                        <h5 class="heading5">Compare pricing</h5>
+                        <div class="list overflow-x-auto w-full mt-4 p-5 rounded-xl bg-surface">
+                            <table class="w-full max-[560px]:w-[560px]">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th scope="col">
+                                            <div class="item flex flex-col items-center gap-1 py-5">
+                                                <span class="text-sm font-bold text-secondary">Starter</span>
+                                                <strong class="heading5">$50</strong>
+                                            </div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="item flex flex-col items-center gap-1 py-5">
+                                                <span class="text-sm font-bold text-secondary">Professional</span>
+                                                <strong class="heading5">$100</strong>
+                                            </div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="item flex flex-col items-center gap-1 py-5">
+                                                <span class="text-sm font-bold text-secondary">Executive</span>
+                                                <strong class="heading5">$300</strong>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Delivery time</th>
+                                        <td class="p-4 bg-white text-title text-center">2 day</td>
+                                        <td class="p-4 bg-white text-title text-center">3 day</td>
+                                        <td class="p-4 rounded-r-lg bg-white text-title text-center">5 day</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg text-left font-normal">Number of revisions</th>
+                                        <td class="p-4 text-title text-center">8 time</td>
+                                        <td class="p-4 text-title text-center">20 time</td>
+                                        <td class="p-4 rounded-r-lg text-title text-center">Unlimited</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Printable resolution file</th>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg text-left font-normal">Logo Design</th>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Branding</th>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg text-left font-normal">Mockup</th>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Vector file</th>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg text-left font-normal">Source Files</th>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Support life time</th>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                        </td>
+                                        <td class="p-4 bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                        <td class="p-4 rounded-r-lg bg-white text-title text-center">
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="review md:mt-15 mt-8">
+                        <div class="heading flex flex-wrap items-center justify-between gap-4">
+                            <h5 class="heading5">Customer Review</h5>
+                            <a href="#form-review" class="button-main -border">Write Reviews </a>
+                        </div>
+                        <div class="rating_area flex max-sm:flex-col justify-between gap-y-3 py-6">
+                            <div class="flex flex-col items-center justify-center gap-1">
+                                <h1 class="heading1 avg_rating">4.8</h1>
+                                <div class="flex flex-col items-center gap-2">
+                                    <ul class="rate flex">
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star-half text-2xl text-yellow"></li>
+                                    </ul>
+                                    <span class="total_rating caption1">(1,968 Ratings)</span>
+                                </div>
+                            </div>
+                            <div class="list_rating flex-shrink-0 xl:w-[465px] sm:w-[60%] w-full">
+                                <div class="item flex items-center justify-between gap-3">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">5</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[70%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">70%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">4</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[20%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">20%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">3</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[10%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">10%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">2</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-0 h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">0%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-2 min-w-7">
+                                        <strong class="text-button-sm">1</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-0 h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">0%</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list_review flex flex-col items-center gap-10 md:pt-10 pt-7 border-t border-line">
+                            <ul class="list flex flex-col gap-6">
+                                <li class="review_item flex gap-5">
+                                    <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">Jeremy L.</span>
+                                                    <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                </div>
+                                                <span class="date caption1 text-secondary">August 24, 2024</span>
+                                                <ul class="review_rate flex mt-1">
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                </ul>
+                                            </div>
+                                            <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                <span class="caption1">Was this helpful?</span>
+                                                <span class="ph ph-thumbs-up"></span>
+                                            </button>
+                                        </div>
+                                        <p class="desc mt-4">I really like the logo that Gihan created, and he was very responsive and great to work with. I would recommend him to anyone looking for a logo or graphic design!</p>
+                                    </div>
+                                </li>
+                                <li class="review_item flex gap-5">
+                                    <img src="{% static 'assets/images/avatar/IMG-11.webp' %}" alt="avatar/IMG-11" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">Alexander P.</span>
+                                                    <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                </div>
+                                                <span class="date caption1 text-secondary">August 13, 2024</span>
+                                                <ul class="review_rate flex mt-1">
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                    <li class="ph-fill ph-star text-yellow"></li>
+                                                </ul>
+                                            </div>
+                                            <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                <span class="caption1">Was this helpful?</span>
+                                                <span class="ph ph-thumbs-up"></span>
+                                            </button>
+                                        </div>
+                                        <p class="desc mt-4">I really like the logo that Gihan created, and he was very responsive and great to work with. I would recommend him to anyone looking for a logo or graphic design!</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            <button class="text-button underline duration-300 hover:text-primary">See more reviews (19)</button>
+                        </div>
+                        <div id="form-review" class="form-review md:pt-10 pt-7">
+                            <h6 class="heading6">Leave A comment</h6>
+                            <form class="form grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
+                                <div class="name">
+                                    <label for="username">Name</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                                </div>
+                                <div class="mail">
+                                    <label for="email">Email</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                                </div>
+                                <div class="col-span-full message">
+                                    <label for="message">Review</label>
+                                    <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Write comment " required></textarea>
+                                </div>
+                                <div class="col-span-full flex items-start gap-2">
+                                    <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
+                                    <label class="" for="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
+                                </div>
+                                <div class="user_rating flex items-center gap-3 col-span-full">
+                                    <span>Your Rating:</span>
+                                    <ul class="list_rate flex gap-1">
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="1"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="2"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="3"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="4"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="5"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-span-full">
+                                    <button class="button-main">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="pricing_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit lg:mt-40 sm:mt-32 mt-24 rounded-xl overflow-hidden bg-white shadow-md duration-300">
+                    <div class="menu_tab w-full max-w-none">
+                        <ul class="menu grid grid-cols-3 w-full border-b border-line" role="tablist">
+                            <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -before -bg flex flex-col items-center gap-1 w-full py-[13px] duration-300 hover:bg-background active" id="pricing_tab01" role="tab" aria-controls="pricing_01" aria-selected="true">
+                                    <span class="caption1 text-secondary">Starter</span>
+                                    <strong class="heading6">$50</strong>
+                                </button>
+                            </li>
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -before -bg flex flex-col items-center gap-1 w-full py-[13px] duration-300 hover:bg-background" id="pricing_tab02" role="tab" aria-controls="pricing_02" aria-selected="false">
+                                    <span class="caption1 text-secondary">Professional</span>
+                                    <strong class="heading6">$100</strong>
+                                </button>
+                            </li>
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -before -bg flex flex-col items-center gap-1 w-full py-[13px] duration-300 hover:bg-background" id="pricing_tab03" role="tab" aria-controls="pricing_03" aria-selected="false">
+                                    <span class="caption1 text-secondary">Executive</span>
+                                    <strong class="heading6">$200</strong>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="pricing_01" class="tab_list p-6 active" role="tabpanel" aria-labelledby="pricing_tab01" aria-hidden="false">
+                        <h6 class="heading6">Starter</h6>
+                        <ul class="list flex flex-col gap-3 w-full py-5 border-b border-line">
+                            <li class="flex items-center justify-between">
+                                <span>Delivery time</span>
+                                <strong class="text-title">3 day</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Number of revisions</span>
+                                <strong class="text-title">20 time</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Printable resolution file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Logo Design</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Branding</span>
+                                <span class="ph-bold ph-x text-red text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Mockup</span>
+                                <span class="ph-bold ph-x text-red text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Vector file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Source Files</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Support life time</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                        </ul>
+                        <div class="total flex items-center justify-between py-5">
+                            <strong class="heading6">Pricing</strong>
+                            <strong class="heading5">$50</strong>
+                        </div>
+                        <a href="#!" class="button-main w-full text-center">Continue</a>
+                    </div>
+                    <div id="pricing_02" class="tab_list p-6" role="tabpanel" aria-labelledby="pricing_tab02" aria-hidden="true">
+                        <h6 class="heading6">Professional</h6>
+                        <ul class="list flex flex-col gap-3 w-full py-5 border-b border-line">
+                            <li class="flex items-center justify-between">
+                                <span>Delivery time</span>
+                                <strong class="text-title">2 day</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Number of revisions</span>
+                                <strong class="text-title">50 time</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Printable resolution file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Logo Design</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Branding</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Mockup</span>
+                                <span class="ph-bold ph-x text-red text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Vector file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Source Files</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Support life time</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                        </ul>
+                        <div class="total flex items-center justify-between py-5">
+                            <strong class="heading6">Pricing</strong>
+                            <strong class="heading5">$100</strong>
+                        </div>
+                        <a href="#!" class="button-main w-full text-center">Continue</a>
+                    </div>
+                    <div id="pricing_03" class="tab_list p-6" role="tabpanel" aria-labelledby="pricing_tab03" aria-hidden="true">
+                        <h6 class="heading6">Executive</h6>
+                        <ul class="list flex flex-col gap-3 w-full py-5 border-b border-line">
+                            <li class="flex items-center justify-between">
+                                <span>Delivery time</span>
+                                <strong class="text-title">1 day</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Number of revisions</span>
+                                <strong class="text-title">100 time</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Printable resolution file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Logo Design</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Branding</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Mockup</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Vector file</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Source Files</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Support life time</span>
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                            </li>
+                        </ul>
+                        <div class="total flex items-center justify-between py-5">
+                            <strong class="heading6">Pricing</strong>
+                            <strong class="heading5">$200</strong>
+                        </div>
+                        <a href="#!" class="button-main w-full text-center">Continue</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_package scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">My Packages</h4>
+                    <div class="table_package w-full p-10 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <div class="list overflow-x-auto w-full">
+                            <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">#</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">ID</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Package</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Package Information</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">1</th>
+                                        <td class="p-5 whitespace-nowrap">6508</td>
+                                        <td class="p-5 heading6 whitespace-nowrap">Basic Plan</td>
+                                        <td class="p-5">
+                                            <ul class="flex flex-col">
+                                                <li><span class="text-secondary">Urgent:</span> Yes</li>
+                                                <li><span class="text-secondary">Featured:</span> Yes</li>
+                                                <li><span class="text-secondary">Poster:</span> 05</li>
+                                                <li><span class="text-secondary">Limit post:</span> 10</li>
+                                                <li><span class="text-secondary">Listing duration:</span> 15</li>
+                                            </ul>
+                                        </td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Active</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">2</th>
+                                        <td class="p-5 whitespace-nowrap">6509</td>
+                                        <td class="p-5 heading6 whitespace-nowrap">Starter Plan</td>
+                                        <td class="p-5">
+                                            <ul class="flex flex-col">
+                                                <li><span class="text-secondary">Urgent:</span> Yes</li>
+                                                <li><span class="text-secondary">Featured:</span> Yes</li>
+                                                <li><span class="text-secondary">Poster:</span> 10</li>
+                                                <li><span class="text-secondary">Limit post:</span> 30</li>
+                                                <li><span class="text-secondary">Listing duration:</span> 15</li>
+                                            </ul>
+                                        </td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Active</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">3</th>
+                                        <td class="p-5 whitespace-nowrap">6510</td>
+                                        <td class="p-5 heading6 whitespace-nowrap">Professional Plan</td>
+                                        <td class="p-5">
+                                            <ul class="flex flex-col">
+                                                <li><span class="text-secondary">Urgent:</span> Yes</li>
+                                                <li><span class="text-secondary">Featured:</span> Yes</li>
+                                                <li><span class="text-secondary">Poster:</span> 30</li>
+                                                <li><span class="text-secondary">Limit post:</span> 30</li>
+                                                <li><span class="text-secondary">Listing duration:</span> 30</li>
+                                            </ul>
+                                        </td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-red text-red text-button">Closed</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">4</th>
+                                        <td class="p-5 whitespace-nowrap">6511</td>
+                                        <td class="p-5 heading6 whitespace-nowrap">Executive Plan</td>
+                                        <td class="p-5">
+                                            <ul class="flex flex-col">
+                                                <li><span class="text-secondary">Urgent:</span> Yes</li>
+                                                <li><span class="text-secondary">Featured:</span> Yes</li>
+                                                <li><span class="text-secondary">Poster:</span> 30</li>
+                                                <li><span class="text-secondary">Limit post:</span> 30</li>
+                                                <li><span class="text-secondary">Listing duration:</span> 30</li>
+                                            </ul>
+                                        </td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-red text-red text-button">Closed</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="list_package p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5 text-center">Or Purchase New Package</h5>
+                        <ul class="list_pricing grid 2xl:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 mt-5">
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Essential</span>
+                                <h3 class="heading3 mt-2">Free</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">5 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">20 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 2 months</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="basic_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="basic_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Starter</span>
+                                <h3 class="heading3 mt-2">$5.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">25 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">100 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 1 month</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="starter_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="starter_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-xl bg-white duration-300 shadow-lg">
+                                <span class="flag absolute top-0 left-1/2 -translate-x-1/2 text-label py-1 px-2.5 rounded-b-lg bg-red text-white">MOST POPULAR</span>
+                                <span class="pricing_type text-title text-secondary">Professional</span>
+                                <h3 class="heading3 mt-2">$10.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">60 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">250 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 6 months</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="professional_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="professional_package" class="w-4 h-4 border border-placehover rounded-sm" checked />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Executive</span>
+                                <h3 class="heading3 mt-2">$25.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">150 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">1000 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 1 week</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="executive_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="executive_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+
+{% endblock %}

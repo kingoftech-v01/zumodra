@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Copyright Policy and DMCA Notice</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub respects intellectual property rights and expects all users to do the same. This Copyright Policy outlines ownership rights, licensing terms, and procedures for reporting copyright infringement under the Digital Millennium Copyright Act (DMCA).</p>
+                            <p class="body2 text-secondary">Users retain ownership of all intellectual property they create or upload to FreelanHub, including portfolios, project deliverables, proposals, and communications. Freelancers own the work they create unless contractual agreements specify otherwise. Clients who commission work receive rights as defined in their service agreements with freelancers.</p>
+                            <p class="body2 text-secondary">By uploading content to FreelanHub, you grant us a limited, non-exclusive license to display, store, and transmit your content as necessary to provide our services. This includes displaying portfolio work, facilitating project collaboration, and enabling communication between users. We do not claim ownership of user-generated content.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">When you post content on FreelanHub, you automatically grant certain licenses to ensure platform functionality and enable business relationships:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Platform License: You grant FreelanHub a worldwide, royalty-free license to host, store, display, and distribute your content as necessary to operate the platform, including portfolio items, project files, and communications.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Client Preview License: Portfolio work and project proposals may be viewed by potential clients for evaluation purposes, enabling them to assess your skills and suitability for projects.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Work Product Rights: Rights to completed project work are governed by individual service agreements between freelancers and clients, which should clearly specify ownership, usage rights, and any restrictions.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">These licenses terminate when you remove content from the platform, except for content that has been shared with other users or incorporated into completed projects. We recommend clearly defining intellectual property rights in all project agreements.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">If you believe your copyrighted work has been infringed on FreelanHub, you may submit a DMCA takedown notice to our designated Copyright Agent. Your notice must include all information required by the DMCA to be valid and actionable.</p>
+                            <p class="body2 text-secondary">A valid DMCA notice must contain: your physical or electronic signature as the copyright owner or authorized agent, identification of the copyrighted work claimed to be infringed, identification of the infringing material and its location on our platform, your contact information including address, telephone number, and email, a statement that you have a good faith belief the use is unauthorized, and a statement under penalty of perjury that the information is accurate and you are authorized to act on behalf of the copyright owner.</p>
+                            <p class="body2 text-secondary">Submit DMCA notices to our Copyright Agent via email or postal mail as specified in our contact information. We will review all valid notices promptly and take appropriate action, which may include removing or disabling access to the allegedly infringing material. False claims may result in legal liability.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">If your content is removed following a DMCA notice, you may submit a counter-notification if you believe the removal was made in error or you have authorization to use the material:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Your counter-notification must include your signature, identification of removed material and its prior location, a statement under penalty of perjury that the material was removed by mistake or misidentification, and consent to jurisdiction.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>We will forward your counter-notification to the original complainant. If they do not file a legal action within 10-14 business days, we may restore the removed content at our discretion.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Both DMCA notices and counter-notifications are legal documents with potential consequences. We recommend consulting an attorney before submitting either, especially in complex copyright situations.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">FreelanHub reserves the right to make final determinations regarding copyright disputes. We may remove content that we believe infringes copyrights, even without a formal DMCA notice, if infringement is apparent.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub maintains a strict policy against repeat copyright infringers. Users who repeatedly violate copyrights or submit content that infringes on others' intellectual property rights will face progressive enforcement actions to protect the creative community.</p>
+                            <p class="body2 text-secondary">Our repeat infringer policy includes warnings for first-time violations, temporary account suspension for repeated violations, permanent account termination for persistent infringers, and potential legal action in cases of willful, commercial-scale infringement. We track infringement complaints and take each violation seriously, regardless of the content type or claimed fair use.</p>
+                            <p class="body2 text-secondary">We encourage all users to respect intellectual property rights, obtain proper licenses or permissions before using others' work, clearly document ownership and usage rights in project agreements, and promptly report suspected infringement. Protecting creative work benefits the entire FreelanHub community and maintains trust in our marketplace.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

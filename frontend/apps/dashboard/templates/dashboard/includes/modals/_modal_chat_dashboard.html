@@ -1,0 +1,66 @@
+{% load static %}
+
+            <div class="modal_item modal_chat overflow-hidden relative lg:w-[900px] w-[90vw] max-h-[90vh] pb-20 rounded-xl bg-white" data-type="modal_chat">
+                <div class="heading flex items-center justify-between w-full h-20 px-7 border-b border-line">
+                    <div class="left flex items-center gap-3">
+                        <div class="avatar relative flex-shrink-0 w-9 h-9">
+                            <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="w-full h-full object-cover" />
+                            <span class="dot_status absolute right-0 bottom-0 w-3 h-3 border-2 border-surface rounded-full bg-success"></span>
+                        </div>
+                        <div>
+                            <strong class="text-button">PrimeEdge Solutions</strong>
+                            <div class="flex items-center gap-1">
+                                <span class="ph ph-map-pin text-lg text-secondary"></span>
+                                <span class="caption1 text-secondary">Las Vegas, USA</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl block"></span>
+                    </button>
+                </div>
+                <div class="chat_content scrollbar_custom">
+                    <div class="content flex flex-col gap-5 w-full p-6">
+                        <div class="message_item flex flex-col items-start self-start lg:w-1/2 sm:w-2/3 w-5/6">
+                            <div class="inner flex flex-row-reverse items-center gap-2">
+                                <button class="ph ph-dots-three-vertical text-xl flex-shrink-0"></button>
+                                <p class="content py-3 px-4 rounded-2xl rounded-bl-none bg-background">How was your weekend?</p>
+                            </div>
+                            <div class="time_stamp text-secondary mt-1">11:28 AM</div>
+                        </div>
+                        <div class="message_item flex flex-col items-end self-end justify-end lg:w-1/2 sm:w-2/3 w-5/6">
+                            <div class="inner flex items-center gap-2">
+                                <button class="ph ph-dots-three-vertical text-xl flex-shrink-0"></button>
+                                <p class="content py-3 px-4 rounded-2xl rounded-br-none bg-background">Hi, John! It was great, thanks for asking. I went hiking with some friends. How about you?</p>
+                            </div>
+                            <div class="time_stamp text-secondary mt-1">11:30 AM</div>
+                        </div>
+                        <div class="message_time flex justify-center relative">
+                            <div class="line absolute top-1/2 left-0 w-full h-px bg-line"></div>
+                            <span class="relative caption1 text-secondary px-5 bg-white">April 22, 2024</span>
+                        </div>
+                        <div class="message_item flex flex-col items-start self-start lg:w-1/2 sm:w-2/3 w-5/6">
+                            <div class="inner flex flex-row-reverse items-center gap-2">
+                                <button class="ph ph-dots-three-vertical text-xl flex-shrink-0"></button>
+                                <p class="content py-3 px-4 rounded-2xl rounded-bl-none bg-background">By the way, did you hear about the new project our team is starting?</p>
+                            </div>
+                            <div class="time_stamp text-secondary mt-1">09:30 AM</div>
+                        </div>
+                        <div class="message_item flex flex-col items-end self-end justify-end lg:w-1/2 sm:w-2/3 w-5/6">
+                            <div class="inner flex items-center gap-2">
+                                <button class="ph ph-dots-three-vertical text-xl flex-shrink-0"></button>
+                                <p class="content py-3 px-4 rounded-2xl rounded-br-none bg-background">Yes, I did! It sounds exciting. Are you involved in it?</p>
+                            </div>
+                            <div class="time_stamp text-secondary mt-1">09:30 AM</div>
+                        </div>
+                    </div>
+                </div>
+                <form class="form_chat flex items-center gap-3 absolute left-0 bottom-0 w-full h-20 px-6 border-t border-line bg-white">
+                    <div class="form_input relative w-full h-12">
+                        <input type="text" placeholder="Add a message..." class="w-full h-full border border-line bg-surface rounded pl-4 pr-14" required />
+                    </div>
+                    <button class="flex flex-shrink-0 items-center justify-center w-12 h-12 rounded bg-black text-white duration-300 hover:bg-primary">
+                        <span class="ph ph-paper-plane-tilt text-2xl"></span>
+                    </button>
+                </form>
+            </div>

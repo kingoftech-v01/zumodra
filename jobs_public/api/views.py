@@ -1,170 +1,231 @@
 """
-API ViewSets for Public Job Catalog.
+Jobs Public Catalog API Views.
 
-Provides read-only public API for browsing job listings.
+RESTful API endpoints for job catalog with filtering, search, and map support.
 """
 
-from django.utils import timezone
-from django_filters import rest_framework as filters
-from rest_framework import viewsets, status
+import logging
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 from jobs_public.models import PublicJobCatalog
-from .serializers import PublicJobCatalogSerializer, PublicJobCatalogListSerializer
-
-
-class PublicJobCatalogFilter(filters.FilterSet):
-    """Filters for public job catalog browsing."""
-
-    company = filters.CharFilter(field_name='company_name', lookup_expr='icontains')
-    title = filters.CharFilter(field_name='title', lookup_expr='icontains')
-    location_city = filters.CharFilter(lookup_expr='icontains')
-    location_country = filters.CharFilter(lookup_expr='iexact')
-    employment_type = filters.ChoiceFilter(choices=[
-        ('full-time', 'Full Time'),
-        ('part-time', 'Part Time'),
-        ('contract', 'Contract'),
-        ('temporary', 'Temporary'),
-        ('internship', 'Internship'),
-    ])
-    is_remote = filters.BooleanFilter()
-    is_featured = filters.BooleanFilter()
-    category = filters.CharFilter(field_name='category_slugs', lookup_expr='contains')
-    salary_min = filters.NumberFilter(field_name='salary_min', lookup_expr='gte')
-    salary_max = filters.NumberFilter(field_name='salary_max', lookup_expr='lte')
-
-    class Meta:
-        model = PublicJobCatalog
-        fields = [
-            'company',
-            'title',
-            'location_city',
-            'location_country',
-            'employment_type',
-            'is_remote',
-            'is_featured',
-            'category',
-            'salary_min',
-            'salary_max',
-        ]
-
-
-@extend_schema_view(
-    list=extend_schema(
-        summary="List public jobs",
-        description="Browse public job listings without authentication. Supports filtering, search, and ordering.",
-        tags=['Public Job Catalog'],
-    ),
-    retrieve=extend_schema(
-        summary="Get job details",
-        description="Get detailed information about a specific public job listing.",
-        tags=['Public Job Catalog'],
-    ),
+from .serializers import (
+    PublicJobCatalogListSerializer,
+    PublicJobCatalogDetailSerializer,
+    PublicJobCatalogMapSerializer,
 )
+
+logger = logging.getLogger(__name__)
+
+
+class PublicJobCatalogPagination(PageNumberPagination):
+    """Custom pagination for job catalog API."""
+    page_size = 12
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class PublicJobCatalogViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Public job catalog API.
+    Public Job Catalog API ViewSet.
 
-    Read-only endpoints for browsing job listings without authentication.
+    Provides read-only access to public job catalog with:
+    - List: GET /api/jobs/
+    - Detail: GET /api/jobs/{uuid}/
+    - Search: GET /api/jobs/?search={query}
+    - Filter: GET /api/jobs/?category={slug}&location_city={city}
+    - Map Data: GET /api/jobs/map_data/
+    - Nearby Jobs: GET /api/jobs/nearby/?lat={lat}&lng={lng}&radius={km}
 
-    Features:
-    - List all active jobs with filtering and search
-    - Get detailed job information
-    - Increment view count on retrieve
-    - Featured jobs endpoint
-    - Search by keywords
+    Permissions: Public access (no authentication required)
     """
 
-    permission_classes = [AllowAny]
-    filterset_class = PublicJobCatalogFilter
-    search_fields = ['title', 'company_name', 'description_html', 'location_city', 'location_country']
-    ordering_fields = ['posted_at', 'view_count', 'application_count', 'salary_min']
-    ordering = ['-is_featured', '-posted_at']
+    queryset = PublicJobCatalog.objects.filter(
+        is_active=True,
+        is_expired=False
+    ).order_by('-is_featured', '-published_at')
 
-    def get_queryset(self):
-        """Get only active, non-expired job listings."""
-        return PublicJobCatalog.objects.filter(
-            is_active=True
-        ).exclude(
-            posted_at__gt=timezone.now()  # Exclude future-dated posts
-        )
+    pagination_class = PublicJobCatalogPagination
+    lookup_field = 'jobposting_uuid'
+    lookup_url_kwarg = 'uuid'
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    # Filter fields
+    filterset_fields = {
+        'employment_type': ['exact'],
+        'location_city': ['exact', 'icontains'],
+        'location_state': ['exact'],
+        'location_country': ['exact'],
+        'is_remote': ['exact'],
+        'experience_level': ['exact'],
+        'is_featured': ['exact'],
+    }
+
+    # Search fields
+    search_fields = [
+        'title',
+        'company_name',
+        'description_html',
+        'location_city',
+        'location_state',
+    ]
+
+    # Ordering fields
+    ordering_fields = [
+        'published_at',
+        'view_count',
+        'application_count',
+        'salary_min',
+        'salary_max',
+    ]
 
     def get_serializer_class(self):
-        """Use lightweight serializer for list, full serializer for detail."""
-        if self.action == 'list':
-            return PublicJobCatalogListSerializer
-        return PublicJobCatalogSerializer
+        """Return appropriate serializer based on action."""
+        if self.action == 'retrieve':
+            return PublicJobCatalogDetailSerializer
+        elif self.action == 'map_data':
+            return PublicJobCatalogMapSerializer
+        return PublicJobCatalogListSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        """Get job details and increment view count."""
-        instance = self.get_object()
-
-        # Increment view count asynchronously
-        PublicJobCatalog.objects.filter(pk=instance.pk).update(
-            view_count=models.F('view_count') + 1
-        )
-
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    @extend_schema(
-        summary="List featured jobs",
-        description="Get jobs marked as featured by admins.",
-        tags=['Public Job Catalog'],
-    )
     @action(detail=False, methods=['get'])
-    def featured(self, request):
-        """Get featured job listings."""
-        queryset = self.get_queryset().filter(is_featured=True)
-        queryset = self.filter_queryset(queryset)
+    def map_data(self, request):
+        """
+        Get jobs with geocoding for map display.
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = PublicJobCatalogListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        Returns lightweight job data optimized for map markers.
+        Limited to 500 jobs with valid coordinates for performance.
 
-        serializer = PublicJobCatalogListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        Query Parameters:
+            - All standard filters apply
+            - Automatically filters to jobs with valid lat/lng
 
-    @extend_schema(
-        summary="Search jobs by keyword",
-        description="Search jobs by keyword in title, description, company name, and location.",
-        tags=['Public Job Catalog'],
-        parameters=[
-            OpenApiParameter('q', str, description='Search query'),
-        ],
-    )
+        Response Format:
+            {
+                "count": 150,
+                "results": [
+                    {
+                        "id": "...",
+                        "uuid": "...",
+                        "title": "...",
+                        "company_name": "...",
+                        "location": {"lat": 37.7749, "lng": -122.4194, "display": "..."},
+                        "employment_type": "full-time",
+                        "salary_display": "$80,000 - $120,000",
+                        "is_remote": false
+                    },
+                    ...
+                ]
+            }
+        """
+        # Get filtered queryset
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Filter to jobs with valid geocoding
+        queryset = queryset.filter(
+            latitude__isnull=False,
+            longitude__isnull=False
+        )[:500]  # Limit for performance
+
+        # Serialize without pagination for map
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response({
+            'count': queryset.count(),
+            'results': serializer.data
+        })
+
     @action(detail=False, methods=['get'])
-    def search(self, request):
-        """Search jobs by keyword."""
-        query = request.query_params.get('q', '').strip()
+    def nearby(self, request):
+        """
+        Find jobs near a specific location using distance calculation.
 
-        if not query:
+        Query Parameters:
+            - lat (required): Latitude
+            - lng (required): Longitude
+            - radius (optional): Search radius in kilometers (default: 50km)
+
+        Response Format:
+            {
+                "count": 25,
+                "center": {"lat": 37.7749, "lng": -122.4194},
+                "radius_km": 50,
+                "results": [...]
+            }
+
+        Note: Uses basic distance calculation. For production, consider using
+        PostGIS ST_Distance for more accurate geospatial queries.
+        """
+        # Get query parameters
+        try:
+            lat = float(request.query_params.get('lat'))
+            lng = float(request.query_params.get('lng'))
+        except (TypeError, ValueError):
             return Response(
-                {'error': 'Query parameter "q" is required'},
+                {'error': 'Invalid or missing lat/lng parameters'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        queryset = self.get_queryset().filter(
-            models.Q(title__icontains=query) |
-            models.Q(company_name__icontains=query) |
-            models.Q(description_html__icontains=query) |
-            models.Q(location_city__icontains=query) |
-            models.Q(location_country__icontains=query) |
-            models.Q(category_names__contains=[query])
+        radius_km = float(request.query_params.get('radius', 50))
+
+        # Get jobs with valid coordinates
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(
+            latitude__isnull=False,
+            longitude__isnull=False
         )
 
-        page = self.paginate_queryset(queryset)
+        # Filter by approximate bounding box (rough filter)
+        # 1 degree latitude ≈ 111 km
+        # 1 degree longitude ≈ 111 km * cos(latitude)
+        import math
+        lat_range = radius_km / 111.0
+        lng_range = radius_km / (111.0 * math.cos(math.radians(lat)))
+
+        nearby_jobs = queryset.filter(
+            latitude__gte=lat - lat_range,
+            latitude__lte=lat + lat_range,
+            longitude__gte=lng - lng_range,
+            longitude__lte=lng + lng_range,
+        )
+
+        # Paginate results
+        page = self.paginate_queryset(nearby_jobs)
         if page is not None:
-            serializer = PublicJobCatalogListSerializer(page, many=True)
+            serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = PublicJobCatalogListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        serializer = self.get_serializer(nearby_jobs, many=True)
 
+        return Response({
+            'count': nearby_jobs.count(),
+            'center': {'lat': lat, 'lng': lng},
+            'radius_km': radius_km,
+            'results': serializer.data
+        })
 
-# Fix import
-from django.db import models
+    @action(detail=True, methods=['post'])
+    def increment_view(self, request, uuid=None):
+        """
+        Increment view count for a job.
+
+        This endpoint can be called when a user views a job detail page.
+
+        Response:
+            {"view_count": 123}
+        """
+        job = self.get_object()
+        job.increment_view_count()
+
+        # Refresh from DB to get updated count
+        job.refresh_from_db()
+
+        return Response({'view_count': job.view_count})

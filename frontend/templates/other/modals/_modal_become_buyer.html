@@ -1,0 +1,98 @@
+{% load static %}
+
+        <!-- Modal -->
+        <div class="modal">
+            <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
+                <form class="h-full">
+                    <div class="block_filter h-full py-4 px-6">
+                        <div class="filter_section search">
+                            <strong class="text-button">search</strong>
+                            <div class="form_input relative w-full h-12 mt-2">
+                                <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                                <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Skill, Industry" />
+                            </div>
+                        </div>
+                        <div class="filter_section location mt-6">
+                            <strong class="text-button">Location</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select location">Select location</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find location..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Africa">Africa</li>
+                                            <li class="capitalize" data-item="Americas">Americas</li>
+                                            <li class="capitalize" data-item="Antarctica">Antarctica</li>
+                                            <li class="capitalize" data-item="Asia">Asia</li>
+                                            <li class="capitalize" data-item="Europe">Europe</li>
+                                            <li class="capitalize" data-item="Oceania">Oceania</li>
+                                            <li class="capitalize" data-item="Australia and New Zealand">Australia and New Zealand</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section category relative mt-6">
+                            <strong class="text-button">category</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select category">Select category</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find category..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Accounting & Consulting">Accounting & Consulting</li>
+                                            <li class="capitalize" data-item="Admin Support">Admin Support</li>
+                                            <li class="capitalize" data-item="Customer Service">Customer Service</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Data Science & Analytics">Data Science & Analytics</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Engineering & Architecture">Engineering & Architecture</li>
+                                            <li class="capitalize" data-item="IT & Networking">IT & Networking</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section filter_radius mt-6">
+                            <strong class="text-button">
+                                <span>Radius: </span>
+                                <span class="radius text-primary">100km</span>
+                            </strong>
+                            <div class="tow_bar_block mt-5">
+                                <div class="progress"></div>
+                            </div>
+                            <div class="range_input">
+                                <input class="input range_max" type="range" min="1" max="100" value="100" />
+                            </div>
+                        </div>
+                        <div class="filter_section size mt-6">
+                            <strong class="text-button">Company Size</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select Company Size">Select Company Size</span>
+                                    <ul class="list_option w-full bg-white">
+                                        <li class="capitalize" data-item="1-5 employees">1-5 employees</li>
+                                        <li class="capitalize" data-item="5-20 employees">5-20 employees</li>
+                                        <li class="capitalize" data-item="20-50 employees">20-50 employees</li>
+                                        <li class="capitalize" data-item="50-100 employees">50-100 employees</li>
+                                        <li class="capitalize" data-item="100-200 employees">100-200 employees</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
+                        <button class="button-main w-full text-center">Find Employers</button>
+                    </div>
+                </form>
+            </div>
+        </div>

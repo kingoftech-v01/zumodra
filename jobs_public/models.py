@@ -136,6 +136,162 @@ class PublicJobCatalog(models.Model):
         help_text="Salary currency code (ISO 4217)"
     )
 
+    salary_period = models.CharField(
+        max_length=35,
+        default='yearly',
+        help_text="Salary payment period (hourly, daily, weekly, monthly, yearly)"
+    )
+
+    show_salary = models.BooleanField(
+        default=False,
+        help_text="Whether salary is publicly visible"
+    )
+
+    # ===== Job Overview (for template requirements) =====
+    experience_level = models.CharField(
+        max_length=50,
+        blank=True,
+        db_index=True,
+        help_text="Experience level (entry, mid, senior, etc.)"
+    )
+
+    hours_per_week = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="Expected hours per week"
+    )
+
+    years_of_experience = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="Required years of experience"
+    )
+
+    english_level = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Required English proficiency (basic, conversational, fluent, native)"
+    )
+
+    # ===== Rich Content (stored as JSON lists of strings) =====
+    responsibilities_list = models.JSONField(
+        default=list,
+        help_text="List of job responsibilities (bullet points)"
+    )
+
+    requirements_list = models.JSONField(
+        default=list,
+        help_text="List of job requirements (bullet points)"
+    )
+
+    qualifications_list = models.JSONField(
+        default=list,
+        help_text="List of preferred qualifications (bullet points)"
+    )
+
+    benefits_list = models.JSONField(
+        default=list,
+        help_text="List of benefits (bullet points)"
+    )
+
+    # ===== Media =====
+    image_gallery = models.JSONField(
+        default=list,
+        help_text="List of image URLs for job gallery"
+    )
+
+    video_url = models.URLField(
+        blank=True,
+        help_text="Promotional video URL (YouTube, Vimeo, etc.)"
+    )
+
+    # ===== Geocoding for Map Display =====
+    latitude = models.FloatField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Latitude coordinate for map display"
+    )
+
+    longitude = models.FloatField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Longitude coordinate for map display"
+    )
+
+    # ===== Metadata =====
+    expiration_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Application deadline"
+    )
+
+    view_count = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        help_text="Number of times job has been viewed"
+    )
+
+    application_count = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        help_text="Number of applications received"
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        db_index=True,
+        help_text="Whether job is currently active"
+    )
+
+    is_expired = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Whether job has expired"
+    )
+
+    is_featured = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Whether job is featured"
+    )
+
+    # ===== Company Information (denormalized from Tenant) =====
+    company_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Company rating (1.00-5.00)"
+    )
+
+    company_established_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Company founding date"
+    )
+
+    company_industry = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Company industry"
+    )
+
+    company_size = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Company size (employee count range)"
+    )
+
+    company_website = models.URLField(blank=True, help_text="Company website URL")
+    company_linkedin = models.URLField(blank=True, help_text="Company LinkedIn URL")
+    company_twitter = models.URLField(blank=True, help_text="Company Twitter/X URL")
+    company_facebook = models.URLField(blank=True, help_text="Company Facebook URL")
+    company_instagram = models.URLField(blank=True, help_text="Company Instagram URL")
+    company_pinterest = models.URLField(blank=True, help_text="Company Pinterest URL")
+
     # ===== Categories & Skills (Denormalized for Fast Filtering) =====
     category_names = models.JSONField(
         default=list,
@@ -180,6 +336,12 @@ class PublicJobCatalog(models.Model):
             models.Index(fields=['employment_type', 'is_remote'], name='ats_pub_type_idx'),
             models.Index(fields=['-published_at'], name='ats_pub_published_idx'),
             models.Index(fields=['company_name'], name='ats_pub_company_idx'),
+            models.Index(fields=['latitude', 'longitude'], name='ats_pub_geo_idx'),
+            models.Index(fields=['experience_level'], name='ats_pub_exp_idx'),
+            models.Index(fields=['-view_count'], name='ats_pub_views_idx'),
+            models.Index(fields=['expiration_date'], name='ats_pub_expiry_idx'),
+            models.Index(fields=['is_active', 'is_expired'], name='ats_pub_active_idx'),
+            models.Index(fields=['is_featured', '-published_at'], name='ats_pub_featured_idx'),
         ]
 
         ordering = ['-published_at']
@@ -202,8 +364,26 @@ class PublicJobCatalog(models.Model):
         return self.salary_min is not None or self.salary_max is not None
 
     @property
+    def salary_display(self):
+        """Display formatted salary with visibility check."""
+        if not self.show_salary or not self.has_salary_info:
+            return None
+
+        currency_symbols = {'USD': '$', 'CAD': '$', 'EUR': '€', 'GBP': '£'}
+        symbol = currency_symbols.get(self.salary_currency, self.salary_currency)
+
+        if self.salary_min and self.salary_max:
+            return f"{symbol}{self.salary_min:,.0f} - {symbol}{self.salary_max:,.0f}"
+        elif self.salary_min:
+            return f"{symbol}{self.salary_min:,.0f}+"
+        elif self.salary_max:
+            return f"Up to {symbol}{self.salary_max:,.0f}"
+
+        return None
+
+    @property
     def salary_range_display(self):
-        """Display formatted salary range."""
+        """Display formatted salary range (legacy, kept for compatibility)."""
         if not self.has_salary_info:
             return "Not specified"
 
@@ -236,3 +416,16 @@ class PublicJobCatalog(models.Model):
             location += " (Remote)"
 
         return location
+
+    @property
+    def is_expired_computed(self):
+        """Check if job has expired based on expiration_date."""
+        if not self.expiration_date:
+            return False
+        from django.utils import timezone
+        return timezone.now() > self.expiration_date
+
+    def increment_view_count(self):
+        """Atomically increment view count to track job popularity."""
+        from django.db.models import F
+        PublicJobCatalog.objects.filter(pk=self.pk).update(view_count=F('view_count') + 1)

@@ -1,0 +1,187 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_service scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">My Services</h4>
+                        <a href="candidates-choose-package.html" class="button-main">Add New Service</a>
+                    </div>
+                    <div class="service_block mt-7.5 rounded-lg bg-white">
+                        <div class="list overflow-x-auto w-full py-5 px-6 rounded-xl">
+                            <table class="w-full max-2xl:w-[1200px] max-md:w-[1000px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Title</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date Created</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Pricing</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">In Queue</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="services-detail1.html" class="block">
+                                                <strong class="title heading6 hover:underline">I will translate your documents with accuracy and precision</strong>
+                                                <p class="desc -style-1 mt-2 font-normal text-secondary">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$380</td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <button class="toggle_btn"></button>
+                                        </td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <a href="candidates-services-inqueue.html" class="button-main -border">view in queue (<span class="quantity">22</span>)</a>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_copy_link flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-copy-simple text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Copy link</span>
+                                                </button>
+                                                <button class="btn_action btn_share flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-share-network text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Share service</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_edit_service flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_service">
+                                                    <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit services</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="services-detail1.html" class="block">
+                                                <strong class="title heading6 hover:underline">I will design a professional and beautiful website on wix</strong>
+                                                <p class="desc -style-1 mt-2 font-normal text-secondary">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 08, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$540</td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <button class="toggle_btn"></button>
+                                        </td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <a href="candidates-services-inqueue.html" class="button-main -border">view in queue (<span class="quantity">8</span>)</a>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_copy_link flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-copy-simple text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Copy link</span>
+                                                </button>
+                                                <button class="btn_action btn_share flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-share-network text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Share service</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_edit_service flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_service">
+                                                    <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit services</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="services-detail1.html" class="block">
+                                                <strong class="title heading6 hover:underline">I will create stunning logo designs for your business</strong>
+                                                <p class="desc -style-1 mt-2 font-normal text-secondary">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 02, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$410</td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <button class="toggle_btn"></button>
+                                        </td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <a href="candidates-services-inqueue.html" class="button-main -border">view in queue (<span class="quantity">26</span>)</a>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_copy_link flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-copy-simple text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Copy link</span>
+                                                </button>
+                                                <button class="btn_action btn_share flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-share-network text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Share service</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_edit_service flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_service">
+                                                    <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit services</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="services-detail1.html" class="block">
+                                                <strong class="title heading6 hover:underline">I will do background illustration and environment concept art</strong>
+                                                <p class="desc -style-1 mt-2 font-normal text-secondary">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Feb 16, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$470</td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <button class="toggle_btn"></button>
+                                        </td>
+                                        <td class="p-5 whitespace-nowrap">
+                                            <a href="candidates-services-inqueue.html" class="button-main -border">view in queue (<span class="quantity">13</span>)</a>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_copy_link flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-copy-simple text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Copy link</span>
+                                                </button>
+                                                <button class="btn_action btn_share flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white">
+                                                    <span class="ph ph-share-network text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Share service</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_edit_service flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_service">
+                                                    <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit services</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_delete_my_services.html' %}
+{% endblock %}

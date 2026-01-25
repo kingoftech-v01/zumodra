@@ -1,0 +1,68 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_alert scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">View services</h4>
+                    <form class="mt-7.5 p-6 rounded-lg bg-white">
+                        <h5 class="heading5">I will design a professional and beautiful website on wix</h5>
+                        <p class="text-secondary my-2">Are you a User Experience Designer with a track</p>
+                        <strong class="text-title">$410</strong>
+                        <div class="outstanding flex max-sm:flex-col sm:items-center justify-between xl:gap-20 gap-10 gap-y-5 mt-7.5 p-5 rounded-lg bg-surface">
+                            <div class="left flex flex-wrap max-sm:flex-col sm:items-center sm:gap-5 gap-4 w-full">
+                                <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                                    <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="candidates_avatar w-full h-full object-cover" />
+                                </div>
+                                <div class="flex flex-col gap-1 max-w-[700px]">
+                                    <h4 class="candidates_name heading4 w-fit mt-1">Devon lane</h4>
+                                    <span class="flex items-center text-secondary">
+                                        <span class="ph ph-map-pin text-lg"></span>
+                                        <span class="candidates_address -style-1 pl-1">Rio de Janeiro, Brazil</span>
+                                    </span>
+                                    <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                                        <span class="tag w-fit caption1 bg-opacity-20 bg-success text-success">Available now</span>
+                                        <div class="candidates_review flex items-center gap-1">
+                                            <span class="ph-fill ph-star text-lg text-yellow"></span>
+                                            <strong class="text-button">4.8</strong>
+                                            <span class="review text-secondary">(751 review)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right flex flex-col sm:items-end sm:gap-2 xl:pl-20 sm:pl-10 sm:border-l border-line">
+                                <button type="button" class="button-main">Completed</button>
+                            </div>
+                        </div>
+                        <div class="decscription mt-5">
+                            <label for="decscription">Decscription: <span class="text-red">*</span></label>
+                            <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="decscription" name="decscription" rows="3" placeholder="Write decscription " required></textarea>
+                        </div>
+                        <div class="upload mt-5">
+                            <label for="file_attached">Upload file attachments:</label>
+                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                <div class="upload_file flex items-center gap-3 w-[220px] px-3 py-2 border border-line rounded">
+                                    <label for="file_attached" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                    <input type="file" name="file_attached" id="file_attached" class="caption2 cursor-pointer" required />
+                                </div>
+                                <span class="caption1 text-secondary">Upload file PDF, Doc, Docx</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="button-main mt-7.5">Send Message</button>
+                    </form>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_create_meeting_view_service_detail.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_view_service_detail.html' %}
+{% endblock %}

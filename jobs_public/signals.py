@@ -1,14 +1,24 @@
 """
-Django signals for syncing tenant JobPosting to public catalog.
+Jobs Public Catalog Signal Handlers.
 
-Listens to ats.JobPosting model signals and triggers Celery tasks
-to sync to PublicJobCatalog.
+Automatically syncs JobPosting instances to public catalog based on visibility rules.
+
+Signal Triggers:
+    - JobPosting saved with published_on_career_page=True → sync to public
+    - JobPosting status changed to closed → remove from public
+    - JobPosting marked as internal_only → remove from public
+    - JobPosting deleted → remove from public
+
+Security:
+    - Only syncs jobs marked as public and open
+    - Sanitizes HTML content before public display
+    - No sensitive data (internal notes, candidate info) in public catalog
 """
 
 import logging
-from django.db.models.signals import post_save, pre_delete
-from django.dispatch import receiver
 from django.db import connection
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django_tenants.utils import get_public_schema_name
 
 logger = logging.getLogger(__name__)
@@ -19,56 +29,74 @@ def sync_job_to_public_catalog(sender, instance, created, **kwargs):
     """
     Trigger sync of JobPosting to public catalog when saved.
 
-    Only syncs if:
-    - Job is marked as published_on_career_page=True
-    - Not in public schema (avoid circular signals)
+    Sync Conditions (ALL must be true):
+        - published_on_career_page=True
+        - status='open' (or equivalent active status)
+        - NOT is_internal_only
+        - NOT in public schema (avoid circular signals)
+        - NOT raw save (from fixtures/migrations)
+
+    If conditions not met, removes job from catalog if it exists.
 
     Args:
-        sender: The model class (JobPosting)
-        instance: The JobPosting instance being saved
+        sender: JobPosting model class
+        instance: JobPosting instance being saved
         created: Boolean indicating if this is a new instance
-        **kwargs: Additional signal arguments
+        **kwargs: Additional signal arguments (raw, using, update_fields)
     """
     # Skip if in public schema (avoid circular signals)
     if connection.schema_name == get_public_schema_name():
         return
 
-    # Only sync if job should be public
-    if not getattr(instance, 'published_on_career_page', False):
-        logger.debug(f"Job {instance.id} not marked for career page, skipping public sync")
+    # Skip raw saves (fixtures, migrations)
+    if kwargs.get('raw', False):
         return
 
-    # Defer to Celery task for async processing
-    from .tasks import sync_job_to_public
+    # Determine if job should be synced to public catalog
+    should_sync = (
+        getattr(instance, 'published_on_career_page', False) and
+        getattr(instance, 'status', None) == 'open' and
+        not getattr(instance, 'is_internal_only', False)
+    )
+
+    from .tasks import sync_job_to_public, remove_job_from_public
 
     try:
         tenant_schema = connection.schema_name
-        sync_job_to_public.delay(str(instance.id), tenant_schema)
-        logger.info(f"Queued sync of job {instance.id} from {tenant_schema} to public catalog")
+
+        if should_sync:
+            # Sync to public catalog (async via Celery)
+            sync_job_to_public.delay(str(instance.id), tenant_schema)
+            logger.info(f"Queued sync of job {instance.id} to public catalog from {tenant_schema}")
+        else:
+            # Remove from public catalog if exists (job became private/internal/closed)
+            remove_job_from_public.delay(str(instance.id), tenant_schema)
+            logger.debug(f"Queued removal of job {instance.id} from public catalog (no longer public)")
+
     except Exception as e:
-        logger.error(f"Error queuing public sync for job {instance.id}: {e}")
+        logger.error(f"Error queuing public sync/removal for job {instance.id}: {e}", exc_info=True)
 
 
-@receiver(pre_delete, sender='jobs.JobPosting')
-def remove_job_from_public_catalog(sender, instance, **kwargs):
+@receiver(post_delete, sender='jobs.JobPosting')
+def remove_deleted_job_from_public(sender, instance, **kwargs):
     """
-    Remove job from public catalog when deleted.
+    Remove job from public catalog when deleted from tenant.
 
     Args:
-        sender: The model class (JobPosting)
-        instance: The JobPosting instance being deleted
+        sender: JobPosting model class
+        instance: JobPosting instance being deleted
         **kwargs: Additional signal arguments
     """
     # Skip if in public schema
     if connection.schema_name == get_public_schema_name():
         return
 
-    # Defer to Celery task for async processing
     from .tasks import remove_job_from_public
 
     try:
         tenant_schema = connection.schema_name
         remove_job_from_public.delay(str(instance.id), tenant_schema)
-        logger.info(f"Queued removal of job {instance.id} from public catalog")
+        logger.info(f"Queued removal of deleted job {instance.id} from public catalog")
+
     except Exception as e:
-        logger.error(f"Error queuing public catalog removal for job {instance.id}: {e}")
+        logger.error(f"Error queuing removal for deleted job {instance.id}: {e}", exc_info=True)

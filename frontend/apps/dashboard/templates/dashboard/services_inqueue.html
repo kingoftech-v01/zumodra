@@ -1,0 +1,138 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_service scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">My Services In Queue</h4>
+                    <div class="service_block mt-7.5 p-6 rounded-lg bg-white">
+                        <div class="outstanding flex max-sm:flex-col sm:items-center justify-between xl:gap-20 gap-10 gap-y-5 p-5 rounded-lg bg-surface">
+                            <div class="left flex max-sm:flex-col sm:items-center sm:gap-5 gap-4">
+                                <div class="service_thumb flex-shrink-0 w-[11.25rem] rounded-lg overflow-hidden">
+                                    <img src="{% static 'assets/images/service/3.webp' %}" alt="service/3" class="w-full h-full object-cover" />
+                                </div>
+                                <a href="services-detail1.html" class="info block">
+                                    <strong class="title md:text-xl text-lg font-semibold hover:underline">I will translate your documents with accuracy and precision</strong>
+                                    <p class="desc text-secondary sm:my-2 my-1">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                    <strong class="price text-title">$380</strong>
+                                </a>
+                            </div>
+                            <div class="right flex flex-col sm:items-end sm:gap-2 xl:pl-20 sm:pl-10 sm:border-l border-line">
+                                <span class="text-secondary whitespace-nowrap">Number of orders</span>
+                                <strong class="heading3">4</strong>
+                            </div>
+                        </div>
+                        <div class="list overflow-x-auto w-full mt-7.5 rounded-xl">
+                            <table class="w-full max-xl:w-[950px] max-sm:w-[680px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Client</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date Orders</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Pricing</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="employers-detail1.html" class="flex items-center gap-4">
+                                                <div class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                    <img src="{% static 'assets/images/company/8.png' %}" alt="company/8" class="employers_avatar w-full h-full object-cover" />
+                                                </div>
+                                                <div class="employers_detail">
+                                                    <strong class="employers_name -style-1 heading6 hover:underline">Rockstar Games New York</strong>
+                                                    <div class="employers_address -style-1 text-secondary mt-1">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$380</td>
+                                        <td class="p-5 whitespace-nowrap text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Completed</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="employers-detail1.html" class="flex items-center gap-4">
+                                                <div class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                    <img src="{% static 'assets/images/company/7.png' %}" alt="company/7" class="employers_avatar w-full h-full object-cover" />
+                                                </div>
+                                                <div class="employers_detail">
+                                                    <strong class="employers_name -style-1 heading6 hover:underline">GlobalTech Partners</strong>
+                                                    <div class="employers_address -style-1 text-secondary mt-1">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">California, USA</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 08, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$540</td>
+                                        <td class="p-5 whitespace-nowrap text-right">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">hired</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="employers-detail1.html" class="flex items-center gap-4">
+                                                <div class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                    <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="employers_avatar w-full h-full object-cover" />
+                                                </div>
+                                                <div class="employers_detail">
+                                                    <strong class="employers_name -style-1 heading6 hover:underline">PrimeEdge Solutions</strong>
+                                                    <div class="employers_address -style-1 text-secondary mt-1">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Nevada, USA</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 02, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$410</td>
+                                        <td class="p-5 whitespace-nowrap text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Completed</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <a href="employers-detail1.html" class="flex items-center gap-4">
+                                                <div class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                    <img src="{% static 'assets/images/company/6.png' %}" alt="company/6" class="employers_avatar w-full h-full object-cover" />
+                                                </div>
+                                                <div class="employers_detail">
+                                                    <strong class="employers_name -style-1 heading6 hover:underline">Apex Innovations</strong>
+                                                    <div class="employers_address -style-1 text-secondary mt-1">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Nevada, USA</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Feb 16, 2024</td>
+                                        <td class="p-5 whitespace-nowrap text-title">$470</td>
+                                        <td class="p-5 whitespace-nowrap text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Completed</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_delete_services_inqueue.html' %}
+{% endblock %}

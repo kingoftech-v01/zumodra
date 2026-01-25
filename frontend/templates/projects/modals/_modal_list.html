@@ -1,0 +1,175 @@
+{% load static %}
+
+        <!-- Modal -->
+        <div class="modal">
+            <div class="sidebar min-[390px]:w-[348px] w-[80vw] h-full bg-white">
+                <form class="h-full">
+                    <div class="block_filter h-full py-4 px-6">
+                        <div class="filter_section search">
+                            <strong class="text-button">search</strong>
+                            <div class="form_input relative w-full h-12 mt-2">
+                                <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                                <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Job title, key words or company" />
+                            </div>
+                        </div>
+                        <div class="filter_section category relative z-[2] mt-6">
+                            <strong class="text-button">category</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select category">Select category</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find category..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Accounting & Consulting">Accounting & Consulting</li>
+                                            <li class="capitalize" data-item="Admin Support">Admin Support</li>
+                                            <li class="capitalize" data-item="Customer Service">Customer Service</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Data Science & Analytics">Data Science & Analytics</li>
+                                            <li class="capitalize" data-item="Design & Creative">Design & Creative</li>
+                                            <li class="capitalize" data-item="Engineering & Architecture">Engineering & Architecture</li>
+                                            <li class="capitalize" data-item="IT & Networking">IT & Networking</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section experience mt-6">
+                            <strong class="text-button">Experience level</strong>
+                            <div class="list_level flex flex-col gap-2 mt-2">
+                                <div class="checkbox_block">
+                                    <input type="checkbox" class="checkbox" id="entry" data-label="entry" />
+                                    <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                                    <label class="label pl-6" for="entry">Entry Level</label>
+                                </div>
+                                <div class="checkbox_block">
+                                    <input type="checkbox" class="checkbox" id="intermediate" data-label="intermediate" />
+                                    <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                                    <label class="label pl-6" for="intermediate">Intermediate</label>
+                                </div>
+                                <div class="checkbox_block">
+                                    <input type="checkbox" class="checkbox" id="expert" data-label="expert" />
+                                    <span class="ph-fill ph-check-square text-xl check_icon"></span>
+                                    <label class="label pl-6" for="expert">Expert</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter_section filter_price mt-6">
+                            <strong class="text-button">Filter by Fixed-Price</strong>
+                            <div class="tow_bar_block mt-5">
+                                <div class="progress"></div>
+                            </div>
+                            <div class="range_input">
+                                <input class="input range_min" type="range" min="0" max="3000" value="0" />
+                                <input class="input range_max" type="range" min="0" max="3000" value="3000" />
+                            </div>
+                            <div class="price_block flex items-center justify-between mt-4">
+                                <div class="price_min flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="0" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                                </div>
+                                <span class="ph-bold ph-minus text-xl"></span>
+                                <div class="price_max flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" value="3000" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter_section hourly mt-6">
+                            <strong class="text-button">Filter by Hourly</strong>
+                            <div class="hour_block flex items-center justify-between mt-2">
+                                <div class="min flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">min</span>
+                                </div>
+                                <span class="ph-bold ph-minus text-xl"></span>
+                                <div class="max flex items-center overflow-hidden relative w-32 h-10">
+                                    <span class="text-button text-secondary absolute top-1/2 -translate-y-1/2 left-3">$</span>
+                                    <input type="number" class="caption1 w-full h-full pl-7 pr-10 border border-line rounded-lg" />
+                                    <span class="caption1 text-placehover absolute top-1/2 -translate-y-1/2 right-3">max</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter_section location mt-6">
+                            <strong class="text-button">Client Location</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select client location">Select client location</span>
+                                    <div class="list_option w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find location..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Africa">Africa</li>
+                                            <li class="capitalize" data-item="Americas">Americas</li>
+                                            <li class="capitalize" data-item="Antarctica">Antarctica</li>
+                                            <li class="capitalize" data-item="Asia">Asia</li>
+                                            <li class="capitalize" data-item="Europe">Europe</li>
+                                            <li class="capitalize" data-item="Oceania">Oceania</li>
+                                            <li class="capitalize" data-item="Australia and New Zealand">Australia and New Zealand</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section timezone mt-6">
+                            <strong class="text-button">Client timezone</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select client timezone">Select client timezone</span>
+                                    <div class="list_option -top w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find timezone..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="(UTC-11:00) Midway Island">(UTC-11:00) Midway Island</li>
+                                            <li class="capitalize" data-item="(UTC-10:00) Hawaii">(UTC-10:00) Hawaii</li>
+                                            <li class="capitalize" data-item="(UTC-08:00) Alaska">(UTC-08:00) Alaska</li>
+                                            <li class="capitalize" data-item="(UTC-07:00) Pacific Time">(UTC-07:00) Pacific Time</li>
+                                            <li class="capitalize" data-item="(UTC-07:00) Arizona">(UTC-07:00) Arizona</li>
+                                            <li class="capitalize" data-item="(UTC-06:00) Mountain Time ">(UTC-06:00) Mountain Time</li>
+                                            <li class="capitalize" data-item="(UTC-05:00) Eastern Time">(UTC-05:00) Eastern Time</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="filter_section english mt-6">
+                            <strong class="text-button">English Level</strong>
+                            <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                                <div class="select">
+                                    <span class="selected capitalize" data-title="Select english level">Select english level</span>
+                                    <div class="list_option -top w-full bg-white">
+                                        <div class="form_input relative w-full h-11">
+                                            <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-lg"></span>
+                                            <input type="text" class="input_search w-full h-full pl-10 pr-3 border border-line rounded-lg" placeholder="Find level..." />
+                                        </div>
+                                        <ul class="list_result mt-3">
+                                            <li class="capitalize" data-item="Basic">Basic</li>
+                                            <li class="capitalize" data-item="Conversational">Conversational</li>
+                                            <li class="capitalize" data-item="Fluent">Fluent</li>
+                                            <li class="capitalize" data-item="Native Or Bilingual">Native Or Bilingual</li>
+                                            <li class="capitalize" data-item="Professional">Professional</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block_btn absolute right-0 bottom-0 left-0 z-[1] bg-white h-[68px] py-2.5 px-6">
+                        <button class="button-main w-full text-center">Find Projects</button>
+                    </div>
+                </form>
+            </div>
+        </div>

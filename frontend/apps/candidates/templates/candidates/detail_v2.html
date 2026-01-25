@@ -1,0 +1,398 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+
+        <section class="candidates_detail lg:pt-40 sm:pt-32 pt-24 lg:pb-20 sm:pb-14 pb-10">
+            <div class="container flex max-lg:flex-col gap-y-10">
+                <div class="candidates_content w-full lg:pr-15">
+                    <div class="flex max-lg:flex-col lg:items-center justify-between gap-7 gap-y-5 md:pb-10 pb-7 border-b border-line">
+                        <div class="candidates_info flex flex-wrap sm:gap-7 gap-4 w-full">
+                            <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                                <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="candidates_avatar w-full h-full object-cover" />
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="tag w-fit caption1 bg-background text-success">Available now</span>
+                                <h4 class="candidates_name heading4 w-fit mt-1">Devon lane</h4>
+                                <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                                    <span class="flex items-center text-secondary">
+                                        <span class="ph ph-map-pin text-lg"></span>
+                                        <span class="candidates_address -style-1 pl-1">Rio de Janeiro, Brazil</span>
+                                    </span>
+                                    <div class="candidates_review flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-lg text-yellow"></span>
+                                        <strong class="text-button">4.8</strong>
+                                        <span class="review text-secondary">(751 review)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="breadcrumb_action flex flex-col max-lg:flex-col-reverse gap-4">
+                            <a href="#!" class="button-main w-fit whitespace-nowrap">DownLoad CV</a>
+                            <a href="employers-messages.html" class="button-main -border w-fit whitespace-nowrap">Send Message</a>
+                        </div>
+                    </div>
+                    <div class="description md:mt-10 mt-7">
+                        <h5 class="heading5">About Me</h5>
+                        <div class="flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">As a UX/UI designer, I am dedicated to crafting seamless and intuitive digital experiences that prioritize user satisfaction and engagement. With a strong background in user-centric design principles, I specialize in creating visually appealing interfaces that not only look great but also function flawlessly across various platforms.</p>
+                            <p class="body2 text-secondary">If you're seeking a UX/UI designer who can elevate your digital presence and deliver exceptional user experiences, look no further. Let's collaborate to bring your vision to life and create meaningful connections with your audience.</p>
+                        </div>
+                    </div>
+                    <div class="info grid sm:grid-cols-2 gap-5 md:mt-10 mt-7">
+                        <div class="education">
+                            <h6 class="heading6">Education</h6>
+                            <ul class="content flex flex-col gap-5 mt-4 pl-5 border-l border-line">
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-primary">July 2022 - Present</span>
+                                    <strong class="text-title">Bachelor of Science</strong>
+                                    <span class="text-secondary">Avitex Inc.</span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-secondary">March 2020 - July 2013</span>
+                                    <strong class="text-title">Android Programming</strong>
+                                    <span class="text-secondary">Google Inc.</span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-secondary">October 2018 - July 2013</span>
+                                    <strong class="text-title">Software Development</strong>
+                                    <span class="text-secondary">DigitalAwesome Inc</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="education">
+                            <h6 class="heading6">Experience</h6>
+                            <ul class="content flex flex-col gap-5 mt-4 pl-5 border-l border-line">
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-primary">July 2022 - Present</span>
+                                    <strong class="text-title">Founder Avitex</strong>
+                                    <span class="text-secondary">Avitex Inc.</span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-secondary">March 2020 - July 2013</span>
+                                    <strong class="text-title">Project Manager</strong>
+                                    <span class="text-secondary">Google Inc.</span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs font-semibold uppercase text-secondary">October 2018 - July 2013</span>
+                                    <strong class="text-title">Bachelor of Science</strong>
+                                    <span class="text-secondary">DigitalAwesome Inc</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="skills md:mt-10 mt-7">
+                        <h6 class="heading6">Management skills</h6>
+                        <ul class="list_skills grid sm:grid-cols-3 grid-cols-2 gap-15 gap-y-8 p-7 mt-4 border border-line rounded-lg">
+                            <li>
+                                <strong class="text-title">Html & CSS</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 90%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong class="text-title">Figma</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 80%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong class="text-title">AI</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 60%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong class="text-title">Photoshop</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 70%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong class="text-title">Sketch</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 50%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong class="text-title">Drawing</strong>
+                                <div class="progress_bar relative w-full h-1 mt-3 bg-line">
+                                    <div class="progress_bar_inner absolute top-0 left-0 h-full bg-black" style="width: 80%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="portfolio md:mt-10 mt-7">
+                        <h6 class="heading6">Portfolio</h6>
+                        <ul class="list_portfolio grid sm:grid-cols-3 grid-cols-2 gap-5 mt-4">
+                            <li class="col-span-2 row-span-2 overflow-hidden rounded-lg">
+                                <img src="{% static 'assets/images/service/2.webp' %}" alt="service/2" class="w-full h-full object-cover" />
+                            </li>
+                            <li class="col-span-1 row-span-1 overflow-hidden rounded-lg">
+                                <img src="{% static 'assets/images/service/3.webp' %}" alt="service/3" class="w-full h-full object-cover" />
+                            </li>
+                            <li class="col-span-1 row-span-1 overflow-hidden rounded-lg">
+                                <img src="{% static 'assets/images/service/4.webp' %}" alt="service/4" class="w-full h-full object-cover" />
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="review md:mt-15 mt-8">
+                        <div class="heading flex flex-wrap items-center justify-between gap-4">
+                            <h5 class="heading5">Customer Review</h5>
+                            <a href="#form-review" class="button-main -border">Write Reviews </a>
+                        </div>
+                        <div class="rating_area flex max-sm:flex-col justify-between gap-y-3 py-6">
+                            <div class="flex flex-col items-center justify-center gap-1">
+                                <h1 class="heading1 avg_rating">4.8</h1>
+                                <div class="flex flex-col items-center gap-2">
+                                    <ul class="rate flex">
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star text-2xl text-yellow"></li>
+                                        <li class="ph-fill ph-star-half text-2xl text-yellow"></li>
+                                    </ul>
+                                    <span class="total_rating caption1">(1,968 Ratings)</span>
+                                </div>
+                            </div>
+                            <div class="list_rating flex-shrink-0 xl:w-[465px] sm:w-[60%] w-full">
+                                <div class="item flex items-center justify-between gap-3">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">5</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[70%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">70%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">4</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[20%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">20%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">3</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[10%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">10%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">2</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-0 h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">0%</strong>
+                                </div>
+                                <div class="item flex items-center justify-between gap-3 mt-1">
+                                    <div class="flex flex-shrink-0 items-center gap-2 min-w-7">
+                                        <strong class="text-button-sm">1</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-0 h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">0%</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list_review flex flex-col items-center gap-10 md:pt-10 pt-7 border-t border-line">
+                            <ul class="list flex flex-col gap-6">
+                                <li class="review_item flex max-sm:flex-col sm:items-center gap-y-4">
+                                    <div class="flex gap-5 sm:pr-10 sm:border-r border-line">
+                                        <img src="{% static 'assets/images/avatar/IMG-12.webp' %}" alt="avatar/IMG-12" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                        <div class="review_content w-full">
+                                            <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                                <div class="user_info">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="name heading6">Jeremy L.</span>
+                                                        <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                    </div>
+                                                    <span class="date caption1 text-secondary">August 24, 2024</span>
+                                                    <ul class="review_rate flex mt-1">
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                    </ul>
+                                                </div>
+                                                <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                    <span class="caption1">Was this helpful?</span>
+                                                    <span class="ph ph-thumbs-up"></span>
+                                                </button>
+                                            </div>
+                                            <p class="desc mt-4">I really like the logo that Gihan created, and he was very responsive and great to work with. I would recommend him to anyone looking for a logo or graphic design!</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col flex-shrink-0 sm:pl-10 pl-20">
+                                        <img src="{% static 'assets/images/service/2.webp' %}" alt="service/2" class="w-[100px] rounded" />
+                                        <strong class="text-button mt-3">Logo Design</strong>
+                                        <span class="caption1">From $120</span>
+                                    </div>
+                                </li>
+                                <li class="review_item flex max-sm:flex-col sm:items-center gap-y-4">
+                                    <div class="flex gap-5 sm:pr-10 sm:border-r border-line">
+                                        <img src="{% static 'assets/images/avatar/IMG-11.webp' %}" alt="avatar/IMG-11" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                        <div class="review_content w-full">
+                                            <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                                <div class="user_info">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="name heading6">Leonardo D.</span>
+                                                        <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                    </div>
+                                                    <span class="date caption1 text-secondary">August 24, 2024</span>
+                                                    <ul class="review_rate flex mt-1">
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                        <li class="ph-fill ph-star text-yellow"></li>
+                                                    </ul>
+                                                </div>
+                                                <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                    <span class="caption1">Was this helpful?</span>
+                                                    <span class="ph ph-thumbs-up"></span>
+                                                </button>
+                                            </div>
+                                            <p class="desc mt-4">Very professional. Gihan has a very creative mind and was able to deliver the logo very quickly. Their exceptional ability to understand and deliver on my concept exceeded all expectations.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col flex-shrink-0 sm:pl-10 pl-20">
+                                        <img src="{% static 'assets/images/service/3.webp' %}" alt="service/3" class="w-[100px] rounded" />
+                                        <strong class="text-button mt-3">Logo Design</strong>
+                                        <span class="caption1">From $120</span>
+                                    </div>
+                                </li>
+                            </ul>
+                            <button class="text-button underline duration-300 hover:text-primary">See more reviews (19)</button>
+                        </div>
+                        <div id="form-review" class="form-review md:pt-10 pt-7">
+                            <h6 class="heading6">Leave A comment</h6>
+                            <form class="form grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
+                                <div class="name">
+                                    <label for="username">Name</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                                </div>
+                                <div class="mail">
+                                    <label for="email">Email</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                                </div>
+                                <div class="col-span-full message">
+                                    <label for="message">Review</label>
+                                    <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Write comment " required></textarea>
+                                </div>
+                                <div class="col-span-full flex items-start gap-2">
+                                    <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
+                                    <label class="" for="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
+                                </div>
+                                <div class="user_rating flex items-center gap-3 col-span-full">
+                                    <span>Your Rating:</span>
+                                    <ul class="list_rate flex gap-1">
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="1"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="2"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="3"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="4"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="5"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-span-full">
+                                    <button class="button-main">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="candidates_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit">
+                    <div class="about overflow-hidden p-6 rounded-xl bg-white shadow-md duration-300">
+                        <h5 class="heading5">Info overview</h5>
+                        <ul class="sidebar_info py-1">
+                            <li class="industry flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Career Finding:</span>
+                                <strong class="text-title">UI UX Designer</strong>
+                            </li>
+                            <li class="location flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Location:</span>
+                                <strong class="text-title">Las Vegas, USA</strong>
+                            </li>
+                            <li class="salary flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Offered Salary:</span>
+                                <strong class="text-title">$2500/Month</strong>
+                            </li>
+                            <li class="experience flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Experience:</span>
+                                <strong class="text-title">4 Year</strong>
+                            </li>
+                            <li class="language flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Language:</span>
+                                <strong class="text-title">English, France</strong>
+                            </li>
+                            <li class="age flex items-center justify-between w-full py-4 border-b border-line">
+                                <span class="text-secondary">Age:</span>
+                                <strong class="text-title">25 Years Old</strong>
+                            </li>
+                            <li class="list_social flex flex-wrap items-center justify-between gap-4 w-full py-4">
+                                <span class="text-secondary">Socials:</span>
+                                <ul class="list flex flex-wrap items-center gap-3">
+                                    <li>
+                                        <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-facebook text-lg"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.linkedin.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-linkedin text-lg"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-twitter text-lg"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-instagram text-lg"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="list_attachments flex flex-col gap-y-3">
+                            <li>
+                                <a href="#!" class="flex items-center justify-between gap-3 w-full h-[76px] p-3 rounded-lg bg-surface duration-300 hover:bg-background">
+                                    <div>
+                                        <span class="text-sm font-bold text-secondary uppercase">file_name_pdf</span>
+                                        <strong class="block mt-1 text-title cursor-pointer">PDF</strong>
+                                    </div>
+                                    <span class="ph ph-file-pdf flex-shrink-0 text-4xl text-primary"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#!" class="flex items-center justify-between gap-3 w-full h-[76px] p-3 rounded-lg bg-surface duration-300 hover:bg-background">
+                                    <div>
+                                        <span class="text-sm font-bold text-secondary uppercase">file_name_doc</span>
+                                        <strong class="block mt-1 text-title cursor-pointer">DOC</strong>
+                                    </div>
+                                    <span class="ph ph-file-doc flex-shrink-0 text-4xl text-primary"></span>
+                                </a>
+                            </li>
+                        </ul>
+                        <a href="#!" class="button-main w-full text-center mt-5">Download CV PRO</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+{% endblock %}

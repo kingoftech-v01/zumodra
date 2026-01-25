@@ -1,0 +1,361 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_service scrollbar_custom w-full bg-surface">
+                <form class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">Submit Job</h4>
+                        <button class="button-main" type="submit">Save & Publish</button>
+                    </div>
+                    <div class="infomation p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Infomation</h5>
+                        <div class="form grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="upload_image">
+                                <label for="uploadLogo">Upload Logo: <span class="text-red">*</span></label>
+                                <div class="flex flex-wrap items-center gap-4 mt-3">
+                                    <div class="bg_img flex-shrink-0 relative w-[10rem] h-[7.5rem] rounded-lg overflow-hidden border border-dashed border-line bg-surface">
+                                        <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
+                                        <img src="#" alt="preview img" class="upload_img relative z-[1] w-full h-full object-cover hidden" />
+                                    </div>
+                                    <div>
+                                        <strong class="text-button">Upload a cover services:</strong>
+                                        <p class="caption1 text-secondary mt-1">JPG 320x240px</p>
+                                        <div class="upload_file flex items-center gap-3 w-[220px] mt-3 px-3 py-2 border border-line rounded">
+                                            <label for="uploadLogo" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                            <input type="file" name="uploadLogo" id="uploadLogo" accept="image/*" class="caption2 cursor-pointer" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="upload_image">
+                                <label for="uploadBanner">Upload Banner: <span class="text-red">*</span></label>
+                                <div class="flex flex-wrap items-center gap-4 mt-3">
+                                    <div class="bg_img flex-shrink-0 relative w-[10rem] h-[7.5rem] rounded-lg overflow-hidden border border-dashed border-line bg-surface">
+                                        <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
+                                        <img src="#" alt="preview img" class="upload_img relative z-[1] w-full h-full object-cover hidden" />
+                                    </div>
+                                    <div>
+                                        <strong class="text-button">Upload a cover services:</strong>
+                                        <p class="caption1 text-secondary mt-1">JPG 320x240px</p>
+                                        <div class="upload_file flex items-center gap-3 w-[220px] mt-3 px-3 py-2 border border-line rounded">
+                                            <label for="uploadBanner" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                            <input type="file" name="uploadBanner" id="uploadBanner" accept="image/*" class="caption2 cursor-pointer" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="title">
+                                <label for="title">Title: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="title" type="text" placeholder="Title..." required />
+                            </div>
+                            <div class="type">
+                                <label>Type: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Fulltime">Fulltime</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Freelance">Freelance</li>
+                                            <li class="capitalize" data-item="Remote">Remote</li>
+                                            <li class="capitalize" data-item="Parttime">Parttime</li>
+                                            <li class="capitalize" data-item="Fulltime">Fulltime</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="categories">
+                                <label>Categories: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Web design">Web design</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="UX/UI Design">UX/UI Design</li>
+                                            <li class="capitalize" data-item="Mobile App">Mobile App</li>
+                                            <li class="capitalize" data-item="Web design">Web design</li>
+                                            <li class="capitalize" data-item="Backend Dev">Backend Dev</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="tags">
+                                <label>Tags: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="categoryInput w-full min-h-8" type="text" placeholder="Type to search tags..." />
+                                    <div class="selectedTags selected-tags w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="deadline_date">
+                                <label for="deadlineDate">Application deadline date: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="deadlineDate" type="date" required />
+                            </div>
+                            <div class="apply_type">
+                                <label>Job Apply Type: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="By Email">By Email</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="By Email">By Email</li>
+                                            <li class="capitalize" data-item="By Message">By Message</li>
+                                            <li class="capitalize" data-item="By Phonecall">By Phonecall</li>
+                                            <li class="capitalize" data-item="Backend Dev">Backend Dev</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="external_url">
+                                <label for="externalUrl">External URL for apply job: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="externalUrl" type="text" required />
+                            </div>
+                            <div class="job_apply_email">
+                                <label for="jobApplyEmail">Job Apply Email: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="jobApplyEmail" type="text" required />
+                            </div>
+                            <div class="phone_number">
+                                <label for="phoneNumber">Phone Number: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="phoneNumber" type="text" required />
+                            </div>
+                            <div class="alternate">
+                                <label for="alternate">Alternate No: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="alternate" type="text" required />
+                            </div>
+                            <div class="gender">
+                                <label>Gender: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Male">Male</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Male">Male</li>
+                                            <li class="capitalize" data-item="Female">Female</li>
+                                            <li class="capitalize" data-item="Other">Other</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="language">
+                                <label>Language: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="languageInput w-full min-h-8" type="text" placeholder="Type to search language..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="salary_type col-span-full">
+                                <label>Salary type: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Month">Month</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Day">Day</li>
+                                            <li class="capitalize" data-item="Week">Week</li>
+                                            <li class="capitalize" data-item="Month">Month</li>
+                                            <li class="capitalize" data-item="Quarter">Quarter</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="min_salary">
+                                <label for="minSalary">Min. salary: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="minSalary" type="text" required />
+                            </div>
+                            <div class="max_salary">
+                                <label for="maxSalary">Max. salary: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="maxSalary" type="text" required />
+                            </div>
+                            <div class="industry">
+                                <label for="industry">Industry: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="industry" type="text" required />
+                            </div>
+                            <div class="qualification">
+                                <label>Qualification: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="University">University</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="University">University</li>
+                                            <li class="capitalize" data-item="Colleague">Colleague</li>
+                                            <li class="capitalize" data-item="Student">Student</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="vacancy">
+                                <label>No of Vacancy: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Banking">Banking</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Banking">Banking</li>
+                                            <li class="capitalize" data-item="Money">Money</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="nationality">
+                                <label for="nationality">Nationality: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="nationality" type="text" required />
+                            </div>
+                            <div class="job_country">
+                                <label for="jobCountry">Job Country: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="jobCountry" type="text" required />
+                            </div>
+                            <div class="preferred_candidates">
+                                <label>Preferred candidates: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="1 month">1 month</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="1 month">1 month</li>
+                                            <li class="capitalize" data-item="3 months">3 months</li>
+                                            <li class="capitalize" data-item="6 month">6 month</li>
+                                            <li class="capitalize" data-item="12 month">12 month</li>
+                                            <li class="capitalize" data-item="18 month">18 month</li>
+                                            <li class="capitalize" data-item="24 month">24 month</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="functional_area">
+                                <label for="functionalArea">Functional area: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="functionalArea" type="text" required />
+                            </div>
+                            <div class="benefit">
+                                <label for="benefit">Benefit: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="benefit" type="text" required />
+                            </div>
+                            <div class="level">
+                                <label>Career level: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Manager">Manager</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Manager">Manager</li>
+                                            <li class="capitalize" data-item="Junior">Junior</li>
+                                            <li class="capitalize" data-item="Senior">Senior</li>
+                                            <li class="capitalize" data-item="Team Lead">Team Lead</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="experience">
+                                <label>Experience: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="1 year">1 year</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="1 year">1 year</li>
+                                            <li class="capitalize" data-item="2 year">2 year</li>
+                                            <li class="capitalize" data-item="3 year">3 year</li>
+                                            <li class="capitalize" data-item="4 year">4 year</li>
+                                            <li class="capitalize" data-item="> 4 year">> 4 year</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="desc col-span-full">
+                                <label>Decscription: <span class="text-red">*</span></label>
+                                <div class="form_editor mt-2">
+                                    <div id="editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="questions p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">questions</h5>
+                        <div class="list_question mt-5">
+                            <div class="item">
+                                <label for="question1">Questions 1:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question1" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <div class="item mt-5">
+                                <label for="question2">Questions 2:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question2" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <div class="item mt-5">
+                                <label for="question3">Questions 3:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question3" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <button class="button-main -border gap-2.5 mt-5" type="button">
+                                <span class="ph ph-plus-circle text-2xl"></span>
+                                <strong class="text-button">Add Another Addons</strong>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="upload_portfolio p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Upload Portfolio</h5>
+                        <div class="multiple-image-section mt-5">
+                            <div class="image-previews flex flex-wrap gap-5">
+                                <label for="multipleImages" class="flex flex-col items-center justify-center gap-2 sm:w-[248px] w-[116px] sm:h-[186px] h-[102px] rounded-lg bg-surface cursor-pointer">
+                                    <span class="ph ph-image sm:text-5xl text-3xl text-secondary"></span>
+                                    <span class="text-button text-secondary text-center">Upload file</span>
+                                    <input type="file" id="multipleImages" name="files[]" accept="image/*" hidden multiple />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="map_location p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <h5 class="heading5">Map Location</h5>
+                        <div class="grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="address col-span-full">
+                                <label for="address">Address:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="address" type="text" placeholder="Address..." value="Block 637 HDB Veerasamy" />
+                            </div>
+                            <div class="location">
+                                <label>Location:</label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Singapore">Singapore</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Singapore">Singapore</li>
+                                            <li class="capitalize" data-item="Japan">Japan</li>
+                                            <li class="capitalize" data-item="South Korea">South Korea</li>
+                                            <li class="capitalize" data-item="United State">United State</li>
+                                            <li class="capitalize" data-item="France">France</li>
+                                            <li class="capitalize" data-item="Germany">Germany</li>
+                                            <li class="capitalize" data-item="United Kingdom">United Kingdom</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="map_location">
+                                <label for="mapLocation">Map Location:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="mapLocation" type="text" placeholder="Map Location..." value="Block 637 HDB Veerasamy" />
+                            </div>
+                            <div class="map col-span-full h-[300px] overflow-hidden rounded-lg">
+                                <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1909.7091869357298!2d103.85507140013029!3d1.30702053658505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19b81a53a2cf%3A0xb073ded76264e6ec!2sBlock%20637%20HDB%20Veerasamy!5e1!3m2!1svi!2s!4v1722584665648!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                            <div class="lat_location">
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="latLocation" type="text" placeholder="Lat Location..." value="1.306833" />
+                            </div>
+                            <div class="lng_location">
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="lngLocation" type="text" placeholder="Lng Location..." value="103.855534" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_job_submit_jobs.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_submit_jobs.html' %}
+{% endblock %}

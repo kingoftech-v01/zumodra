@@ -1,0 +1,35 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_delete_profile scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">Delete Profile</h4>
+                    <div class="form_delete p-10 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <h5 class="heading5">Are you sure! You want to delete your profile.</h5>
+                        <p class="text-secondary mt-2">This can’t be undone!</p>
+                        <form class="grid grid-cols-2 gap-5 w-full mt-5">
+                            <div class="password col-span-full flex flex-col">
+                                <label for="password" class="w-fit">Please enter your login Password to confirm: <span class="text-red">*</span></label>
+                                <input class="w-1/2 h-12 px-4 mt-2 border-line rounded-lg" id="password" type="password" placeholder="Your Password..." required />
+                            </div>
+                            <div class="block_btn">
+                                <button class="button-main btn_open_popup btn_delete_profile bg-red" data-type="modal_delete_profile">Delete Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_delete_profile_delete_profile.html' %}
+{% endblock %}

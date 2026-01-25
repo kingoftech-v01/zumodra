@@ -1,0 +1,859 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_bookmarks scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">My Borkmarks</h4>
+                    <div class="bookmarks_block mt-7.5 rounded-lg bg-white">
+                        <div class="list_category flex items-center h-20 px-6 border-b border-line">
+                            <div class="menu_tab overflow-unset max-w-none">
+                                <ul class="menu flex gap-7" role="tablist">
+                                    <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300 active" id="projects_tab01" role="tab" aria-controls="projects_01" aria-selected="true">Projects</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="jobs_tab02" role="tab" aria-controls="jobs_02" aria-selected="false">Jobs</button>
+                                    </li>
+                                    <li class="tab_item" role="presentation">
+                                        <button class="tab_btn -before py-1 text-button hover:text-primary duration-300" id="employers_tab03" role="tab" aria-controls="employers_03" aria-selected="false">Employers</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="projects_01" class="tab_list active" role="tabpanel" aria-labelledby="projects_tab01" aria-hidden="false">
+                            <ul class="list_projects grid md:grid-cols-2 grid-cols-1 lg:gap-6 gap-5 p-6">
+                                <li class="item project_item p-6 rounded-lg bg-white duration-300 shadow-md">
+                                    <div class="project_innner">
+                                        <div class="project_info flex justify-between gap-3 pb-4 border-b border-line">
+                                            <div class="project_content">
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Figma mockup needed for a new website for Electrical contractor business website</a>
+                                                <div class="project_related_info flex flex-wrap items-center gap-3 mt-3">
+                                                    <div class="project_date flex items-center gap-1">
+                                                        <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                        <span class="caption1 text-secondary">2 days ago</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                        <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="project_spent flex items-center gap-1">
+                                                        <span class="caption1 text-secondary">$</span>
+                                                        <span class="caption1 text-secondary">2.8K</span>
+                                                        <span class="caption1 text-secondary">spent</span>
+                                                    </div>
+                                                    <div class="project_rate flex items-center">
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-placehover"></span>
+                                                    </div>
+                                                </div>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                        <div class="project_more_info flex items-center justify-between pt-4">
+                                            <div class="project_proposals">
+                                                <span class="text-secondary">Proposals: </span>
+                                                <span class="proposals">50+</span>
+                                            </div>
+                                            <div class="project_price">
+                                                <span class="price text-title">$170</span>
+                                                <span class="text-secondary">/fixed-price</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="project_action mt-3">
+                                        <a href="project-detail1.html" class="project_apply_btn button-main -border w-full">Apply now</a>
+                                    </div>
+                                </li>
+                                <li class="item project_item p-6 rounded-lg bg-white duration-300 shadow-md">
+                                    <div class="project_innner">
+                                        <div class="project_info flex justify-between gap-3 pb-4 border-b border-line">
+                                            <div class="project_content">
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">I need you to design a email confirming for a ticket buying in a beautiful modern way for mobile</a>
+                                                <div class="project_related_info flex flex-wrap items-center gap-3 mt-3">
+                                                    <div class="project_date flex items-center gap-1">
+                                                        <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                        <span class="caption1 text-secondary">2 days ago</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                        <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="project_spent flex items-center gap-1">
+                                                        <span class="caption1 text-secondary">$</span>
+                                                        <span class="caption1 text-secondary">2.8K</span>
+                                                        <span class="caption1 text-secondary">spent</span>
+                                                    </div>
+                                                    <div class="project_rate flex items-center">
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                    </div>
+                                                </div>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                        <div class="project_more_info flex items-center justify-between pt-4">
+                                            <div class="project_proposals">
+                                                <span class="text-secondary">Proposals: </span>
+                                                <span class="proposals">50+</span>
+                                            </div>
+                                            <div class="project_price">
+                                                <span class="price text-title">$170</span>
+                                                <span class="text-secondary">/fixed-price</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="project_action mt-3">
+                                        <a href="project-detail1.html" class="project_apply_btn button-main -border w-full">Apply now</a>
+                                    </div>
+                                </li>
+                                <li class="item project_item p-6 rounded-lg bg-white duration-300 shadow-md">
+                                    <div class="project_innner">
+                                        <div class="project_info flex justify-between gap-3 pb-4 border-b border-line">
+                                            <div class="project_content">
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Website Design (Web & Responsive) for an Online Tutoring Website</a>
+                                                <div class="project_related_info flex flex-wrap items-center gap-3 mt-3">
+                                                    <div class="project_date flex items-center gap-1">
+                                                        <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                        <span class="caption1 text-secondary">2 days ago</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                        <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="project_spent flex items-center gap-1">
+                                                        <span class="caption1 text-secondary">$</span>
+                                                        <span class="caption1 text-secondary">2.8K</span>
+                                                        <span class="caption1 text-secondary">spent</span>
+                                                    </div>
+                                                    <div class="project_rate flex items-center">
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-placehover"></span>
+                                                    </div>
+                                                </div>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                        <div class="project_more_info flex items-center justify-between pt-4">
+                                            <div class="project_proposals">
+                                                <span class="text-secondary">Proposals: </span>
+                                                <span class="proposals">50+</span>
+                                            </div>
+                                            <div class="project_price">
+                                                <span class="price text-title">$50-$70</span>
+                                                <span class="text-secondary">/hours</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="project_action mt-3">
+                                        <a href="project-detail1.html" class="project_apply_btn button-main -border w-full">Apply now</a>
+                                    </div>
+                                </li>
+                                <li class="item project_item p-6 rounded-lg bg-white duration-300 shadow-md">
+                                    <div class="project_innner">
+                                        <div class="project_info flex justify-between gap-3 pb-4 border-b border-line">
+                                            <div class="project_content">
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">UX/UI Designer | Brander to Redesign the First Screen of the Main Page</a>
+                                                <div class="project_related_info flex flex-wrap items-center gap-3 mt-3">
+                                                    <div class="project_date flex items-center gap-1">
+                                                        <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                        <span class="caption1 text-secondary">2 days ago</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                        <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="project_spent flex items-center gap-1">
+                                                        <span class="caption1 text-secondary">$</span>
+                                                        <span class="caption1 text-secondary">2.8K</span>
+                                                        <span class="caption1 text-secondary">spent</span>
+                                                    </div>
+                                                    <div class="project_rate flex items-center">
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-yellow"></span>
+                                                        <span class="ph-fill ph-star text-placehover"></span>
+                                                    </div>
+                                                </div>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                        <div class="project_more_info flex items-center justify-between pt-4">
+                                            <div class="project_proposals">
+                                                <span class="text-secondary">Proposals: </span>
+                                                <span class="proposals">50+</span>
+                                            </div>
+                                            <div class="project_price">
+                                                <span class="price text-title">$20-$30</span>
+                                                <span class="text-secondary">/hours</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="project_action mt-3">
+                                        <a href="project-detail1.html" class="project_apply_btn button-main -border w-full">Apply now</a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                    </li>
+                                </ul>
+                                <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">4</span> of <span class="total">16</span> entries</p>
+                            </div>
+                        </div>
+                        <div id="jobs_02" class="tab_list" role="tabpanel" aria-labelledby="jobs_tab02" aria-hidden="true">
+                            <ul class="list_jobs grid 2xl:grid-cols-3 md:grid-cols-2 grid-cols-1 lg:gap-6 gap-5 p-6">
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/8.png' %}" alt="company/8" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                                <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$100 - $120</span>
+                                            <span class="text-secondary">/hour</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/7.png' %}" alt="company/7" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">GlobalTech Partners</span>
+                                                <strong class="jobs_name text-title -style-1">Senior DevOps Engineer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">California, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$60-$80</span>
+                                            <span class="text-secondary">/day</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/6.png' %}" alt="company/6" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
+                                                <strong class="jobs_name text-title -style-1">Senior UI/UX Designer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">California, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$850 - $900</span>
+                                            <span class="text-secondary">/month</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/5.png' %}" alt="company/5" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
+                                                <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">New York, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$10 - $15</span>
+                                            <span class="text-secondary">/hour</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/4.png' %}" alt="company/4" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                                <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$450 - $550</span>
+                                            <span class="text-secondary">/month</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
+                                                <strong class="jobs_name text-title -style-1">Digital Marketing</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">California, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$10 - $15</span>
+                                            <span class="text-secondary">/hour</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/9.png' %}" alt="company/9" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                                <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$100 - $120</span>
+                                            <span class="text-secondary">/hour</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/12.png' %}" alt="company/12" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
+                                                <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">New York, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$10 - $15</span>
+                                            <span class="text-secondary">/hour</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                        <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                            <img src="{% static 'assets/images/company/13.png' %}" alt="company/13" class="jobs_avatar w-full h-full object-cover" />
+                                        </a>
+                                        <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                            <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                                <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
+                                                <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                    <div class="jobs_address -style-1 text-secondary">
+                                                        <span class="ph ph-map-pin text-lg"></span>
+                                                        <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                    </div>
+                                                    <div class="jobs_date text-secondary">
+                                                        <span class="ph ph-calendar-blank text-lg"></span>
+                                                        <span class="date caption1 align-top">2 days ago</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                                <span class="ph ph-trash text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                            <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                        </div>
+                                        <div class="jobs_price">
+                                            <span class="price text-title">$450 - $550</span>
+                                            <span class="text-secondary">/month</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                    </li>
+                                </ul>
+                                <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">4</span> of <span class="total">16</span> entries</p>
+                            </div>
+                        </div>
+                        <div id="employers_03" class="tab_list" role="tabpanel" aria-labelledby="employers_tab03" aria-hidden="true">
+                            <ul class="list_employers grid 2xl:grid-cols-3 sm:grid-cols-2 lg:gap-6 gap-5 w-full p-6">
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-placehover"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">Bright Future</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Las Vegas, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/2.png' %}" alt="company/2" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">Innovations</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">New York, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">CoreTech</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Texas, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/4.png' %}" alt="company/4" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">GlobalTech Partners</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">California, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/5.png' %}" alt="company/5" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">PrimeEdge Solutions</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Nevada, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/6.png' %}" alt="company/6" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-placehover"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">Stellar Enterprises</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Georgia, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/7.png' %}" alt="company/7" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-placehover"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">EliteTech Solutions</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Idaho, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/8.png' %}" alt="company/8" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">Apex Innovations</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">New Mexico, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                                <li class="item employers_item flex items-center justify-between gap-4 h-full p-6 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                    <a href="employers-detail1.html" class="employers_item flex items-center gap-4 w-full">
+                                        <img src="{% static 'assets/images/company/9.png' %}" alt="company/9" class="flex-shrink-0 w-15 h-15" />
+                                        <div>
+                                            <div class="rate flex items-center pb-1">
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-yellow"></span>
+                                                <span class="ph-fill ph-star text-placehover"></span>
+                                            </div>
+                                            <strong class="employers_name text-title duration-300 hover:text-primary">Infinity Solutions</strong>
+                                            <div class="employers_address -style-1 text-secondary mt-1">
+                                                <span class="ph ph-map-pin text-lg"></span>
+                                                <span class="address caption1 align-top">Colorado, USA</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                        <span class="ph ph-trash text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                    </li>
+                                </ul>
+                                <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">4</span> of <span class="total">16</span> entries</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_delete_bookmarks.html' %}
+{% endblock %}

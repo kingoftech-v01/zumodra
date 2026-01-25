@@ -1,0 +1,159 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_project scrollbar_custom w-full bg-surface">
+                <form class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">Submit Project</h4>
+                        <button class="button-main" type="submit">Save & Publish</button>
+                    </div>
+                    <div class="infomation p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Infomation</h5>
+                        <div class="form grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="title">
+                                <label for="title">Title: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="title" type="text" placeholder="Title..." required />
+                            </div>
+                            <div class="categories">
+                                <label>Categories: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Web design">Web design</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="UX/UI Design">UX/UI Design</li>
+                                            <li class="capitalize" data-item="Mobile App">Mobile App</li>
+                                            <li class="capitalize" data-item="Web design">Web design</li>
+                                            <li class="capitalize" data-item="Backend Dev">Backend Dev</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="type">
+                                <label>Type: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Fulltime">Fulltime</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Freelance">Freelance</li>
+                                            <li class="capitalize" data-item="Remote">Remote</li>
+                                            <li class="capitalize" data-item="Parttime">Parttime</li>
+                                            <li class="capitalize" data-item="Fulltime">Fulltime</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="duration">
+                                <label for="duration">Duration: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="duration" type="text" required />
+                            </div>
+                            <div class="language">
+                                <label>Language: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="languageInput w-full min-h-8" type="text" placeholder="Type to search language..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="min_salary">
+                                <label for="minSalary">Min. salary: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="minSalary" type="text" required />
+                            </div>
+                            <div class="max_salary">
+                                <label for="maxSalary">Max. salary: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="maxSalary" type="text" required />
+                            </div>
+                            <div class="job_country">
+                                <label for="jobCountry">Project Country: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg uppercase" id="jobCountry" type="text" required />
+                            </div>
+                            <div class="level">
+                                <label>Career level: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Manager">Manager</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Manager">Manager</li>
+                                            <li class="capitalize" data-item="Junior">Junior</li>
+                                            <li class="capitalize" data-item="Senior">Senior</li>
+                                            <li class="capitalize" data-item="Team Lead">Team Lead</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="experience">
+                                <label>Experience: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="1 year">1 year</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="1 year">1 year</li>
+                                            <li class="capitalize" data-item="2 year">2 year</li>
+                                            <li class="capitalize" data-item="3 year">3 year</li>
+                                            <li class="capitalize" data-item="4 year">4 year</li>
+                                            <li class="capitalize" data-item="> 4 year">> 4 year</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="desc col-span-full">
+                                <label>Decscription: <span class="text-red">*</span></label>
+                                <div class="form_editor mt-2">
+                                    <div id="editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="questions p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">questions</h5>
+                        <div class="list_question mt-5">
+                            <div class="item">
+                                <label for="question1">Questions 1:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question1" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <div class="item mt-5">
+                                <label for="question2">Questions 2:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question2" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <div class="item mt-5">
+                                <label for="question3">Questions 3:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg text-title" id="question3" type="text" value="Why do you think you are a suitable candidate?" required />
+                            </div>
+                            <button class="button-main -border gap-2.5 mt-5" type="button">
+                                <span class="ph ph-plus-circle text-2xl"></span>
+                                <strong class="text-button">Add Another Addons</strong>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="upload_portfolio p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Attachments</h5>
+                        <div class="multiple-image-section mt-5">
+                            <div class="image-previews flex flex-wrap gap-5">
+                                <label for="multipleImages" class="flex flex-col items-center justify-center gap-2 sm:w-[248px] w-[116px] sm:h-[186px] h-[102px] rounded-lg bg-surface cursor-pointer">
+                                    <span class="ph ph-image sm:text-5xl text-3xl text-secondary"></span>
+                                    <span class="text-button text-secondary text-center">Upload file</span>
+                                    <input type="file" id="multipleImages" name="files[]" accept="image/*" hidden multiple />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_job_submit_projects.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_submit_projects.html' %}
+{% endblock %}

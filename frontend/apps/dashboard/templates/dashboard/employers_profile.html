@@ -1,0 +1,406 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_profile scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 min-[1400px]:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="heading flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">My profile</h4>
+                        <a href="employers-profile-setting.html" class="button-main">Edit Profile</a>
+                    </div>
+                    <div class="profile_block overflow-hidden flex max-lg:flex-col-reverse gap-y-10 w-full mt-7.5">
+                        <div class="left flex-shrink-0 lg:w-[29.5%]">
+                            <div class="info_overview p-8 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Info company</h5>
+                                <div class="map flex-shrink-0 w-full aspect-[4/3] mt-5">
+                                    <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d742.4556963440328!2d-87.62313632867398!3d41.896668148301984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fd35498b7bfaf%3A0xaf89aff7166aaa5f!2sOlympia%20Centre%20Condos!5e0!3m2!1svi!2s!4v1721272000241!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                </div>
+                                <ul class="employers_info pt-1">
+                                    <li class="industry flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Website:</span>
+                                        <strong class="text-title">http://www.avitex.vn</strong>
+                                    </li>
+                                    <li class="location flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Email:</span>
+                                        <strong class="text-title">hi.avitex@gmail.com</strong>
+                                    </li>
+                                    <li class="phone flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Industry:</span>
+                                        <strong class="text-title">Internet Publishing</strong>
+                                    </li>
+                                    <li class="email flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Company size:</span>
+                                        <strong class="text-title">51-200 employees</strong>
+                                    </li>
+                                    <li class="salary flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Address:</span>
+                                        <strong class="text-title">3 Leson, Las Vegas, USA</strong>
+                                    </li>
+                                    <li class="experience flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Founded:</span>
+                                        <strong class="text-title">2020</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="list_social p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Link Social</h5>
+                                <ul class="list flex flex-col gap-3 mt-5">
+                                    <li class="w-full">
+                                        <a href="https://www.facebook.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-facebook text-lg"></span>
+                                            <span>Facebook</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.linkedin.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-linkedin text-lg"></span>
+                                            <span>Linkedin</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.twitter.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-twitter text-lg"></span>
+                                            <span>Twitter</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.instagram.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-instagram text-lg"></span>
+                                            <span>Instagram</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.pinterest.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-pinterest text-lg"></span>
+                                            <span>Pinterest</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.youtube.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-youtube text-lg"></span>
+                                            <span>Youtube</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="right lg:w-[70.5%] lg:pl-7.5">
+                            <div class="about p-8 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">About me</h5>
+                                <div class="desc mt-3">
+                                    <p class="body2 text-secondary">Seeking a talented User Experience Designer to join our dynamic team at Deloitte's Green Dot Agency. Are you passionate about creating intuitive digital experiences that resonate with users? Are you a strategic thinker who thrives on crafting compelling campaigns across multiple platforms?</p>
+                                    <p class="body2 text-secondary mt-3">As a Lead User Experience Designer, you will collaborate closely with our Creative Directors and Associate Creative Directors to conceptualize and execute innovative campaigns and digital experiences. You'll play a key role in making strategic UX decisions and creating wireframes that guide the user journey.</p>
+                                </div>
+                            </div>
+                            <div class="gallery p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Gallery</h5>
+                                <div class="images overflow-hidden w-full mt-5">
+                                    <div class="swiper swiper-thumb-images section-swiper-navigation rounded-xl">
+                                        <button class="custom-button-prev -border lg:left-6 left-4">
+                                            <span class="ph-bold ph-arrow-left text-xl"></span>
+                                        </button>
+                                        <div class="swiper-wrapper">
+                                            <div class="swiper-slide">
+                                                <img src="{% static 'assets/images/company/gallery1.webp' %}" alt="company/gallery1" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <img src="{% static 'assets/images/company/gallery2.webp' %}" alt="company/gallery2" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <img src="{% static 'assets/images/company/gallery3.webp' %}" alt="company/gallery3" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <img src="{% static 'assets/images/company/gallery4.webp' %}" alt="company/gallery4" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <img src="{% static 'assets/images/company/gallery5.webp' %}" alt="company/gallery5" class="w-full h-full object-cover" />
+                                            </div>
+                                        </div>
+                                        <button class="custom-button-next -border lg:right-6 right-4">
+                                            <span class="ph-bold ph-arrow-right text-xl"></span>
+                                        </button>
+                                    </div>
+                                    <div class="swiper swiper-list-images mt-4">
+                                        <div class="swiper-wrapper">
+                                            <div class="swiper-slide overflow-hidden rounded-lg">
+                                                <img src="{% static 'assets/images/company/gallery1.webp' %}" alt="company/gallery1" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide overflow-hidden rounded-lg">
+                                                <img src="{% static 'assets/images/company/gallery2.webp' %}" alt="company/gallery2" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide overflow-hidden rounded-lg">
+                                                <img src="{% static 'assets/images/company/gallery3.webp' %}" alt="company/gallery3" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide overflow-hidden rounded-lg">
+                                                <img src="{% static 'assets/images/company/gallery4.webp' %}" alt="company/gallery4" class="w-full h-full object-cover" />
+                                            </div>
+                                            <div class="swiper-slide overflow-hidden rounded-lg">
+                                                <img src="{% static 'assets/images/company/gallery5.webp' %}" alt="company/gallery5" class="w-full h-full object-cover" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="jobs w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Jobs Openning</h5>
+                                <ul class="list_related flex flex-col md:gap-7.5 gap-6 w-full mt-5">
+                                    <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                            <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                <img src="{% static 'assets/images/company/2.png' %}" alt="company/2" class="jobs_avatar w-full h-full object-cover" />
+                                            </a>
+                                            <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                                                <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
+                                                    <strong class="jobs_name text-title -style-1">Digital Marketing</strong>
+                                                    <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                        <div class="jobs_address -style-1 text-secondary">
+                                                            <span class="ph ph-map-pin text-lg"></span>
+                                                            <span class="address caption1 align-top">Nevada, USA</span>
+                                                        </div>
+                                                        <div class="jobs_date text-secondary">
+                                                            <span class="ph ph-calendar-blank text-lg"></span>
+                                                            <span class="date caption1 align-top">2 days ago</span>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <button class="add_wishlist_btn -relative -border">
+                                                    <span class="ph ph-heart text-xl"></span>
+                                                    <span class="ph-fill ph-heart text-xl"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                            <div class="flex flex-wrap items-center gap-2.5">
+                                                <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
+                                                <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                            </div>
+                                            <div class="jobs_price">
+                                                <span class="price text-title">$10 - $15</span>
+                                                <span class="text-secondary">/hour</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                        <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                            <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                                <img src="{% static 'assets/images/company/9.png' %}" alt="company/9" class="jobs_avatar w-full h-full object-cover" />
+                                            </a>
+                                            <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                                                <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                                    <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                                    <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
+                                                    <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                        <div class="jobs_address -style-1 text-secondary">
+                                                            <span class="ph ph-map-pin text-lg"></span>
+                                                            <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                        </div>
+                                                        <div class="jobs_date text-secondary">
+                                                            <span class="ph ph-calendar-blank text-lg"></span>
+                                                            <span class="date caption1 align-top">2 days ago</span>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <button class="add_wishlist_btn -relative -border">
+                                                    <span class="ph ph-heart text-xl"></span>
+                                                    <span class="ph-fill ph-heart text-xl"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                            <div class="flex flex-wrap items-center gap-2.5">
+                                                <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Part-Time</a>
+                                                <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Web Design</a>
+                                            </div>
+                                            <div class="jobs_price">
+                                                <span class="price text-title">$100 - $120</span>
+                                                <span class="text-secondary">/hour</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="projects w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Projects Openning</h5>
+                                <ul class="list_project grid grid-cols-1 sm:gap-7.5 gap-5 mt-5">
+                                    <li class="project_item py-5 px-6 rounded-lg bg-white duration-300 shadow-md">
+                                        <div class="project_innner flex max-sm:flex-col items-center justify-between xl:gap-9 gap-6 h-full">
+                                            <div class="project_info">
+                                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                                    <a href="employers-detail1.html" class="avatar overflow-hidden flex-shrink-0 w-15 h-15">
+                                                        <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="jobs_avatar w-full h-full object-cover" />
+                                                    </a>
+                                                    <div>
+                                                        <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Rockstar Games New York</a>
+                                                        <div class="project_related_info flex flex-wrap items-center gap-3 mt-1">
+                                                            <div class="project_date flex items-center gap-1">
+                                                                <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                                <span class="caption1 text-secondary">2 days ago</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                                <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                            </div>
+                                                            <div class="project_spent flex items-center gap-1">
+                                                                <span class="caption1 text-secondary">$</span>
+                                                                <span class="caption1 text-secondary">2.8K</span>
+                                                                <span class="caption1 text-secondary">spent</span>
+                                                            </div>
+                                                            <div class="project_rate flex items-center gap-1">
+                                                                <span class="rate caption1 text-secondary">4.8</span>
+                                                                <span class="ph-fill ph-star text-yellow -mt-0.5"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Website Design for an Online Tutoring Website</a>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <div class="line flex-shrink-0 w-px h-full bg-line max-sm:hidden"></div>
+                                            <div class="project_more_info flex flex-shrink-0 max-sm:flex-wrap sm:flex-col sm:items-end items-start sm:gap-7 gap-4 max-sm:w-full sm:h-full">
+                                                <button class="add_wishlist_btn -relative -border max-sm:order-1">
+                                                    <span class="ph ph-heart text-xl"></span>
+                                                    <span class="ph-fill ph-heart text-xl"></span>
+                                                </button>
+                                                <div class="max-sm:w-full max-sm:order-[-1]">
+                                                    <div class="project_price sm:text-end mt-1">
+                                                        <span class="price text-title">$170</span>
+                                                        <span class="text-secondary">/fixed-price</span>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="button-main -border h-fit">See more</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="project_item py-5 px-6 rounded-lg bg-white duration-300 shadow-md">
+                                        <div class="project_innner flex max-sm:flex-col items-center justify-between xl:gap-9 gap-6 h-full">
+                                            <div class="project_info">
+                                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                                    <a href="employers-detail1.html" class="avatar overflow-hidden flex-shrink-0 w-15 h-15">
+                                                        <img src="{% static 'assets/images/company/2.png' %}" alt="company/2" class="jobs_avatar w-full h-full object-cover" />
+                                                    </a>
+                                                    <div>
+                                                        <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Rockstar Games New York</a>
+                                                        <div class="project_related_info flex flex-wrap items-center gap-3 mt-1">
+                                                            <div class="project_date flex items-center gap-1">
+                                                                <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                                <span class="caption1 text-secondary">2 days ago</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                                <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                            </div>
+                                                            <div class="project_spent flex items-center gap-1">
+                                                                <span class="caption1 text-secondary">$</span>
+                                                                <span class="caption1 text-secondary">2.8K</span>
+                                                                <span class="caption1 text-secondary">spent</span>
+                                                            </div>
+                                                            <div class="project_rate flex items-center gap-1">
+                                                                <span class="rate caption1 text-secondary">4.8</span>
+                                                                <span class="ph-fill ph-star text-yellow -mt-0.5"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Website Design for an Online Tutoring Website</a>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <div class="line flex-shrink-0 w-px h-full bg-line max-sm:hidden"></div>
+                                            <div class="project_more_info flex flex-shrink-0 max-sm:flex-wrap sm:flex-col sm:items-end items-start sm:gap-7 gap-4 max-sm:w-full sm:h-full">
+                                                <button class="add_wishlist_btn -relative -border max-sm:order-1">
+                                                    <span class="ph ph-heart text-xl"></span>
+                                                    <span class="ph-fill ph-heart text-xl"></span>
+                                                </button>
+                                                <div class="max-sm:w-full max-sm:order-[-1]">
+                                                    <div class="project_price sm:text-end mt-1">
+                                                        <span class="price text-title">$170</span>
+                                                        <span class="text-secondary">/fixed-price</span>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="button-main -border h-fit">See more</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="project_item py-5 px-6 rounded-lg bg-white duration-300 shadow-md">
+                                        <div class="project_innner flex max-sm:flex-col items-center justify-between xl:gap-9 gap-6 h-full">
+                                            <div class="project_info">
+                                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                                    <a href="employers-detail1.html" class="avatar overflow-hidden flex-shrink-0 w-15 h-15">
+                                                        <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="jobs_avatar w-full h-full object-cover" />
+                                                    </a>
+                                                    <div>
+                                                        <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Rockstar Games New York</a>
+                                                        <div class="project_related_info flex flex-wrap items-center gap-3 mt-1">
+                                                            <div class="project_date flex items-center gap-1">
+                                                                <span class="ph ph-calendar-blank text-xl text-secondary"></span>
+                                                                <span class="caption1 text-secondary">2 days ago</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                                                <span class="project_address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                                            </div>
+                                                            <div class="project_spent flex items-center gap-1">
+                                                                <span class="caption1 text-secondary">$</span>
+                                                                <span class="caption1 text-secondary">2.8K</span>
+                                                                <span class="caption1 text-secondary">spent</span>
+                                                            </div>
+                                                            <div class="project_rate flex items-center gap-1">
+                                                                <span class="rate caption1 text-secondary">4.8</span>
+                                                                <span class="ph-fill ph-star text-yellow -mt-0.5"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="project_name heading6 duration-300 hover:underline">Website Design for an Online Tutoring Website</a>
+                                                <p class="project_desc mt-3 text-secondary">I am looking for a talented UX/UI Designer to create screens for my basic product idea. The project involves designing a web application, you may be missing out on some big opportunities.</p>
+                                                <div class="list_tag flex items-center gap-2.5 flex-wrap mt-3">
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Graphic Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Website Design</a>
+                                                    <a href="project-default.html" class="project_tag tag bg-surface caption1 hover:text-white hover:bg-primary">Figma</a>
+                                                </div>
+                                            </div>
+                                            <div class="line flex-shrink-0 w-px h-full bg-line max-sm:hidden"></div>
+                                            <div class="project_more_info flex flex-shrink-0 max-sm:flex-wrap sm:flex-col sm:items-end items-start sm:gap-7 gap-4 max-sm:w-full sm:h-full">
+                                                <button class="add_wishlist_btn -relative -border max-sm:order-1">
+                                                    <span class="ph ph-heart text-xl"></span>
+                                                    <span class="ph-fill ph-heart text-xl"></span>
+                                                </button>
+                                                <div class="max-sm:w-full max-sm:order-[-1]">
+                                                    <div class="project_price sm:text-end mt-1">
+                                                        <span class="price text-title">$170</span>
+                                                        <span class="text-secondary">/fixed-price</span>
+                                                    </div>
+                                                </div>
+                                                <a href="project-detail1.html" class="button-main -border h-fit">See more</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[2] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+
+{% endblock %}

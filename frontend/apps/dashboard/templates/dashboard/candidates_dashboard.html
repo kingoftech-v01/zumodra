@@ -1,0 +1,452 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="content_dashboard scrollbar_custom max-h-full w-full h-fit bg-surface">
+                <div class="container h-full lg:py-15 sm:py-12 py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">Dashboard</h4>
+                    <ul class="list_counter grid 2xl:grid-cols-4 grid-cols-2 sm:gap-7.5 gap-5 mt-7.5 w-full">
+                        <li class="counter_item applied_job flex items-center justify-between sm:gap-4 gap-3 sm:p-6 p-5 rounded-lg bg-white">
+                            <div class="counter_content">
+                                <span class="text-secondary">Applied Jobs</span>
+                                <h4 class="number heading4 mt-1">5672</h4>
+                            </div>
+                            <div class="counter_icon flex flex-shrink-0 items-center justify-center sm:w-[72px] w-12 sm:h-[72px] h-12 rounded-full bg-gradient">
+                                <span class="ph-fill ph-briefcase sm:text-3xl text-2xl text-white"></span>
+                            </div>
+                        </li>
+                        <li class="counter_item services_offered flex items-center justify-between sm:gap-4 gap-3 sm:p-6 p-5 rounded-lg bg-white">
+                            <div class="counter_content">
+                                <span class="text-secondary">Services Offered</span>
+                                <h4 class="number heading4 mt-1">4212</h4>
+                            </div>
+                            <div class="counter_icon flex flex-shrink-0 items-center justify-center sm:w-[72px] w-12 sm:h-[72px] h-12 rounded-full bg-gradient">
+                                <span class="ph-fill ph-notepad sm:text-3xl text-2xl text-white"></span>
+                            </div>
+                        </li>
+                        <li class="counter_item views_profile flex items-center justify-between sm:gap-4 gap-3 sm:p-6 p-5 rounded-lg bg-white">
+                            <div class="counter_content">
+                                <span class="text-secondary">Views Profile</span>
+                                <h4 class="number heading4 mt-1">5342</h4>
+                            </div>
+                            <div class="counter_icon flex flex-shrink-0 items-center justify-center sm:w-[72px] w-12 sm:h-[72px] h-12 rounded-full bg-gradient">
+                                <span class="ph-fill ph-eye sm:text-3xl text-2xl text-white"></span>
+                            </div>
+                        </li>
+                        <li class="counter_item total_reviews flex items-center justify-between sm:gap-4 gap-3 sm:p-6 p-5 rounded-lg bg-white">
+                            <div class="counter_content">
+                                <span class="text-secondary">Total Reviews</span>
+                                <h4 class="number heading4 mt-1">4214</h4>
+                            </div>
+                            <div class="counter_icon flex flex-shrink-0 items-center justify-center sm:w-[72px] w-12 sm:h-[72px] h-12 rounded-full bg-gradient">
+                                <span class="ph-fill ph-thumbs-up sm:text-3xl text-2xl text-white"></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="chart_overview flex max-xl:flex-col gap-7.5 mt-7.5">
+                        <div class="w-full h-full rounded-lg bg-white">
+                            <div class="flex flex-wrap justify-between gap-6 p-6">
+                                <h5 class="heading5">Page Views</h5>
+                                <div class="menu_time flex flex-wrap gap-7.5">
+                                    <button id="one_week" class="button_time line-before line-black line-2px text-button text-secondary">Week</button>
+                                    <button id="one_month" class="button_time line-before line-black line-2px text-button text-secondary">Month</button>
+                                    <button id="one_year" class="button_time line-before line-black line-2px text-button text-secondary active">Year</button>
+                                </div>
+                            </div>
+                            <div class="chart md:px-6 pb-6">
+                                <div id="chart-timeline"></div>
+                            </div>
+                        </div>
+                        <div class="notification overflow-hidden flex-shrink-0 flex-grow xl:w-[300px] h-full rounded-lg bg-white py-6">
+                            <h5 class="heading5 px-6">Notifications</h5>
+                            <ul class="list_notification scrollbar_custom max-h-[420px] flex flex-col gap-2.5 px-6 mt-5">
+                                <li class="item flex gap-2">
+                                    <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                                        <span class="ph-fill ph-bell text-lg"></span>
+                                    </span>
+                                    <div class="content flex flex-col gap-2">
+                                        <p class="title text-secondary">The application is rejected on your job <a href="jobs-detail1.html" class="text-black hover:underline">UI Designer</a> by <a href="employers-detail1.html" class="text-black hover:underline">Employer</a>.</p>
+                                        <span class="date caption1 text-secondary">25 mins ago</span>
+                                    </div>
+                                </li>
+                                <li class="item flex gap-2">
+                                    <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                                        <span class="ph-fill ph-bell text-lg"></span>
+                                    </span>
+                                    <div class="content flex flex-col gap-2">
+                                        <p class="title text-secondary">The application is rejected on your job <a href="jobs-detail1.html" class="text-black hover:underline">Internet Security</a> by <a href="employers-detail1.html" class="text-black hover:underline">Employer</a>.</p>
+                                        <span class="date caption1 text-secondary">1 hours ago</span>
+                                    </div>
+                                </li>
+                                <li class="item flex gap-2">
+                                    <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                                        <span class="ph-fill ph-bell text-lg"></span>
+                                    </span>
+                                    <div class="content flex flex-col gap-2">
+                                        <p class="title text-secondary">The application is rejected on your job <a href="jobs-detail1.html" class="text-black hover:underline">Social Media Marketing</a> by <a href="employers-detail1.html" class="text-black hover:underline">Employer</a>.</p>
+                                        <span class="date caption1 text-secondary">5 hours ago</span>
+                                    </div>
+                                </li>
+                                <li class="item flex gap-2">
+                                    <span class="icon flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-surface text-secondary">
+                                        <span class="ph-fill ph-bell text-lg"></span>
+                                    </span>
+                                    <div class="content flex flex-col gap-2">
+                                        <p class="title text-secondary">The application is rejected on your job <a href="jobs-detail1.html" class="text-black hover:underline">UI Designer</a> by <a href="employers-detail1.html" class="text-black hover:underline">Employer</a>.</p>
+                                        <span class="date caption1 text-secondary">8 hours ago</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="active_work p-6 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Active Work</h5>
+                        <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                            <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">title</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Type</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Pricing</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Due in</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="jobs-detail1.html" class="title heading6 duration-300 hover:underline">Full Stack Developer</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">PrimeEdge Solutions</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5">Job</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">Doing</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_job">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Work</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                                    <span class="ph ph-chats text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_submit flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_apply">
+                                                    <span class="ph ph-file-arrow-up text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Submit Work</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="jobs-detail1.html" class="title heading6 duration-300 hover:underline">Senior DevOps Engineer</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/2.png' %}" alt="company/2" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">Bright Future</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5">Job</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">submitted</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_job">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Work</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                                    <span class="ph ph-chats text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_submit flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_apply">
+                                                    <span class="ph ph-file-arrow-up text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Submit Work</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="jobs-detail1.html" class="title heading6 duration-300 hover:underline">Social Media Marketing</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">GlobalTech Partners</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5">Job</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">Approved</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_job">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Work</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                                    <span class="ph ph-chats text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_submit flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_apply">
+                                                    <span class="ph ph-file-arrow-up text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Submit Work</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="recent_service_orders p-6 mt-7.5 rounded-lg bg-white">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <h5 class="heading5">Recent service orders</h5>
+                            <a href="#!" class="text-button underline duration-300 hover:text-primary">View orders</a>
+                        </div>
+                        <div class="list overflow-x-auto w-full p-5 rounded-xl">
+                            <table class="w-full max-[1400px]:w-[1200px] max-md:w-[1000px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">title</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date Orders</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Pricing</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="services-detail1.html" class="title heading6 duration-300 hover:underline">UI/UX Sales Page Design for Natural Skincare Brand</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/1.png' %}" alt="company/1" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">PrimeEdge Solutions</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">hired</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_buyer">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Buyer</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_confirm flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_confirm">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Confirm</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_cancel flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_cancel">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Cancel</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="services-detail1.html" class="title heading6 duration-300 hover:underline">High-quality video editing for your marketing campaign</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/2.png' %}" alt="company/2" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">Bright Future</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">pending</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_buyer">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Buyer</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_confirm flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_confirm">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Confirm</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_cancel flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_cancel">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Cancel</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="services-detail1.html" class="title heading6 duration-300 hover:underline">Professional voiceover services for your videos</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">GlobalTech Partners</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-red text-red text-button">cancelled</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_buyer">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Buyer</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_confirm flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_confirm">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Confirm</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_cancel flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_cancel">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Cancel</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left">
+                                            <div class="info">
+                                                <a href="services-detail1.html" class="title heading6 duration-300 hover:underline">UI/UX Sales Page Design for Natural Skincare Brand</a>
+                                                <div class="flex flex-wrap items-center gap-4 mt-2">
+                                                    <a href="employers-detail1.html" class="employers flex items-center gap-2 text-secondary duration-300 hover:text-primary">
+                                                        <img src="{% static 'assets/images/company/4.png' %}" alt="company/4" class="flex-shrink-0 w-5 h-5" />
+                                                        <span class="employers_name font-normal">Apex Innovations</span>
+                                                    </a>
+                                                    <div class="line flex-shrink-0 w-px h-4 bg-line"></div>
+                                                    <div class="address flex items-center gap-2 text-secondary">
+                                                        <span class="ph ph-map-pin text-xl"></span>
+                                                        <span class="employers_address font-normal">Las Vegas, USA</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td class="p-5 whitespace-nowrap">Mar 12, 2024</td>
+                                        <td class="p-5">$410</td>
+                                        <td class="p-5">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">completed</span>
+                                        </td>
+                                        <td class="p-5">
+                                            <div class="flex justify-end gap-2">
+                                                <button class="btn_action btn_open_popup btn_view flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_view_buyer">
+                                                    <span class="ph ph-eye text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">View Buyer</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_confirm flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_confirm">
+                                                    <span class="ph ph-check text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Confirm</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_cancel flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_cancel">
+                                                    <span class="ph ph-x text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Cancel</span>
+                                                </button>
+                                                <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                    <span class="ph ph-trash text-xl"></span>
+                                                    <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_job_dashboard.html' %}
+    {% include 'dashboard/includes/modals/_modal_chat_dashboard.html' %}
+    {% include 'dashboard/includes/modals/_modal_apply_dashboard.html' %}
+    {% include 'dashboard/includes/modals/_modal_view_buyer_dashboard.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_dashboard.html' %}
+{% endblock %}

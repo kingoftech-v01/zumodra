@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Payment Terms</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub processes all payments through a secure escrow system to protect both freelancers and clients. When a client funds a milestone, payment is held securely until the work is completed and approved. This system ensures freelancers receive compensation for completed work while giving clients confidence that funds are only released when deliverables meet agreed specifications.</p>
+                            <p class="body2 text-secondary">All transactions on the platform are processed through our certified payment processors in compliance with PCI-DSS standards. We support major credit cards, debit cards, and various online payment methods. Payments are denominated in USD, EUR, GBP, and other major currencies, with automatic conversion available at current exchange rates.</p>
+                            <p class="body2 text-secondary">FreelanHub charges a service fee for facilitating transactions on the platform. The fee structure is transparent and calculated as a percentage of the project value. Fees are clearly displayed before transaction confirmation and are automatically deducted from payments. Both freelancers and clients may incur fees depending on the transaction type.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Platform fees and payment limitations ensure fair, transparent transactions while covering operational costs. The following fee structure and limitations apply:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Service fees range from 5-20% depending on user tier, project value, and account status. New users typically pay higher fees, which decrease with increased platform activity and positive ratings.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Withdrawal limits apply based on account verification level. Verified accounts can withdraw up to $50,000 per month, while unverified accounts have lower limits. Processing times vary by payment method.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Currency conversion fees may apply when transacting in currencies different from your account's primary currency. Exchange rates are updated regularly and displayed before transaction confirmation.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Minimum and maximum transaction amounts may apply depending on payment method and region. Payment processors may also impose their own fees for certain transaction types, including international transfers and credit card processing.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub reserves the right to modify payment terms, fee structures, and processing policies to reflect operational costs, regulatory requirements, or market conditions. We will provide at least 30 days' advance notice for any fee increases or material changes to payment processing procedures.</p>
+                            <p class="body2 text-secondary">Changes to payment terms will be communicated through email notifications and prominent platform announcements. The updated fee structure will be clearly displayed on your account dashboard and during transaction flows. For ongoing projects, fee changes typically apply to new milestones funded after the effective date.</p>
+                            <p class="body2 text-secondary">Users who do not accept revised payment terms may complete existing projects under the previous terms but may need to discontinue use of the platform for future transactions. Historical transaction records and fee disclosures remain accessible in your account for reference and tax reporting purposes.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">For situations involving payment disputes, cancellations, or quality concerns, please refer to our Refund Policy for detailed procedures. The following points clarify how refunds and chargebacks are handled:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Refund requests must follow the dispute resolution process. Funds held in escrow may be refunded if deliverables are not provided or do not meet agreed specifications, subject to review and evidence.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Chargebacks initiated through your payment provider may result in account suspension pending investigation. Repeated chargebacks may lead to permanent account termination and reporting to fraud prevention services.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Platform service fees are generally non-refundable even when project payments are refunded, as they cover transaction processing and platform infrastructure costs already incurred.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">We encourage users to utilize the dispute resolution system rather than initiating chargebacks, as this provides both parties opportunity to present evidence and reach fair outcomes. Chargeback abuse violates our Terms of Use and may result in legal action.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">While FreelanHub implements robust security measures to protect financial transactions, users should be aware of payment-related risks. Our escrow system significantly reduces payment fraud risk, but users must still exercise caution. Never share payment credentials, and always verify project details before funding milestones.</p>
+                            <p class="body2 text-secondary">Fraud prevention measures include transaction monitoring, identity verification, and behavioral analysis. Suspicious activity may result in payment delays or account holds while we investigate. We may request additional documentation to verify account ownership or transaction legitimacy. These measures protect all users but may occasionally cause inconvenience.</p>
+                            <p class="body2 text-secondary">Users are responsible for understanding tax obligations related to platform earnings. FreelanHub may be required to report transaction information to tax authorities in certain jurisdictions. We provide transaction history and reporting tools, but users should consult tax professionals for guidance on their specific situations. For detailed information about payment security, see our Privacy Policy and Security documentation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

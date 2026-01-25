@@ -1,0 +1,250 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_service scrollbar_custom w-full bg-surface">
+                <form class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">Add services</h4>
+                        <button class="button-main">Save & Publish</button>
+                    </div>
+                    <div class="infomation p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Infomation</h5>
+                        <div class="form grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="upload_image col-span-full">
+                                <label for="uploadImage">Upload Preview: <span class="text-red">*</span></label>
+                                <div class="flex flex-wrap items-center gap-5 mt-3">
+                                    <div class="bg_img flex-shrink-0 relative w-[10rem] h-[7.5rem] rounded-lg overflow-hidden border border-dashed border-line bg-surface">
+                                        <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
+                                        <img src="#" alt="preview img" class="upload_img relative z-[1] w-full h-full object-cover hidden" />
+                                    </div>
+                                    <div>
+                                        <strong class="text-button">Upload a cover services:</strong>
+                                        <p class="caption1 text-secondary mt-1">JPG 320x240px</p>
+                                        <div class="upload_file flex items-center gap-3 w-[220px] mt-3 px-3 py-2 border border-line rounded">
+                                            <label for="uploadImage" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                            <input type="file" name="uploadImage" id="uploadImage" accept="image/*" class="caption2 cursor-pointer" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="title">
+                                <label for="title">Title: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="title" type="text" placeholder="Title..." required />
+                            </div>
+                            <div class="price">
+                                <label for="price">Price: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="price" type="text" placeholder="Price..." />
+                            </div>
+                            <div class="response_time">
+                                <label>Response time: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="3 Hours">3 Hours</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="1 Hour">1 Hour</li>
+                                            <li class="capitalize" data-item="2 Hours">2 Hours</li>
+                                            <li class="capitalize" data-item="3 Hours">3 Hours</li>
+                                            <li class="capitalize" data-item="4 Hours">4 Hours</li>
+                                            <li class="capitalize" data-item="5 Hours">5 Hours</li>
+                                            <li class="capitalize" data-item="6 Hours">6 Hours</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="delivery_time">
+                                <label>Delivery time: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="12 Hours">12 Hours</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="12 Hours">12 Hours</li>
+                                            <li class="capitalize" data-item="24 Hours">24 Hours</li>
+                                            <li class="capitalize" data-item="36 Hours">36 Hours</li>
+                                            <li class="capitalize" data-item="48 Hours">48 Hours</li>
+                                            <li class="capitalize" data-item="60 Hours">60 Hours</li>
+                                            <li class="capitalize" data-item="72 Hours">72 Hours</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="categories">
+                                <label>Categories: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="categoryInput w-full min-h-8" type="text" placeholder="Type to search categories..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="tools">
+                                <label>Tools: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="toolsInput w-full min-h-8" type="text" placeholder="Type to search tools..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="language col-span-full">
+                                <label>Language: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="languageInput w-full min-h-8" type="text" placeholder="Type to search language..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="country">
+                                <label>Country: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="United States">United States</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="United States">United States</li>
+                                            <li class="capitalize" data-item="United Kingdom">United Kingdom</li>
+                                            <li class="capitalize" data-item="Germany">Germany</li>
+                                            <li class="capitalize" data-item="Japan">Japan</li>
+                                            <li class="capitalize" data-item="South Korea">South Korea</li>
+                                            <li class="capitalize" data-item="China">China</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="province">
+                                <label>Province/State: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="New York">New York</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="New York">New York</li>
+                                            <li class="capitalize" data-item="London">London</li>
+                                            <li class="capitalize" data-item="Berlin">Berlin</li>
+                                            <li class="capitalize" data-item="Tokyo">Tokyo</li>
+                                            <li class="capitalize" data-item="Seoul">Seoul</li>
+                                            <li class="capitalize" data-item="Beijing">Beijing</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="desc col-span-full">
+                                <label>Decscription: <span class="text-red">*</span></label>
+                                <div class="form_editor mt-2">
+                                    <div id="editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upload_portfolio p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Upload Portfolio</h5>
+                        <div class="multiple-image-section mt-5">
+                            <div class="image-previews flex flex-wrap gap-5">
+                                <label for="multipleImages" class="flex flex-col items-center justify-center gap-2 sm:w-[248px] w-[116px] sm:h-[186px] h-[102px] rounded-lg bg-surface cursor-pointer">
+                                    <span class="ph ph-image sm:text-5xl text-3xl text-secondary"></span>
+                                    <span class="text-button text-secondary text-center">Upload file</span>
+                                    <input type="file" id="multipleImages" name="files[]" accept="image/*" hidden multiple />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="choose_plan p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Add Extra Options</h5>
+                        <div class="list_plan overflow-x-auto w-full xl:pr-4 pt-5">
+                            <table class="w-full max-xl:w-[950px] max-sm:w-[680px]">
+                                <tr class="item duration-300 hover:bg-background">
+                                    <th scope="row" class="p-5 text-left">
+                                        <div class="flex items-center gap-5">
+                                            <input type="radio" name="addons" id="addons1" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                            <label for="addons1" class="flex flex-col gap-1 cursor-pointer">
+                                                <strong class="heading6">Addons 1</strong>
+                                                <span>Are you a User Experience Designer with a track record of delivering intuitive digital experiences that drive results?</span>
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <td class="p-5 whitespace-nowrap text-title">$380</td>
+                                    <td class="p-5">
+                                        <div class="flex justify-end gap-2">
+                                            <button class="btn_action btn_open_popup btn_edit_addons flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_addons">
+                                                <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Addons</span>
+                                            </button>
+                                            <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                <span class="ph ph-x text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Addons</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="item duration-300 hover:bg-background">
+                                    <th scope="row" class="p-5 text-left">
+                                        <div class="flex items-center gap-5">
+                                            <input type="radio" name="addons" id="addons2" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                            <label for="addons2" class="flex flex-col gap-1 cursor-pointer">
+                                                <strong class="heading6">Addons 2</strong>
+                                                <span>Are you a User Experience Designer with a track record of delivering intuitive digital experiences that drive results?</span>
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <td class="p-5 whitespace-nowrap text-title">$290</td>
+                                    <td class="p-5">
+                                        <div class="flex justify-end gap-2">
+                                            <button class="btn_action btn_open_popup btn_edit_addons flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_addons">
+                                                <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Addons</span>
+                                            </button>
+                                            <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                <span class="ph ph-x text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Addons</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="item duration-300 hover:bg-background">
+                                    <th scope="row" class="p-5 text-left">
+                                        <div class="flex items-center gap-5">
+                                            <input type="radio" name="addons" id="addons3" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                            <label for="addons3" class="flex flex-col gap-1 cursor-pointer">
+                                                <strong class="heading6">Addons 3</strong>
+                                                <span>Are you a User Experience Designer with a track record of delivering intuitive digital experiences that drive results?</span>
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <td class="p-5 whitespace-nowrap text-title">$320</td>
+                                    <td class="p-5">
+                                        <div class="flex justify-end gap-2">
+                                            <button class="btn_action btn_open_popup btn_edit_addons flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_edit_addons">
+                                                <span class="ph ph-pencil-simple-line text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Edit Addons</span>
+                                            </button>
+                                            <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                                <span class="ph ph-x text-xl"></span>
+                                                <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Addons</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <button class="btn_open_popup button-main -border gap-2.5 mt-5" data-type="modal_add_addons">
+                            <span class="ph ph-plus-circle text-2xl"></span>
+                            <strong class="text-button">Add Another Addons</strong>
+                        </button>
+                    </div>
+                </form>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_add_addons_add_service.html' %}
+    {% include 'dashboard/includes/modals/_modal_edit_addons_add_service.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_add_service.html' %}
+{% endblock %}

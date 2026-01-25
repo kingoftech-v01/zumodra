@@ -1,0 +1,87 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- map -->
+        <section class="map">
+            <div class="map_inner lg:h-[580px] h-[480px] sm:pt-20 pt-16">
+                <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d742.4556963440328!2d-87.62313632867398!3d41.896668148301984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fd35498b7bfaf%3A0xaf89aff7166aaa5f!2sOlympia%20Centre%20Condos!5e0!3m2!1svi!2s!4v1721272000241!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </section>
+
+        <!-- Contact Us -->
+        <section class="contact lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col lg:items-center justify-between gap-y-10">
+                <div class="content lg:w-5/12">
+                    <div class="heading">
+                        <h3 class="heading3">We’d love to help</h3>
+                        <p class="body2 text-secondary mt-3">We're here to assist you every step of the way. Let's make your goals a reality.</p>
+                    </div>
+                    <ul class="list grid xl:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6 sm:mt-8 mt-6">
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Address:</strong>
+                            <p class="desc body2 text-secondary">101 E 129th St, Chicago, IN 46312, US</p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Opentime:</strong>
+                            <p class="desc body2 text-secondary">
+                                Mon- Fri: 08:00 - 20:00<br />
+                                Sat- Sun: 10:00 - 18:00
+                            </p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Infomation:</strong>
+                            <p class="desc body2 text-secondary">hi.avitex@gmail.com</p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Our social media:</strong>
+                            <ul class="list flex flex-wrap items-center gap-2.5">
+                                <li>
+                                    <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-facebook text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-instagram text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-twitter text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-youtube text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.pinterest.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-pinterest text-black duration-300"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form_area flex-shrink-0 xl:w-[520px] lg:w-1/2 p-9 rounded-xl bg-white shadow-lg duration-300">
+                    <form class="form flex flex-col gap-5">
+                        <div class="name">
+                            <label for="username">Name</label>
+                            <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                        </div>
+                        <div class="mail">
+                            <label for="email">Email</label>
+                            <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                        </div>
+                        <div class="message">
+                            <label for="message">Message</label>
+                            <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Message content..." required></textarea>
+                        </div>
+                        <button class="button-main w-full text-center mt-1">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+{% endblock %}

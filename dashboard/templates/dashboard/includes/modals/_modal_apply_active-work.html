@@ -1,0 +1,29 @@
+{% load static %}
+
+
+            <!-- modal_apply -->
+            <div class="modal_item modal_apply overflow-hidden md:w-[660px] w-[90vw] rounded-xl bg-white" data-type="modal_apply">
+                <div class="flex items-center justify-between px-7.5 py-6 border-b border-line">
+                    <h5 class="heading5">Submit Work</h5>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl"></span>
+                    </button>
+                </div>
+                <form class="p-7.5">
+                    <div class="message">
+                        <label for="message" class="label caption1">Message to Innovation:<span class="text-red">*</span></label>
+                        <textarea id="message" name="message" class="w-full h-32 mt-2 px-4 py-3 border border-line rounded" placeholder="Message to Innovation" required></textarea>
+                    </div>
+                    <div class="file mt-5">
+                        <label for="file_attached" class="label caption1">Attach file: <span class="text-red">*</span></label>
+                        <div class="flex flex-wrap items-center gap-2 w-full mt-2">
+                            <div class="upload_file flex items-center gap-3 w-[220px] px-3 py-2 border border-line rounded">
+                                <label for="file_attached" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                <input type="file" name="file_attached" id="file_attached" class="caption2 cursor-pointer" />
+                            </div>
+                            <span class="caption2 text-secondary">Up to 200 MB</span>
+                        </div>
+                    </div>
+                    <button class="button-main w-full mt-5 text-center">Submit Work</button>
+                </form>
+            </div>

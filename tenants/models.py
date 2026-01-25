@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
 from django_tenants.models import TenantMixin, DomainMixin
 from django.conf import settings
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 
 
@@ -197,6 +197,30 @@ class Tenant(TenantMixin):
         blank=True
     )
     website = models.URLField(blank=True)
+
+    # Company Details for Public Job Catalog
+    rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))],
+        help_text=_('Company rating (1.00-5.00)')
+    )
+    established_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text=_('Date company was established/founded')
+    )
+
+    # Social Media Links
+    linkedin_url = models.URLField(blank=True, help_text=_('LinkedIn company page URL'))
+    twitter_url = models.URLField(blank=True, help_text=_('Twitter/X company profile URL'))
+    facebook_url = models.URLField(blank=True, help_text=_('Facebook company page URL'))
+    instagram_url = models.URLField(blank=True, help_text=_('Instagram company profile URL'))
+    pinterest_url = models.URLField(blank=True, help_text=_('Pinterest company profile URL'))
+
+    # Company Logo
     logo = models.ImageField(
         upload_to='tenant_logos/',
         blank=True,

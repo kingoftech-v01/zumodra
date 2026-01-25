@@ -1,0 +1,274 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+
+        <!-- Slider -->
+        <section class="slider">
+            <div class="slider_inner relative lg:h-[680px] md:h-[520px] h-[350px] sm:pt-20 pt-16 overflow-hidden">
+                <img src="{% static 'assets/images/blog/blog_detail.webp' %}" alt="blog/blog_detail" class="blog_img w-full h-full object-cover" />
+            </div>
+        </section>
+
+        <!-- Blog Detail -->
+        <section class="blog_detail lg:py-20 sm:py-14 py-10">
+            <div class="container flex justify-center">
+                <div class="blog_content lg:w-5/6 w-full">
+                    <ul class="list_tags flex flex-wrap gap-3 gap-y-4">
+                        <li>
+                            <a href="blog-default.html" class="tag -large block text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Website Design </a>
+                        </li>
+                        <li>
+                            <a href="blog-default.html" class="tag -large block text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> UX/UI </a>
+                        </li>
+                        <li>
+                            <a href="blog-default.html" class="tag -large block text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> Animation </a>
+                        </li>
+                    </ul>
+                    <h2 class="heading2 title mt-4">Designing for Mobile First: Strategies for Crafting Mobile-Optimized Experiences</h2>
+                    <div class="flex flex-wrap items-center justify-between gap-8 gap-y-4 mt-4">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-3">
+                                <img src="{% static 'assets/images/avatar/IMG-10.webp' %}" alt="avatar/IMG-10" class="flex-shrink-0 w-12 h-12 rounded-full" />
+                                <span>
+                                    <span class="text-placehover">by </span>
+                                    <span class="blog_author">Shara Miller</span>
+                                </span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="date flex items-center gap-2">
+                                <span class="ph ph-calendar-blank text-xl"></span>
+                                <span class="blog_date caption1">February 28, 2024</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="comment flex items-center gap-2">
+                                <span class="ph ph-chats-circle text-2xl"></span>
+                                <span class="blog_comment">12</span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="view flex items-center gap-2">
+                                <span class="ph ph-eye text-2xl"></span>
+                                <span class="blog_view">260.2K</span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="view flex items-center gap-2">
+                                <span class="ph ph-clock text-2xl"></span>
+                                <span class="blog_min_read">5 Min Read</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="body2 md:mt-10 mt-7">In today's digital age, the importance of mobile optimization cannot be overstated. With an increasing number of users accessing the internet through smartphones and tablets, designing for mobile-first has become imperative for businesses looking to provide seamless user experiences.</p>
+                    <h4 class="heading4 md:mt-10 mt-7">Here are some key strategies:</h4>
+                    <ul class="flex flex-col gap-3 mt-4">
+                        <li class="flex body2">
+                            <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                            <p>Prioritize Content: When designing for mobile, prioritize content that is essential for users to accomplish their goals. Keep the layout clean and concise, focusing on delivering the most relevant information in a clear and accessible manner.</p>
+                        </li>
+                        <li class="flex body2">
+                            <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                            <p>Embrace Responsive Design: Responsive design allows websites to adapt seamlessly to different screen sizes and resolutions. By employing responsive design principles, you can ensure that your website looks and functions flawlessly across various devices, enhancing user satisfaction and engagement.</p>
+                        </li>
+                    </ul>
+                    <div class="qoute md:mt-10 mt-7 py-8 px-10 rounded-xl border-l-4 border-primary bg-surface">
+                        <h4 class="heading4">"Success is not final, failure is not fatal: It is the courage to continue that counts."</h4>
+                        <h6 class="flex items-center gap-2 mt-2 heading6 text-secondary">
+                            <span class="ph ph-minus"></span>
+                            <span>Winston Churchi</span>
+                        </h6>
+                    </div>
+                    <div class="images grid sm:grid-cols-2 gap-7.5 md:mt-10 mt-7">
+                        <img src="{% static 'assets/images/blog/1.webp' %}" alt="blog/1" class="rounded-xl" />
+                        <img src="{% static 'assets/images/blog/2.webp' %}" alt="blog/2" class="rounded-xl" />
+                    </div>
+                    <h4 class="heading4 md:mt-10 mt-7">Crafting Mobile-Optimized Experiences</h4>
+                    <p class="mt-4">By implementing these strategies and prioritizing mobile optimization in your design process, you can create mobile-optimized experiences that resonate with users, drive engagement, and ultimately contribute to the success of your business in the digital landscape. Remember, in today's mobile-centric world, unlocking success means crafting experiences that seamlessly adapt to the needs and preferences of mobile users.</p>
+                    <div class="action flex flex-wrap items-center justify-between gap-5 md:mt-10 mt-7">
+                        <div class="list_tags flex flex-wrap items-center gap-3">
+                            <span>Tag:</span>
+                            <ul class="list flex flex-wrap items-center gap-3">
+                                <li>
+                                    <a href="blog-default.html" class="tag -border -rounded-sm block caption1 hover:bg-primary hover:text-white"> Website Design </a>
+                                </li>
+                                <li>
+                                    <a href="blog-default.html" class="tag -border -rounded-sm block caption1 hover:bg-primary hover:text-white"> UX/UI </a>
+                                </li>
+                                <li>
+                                    <a href="blog-default.html" class="tag -border -rounded-sm block caption1 hover:bg-primary hover:text-white"> Animation </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="list_social flex items-center gap-3 flex-wrap">
+                            <span>Share:</span>
+                            <ul class="list flex flex-wrap items-center gap-3">
+                                <li>
+                                    <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-facebook duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-instagram duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-twitter duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-youtube duration-100"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="next-pre grid sm:grid-cols-2 xl:gap-60 gap-20 gap-y-7 relative md:mt-10 mt-7 py-5 border-y border-line">
+                        <a href="blog-detail1.html" class="left">
+                            <span class="text-sm font-bold text-secondary uppercase">Previous</span>
+                            <strong class="heading6 inline-block prev mt-2 duration-300 hover:text-primary">Designing for Delight: Elevating User Experience with Emotional Design</strong>
+                        </a>
+                        <a href="blog-detail1.html" class="right sm:text-right">
+                            <span class="text-sm font-bold text-secondary uppercase">Next</span>
+                            <strong class="heading6 inline-block next mt-2 duration-300 hover:text-primary">Leveraging Artificial Intelligence for Enhanced Experiences</strong>
+                        </a>
+                    </div>
+                    <div class="review lg:mt-20 sm:mt-14 mt-10">
+                        <div class="heading flex flex-wrap items-center justify-between gap-4">
+                            <h4 class="heading4">03 Comments</h4>
+                            <div class="flex items-center gap-2">
+                                <span>Sort By:</span>
+                                <div class="select_block sm:pr-8 pr-6 pl-3 py-1 border border-line rounded">
+                                    <div class="select">
+                                        <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                                        <ul class="list_option w-full p-0 bg-white">
+                                            <li class="capitalize" data-item="default">default</li>
+                                            <li class="capitalize" data-item="newest">newest</li>
+                                            <li class="capitalize" data-item="oldest">oldest</li>
+                                            <li class="capitalize" data-item="random">random</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list_review flex flex-col items-center md:mt-10 mt-7">
+                            <ul class="list flex flex-col md:gap-10 gap-7">
+                                <li class="review_item flex gap-5 md:pb-10 pb-7 border-b border-line">
+                                    <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">Jeremy L.</span>
+                                                    <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                </div>
+                                                <span class="date caption1 text-secondary">August 24, 2024</span>
+                                            </div>
+                                            <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                <span class="caption1">Was this helpful?</span>
+                                                <span class="ph ph-thumbs-up"></span>
+                                            </button>
+                                        </div>
+                                        <p class="desc mt-4">I really like the logo that Gihan created, and he was very responsive and great to work with. I would recommend him to anyone looking for a logo or graphic design!</p>
+                                    </div>
+                                </li>
+                                <li class="review_item flex gap-5 md:pb-10 pb-7">
+                                    <img src="{% static 'assets/images/avatar/IMG-11.webp' %}" alt="avatar/IMG-11" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">Alexander P.</span>
+                                                    <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                </div>
+                                                <span class="date caption1 text-secondary">August 13, 2024</span>
+                                            </div>
+                                            <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                <span class="caption1">Was this helpful?</span>
+                                                <span class="ph ph-thumbs-up"></span>
+                                            </button>
+                                        </div>
+                                        <p class="desc mt-4">I really like the logo that Gihan created, and he was very responsive and great to work with. I would recommend him to anyone looking for a logo or graphic design!</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            <button class="text-button underline duration-300 hover:text-primary">View more</button>
+                        </div>
+                        <div id="form-review" class="form-review md:pt-10 pt-7">
+                            <h6 class="heading6">Leave A comment</h6>
+                            <form class="form grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
+                                <div class="name">
+                                    <label for="username">Name</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                                </div>
+                                <div class="mail">
+                                    <label for="email">Email</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                                </div>
+                                <div class="col-span-full message">
+                                    <label for="message">Review</label>
+                                    <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Write comment " required></textarea>
+                                </div>
+                                <div class="col-span-full flex items-start gap-2">
+                                    <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
+                                    <label class="" for="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
+                                </div>
+                                <div class="col-span-full">
+                                    <button class="button-main">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Post -->
+        <section class="blog lg:pb-20 sm:pb-14 pb-10">
+            <div class="container">
+                <h3 class="heading3 text-center">Related Posts</h3>
+                <ul class="list_blog grid lg:grid-cols-3 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
+                    <li class="blog_item">
+                        <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                            <img src="{% static 'assets/images/blog/1.webp' %}" alt="1" class="blog_img w-full" />
+                        </a>
+                        <div class="blog_info flex items-center gap-2 mt-5">
+                            <span class="blog_date caption1">February 28, 2024</span>
+                            <div class="line w-px h-3 bg-line"></div>
+                            <a href="blog-default.html" class="caption1 duration-300 hover:text-primary">Freelancers</a>
+                        </div>
+                        <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">Boosting your freelancing game: AI tools for enhanced efficiency</a>
+                        <p class="blog_desc mt-2 text-secondary">AI tools have emerged as a powerful ally for freelancers across diverse fields.</p>
+                    </li>
+                    <li class="blog_item">
+                        <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                            <img src="{% static 'assets/images/blog/2.webp' %}" alt="2" class="blog_img w-full" />
+                        </a>
+                        <div class="blog_info flex items-center gap-2 mt-5">
+                            <span class="blog_date caption1">February 28, 2024</span>
+                            <div class="line w-px h-3 bg-line"></div>
+                            <a href="blog-default.html" class="caption1 duration-300 hover:text-primary">Developement</a>
+                        </div>
+                        <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">5 ways to enhance your business website in 2024</a>
+                        <p class="blog_desc mt-2 text-secondary">If it's been a while since your last website upgrade, you may be missing out on some big opportunities.</p>
+                    </li>
+                    <li class="blog_item max-lg:hidden">
+                        <a href="blog-detail1.html" class="blog_thumb block overflow-hidden rounded-xl">
+                            <img src="{% static 'assets/images/blog/3.webp' %}" alt="3" class="blog_img w-full" />
+                        </a>
+                        <div class="blog_info flex items-center gap-2 mt-5">
+                            <span class="blog_date caption1">February 28, 2024</span>
+                            <div class="line w-px h-3 bg-line"></div>
+                            <a href="blog-default.html" class="caption1 duration-300 hover:text-primary">Marketing</a>
+                        </div>
+                        <a href="blog-detail1.html" class="heading5 blog_title mt-3 hover:underline">How No-Code Solutions Let You Build Apps Without Coding Skills</a>
+                        <p class="blog_desc mt-2 text-secondary">In this blog article by our partner Appy Pie, we're exploring what no-code app development.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+
+{% endblock %}

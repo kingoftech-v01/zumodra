@@ -1,0 +1,342 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+
+        <!-- Slider -->
+        <section class="slider">
+            <div class="slider_inner relative sm:mt-20 mt-16 md:py-20 py-14">
+                <div class="slider_bg absolute top-0 left-0 w-full h-full">
+                    <img src="{% static 'assets/images/components/breadcrumb_project.webp' %}" alt="components/breadcrumb_project" class="w-full h-full object-cover" />
+                </div>
+                <div class="container relative h-full">
+                    <div class="slider_content flex flex-col items-start justify-center xl:w-[600px] lg:w-[848px] md:w-5/6 w-full h-full">
+                        <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 1">Unlock your access top talent</h3>
+                        <p class="desc body2 text-white mt-3 animate animate_top" style="--i: 2">Unlock Your Access to Top Talent and Elevate Your Projects with the Best Professionals.</p>
+                        <div class="mt-7.5 animate animate_top" style="--i: 3">
+                            <a href="register.html" class="button-main bg-white">Become A Seller</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Our Freelance community -->
+        <section class="join_us lg:py-20 sm:py-14 py-10">
+            <div class="container">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Join Our Freelance community</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Explore a wide range of services organized by category</p>
+                <ul class="list_jobs grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 sm:gap-7.5 gap-4 md:mt-10 mt-7">
+                    <li class="item animate animate_top" style="--i: 1">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/1.webp' %}" alt="blog/1" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Graphic Designer</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 2">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/2.webp' %}" alt="blog/2" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Media Marketer</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 3">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/3.webp' %}" alt="blog/3" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Voiceover Artist</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 4">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/4.webp' %}" alt="blog/4" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Musician</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 5">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/5.webp' %}" alt="blog/5" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Content Creater</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 6">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/6.webp' %}" alt="blog/6" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Content Writer</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 7">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/7.webp' %}" alt="blog/7" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Developer</strong>
+                        </div>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 8">
+                        <div>
+                            <div class="jobs_bg overflow-hidden rounded-lg aspect-square">
+                                <img src="{% static 'assets/images/blog/8.webp' %}" alt="blog/8" class="w-full h-full object-cover" />
+                            </div>
+                            <strong class="block mt-3 heading6">Video Editor</strong>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- How it work -->
+        <section class="process lg:py-20 sm:py-14 py-10 bg-surface">
+            <div class="container">
+                <h3 class="heading3 animate animate_top" style="--i: 1">How It Work</h3>
+                <p class="body2 text-secondary mt-3 animate animate_top" style="--i: 2">Recruitment made easy in 100 seconds</p>
+                <ul class="list grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-7.5 md:mt-10 mt-7">
+                    <li class="item animate animate_top" style="--i: 1">
+                        <span class="icon-job text-4xl"></span>
+                        <h6 class="heading6 mt-4">Post Your Job</h6>
+                        <p class="mt-1">Create a job listing with details like requirements and budget.</p>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 2">
+                        <span class="icon-applicant text-4xl"></span>
+                        <h6 class="heading6 mt-4">Review Applicants</h6>
+                        <p class="mt-1">Receive and evaluate applications from freelancers.</p>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 3">
+                        <span class="icon-choose text-4xl"></span>
+                        <h6 class="heading6 mt-4">Choose a Freelancer</h6>
+                        <p class="mt-1">Conduct interviews or discussions to choose the best candidate.</p>
+                    </li>
+                    <li class="item animate animate_top" style="--i: 4">
+                        <span class="icon-manage text-4xl"></span>
+                        <h6 class="heading6 mt-4">Manage the Project</h6>
+                        <p class="mt-1">Collaborate with the selected freelancer to complete the project.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Benefit -->
+        <section class="benefit">
+            <div class="container">
+                <div class="benefit_inner flex max-lg:flex-col-reverse items-center justify-between gap-y-8 lg:py-20 sm:py-14 py-10 border-b border-line">
+                    <div class="benefit_content xl:w-[570px] lg:w-5/12 w-full">
+                        <h3 class="heading3 animate animate_top" style="--i: 1">FreelanHub! The best choice?</h3>
+                        <p class="body2 mt-3 animate animate_top" style="--i: 2">Streamline your hiring process with strategic channels to reach qualified candidates</p>
+                        <ul class="list_benefit flex flex-col gap-6 mt-8">
+                            <li class="benefit_item flex gap-4 animate animate_top" style="--i: 3">
+                                <span class="ph ph-wallet flex-shrink-0 text-4xl text-primary"></span>
+                                <div class="benefit_info">
+                                    <h6 class="title heading6">Stick to your budget</h6>
+                                    <p class="desc mt-1">Reduce your time-to-hire by up to 75% and free up headspace for other HR priorities.</p>
+                                </div>
+                            </li>
+                            <li class="benefit_item flex gap-4 animate animate_top" style="--i: 4">
+                                <span class="ph ph-certificate flex-shrink-0 text-4xl text-primary"></span>
+                                <div class="benefit_info">
+                                    <h6 class="title heading6">Get quality work done quickly</h6>
+                                    <p class="desc mt-1">Hand your project over to a talented freelancer in minutes, get long-lasting results.</p>
+                                </div>
+                            </li>
+                            <li class="benefit_item flex gap-4 animate animate_top" style="--i: 5">
+                                <span class="ph ph-phone-call flex-shrink-0 text-4xl text-primary"></span>
+                                <div class="benefit_info">
+                                    <h6 class="title heading6">Support On 24/7</h6>
+                                    <p class="desc mt-1">Our round-the-clock support team is available to help anytime, anywhere.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="benefit_bg relative lg:w-5/12 sm:w-[45%] w-[85%] lg:pl-3 lg:pr-15">
+                        <img src="{% static 'assets/images/components/benefit1.webp' %}" alt="benefit1" class="w-full rounded-20" />
+                        <div class="flag_benefit flex items-center gap-3 absolute sm:top-44 top-36 lg:right-0 -right-8 p-3 bg-white rounded-xl shadow-xl animate animate_left" style="--i: 1">
+                            <span class="ph ph-lightning sm:text-4xl text-3xl text-primary flex-shrink-0"></span>
+                            <div class="flag_info">
+                                <h6 class="heading6">+20k</h6>
+                                <span class="caption1">Daily website traffic</span>
+                            </div>
+                        </div>
+                        <div class="flag_benefit flex items-center gap-3 absolute bottom-15 sm:-left-28 -left-7 p-3 bg-white rounded-xl shadow-xl animate animate_right" style="--i: 2">
+                            <div class="flag_info pl-[14px] border-l-2 border-primary">
+                                <h6 class="heading6">+10k</h6>
+                                <span class="caption1">Job applications this month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials lg:py-20 sm:py-14 py-10">
+            <div class="container">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Buyer Stories</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Discover exceptional experiences through testimonials from our satisfied customers.</p>
+                <div class="swiper -section swiper-list-testimonials style-3 md:pt-10 pt-7">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 1">
+                                <strong class="text-title">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</strong>
+                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                        <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="IMG-1" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="testimonials_user">
+                                        <h6 class="testimonials_name heading6">Liam Anderson</h6>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 2">
+                                <strong class="text-title">I'm truly impressed by the results delivered by FreelanHub. Their team's professionalism and dedication shine through in every project in your eyes.</strong>
+                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                        <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="IMG-2" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="testimonials_user">
+                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 3">
+                                <strong class="text-title">I'm truly impressed by the results delivered by fivero. Their team's professionalism and dedication shine through in every project and conversions.</strong>
+                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                        <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="IMG-3" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="testimonials_user">
+                                        <h6 class="testimonials_name heading6">Alexander Peter</h6>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="testimonials_item flex flex-col justify-between p-7.5 bg-white h-full rounded-lg duration-300 shadow-md animate animate_top" style="--i: 4">
+                                <strong class="text-title">Working with fivero has been an absolute game-changer for our online presence. Their innovative strategies and creative approach have taken our brand!</strong>
+                                <div class="testimonials_info flex items-center gap-5 mt-5 pt-5 border-t border-line">
+                                    <div class="testimonials_avatar w-15 h-15 rounded-full overflow-hidden">
+                                        <img src="{% static 'assets/images/avatar/IMG-4.webp' %}" alt="IMG-4" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="testimonials_user">
+                                        <h6 class="testimonials_name heading6">Emily Johnson</h6>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Counter -->
+        <section class="counter lg:py-15 sm:py-12 py-8 bg-[#FAF7F1]">
+            <div class="container flex max-lg:flex-wrap items-center justify-between max-lg:gap-y-8">
+                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 1">
+                    <h2 class="heading2 pb-1 text-center">2,5M+</h2>
+                    <span class="body1 text-center">Jobs Available</span>
+                </div>
+                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 2">
+                    <h2 class="heading2 pb-1 text-center">177k+</h2>
+                    <span class="body1 text-center">New Jobs This Week!</span>
+                </div>
+                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 3">
+                    <h2 class="heading2 pb-1 text-center">298k+</h2>
+                    <span class="body1 text-center">Companies Hiring</span>
+                </div>
+                <div class="line flex-shrink-0 w-px h-20 bg-line max-lg:hidden"></div>
+                <div class="item max-lg:flex max-lg:flex-col max-lg:w-1/2 animate animate_top" style="--i: 4">
+                    <h2 class="heading2 pb-1 text-center">5M+</h2>
+                    <span class="body1 text-center">Total Freelancers</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs -->
+        <section class="faqs lg:py-20 sm:py-14 py-10">
+            <div class="container flex flex-col items-center">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Frequently asked questions</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">We're Here to Provide Answers and Support Every Step of the Way</p>
+                <div class="list_faqs md:w-5/6 flex flex-col gap-2 md:mt-10 mt-7">
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How do I post a job or find a freelancer?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Is there a fee for using your services?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Can I request advice or support from your team?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How do I pay for the freelancers or businesses I hire?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How can I ensure that I receive quality services?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Do I need to log in to access all the features of your website?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+{% endblock %}
+
+{% block page_modals %}
+    {% include 'other/modals/_modal_become_seller.html' %}
+{% endblock %}

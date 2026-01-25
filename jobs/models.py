@@ -1161,6 +1161,36 @@ class JobPosting(TenantSoftDeleteModel):
     equity_offered = models.BooleanField(default=False)
     equity_range = models.CharField(max_length=50, blank=True)
 
+    # Job Overview (for template requirements)
+    hours_per_week = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("Expected hours per week")
+    )
+    years_of_experience = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(50)],
+        help_text=_("Required years of experience")
+    )
+    english_level = models.CharField(
+        max_length=50,
+        blank=True,
+        choices=[
+            ('basic', _('Basic')),
+            ('conversational', _('Conversational')),
+            ('fluent', _('Fluent')),
+            ('native', _('Native/Bilingual')),
+        ],
+        help_text=_("Required English proficiency level")
+    )
+
+    # Media
+    video_url = models.URLField(
+        blank=True,
+        help_text=_("URL to job promotional video (YouTube, Vimeo, etc.)")
+    )
+
     # Skills & Requirements
     required_skills = ArrayField(
         models.CharField(max_length=100),
@@ -1558,6 +1588,58 @@ class JobPosting(TenantSoftDeleteModel):
         )
         new_job.save()
         return new_job
+
+
+# =============================================================================
+# JOB IMAGE MODEL
+# =============================================================================
+
+class JobImage(models.Model):
+    """
+    Images for job postings (office photos, team photos, workplace environment, etc.).
+
+    Supports multiple images per job for gallery display on public job pages.
+    Images help candidates visualize the workplace and team culture.
+    """
+
+    job = models.ForeignKey(
+        'JobPosting',
+        on_delete=models.CASCADE,
+        related_name='images',
+        help_text=_("Job posting this image belongs to")
+    )
+
+    image = models.ImageField(
+        upload_to='jobs/images/%Y/%m/',
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])
+        ],
+        help_text=_("Job image file (JPG, PNG, or WebP)")
+    )
+
+    caption = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=_("Optional image caption describing the photo")
+    )
+
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        help_text=_("Display order (0 = first, higher numbers appear later)")
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = _("Job Image")
+        verbose_name_plural = _("Job Images")
+        indexes = [
+            models.Index(fields=['job', 'order'], name='ats_jobimage_job_order'),
+        ]
+
+    def __str__(self):
+        return f"Image for {self.job.title}" + (f": {self.caption}" if self.caption else "")
 
 
 # =============================================================================

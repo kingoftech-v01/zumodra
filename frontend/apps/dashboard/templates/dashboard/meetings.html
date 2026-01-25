@@ -1,0 +1,208 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_meeting scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">Video Mettings</h4>
+                    <div class="meeting_block p-6 mt-7.5 rounded-lg bg-white">
+                        <ul class="list_meeting">
+                            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 border-b border-line rounded-lg duration-300 hover:bg-background">
+                                <div class="left flex items-center gap-10">
+                                    <div class="calendar_block overflow-hidden w-[76px] rounded">
+                                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">wed</div>
+                                        <div class="days heading4 py-1 bg-surface text-center">26</div>
+                                    </div>
+                                    <div class="info">
+                                        <strong class="title -style-1 heading6 hover:underline">UX/UI Designer</strong>
+                                        <p class="caption1 text-secondary mt-1">Meeting with: <span class="name capitalize text-black">Dean</span></p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-clock text-secondary"></span>
+                                                <span class="hour caption1">10h:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-hourglass text-secondary"></span>
+                                                <span class="time caption1">30m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action flex justify-end gap-2">
+                                    <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                        <span class="ph ph-chats text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_meeting">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Re-schedule Meeting</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                        <span class="ph ph-x text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Metting</span>
+                                    </button>
+                                </div>
+                            </li>
+                            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 border-b border-line rounded-lg duration-300 hover:bg-background">
+                                <div class="left flex items-center gap-10">
+                                    <div class="calendar_block overflow-hidden w-[76px] rounded">
+                                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">mon</div>
+                                        <div class="days heading4 py-1 bg-surface text-center">17</div>
+                                    </div>
+                                    <div class="info">
+                                        <strong class="title -style-1 heading6 hover:underline">Web Designer</strong>
+                                        <p class="caption1 text-secondary mt-1">Meeting with: <span class="name capitalize text-black">Alexander</span></p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-clock text-secondary"></span>
+                                                <span class="hour caption1">10h:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-hourglass text-secondary"></span>
+                                                <span class="time caption1">30m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action flex justify-end gap-2">
+                                    <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                        <span class="ph ph-chats text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_meeting">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Re-schedule Meeting</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                        <span class="ph ph-x text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Metting</span>
+                                    </button>
+                                </div>
+                            </li>
+                            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 border-b border-line rounded-lg duration-300 hover:bg-background">
+                                <div class="left flex items-center gap-10">
+                                    <div class="calendar_block overflow-hidden w-[76px] rounded">
+                                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">fri</div>
+                                        <div class="days heading4 py-1 bg-surface text-center">14</div>
+                                    </div>
+                                    <div class="info">
+                                        <strong class="title -style-1 heading6 hover:underline">Digital Marketing</strong>
+                                        <p class="caption1 text-secondary mt-1">Meeting with: <span class="name capitalize text-black">Peter</span></p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-clock text-secondary"></span>
+                                                <span class="hour caption1">10h:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-hourglass text-secondary"></span>
+                                                <span class="time caption1">30m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action flex justify-end gap-2">
+                                    <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                        <span class="ph ph-chats text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_meeting">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Re-schedule Meeting</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                        <span class="ph ph-x text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Metting</span>
+                                    </button>
+                                </div>
+                            </li>
+                            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 border-b border-line rounded-lg duration-300 hover:bg-background">
+                                <div class="left flex items-center gap-10">
+                                    <div class="calendar_block overflow-hidden w-[76px] rounded">
+                                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">thu</div>
+                                        <div class="days heading4 py-1 bg-surface text-center">13</div>
+                                    </div>
+                                    <div class="info">
+                                        <strong class="title -style-1 heading6 hover:underline">App Developement</strong>
+                                        <p class="caption1 text-secondary mt-1">Meeting with: <span class="name capitalize text-black">William</span></p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-clock text-secondary"></span>
+                                                <span class="hour caption1">10h:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-hourglass text-secondary"></span>
+                                                <span class="time caption1">30m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action flex justify-end gap-2">
+                                    <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                        <span class="ph ph-chats text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_meeting">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Re-schedule Meeting</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                        <span class="ph ph-x text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Metting</span>
+                                    </button>
+                                </div>
+                            </li>
+                            <li class="item flex flex-wrap items-center justify-between gap-4 p-5 border-b border-line rounded-lg duration-300 hover:bg-background">
+                                <div class="left flex items-center gap-10">
+                                    <div class="calendar_block overflow-hidden w-[76px] rounded">
+                                        <div class="top py-1 bg-black text-sm font-bold uppercase text-white text-center">sat</div>
+                                        <div class="days heading4 py-1 bg-surface text-center">8</div>
+                                    </div>
+                                    <div class="info">
+                                        <strong class="title -style-1 heading6 hover:underline">SEO Marketing</strong>
+                                        <p class="caption1 text-secondary mt-1">Meeting with: <span class="name capitalize text-black">Jackson</span></p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-clock text-secondary"></span>
+                                                <span class="hour caption1">10h:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="ph ph-hourglass text-secondary"></span>
+                                                <span class="time caption1">30m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="action flex justify-end gap-2">
+                                    <button class="btn_action btn_open_popup btn_chat flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_chat">
+                                        <span class="ph ph-chats text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Send Message</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_meeting flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_meeting">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Re-schedule Meeting</span>
+                                    </button>
+                                    <button class="btn_action btn_open_popup btn_delete flex items-center justify-center relative w-10 h-10 rounded border border-line duration-300 hover:bg-primary hover:text-white" data-type="modal_delete">
+                                        <span class="ph ph-x text-xl"></span>
+                                        <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete Metting</span>
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_chat_meetings.html' %}
+    {% include 'dashboard/includes/modals/_modal_meeting_meetings.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_meetings.html' %}
+{% endblock %}

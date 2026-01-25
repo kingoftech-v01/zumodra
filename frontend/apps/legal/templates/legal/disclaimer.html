@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Legal Disclaimer</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub operates as a marketplace platform connecting freelancers with clients seeking services. We are not a party to any agreements between users, nor are we an employer, agent, or representative of any user. This disclaimer clarifies our role and limitations regarding services provided through our platform.</p>
+                            <p class="body2 text-secondary">FreelanHub provides the infrastructure, tools, and features to facilitate connections, communications, project management, and secure payments between freelancers and clients. However, we do not employ freelancers, do not direct or control the work they perform, and are not responsible for the quality, timeliness, legality, or delivery of any services arranged through our platform.</p>
+                            <p class="body2 text-secondary">Users engage with each other as independent parties. Freelancers are independent contractors responsible for their own taxes, insurance, and business operations. Clients are responsible for evaluating freelancers, defining project requirements, and ensuring compliance with applicable employment and contracting laws in their jurisdiction.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub makes no warranties or guarantees regarding the quality, reliability, or suitability of freelancers or clients using our platform. We provide information and tools but cannot verify all claims made by users:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>We do not guarantee the accuracy of user profiles, portfolios, credentials, or experience claims. While we encourage honest representation and may verify certain information, users are responsible for conducting their own due diligence before entering into agreements.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>We do not guarantee project outcomes, deliverable quality, deadline adherence, or client satisfaction. Success depends on clear communication, realistic expectations, and professional conduct by both parties.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>We do not guarantee payment collection or work delivery. While our escrow system provides protection, disputes may still arise. Users should carefully review project terms and use milestone-based payments for protection.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">FreelanHub provides ratings, reviews, and verification badges as tools to help users make informed decisions, but these do not constitute endorsements or guarantees. Users must exercise independent judgment when selecting partners for projects.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub is provided on an "as-is" and "as-available" basis without warranties of any kind, either express or implied. We do not guarantee uninterrupted, error-free, or secure operation of our platform at all times.</p>
+                            <p class="body2 text-secondary">To the maximum extent permitted by law, we disclaim all warranties including implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement. We make no warranty that our platform will meet your requirements, that results obtained will be accurate or reliable, or that defects will be corrected. Platform features, availability, and functionality may change without notice.</p>
+                            <p class="body2 text-secondary">While we implement security measures to protect user data and transactions, we cannot guarantee absolute security. Users are responsible for maintaining the confidentiality of their account credentials and for all activities under their accounts. We are not liable for unauthorized access resulting from user negligence.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub's liability is limited to the maximum extent permitted by applicable law. We shall not be liable for certain types of damages arising from your use of our platform:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Indirect, incidental, special, consequential, or punitive damages including lost profits, lost revenue, lost data, or business interruption arising from your use or inability to use our services, even if we were advised of such possibility.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Damages arising from user conduct, disputes between users, quality of work delivered, payment issues, or any interactions between freelancers and clients facilitated through our platform.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Total aggregate liability for all claims related to our services exceeding the greater of one hundred dollars ($100) or the amount of fees you paid to FreelanHub in the twelve months preceding the claim.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Some jurisdictions do not allow limitation of liability for certain damages. In such jurisdictions, our liability is limited to the fullest extent permitted by law. These limitations apply regardless of the legal theory on which claims are based.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">You agree to indemnify, defend, and hold harmless FreelanHub, its officers, directors, employees, and agents from any claims, liabilities, damages, losses, costs, or expenses arising from your use of our platform, your violation of these terms, or your violation of any rights of third parties.</p>
+                            <p class="body2 text-secondary">This indemnification includes legal fees and costs incurred in defending against claims related to your conduct on the platform, services you provide or receive, disputes with other users, content you post, or any breach of your obligations. You are responsible for your own actions and any consequences resulting from your use of FreelanHub.</p>
+                            <p class="body2 text-secondary">By using FreelanHub, you acknowledge that you have read, understood, and agree to be bound by this disclaimer and all other terms and policies. If you do not agree with any part of this disclaimer, you should not use our services. Questions about this disclaimer should be directed to our legal team through the contact information provided in our Terms of Service.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

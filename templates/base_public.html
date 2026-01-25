@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Header -->
+    {% include 'includes/_header.html' %}
+
+    <!-- Main Content -->
+    {% block page_content %}{% endblock %}
+
+    <!-- Footer -->
+    {% include 'includes/_footer.html' %}
+
+    <!-- Menu mobile -->
+    {% include 'includes/_menu_mobile.html' %}
+
+    <!-- Page Modals -->
+    {% block page_modals %}{% endblock %}
+
+{% endblock %}

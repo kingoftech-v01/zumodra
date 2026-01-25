@@ -1,0 +1,352 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+
+        <!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+                <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                    <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                </div>
+                <div class="container relative h-full">
+                    <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                        <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                            <a href="index.html" class="caption1 text-white">Home</a>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white">Pages</span>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white opacity-60">Our Pricing</span>
+                        </div>
+                        <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Our Pricing</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section class="pricing lg:py-20 sm:py-14 py-10">
+            <div class="container">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Choose The Plans & Pricing</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">We offer a variety of pricing packages to meet the unique needs of our freelancers.</p>
+                <ul class="list_pricing grid xl:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
+                    <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:hover:shadow-2xl animate animate_top" style="--i: 1">
+                        <span class="pricing_type text-title text-secondary">Basic Plan</span>
+                        <h3 class="heading3 mt-2">Free</h3>
+                        <ul class="list_feature mt-3">
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Up to 5 Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Apply 20 Jobs</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">5 CV’s template</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Featured Profile</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Expiry 7 days</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Messenger Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Unlimited Video Calls Interviews</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Live Chatbot</strong>
+                            </li>
+                        </ul>
+                        <a class="button-main -border w-full text-center mt-5" href="pricing.html">Choose The Package</a>
+                    </li>
+                    <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:hover:shadow-2xl animate animate_top" style="--i: 2">
+                        <span class="pricing_type text-title text-secondary">Starter</span>
+                        <h3 class="heading3 mt-2">$5.00</h3>
+                        <ul class="list_feature mt-3">
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Up to 10 Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Apply 20 Jobs</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">5 CV’s template</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Expiry 1 month</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Featured Profile</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Messenger Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Unlimited Video Calls Interviews</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Live Chatbot</strong>
+                            </li>
+                        </ul>
+                        <a class="button-main -border w-full text-center mt-5" href="pricing.html">Choose The Package</a>
+                    </li>
+                    <li class="pricing_item relative p-6 border border-line rounded-xl bg-white duration-300 shadow-lg hover:hover:shadow-2xl animate animate_top" style="--i: 3">
+                        <span class="flag absolute top-0 left-1/2 -translate-x-1/2 text-label py-1 px-2.5 rounded-b-lg bg-red text-white">MOST POPULAR</span>
+                        <span class="pricing_type text-title text-secondary">Professional</span>
+                        <h3 class="heading3 mt-2">$10.00</h3>
+                        <ul class="list_feature mt-3">
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Up to 20 Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Apply 50 Jobs</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">5 CV’s template</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Featured Profile</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Expiry 2 month</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Messenger Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Unlimited Video Calls Interviews</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                <strong class="pricing_feature text-title text-placehover">Live Chatbot</strong>
+                            </li>
+                        </ul>
+                        <a class="button-main -border w-full text-center mt-5" href="pricing.html">Choose The Package</a>
+                    </li>
+                    <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md hover:hover:shadow-2xl animate animate_top" style="--i: 4">
+                        <span class="pricing_type text-title text-secondary">Executive</span>
+                        <h3 class="heading3 mt-2">$25.00</h3>
+                        <ul class="list_feature mt-3">
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Up to 50 Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Apply 150 Jobs</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">5 CV’s template</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Featured Profile</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Expiry 3 month</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Messenger Services</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Unlimited Video Calls Interviews</strong>
+                            </li>
+                            <li class="feature_item flex items-start gap-2 py-2">
+                                <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                <strong class="pricing_feature text-title">Live Chatbot</strong>
+                            </li>
+                        </ul>
+                        <a class="button-main -border w-full text-center mt-5" href="pricing.html">Choose The Package</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials -style-6 lg:py-20 sm:py-14 py-10 bg-surface">
+            <div class="container flex max-sm:flex-col items-center justify-between gap-y-8">
+                <div class="testimonials_image flex-shrink-0 xl:w-[420px] lg:w-1/3 sm:w-2/5 w-full aspect-square rounded-xl overflow-hidden">
+                    <img src="{% static 'assets/images/avatar/IMG-1.webp' %}" alt="IMG-1" class="testimonials_avatar w-full h-full object-cover" data-item="1" />
+                    <img src="{% static 'assets/images/avatar/IMG-2.webp' %}" alt="IMG-2" class="testimonials_avatar w-full h-full object-cover hidden" data-item="2" />
+                    <img src="{% static 'assets/images/avatar/IMG-3.webp' %}" alt="IMG-3" class="testimonials_avatar w-full h-full object-cover hidden" data-item="3" />
+                    <img src="{% static 'assets/images/avatar/IMG-4.webp' %}" alt="IMG-4" class="testimonials_avatar w-full h-full object-cover hidden" data-item="4" />
+                </div>
+                <div class="list_testimonials lg:w-2/3 sm:w-3/5 w-full lg:pl-20 sm:pl-8">
+                    <div class="swiper swiper-list-testimonials6">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="testimonials_item" data-item="1">
+                                    <div class="testimonials_rate flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-placehover text-2xl"></span>
+                                    </div>
+                                    <p class="lg:text-2xl text-xl lg:mt-5 mt-3">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</p>
+                                    <div class="testimonials_info mt-3">
+                                        <h5 class="testimonials_name heading5 lg:pb-1">Georgina Emma</h5>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="testimonials_item" data-item="2">
+                                    <div class="testimonials_rate flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                    </div>
+                                    <p class="lg:text-2xl text-xl lg:mt-5 mt-3">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</p>
+                                    <div class="testimonials_info mt-3">
+                                        <h5 class="testimonials_name heading5 lg:pb-1">Alexander Pato</h5>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="testimonials_item" data-item="3">
+                                    <div class="testimonials_rate flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                    </div>
+                                    <p class="lg:text-2xl text-xl lg:mt-5 mt-3">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</p>
+                                    <div class="testimonials_info mt-3">
+                                        <h5 class="testimonials_name heading5 lg:pb-1">Leonardo Pavard</h5>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="testimonials_item" data-item="4">
+                                    <div class="testimonials_rate flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-yellow text-2xl"></span>
+                                        <span class="ph-fill ph-star text-placehover text-2xl"></span>
+                                    </div>
+                                    <p class="lg:text-2xl text-xl lg:mt-5 mt-3">Choosing FreelanHub was the best decision we made for our business. Their expertise in SEO and digital marketing has significantly boosted our traffic and conversions.</p>
+                                    <div class="testimonials_info mt-3">
+                                        <h5 class="testimonials_name heading5 lg:pb-1">Christina Anna</h5>
+                                        <span class="caption1 text-secondary">Head of Recruitment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list_action flex items-center justify-between lg:mt-8 mt-5">
+                        <div class="section-swiper-navigation flex items-center gap-3">
+                            <button class="custom-button-testimonials-prev -border -relative">
+                                <span class="ph-bold ph-arrow-left text-xl"></span>
+                            </button>
+                            <button class="custom-button-testimonials-next -border -relative">
+                                <span class="ph-bold ph-arrow-right text-xl"></span>
+                            </button>
+                        </div>
+                        <a href="about1.html" class="text-button border-b-2 border-black duration-300 hover:border-primary hover:text-primary">Read Case Studies</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs -->
+        <section class="faqs lg:py-20 sm:py-14 py-10">
+            <div class="container flex flex-col items-center">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Frequently asked questions</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">We're Here to Provide Answers and Support Every Step of the Way</p>
+                <div class="list_faqs md:w-5/6 flex flex-col gap-2 md:mt-10 mt-7">
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How do I post a job or find a freelancer?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Is there a fee for using your services?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Can I request advice or support from your team?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How do I pay for the freelancers or businesses I hire?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">How can I ensure that I receive quality services?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                    <div class="faq_item py-6 border-b border-line cursor-pointer">
+                        <div class="heading flex items-center justify-between gap-2">
+                            <h5 class="title heading5">Do I need to log in to access all the features of your website?</h5>
+                            <span class="icon_arrow ph-bold ph-caret-down text-2xl duration-[400ms]"></span>
+                        </div>
+                        <div class="answer mt-3">
+                            <p class="body2 text-secondary">To post a job or find a freelancer, go to our website's 'Post a Job' section. Provide job details and requirements. For finding freelancers, explore our database, filter based on your needs, and connect directly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+{% endblock %}

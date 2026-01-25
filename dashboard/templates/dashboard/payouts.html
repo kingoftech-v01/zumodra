@@ -1,0 +1,175 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_payouts scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">Payouts</h4>
+                    <div class="list_category p-6 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Payout settings</h5>
+                        <ul class="menu_tab overflow-unset max-w-none flex flex-wrap gap-5 mt-5" role="tablist">
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -border -bg flex flex-col items-center gap-1 relative w-[140px] py-4 border border-line rounded duration-300 hover:border-primary active" id="bank_tab01" role="tab" aria-controls="bank_01" aria-selected="true">
+                                    <span class="ic_type ph-fill ph-bank text-secondary text-4xl duration-300"></span>
+                                    <span>Bank transfer</span>
+                                    <span class="ic_check absolute -top-3 -right-3">
+                                        <span class="ph-fill ph-check-circle text-primary text-xl bg-white rounded-full"></span>
+                                    </span>
+                                </button>
+                            </li>
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -border -bg flex flex-col items-center gap-1 relative w-[140px] py-4 border border-line rounded duration-300 hover:border-primary" id="paypal_tab02" role="tab" aria-controls="paypal_02" aria-selected="false">
+                                    <span class="ic_type ph-fill ph-paypal-logo text-secondary text-4xl duration-300"></span>
+                                    <span>Paypal</span>
+                                    <span class="ic_check absolute -top-3 -right-3">
+                                        <span class="ph-fill ph-check-circle text-primary text-xl bg-white rounded-full"></span>
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                        <form class="form grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="tags">
+                                <label>Bank Account <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="United States">United States</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="United States">United States</li>
+                                            <li class="capitalize" data-item="Australia">Australia</li>
+                                            <li class="capitalize" data-item="South Korea">South Korea</li>
+                                            <li class="capitalize" data-item="United Kingdom">United Kingdom</li>
+                                            <li class="capitalize" data-item="South Africa">South Africa</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="code">
+                                <label for="code">Bank BIC/SWIFT <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="code" type="text" placeholder="ABCDEFGHXYZ" required />
+                            </div>
+                            <div class="address">
+                                <label for="address">Bank Address <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="address" type="text" placeholder="123 Street, Los Angeles, USA" />
+                            </div>
+                            <div class="city">
+                                <label for="city">Bank City <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="city" type="text" placeholder="Los Angeles" required />
+                            </div>
+                            <div class="state">
+                                <label>Bank Province/State <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="California">California</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="California">California</li>
+                                            <li class="capitalize" data-item="Los Angeles">Los Angeles</li>
+                                            <li class="capitalize" data-item="Las Vegas">Las Vegas</li>
+                                            <li class="capitalize" data-item="New York">New York</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="number">
+                                <label for="number">Account Number * <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="number" type="text" placeholder="10240135686" required />
+                            </div>
+                            <div class="holder">
+                                <label for="holder">Name of Account Holder (as shown on bank statement) <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="holder" type="text" placeholder="Alexander" required />
+                            </div>
+                            <div class="flex items-center col-span-full gap-5 mt-1">
+                                <button class="button-main -border">Add Payment</button>
+                                <button class="button-main">Add payment & Active</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="payouts_history mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5 pt-6 px-6">Payout history</h5>
+                        <div class="list overflow-x-auto w-full py-5 px-6 rounded-xl">
+                            <table class="w-full max-[500px]:w-[500px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Amount</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Payout Method</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$695.82</th>
+                                        <td class="p-5 text-left heading6">Paypal</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">May 29, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$677.00</th>
+                                        <td class="p-5 text-left heading6">Paypal</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">May 17, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$451.82</th>
+                                        <td class="p-5 text-left heading6">Bank transfer</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Apr 30, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$474.28</th>
+                                        <td class="p-5 text-left heading6">Bank transfer</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Apr 12, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$314.40</th>
+                                        <td class="p-5 text-left heading6">Paypal</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Mar 31, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$434.89</th>
+                                        <td class="p-5 text-left heading6">Bank transfer</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Mar 15, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$394.05</th>
+                                        <td class="p-5 text-left heading6">Paypal</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Feb 29, 2024</td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">$900.23</th>
+                                        <td class="p-5 text-left heading6">Bank transfer</td>
+                                        <td class="p-5 text-left text-title whitespace-nowrap">Jan 31, 2024</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                            <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                </li>
+                            </ul>
+                            <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">8</span> of <span class="total">32</span> entries</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+
+{% endblock %}

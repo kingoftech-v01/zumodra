@@ -1,0 +1,107 @@
+{% load static %}
+
+<!-- Job Video Modal -->
+<div class="modal_video modal relative z-[999]" data-type="modal_video">
+    <div class="modal_bg absolute top-0 left-0 w-full h-full bg-black/80"></div>
+    <div class="modal_inner relative lg:w-[900px] md:w-11/12 w-full">
+        <button class="close_modal_btn absolute -top-12 right-0 text-white hover:text-gray-300 duration-300">
+            <span class="ph-bold ph-x text-3xl"></span>
+        </button>
+        <div class="modal_content bg-white rounded-lg overflow-hidden">
+            {% if job and job.video_url %}
+            <div class="video_wrapper relative aspect-video bg-black">
+                <!-- YouTube Embed -->
+                {% if 'youtube.com' in job.video_url or 'youtu.be' in job.video_url %}
+                <iframe
+                    id="job-video-iframe"
+                    class="w-full h-full"
+                    src="{{ job.video_url|safe }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                ></iframe>
+
+                <!-- Vimeo Embed -->
+                {% elif 'vimeo.com' in job.video_url %}
+                <iframe
+                    id="job-video-iframe"
+                    class="w-full h-full"
+                    src="{{ job.video_url|safe }}"
+                    frameborder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowfullscreen
+                ></iframe>
+
+                <!-- HTML5 Video for direct video files -->
+                {% else %}
+                <video
+                    id="job-video-player"
+                    class="w-full h-full"
+                    controls
+                    preload="metadata"
+                >
+                    <source src="{{ job.video_url }}" type="video/mp4">
+                    <source src="{{ job.video_url }}" type="video/webm">
+                    <source src="{{ job.video_url }}" type="video/ogg">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
+            </div>
+
+            <!-- Video Info -->
+            <div class="video_info p-5 border-t border-line">
+                <div class="flex items-start gap-3">
+                    {% if job.company_logo_url %}
+                    <img src="{{ job.company_logo_url }}" alt="{{ job.company_name }}" class="w-12 h-12 rounded flex-shrink-0" />
+                    {% else %}
+                    <div class="w-12 h-12 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span class="ph ph-video-camera text-2xl text-primary"></span>
+                    </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <strong class="text-title block mb-1">{{ job.title }}</strong>
+                        <span class="text-secondary caption1">{{ job.company_name }}</span>
+                    </div>
+                    <a
+                        href="{% url 'jobs_public:job_detail' uuid=job.jobposting_uuid %}"
+                        class="button-main -border -small"
+                    >
+                        View Job
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="p-10 text-center">
+                <span class="ph ph-video-camera-slash text-6xl text-secondary mb-4 block"></span>
+                <p class="text-secondary">Video not available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Pause video when modal is closed
+document.addEventListener('DOMContentLoaded', function() {
+    const videoModal = document.querySelector('.modal_video');
+    if (videoModal) {
+        const closeButtons = videoModal.querySelectorAll('.close_modal_btn, .modal_bg');
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Pause iframe videos (YouTube, Vimeo)
+                const iframe = videoModal.querySelector('iframe');
+                if (iframe) {
+                    iframe.src = iframe.src; // Reload iframe to stop video
+                }
+
+                // Pause HTML5 video
+                const video = videoModal.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+            });
+        });
+    }
+});
+</script>

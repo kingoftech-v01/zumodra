@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Refund Policy</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub's refund policy is designed to protect both clients and freelancers in cases where work does not meet agreed specifications or projects are not completed as promised. Refunds are processed on a milestone basis, meaning payments are evaluated individually based on the deliverables and acceptance criteria defined for each milestone.</p>
+                            <p class="body2 text-secondary">Clients may request refunds when freelancers fail to deliver work, deliver work that materially differs from specifications, or violate platform policies during project execution. Requests must be submitted through our dispute resolution system with supporting evidence including project requirements, communication records, and delivered work samples.</p>
+                            <p class="body2 text-secondary">The escrow system provides protection by holding funds until clients approve completed work. If disputes arise, funds remain in escrow while our review team examines evidence from both parties. Refund decisions are based on objective evaluation of whether deliverables meet the originally agreed terms and professional quality standards.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Not all situations qualify for refunds. The following limitations apply to refund eligibility to ensure fair treatment of both parties:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Work that has been completed according to specifications and approved by the client is not eligible for refunds. Once a milestone is marked complete, payment is released to the freelancer and cannot be reversed.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Subjective dissatisfaction with completed work that meets technical requirements does not qualify for refunds. Disputes must demonstrate material failure to meet defined specifications or deliverables.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Refund requests must be submitted within 30 days of the disputed milestone's delivery date. Requests submitted after this period may not be considered unless extraordinary circumstances apply.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Platform service fees are generally non-refundable as they cover transaction processing costs. In cases of proven fraud or platform error, fees may be refunded at FreelanHub's discretion. Change of mind or project cancellation after work has begun does not typically qualify for full refunds.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">This Refund Policy may be updated periodically based on operational experience, user feedback, and dispute resolution patterns. We analyze common dispute scenarios to refine our policies and ensure they balance protection for both clients and freelancers fairly.</p>
+                            <p class="body2 text-secondary">Material changes to refund eligibility criteria or processing procedures will be communicated through email notification and platform announcements. The updated policy will apply to new projects initiated after the effective date, while ongoing projects generally follow the policy in effect when they began.</p>
+                            <p class="body2 text-secondary">We welcome user feedback on refund policies and dispute resolution procedures. If you believe a refund decision was made in error or have concerns about policy application, you may request a secondary review through our support team. Policy updates reflect our commitment to continuous improvement of the platform experience.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">To request a refund, follow these procedures to ensure your case is properly reviewed and resolved efficiently:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Initiate a dispute through the platform's dispute resolution system. Provide detailed explanation of the issue, attach relevant documentation including project requirements, communication records, and delivered work samples.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Our review team will examine evidence from both parties within 5-7 business days. Additional information may be requested to make an informed decision. Both parties will have opportunity to present their case.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Refund decisions will be communicated via email and platform notification. Approved refunds are typically processed within 5-10 business days, returning funds to the original payment method used.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Documentation is critical for refund requests. Save all project communications, specifications, revision requests, and delivery confirmations. Clear, well-documented cases are resolved more quickly. For guidance on documentation requirements, please consult our Dispute Resolution guidelines.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">While our refund policy aims to provide fair protection, users should understand that refunds are not guaranteed and are determined based on evidence and policy criteria. The dispute resolution process requires cooperation from both parties and may take several days to complete, which can delay project timelines.</p>
+                            <p class="body2 text-secondary">FreelanHub's refund decisions are final and binding unless extraordinary circumstances or new evidence warrants reconsideration. We make decisions based on available evidence and platform policies, but cannot account for all nuances of every situation. Users dissatisfied with outcomes may have limited recourse beyond the platform's internal review process.</p>
+                            <p class="body2 text-secondary">To minimize refund-related risks, clearly define project requirements, maintain detailed communication records, and use the milestone system to break work into manageable, verifiable deliverables. Proactive communication and documentation significantly reduce the likelihood of disputes and improve outcomes when issues arise. For fraud prevention measures and related information, see our Payment Terms and Security documentation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

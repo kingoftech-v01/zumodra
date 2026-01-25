@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Cookie Policy</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">This Cookie Policy explains how FreelanHub uses cookies and similar tracking technologies when you visit our platform. Cookies are small text files stored on your device that help us provide, protect, and improve our services for both freelancers and clients.</p>
+                            <p class="body2 text-secondary">By using FreelanHub, you consent to our use of cookies in accordance with this policy. We use cookies to remember your preferences, authenticate your sessions, analyze platform usage, and deliver personalized content. You have control over cookie settings through your browser, though disabling certain cookies may affect platform functionality.</p>
+                            <p class="body2 text-secondary">We are committed to transparency about our data practices. This policy describes the types of cookies we use, their purposes, and how you can manage your cookie preferences to maintain control over your privacy.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub uses several types of cookies to enhance your experience on our platform. Each category serves specific purposes to improve functionality, security, and user experience:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Essential Cookies: Required for basic platform functionality including user authentication, session management, security features, and access to protected areas like your dashboard, messaging system, and escrow transactions.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Analytics Cookies: Help us understand how users interact with FreelanHub by collecting anonymous data about page visits, feature usage, and navigation patterns to improve our services.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Marketing Cookies: Track your preferences and browsing activity to deliver relevant job recommendations for freelancers and suitable candidate suggestions for clients, while measuring campaign effectiveness.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">We may also use third-party cookies from trusted service providers for payment processing, customer support, and analytics. These providers are contractually obligated to protect your data and use it only for specified purposes.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">You have control over how cookies are used on FreelanHub. Most web browsers automatically accept cookies, but you can modify your browser settings to decline cookies or alert you when cookies are being sent. You can manage your preferences through your browser's privacy settings.</p>
+                            <p class="body2 text-secondary">Please note that disabling cookies may affect your ability to use certain features of FreelanHub. Essential cookies are required for core functionality such as logging in, accessing your account, managing projects, processing payments through our escrow system, and communicating with other users. Without these cookies, you may not be able to fully utilize the platform's features.</p>
+                            <p class="body2 text-secondary">For analytics and marketing cookies, you can opt out through your account settings or browser preferences. We respect your choices and will honor your cookie preferences, though this may result in a less personalized experience on our platform.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub may update this Cookie Policy periodically to reflect changes in technology, legal requirements, or our business practices. We will notify users of material changes through the following methods:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Email notification to your registered account address at least 30 days before significant changes take effect, giving you time to review and adjust your cookie preferences accordingly.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Prominent banner notification on the FreelanHub platform when you log in, ensuring you are aware of any updates to our cookie practices.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Updated revision date at the top of this policy document, allowing you to track when changes were made and review the complete history of modifications.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Your continued use of FreelanHub after policy changes constitutes acceptance of the updated Cookie Policy. If you do not agree with the changes, you may adjust your cookie settings or discontinue using our services.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We work with trusted third-party service providers who may place cookies on your device when you use FreelanHub. These partners help us deliver essential services including payment processing, fraud prevention, customer support, and analytics. All third-party providers are carefully vetted and must comply with our privacy standards.</p>
+                            <p class="body2 text-secondary">Third-party cookies are subject to the respective privacy policies of these external services. While we contractually require our partners to protect your data, we cannot control their cookie practices directly. We recommend reviewing the privacy policies of these third parties, which may include payment processors, analytics platforms, and customer service tools integrated into our platform.</p>
+                            <p class="body2 text-secondary">If you have questions about our Cookie Policy or how we use cookies on FreelanHub, please contact our Privacy Team through the contact information provided in our Privacy Policy. We are committed to transparency and will respond to your inquiries promptly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}
