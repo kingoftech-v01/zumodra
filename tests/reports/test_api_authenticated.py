@@ -15,28 +15,32 @@ BASE_URL = "http://localhost:8002"
 API_V1 = f"{BASE_URL}/api/v1"
 
 # Load authentication token
+ACCESS_TOKEN = None
 try:
-    with open('/home/king/zumodra/auth_token.json', 'r') as f:
+    token_path = '/home/kingoftech/zumodra/auth_token.json'
+    with open(token_path, 'r') as f:
         tokens = json.load(f)
         ACCESS_TOKEN = tokens['access']
         print(f"✅ Loaded authentication token")
 except Exception as e:
     print(f"❌ Failed to load token: {e}")
-    sys.exit(1)
+    print(f"⚠ Skipping authenticated API tests - token file not found")
+    # Don't exit - let pytest skip tests gracefully
 
-# Headers with authentication
-headers = {
-    "Authorization": f"Bearer {ACCESS_TOKEN}",
-    "Content-Type": "application/json"
-}
+if __name__ == '__main__':
+    # Headers with authentication
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
 
-# Test results storage
-results = {
-    "passed": [],
-    "failed": [],
-    "errors": [],
-    "created_resources": {}
-}
+    # Test results storage
+    results = {
+        "passed": [],
+        "failed": [],
+        "errors": [],
+        "created_resources": {}
+    }
 
 def log_test(category, endpoint, method, expected, actual, details=""):
     """Log test result"""
@@ -90,100 +94,102 @@ def test_request(category, endpoint, method="GET", data=None, expected_status=20
         log_test(category, endpoint, method, expected_status, 0, str(e))
         return None, None
 
-print("\n" + "="*80)
-print("ZUMODRA AUTHENTICATED API COMPREHENSIVE TEST SUITE")
-print("="*80)
+# Only run this script when executed directly, not during pytest import
+if __name__ == '__main__':
+    print("\n" + "="*80)
+    print("ZUMODRA AUTHENTICATED API COMPREHENSIVE TEST SUITE")
+    print("="*80)
 
-# Test ATS Endpoints
-print("\n🎯 Testing ATS (Applicant Tracking System) APIs...")
-test_request("ATS", "/ats/jobs/", "GET", expected_status=200)
-test_request("ATS", "/ats/candidates/", "GET", expected_status=200)
-test_request("ATS", "/ats/applications/", "GET", expected_status=200)
-test_request("ATS", "/ats/interviews/", "GET", expected_status=200)
-test_request("ATS", "/ats/offers/", "GET", expected_status=200)
-test_request("ATS", "/ats/pipelines/", "GET", expected_status=200)
+    # Test ATS Endpoints
+    print("\n🎯 Testing ATS (Applicant Tracking System) APIs...")
+    test_request("ATS", "/ats/jobs/", "GET", expected_status=200)
+    test_request("ATS", "/ats/candidates/", "GET", expected_status=200)
+    test_request("ATS", "/ats/applications/", "GET", expected_status=200)
+    test_request("ATS", "/ats/interviews/", "GET", expected_status=200)
+    test_request("ATS", "/ats/offers/", "GET", expected_status=200)
+    test_request("ATS", "/ats/pipelines/", "GET", expected_status=200)
 
-# Test HR Endpoints
-print("\n👥 Testing HR Core APIs...")
-test_request("HR", "/hr/employees/", "GET", expected_status=200)
-test_request("HR", "/hr/time-off-requests/", "GET", expected_status=200)
-test_request("HR", "/hr/performance-reviews/", "GET", expected_status=200)
-test_request("HR", "/hr/documents/", "GET", expected_status=200)
+    # Test HR Endpoints
+    print("\n👥 Testing HR Core APIs...")
+    test_request("HR", "/hr/employees/", "GET", expected_status=200)
+    test_request("HR", "/hr/time-off-requests/", "GET", expected_status=200)
+    test_request("HR", "/hr/performance-reviews/", "GET", expected_status=200)
+    test_request("HR", "/hr/documents/", "GET", expected_status=200)
 
-# Test Services/Marketplace
-print("\n🛒 Testing Services/Marketplace APIs...")
-test_request("Services", "/services/services/", "GET", expected_status=200)
-test_request("Services", "/services/providers/", "GET", expected_status=200)
-test_request("Services", "/services/contracts/", "GET", expected_status=200)
-test_request("Services", "/services/reviews/", "GET", expected_status=200)
+    # Test Services/Marketplace
+    print("\n🛒 Testing Services/Marketplace APIs...")
+    test_request("Services", "/services/services/", "GET", expected_status=200)
+    test_request("Services", "/services/providers/", "GET", expected_status=200)
+    test_request("Services", "/services/contracts/", "GET", expected_status=200)
+    test_request("Services", "/services/reviews/", "GET", expected_status=200)
 
-# Test Finance
-print("\n💰 Testing Finance APIs...")
-test_request("Finance", "/finance/subscriptions/", "GET", expected_status=200)
-test_request("Finance", "/finance/invoices/", "GET", expected_status=200)
-test_request("Finance", "/finance/transactions/", "GET", expected_status=200)
+    # Test Finance
+    print("\n💰 Testing Finance APIs...")
+    test_request("Finance", "/finance/subscriptions/", "GET", expected_status=200)
+    test_request("Finance", "/finance/invoices/", "GET", expected_status=200)
+    test_request("Finance", "/finance/transactions/", "GET", expected_status=200)
 
-# Test Messages
-print("\n💬 Testing Messages APIs...")
-test_request("Messages", "/messages/conversations/", "GET", expected_status=200)
-test_request("Messages", "/messages/messages/", "GET", expected_status=200)
+    # Test Messages
+    print("\n💬 Testing Messages APIs...")
+    test_request("Messages", "/messages/conversations/", "GET", expected_status=200)
+    test_request("Messages", "/messages/messages/", "GET", expected_status=200)
 
-# Test Notifications
-print("\n🔔 Testing Notifications APIs...")
-test_request("Notifications", "/notifications/", "GET", expected_status=200)
-test_request("Notifications", "/notifications/preferences/", "GET", expected_status=200)
+    # Test Notifications
+    print("\n🔔 Testing Notifications APIs...")
+    test_request("Notifications", "/notifications/", "GET", expected_status=200)
+    test_request("Notifications", "/notifications/preferences/", "GET", expected_status=200)
 
-# Test Analytics
-print("\n📊 Testing Analytics APIs...")
-test_request("Analytics", "/analytics/dashboard/", "GET", expected_status=200)
-test_request("Analytics", "/analytics/reports/", "GET", expected_status=200)
+    # Test Analytics
+    print("\n📊 Testing Analytics APIs...")
+    test_request("Analytics", "/analytics/dashboard/", "GET", expected_status=200)
+    test_request("Analytics", "/analytics/reports/", "GET", expected_status=200)
 
-# Test Careers (Public)
-print("\n💼 Testing Careers APIs...")
-test_request("Careers", "/careers/jobs/", "GET", expected_status=200)
-test_request("Careers", "/careers/applications/", "GET", expected_status=200)
+    # Test Careers (Public)
+    print("\n💼 Testing Careers APIs...")
+    test_request("Careers", "/careers/jobs/", "GET", expected_status=200)
+    test_request("Careers", "/careers/applications/", "GET", expected_status=200)
 
-# Generate Summary
-print("\n" + "="*80)
-print("TEST SUMMARY")
-print("="*80)
+    # Generate Summary
+    print("\n" + "="*80)
+    print("TEST SUMMARY")
+    print("="*80)
 
-total = len(results["passed"]) + len(results["failed"]) + len(results["errors"])
-passed = len(results["passed"])
-failed = len(results["failed"])
-errors = len(results["errors"])
+    total = len(results["passed"]) + len(results["failed"]) + len(results["errors"])
+    passed = len(results["passed"])
+    failed = len(results["failed"])
+    errors = len(results["errors"])
 
-print(f"\n📊 Total Tests: {total}")
-print(f"✅ Passed: {passed} ({passed/total*100 if total > 0 else 0:.1f}%)")
-print(f"❌ Failed: {failed} ({failed/total*100 if total > 0 else 0:.1f}%)")
-print(f"⚠️  Errors: {errors} ({errors/total*100 if total > 0 else 0:.1f}%)")
+    print(f"\n📊 Total Tests: {total}")
+    print(f"✅ Passed: {passed} ({passed/total*100 if total > 0 else 0:.1f}%)")
+    print(f"❌ Failed: {failed} ({failed/total*100 if total > 0 else 0:.1f}%)")
+    print(f"⚠️  Errors: {errors} ({errors/total*100 if total > 0 else 0:.1f}%)")
 
-# Group by category
-by_category = {}
-for r in results["passed"] + results["failed"] + results["errors"]:
-    cat = r["category"]
-    if cat not in by_category:
-        by_category[cat] = {"passed": 0, "failed": 0}
+    # Group by category
+    by_category = {}
+    for r in results["passed"] + results["failed"] + results["errors"]:
+        cat = r["category"]
+        if cat not in by_category:
+            by_category[cat] = {"passed": 0, "failed": 0}
 
-    if r in results["passed"]:
-        by_category[cat]["passed"] += 1
-    else:
-        by_category[cat]["failed"] += 1
+        if r in results["passed"]:
+            by_category[cat]["passed"] += 1
+        else:
+            by_category[cat]["failed"] += 1
 
-print("\n📋 By Category:")
-for cat, stats in sorted(by_category.items()):
-    total_cat = stats["passed"] + stats["failed"]
-    print(f"  {cat}: {stats['passed']}/{total_cat} passed")
+    print("\n📋 By Category:")
+    for cat, stats in sorted(by_category.items()):
+        total_cat = stats["passed"] + stats["failed"]
+        print(f"  {cat}: {stats['passed']}/{total_cat} passed")
 
-# Show failures
-if results["failed"]:
-    print("\n❌ Failed Tests:")
-    for r in results["failed"]:
-        print(f"  {r['method']} {r['endpoint']} - {r['details'][:100]}")
+    # Show failures
+    if results["failed"]:
+        print("\n❌ Failed Tests:")
+        for r in results["failed"]:
+            print(f"  {r['method']} {r['endpoint']} - {r['details'][:100]}")
 
-# Save report
-with open('/home/king/zumodra/api_authenticated_test_report.json', 'w') as f:
-    json.dump(results, f, indent=2)
+    # Save report
+    with open('/home/kingoftech/zumodra/api_authenticated_test_report.json', 'w') as f:
+        json.dump(results, f, indent=2)
 
-print(f"\n📄 Full report saved to: api_authenticated_test_report.json")
-print("="*80 + "\n")
+    print(f"\n📄 Full report saved to: api_authenticated_test_report.json")
+    print("="*80 + "\n")

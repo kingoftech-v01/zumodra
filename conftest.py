@@ -69,7 +69,7 @@ class UserFactory(DjangoModelFactory):
     """Factory for CustomUser model."""
 
     class Meta:
-        model = 'custom_account_u.CustomUser'
+        model = 'core_identity.CustomUser'
         django_get_or_create = ('email',)
 
     username = factory.LazyAttribute(lambda o: f"user_{uuid.uuid4().hex[:8]}")

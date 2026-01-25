@@ -33,8 +33,8 @@ from django.conf import settings
 from django_tenants.utils import get_tenant_model, get_public_schema_name
 
 from tenants.models import Tenant, Domain, Plan
-from jobs.models import Job, Candidate, Application, Interview, Offer
-from hr_core.models import Employee, TimeOff
+from jobs.models import JobPosting, Candidate, Application, Interview, Offer
+from hr_core.models import Employee, TimeOffRequest
 from tenant_profiles.models import UserProfile
 
 User = get_user_model()
@@ -240,40 +240,40 @@ class MultiTenancyIsolationTest:
 
             # Create job in tenant 1
             connection.set_schema(tenant1.schema_name)
-            job1 = Job.objects.create(
+            job1 = JobPosting.objects.create(
                 title="Software Engineer - Tenant 1",
                 description="Job for tenant 1",
                 created_by=None,
                 status='draft'
             )
             job1_id = job1.id
-            jobs_in_t1 = Job.objects.count()
+            jobs_in_t1 = JobPosting.objects.count()
 
             # Create job in tenant 2
             connection.set_schema(tenant2.schema_name)
-            job2 = Job.objects.create(
+            job2 = JobPosting.objects.create(
                 title="Product Manager - Tenant 2",
                 description="Job for tenant 2",
                 created_by=None,
                 status='draft'
             )
             job2_id = job2.id
-            jobs_in_t2 = Job.objects.count()
+            jobs_in_t2 = JobPosting.objects.count()
 
             # Verify tenant 1 doesn't see tenant 2's job
             connection.set_schema(tenant1.schema_name)
             try:
-                Job.objects.get(pk=job2_id)
+                JobPosting.objects.get(pk=job2_id)
                 self.add_leak(f"Tenant 1 can access Tenant 2 job (ID: {job2_id})")
                 self.add_result("data_isolation", "FAIL", "Cross-tenant data access detected")
                 return
-            except Job.DoesNotExist:
+            except JobPosting.DoesNotExist:
                 pass  # Expected
 
             # Verify job counts are separate
-            t1_job_count = Job.objects.count()
+            t1_job_count = JobPosting.objects.count()
             connection.set_schema(tenant2.schema_name)
-            t2_job_count = Job.objects.count()
+            t2_job_count = JobPosting.objects.count()
 
             if t1_job_count == t2_job_count:
                 self.add_leak("Tenants have identical job counts - possible data sharing")
@@ -378,7 +378,7 @@ class MultiTenancyIsolationTest:
 
             # Verify tenant-specific tables are NOT in public schema
             try:
-                Job.objects.all().count()
+                JobPosting.objects.all().count()
                 self.add_leak("Job objects found in public schema - should be tenant-specific")
             except Exception:
                 pass  # Expected - Job should not be in public schema
@@ -413,7 +413,7 @@ class MultiTenancyIsolationTest:
             # Test access to tenant 1
             connection.set_schema(tenant1.schema_name)
             try:
-                job1 = Job.objects.first()
+                job1 = JobPosting.objects.first()
                 t1_accessible = True
             except Exception:
                 t1_accessible = False
@@ -421,7 +421,7 @@ class MultiTenancyIsolationTest:
             # Test access to tenant 2
             connection.set_schema(tenant2.schema_name)
             try:
-                job2 = Job.objects.first()
+                job2 = JobPosting.objects.first()
                 t2_accessible = True
             except Exception:
                 t2_accessible = False
@@ -452,7 +452,7 @@ class MultiTenancyIsolationTest:
 
             # Create test data
             connection.set_schema(tenant1.schema_name)
-            job1 = Job.objects.create(
+            job1 = JobPosting.objects.create(
                 title="Job 1",
                 description="Description 1",
                 created_by=None,
@@ -460,13 +460,13 @@ class MultiTenancyIsolationTest:
             )
 
             connection.set_schema(tenant2.schema_name)
-            job2 = Job.objects.create(
+            job2 = JobPosting.objects.create(
                 title="Job 2",
                 description="Description 2",
                 created_by=None,
                 status='draft'
             )
-            job3 = Job.objects.create(
+            job3 = JobPosting.objects.create(
                 title="Job 3",
                 description="Description 3",
                 created_by=None,
@@ -475,10 +475,10 @@ class MultiTenancyIsolationTest:
 
             # Verify tenant1 only sees tenant1 data
             connection.set_schema(tenant1.schema_name)
-            t1_jobs = list(Job.objects.all().values_list('title', flat=True))
+            t1_jobs = list(JobPosting.objects.all().values_list('title', flat=True))
 
             connection.set_schema(tenant2.schema_name)
-            t2_jobs = list(Job.objects.all().values_list('title', flat=True))
+            t2_jobs = list(JobPosting.objects.all().values_list('title', flat=True))
 
             # Check for overlaps
             overlap = set(t1_jobs) & set(t2_jobs)
@@ -514,7 +514,7 @@ class MultiTenancyIsolationTest:
 
             # Switch to tenant1 and create job
             connection.set_schema(tenant1.schema_name)
-            job1 = Job.objects.create(
+            job1 = JobPosting.objects.create(
                 title="Job 1",
                 description="Description 1",
                 created_by=user1,
@@ -523,7 +523,7 @@ class MultiTenancyIsolationTest:
 
             # Verify user1 can access job1
             try:
-                accessed = Job.objects.get(pk=job1.pk)
+                accessed = JobPosting.objects.get(pk=job1.pk)
                 user1_access = True
             except:
                 user1_access = False
@@ -533,7 +533,7 @@ class MultiTenancyIsolationTest:
 
             # User1 should NOT be able to access job from tenant1
             try:
-                accessed = Job.objects.get(pk=job1.pk)
+                accessed = JobPosting.objects.get(pk=job1.pk)
                 user1_t2_access = True
                 self.add_leak(f"User from Tenant 1 accessed Tenant 2 job")
             except:
@@ -565,7 +565,7 @@ class MultiTenancyIsolationTest:
             connection.set_schema(tenant1.schema_name)
 
             # Create an object that might be logged
-            job = Job.objects.create(
+            job = JobPosting.objects.create(
                 title="Audited Job",
                 description="This job should be audited",
                 created_by=None,
@@ -601,7 +601,7 @@ class MultiTenancyIsolationTest:
         try:
             for tenant in self.test_tenants:
                 connection.set_schema(tenant.schema_name)
-                Job.objects.all().delete()
+                JobPosting.objects.all().delete()
                 Candidate.objects.all().delete()
                 Application.objects.all().delete()
                 Interview.objects.all().delete()
