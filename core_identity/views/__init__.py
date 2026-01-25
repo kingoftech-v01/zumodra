@@ -7,14 +7,6 @@ Exports all view classes and functions for easy importing.
 # Import all original views from account_views.py
 from ..account_views import (
     launch_kyc_view,
-    create_identification_token,
-    start_kyc,
-    check_face_auth_status,
-    generate_face_auth_token,
-    start_face_auth,
-    verify_business,
-    start_kyb,
-    idenfy_webhook,
     public_profile_view,
     profile_sync_settings_list,
     profile_sync_settings_edit,
@@ -31,14 +23,6 @@ from .freelancer_onboarding import FreelancerOnboardingWizard
 __all__ = [
     # Original view functions
     'launch_kyc_view',
-    'create_identification_token',
-    'start_kyc',
-    'check_face_auth_status',
-    'generate_face_auth_token',
-    'start_face_auth',
-    'verify_business',
-    'start_kyb',
-    'idenfy_webhook',
     'public_profile_view',
     'profile_sync_settings_list',
     'profile_sync_settings_edit',
