@@ -310,11 +310,19 @@ class JournalEntry(TenantAwareModel):
         super().save(*args, **kwargs)
 
     @property
+    def total_debits(self):
+        """Calculate total debits from all lines"""
+        return sum(line.debit for line in self.lines.all())
+
+    @property
+    def total_credits(self):
+        """Calculate total credits from all lines"""
+        return sum(line.credit for line in self.lines.all())
+
+    @property
     def is_balanced(self):
         """Check if debits equal credits"""
-        total_debits = sum(line.debit for line in self.lines.all())
-        total_credits = sum(line.credit for line in self.lines.all())
-        return total_debits == total_credits
+        return self.total_debits == self.total_credits
 
 
 class JournalEntryLine(models.Model):

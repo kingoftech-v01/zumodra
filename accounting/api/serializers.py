@@ -20,12 +20,13 @@ from ..models import (
 class AccountingProviderListSerializer(serializers.ModelSerializer):
     """Lightweight accounting provider list"""
     provider_display = serializers.CharField(source='get_provider_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
     days_since_last_sync = serializers.SerializerMethodField()
 
     class Meta:
         model = AccountingProvider
         fields = [
-            'id', 'provider', 'provider_display', 'is_active',
+            'id', 'provider', 'provider_display', 'status', 'status_display',
             'last_sync', 'days_since_last_sync', 'created_at',
         ]
         read_only_fields = fields
@@ -40,14 +41,15 @@ class AccountingProviderListSerializer(serializers.ModelSerializer):
 class AccountingProviderDetailSerializer(serializers.ModelSerializer):
     """Full accounting provider details"""
     provider_display = serializers.CharField(source='get_provider_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
     sync_logs_count = serializers.IntegerField(source='sync_logs.count', read_only=True)
 
     class Meta:
         model = AccountingProvider
         fields = [
-            'id', 'provider', 'provider_display', 'company_id',
-            'is_active', 'last_sync', 'sync_logs_count',
-            'metadata', 'created_at', 'updated_at',
+            'id', 'provider', 'provider_display', 'company_name', 'base_currency',
+            'status', 'status_display', 'last_sync', 'sync_logs_count',
+            'metadata', 'auto_sync', 'sync_frequency', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -57,7 +59,8 @@ class AccountingProviderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountingProvider
         fields = [
-            'provider', 'company_id', 'is_active', 'metadata',
+            'provider', 'company_name', 'base_currency', 'status',
+            'auto_sync', 'sync_frequency', 'metadata',
         ]
 
 
@@ -88,19 +91,23 @@ class ChartOfAccountsDetailSerializer(serializers.ModelSerializer):
             'id', 'provider', 'account_number', 'account_name',
             'account_type', 'account_type_display', 'description',
             'parent_account', 'is_active',
-            'provider_account_id', 'metadata', 'created_at', 'updated_at',
+            'provider_account_id', 'current_balance', 'last_synced',
+            'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'current_balance', 'last_synced', 'created_at', 'updated_at']
 
 
 # ============= JournalEntry Serializers =============
 
 class JournalEntryLineSerializer(serializers.ModelSerializer):
     """Journal entry line serializer"""
+    account_number = serializers.CharField(source='account.account_number', read_only=True)
+    account_name = serializers.CharField(source='account.account_name', read_only=True)
+
     class Meta:
         model = JournalEntryLine
         fields = [
-            'id', 'account_code', 'account_name', 'debit', 'credit', 'description',
+            'id', 'account', 'account_number', 'account_name', 'debit', 'credit', 'description',
         ]
 
 
@@ -113,7 +120,7 @@ class JournalEntryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalEntry
         fields = [
-            'id', 'entry_number', 'date', 'description', 'status',
+            'id', 'entry_number', 'entry_date', 'description', 'status',
             'status_display', 'line_count', 'is_balanced', 'created_at',
         ]
         read_only_fields = fields
@@ -130,10 +137,9 @@ class JournalEntryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalEntry
         fields = [
-            'id', 'entry_number', 'date', 'description', 'reference',
+            'id', 'entry_number', 'entry_date', 'description', 'reference',
             'status', 'status_display', 'lines', 'is_balanced',
-            'total_debits', 'total_credits', 'external_id', 'metadata',
-            'created_at', 'updated_at',
+            'total_debits', 'total_credits', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -145,7 +151,7 @@ class JournalEntryCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalEntry
         fields = [
-            'entry_number', 'date', 'description', 'reference', 'lines',
+            'entry_number', 'entry_date', 'description', 'reference', 'lines',
         ]
 
     def validate_lines(self, value):

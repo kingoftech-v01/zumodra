@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ('tenant_profiles', '0001_initial'),
         ('tenants', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
@@ -201,7 +201,7 @@ class Migration(migrations.Migration):
                 ('rejected_at', models.DateTimeField(blank=True, null=True)),
                 ('rejection_reason', models.TextField(blank=True)),
                 ('questionnaire_responses', models.JSONField(blank=True, default=dict, help_text='Answers to project-specific questions')),
-                ('freelancer_profile', models.ForeignKey(blank=True, help_text='If provider is individual freelancer', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='project_proposals', to='accounts.freelancerprofile')),
+                ('freelancer_profile', models.ForeignKey(blank=True, help_text='If provider is individual freelancer', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='project_proposals', to='tenant_profiles.freelancerprofile')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='proposals', to='projects.project')),
             ],
             options={

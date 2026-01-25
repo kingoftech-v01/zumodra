@@ -40,7 +40,7 @@ from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from modelcluster.tags import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from wagtail.fields import StreamField
 from wagtail import blocks
@@ -81,7 +81,7 @@ class UserProfile(models.Model):
     ------
     All modifications are tracked via django-auditlog.
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blog_profile')
     avatar = models.ForeignKey(
         'wagtailimages.Image',
         on_delete=models.SET_NULL,

@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0002_initial'),
+        ('tenant_profiles', '0002_initial'),
         ('auth', '0012_alter_user_first_name_max_length'),
         ('configurations', '0002_initial'),
         ('services', '0001_initial'),
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dataaccesslog',
             name='consent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='accounts.progressiveconsent'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='tenant_profiles.progressiveconsent'),
         ),
         migrations.AddField(
             model_name='review',
@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coopterm',
             name='student',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='coop_terms', to='accounts.studentprofile'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='coop_terms', to='tenant_profiles.studentprofile'),
         ),
         migrations.AddField(
             model_name='tenantprofile',
@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tenantuser',
             name='reports_to',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='direct_reports', to='accounts.tenantuser'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='direct_reports', to='tenant_profiles.tenantuser'),
         ),
         migrations.AddField(
             model_name='tenantuser',
@@ -137,7 +137,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tenantprofile',
             name='reports_to',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subordinate_profiles', to='accounts.tenantuser'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subordinate_profiles', to='tenant_profiles.tenantuser'),
         ),
         migrations.AddField(
             model_name='trustscore',
@@ -151,11 +151,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='candidatecv',
-            index=models.Index(fields=['user', 'is_primary'], name='accounts_ca_user_id_8bc1a0_idx'),
+            index=models.Index(fields=['user', 'is_primary'], name='tenant_profiles_ca_user_id_8bc1a0_idx'),
         ),
         migrations.AddIndex(
             model_name='candidatecv',
-            index=models.Index(fields=['user', 'status'], name='accounts_ca_user_id_475450_idx'),
+            index=models.Index(fields=['user', 'status'], name='tenant_profiles_ca_user_id_475450_idx'),
         ),
         migrations.AlterUniqueTogether(
             name='candidatecv',
@@ -163,71 +163,71 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='educationverification',
-            index=models.Index(fields=['user', 'status'], name='accounts_ed_user_id_388b55_idx'),
+            index=models.Index(fields=['user', 'status'], name='tenant_profiles_ed_user_id_388b55_idx'),
         ),
         migrations.AddIndex(
             model_name='educationverification',
-            index=models.Index(fields=['verification_token'], name='accounts_ed_verific_c27e9d_idx'),
+            index=models.Index(fields=['verification_token'], name='tenant_profiles_ed_verific_c27e9d_idx'),
         ),
         migrations.AddIndex(
             model_name='educationverification',
-            index=models.Index(fields=['status', 'created_at'], name='accounts_ed_status_7dc7b4_idx'),
+            index=models.Index(fields=['status', 'created_at'], name='tenant_profiles_ed_status_7dc7b4_idx'),
         ),
         migrations.AddIndex(
             model_name='employmentverification',
-            index=models.Index(fields=['user', 'status'], name='accounts_em_user_id_f26402_idx'),
+            index=models.Index(fields=['user', 'status'], name='tenant_profiles_em_user_id_f26402_idx'),
         ),
         migrations.AddIndex(
             model_name='employmentverification',
-            index=models.Index(fields=['verification_token'], name='accounts_em_verific_69a171_idx'),
+            index=models.Index(fields=['verification_token'], name='tenant_profiles_em_verific_69a171_idx'),
         ),
         migrations.AddIndex(
             model_name='employmentverification',
-            index=models.Index(fields=['status', 'created_at'], name='accounts_em_status_ca84d0_idx'),
+            index=models.Index(fields=['status', 'created_at'], name='tenant_profiles_em_status_ca84d0_idx'),
         ),
         migrations.AddIndex(
             model_name='freelancerprofile',
-            index=models.Index(fields=['availability_status'], name='accounts_fr_availab_354e7e_idx'),
+            index=models.Index(fields=['availability_status'], name='tenant_profiles_fr_availab_354e7e_idx'),
         ),
         migrations.AddIndex(
             model_name='freelancerprofile',
-            index=models.Index(fields=['is_verified'], name='accounts_fr_is_veri_75c103_idx'),
+            index=models.Index(fields=['is_verified'], name='tenant_profiles_fr_is_veri_75c103_idx'),
         ),
         migrations.AddIndex(
             model_name='freelancerprofile',
-            index=models.Index(fields=['average_rating', 'total_reviews'], name='accounts_fr_average_6ae189_idx'),
+            index=models.Index(fields=['average_rating', 'total_reviews'], name='tenant_profiles_fr_average_6ae189_idx'),
         ),
         migrations.AddIndex(
             model_name='freelancerprofile',
-            index=models.Index(fields=['created_at'], name='accounts_fr_created_776e25_idx'),
+            index=models.Index(fields=['created_at'], name='tenant_profiles_fr_created_776e25_idx'),
         ),
         migrations.AddIndex(
             model_name='kycverification',
-            index=models.Index(fields=['user', 'verification_type'], name='accounts_ky_user_id_39f92a_idx'),
+            index=models.Index(fields=['user', 'verification_type'], name='tenant_profiles_ky_user_id_39f92a_idx'),
         ),
         migrations.AddIndex(
             model_name='kycverification',
-            index=models.Index(fields=['status', 'created_at'], name='accounts_ky_status_60cf02_idx'),
+            index=models.Index(fields=['status', 'created_at'], name='tenant_profiles_ky_status_60cf02_idx'),
         ),
         migrations.AddIndex(
             model_name='kycverification',
-            index=models.Index(fields=['user', 'status'], name='accounts_ky_user_id_f149d0_idx'),
+            index=models.Index(fields=['user', 'status'], name='tenant_profiles_ky_user_id_f149d0_idx'),
         ),
         migrations.AddIndex(
             model_name='loginhistory',
-            index=models.Index(fields=['user', 'timestamp'], name='accounts_lo_user_id_85d75c_idx'),
+            index=models.Index(fields=['user', 'timestamp'], name='tenant_profiles_lo_user_id_85d75c_idx'),
         ),
         migrations.AddIndex(
             model_name='loginhistory',
-            index=models.Index(fields=['ip_address', 'timestamp'], name='accounts_lo_ip_addr_bcaa8b_idx'),
+            index=models.Index(fields=['ip_address', 'timestamp'], name='tenant_profiles_lo_ip_addr_bcaa8b_idx'),
         ),
         migrations.AddIndex(
             model_name='progressiveconsent',
-            index=models.Index(fields=['grantor', 'status'], name='accounts_pr_grantor_d2b597_idx'),
+            index=models.Index(fields=['grantor', 'status'], name='tenant_profiles_pr_grantor_d2b597_idx'),
         ),
         migrations.AddIndex(
             model_name='progressiveconsent',
-            index=models.Index(fields=['grantee_user', 'status'], name='accounts_pr_grantee_81e795_idx'),
+            index=models.Index(fields=['grantee_user', 'status'], name='tenant_profiles_pr_grantee_81e795_idx'),
         ),
         migrations.AlterUniqueTogether(
             name='progressiveconsent',
@@ -235,51 +235,51 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='dataaccesslog',
-            index=models.Index(fields=['data_subject', 'accessed_at'], name='accounts_da_data_su_289b4c_idx'),
+            index=models.Index(fields=['data_subject', 'accessed_at'], name='tenant_profiles_da_data_su_289b4c_idx'),
         ),
         migrations.AddIndex(
             model_name='dataaccesslog',
-            index=models.Index(fields=['accessor', 'accessed_at'], name='accounts_da_accesso_404a3e_idx'),
+            index=models.Index(fields=['accessor', 'accessed_at'], name='tenant_profiles_da_accesso_404a3e_idx'),
         ),
         migrations.AddIndex(
             model_name='review',
-            index=models.Index(fields=['reviewee', 'status', '-created_at'], name='accounts_re_reviewe_b666be_idx'),
+            index=models.Index(fields=['reviewee', 'status', '-created_at'], name='tenant_profiles_re_reviewe_b666be_idx'),
         ),
         migrations.AddIndex(
             model_name='review',
-            index=models.Index(fields=['reviewer', '-created_at'], name='accounts_re_reviewe_aa662c_idx'),
+            index=models.Index(fields=['reviewer', '-created_at'], name='tenant_profiles_re_reviewe_aa662c_idx'),
         ),
         migrations.AddIndex(
             model_name='review',
-            index=models.Index(fields=['overall_rating', 'status'], name='accounts_re_overall_8dcb26_idx'),
+            index=models.Index(fields=['overall_rating', 'status'], name='tenant_profiles_re_overall_8dcb26_idx'),
         ),
         migrations.AddIndex(
             model_name='review',
-            index=models.Index(fields=['is_negative', 'status'], name='accounts_re_is_nega_56f32b_idx'),
+            index=models.Index(fields=['is_negative', 'status'], name='tenant_profiles_re_is_nega_56f32b_idx'),
         ),
         migrations.AddConstraint(
             model_name='review',
-            constraint=models.UniqueConstraint(fields=('reviewer', 'reviewee', 'context_type', 'context_id'), name='accounts_review_unique_per_context'),
+            constraint=models.UniqueConstraint(fields=('reviewer', 'reviewee', 'context_type', 'context_id'), name='tenant_profiles_review_unique_per_context'),
         ),
         migrations.AddIndex(
             model_name='securityquestion',
-            index=models.Index(fields=['user', 'created_at'], name='accounts_se_user_id_fc0700_idx'),
+            index=models.Index(fields=['user', 'created_at'], name='tenant_profiles_se_user_id_fc0700_idx'),
         ),
         migrations.AddIndex(
             model_name='studentprofile',
-            index=models.Index(fields=['enrollment_status'], name='accounts_st_enrollm_eb8800_idx'),
+            index=models.Index(fields=['enrollment_status'], name='tenant_profiles_st_enrollm_eb8800_idx'),
         ),
         migrations.AddIndex(
             model_name='studentprofile',
-            index=models.Index(fields=['enrollment_verified'], name='accounts_st_enrollm_899e7e_idx'),
+            index=models.Index(fields=['enrollment_verified'], name='tenant_profiles_st_enrollm_899e7e_idx'),
         ),
         migrations.AddIndex(
             model_name='coopterm',
-            index=models.Index(fields=['student', 'status'], name='accounts_co_student_8f0b12_idx'),
+            index=models.Index(fields=['student', 'status'], name='tenant_profiles_co_student_8f0b12_idx'),
         ),
         migrations.AddIndex(
             model_name='coopterm',
-            index=models.Index(fields=['status', 'start_date'], name='accounts_co_status_3cde09_idx'),
+            index=models.Index(fields=['status', 'start_date'], name='tenant_profiles_co_status_3cde09_idx'),
         ),
         migrations.AlterUniqueTogether(
             name='coopterm',
@@ -291,15 +291,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='tenantprofile',
-            index=models.Index(fields=['user', 'tenant'], name='accounts_te_user_id_24a5a3_idx'),
+            index=models.Index(fields=['user', 'tenant'], name='tenant_profiles_te_user_id_24a5a3_idx'),
         ),
         migrations.AddIndex(
             model_name='tenantprofile',
-            index=models.Index(fields=['tenant', 'job_title'], name='accounts_te_tenant__dff779_idx'),
+            index=models.Index(fields=['tenant', 'job_title'], name='tenant_profiles_te_tenant__dff779_idx'),
         ),
         migrations.AddIndex(
             model_name='tenantprofile',
-            index=models.Index(fields=['department'], name='accounts_te_departm_2153ee_idx'),
+            index=models.Index(fields=['department'], name='tenant_profiles_te_departm_2153ee_idx'),
         ),
         migrations.AlterUniqueTogether(
             name='tenantprofile',
@@ -307,18 +307,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='trustscore',
-            index=models.Index(fields=['trust_level', 'overall_score'], name='accounts_tr_trust_l_005fb4_idx'),
+            index=models.Index(fields=['trust_level', 'overall_score'], name='tenant_profiles_tr_trust_l_005fb4_idx'),
         ),
         migrations.AddIndex(
             model_name='trustscore',
-            index=models.Index(fields=['entity_type', 'trust_level'], name='accounts_tr_entity__1c5d75_idx'),
+            index=models.Index(fields=['entity_type', 'trust_level'], name='tenant_profiles_tr_entity__1c5d75_idx'),
         ),
         migrations.AddIndex(
             model_name='trustscore',
-            index=models.Index(fields=['is_id_verified', 'is_career_verified'], name='accounts_tr_is_id_v_dd9b6e_idx'),
+            index=models.Index(fields=['is_id_verified', 'is_career_verified'], name='tenant_profiles_tr_is_id_v_dd9b6e_idx'),
         ),
         migrations.AddIndex(
             model_name='userprofile',
-            index=models.Index(fields=['user'], name='accounts_us_user_id_806298_idx'),
+            index=models.Index(fields=['user'], name='tenant_profiles_us_user_id_806298_idx'),
         ),
     ]

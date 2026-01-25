@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('refresh_token', models.CharField(blank=True, help_text='OAuth refresh token (should be encrypted)', max_length=500)),
                 ('token_expires_at', models.DateTimeField(blank=True, null=True)),
                 ('realm_id', models.CharField(blank=True, help_text='QuickBooks Company ID', max_length=255)),
-                ('tenant_id', models.CharField(blank=True, help_text='Xero Tenant ID', max_length=255)),
+                ('xero_tenant_id', models.CharField(blank=True, help_text='Xero Tenant ID', max_length=255)),
                 ('company_name', models.CharField(max_length=255)),
                 ('base_currency', models.CharField(default='USD', max_length=3)),
                 ('auto_sync', models.BooleanField(default=False, help_text='Automatically sync transactions')),
