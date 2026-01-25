@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Acceptable Use Policy</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">This Acceptable Use Policy governs your use of FreelanHub and defines the standards of conduct expected from all users, including freelancers and clients. By accessing our platform, you agree to use our services lawfully, professionally, and in accordance with these guidelines.</p>
+                            <p class="body2 text-secondary">FreelanHub is designed to facilitate legitimate freelance work opportunities and professional business relationships. You may use our platform to post jobs, submit proposals, communicate with other users, manage projects, process payments through our escrow system, and build your professional reputation through reviews and ratings.</p>
+                            <p class="body2 text-secondary">You are responsible for all activity that occurs under your account. You must maintain the security of your login credentials, ensure all information you provide is accurate and current, and comply with all applicable laws and regulations in your jurisdiction.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">The following activities are strictly prohibited on FreelanHub. Engaging in any of these behaviors may result in immediate account suspension or termination without refund:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Posting illegal, fraudulent, or misleading job listings or proposals; engaging in spam, phishing, or unsolicited commercial messages; or attempting to manipulate our platform's ranking, reviews, or search algorithms through artificial means.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Harassment, discrimination, threats, or abusive behavior toward other users; posting offensive, defamatory, or inappropriate content; or circumventing our escrow system to process payments off-platform.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Unauthorized access to other user accounts, scraping or harvesting data from our platform, uploading malware or viruses, or any activity that disrupts or interferes with FreelanHub's operation or security.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Additionally, you must not impersonate others, create multiple accounts to evade restrictions, share login credentials, or use our platform for any purpose that violates local, national, or international law. We reserve the right to investigate and take appropriate action against violators.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Violations of this Acceptable Use Policy will be addressed through a progressive enforcement system designed to maintain platform integrity while providing opportunities for users to correct their behavior. The severity of enforcement depends on the nature and frequency of violations.</p>
+                            <p class="body2 text-secondary">First-time minor violations may result in a warning and requirement to correct the behavior. Repeated or more serious violations can lead to temporary account suspension, restriction of specific features such as messaging or bidding, or removal of offending content. Severe violations including fraud, harassment, or illegal activity will result in immediate permanent account termination and may be reported to law enforcement.</p>
+                            <p class="body2 text-secondary">We reserve the right to investigate suspected violations, review user communications and transactions, and take appropriate action at our discretion. Users subject to enforcement actions may appeal through our support channels, except in cases of severe violations where termination is final.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">If you witness or experience violations of this Acceptable Use Policy, we encourage you to report them through our built-in reporting mechanisms. FreelanHub provides multiple ways to report concerning behavior:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Use the "Report" button available on job postings, user profiles, messages, and project pages to flag inappropriate content or behavior directly to our moderation team for review.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Contact our Trust and Safety team through the support center with detailed information about the violation, including relevant screenshots, messages, or transaction details.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>For urgent matters involving threats, fraud, or illegal activity, use our emergency reporting hotline available 24/7 to speak with a dedicated safety specialist.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">All reports are treated confidentially and reviewed promptly by our moderation team. We do not tolerate retaliation against users who report violations in good faith. Making false reports maliciously is itself a violation of this policy and subject to enforcement.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub reserves the right to update this Acceptable Use Policy at any time to reflect changes in our services, legal requirements, or community standards. We will notify users of material changes through email and prominent platform notifications at least 30 days before they take effect.</p>
+                            <p class="body2 text-secondary">Your continued use of FreelanHub after policy updates constitutes acceptance of the revised terms. If you do not agree with the changes, you should discontinue using our services. We encourage all users to review this policy periodically to stay informed about acceptable conduct standards and their responsibilities on our platform.</p>
+                            <p class="body2 text-secondary">We are committed to maintaining a safe, professional, and trustworthy marketplace for all users. By working together to uphold these standards, we create an environment where freelancers and clients can collaborate successfully and build lasting professional relationships.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

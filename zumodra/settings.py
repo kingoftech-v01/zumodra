@@ -75,8 +75,8 @@ SHARED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',  # PostGIS for geographic fields in public schema
 
-    # Custom User Model - SHARED (users can belong to multiple tenants)
-    'custom_account_u',
+    # Core Identity & Verification - SHARED (users can belong to multiple tenants)
+    'core_identity',
 
     # Tenant Management - SHARED
     'tenants',
@@ -92,13 +92,6 @@ SHARED_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.linkedin_oauth2',
-
-    # Two-Factor Authentication - SHARED (tied to user accounts)
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_hotp',
-    'django_otp.plugins.otp_email',
-    'django_otp.plugins.otp_static',
 
     # Celery Beat - SHARED (single scheduler for entire platform)
     'django_celery_beat',
@@ -125,8 +118,12 @@ SHARED_APPS = [
     'taggit',
 
     # PUBLIC CATALOG APPS (shared - cross-tenant browsing without tenant context)
-    'ats_public',  # Public job catalog for browsing
+    'jobs_public',  # Public job catalog for browsing (renamed from ats_public 2026-01-18)
     'services_public',  # Public service/provider catalog for marketplace
+    'projects_public',  # Public project catalog for mission-based opportunities
+
+    # Finance Apps - SHARED (PUBLIC schema)
+    'billing',  # Platform subscription management (Zumodra charges tenants) - Phase 11 (2026-01-18)
 ]
 
 TENANT_APPS = [
@@ -145,7 +142,7 @@ TENANT_APPS = [
 
     # Analytics & Tracking - TENANT-SPECIFIC
     'analytical',
-    'newsletter',
+    # 'newsletter',  # REMOVED (2026-01-18): Merged into 'marketing_campaigns'
     'auditlog',
     'user_agents',
     'import_export',
@@ -171,26 +168,37 @@ TENANT_APPS = [
     'channels',
 
     # Zumodra Core Apps - TENANT-SPECIFIC
-    'accounts',
-    'ats',
+    'tenant_profiles',  # Renamed from 'accounts' (Phase 10 - 2026-01-18)
+    'jobs',  # Renamed from 'jobs' (2026-01-18)
     'hr_core',
     'services',
-    'finance',
+    'projects',  # Project missions (distinct from ongoing services)
+
+    # Finance Apps (Phase 11) - Split from monolithic 'finance' app (2026-01-18)
+    'payments',          # Payment transactions, multi-currency support
+    'escrow',           # Escrow management for marketplace
+    'payroll',          # Employee payroll processing
+    'expenses',         # Business expense tracking
+    'subscriptions',    # Tenant subscription products
+    'stripe_connect',   # Marketplace payment infrastructure
+    'tax',              # Tax calculation & Avalara integration
+    'accounting',       # QuickBooks/Xero integration
+    'finance_webhooks', # Webhook monitoring
+
     'messages_sys',
     'notifications',
     'careers',
     'ai_matching',
     'integrations',
     'dashboard',
-    'dashboard_service',
     'analytics',
     'blog',
     'configurations',
     'core',
     'security',
-    'marketing',
+    'marketing_campaigns',  # Phase 8: Merged from 'marketing' + 'newsletter' (2026-01-18)
     'api',
-    'appointment.apps.AppointmentConfig',
+    'interviews',  # Changed from 'interviews.apps.InterviewsConfig' (2026-01-18)
 ]
 
 # INSTALLED_APPS: Computed from SHARED_APPS + TENANT_APPS (django-tenants standard)
@@ -231,15 +239,13 @@ MIDDLEWARE = [
 
     # Authentication
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'custom_account_u.middleware.Require2FAMiddleware',
-    'accounts.middleware.MFAEnforcementMiddleware',  # 30-day MFA grace period enforcement
+    'core_identity.middleware.UnifiedMFAEnforcementMiddleware',  # 30-day MFA grace period
 
     # Messages & Security
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'custom_account_u.middleware.AuthSecurityMiddleware',
+    'core_identity.middleware.AuthSecurityMiddleware',
 
     # Audit & History
     'simple_history.middleware.HistoryRequestMiddleware',
@@ -385,7 +391,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'custom_account_u.CustomUser'
+AUTH_USER_MODEL = 'core_identity.CustomUser'
 
 # =============================================================================
 # DOMAIN CONFIGURATION
@@ -455,7 +461,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_ADAPTER = 'custom_account_u.adapter.ZumodraAccountAdapter'
+ACCOUNT_ADAPTER = 'core_identity.adapter.ZumodraAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -512,7 +518,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Session persists for SESSION_COOKIE_A
 # Custom Settings
 MAX_LOGIN_ATTEMPTS = 7
 LOGIN_ATTEMPT_TIMEOUT = 86400  # in seconds (72 hours)
-ACCOUNT_FORMS = {'signup': 'custom_account_u.forms.CustomSignupForm'}
+ACCOUNT_FORMS = {'signup': 'core_identity.forms.CustomSignupForm'}
 
 # django-analytical settings
 GOOGLE_ANALYTICS_PROPERTY_ID = env('GOOGLE_ANALYTICS_PROPERTY_ID', default='')
@@ -585,11 +591,11 @@ CELERY_TASK_ROUTES = {
 
     # HR tasks
     'hr_core.tasks.*': {'queue': 'hr'},
-    'accounts.tasks.*': {'queue': 'hr'},
+    'tenant_profiles.tasks.*': {'queue': 'hr'},
 
-    # ATS tasks
-    'ats.tasks.*': {'queue': 'ats'},
-    'careers.tasks.*': {'queue': 'ats'},
+    # Jobs tasks (renamed from ATS 2026-01-18)
+    'jobs.tasks.*': {'queue': 'jobs'},
+    'careers.tasks.*': {'queue': 'jobs'},
 }
 
 # Task rate limits
@@ -598,7 +604,7 @@ CELERY_TASK_ANNOTATIONS = {
     'notifications.tasks.send_email_notification': {'rate_limit': '100/m'},
     'finance.tasks.process_payment': {'rate_limit': '30/m'},
     'analytics.tasks.calculate_daily_metrics': {'rate_limit': '2/m'},
-    'ats.tasks.calculate_match_scores': {'rate_limit': '20/m'},
+    'jobs.tasks.calculate_match_scores': {'rate_limit': '20/m'},
 }
 
 # Celery Beat scheduler
@@ -776,17 +782,17 @@ LEAFLET_MAP_OPTIONS = {
     'max_native_zoom': 18,
 }
 
-# Appointment settings
+# Interview scheduling settings
 
-APPOINTMENT_START_TIME = 8
-APPOINTMENT_END_TIME = 18
-APPOINTMENT_SERVICE_MODEL = 'dashboard_service.Service'
+INTERVIEWS_START_TIME = 8
+INTERVIEWS_END_TIME = 18
+INTERVIEWS_SERVICE_MODEL = 'services.Service'  # Updated from dashboard_service.Service
 
 
 # Django Q
 
 Q_CLUSTER = {
-    'name': 'django-appointment',
+    'name': 'django-interviews',
     'workers': 4,
     'timeout': 90,
     'retry': 120,
@@ -1001,7 +1007,7 @@ SPECTACULAR_SETTINGS = {
     Zumodra Multi-Tenant SaaS Platform REST API
 
     A comprehensive freelance services marketplace with integrated CRM tools,
-    appointment booking, escrow payments, real-time messaging, email marketing,
+    interview scheduling, escrow payments, real-time messaging, email marketing,
     and content management.
 
     ## Features

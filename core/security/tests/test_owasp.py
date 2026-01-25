@@ -271,7 +271,7 @@ class TestA03Injection:
 
         # Should not cause SQL error or data loss
         # Database should still be intact
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         # If test gets here, table wasn't dropped
 
     def test_orm_queries_parameterized(self):
@@ -650,7 +650,7 @@ class TestA09LoggingFailures:
         """
         Test: Failed login attempts are logged.
         """
-        with patch('accounts.signals.logger') as mock_logger:
+        with patch('tenant_profiles.signals.logger') as mock_logger:
             client.post('/api/auth/login/', {
                 'email': 'test@test.com',
                 'password': 'wrongpassword'

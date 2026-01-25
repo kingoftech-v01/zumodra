@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Legal Notice</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">This Legal Notice provides important information about the ownership and operation of FreelanHub, including company identification, contact details, and regulatory compliance information required by applicable laws in our operating jurisdictions.</p>
+                            <p class="body2 text-secondary">FreelanHub is operated by FreelanHub Technologies Inc., a Delaware corporation registered in the United States. Company Registration Number: 12345678. Registered Office: 123 Innovation Drive, Suite 500, San Francisco, California 94105, United States of America. VAT/Tax Identification Number: US-987654321.</p>
+                            <p class="body2 text-secondary">Our platform connects freelancers and clients globally, operating as a marketplace for professional services. We are committed to transparency in our business operations and compliance with all applicable laws, regulations, and industry standards in the jurisdictions where we operate.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">For inquiries, support, or legal communications, you may contact FreelanHub through the following official channels. All communications are handled professionally and confidentially:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>General Support and Customer Service: support@freelanhub.com, available Monday through Friday, 9:00 AM to 6:00 PM Pacific Time. For urgent matters outside business hours, use our in-platform emergency support system.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Legal and Compliance Inquiries: legal@freelanhub.com for matters related to Terms of Service, DMCA notices, copyright concerns, regulatory compliance, or formal legal correspondence requiring attorney attention.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Privacy and Data Protection: privacy@freelanhub.com for questions about data processing, GDPR requests, privacy policy inquiries, or data subject access requests under applicable privacy laws.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Postal correspondence should be sent to our registered office address listed above. Please allow 5-10 business days for responses to written correspondence. For time-sensitive matters, we recommend using email or our in-platform support system for faster response times.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub operates globally and is subject to multiple regulatory frameworks depending on the location of our users and the nature of services provided. We maintain compliance with applicable laws in all jurisdictions where we conduct business.</p>
+                            <p class="body2 text-secondary">Our platform complies with United States federal and state laws including consumer protection regulations, payment processing requirements, and data security standards. For European users, we comply with GDPR and applicable EU directives. We also adhere to international standards for cross-border data transfers, anti-money laundering regulations, and financial services compliance where applicable to our payment processing and escrow services.</p>
+                            <p class="body2 text-secondary">Users are responsible for ensuring their use of FreelanHub complies with laws in their own jurisdictions. This includes tax obligations, employment laws, business licensing requirements, and industry-specific regulations. We recommend consulting with legal and tax professionals to understand your obligations when using our platform.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub is represented by qualified legal counsel in various jurisdictions to ensure compliance and protect user interests. Our legal structure includes:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>United States Operations: Wilson & Partners LLP, 456 Legal Plaza, New York, NY 10001, serving as primary counsel for U.S. regulatory matters, intellectual property, and corporate governance.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>European Union Representation: Our designated EU representative for GDPR purposes is DataProtect Services Ltd, 789 Compliance Street, Dublin 2, Ireland, contact: eurep@freelanhub.com.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Data Protection Officer: Our DPO oversees privacy compliance and can be reached at dpo@freelanhub.com for matters related to data processing, privacy rights, or compliance with data protection regulations.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">For regulatory complaints or concerns, users may also contact relevant authorities in their jurisdiction, including consumer protection agencies, data protection authorities, or financial services regulators, depending on the nature of the issue.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub maintains appropriate licenses and registrations required to operate our platform and provide our services. This includes payment processing licenses, money transmitter licenses where required, and business operating licenses in applicable jurisdictions.</p>
+                            <p class="body2 text-secondary">We work with licensed payment processors and financial institutions to handle all monetary transactions securely and in compliance with banking regulations. Our escrow services are provided in partnership with regulated financial institutions that maintain appropriate licenses and insurance. We carry professional liability insurance and cybersecurity insurance to protect our operations and user interests.</p>
+                            <p class="body2 text-secondary">This Legal Notice is current as of the last revision date specified at the top of this document. We may update this notice periodically to reflect changes in our corporate structure, contact information, or regulatory status. Material changes will be communicated to users through our standard notification procedures. For questions about this Legal Notice or our legal structure, please contact our legal team at legal@freelanhub.com.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

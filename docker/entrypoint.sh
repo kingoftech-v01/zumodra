@@ -637,20 +637,20 @@ verify_django_setup() {
 }
 
 # -----------------------------------------------------------------------------
-# Bootstrap Demo Tenants (optional) - Creates COMPANY and FREELANCER types
+# Bootstrap Demo Tenant (optional) - Creates demo COMPANY tenant
 # -----------------------------------------------------------------------------
 bootstrap_demo_tenant() {
     if [ "$CREATE_DEMO_TENANT" != "true" ] && [ "$CREATE_DEMO_TENANT" != "1" ]; then
-        log_info "Skipping demo tenants (CREATE_DEMO_TENANT not set)"
+        log_info "Skipping demo tenant (CREATE_DEMO_TENANT not set)"
         return 0
     fi
 
-    log_info "Bootstrapping demo tenants (COMPANY and FREELANCER types)..."
+    log_info "Bootstrapping demo company tenant..."
 
     if python manage.py bootstrap_demo_tenants 2>&1; then
-        log_info "Demo tenants bootstrapped successfully!"
+        log_info "Demo tenant bootstrapped successfully!"
     else
-        log_warn "Demo tenants bootstrap had issues (non-fatal, continuing...)"
+        log_warn "Demo tenant bootstrap had issues (non-fatal, continuing...)"
     fi
 }
 

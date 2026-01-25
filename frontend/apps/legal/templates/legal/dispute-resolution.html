@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Dispute Resolution Process</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub is committed to helping freelancers and clients resolve disputes fairly and efficiently. This Dispute Resolution Process outlines the steps to address conflicts that may arise during transactions, project work, or platform interactions.</p>
+                            <p class="body2 text-secondary">Common disputes on our platform include payment disagreements over milestone completion, quality concerns regarding delivered work, scope disputes when project requirements are unclear, deadline conflicts, communication breakdowns, and violations of our Terms of Service. Our process is designed to protect both parties while facilitating constructive resolution.</p>
+                            <p class="body2 text-secondary">We encourage users to attempt direct communication first before escalating disputes. Many issues can be resolved through professional dialogue. However, when direct resolution fails, our structured dispute process provides a clear pathway to fair outcomes with support from our mediation team.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">When a dispute arises, users should initiate the formal dispute process through their project dashboard. The process follows these structured steps:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Informal Resolution (1-3 days): Both parties attempt to resolve the issue through direct communication using our messaging system. During this period, funds in escrow remain protected and no actions are taken against either party's account.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Mediation (5-7 days): If informal resolution fails, either party can request mediation. A neutral FreelanHub mediator reviews all evidence, communicates with both parties, and proposes a fair resolution based on our Terms of Service and industry standards.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Arbitration (10-14 days): For unresolved disputes, binding arbitration is available. An independent arbitrator reviews the complete case record and issues a final, enforceable decision. This decision is binding on both parties and cannot be appealed.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Throughout the process, escrow funds remain protected until resolution. We encourage good faith participation at all stages to reach fair outcomes quickly. Delays or non-participation may negatively impact the final decision.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Strong evidence is crucial for successful dispute resolution. When filing a dispute, users should gather and submit comprehensive documentation to support their position. The quality and completeness of evidence significantly impacts the outcome of mediation and arbitration.</p>
+                            <p class="body2 text-secondary">Required evidence includes all written communications between parties through our messaging system, the original project description and agreed scope, contracts or service agreements, deliverables submitted by the freelancer, revision requests and feedback, payment records and milestone details, screenshots of relevant conversations or work, and any other documentation demonstrating the facts of the dispute.</p>
+                            <p class="body2 text-secondary">Evidence must be submitted through our secure dispute portal within the specified timeframes. Late submissions may not be considered. Both parties have equal opportunity to present evidence and respond to claims. Our mediators and arbitrators evaluate evidence objectively based on contractual obligations and platform policies.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Dispute outcomes vary based on the specific circumstances and evidence presented. Our mediation and arbitration teams have authority to implement various resolutions to achieve fair outcomes:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Payment adjustments including full payment to freelancer, partial payment based on work completed, refund to client, or split decisions where both parties share costs based on fault determination.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Account actions such as warnings, temporary restrictions, rating adjustments, or in severe cases of misconduct, permanent account suspension for repeated violations or fraudulent behavior.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Additional remedies including mandated project completion, revision requirements, deadline extensions, or requirements for future compliance with specific terms to prevent recurring issues.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">All decisions are documented and communicated to both parties with detailed reasoning. Arbitration decisions are final and binding. Users who fail to comply with arbitration outcomes may face account suspension and legal action to enforce the decision.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub's dispute resolution process is designed to handle the vast majority of conflicts efficiently and fairly. However, in rare cases involving complex legal issues, significant financial amounts, or disputes that cannot be resolved through our process, parties may have the right to pursue legal action.</p>
+                            <p class="body2 text-secondary">Before pursuing litigation, users must complete our dispute resolution process in good faith. This requirement is outlined in our Terms of Service. Legal action should be considered a last resort after all platform-based resolution attempts have been exhausted. Users are responsible for their own legal costs and must comply with applicable jurisdiction requirements.</p>
+                            <p class="body2 text-secondary">We strongly encourage users to prevent disputes by maintaining clear communication, documenting agreements thoroughly, setting realistic expectations, using our milestone-based escrow system, providing detailed project specifications, and adhering to professional standards throughout the working relationship. Prevention is always better than resolution.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

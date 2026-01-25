@@ -111,7 +111,7 @@ class AnalyticsDashboardView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermi
         }
 
         # Import models
-        from ats.models import JobPosting, Candidate, Application, Interview, Offer
+        from jobs.models import JobPosting, Candidate, Application, Interview, Offer
 
         # ===== KEY METRICS =====
 
@@ -217,7 +217,7 @@ class AnalyticsDashboardView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermi
         ])
 
         # ===== TOP SOURCES =====
-        from ats.models import CandidateSource
+        from jobs.models import CandidateSource
         top_sources = Candidate.objects.filter(
             tenant=tenant,
             created_at__date__gte=start_date
@@ -256,7 +256,7 @@ class FunnelChartView(LoginRequiredMixin, TenantViewMixin, View):
         # Job filter
         job_id = request.GET.get('job')
 
-        from ats.models import Application
+        from jobs.models import Application
 
         base_qs = Application.objects.filter(
             tenant=tenant,
@@ -300,7 +300,7 @@ class PipelineAnalyticsView(LoginRequiredMixin, TenantViewMixin, View):
         if not tenant:
             return JsonResponse({'error': 'No tenant'}, status=403)
 
-        from ats.models import Pipeline, Application
+        from jobs.models import Pipeline, Application
 
         pipeline_id = request.GET.get('pipeline')
         period = int(request.GET.get('period', 30))
@@ -462,7 +462,7 @@ class ReportGenerateView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermissio
         return JsonResponse(data)
 
     def _generate_recruitment_summary(self, tenant, start_date, end_date):
-        from ats.models import JobPosting, Candidate, Application, Interview, Offer
+        from jobs.models import JobPosting, Candidate, Application, Interview, Offer
 
         return {
             'summary': {
@@ -488,7 +488,7 @@ class ReportGenerateView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermissio
         }
 
     def _generate_time_to_hire(self, tenant, start_date, end_date):
-        from ats.models import Application
+        from jobs.models import Application
 
         hired_apps = Application.objects.filter(
             tenant=tenant,
@@ -515,7 +515,7 @@ class ReportGenerateView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermissio
         }
 
     def _generate_source_quality(self, tenant, start_date, end_date):
-        from ats.models import Candidate, Application
+        from jobs.models import Candidate, Application
 
         # Get candidates by source with application outcomes
         source_data = Candidate.objects.filter(
@@ -531,7 +531,7 @@ class ReportGenerateView(LoginRequiredMixin, TenantViewMixin, AnalyticsPermissio
         }
 
     def _generate_pipeline_performance(self, tenant, start_date, end_date):
-        from ats.models import Pipeline, Application
+        from jobs.models import Pipeline, Application
 
         pipelines = Pipeline.objects.filter(tenant=tenant)
         pipeline_data = []
@@ -597,7 +597,7 @@ class ApplicationsTrendChartView(LoginRequiredMixin, TenantViewMixin, View):
         end_date = date.today()
         start_date = end_date - timedelta(days=period)
 
-        from ats.models import Application
+        from jobs.models import Application
 
         trend_data = Application.objects.filter(
             tenant=tenant,
@@ -636,7 +636,7 @@ class HiresByDepartmentChartView(LoginRequiredMixin, TenantViewMixin, View):
         end_date = date.today()
         start_date = end_date - timedelta(days=period)
 
-        from ats.models import Application
+        from jobs.models import Application
 
         dept_data = Application.objects.filter(
             tenant=tenant,
@@ -675,7 +675,7 @@ class SourcePerformanceChartView(LoginRequiredMixin, TenantViewMixin, View):
         end_date = date.today()
         start_date = end_date - timedelta(days=period)
 
-        from ats.models import Candidate, Application
+        from jobs.models import Candidate, Application
 
         source_data = Candidate.objects.filter(
             tenant=tenant,

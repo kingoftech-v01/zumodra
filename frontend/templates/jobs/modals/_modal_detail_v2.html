@@ -1,0 +1,43 @@
+{% load static %}
+
+        <!-- Modal -->
+        <div class="modal">
+            <div class="modal_item modal_apply overflow-hidden md:w-[660px] w-[90vw] rounded-xl bg-white" data-type="modal_apply">
+                <div class="flex items-center justify-between px-7.5 py-6 border-b border-line">
+                    <h6 class="heading6">Apply Jobs</h6>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl"></span>
+                    </button>
+                </div>
+                <form class="p-7.5">
+                    <div class="cover_letter">
+                        <label for="cover_letter" class="label caption1">Cover letter <span class="text-red">*</span></label>
+                        <textarea id="cover_letter" name="cover_letter" class="w-full h-32 mt-2 px-4 py-3 border border-line rounded" placeholder="Enter your cover letter" required></textarea>
+                    </div>
+                    <div class="cv mt-5">
+                        <label for="pdf-cv" class="label caption1">CV <span class="text-red">*</span></label>
+                        <ul class="list_attachments grid grid-cols-2 gap-4 mt-2 p-4 border border-line rounded">
+                            <li class="pdf_file flex items-center justify-between gap-3 h-[76px] p-3 rounded-lg bg-surface duration-300 hover:bg-background">
+                                <div class="upload_file">
+                                    <input type="file" name="pdf" id="pdf-cv" class="w-full cursor-pointer" />
+                                    <label for="pdf-cv" class="block text-title cursor-pointer">PDF</label>
+                                </div>
+                                <span class="ph ph-file-pdf flex-shrink-0 text-4xl text-primary"></span>
+                            </li>
+                            <li class="doc_file flex items-center justify-between gap-3 h-[76px] p-3 rounded-lg bg-surface duration-300 hover:bg-background">
+                                <div class="upload_file">
+                                    <input type="file" name="doc" id="doc-cv" class="w-full cursor-pointer" />
+                                    <label for="doc-cv" class="block text-title cursor-pointer">Doc</label>
+                                </div>
+                                <span class="ph ph-file-doc flex-shrink-0 text-4xl text-primary"></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="button-main w-full mt-5 text-center">Apply Now</button>
+                </form>
+            </div>
+
+            <div class="modal_item modal_video md:w-[700px] w-[90vw] aspect-[16/9]" data-type="modal_video">
+                <iframe class="w-full h-full" src="https://www.youtube.com/embed/VCPGMjCW0is?si=ZxMxN4w4R8_UyB7U" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>

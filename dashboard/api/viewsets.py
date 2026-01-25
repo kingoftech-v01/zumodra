@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from core.cache import TenantCache
 from tenants.mixins import TenantViewMixin
 
-from ..serializers import (
+from .serializers import (
     DashboardStatsSerializer,
     QuickStatsSerializer,
     SearchResultsSerializer,
@@ -76,7 +76,7 @@ class DashboardOverviewView(TenantAPIViewMixin, APIView):
             return Response(cached_data)
 
         # Import models
-        from ats.models import JobPosting, Candidate, Application, Interview
+        from jobs.models import JobPosting, Candidate, Application, Interview
         from hr_core.models import Employee, TimeOffRequest
         from notifications.models import Notification
 
@@ -222,7 +222,7 @@ class QuickStatsView(TenantAPIViewMixin, APIView):
         if cached_data is not None:
             return Response(cached_data)
 
-        from ats.models import JobPosting, Candidate, Application, Interview
+        from jobs.models import JobPosting, Candidate, Application, Interview
 
         now = timezone.now()
         week_ago = now.date() - timedelta(days=7)
@@ -273,7 +273,7 @@ class SearchView(TenantAPIViewMixin, APIView):
                 'total_count': 0,
             })
 
-        from ats.models import JobPosting, Candidate, Application
+        from jobs.models import JobPosting, Candidate, Application
         from hr_core.models import Employee
 
         results = {
@@ -391,7 +391,7 @@ class UpcomingInterviewsView(TenantAPIViewMixin, APIView):
         if cached_data is not None:
             return Response(cached_data)
 
-        from ats.models import Interview
+        from jobs.models import Interview
 
         now = timezone.now()
         end_date = now + timedelta(days=days)
@@ -486,7 +486,7 @@ class ATSMetricsView(TenantAPIViewMixin, APIView):
         if cached_data is not None:
             return Response(cached_data)
 
-        from ats.models import JobPosting, Candidate, Application
+        from jobs.models import JobPosting, Candidate, Application
 
         # Job counts
         all_jobs = JobPosting.objects.filter(tenant=tenant)

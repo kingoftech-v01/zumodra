@@ -65,8 +65,8 @@ class APIErrorTester:
         print("="*80)
 
         endpoints = [
-            "/api/v1/ats/jobs/",
-            "/api/v1/ats/candidates/",
+            "/api/v1/jobs/jobs/",
+            "/api/v1/jobs/candidates/",
             "/api/v1/hr/employees/",
             "/api/v1/dashboard/overview/",
         ]
@@ -123,8 +123,8 @@ class APIErrorTester:
         print("="*80)
 
         urls = [
-            "/api/v1/ats/jobs/99999/",
-            "/api/v1/ats/candidates/99999/",
+            "/api/v1/jobs/jobs/99999/",
+            "/api/v1/jobs/candidates/99999/",
             "/nonexistent-endpoint",
             "/app/../../../etc/passwd",
         ]

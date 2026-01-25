@@ -45,7 +45,7 @@ from .models import (
     WebhookDelivery,
     IntegrationEvent,
 )
-from .serializers import (
+from .api.serializers import (
     IntegrationSerializer,
     IntegrationListSerializer,
     IntegrationCreateSerializer,

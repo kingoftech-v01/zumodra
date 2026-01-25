@@ -1,0 +1,205 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize %}
+
+{% block page_title %}{% trans "Candidates" %}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h4 class="heading4 max-lg:mt-3">{% trans "Candidates" %}</h4>
+        <div class="flex items-center gap-3">
+            <button hx-get="{% url 'frontend:jobs:candidate_import' %}"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    class="button-main -border">
+                <span class="ph ph-upload text-xl mr-2"></span>
+                {% trans "Import" %}
+            </button>
+            <a href="{% url 'frontend:jobs:candidate_create' %}" class="button-main">
+                <span class="ph ph-plus text-xl mr-2"></span>
+                {% trans "Add Candidate" %}
+            </a>
+        </div>
+    </div>
+
+    {% if request.tenant.tenant_type != 'company' %}
+    <div class="mt-5 rounded-lg bg-yellow-50 p-4 border-l-4 border-yellow-400">
+        <div class="flex">
+            <span class="ph ph-warning text-yellow-600 text-2xl mr-3"></span>
+            <div>
+                <p class="text-sm text-yellow-700">
+                    {% trans "ATS features are only available for company tenants." %}
+                    <a href="{% url 'tenants:tenant_settings' %}" class="font-medium underline hover:text-yellow-600">
+                        {% trans "Switch to company account" %}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+
+    <!-- Filters and Content -->
+    <div class="mt-7.5 flex max-lg:flex-col-reverse gap-y-10">
+        <!-- Sidebar Filters -->
+        <div class="sidebar_inner flex-shrink-0 lg:w-[300px] w-full lg:pr-7.5">
+            <form class="filter_form bg-white rounded-lg p-6">
+                <div class="filter_section search">
+                    <strong class="text-button">{% trans "Search" %}</strong>
+                    <div class="form_input relative w-full h-12 mt-2">
+                        <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-3 text-xl"></span>
+                        <input type="text" name="search"
+                               hx-get="{% url 'frontend:jobs:candidate_list' %}"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#candidates-container"
+                               hx-swap="innerHTML"
+                               class="w-full h-full pl-10 pr-3 border border-line rounded-lg"
+                               placeholder="{% trans 'Search candidates...' %}" />
+                    </div>
+                </div>
+
+                <div class="filter_section location mt-6">
+                    <strong class="text-button">{% trans "Location" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="{% trans 'All Locations' %}">{% trans "All Locations" %}</span>
+                            <ul class="list_option w-full bg-white">
+                                <li class="capitalize" data-item="{% trans 'All Locations' %}">{% trans "All Locations" %}</li>
+                                <li class="capitalize" data-item="Remote">Remote</li>
+                            </ul>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+
+                <div class="filter_section skills mt-6">
+                    <strong class="text-button">{% trans "Skills" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <div class="select">
+                            <span class="selected capitalize" data-title="{% trans 'All Skills' %}">{% trans "All Skills" %}</span>
+                            <ul class="list_option w-full bg-white">
+                                <li class="capitalize" data-item="{% trans 'All Skills' %}">{% trans "All Skills" %}</li>
+                            </ul>
+                        </div>
+                        <span class="icon_down ph ph-caret-down right-3"></span>
+                    </div>
+                </div>
+
+                <div class="filter_section source mt-6">
+                    <strong class="text-button">{% trans "Source" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <select name="source"
+                                hx-get="{% url 'frontend:jobs:candidate_list' %}"
+                                hx-trigger="change"
+                                hx-target="#candidates-container"
+                                hx-swap="innerHTML"
+                                class="w-full h-full border-0 outline-none">
+                            <option value="">{% trans "All Sources" %}</option>
+                            <option value="website">{% trans "Website" %}</option>
+                            <option value="linkedin">{% trans "LinkedIn" %}</option>
+                            <option value="referral">{% trans "Referral" %}</option>
+                            <option value="agency">{% trans "Agency" %}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter_section tags mt-6">
+                    <strong class="text-button">{% trans "Tags" %}</strong>
+                    <div class="select_block flex items-center w-full h-12 pr-10 pl-3 mt-2 border border-line rounded-lg">
+                        <select name="tags"
+                                hx-get="{% url 'frontend:jobs:candidate_list' %}"
+                                hx-trigger="change"
+                                hx-target="#candidates-container"
+                                hx-swap="innerHTML"
+                                class="w-full h-full border-0 outline-none">
+                            <option value="">{% trans "All Tags" %}</option>
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="candidates_content flex-1">
+            <div id="candidates-container">
+                <ul class="list_layout_cols list_candidates grid xl:grid-cols-3 sm:grid-cols-2 lg:gap-7.5 gap-5 w-full">
+                    {% for candidate in candidates %}
+                    <li class="candidates_item relative p-6 rounded-lg bg-white duration-300 shadow-lg hover:shadow-2xl">
+                        <div class="candidates_innner">
+                            <a href="{% url 'frontend:jobs:candidate_detail' candidate.id %}" class="flex flex-col items-center justify-center">
+                                {% if candidate.photo %}
+                                <img src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}" class="w-20 h-20 rounded-full object-cover" />
+                                {% else %}
+                                <div class="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+                                    <span class="text-white text-2xl font-bold">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
+                                </div>
+                                {% endif %}
+                                <strong class="candidates_name -style-1 text-title mt-3 duration-300 hover:text-primary">{{ candidate.full_name }}</strong>
+                                {% if candidate.location %}
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                    <span class="candidates_address -style-1 caption1 text-secondary">{{ candidate.location }}</span>
+                                </div>
+                                {% endif %}
+                                {% if candidate.user and candidate.user.trust_score %}
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="ph-fill ph-star text-yellow"></span>
+                                    <strong class="candidates_rate text-sm font-semibold">{{ candidate.user.trust_score|floatformat:1 }}</strong>
+                                    <span class="candidates_rate_quantity caption1 text-secondary">({% trans "Verified" %})</span>
+                                </div>
+                                {% endif %}
+                            </a>
+                            <div class="list_tag flex items-center justify-center gap-2.5 flex-wrap sm:py-5 py-3 border-b border-line">
+                                {% for skill in candidate.skills.all|slice:":2" %}
+                                <span class="candidates_tag tag bg-surface caption1 hover:text-white hover:bg-primary">{{ skill.name }}</span>
+                                {% empty %}
+                                <span class="candidates_tag tag bg-surface caption1">{{ candidate.current_title|default:"N/A" }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="candidates_more_info flex flex-wrap items-center justify-between gap-2 mt-3">
+                                <span class="candidates_projects text-secondary">{{ applications|length }} {% trans "Applications" %}</span>
+                                <div class="candidates_price">
+                                    {% if candidate.expected_salary %}
+                                    <span class="price text-title">${{ candidate.expected_salary|intcomma }}</span>
+                                    {% else %}
+                                    <span class="price text-title">{% trans "Contact" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'frontend:jobs:candidate_detail' candidate.id %}" class="candidates_apply_btn button-main text-center -border w-full mt-3">
+                            {% trans "View profile" %}
+                        </a>
+                        <button class="add_wishlist_btn -border"
+                                hx-post="{% url 'frontend:jobs:candidate_add_to_job' candidate.id %}"
+                                hx-target="#modal-container"
+                                hx-swap="innerHTML">
+                            <span class="ph ph-briefcase text-xl"></span>
+                        </button>
+                    </li>
+                    {% empty %}
+                    <li class="col-span-full">
+                        <div class="flex flex-col items-center justify-center py-12 bg-white rounded-lg">
+                            <span class="ph ph-users text-6xl text-placehover mb-4"></span>
+                            <h3 class="heading6 text-title">{% trans "No candidates found" %}</h3>
+                            <p class="mt-1 body2 text-secondary">{% trans "Start building your talent pool." %}</p>
+                            <a href="{% url 'frontend:jobs:candidate_create' %}" class="button-main mt-4">
+                                <span class="ph ph-plus text-xl mr-2"></span>
+                                {% trans "Add Candidate" %}
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                {% if page_obj %}
+                <div class="pagination mt-7.5 flex items-center justify-center">
+                    {% include "components/pagination.html" %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

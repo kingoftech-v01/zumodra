@@ -137,28 +137,28 @@ CELERY_BEAT_SCHEDULE = {
     # ==================== ACCOUNT TASKS ====================
 
     'cleanup-expired-tokens': {
-        'task': 'accounts.tasks.cleanup_expired_tokens',
+        'task': 'tenant_profiles.tasks.cleanup_expired_tokens',
         'schedule': crontab(hour=4, minute=30),  # Daily at 4:30 AM
         'options': {'queue': 'hr'},
         'description': 'Remove expired authentication tokens',
     },
 
     'kyc-verification-reminder': {
-        'task': 'accounts.tasks.kyc_verification_reminder',
+        'task': 'tenant_profiles.tasks.kyc_verification_reminder',
         'schedule': crontab(hour=11, minute=0),  # Daily at 11 AM
         'options': {'queue': 'emails'},
         'description': 'Send KYC verification reminders',
     },
 
     'expire-kyc-verifications': {
-        'task': 'accounts.tasks.expire_kyc_verifications',
+        'task': 'tenant_profiles.tasks.expire_kyc_verifications',
         'schedule': crontab(hour=0, minute=0),  # Daily at midnight
         'options': {'queue': 'hr'},
         'description': 'Mark expired KYC verifications',
     },
 
     'cleanup-old-login-history': {
-        'task': 'accounts.tasks.cleanup_old_login_history',
+        'task': 'tenant_profiles.tasks.cleanup_old_login_history',
         'schedule': crontab(hour=3, minute=30, day_of_week='sunday'),  # Weekly on Sunday
         'options': {'queue': 'hr'},
         'kwargs': {'days': 180},  # Keep login history for 180 days
@@ -166,7 +166,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 
     'expire-consents': {
-        'task': 'accounts.tasks.expire_consents',
+        'task': 'tenant_profiles.tasks.expire_consents',
         'schedule': crontab(hour=1, minute=30),  # Daily at 1:30 AM
         'options': {'queue': 'hr'},
         'description': 'Mark expired progressive consents',
@@ -175,21 +175,21 @@ CELERY_BEAT_SCHEDULE = {
     # --- Verification & Trust System Tasks ---
 
     'expire-old-verifications': {
-        'task': 'accounts.tasks.expire_old_verifications',
+        'task': 'tenant_profiles.tasks.expire_old_verifications',
         'schedule': crontab(hour=0, minute=45),  # Daily at 12:45 AM
         'options': {'queue': 'hr'},
         'description': 'Expire employment/education verifications past expiry date',
     },
 
     'send-pending-verification-reminders': {
-        'task': 'accounts.tasks.send_pending_verification_reminders',
+        'task': 'tenant_profiles.tasks.send_pending_verification_reminders',
         'schedule': crontab(hour=10, minute=30),  # Daily at 10:30 AM
         'options': {'queue': 'emails'},
         'description': 'Send reminders for pending verifications older than 7 days',
     },
 
     'send-expiring-verification-warnings': {
-        'task': 'accounts.tasks.send_expiring_verification_warnings',
+        'task': 'tenant_profiles.tasks.send_expiring_verification_warnings',
         'schedule': crontab(hour=9, minute=30),  # Daily at 9:30 AM
         'options': {'queue': 'emails'},
         'kwargs': {'days_before': 30},
@@ -197,7 +197,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 
     'analyze-pending-reviews': {
-        'task': 'accounts.tasks.analyze_pending_reviews',
+        'task': 'tenant_profiles.tasks.analyze_pending_reviews',
         'schedule': timedelta(hours=2),  # Every 2 hours
         'options': {'queue': 'hr'},
         'kwargs': {'limit': 50},
@@ -205,7 +205,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 
     'recalculate-all-trust-scores': {
-        'task': 'accounts.tasks.recalculate_all_trust_scores',
+        'task': 'tenant_profiles.tasks.recalculate_all_trust_scores',
         'schedule': crontab(hour=3, minute=0, day_of_week='sunday'),  # Weekly on Sunday at 3 AM
         'options': {'queue': 'hr'},
         'description': 'Recalculate trust scores for all users',
@@ -215,44 +215,44 @@ CELERY_BEAT_SCHEDULE = {
     # ==================== ATS TASKS ====================
 
     'calculate-match-scores': {
-        'task': 'ats.tasks.calculate_match_scores',
+        'task': 'jobs.tasks.calculate_match_scores',
         'schedule': timedelta(hours=2),  # Every 2 hours
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Calculate AI match scores for candidates',
     },
 
     'send-application-reminders': {
-        'task': 'ats.tasks.send_application_reminders',
+        'task': 'jobs.tasks.send_application_reminders',
         'schedule': crontab(hour=9, minute=30),  # Daily at 9:30 AM
         'options': {'queue': 'emails'},
         'description': 'Send reminders for pending application reviews',
     },
 
     'auto-reject-stale-applications': {
-        'task': 'ats.tasks.auto_reject_stale_applications',
+        'task': 'jobs.tasks.auto_reject_stale_applications',
         'schedule': crontab(hour=6, minute=0),  # Daily at 6 AM
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Auto-reject applications that have been stale too long',
     },
 
     'update-pipeline-statistics': {
-        'task': 'ats.tasks.update_pipeline_statistics',
+        'task': 'jobs.tasks.update_pipeline_statistics',
         'schedule': crontab(hour='*/4', minute=0),  # Every 4 hours
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Update pipeline stage statistics',
     },
 
     'send-interview-reminders': {
-        'task': 'ats.tasks.send_interview_reminders',
+        'task': 'jobs.tasks.send_interview_reminders',
         'schedule': crontab(minute='*/30'),  # Every 30 minutes
         'options': {'queue': 'emails'},
         'description': 'Send upcoming interview reminders',
     },
 
     'expire-job-postings': {
-        'task': 'ats.tasks.expire_job_postings',
+        'task': 'jobs.tasks.expire_job_postings',
         'schedule': crontab(hour=0, minute=15),  # Daily at 12:15 AM
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Close expired job postings',
     },
 
@@ -307,28 +307,28 @@ CELERY_BEAT_SCHEDULE = {
     'process-public-applications': {
         'task': 'careers.tasks.process_public_applications',
         'schedule': timedelta(minutes=5),  # Every 5 minutes
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Process applications from public career page',
     },
 
     'update-job-view-counts': {
         'task': 'careers.tasks.update_job_view_counts',
         'schedule': crontab(hour='*/6', minute=15),  # Every 6 hours
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Aggregate and update job view counts',
     },
 
     'sync-job-listings': {
         'task': 'careers.tasks.sync_job_listings',
         'schedule': timedelta(minutes=10),  # Every 10 minutes
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Sync job listings with ATS job postings',
     },
 
     'generate-sitemap': {
         'task': 'careers.tasks.generate_sitemap',
         'schedule': crontab(hour=5, minute=0),  # Daily at 5 AM
-        'options': {'queue': 'ats'},
+        'options': {'queue': 'jobs'},
         'description': 'Regenerate career page sitemap',
     },
 

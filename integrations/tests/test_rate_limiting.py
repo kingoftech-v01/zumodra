@@ -27,8 +27,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from tenants.models import Tenant
-from accounts.models import TenantUser
-from ats.models import Job
+from tenant_profiles.models import TenantUser
+from jobs.models import Job
 
 
 User = get_user_model()
@@ -92,7 +92,7 @@ class RateLimitingTestCase(APITestCase):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
 
-    def make_api_call(self, method='GET', endpoint='/api/v1/ats/jobs/',
+    def make_api_call(self, method='GET', endpoint='/api/v1/jobs/jobs/',
                      token=None, expect_throttled=False, **kwargs):
         """Make an API call and return response with headers"""
         if token:
@@ -132,7 +132,7 @@ class Test1PerUserRateLimits(RateLimitingTestCase):
         for i in range(limit_count):
             response = self.make_api_call(
                 'GET',
-                '/api/v1/ats/jobs/',
+                '/api/v1/jobs/jobs/',
                 token=token
             )
             assert response['status'] in [200, 404], f"Request {i+1} failed with {response['status']}"
@@ -140,7 +140,7 @@ class Test1PerUserRateLimits(RateLimitingTestCase):
         # Next request should be throttled
         response = self.make_api_call(
             'GET',
-            '/api/v1/ats/jobs/',
+            '/api/v1/jobs/jobs/',
             token=token
         )
         # This may return 429 if throttle is enabled
@@ -166,10 +166,10 @@ class Test1PerUserRateLimits(RateLimitingTestCase):
         token2 = self.get_api_token(user2)
 
         # Make requests with user 1
-        resp1 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token1)
+        resp1 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token1)
 
         # Make requests with user 2
-        resp2 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token2)
+        resp2 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token2)
 
         # Both should succeed (separate limits)
         assert resp1['status'] in [200, 401, 404]
@@ -201,7 +201,7 @@ class Test2PerTierRateLimits(RateLimitingTestCase):
 
         requests_made = 0
         for i in range(free_limit + 10):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             requests_made += 1
             if response['status'] == 429:
                 break
@@ -226,7 +226,7 @@ class Test2PerTierRateLimits(RateLimitingTestCase):
         # Professional should have higher limit
         prof_limit = 2000  # From throttling.py: PROFESSIONAL sustained is 2000/hour
 
-        response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         # Should be able to make at least the first request
         assert response['status'] in [200, 401, 404]
@@ -241,7 +241,7 @@ class Test3RateLimitHeaders(RateLimitingTestCase):
         """Test that responses include X-RateLimit-* headers"""
         token = self.get_api_token(self.user)
 
-        response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         # Check for rate limit headers
         headers = response['headers']
@@ -266,12 +266,12 @@ class Test3RateLimitHeaders(RateLimitingTestCase):
         """Test that X-RateLimit-Remaining decreases with each request"""
         token = self.get_api_token(self.user)
 
-        response1 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response1 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
         remaining1 = response1['headers'].get('X-RateLimit-Remaining')
 
         if remaining1:
             # Make another request
-            response2 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response2 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             remaining2 = response2['headers'].get('X-RateLimit-Remaining')
 
             print(f"\nTest 3.2 Result: Remaining count tracking")
@@ -295,7 +295,7 @@ class Test4RateLimitExceededHandling(RateLimitingTestCase):
         throttled_at_request = None
 
         for i in range(100):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             last_status = response['status']
 
             if last_status == 429:
@@ -313,7 +313,7 @@ class Test4RateLimitExceededHandling(RateLimitingTestCase):
 
         # Try to trigger throttle
         for i in range(100):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
             if response['status'] == 429:
                 # Check for retry information in headers
@@ -342,7 +342,7 @@ class Test5StaffAdminBypass(RateLimitingTestCase):
         requests_count = 0
 
         for i in range(50):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             requests_count += 1
 
             if response['status'] == 429:
@@ -366,7 +366,7 @@ class Test5StaffAdminBypass(RateLimitingTestCase):
         # Make many requests
         responses = []
         for i in range(20):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             responses.append(response['status'])
 
         throttled = 429 in responses
@@ -383,7 +383,7 @@ class Test6BurstAllowance(RateLimitingTestCase):
         # Make rapid requests (burst)
         burst_responses = []
         for i in range(15):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             burst_responses.append(response['status'])
             time.sleep(0.01)  # Very small delay between requests
 
@@ -401,7 +401,7 @@ class Test6BurstAllowance(RateLimitingTestCase):
 
         # Make requests to get close to limit
         for i in range(5):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
             if response['status'] == 429:
                 break
 
@@ -409,7 +409,7 @@ class Test6BurstAllowance(RateLimitingTestCase):
         time.sleep(2)
 
         # Try again - should work or be less limited
-        response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         print(f"\nTest 6.2 Result: Window reset - Status after reset: {response['status']}")
 
@@ -422,7 +422,7 @@ class Test7RedisStorage(RateLimitingTestCase):
         token = self.get_api_token(self.user)
 
         # Make a request
-        response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         # Check cache for rate limit keys
         # Keys should follow pattern: throttle_*
@@ -466,10 +466,10 @@ class Test7RedisStorage(RateLimitingTestCase):
         token2 = self.get_api_token(user2)
 
         # Make request with user 1
-        resp1 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token1)
+        resp1 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token1)
 
         # Make request with user 2
-        resp2 = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token2)
+        resp2 = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token2)
 
         print(f"\nTest 7.2 Result: Tenant isolation")
         print(f"  User 1 response: {resp1['status']}")
@@ -501,7 +501,7 @@ class Test8RoleBasedRateLimits(RateLimitingTestCase):
         # Try multiple requests with owner
         owner_requests = 0
         for i in range(50):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=owner_token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=owner_token)
             owner_requests += 1
             if response['status'] == 429:
                 break
@@ -509,7 +509,7 @@ class Test8RoleBasedRateLimits(RateLimitingTestCase):
         # Try multiple requests with member
         member_requests = 0
         for i in range(50):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=member_token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=member_token)
             member_requests += 1
             if response['status'] == 429:
                 break
@@ -533,7 +533,7 @@ class Test9AnonymousUserLimits(RateLimitingTestCase):
 
         anonymous_requests = 0
         for i in range(50):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/')
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/')
             anonymous_requests += 1
 
             if response['status'] == 429 or response['status'] == 401:
@@ -552,7 +552,7 @@ class Test10CacheInvalidation(RateLimitingTestCase):
 
         # Make some requests
         for i in range(5):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         # Get remaining before clear
         remaining_before = response['headers'].get('X-RateLimit-Remaining')
@@ -561,7 +561,7 @@ class Test10CacheInvalidation(RateLimitingTestCase):
         self.clear_rate_limits()
 
         # Make another request
-        response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+        response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
         remaining_after = response['headers'].get('X-RateLimit-Remaining')
 
         print(f"\nTest 10 Result: Cache invalidation")
@@ -586,7 +586,7 @@ class TestPerformanceAndStress(RateLimitingTestCase):
         throttle_count = 0
 
         for i in range(100):
-            response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+            response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
             if response['status'] in [200, 404]:
                 success_count += 1
@@ -627,7 +627,7 @@ class TestPerformanceAndStress(RateLimitingTestCase):
 
         for token in tokens:
             for i in range(20):
-                response = self.make_api_call('GET', '/api/v1/ats/jobs/', token=token)
+                response = self.make_api_call('GET', '/api/v1/jobs/jobs/', token=token)
 
         elapsed = time.time() - start_time
 

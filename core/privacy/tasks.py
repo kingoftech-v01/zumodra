@@ -461,7 +461,7 @@ def _audit_tenant_compliance(tenant: Tenant) -> List[Dict[str, Any]]:
         DataSubjectRequest,
         DataRetentionPolicy,
     )
-    from accounts.models import DataAccessLog
+    from tenant_profiles.models import DataAccessLog
 
     findings = []
 

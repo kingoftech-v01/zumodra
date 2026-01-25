@@ -357,7 +357,7 @@ class Command(BaseCommand):
         self.stdout.write("\n4. Creating starter data...")
 
         try:
-            from ats.models import Pipeline, PipelineStage, JobCategory
+            from jobs.models import Pipeline, PipelineStage, JobCategory
 
             # Create default pipeline
             pipeline, created = Pipeline.objects.get_or_create(

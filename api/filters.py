@@ -105,7 +105,7 @@ class CircusaleFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         try:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             tenant_user = TenantUser.objects.get(
                 user=request.user,
                 tenant=tenant,
@@ -501,7 +501,7 @@ class RoleBasedFilterBackend(filters.BaseFilterBackend):
     def _get_user_role(self, user, tenant) -> str:
         """Get user's role in tenant."""
         try:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             tenant_user = TenantUser.objects.get(
                 user=user,
                 tenant=tenant,

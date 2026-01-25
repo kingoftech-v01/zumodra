@@ -1,0 +1,245 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_service scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">Choose job package</h4>
+                        <a href="employers-submit-jobs.html" class="button-main">Continue using quota</a>
+                    </div>
+                    <div class="choose_plan p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Your Package</h5>
+                        <ul class="list_plan grid sm:grid-cols-2 lg:gap-7.5 gap-6 mt-5">
+                            <li class="item flex items-center gap-4 p-6 border-2 border-line rounded-lg duration-300 hover:border-primary">
+                                <input type="radio" name="package_plan" id="essential_plan_package" class="w-6 h-6 flex-shrink-0 cursor-pointer" checked />
+                                <label for="essential_plan_package" class="flex flex-col gap-1 cursor-pointer">
+                                    <strong class="heading6">Essential plan package</strong>
+                                    <span class="text-secondary">1/5 Job posting, Job displayed for 15 days</span>
+                                </label>
+                            </li>
+                            <li class="item flex items-center gap-4 p-6 border-2 border-line rounded-lg duration-300 hover:border-primary">
+                                <input type="radio" name="package_plan" id="small_business_package" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                <label for="small_business_package" class="flex flex-col gap-1 cursor-pointer">
+                                    <strong class="heading6">Small business</strong>
+                                    <span class="text-secondary">20/25 Job posting, Job displayed for 15 days</span>
+                                </label>
+                            </li>
+                            <li class="item flex items-center gap-4 p-6 border-2 border-line rounded-lg duration-300 hover:border-primary">
+                                <input type="radio" name="package_plan" id="growing_business_package" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                <label for="growing_business_package" class="flex flex-col gap-1 cursor-pointer">
+                                    <strong class="heading6">Growing business plan package</strong>
+                                    <span class="text-secondary">24/60 Job posting, Job displayed for 15 days</span>
+                                </label>
+                            </li>
+                            <li class="item flex items-center gap-4 p-6 border-2 border-line rounded-lg duration-300 hover:border-primary">
+                                <input type="radio" name="package_plan" id="enterprise_package" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                                <label for="enterprise_package" class="flex flex-col gap-1 cursor-pointer">
+                                    <strong class="heading6">Enterprise plan package</strong>
+                                    <span class="text-secondary">87/150 Job posting, Job displayed for 15 days</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="list_package p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5 text-center">Or Purchase New Package</h5>
+                        <ul class="list_pricing grid 2xl:grid-cols-4 sm:grid-cols-2 lg:gap-7.5 gap-6 mt-5">
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Essential</span>
+                                <h3 class="heading3 mt-2">Free</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">5 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">20 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 2 months</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="basic_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="basic_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Starter</span>
+                                <h3 class="heading3 mt-2">$5.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">25 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">100 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 1 month</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="starter_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="starter_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-xl bg-white duration-300 shadow-lg">
+                                <span class="flag absolute top-0 left-1/2 -translate-x-1/2 text-label py-1 px-2.5 rounded-b-lg bg-red text-white">MOST POPULAR</span>
+                                <span class="pricing_type text-title text-secondary">Professional</span>
+                                <h3 class="heading3 mt-2">$10.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">60 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">250 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 6 months</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-placehover"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="professional_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="professional_package" class="w-4 h-4 border border-placehover rounded-sm" checked />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                            <li class="pricing_item relative p-6 border border-line rounded-lg bg-white duration-300 shadow-md">
+                                <span class="pricing_type text-title text-secondary">Executive</span>
+                                <h3 class="heading3 mt-2">$25.00</h3>
+                                <ul class="list_feature mt-3">
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">150 Jobs & Projects Posting</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">1000 CV’s view/download</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Messenger Services</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Expiry 1 week</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Screening Automation</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Applicant Tracking System</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Recruitment Analytics</strong>
+                                    </li>
+                                    <li class="feature_item flex items-start gap-2 py-2">
+                                        <span class="ph-fill ph-check-circle flex-shrink-0 pt-1 text-xl text-primary"></span>
+                                        <strong class="pricing_feature text-title">Live Chatbot</strong>
+                                    </li>
+                                </ul>
+                                <label for="executive_package" class="btn_buy flex items-center justify-center gap-2 w-full py-2.5 mt-5 rounded border border-primary cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="radio" name="buy_package" id="executive_package" class="w-4 h-4 border border-placehover rounded-sm" />
+                                        <span class="ic_check ph-fill ph-check-square text-xl text-white block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
+                                    </div>
+                                    <span class="text-button">Buy this package</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_job_choose_job_package.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_choose_job_package.html' %}
+{% endblock %}

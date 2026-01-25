@@ -1,1 +1,38 @@
-{% extends "base/freelanhub_base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zumodra - Job Board & Freelance Marketplace">
+    <title>{% block title %}Zumodra - Job Board & Freelance Marketplace{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/leaflet.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/output-tailwind.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/output-scss.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/apexcharts.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="lg:overflow-hidden">
+    {% block content %}{% endblock %}
+
+    <!-- JavaScript -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/phosphor-icons.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/leaflet.js' %}"></script>
+    <script src="{% static 'assets/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/apexcharts.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

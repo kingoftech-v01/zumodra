@@ -350,7 +350,10 @@ class ServiceProvider(TenantAwareModel):
         help_text=_("DEPRECATED: Use marketplace_enabled instead. Only visible via direct link")
     )
 
-    is_accepting_projects = models.BooleanField(default=True)
+    is_accepting_work = models.BooleanField(
+        default=True,
+        help_text=_("Provider is currently accepting new service requests and contracts")
+    )
     can_work_remotely = models.BooleanField(default=True)
     can_work_onsite = models.BooleanField(default=False)
 
@@ -637,6 +640,139 @@ class ServiceLike(TenantAwareModel):
 
     def __str__(self):
         return f"{self.user.email} likes {self.service.name}"
+
+
+class ServicePricingTier(TenantAwareModel):
+    """
+    Pricing tiers/packages for services.
+
+    Allows services to offer multiple pricing options (e.g., Starter, Professional, Executive)
+    with different features, delivery times, and revision counts.
+
+    This data is synced to the public catalog when service.is_public=True.
+    """
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name='pricing_tiers',
+        help_text=_("Parent service")
+    )
+
+    name = models.CharField(
+        max_length=100,
+        help_text=_("Tier name (e.g., Starter, Professional, Executive)")
+    )
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text=_("Tier price")
+    )
+
+    delivery_time_days = models.PositiveSmallIntegerField(
+        help_text=_("Delivery time in days for this tier")
+    )
+
+    revisions = models.PositiveSmallIntegerField(
+        help_text=_("Number of revisions included (0 = unlimited)")
+    )
+
+    features = models.JSONField(
+        default=dict,
+        help_text=_(
+            "Feature list with boolean/text values: "
+            "{'printable_resolution': true, 'logo_design': true, ...}"
+        )
+    )
+
+    sort_order = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        help_text=_("Display order (usually price ascending)")
+    )
+
+    is_recommended = models.BooleanField(
+        default=False,
+        help_text=_("Highlight this tier as recommended")
+    )
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Service Pricing Tier")
+        verbose_name_plural = _("Service Pricing Tiers")
+        ordering = ['service', 'sort_order']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['service', 'name'],
+                name='services_pricing_tier_unique_service_name'
+            )
+        ]
+
+    def __str__(self):
+        currency = self.service.currency if hasattr(self.service, 'currency') else 'CAD'
+        return f"{self.service.name} - {self.name} ({currency} {self.price})"
+
+
+class ProviderPortfolio(TenantAwareModel):
+    """
+    Provider portfolio items.
+
+    Stores portfolio images and descriptions for providers to showcase their past work.
+    This data is synced to the public catalog when associated services are made public.
+    """
+    provider = models.ForeignKey(
+        ServiceProvider,
+        on_delete=models.CASCADE,
+        related_name='portfolio',
+        help_text=_("Provider who owns this portfolio item")
+    )
+
+    image = models.ImageField(
+        upload_to='provider_portfolio/',
+        help_text=_("Portfolio image")
+    )
+
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=_("Portfolio piece title")
+    )
+
+    description = models.TextField(
+        blank=True,
+        help_text=_("Portfolio piece description")
+    )
+
+    sort_order = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        help_text=_("Display order in portfolio grid")
+    )
+
+    grid_col_span = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(3)],
+        help_text=_("Grid column span (1-3)")
+    )
+
+    grid_row_span = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(2)],
+        help_text=_("Grid row span (1-2)")
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = TenantAwareManager()
+
+    class Meta:
+        verbose_name = _("Provider Portfolio Item")
+        verbose_name_plural = _("Provider Portfolio Items")
+        ordering = ['provider', 'sort_order']
+
+    def __str__(self):
+        return f"{self.provider.display_name} - {self.title or 'Untitled'}"
 
 
 # =============================================================================
@@ -993,7 +1129,7 @@ class ServiceContract(TenantAwareModel):
     """
     A contract between client and provider with escrow integration.
 
-    Linked to finance.EscrowTransaction for secure payment handling.
+    Linked to escrow.EscrowTransaction for secure payment handling.
     """
     class ContractStatus(models.TextChoices):
         DRAFT = 'draft', _('Draft')
@@ -1073,7 +1209,7 @@ class ServiceContract(TenantAwareModel):
 
     # Escrow Integration
     escrow_transaction = models.OneToOneField(
-        'finance.EscrowTransaction',
+        'escrow.EscrowTransaction',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

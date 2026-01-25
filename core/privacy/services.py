@@ -1049,10 +1049,10 @@ class AnonymizationService:
 
         # Models to check for user-related data
         models_to_check = [
-            ('accounts.UserProfile', 'user'),
-            ('accounts.LoginHistory', 'user'),
-            ('accounts.DataAccessLog', 'accessor'),
-            ('ats.Candidate', 'email'),
+            ('tenant_profiles.UserProfile', 'user'),
+            ('tenant_profiles.LoginHistory', 'user'),
+            ('tenant_profiles.DataAccessLog', 'accessor'),
+            ('jobs.Candidate', 'email'),
             ('hr_core.Employee', 'user'),
         ]
 

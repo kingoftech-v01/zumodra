@@ -354,7 +354,7 @@ class TenantUserFactory(DjangoModelFactory):
     """Factory for tenant user memberships."""
 
     class Meta:
-        model = 'accounts.TenantUser'
+        model = 'tenant_profiles.TenantUser'
 
     user = factory.SubFactory(UserFactory)
     tenant = factory.SubFactory(TenantFactory)
@@ -386,7 +386,7 @@ class UserProfileFactory(DjangoModelFactory):
     """Factory for user profiles."""
 
     class Meta:
-        model = 'accounts.UserProfile'
+        model = 'tenant_profiles.UserProfile'
 
     user = factory.SubFactory(UserFactory)
     profile_type = 'candidate'
@@ -413,7 +413,7 @@ class KYCVerificationFactory(DjangoModelFactory):
     """Factory for KYC verifications."""
 
     class Meta:
-        model = 'accounts.KYCVerification'
+        model = 'tenant_profiles.KYCVerification'
 
     user = factory.SubFactory(UserFactory)
     verification_type = 'identity'
@@ -437,7 +437,7 @@ class ProgressiveConsentFactory(DjangoModelFactory):
     """Factory for progressive consent records."""
 
     class Meta:
-        model = 'accounts.ProgressiveConsent'
+        model = 'tenant_profiles.ProgressiveConsent'
 
     grantor = factory.SubFactory(UserFactory)
     grantee_tenant = factory.SubFactory(TenantFactory)
@@ -450,7 +450,7 @@ class LoginHistoryFactory(DjangoModelFactory):
     """Factory for login history records."""
 
     class Meta:
-        model = 'accounts.LoginHistory'
+        model = 'tenant_profiles.LoginHistory'
 
     user = factory.SubFactory(UserFactory)
     result = 'success'
@@ -466,7 +466,7 @@ class JobCategoryFactory(DjangoModelFactory):
     """Factory for job categories."""
 
     class Meta:
-        model = 'ats.JobCategory'
+        model = 'jobs.JobCategory'
         django_get_or_create = ('tenant', 'slug',)
 
     tenant = factory.SubFactory(TenantFactory)
@@ -482,7 +482,7 @@ class PipelineFactory(DjangoModelFactory):
     """Factory for recruitment pipelines."""
 
     class Meta:
-        model = 'ats.Pipeline'
+        model = 'jobs.Pipeline'
 
     tenant = factory.SubFactory(TenantFactory)
     name = factory.Sequence(lambda n: f"Pipeline {n}")
@@ -503,7 +503,7 @@ class PipelineStageFactory(DjangoModelFactory):
     """Factory for pipeline stages."""
 
     class Meta:
-        model = 'ats.PipelineStage'
+        model = 'jobs.PipelineStage'
 
     pipeline = factory.SubFactory(PipelineFactory)
     name = factory.Sequence(lambda n: f"Stage {n}")
@@ -520,7 +520,7 @@ class JobPostingFactory(DjangoModelFactory):
     """Factory for job postings."""
 
     class Meta:
-        model = 'ats.JobPosting'
+        model = 'jobs.JobPosting'
 
     tenant = factory.SubFactory(TenantFactory)
     title = factory.Faker('job')
@@ -576,7 +576,7 @@ class CandidateFactory(DjangoModelFactory):
     """Factory for ATS candidates."""
 
     class Meta:
-        model = 'ats.Candidate'
+        model = 'jobs.Candidate'
 
     tenant = factory.SubFactory(TenantFactory)
     first_name = factory.Faker('first_name')
@@ -607,7 +607,7 @@ class ApplicationFactory(DjangoModelFactory):
     """Factory for job applications."""
 
     class Meta:
-        model = 'ats.Application'
+        model = 'jobs.Application'
 
     tenant = factory.SubFactory(TenantFactory)
     candidate = factory.SubFactory(CandidateFactory, tenant=factory.SelfAttribute('..tenant'))
@@ -624,7 +624,7 @@ class ApplicationActivityFactory(DjangoModelFactory):
     """Factory for application activities."""
 
     class Meta:
-        model = 'ats.ApplicationActivity'
+        model = 'jobs.ApplicationActivity'
 
     application = factory.SubFactory(ApplicationFactory)
     activity_type = 'created'
@@ -636,7 +636,7 @@ class ApplicationNoteFactory(DjangoModelFactory):
     """Factory for application notes."""
 
     class Meta:
-        model = 'ats.ApplicationNote'
+        model = 'jobs.ApplicationNote'
 
     application = factory.SubFactory(ApplicationFactory)
     author = factory.SubFactory(UserFactory)
@@ -648,7 +648,7 @@ class InterviewFactory(DjangoModelFactory):
     """Factory for interviews."""
 
     class Meta:
-        model = 'ats.Interview'
+        model = 'jobs.Interview'
 
     application = factory.SubFactory(ApplicationFactory)
     interview_type = 'video'
@@ -672,7 +672,7 @@ class InterviewFeedbackFactory(DjangoModelFactory):
     """Factory for interview feedback."""
 
     class Meta:
-        model = 'ats.InterviewFeedback'
+        model = 'jobs.InterviewFeedback'
 
     interview = factory.SubFactory(InterviewFactory)
     interviewer = factory.SubFactory(UserFactory)
@@ -693,7 +693,7 @@ class OfferFactory(DjangoModelFactory):
     """Factory for job offers."""
 
     class Meta:
-        model = 'ats.Offer'
+        model = 'jobs.Offer'
 
     application = factory.SubFactory(ApplicationFactory)
 
@@ -731,7 +731,7 @@ class SavedSearchFactory(DjangoModelFactory):
     """Factory for saved searches."""
 
     class Meta:
-        model = 'ats.SavedSearch'
+        model = 'jobs.SavedSearch'
 
     user = factory.SubFactory(UserFactory)
     name = factory.Sequence(lambda n: f"Search {n}")
@@ -2661,3 +2661,101 @@ def mock_stripe():
             'account_link': mock_account_link,
             'payout': mock_payout
         }
+
+
+# ============================================================================
+# FREELANCER PROFILE FACTORY
+# ============================================================================
+
+class FreelancerProfileFactory(DjangoModelFactory):
+    """Factory for freelancer profiles."""
+
+    class Meta:
+        model = 'tenant_profiles.FreelancerProfile'
+
+    user = factory.SubFactory(UserFactory)
+    professional_title = factory.Faker('job')
+    bio = factory.Faker('text', max_nb_chars=500)
+    years_of_experience = factory.Faker('random_int', min=0, max=20)
+
+    # Availability
+    availability_status = 'available'
+    availability_hours_per_week = 40
+
+    # Pricing
+    hourly_rate = factory.Faker('pydecimal', left_digits=3, right_digits=2, positive=True, min_value=15, max_value=500)
+    hourly_rate_currency = 'CAD'
+    minimum_project_budget = factory.Faker('pydecimal', left_digits=4, right_digits=2, positive=True, min_value=500, max_value=10000)
+
+    # Skills
+    skills = factory.LazyFunction(
+        lambda: [
+            'Python', 'Django', 'React', 'JavaScript', 'PostgreSQL'
+        ][:factory.Faker('random_int', min=1, max=5).evaluate(None, None, {})]
+    )
+
+    # Portfolio
+    portfolio_url = factory.LazyAttribute(lambda o: f"https://portfolio.{o.user.username}.com")
+    github_url = factory.LazyAttribute(lambda o: f"https://github.com/{o.user.username}")
+    linkedin_url = factory.LazyAttribute(lambda o: f"https://linkedin.com/in/{o.user.username}")
+
+    # Location
+    city = factory.Faker('city')
+    country = 'Canada'
+    timezone = 'America/Toronto'
+    remote_only = True
+    willing_to_relocate = False
+
+    # Verification
+    is_verified = False
+    identity_verified = False
+    payment_method_verified = False
+
+    # Stats
+    completed_projects = 0
+    completed_services = 0
+    total_earnings = Decimal('0.00')
+    average_rating = None
+    total_reviews = 0
+
+
+class VerifiedFreelancerProfileFactory(FreelancerProfileFactory):
+    """Factory for verified freelancer profiles."""
+
+    is_verified = True
+    identity_verified = True
+    payment_method_verified = True
+    verification_date = factory.LazyFunction(timezone.now)
+
+    # More established freelancers
+    years_of_experience = factory.Faker('random_int', min=3, max=15)
+    completed_projects = factory.Faker('random_int', min=5, max=50)
+    completed_services = factory.Faker('random_int', min=2, max=30)
+    total_earnings = factory.Faker('pydecimal', left_digits=5, right_digits=2, positive=True, min_value=5000, max_value=250000)
+    average_rating = factory.Faker('pydecimal', left_digits=1, right_digits=2, positive=True, min_value=3.5, max_value=5.0)
+    total_reviews = factory.Faker('random_int', min=5, max=100)
+
+
+class BusyFreelancerProfileFactory(VerifiedFreelancerProfileFactory):
+    """Factory for busy/unavailable freelancers."""
+
+    availability_status = 'busy'
+    availability_hours_per_week = 10
+
+
+class RemoteOnlyFreelancerProfileFactory(VerifiedFreelancerProfileFactory):
+    """Factory for remote-only freelancers."""
+
+    remote_only = True
+    willing_to_relocate = False
+    city = ''
+    country = ''
+
+
+class WillingToRelocateFreelancerProfileFactory(VerifiedFreelancerProfileFactory):
+    """Factory for freelancers willing to relocate."""
+
+    remote_only = False
+    willing_to_relocate = True
+    city = factory.Faker('city')
+    country = 'Canada'

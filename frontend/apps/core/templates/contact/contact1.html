@@ -1,0 +1,147 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+                <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                    <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                </div>
+                <div class="container relative h-full">
+                    <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                        <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                            <a href="index.html" class="caption1 text-white">Home</a>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white">Pages</span>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white opacity-60">Contact Us</span>
+                        </div>
+                        <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Contact Us</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Form Contact -->
+        <section class="form_contact lg:py-20 sm:py-14 py-10">
+            <div class="container">
+                <div class="content flex max-md:flex-col md:justify-end relative bg-surface">
+                    <div class="bg_img overflow-hidden w-full md:aspect-[1.05]">
+                        <img src="{% static 'assets/images/blog/9.webp' %}" alt="blog/9" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="form_area flex-shrink-0 md:w-[52%] xl:p-15 p-8">
+                        <h3 class="heading3">Drop us a line</h3>
+                        <p class="body2 text-secondary mt-3">Get in touch with us. Start a conversation and unlock new opportunities.</p>
+                        <form class="form grid lg:grid-cols-2 gap-4 gap-y-5 mt-7.5">
+                            <div class="name">
+                                <label for="username">Name</label>
+                                <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                            </div>
+                            <div class="mail">
+                                <label for="email">Email</label>
+                                <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                            </div>
+                            <div class="col-span-full message">
+                                <label for="message">Message</label>
+                                <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Message content..." required></textarea>
+                            </div>
+                            <div class="col-span-full">
+                                <button class="button-main">Send Message</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Us -->
+        <section class="contact lg:py-20 sm:py-14 py-10 bg-surface">
+            <div class="container flex max-lg:flex-col lg:items-center justify-between xl:gap-32 gap-20 gap-y-10">
+                <div class="content">
+                    <div class="heading">
+                        <h3 class="heading3">Contact Us</h3>
+                        <p class="body2 text-secondary mt-3">We're here to assist you every step of the way. Let's make your goals a reality.</p>
+                    </div>
+                    <ul class="list grid xl:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6 sm:mt-8 mt-6">
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Address:</strong>
+                            <p class="desc body2 text-secondary">101 E 129th St, Chicago, IN 46312, US</p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Opentime:</strong>
+                            <p class="desc body2 text-secondary">
+                                Mon- Fri: 08:00 - 20:00<br />
+                                Sat- Sun: 10:00 - 18:00
+                            </p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Infomation:</strong>
+                            <p class="desc body2 text-secondary">hi.avitex@gmail.com</p>
+                        </li>
+                        <li class="flex flex-col gap-2">
+                            <strong class="text-title">Our social media:</strong>
+                            <ul class="list flex flex-wrap items-center gap-2.5">
+                                <li>
+                                    <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-facebook text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-instagram text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-twitter text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-youtube text-black duration-300"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.pinterest.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 hover:bg-primary hover:text-white">
+                                        <span class="icon-pinterest text-black duration-300"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="map flex-shrink-0 xl:w-[630px] lg:w-1/2 w-full h-[400px]">
+                    <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d742.4556963440328!2d-87.62313632867398!3d41.896668148301984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fd35498b7bfaf%3A0xaf89aff7166aaa5f!2sOlympia%20Centre%20Condos!5e0!3m2!1svi!2s!4v1721272000241!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Freelancer or employer, start here -->
+        <section class="banner lg:py-20 sm:py-14 py-10">
+            <div class="container">
+                <h3 class="heading3 text-center animate animate_top" style="--i: 1">Freelancer or employer, start here</h3>
+                <p class="body2 text-secondary text-center mt-3 animate animate_top" style="--i: 2">Unlock Opportunities and Begin Your Journey as a Freelancer or Employer Today</p>
+                <ul class="list_banner grid lg:grid-cols-2 gap-10 gap-y-7 md:mt-10 mt-7">
+                    <li class="banner_item overflow-hidden relative md:p-10 p-7.5 rounded-xl bg-[#F7F2EE]">
+                        <img src="{% static 'assets/images/components/banner11-1.png' %}" alt="components/banner11-1" class="absolute bottom-0 right-0 max-sm:w-2/3 max-sm:opacity-80" />
+                        <div class="banner_content relative z-[1] sm:w-[240px]">
+                            <strong class="md:text-sm text-xs font-bold uppercase">For Candidate</strong>
+                            <h5 class="heading5 mt-2">Discover exciting opportunities</h5>
+                            <p class="desc mt-3">Unlock your potential, explore a world of exciting opportunities as a freelancer.</p>
+                            <a href="jobs-default.html" class="button-main mt-3 capitalize">Discover now</a>
+                        </div>
+                    </li>
+                    <li class="banner_item overflow-hidden relative md:p-10 p-7.5 rounded-xl bg-[#EBF4F2]">
+                        <img src="{% static 'assets/images/components/banner11-2.png' %}" alt="components/banner11-2" class="absolute bottom-0 right-0 max-sm:w-2/3 max-sm:opacity-80" />
+                        <div class="banner_content relative z-[1] sm:w-[240px]">
+                            <strong class="md:text-sm text-xs font-bold uppercase">For Employers</strong>
+                            <h5 class="heading5 mt-2">Unlock your access top talent</h5>
+                            <p class="desc mt-3">Unlock Your Access to Top Talent and Elevate Your Projects with the Best Professionals.</p>
+                            <a href="candidates-default.html" class="button-main mt-3 capitalize">Find candidates now</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+{% endblock %}

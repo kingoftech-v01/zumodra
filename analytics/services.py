@@ -83,7 +83,7 @@ class RecruitmentAnalyticsService:
     def __init__(self, date_filter: Optional[DateRangeFilter] = None):
         self.date_filter = date_filter or DateRangeFilter()
         # Lazy imports to avoid circular imports
-        from ats.models import JobPosting, Application, Interview, Offer, Candidate
+        from jobs.models import JobPosting, Application, Interview, Offer, Candidate
         self.JobPosting = JobPosting
         self.Application = Application
         self.Interview = Interview
@@ -319,7 +319,7 @@ class DiversityAnalyticsService:
         self.scope = scope
         # Lazy imports
         from hr_core.models import Employee
-        from ats.models import Candidate, Application
+        from jobs.models import Candidate, Application
         self.Employee = Employee
         self.Candidate = Candidate
         self.Application = Application
@@ -947,7 +947,7 @@ class DashboardDataService:
 
     def _get_applications_trend(self) -> List[Dict[str, Any]]:
         """Get daily/weekly application trend data for charts."""
-        from ats.models import Application
+        from jobs.models import Application
 
         apps = Application.objects.filter(
             applied_at__gte=self.date_filter.start_date,
@@ -1061,7 +1061,7 @@ class AnalyticsService:
         Returns:
             Dict with time-to-hire metrics
         """
-        from ats.models import Application
+        from jobs.models import Application
 
         # Get hired applications in period
         hired = Application.objects.filter(
@@ -1123,7 +1123,7 @@ class AnalyticsService:
         Returns:
             Dict mapping source names to effectiveness metrics
         """
-        from ats.models import Application, Candidate
+        from jobs.models import Application, Candidate
 
         applications = Application.objects.filter(
             applied_at__gte=self.date_filter.start_date,
@@ -1184,7 +1184,7 @@ class AnalyticsService:
         Returns:
             Dict with velocity metrics by stage
         """
-        from ats.models import Application, PipelineStageChange
+        from jobs.models import Application, PipelineStageChange
 
         # Get stage changes in period
         changes = PipelineStageChange.objects.filter(
@@ -1228,7 +1228,7 @@ class AnalyticsService:
             Dict with performance metrics (or list if no recruiter_id)
         """
         from django.contrib.auth import get_user_model
-        from ats.models import Application
+        from jobs.models import Application
 
         User = get_user_model()
 
@@ -1309,7 +1309,7 @@ class AnalyticsService:
         Returns:
             List of monthly hiring data points
         """
-        from ats.models import Application
+        from jobs.models import Application
         from django.db.models.functions import TruncMonth
 
         end_date = timezone.now().date()
@@ -1434,7 +1434,7 @@ class ReportingService:
         Returns:
             Dict with cost metrics
         """
-        from ats.models import Application
+        from jobs.models import Application
 
         hired = Application.objects.filter(
             status='hired',
@@ -1607,7 +1607,7 @@ class PredictiveAnalyticsService:
         Returns:
             Dict with prediction and confidence
         """
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
 
         # Get historical data for similar jobs
         similar_jobs = JobPosting.objects.filter(
@@ -1702,7 +1702,7 @@ class PredictiveAnalyticsService:
         Returns:
             Dict with acceptance probability and factors
         """
-        from ats.models import Offer
+        from jobs.models import Offer
 
         # Get historical acceptance data
         past_offers = Offer.objects.filter(
@@ -1863,7 +1863,7 @@ class PredictiveAnalyticsService:
         Returns:
             List of monthly forecasts
         """
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
         from hr_core.models import Employee
         from django.db.models.functions import TruncMonth
 

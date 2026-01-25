@@ -12,24 +12,41 @@ The Blog app provides Wagtail CMS-based content management for marketing and com
 - **Publishing Workflow**: Four-stage status system (draft, scheduled, finished, published)
 - **Category Management**: Hierarchical categories with nested support
 - **Tag System**: Tagging with tag-based filtering and popular tags tracking
-- **Comment System**: Threaded comments with nested replies
+- **Comment System**: Threaded comments with nested replies and HTML sanitization
 - **Image Management**: Featured images with responsive renditions (thumbnail, medium, large)
 - **SEO Optimization**: Custom meta titles and descriptions per post
-- **Search Functionality**: Full-text search across titles and excerpts
+- **Search Functionality**: Full-text search across titles and excerpts with multi-criteria filtering
 - **REST API**: Complete API for blog integration with other apps
 - **Caching**: Tenant-aware caching for improved performance
-- **Audit Logging**: Automatic change tracking for posts, comments, and categories
+- **Audit Logging**: Automatic change tracking for posts, comments, categories, and user profiles
+- **User Profiles**: Extended user model with avatars, bios, and follower counts
+- **View Tracking**: Thread-safe view counter with automatic increment on page serve
+- **Comment Forms**: Django forms with CSRF protection and validation
+- **Dynamic Templates**: Fully dynamic templates rendering real data from database
+- **Reading Time**: Automatic calculation of reading time based on word count
+
+### Recently Implemented (January 2026)
+
+- ✅ **UserProfile Model**: Extended user profiles with avatars and bios
+- ✅ **View Tracking System**: Thread-safe view counter with F() expressions
+- ✅ **Dynamic Templates**: Converted all static templates to fully dynamic rendering
+- ✅ **Comment Form**: Django form with CSRF protection and HTML sanitization
+- ✅ **Search Functionality**: Multi-criteria search (text, category, tag)
+- ✅ **Reading Time**: Automatic calculation based on word count (200 words/min)
+- ✅ **Navigation**: Previous/next post navigation in detail template
+- ✅ **Related Posts**: Tag-based related posts algorithm
+- ✅ **Comprehensive Documentation**: Docstrings and comments throughout codebase
+- ✅ **Template Pagination**: Django Paginator with proper page range display
 
 ### In Development
 
 - Enhanced SEO analytics and optimization
-- Multi-author support with author profiles
 - Advanced category taxonomy (tags + categories)
 - Editorial calendar view
 - Content scheduling automation
 - Social media sharing integration
-- Reading time estimation
 - Related posts algorithm improvements
+- Comment moderation queue
 
 ## Architecture
 
@@ -39,7 +56,8 @@ Located in `blog/models.py`:
 
 | Model | Description | Key Fields |
 |-------|-------------|------------|
-| **BlogPostPage** | Main blog post content | title, slug, body (StreamField), excerpt, featured_image, status, meta_title, meta_description, publishing_date, tags |
+| **UserProfile** | Extended user profiles | user, avatar (ForeignKey to Image), bio, followers_count |
+| **BlogPostPage** | Main blog post content | title, slug, body (StreamField), excerpt, featured_image, status, meta_title, meta_description, publishing_date, tags, view_count |
 | **BlogIndexPage** | Blog homepage/listing | title, intro (RichText), contains all blog posts |
 | **CategoryPage** | Blog categories | title, description, hierarchical structure |
 | **Comment** | Post comments | post, author_name, content, parent (for threading), created_at |
@@ -65,11 +83,12 @@ BlogPostPage uses Wagtail's StreamField for flexible content:
 
 **Blog Views:**
 - `blog_list_view` - Alternative list view (Wagtail handles primary routing)
-- `blog_search_view` - Search posts by query
+- `blog_search_view` - Search posts by text query, category ID, or tag slug with pagination
+- `submit_comment` - Handle comment POST submission with CSRF protection and validation
 
 **Wagtail Page Views** (automatic routing):
-- `BlogIndexPage.serve()` - Blog homepage with post listing
-- `BlogPostPage.serve()` - Individual blog post page
+- `BlogIndexPage.serve()` - Blog homepage with post listing and pagination
+- `BlogPostPage.serve()` - Individual blog post page with automatic view tracking
 - `CategoryPage.serve()` - Category landing page
 
 #### API Views (`blog/api/viewsets.py`)
@@ -108,12 +127,15 @@ BlogPostPage uses Wagtail's StreamField for flexible content:
 
 ```python
 # Search
-blog:search
+GET  /blog/search/?q={query}&category={id}&tag={slug}  → blog:search
+
+# Comment submission
+POST /blog/comment/{post_id}/                           → blog:submit_comment
 
 # Wagtail automatic routing:
-/blog/ → BlogIndexPage
-/blog/post-slug/ → BlogPostPage
-/blog/category-slug/ → CategoryPage
+/blog/                    → BlogIndexPage
+/blog/post-slug/          → BlogPostPage
+/blog/category-slug/      → CategoryPage
 ```
 
 #### API URLs (`api:v1:blog-api:*`)
@@ -150,12 +172,22 @@ GET    /api/v1/blog/stats/                     # Get blog statistics (admin only
 Located in `blog/templates/blog/`:
 
 **Main Templates:**
-- `blog-default.html` - Blog index page (BlogIndexPage template)
-- `blog-detail1.html` - Blog post detail page (BlogPostPage template)
-- `blog-list.html` - Alternative list view
-- `blog-search.html` - Search results page
+- `blog-default.html` - Blog index page (BlogIndexPage template) with pagination and sidebar
+- `blog-detail1.html` - Blog post detail page (BlogPostPage template) with StreamField rendering, comments, and navigation
+- `search_results.html` - Search results page with multi-criteria filtering
 
-**Note:** Wagtail uses the `template` attribute on Page models to determine rendering.
+**Template Features:**
+- **100% Dynamic Content**: All templates render real data from database (no static placeholders)
+- **StreamField Rendering**: Proper block-by-block rendering for all content types (heading, paragraph, list, image, quote, table)
+- **Image Renditions**: Wagtail image tags with responsive renditions (fill-800x450, fill-360x240, fill-100x75, etc.)
+- **Pagination**: Django Paginator with page range display (10 posts per page)
+- **Comment Threading**: Display parent comments with nested replies
+- **CSRF Protection**: All POST forms include {% csrf_token %}
+- **Conditional Rendering**: Proper {% if %} checks for optional fields (avatars, featured images, tags, etc.)
+- **URL Generation**: All links use {% url %} tags with proper namespacing
+- **Preserved Styling**: All CSS classes and HTML structure preserved from original static templates
+
+**Note:** Wagtail uses the `template` attribute on Page models to determine rendering. All templates extend `base_public.html`.
 
 ### Serializers
 
@@ -171,6 +203,25 @@ Located in `blog/serializers.py`:
 - `CategoryDetailSerializer` - Category with child categories
 - `BlogIndexSerializer` - Blog index with categories
 - `BlogStatsSerializer` - Analytics data
+
+### Forms
+
+Located in `blog/forms.py`:
+
+- `CommentForm` - Django ModelForm for comment submission with:
+  - Fields: author_name, content, parent (hidden field for threading)
+  - HTML sanitization via `core.validators.sanitize_html`
+  - Custom widgets with preserved CSS classes from templates
+  - Validation for both content and author name
+
+### Signals
+
+Located in `blog/signals.py`:
+
+- `create_user_profile` - Auto-creates UserProfile when User is created
+- `save_user_profile` - Saves UserProfile when User is saved
+
+All signals are registered in `blog/apps.py` via the `ready()` method.
 
 ## Integration Points
 
@@ -213,9 +264,12 @@ The blog app leverages Wagtail CMS features:
 
 ### Content Security
 
-- HTML sanitization for comments (via `core.validators.sanitize_html`)
-- XSS protection in user-generated content
-- CSRF protection for comment submission
+- **HTML sanitization** for comments via `core.validators.sanitize_html`
+  - Applied in `CommentForm.clean_content()` and `CommentForm.clean_author_name()`
+  - Prevents XSS attacks in user-generated content
+- **CSRF protection** for all POST forms ({% csrf_token %} in templates)
+- **Form validation** with Django forms (CommentForm)
+- **Thread-safe operations** with F() expressions for view_count
 - Rate limiting on comment creation (planned)
 - Spam detection for comments (planned)
 

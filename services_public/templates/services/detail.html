@@ -1,0 +1,430 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<section class="services_detail lg:pb-20 sm:pb-14 pb-10">
+            <div class="container flex max-lg:flex-col gap-y-10">
+                <div class="services_content w-full overflow-hidden lg:pr-15 lg:pt-40 sm:pt-32 pt-24">
+                    <div class="flex max-xl:flex-col xl:items-center justify-between gap-7 gap-y-2 w-full md:pb-10 pb-7 border-b border-line">
+                        <div class="services_info flex max-md:flex-wrap sm:gap-7 gap-4 w-full">
+                            <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                                {% if service.provider_avatar_url %}
+                                <img src="{{ service.provider_avatar_url }}" alt="{{ service.provider_name }}" class="services_avatar w-full h-full object-cover" />
+                                {% else %}
+                                <img src="{% static 'assets/images/avatar/default-avatar.webp' %}" alt="{{ service.provider_name }}" class="services_avatar w-full h-full object-cover" />
+                                {% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <h3 class="services_name heading3">{{ service.name }}</h3>
+                                <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                                    <div class="services_review flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-xl text-yellow"></span>
+                                        <strong class="text-button">{{ service.rating_avg|default:"0.0" }}</strong>
+                                        <span class="review text-secondary">({{ service.total_reviews|default:0 }} review{{ service.total_reviews|pluralize }})</span>
+                                    </div>
+                                    {% if service.is_featured %}
+                                    <div class="services_date flex items-center gap-1">
+                                        <span class="ph-fill ph-crown-simple text-xl text-primary"></span>
+                                        <span>Featured</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if service.provider_is_verified %}
+                                    <div class="services_date flex items-center gap-1">
+                                        <span class="ph-fill ph-check-circle text-xl text-green"></span>
+                                        <span>Verified Provider</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="breadcrumb_action flex flex-col max-xl:flex-col-reverse gap-2">
+                            <div class="flex max-sm:flex-wrap xl:justify-end gap-3">
+                                <button class="button_share flex items-center justify-center w-12 h-12 border border-line rounded-full bg-white duration-300 hover:border-black">
+                                    <span class="ph ph-share-network text-2xl"></span>
+                                    <ul class="social">
+                                        <li class="social_item">
+                                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-facebook"></span>
+                                            </a>
+                                        </li>
+                                        <li class="social_item">
+                                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-linkedin"></span>
+                                            </a>
+                                        </li>
+                                        <li class="social_item">
+                                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ service.name|urlencode }}" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                                <span class="icon-twitter"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </button>
+                                <button class="add_wishlist_btn -relative -border w-12">
+                                    <span class="ph ph-heart text-2xl"></span>
+                                    <span class="ph-fill ph-heart text-2xl"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="body2 text-secondary">From:</span>
+                                <h5 class="heading5">${{ service.price|default:"0" }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="images overflow-hidden w-full md:mt-10 mt-7">
+                        {% if images %}
+                        <div class="swiper swiper-thumb-images section-swiper-navigation rounded-xl">
+                            <button class="custom-button-prev -border lg:left-6 left-4">
+                                <span class="ph-bold ph-arrow-left text-xl"></span>
+                            </button>
+                            <div class="swiper-wrapper">
+                                {% for image in images %}
+                                <div class="swiper-slide">
+                                    <img src="{{ image.image_url }}" alt="{{ image.alt_text|default:service.name }}" class="w-full h-full object-cover" />
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button class="custom-button-next -border lg:right-6 right-4">
+                                <span class="ph-bold ph-arrow-right text-xl"></span>
+                            </button>
+                        </div>
+                        {% elif service.thumbnail_url %}
+                        <div class="rounded-xl overflow-hidden">
+                            <img src="{{ service.thumbnail_url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        {% else %}
+                        <div class="rounded-xl overflow-hidden bg-surface">
+                            <div class="flex items-center justify-center h-96">
+                                <span class="ph ph-image text-6xl text-secondary opacity-40"></span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if images.count > 1 %}
+                        <div thumbsSlider="" class="swiper swiper-list-images mt-4">
+                            <div class="swiper-wrapper">
+                                {% for image in images %}
+                                <div class="swiper-slide overflow-hidden rounded-lg">
+                                    <img src="{{ image.image_url }}" alt="{{ image.alt_text|default:service.name }}" class="w-full h-full object-cover" />
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="description md:mt-10 mt-7">
+                        <h6 class="heading6">About this service</h6>
+                        <div class="flex flex-col gap-3 mt-3">
+                            {{ service.description|safe }}
+                        </div>
+                    </div>
+                    {% if service.services_list %}
+                    <div class="services md:mt-10 mt-7">
+                        <h6 class="heading6">Services Offered:</h6>
+                        <ul class="list_services w-full mt-3">
+                            {% for offered_service in service.services_list %}
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>{{ offered_service }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if service.tags_list %}
+                    <div class="tags md:mt-10 mt-7">
+                        <h6 class="heading6">Tags:</h6>
+                        <ul class="list_tags flex flex-wrap gap-3 gap-y-5 mt-4">
+                            {% for tag in service.tags_list %}
+                            <li>
+                                <a href="?q={{ tag }}" class="tag -large text-sm font-semibold bg-surface hover:bg-primary hover:text-white"> {{ tag }} </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    </div>
+                    <div class="about md:mt-15 mt-8">
+                        <div class="introduce">
+                            <h5 class="heading5">About me</h5>
+                            <div class="flex flex-wrap gap-5 items-center justify-between mt-4">
+                                <a href="candidates-detail1.html" class="info flex items-center gap-5">
+                                    <img src="{% static 'assets/images/avatar/IMG-13.webp' %}" alt="avatar/IMG-13" class="flex-shrink-0 w-[100px] h-[100px] rounded-lg" />
+                                    <div class="flex flex-col gap-2">
+                                        <span class="tag w-fit caption1 bg-background text-success">Available now</span>
+                                        <div class="flex items-center gap-2">
+                                            <strong class="heading6 duration-300 hover:text-primary">Devon Lane</strong>
+                                            <span class="ph-fill ph-crown-simple text-primary text-2xl"></span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="ph ph-map-pin text-xl text-secondary"></span>
+                                            <span class="address -style-1 caption1 text-secondary">Las Vegas, USA</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="group_btn flex flex-col gap-3">
+                                    <a href="#!" class="button-main whitespace-nowrap">Contact me</a>
+                                    <a href="candidates-detail1.html" class="button-main -border whitespace-nowrap">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% if portfolio_images %}
+                        <div class="portfolio md:mt-10 mt-7">
+                            <h6 class="heading6">Portfolio</h6>
+                            <ul class="list_portfolio grid sm:grid-cols-3 grid-cols-2 gap-5 mt-4">
+                                {% for portfolio in portfolio_images %}
+                                <li class="col-span-{{ portfolio.grid_col_span|default:1 }} row-span-{{ portfolio.grid_row_span|default:1 }} overflow-hidden rounded-lg">
+                                    {% if portfolio.image_url %}
+                                    <img src="{{ portfolio.image_url }}" alt="{{ portfolio.title|default:service.provider_name }}" class="w-full h-full object-cover" />
+                                    {% else %}
+                                    <div class="w-full h-full bg-surface flex items-center justify-center min-h-[200px]">
+                                        <span class="ph ph-image text-4xl text-secondary opacity-40"></span>
+                                    </div>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if pricing_tiers %}
+                    <div class="compare_pricing md:mt-15 mt-8">
+                        <h5 class="heading5">Compare pricing</h5>
+                        <div class="list overflow-x-auto w-full mt-4 p-5 rounded-xl bg-surface">
+                            <table class="w-full max-[560px]:w-[560px]">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        {% for tier in pricing_tiers %}
+                                        <th scope="col">
+                                            <div class="item flex flex-col items-center gap-1 py-5">
+                                                <span class="text-sm font-bold text-secondary">{{ tier.name }}</span>
+                                                <strong class="heading5">${{ tier.price }}</strong>
+                                            </div>
+                                        </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg bg-white text-left font-normal">Delivery time</th>
+                                        {% for tier in pricing_tiers %}
+                                        <td class="p-4 {% cycle 'bg-white' '' %} text-title text-center {% if forloop.last %}rounded-r-lg{% endif %}">{{ tier.delivery_time_days }} day{{ tier.delivery_time_days|pluralize }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg text-left font-normal">Number of revisions</th>
+                                        {% for tier in pricing_tiers %}
+                                        <td class="p-4 text-title text-center {% if forloop.last %}rounded-r-lg{% endif %}">{% if tier.revisions == -1 %}Unlimited{% else %}{{ tier.revisions }} time{{ tier.revisions|pluralize }}{% endif %}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% if pricing_tiers.0.features %}
+                                    {% for feature_key, feature_label in pricing_tiers.0.features.items %}
+                                    <tr>
+                                        <th scope="row" class="p-4 rounded-l-lg {% cycle 'bg-white' '' %} text-left font-normal">{{ feature_label }}</th>
+                                        {% for tier in pricing_tiers %}
+                                        <td class="p-4 {% cycle 'bg-white' '' %} text-title text-center {% if forloop.last %}rounded-r-lg{% endif %}">
+                                            {% if tier.features|get_item:feature_key %}
+                                            <span class="ph-bold ph-check text-xl text-primary"></span>
+                                            {% else %}
+                                            <span class="ph-bold ph-minus text-xl text-placehover"></span>
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="review md:mt-15 mt-8">
+                        <div class="heading flex flex-wrap items-center justify-between gap-4">
+                            <h5 class="heading5">Customer Review</h5>
+                            <a href="#form-review" class="button-main -border">Write Reviews </a>
+                        </div>
+                        <div class="rating_area flex max-sm:flex-col justify-between gap-y-3 py-6">
+                            <div class="flex flex-col items-center justify-center gap-1">
+                                <h1 class="heading1 avg_rating">{{ service.rating_avg|default:"0.0" }}</h1>
+                                <div class="flex flex-col items-center gap-2">
+                                    <ul class="rate flex">
+                                        {% with rating=service.rating_avg|default:0|floatformat:0|add:"0" %}
+                                        {% for i in "12345" %}
+                                        <li class="ph-fill ph-star{% if forloop.counter > rating %}-half{% endif %} text-2xl text-yellow"></li>
+                                        {% endfor %}
+                                        {% endwith %}
+                                    </ul>
+                                    <span class="total_rating caption1">({{ service.total_reviews|default:0 }} Rating{{ service.total_reviews|pluralize }})</span>
+                                </div>
+                            </div>
+                            <div class="list_rating flex-shrink-0 xl:w-[465px] sm:w-[60%] w-full">
+                                {% for rating_num in "54321" %}
+                                <div class="item flex items-center justify-between gap-3 {% if not forloop.first %}mt-1{% endif %}">
+                                    <div class="flex flex-shrink-0 items-center gap-1 min-w-7">
+                                        <strong class="text-button-sm">{{ rating_num }}</strong>
+                                        <span class="ph-fill ph-star text-sm text-yellow"></span>
+                                    </div>
+                                    <div class="progress bg-line relative w-full h-3">
+                                        <div class="progress-percent absolute bg-primary w-[{{ service.rating_breakdown|get_item:rating_num|default:0 }}%] h-full left-0 top-0"></div>
+                                    </div>
+                                    <strong class="percent flex-shrink-0 min-w-8 text-right text-button-sm">{{ service.rating_breakdown|get_item:rating_num|default:0 }}%</strong>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="list_review flex flex-col items-center gap-10 md:pt-10 pt-7 border-t border-line">
+                            {% if reviews %}
+                            <ul class="list flex flex-col gap-6">
+                                {% for review in reviews %}
+                                <li class="review_item flex gap-5">
+                                    {% if review.reviewer_avatar_url %}
+                                    <img src="{{ review.reviewer_avatar_url }}" alt="{{ review.reviewer_name }}" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    {% else %}
+                                    <img src="{% static 'assets/images/avatar/default-avatar.webp' %}" alt="{{ review.reviewer_name }}" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    {% endif %}
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">{{ review.reviewer_name }}</span>
+                                                    {% if review.reviewer_is_verified %}
+                                                    <span class="ph-fill ph-check-circle text-lg text-success"></span>
+                                                    {% endif %}
+                                                </div>
+                                                <span class="date caption1 text-secondary">{{ review.created_at|date:"F d, Y" }}</span>
+                                                <ul class="review_rate flex mt-1">
+                                                    {% for i in "12345" %}
+                                                    <li class="ph-fill ph-star{% if forloop.counter > review.rating %} text-line{% else %} text-yellow{% endif %}"></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <button class="is_helpful button-main -small -border border-line gap-2 h-fit bg-white text-secondary">
+                                                <span class="caption1">Was this helpful?</span>
+                                                <span class="ph ph-thumbs-up"></span>
+                                            </button>
+                                        </div>
+                                        {% if review.title %}
+                                        <h6 class="heading6 mt-3">{{ review.title }}</h6>
+                                        {% endif %}
+                                        <p class="desc mt-4">{{ review.content }}</p>
+                                        {% if review.provider_response %}
+                                        <div class="provider_response mt-4 p-4 bg-surface rounded-lg">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="caption1 font-semibold">Response from {{ service.provider_name }}:</span>
+                                                <span class="caption2 text-secondary">{{ review.provider_responded_at|date:"F d, Y" }}</span>
+                                            </div>
+                                            <p class="caption1 text-secondary">{{ review.provider_response }}</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% if service.total_reviews > reviews|length %}
+                            <button class="text-button underline duration-300 hover:text-primary">See more reviews ({{ service.total_reviews|add:"-10" }})</button>
+                            {% endif %}
+                            {% else %}
+                            <div class="flex flex-col items-center gap-4 py-10">
+                                <span class="ph ph-chat-text text-6xl text-secondary opacity-40"></span>
+                                <h6 class="heading6 text-secondary">No reviews yet</h6>
+                                <p class="text-secondary">Be the first to review this service!</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div id="form-review" class="form-review md:pt-10 pt-7">
+                            <h6 class="heading6">Leave A comment</h6>
+                            <form class="form grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
+                                <div class="name">
+                                    <label for="username">Name</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="username" type="text" placeholder="Your Name" required />
+                                </div>
+                                <div class="mail">
+                                    <label for="email">Email</label>
+                                    <input class="w-full mt-2 px-4 py-3 border-line rounded-lg" id="email" type="email" placeholder="Your Email" required />
+                                </div>
+                                <div class="col-span-full message">
+                                    <label for="message">Review</label>
+                                    <textarea class="border w-full mt-2 px-4 py-3 border-line rounded-lg" id="message" name="message" rows="3" placeholder="Write comment " required></textarea>
+                                </div>
+                                <div class="col-span-full flex items-start gap-2">
+                                    <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
+                                    <label class="" for="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
+                                </div>
+                                <div class="user_rating flex items-center gap-3 col-span-full">
+                                    <span>Your Rating:</span>
+                                    <ul class="list_rate flex gap-1">
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="1"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="2"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="3"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="4"></li>
+                                        <li class="ph-fill ph-star star text-2xl text-line cursor-pointer" data-value="5"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-span-full">
+                                    <button class="button-main">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% if pricing_tiers %}
+                <div class="pricing_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit lg:mt-40 sm:mt-32 mt-24 rounded-xl overflow-hidden bg-white shadow-md duration-300">
+                    <div class="menu_tab w-full max-w-none">
+                        <ul class="menu grid grid-cols-{{ pricing_tiers|length }} w-full border-b border-line" role="tablist">
+                            <li class="indicator absolute bottom-0 h-0.5 bg-primary rounded-full duration-300"></li>
+                            {% for tier in pricing_tiers %}
+                            <li class="tab_item" role="presentation">
+                                <button class="tab_btn -before -bg flex flex-col items-center gap-1 w-full py-[13px] duration-300 hover:bg-background {% if forloop.first %}active{% endif %}" id="pricing_tab0{{ forloop.counter }}" role="tab" aria-controls="pricing_0{{ forloop.counter }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                                    <span class="caption1 text-secondary">{{ tier.name }}</span>
+                                    <strong class="heading6">${{ tier.price }}</strong>
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% for tier in pricing_tiers %}
+                    <div id="pricing_0{{ forloop.counter }}" class="tab_list p-6 {% if forloop.first %}active{% endif %}" role="tabpanel" aria-labelledby="pricing_tab0{{ forloop.counter }}" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+                        <h6 class="heading6">{{ tier.name }}</h6>
+                        <ul class="list flex flex-col gap-3 w-full py-5 border-b border-line">
+                            <li class="flex items-center justify-between">
+                                <span>Delivery time</span>
+                                <strong class="text-title">{{ tier.delivery_time_days }} day{{ tier.delivery_time_days|pluralize }}</strong>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span>Number of revisions</span>
+                                <strong class="text-title">{% if tier.revisions == -1 %}Unlimited{% else %}{{ tier.revisions }} time{{ tier.revisions|pluralize }}{% endif %}</strong>
+                            </li>
+                            {% if tier.features %}
+                            {% for feature_key, feature_value in tier.features.items %}
+                            <li class="flex items-center justify-between">
+                                <span>{{ feature_key|title|replace:"_":" " }}</span>
+                                {% if feature_value %}
+                                <span class="ph-bold ph-check text-primary text-xl"></span>
+                                {% else %}
+                                <span class="ph-bold ph-x text-red text-xl"></span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <div class="total flex items-center justify-between py-5">
+                            <strong class="heading6">Pricing</strong>
+                            <strong class="heading5">${{ tier.price }}</strong>
+                        </div>
+                        <a href="{{ service.booking_url }}?tier={{ tier.id }}" class="button-main w-full text-center">Continue</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="pricing_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit lg:mt-40 sm:mt-32 mt-24 rounded-xl overflow-hidden bg-white shadow-md duration-300">
+                    <div class="p-6">
+                        <h6 class="heading6">Book this service</h6>
+                        <div class="total flex items-center justify-between py-5 border-b border-line">
+                            <strong class="heading6">Starting from</strong>
+                            <strong class="heading5">${{ service.price|default:"0" }}</strong>
+                        </div>
+                        <a href="{{ service.booking_url }}" class="button-main w-full text-center mt-5">Book Now</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+{% endblock %}

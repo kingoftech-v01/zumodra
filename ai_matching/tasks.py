@@ -575,7 +575,7 @@ def process_candidate_profile(self, candidate_id: int, force: bool = False):
     Returns:
         Dict with processing results
     """
-    from ats.models import Candidate
+    from jobs.models import Candidate
     from .models import MatchingProfile, AIModelVersion
     from .services import (
         SentenceTransformerEmbeddingService,
@@ -705,7 +705,7 @@ def process_job_profile(self, job_id: int, force: bool = False):
     Returns:
         Dict with processing results
     """
-    from ats.models import JobPosting
+    from jobs.models import JobPosting
     from .models import JobMatchingProfile, AIModelVersion
     from .services import SentenceTransformerEmbeddingService, SkillNormalizationService
 
@@ -830,7 +830,7 @@ def batch_compute_matches(
     Returns:
         Dict with batch processing results
     """
-    from ats.models import JobPosting, Candidate
+    from jobs.models import JobPosting, Candidate
     from .services import CandidateMatchingService
 
     try:
@@ -898,7 +898,7 @@ def batch_process_candidate_profiles(
     Returns:
         Dict with batch results
     """
-    from ats.models import Candidate
+    from jobs.models import Candidate
     from .models import MatchingProfile
 
     try:
@@ -958,7 +958,7 @@ def batch_process_job_profiles(
     Returns:
         Dict with batch results
     """
-    from ats.models import JobPosting
+    from jobs.models import JobPosting
     from .models import JobMatchingProfile
 
     try:

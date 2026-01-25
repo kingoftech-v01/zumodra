@@ -2,7 +2,7 @@
 
 ## Overview
 
-The HR Core app provides comprehensive human resources management functionality including employee directory, time-off management, onboarding workflows, organizational charts, and HR analytics. It integrates seamlessly with the ATS app to convert hired candidates into employees.
+The HR Core app provides comprehensive human resources management functionality including employee directory, time-off management, onboarding workflows, organizational charts, and HR analytics. It integrates seamlessly with the Jobs app to convert hired candidates into employees.
 
 ## Key Features
 

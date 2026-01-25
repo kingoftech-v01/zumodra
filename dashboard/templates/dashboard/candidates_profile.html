@@ -1,0 +1,284 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_profile scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 min-[1400px]:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="heading flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">My profile</h4>
+                        <a href="candidates-profile-setting.html" class="button-main">Edit Profile</a>
+                    </div>
+                    <div class="profile_block overflow-hidden flex max-lg:flex-col-reverse gap-y-10 w-full mt-7.5">
+                        <div class="left flex-shrink-0 lg:w-[29.5%]">
+                            <div class="info_overview p-8 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Info overview</h5>
+                                <ul class="candidates_info pt-1">
+                                    <li class="industry flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Career Finding:</span>
+                                        <strong class="text-title">UI UX Designer</strong>
+                                    </li>
+                                    <li class="location flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Location:</span>
+                                        <strong class="text-title">Las Vegas, USA</strong>
+                                    </li>
+                                    <li class="phone flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Phone:</span>
+                                        <strong class="text-title">+12-345-678-910</strong>
+                                    </li>
+                                    <li class="email flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Email:</span>
+                                        <strong class="text-title">hi.avitex@gmail.com</strong>
+                                    </li>
+                                    <li class="salary flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Offered Salary:</span>
+                                        <strong class="text-title">$2500/Month</strong>
+                                    </li>
+                                    <li class="experience flex flex-wrap items-center justify-between gap-1 w-full py-4 border-b border-line">
+                                        <span class="text-secondary">Experience:</span>
+                                        <strong class="text-title">4 Year</strong>
+                                    </li>
+                                    <li class="age flex flex-wrap items-center justify-between gap-1 w-full pt-4">
+                                        <span class="text-secondary">Age:</span>
+                                        <strong class="text-title">25 Years Old</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="list_social p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Link Social</h5>
+                                <ul class="list flex flex-col gap-3 mt-5">
+                                    <li class="w-full">
+                                        <a href="https://www.facebook.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-facebook text-lg"></span>
+                                            <span>Facebook</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.linkedin.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-linkedin text-lg"></span>
+                                            <span>Linkedin</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.twitter.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-twitter text-lg"></span>
+                                            <span>Twitter</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.instagram.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-instagram text-lg"></span>
+                                            <span>Instagram</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.pinterest.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-pinterest text-lg"></span>
+                                            <span>Pinterest</span>
+                                        </a>
+                                    </li>
+                                    <li class="w-full">
+                                        <a href="https://www.youtube.com/" target="_blank" class="w-full py-2 flex items-center justify-center gap-3 border border-line rounded-full bg-surface text-black duration-300 hover:bg-primary hover:text-white">
+                                            <span class="icon-youtube text-lg"></span>
+                                            <span>Youtube</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="right lg:w-[70.5%] lg:pl-7.5">
+                            <div class="about p-8 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">About me</h5>
+                                <div class="desc mt-3">
+                                    <p class="body2 text-secondary">As a UX/UI designer, I am dedicated to crafting seamless and intuitive digital experiences that prioritize user satisfaction and engagement. With a strong background in user-centric design principles, I specialize in creating visually appealing interfaces that not only look great but also function flawlessly across various platforms.</p>
+                                    <p class="body2 text-secondary mt-3">If you're seeking a UX/UI designer who can elevate your digital presence and deliver exceptional user experiences, look no further. Let's collaborate to bring your vision to life and create meaningful connections with your audience.</p>
+                                </div>
+                            </div>
+                            <div class="tools p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Tools</h5>
+                                <div class="list flex flex-wrap items-center gap-3 mt-5">
+                                    <span class="tag bg-surface caption1">Prototyping</span>
+                                    <span class="tag bg-surface caption1">Responsive Design</span>
+                                    <span class="tag bg-surface caption1">Mobile App</span>
+                                    <span class="tag bg-surface caption1">Figma</span>
+                                    <span class="tag bg-surface caption1">Adobe XD</span>
+                                    <span class="tag bg-surface caption1">Adobe Photoshop</span>
+                                    <span class="tag bg-surface caption1">InVision</span>
+                                    <span class="tag bg-surface caption1">Mobile Ul Design</span>
+                                    <span class="tag bg-surface caption1">Graphic Design</span>
+                                    <span class="tag bg-surface caption1">Web UI</span>
+                                    <span class="tag bg-surface caption1">Dashboard</span>
+                                </div>
+                            </div>
+                            <div class="portfolio w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">My Portfolio</h5>
+                                <div class="list section-swiper-navigation relative mt-5">
+                                    <button class="custom-button-prev -border -left-5">
+                                        <span class="ph-bold ph-arrow-left text-xl"></span>
+                                    </button>
+                                    <div class="swiper swiper-list-portfolio w-full">
+                                        <div class="swiper-wrapper">
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/1.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Creating Clean and Modern Web Designs</strong>
+                                                </a>
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/2.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Balancing Beauty & Usability in App Design</strong>
+                                                </a>
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/3.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Building Cohesive Brand Experiences</strong>
+                                                </a>
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/4.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Creating Clean and Modern Web Designs</strong>
+                                                </a>
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/5.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Balancing Beauty & Usability in App Design</strong>
+                                                </a>
+                                            </div>
+                                            <div class="swiper-slide">
+                                                <a href="services-detail1.html" class="portfolio_item block">
+                                                    <div class="img-portfolio pb-4">
+                                                        <img src="{% static 'assets/images/service/6.webp' %}" alt="portfolio" class="w-full rounded-lg" />
+                                                    </div>
+                                                    <strong class="text-title">Building Cohesive Brand Experiences</strong>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="custom-button-next -border -right-5">
+                                        <span class="ph-bold ph-arrow-right text-xl"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="services w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">My Services</h5>
+                                <ul class="list max-lg:flex flex-col gap-7 mt-5">
+                                    <li>
+                                        <div class="item flex items-center justify-between xl:gap-20 sm:gap-10 gap-5 lg:p-5 duration-300 lg:hover:bg-background">
+                                            <div class="left flex max-sm:flex-col sm:items-center sm:gap-5 gap-4">
+                                                <a href="services-detail1.html" class="service_thumb block flex-shrink-0 w-[11.25rem] rounded-lg overflow-hidden">
+                                                    <img src="{% static 'assets/images/service/7.webp' %}" alt="service/7" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="services-detail1.html" class="info block">
+                                                    <strong class="service_title md:text-xl text-lg font-semibold hover:underline">I will translate your documents with accuracy and precision</strong>
+                                                    <p class="service_desc text-secondary sm:my-2 my-1">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                                    <strong class="price text-title">$380</strong>
+                                                </a>
+                                            </div>
+                                            <button class="toggle_btn flex-shrink-0 active"></button>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item flex items-center justify-between xl:gap-20 sm:gap-10 gap-5 lg:p-5 duration-300 lg:hover:bg-background">
+                                            <div class="left flex max-sm:flex-col sm:items-center sm:gap-5 gap-4">
+                                                <a href="services-detail1.html" class="service_thumb block flex-shrink-0 w-[11.25rem] rounded-lg overflow-hidden">
+                                                    <img src="{% static 'assets/images/service/8.webp' %}" alt="service/8" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="services-detail1.html" class="info block">
+                                                    <strong class="service_title md:text-xl text-lg font-semibold hover:underline">I will design a professional and beautiful website on wix</strong>
+                                                    <p class="service_desc text-secondary sm:my-2 my-1">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                                    <strong class="price text-title">$299</strong>
+                                                </a>
+                                            </div>
+                                            <button class="toggle_btn flex-shrink-0 active"></button>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item flex items-center justify-between xl:gap-20 sm:gap-10 gap-5 lg:p-5 duration-300 lg:hover:bg-background">
+                                            <div class="left flex max-sm:flex-col sm:items-center sm:gap-5 gap-4">
+                                                <a href="services-detail1.html" class="service_thumb block flex-shrink-0 w-[11.25rem] rounded-lg overflow-hidden">
+                                                    <img src="{% static 'assets/images/service/9.webp' %}" alt="service/9" class="w-full h-full object-cover" />
+                                                </a>
+                                                <a href="services-detail1.html" class="info block">
+                                                    <strong class="service_title md:text-xl text-lg font-semibold hover:underline">I will create stunning logo designs for your business</strong>
+                                                    <p class="service_desc text-secondary sm:my-2 my-1">We need someone that can translate our documents with accuracy and precision to our customer</p>
+                                                    <strong class="price text-title">$349</strong>
+                                                </a>
+                                            </div>
+                                            <button class="toggle_btn flex-shrink-0"></button>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="education w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Education</h5>
+                                <ul class="list flex flex-col gap-7 mt-5 pl-7 border-l border-line">
+                                    <li>
+                                        <div class="flex items-center gap-4 mb-1">
+                                            <strong class="edu_name text-button-sm">FPT University</strong>
+                                            <span class="time caption2">2016 - 2020</span>
+                                        </div>
+                                        <strong class="position text-button">Software Engineering</strong>
+                                        <p class="desc text-secondary mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center gap-4 mb-1">
+                                            <strong class="edu_name text-button-sm">Devpro</strong>
+                                            <span class="time caption2">2020 - 2021</span>
+                                        </div>
+                                        <strong class="position text-button">UI/UX Design Course</strong>
+                                        <p class="desc text-secondary mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="experience w-full overflow-hidden p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                                <h5 class="heading5">Experience</h5>
+                                <ul class="list flex flex-col gap-7 mt-5 pl-7 border-l border-line">
+                                    <li>
+                                        <div class="flex items-center gap-4 mb-1">
+                                            <strong class="company_name text-button-sm">Avitex Agency Inc.</strong>
+                                            <span class="time text-xs font-semibold uppercase">June 2021 - December 2022</span>
+                                        </div>
+                                        <strong class="position text-button">UI/UX Design</strong>
+                                        <p class="desc text-secondary mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center gap-4 mb-1">
+                                            <strong class="company_name text-button-sm">Google Inc.</strong>
+                                            <span class="time text-xs font-semibold uppercase text-primary">January 2023 - Present</span>
+                                        </div>
+                                        <strong class="position text-button">UI/UX Design</strong>
+                                        <p class="desc text-secondary mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[2] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_view_buyer_profile.html' %}
+    {% include 'dashboard/includes/modals/_modal_delete_profile.html' %}
+{% endblock %}

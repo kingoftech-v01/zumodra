@@ -456,7 +456,7 @@ class TestPublicApplicationProcessing:
 
     def test_process_duplicate_application(self, public_application_factory, candidate_factory, job_listing_factory, job_posting_factory, application_factory):
         """Test processing duplicate application."""
-        from ats.models import Candidate
+        from jobs.models import Candidate
 
         # Create existing candidate and application
         job = job_posting_factory()

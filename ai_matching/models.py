@@ -756,7 +756,7 @@ class MatchingProfile(TenantAwareModelMixin, models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     candidate = models.OneToOneField(
-        'ats.Candidate',
+        'jobs.Candidate',
         on_delete=models.CASCADE,
         related_name='matching_profile'
     )
@@ -903,7 +903,7 @@ class JobMatchingProfile(TenantAwareModelMixin, models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     job = models.OneToOneField(
-        'ats.JobPosting',
+        'jobs.JobPosting',
         on_delete=models.CASCADE,
         related_name='matching_profile'
     )
@@ -1066,12 +1066,12 @@ class MatchResult(TenantAwareModelMixin, models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     candidate = models.ForeignKey(
-        'ats.Candidate',
+        'jobs.Candidate',
         on_delete=models.CASCADE,
         related_name='ai_match_results'
     )
     job = models.ForeignKey(
-        'ats.JobPosting',
+        'jobs.JobPosting',
         on_delete=models.CASCADE,
         related_name='ai_match_results'
     )
@@ -1366,7 +1366,7 @@ class BiasMetric(TenantAwareModelMixin, models.Model):
 
     # Scope
     job = models.ForeignKey(
-        'ats.JobPosting',
+        'jobs.JobPosting',
         on_delete=models.CASCADE,
         null=True,
         blank=True,

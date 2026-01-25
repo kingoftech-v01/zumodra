@@ -157,7 +157,7 @@ def send_daily_digest(self):
         dict: Summary of emails sent.
     """
     from tenants.models import Tenant, TenantSettings
-    from accounts.models import TenantUser
+    from tenant_profiles.models import TenantUser
     from django.contrib.auth import get_user_model
 
     User = get_user_model()
@@ -233,7 +233,7 @@ def _gather_tenant_digest_data(tenant, start_date, end_date):
     Returns:
         dict: Digest data with activity counts
     """
-    from ats.models import Application, JobPosting
+    from jobs.models import Application, JobPosting
     from hr_core.models import TimeOffRequest
 
     data = {
@@ -326,7 +326,7 @@ def send_weekly_summary(self):
         dict: Summary of emails sent.
     """
     from tenants.models import Tenant
-    from accounts.models import TenantUser
+    from tenant_profiles.models import TenantUser
 
     try:
         now = timezone.now()
@@ -369,7 +369,7 @@ def send_weekly_summary(self):
 
 def _gather_weekly_summary(tenant, start_date, end_date):
     """Gather weekly summary data for tenant."""
-    from ats.models import Application, JobPosting
+    from jobs.models import Application, JobPosting
     from hr_core.models import Employee
 
     return {

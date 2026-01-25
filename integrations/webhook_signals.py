@@ -176,7 +176,7 @@ def connect_tenants_webhooks():
 def connect_accounts_webhooks():
     """Connect webhook signals for accounts app."""
     try:
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         from django.contrib.auth import get_user_model
         User = get_user_model()
 
@@ -217,12 +217,12 @@ def connect_accounts_webhooks():
 def connect_ats_webhooks():
     """Connect webhook signals for ATS app."""
     try:
-        from ats.models import JobPosting, Candidate, Application, Interview, Offer
+        from jobs.models import JobPosting, Candidate, Application, Interview, Offer
 
         @receiver(post_save, sender=JobPosting)
         def job_saved(sender, instance, created, **kwargs):
             event = 'job.created' if created else 'job.updated'
-            dispatch_webhook_for_model(instance, 'ats', event, {
+            dispatch_webhook_for_model(instance, 'jobs', event, {
                 'title': instance.title,
                 'status': instance.status,
                 'department': getattr(instance, 'department', None),
@@ -230,12 +230,12 @@ def connect_ats_webhooks():
 
         @receiver(post_delete, sender=JobPosting)
         def job_deleted(sender, instance, **kwargs):
-            dispatch_webhook_for_model(instance, 'ats', 'job.deleted')
+            dispatch_webhook_for_model(instance, 'jobs', 'job.deleted')
 
         @receiver(post_save, sender=Candidate)
         def candidate_saved(sender, instance, created, **kwargs):
             event = 'candidate.created' if created else 'candidate.updated'
-            dispatch_webhook_for_model(instance, 'ats', event, {
+            dispatch_webhook_for_model(instance, 'jobs', event, {
                 'first_name': getattr(instance, 'first_name', None),
                 'last_name': getattr(instance, 'last_name', None),
                 'email': getattr(instance, 'email', None),
@@ -243,12 +243,12 @@ def connect_ats_webhooks():
 
         @receiver(post_delete, sender=Candidate)
         def candidate_deleted(sender, instance, **kwargs):
-            dispatch_webhook_for_model(instance, 'ats', 'candidate.deleted')
+            dispatch_webhook_for_model(instance, 'jobs', 'candidate.deleted')
 
         @receiver(post_save, sender=Application)
         def application_saved(sender, instance, created, **kwargs):
             event = 'application.created' if created else 'application.updated'
-            dispatch_webhook_for_model(instance, 'ats', event, {
+            dispatch_webhook_for_model(instance, 'jobs', event, {
                 'status': instance.status,
                 'job_id': str(instance.job_id) if hasattr(instance, 'job_id') else None,
                 'candidate_id': str(instance.candidate_id) if hasattr(instance, 'candidate_id') else None,
@@ -256,12 +256,12 @@ def connect_ats_webhooks():
 
         @receiver(post_delete, sender=Application)
         def application_deleted(sender, instance, **kwargs):
-            dispatch_webhook_for_model(instance, 'ats', 'application.deleted')
+            dispatch_webhook_for_model(instance, 'jobs', 'application.deleted')
 
         @receiver(post_save, sender=Interview)
         def interview_saved(sender, instance, created, **kwargs):
             event = 'interview.scheduled' if created else 'interview.updated'
-            dispatch_webhook_for_model(instance, 'ats', event, {
+            dispatch_webhook_for_model(instance, 'jobs', event, {
                 'status': getattr(instance, 'status', None),
                 'scheduled_start': str(getattr(instance, 'scheduled_start', None)),
             })
@@ -269,7 +269,7 @@ def connect_ats_webhooks():
         @receiver(post_save, sender=Offer)
         def offer_saved(sender, instance, created, **kwargs):
             event = 'offer.created' if created else 'offer.updated'
-            dispatch_webhook_for_model(instance, 'ats', event, {
+            dispatch_webhook_for_model(instance, 'jobs', event, {
                 'status': getattr(instance, 'status', None),
             })
 
@@ -394,9 +394,10 @@ def connect_services_webhooks():
 # =============================================================================
 
 def connect_finance_webhooks():
-    """Connect webhook signals for finance app."""
+    """Connect webhook signals for finance apps (Phase 11 - split from monolithic finance)."""
     try:
-        from finance.models import PaymentTransaction, Invoice, UserSubscription
+        from payments.models import PaymentTransaction  # Renamed from finance
+        from subscriptions.models import SubscriptionInvoice, CustomerSubscription  # Renamed from finance
 
         @receiver(post_save, sender=PaymentTransaction)
         def payment_saved(sender, instance, created, **kwargs):
@@ -413,7 +414,7 @@ def connect_finance_webhooks():
                 'succeeded': getattr(instance, 'succeeded', None),
             })
 
-        @receiver(post_save, sender=Invoice)
+        @receiver(post_save, sender=SubscriptionInvoice)
         def invoice_saved(sender, instance, created, **kwargs):
             if created:
                 event = 'invoice.created'
@@ -423,12 +424,12 @@ def connect_finance_webhooks():
                     event = 'invoice.paid'
                 else:
                     event = 'invoice.updated'
-            dispatch_webhook_for_model(instance, 'finance', event, {
-                'total': str(getattr(instance, 'total_amount', None)),
+            dispatch_webhook_for_model(instance, 'subscriptions', event, {
+                'total': str(getattr(instance, 'total', None)),
                 'status': getattr(instance, 'status', None),
             })
 
-        @receiver(post_save, sender=UserSubscription)
+        @receiver(post_save, sender=CustomerSubscription)
         def subscription_saved(sender, instance, created, **kwargs):
             if created:
                 event = 'subscription.created'
@@ -449,35 +450,35 @@ def connect_finance_webhooks():
 
 
 # =============================================================================
-# APPOINTMENT APP WEBHOOKS
+# INTERVIEWS APP WEBHOOKS
 # =============================================================================
 
-def connect_appointment_webhooks():
-    """Connect webhook signals for appointment app."""
+def connect_interviews_webhooks():
+    """Connect webhook signals for interviews app."""
     try:
-        from appointment.models import Appointment
+        from interviews.models import Appointment
 
         @receiver(post_save, sender=Appointment)
-        def appointment_saved(sender, instance, created, **kwargs):
+        def interviews_appointment_saved(sender, instance, created, **kwargs):
             if created:
-                event = 'appointment.booked'
+                event = 'interviews.appointment.booked'
             else:
                 status = getattr(instance, 'status', '')
                 if status == 'cancelled':
-                    event = 'appointment.cancelled'
+                    event = 'interviews.appointment.cancelled'
                 elif status == 'completed':
-                    event = 'appointment.completed'
+                    event = 'interviews.appointment.completed'
                 elif status == 'no_show':
-                    event = 'appointment.no_show'
+                    event = 'interviews.appointment.no_show'
                 else:
-                    event = 'appointment.updated'
-            dispatch_webhook_for_model(instance, 'appointment', event, {
+                    event = 'interviews.appointment.updated'
+            dispatch_webhook_for_model(instance, 'interviews', event, {
                 'status': getattr(instance, 'status', None),
             })
 
-        logger.info("Appointment webhook signals connected")
+        logger.info("Interviews webhook signals connected")
     except ImportError as e:
-        logger.warning(f"Could not connect Appointment webhooks: {e}")
+        logger.warning(f"Could not connect Interviews webhooks: {e}")
 
 
 # =============================================================================
@@ -562,42 +563,6 @@ def connect_blog_webhooks():
 
 
 # =============================================================================
-# NEWSLETTER APP WEBHOOKS
-# =============================================================================
-
-def connect_newsletter_webhooks():
-    """Connect webhook signals for newsletter app."""
-    try:
-        from newsletter.models import Newsletter, Subscription, Message
-
-        @receiver(post_save, sender=Newsletter)
-        def newsletter_saved(sender, instance, created, **kwargs):
-            if created:
-                dispatch_webhook_for_model(instance, 'newsletter', 'newsletter.created', {
-                    'title': instance.title,
-                })
-
-        @receiver(post_save, sender=Subscription)
-        def newsletter_subscription_saved(sender, instance, created, **kwargs):
-            if created:
-                event = 'subscription.created'
-            elif not getattr(instance, 'subscribed', True):
-                event = 'subscription.cancelled'
-            else:
-                return
-            dispatch_webhook_for_model(instance, 'newsletter', event)
-
-        @receiver(post_save, sender=Message)
-        def newsletter_message_saved(sender, instance, created, **kwargs):
-            if created:
-                dispatch_webhook_for_model(instance, 'newsletter', 'message.sent')
-
-        logger.info("Newsletter webhook signals connected")
-    except ImportError as e:
-        logger.warning(f"Could not connect Newsletter webhooks: {e}")
-
-
-# =============================================================================
 # MASTER CONNECTOR
 # =============================================================================
 
@@ -609,9 +574,8 @@ def connect_all_webhook_signals():
     connect_hr_core_webhooks()
     connect_services_webhooks()
     connect_finance_webhooks()
-    connect_appointment_webhooks()
+    connect_interviews_webhooks()
     connect_messages_webhooks()
     connect_notifications_webhooks()
     connect_blog_webhooks()
-    connect_newsletter_webhooks()
     logger.info("All outbound webhook signals connected")

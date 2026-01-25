@@ -1,1 +1,0 @@
-"""Newsletter API Module."""

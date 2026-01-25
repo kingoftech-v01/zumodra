@@ -430,7 +430,7 @@ class RoleBasedViewSet(SecureTenantViewSet):
         if not tenant:
             raise PermissionDenied("No tenant context")
 
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         has_role = TenantUser.objects.filter(
             user=request.user,
@@ -546,7 +546,7 @@ class ParticipantViewSet(SecureTenantViewSet):
             # Check if admin (admins can access all)
             tenant = self.get_tenant()
             if tenant:
-                from accounts.models import TenantUser
+                from tenant_profiles.models import TenantUser
                 is_admin = TenantUser.objects.filter(
                     user=request.user,
                     tenant=tenant,
@@ -589,7 +589,7 @@ class ParticipantViewSet(SecureTenantViewSet):
         # Check if admin (admins see all)
         tenant = self.get_tenant()
         if tenant:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             is_admin = TenantUser.objects.filter(
                 user=user,
                 tenant=tenant,
@@ -680,7 +680,7 @@ class BulkOperationViewSet(SecureTenantViewSet):
         if not tenant:
             raise PermissionDenied("No tenant context")
 
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         has_role = TenantUser.objects.filter(
             user=request.user,

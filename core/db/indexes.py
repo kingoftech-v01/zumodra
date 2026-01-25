@@ -542,7 +542,7 @@ def generate_django_indexes(app_name: str) -> Dict[str, List[str]]:
     Generate Django Meta class index definitions.
 
     Args:
-        app_name: Django app name (e.g., 'tenants', 'accounts', 'ats')
+        app_name: Django app name (e.g., 'tenants', 'accounts', 'jobs')
 
     Returns:
         Dict mapping model names to list of index definitions

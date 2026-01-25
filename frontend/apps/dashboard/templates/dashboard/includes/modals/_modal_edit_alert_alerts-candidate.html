@@ -1,0 +1,92 @@
+{% load static %}
+
+
+            <!-- modal_edit_alert -->
+            <div class="modal_item modal_edit_alert relative flex-shrink-0 lg:w-[900px] w-[90vw] rounded-lg bg-white" data-type="modal_edit_alert">
+                <div class="heading flex items-center justify-between py-6 px-7 border-b border-line">
+                    <h5 class="heading5">Edit Alerts</h5>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl"></span>
+                    </button>
+                </div>
+                <form class="form grid sm:grid-cols-2 gap-5 md:p-7.5 p-6">
+                    <div class="name">
+                        <label for="name">Alert Name <span class="text-red">*</span></label>
+                        <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="name" type="text" placeholder="Alert Name..." required />
+                    </div>
+                    <div class="keyword">
+                        <label for="keyword">Keyword</label>
+                        <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="keyword" type="text" placeholder="Keyword..." />
+                    </div>
+                    <div class="region">
+                        <label for="region">Job Region <span class="text-red">*</span></label>
+                        <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="region" type="text" placeholder="Job Region..." required />
+                    </div>
+                    <div class="experience">
+                        <label>Experience <span class="text-red">*</span></label>
+                        <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                            <div class="select">
+                                <span class="selected capitalize" data-title="> 5 years">> 5 years</span>
+                                <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                    <li class="capitalize" data-item="> 5 years">> 5 years</li>
+                                    <li class="capitalize" data-item="4 years">4 years</li>
+                                    <li class="capitalize" data-item="3 years">3 years</li>
+                                    <li class="capitalize" data-item="2 years">2 years</li>
+                                    <li class="capitalize" data-item="1 years">1 years</li>
+                                    <li class="capitalize" data-item="&lt; 1 year">&lt; 1 year</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down right-3"></span>
+                        </div>
+                    </div>
+                    <div class="level">
+                        <label>Career level <span class="text-red">*</span></label>
+                        <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                            <div class="select">
+                                <span class="selected capitalize" data-title="fresher">fresher</span>
+                                <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                    <li class="capitalize" data-item="fresher">fresher</li>
+                                    <li class="capitalize" data-item="junior">junior</li>
+                                    <li class="capitalize" data-item="senior">senior</li>
+                                    <li class="capitalize" data-item="team leader">team leader</li>
+                                    <li class="capitalize" data-item="manager">manager</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down right-3"></span>
+                        </div>
+                    </div>
+                    <div class="type">
+                        <label>Job Type <span class="text-red">*</span></label>
+                        <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                            <div class="select">
+                                <span class="selected capitalize" data-title="Fulltime">Fulltime</span>
+                                <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                    <li class="capitalize" data-item="Fulltime">Fulltime</li>
+                                    <li class="capitalize" data-item="Parttime">Parttime</li>
+                                    <li class="capitalize" data-item="Remote">Remote</li>
+                                    <li class="capitalize" data-item="Onsite">Onsite</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down right-3"></span>
+                        </div>
+                    </div>
+                    <div class="type">
+                        <label>Email Frequency <span class="text-red">*</span></label>
+                        <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                            <div class="select">
+                                <span class="selected capitalize" data-title="weekly">weekly</span>
+                                <ul class="list_option -top scrollbar_custom w-full max-h-[200px] bg-white">
+                                    <li class="capitalize" data-item="daily">daily</li>
+                                    <li class="capitalize" data-item="weekly">weekly</li>
+                                    <li class="capitalize" data-item="monthly">monthly</li>
+                                </ul>
+                            </div>
+                            <span class="icon_down ph ph-caret-down right-3"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end col-span-full gap-5 sm:mt-2">
+                        <button class="button-main bg-primary" type="submit">Save Alerts</button>
+                        <button class="button-main -border close_popup_btn" type="button">Cancel</button>
+                    </div>
+                </form>
+            </div>

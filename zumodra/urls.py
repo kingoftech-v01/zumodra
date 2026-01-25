@@ -48,6 +48,9 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+# Blog URL imports (following URL_AND_VIEW_CONVENTIONS.md)
+from blog.urls import frontend_urlpatterns as blog_frontend_urls
+
 
 # ==================== Health Check Endpoint ====================
 
@@ -207,7 +210,7 @@ urlpatterns = [
 ]
 
 # Import and add public verification view
-from accounts.template_views import EmploymentVerificationResponseView
+from tenant_profiles.template_views import EmploymentVerificationResponseView
 
 urlpatterns += [
     # Public Verification Response Endpoint (no auth, no i18n)
@@ -264,8 +267,8 @@ urlpatterns += i18n_patterns(
     path('login/', redirect_login, name='redirect_login'),
     path('signup/', redirect_signup, name='redirect_signup'),
     path('dashboard/', redirect_dashboard, name='redirect_dashboard'),
-    path('ats/applications/', redirect_ats_applications, name='redirect_ats_applications'),
-    path('ats/pipeline/', redirect_ats_pipeline, name='redirect_ats_pipeline'),
+    path('jobs/applications/', redirect_ats_applications, name='redirect_ats_applications'),
+    path('jobs/pipeline/', redirect_ats_pipeline, name='redirect_ats_pipeline'),
     path('hr/time-off/', redirect_hr_timeoff, name='redirect_hr_timeoff'),
     path('profile/', redirect_profile, name='redirect_profile'),
     path('accounts/profile/', redirect_profile, name='redirect_accounts_profile'),
@@ -274,38 +277,35 @@ urlpatterns += i18n_patterns(
     path('marketplace/', redirect_marketplace, name='redirect_marketplace'),
 
     # Frontend Template Views (HTMX-powered)
-    # All frontend views including dashboard, appointments, messages are handled through core.urls_frontend
+    # All frontend views including dashboard, interview scheduling, messages are handled through core.urls_frontend
     path('app/', include('core.urls_frontend', namespace='frontend')),  # All frontend views with namespace
 
-    # Custom Account & User Management
-    # Public profile, KYC, and profile sync settings
-    path('user/', include('custom_account_u.urls', namespace='custom_account_u')),
+    # Core Identity & User Management
+    # Public profile, KYC, and verification (renamed from custom_account_u - Phase 10)
+    # path('user/', include('core_identity.urls', namespace='core_identity')),  # TEMP DISABLED (2026-01-18): Incomplete Phase 10 migration - PublicProfile/ProfileFieldSync imports broken
 
     # Legacy standalone routes (redirects to frontend namespace)
-    # Note: Dashboard, appointment, messages are now served via core.urls_frontend
+    # Note: Dashboard, interview scheduling, messages are now served via core.urls_frontend
     # Keep these only if you need backward-compatible URLs
     path('app/messages/', include('messages_sys.urls', namespace='messages_sys')),  # Messages (standalone)
 
     # Services Marketplace (tenant-specific)
-    path('services/', include('services.urls', namespace='services')),  # Services marketplace
+    path('services/', include('services.urls_frontend', namespace='services')),  # Services marketplace (Phase 12)
+
+    # Public Service Catalog (cross-tenant marketplace)
+    path('browse-services/', include('services_public.urls', namespace='services_public')),  # Public service catalog
+
+    # Public Job Catalog (cross-tenant job board)
+    path('jobs/', include('jobs_public.urls')),  # Public job catalog with interactive map
 
     # Notifications (web views)
-    path('notifications/', include('notifications.urls', namespace='notifications')),  # In-app notifications
+    path('notifications/', include('notifications.api.urls', namespace='notifications')),  # In-app notifications
 
     # Analytics (web views)
-    path('analytics/', include('analytics.urls', namespace='analytics')),  # Analytics dashboards
-
-    # Finance (payments, subscriptions, invoices)
-    path('finance/', include('finance.urls', namespace='finance')),
-
-    # Newsletter
-    path('newsletter/', include('newsletter.urls', namespace='newsletter')),
+    path('analytics/', include('analytics.api.urls', namespace='analytics')),  # Analytics dashboards
 
     # Configurations (staff dashboard)
     path('configurations/', include('configurations.urls', namespace='configurations')),
-
-    # Marketing (staff dashboard)
-    path('marketing/', include('marketing.urls', namespace='marketing')),
 
     # Security (staff dashboard)
     path('security/', include('security.urls', namespace='security')),
@@ -316,8 +316,9 @@ urlpatterns += i18n_patterns(
     # Wagtail documents
     path('documents/', include(wagtaildocs_urls)),
 
-    # Blog search (auxiliary)
-    path('blog/', include('blog.urls', namespace='blog')),
+    # Blog auxiliary routes (search, comments)
+    # Note: Main blog routing (/blog/, /blog/slug/) handled by Wagtail catch-all at line 364
+    path('blog/', include((blog_frontend_urls, 'blog'), namespace='frontend')),
 
     # Development/testing
     path('auth-test/', auth_test_view, name='auth_test'),
@@ -389,7 +390,7 @@ API Endpoints:
     /api/v1/auth/           - JWT authentication
     /api/v1/tenants/        - Multi-tenant management
     /api/v1/accounts/       - User accounts and profiles
-    /api/v1/ats/            - Applicant Tracking System
+    /api/v1/jobs/           - Jobs & Recruitment (ATS)
     /api/v1/hr/             - Human Resources core
     /api/v1/careers/        - Career pages (public + admin)
     /api/v1/analytics/      - Analytics and reporting
@@ -433,9 +434,12 @@ Authentication (with language prefix):
 
 Application Features (with language prefix):
     /<lang>/app/dashboard/  - User dashboard
-    /<lang>/app/appointment/- Appointments
+    /<lang>/app/appointments/- Interview Scheduling
     /<lang>/app/messages/   - Messaging system
-    /<lang>/services/       - Services marketplace
+    /<lang>/services/       - Services marketplace (tenant-specific)
+    /<lang>/browse-services/- Public service catalog (cross-tenant)
+    /<lang>/browse-services/map/ - Service map view
+    /<lang>/browse-services/<uuid>/ - Service detail
     /<lang>/notifications/  - Notifications
     /<lang>/analytics/      - Analytics
     /<lang>/finance/        - Finance (payments, subscriptions)

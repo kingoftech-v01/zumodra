@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Dashboard Header -->
+    {% include 'dashboard/includes/_header.html' %}
+
+    <div class="dashboard_main overflow-hidden lg:w-screen lg:h-screen flex sm:pt-20 pt-16">
+        <!-- Include sidebar desktop -->
+        {% include 'dashboard/includes/_sidebar.html' %}
+
+        <!-- Dashboard Content -->
+        {% block dashboard_content %}{% endblock %}
+    </div>
+
+    <!-- Include menu mobile -->
+    {% include 'dashboard/includes/menu-mobile-dashboard.html' %}
+
+    <!-- Modal -->
+    <div class="modal">
+        {% block modal_content %}{% endblock %}
+    </div>
+{% endblock %}

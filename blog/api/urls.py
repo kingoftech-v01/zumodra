@@ -1,35 +1,26 @@
 """
-Blog API URLs.
+Blog API URLs - DEPRECATED
+===========================
+
+This module is deprecated. All URL patterns moved to blog/urls.py per
+URL_AND_VIEW_CONVENTIONS.md.
+
+Migration:
+    OLD: path('blog/', include('blog.api.urls'))
+    NEW: path('blog/', include('blog.urls'))  # Import api_urlpatterns
+
+This shim will be removed in a future version.
 """
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+import warnings
 
-from .viewsets import (
-    BlogPostViewSet,
-    CategoryViewSet,
-    CommentViewSet,
-    TagViewSet,
-    BlogStatsView,
+warnings.warn(
+    "blog.api.urls is deprecated. Use blog.urls (api_urlpatterns) instead.",
+    DeprecationWarning,
+    stacklevel=2
 )
 
-app_name = 'blog'
+# Re-export from new location for backwards compatibility
+from blog.urls import api_urlpatterns
 
-router = DefaultRouter()
-
-# Blog posts
-router.register(r'posts', BlogPostViewSet, basename='post')
-
-# Categories
-router.register(r'categories', CategoryViewSet, basename='category')
-
-# Comments
-router.register(r'comments', CommentViewSet, basename='comment')
-
-# Tags
-router.register(r'tags', TagViewSet, basename='tag')
-
-urlpatterns = [
-    path('', include(router.urls)),
-    path('stats/', BlogStatsView.as_view(), name='stats'),
-]
+urlpatterns = api_urlpatterns

@@ -28,8 +28,8 @@ from django.utils import timezone
 
 from tenants.models import Tenant
 from tenants.utils import tenant_context
-from accounts.models import TenantUser
-from ats.models import Candidate, JobPosting, JobCategory, Application
+from tenant_profiles.models import TenantUser
+from jobs.models import Candidate, JobPosting, JobCategory, Application
 
 User = get_user_model()
 

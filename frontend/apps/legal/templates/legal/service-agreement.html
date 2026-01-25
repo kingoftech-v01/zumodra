@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Service Agreement</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">This Service Agreement governs the relationship between freelancers and clients conducting business through FreelanHub. When a client accepts a freelancer's proposal or when parties agree to work together on the platform, a binding service contract is formed. This agreement defines the terms, expectations, and obligations for both parties throughout the engagement.</p>
+                            <p class="body2 text-secondary">Services are typically structured around milestones with defined deliverables, timelines, and payment terms. Each milestone should clearly specify what work will be completed, acceptance criteria, and payment amount. Both parties are encouraged to communicate openly and document all agreements and changes through the platform's messaging system to maintain a clear record.</p>
+                            <p class="body2 text-secondary">The service contract exists between the freelancer and client directly. FreelanHub facilitates the connection and provides tools for project management, communication, and secure payment processing, but is not a party to the service agreement and bears no responsibility for work quality, delivery, or outcomes.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub's role is strictly limited to providing a marketplace platform and related services. The following limitations apply to the platform's involvement in service agreements:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>FreelanHub is an intermediary and technology provider only. We do not create an employment relationship, agency, or partnership between freelancers, clients, or the platform.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Freelancers are independent contractors responsible for their own taxes, insurance, and legal obligations. Clients are responsible for determining project requirements and evaluating freelancer qualifications.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>The platform does not guarantee work quality, freelancer availability, timely delivery, or client satisfaction. Users must exercise their own due diligence when selecting work partners.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">All intellectual property created during the engagement belongs to the parties as agreed in their service contract. Platform fees apply as outlined in our Payment Terms and are separate from the compensation agreed between freelancer and client.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Changes to the scope, timeline, or terms of a service agreement must be mutually agreed upon by both the freelancer and client. All modifications should be documented through the platform's messaging system or by creating revised milestone agreements to maintain a clear record and prevent misunderstandings.</p>
+                            <p class="body2 text-secondary">If disputes arise regarding deliverables, quality, or other aspects of the service agreement, parties are encouraged to communicate directly to resolve issues. If direct resolution fails, either party may initiate FreelanHub's dispute resolution process as outlined in our Dispute Resolution policy. The platform will review evidence and facilitate mediation.</p>
+                            <p class="body2 text-secondary">FreelanHub reserves the right to update this Service Agreement framework to comply with legal requirements or improve platform functionality. Users will be notified of material changes, and ongoing projects will generally be governed by the terms in effect when the project began unless both parties agree otherwise.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Either party may terminate a service agreement according to the terms specified in their contract. FreelanHub provides tools to facilitate orderly project closure. The following termination scenarios are recognized:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Mutual agreement: Both parties agree to end the engagement. Payments for completed milestones are processed, and incomplete work is handled as agreed between parties.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Unilateral termination: One party ends the contract according to cancellation terms. Early termination fees or partial payments may apply based on work completed.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Platform-initiated termination: FreelanHub may terminate agreements that violate platform policies, with funds distributed based on completed work and dispute resolution findings.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Upon termination, parties should deliver completed work, process final payments, and provide necessary project documentation. Both parties retain rights to work completed before termination unless otherwise specified in their agreement. Platform fees for completed transactions remain non-refundable.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">While FreelanHub provides an escrow system to secure payments, users should understand that freelance engagements carry inherent risks. Work quality may vary, deadlines may not be met, and disagreements over deliverables can occur. Both parties should clearly define expectations, maintain detailed communication, and document all agreements to minimize these risks.</p>
+                            <p class="body2 text-secondary">FreelanHub's liability is strictly limited to platform service provision. We are not liable for work quality, professional negligence, intellectual property disputes, or financial losses resulting from service agreements between users. The platform provides dispute resolution services but cannot guarantee outcomes that satisfy all parties.</p>
+                            <p class="body2 text-secondary">We strongly recommend that users maintain appropriate insurance coverage for their professional activities. Freelancers should consider professional liability insurance, and clients should evaluate whether contractor agreements require additional protections. For high-value or complex projects, parties may wish to supplement platform agreements with formal contracts reviewed by legal counsel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

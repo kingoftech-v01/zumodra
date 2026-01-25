@@ -156,7 +156,7 @@ class SecureTenantTask(TenantAwareTask):
             )
 
         # Get tenant user
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         try:
             self._tenant_user = TenantUser.objects.get(
@@ -208,7 +208,7 @@ class SecureTenantTask(TenantAwareTask):
 
         # Get or refresh tenant user
         if not self._tenant_user and self._tenant_id:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             try:
                 self._tenant_user = TenantUser.objects.get(
                     user_id=self._user_id,
@@ -246,7 +246,7 @@ class SecureTenantTask(TenantAwareTask):
         if not self._user_id:
             raise PermissionDenied(f"user_id required for role check")
 
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         has_role = TenantUser.objects.filter(
             user_id=self._user_id,

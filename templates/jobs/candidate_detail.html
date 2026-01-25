@@ -1,0 +1,320 @@
+{% extends "base/freelanhub_dashboard_base.html" %}
+{% load static i18n humanize security_filters %}
+
+{% block page_title %}{{ candidate.full_name }}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .timeline-item:last-child .timeline-line {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+    <!-- Candidate Profile Header -->
+    <div class="candidates_breadcrumb bg-surface sm:pt-10 pt-8 pb-10 rounded-xl mb-7">
+        <div class="flex max-lg:flex-col lg:items-center justify-between gap-7 gap-y-5">
+            <div class="candidates_info flex flex-wrap sm:gap-7 gap-4 w-full">
+                <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                    {% if candidate.photo %}
+                    <img src="{{ candidate.photo.url }}" alt="{{ candidate.full_name }}" class="candidates_avatar w-full h-full object-cover" />
+                    {% else %}
+                    <div class="candidates_avatar w-full h-full bg-primary flex items-center justify-center">
+                        <span class="text-white text-4xl font-bold">{{ candidate.first_name|slice:":1" }}{{ candidate.last_name|slice:":1" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex flex-col gap-1 lg:w-[760px]">
+                    {% if candidate.status == 'active' %}
+                    <span class="tag w-fit caption1 bg-background text-success">{% trans "Active" %}</span>
+                    {% elif candidate.status == 'hired' %}
+                    <span class="tag w-fit caption1 bg-background text-primary">{% trans "Hired" %}</span>
+                    {% else %}
+                    <span class="tag w-fit caption1 bg-background text-secondary">{% trans "Archived" %}</span>
+                    {% endif %}
+                    <h4 class="candidates_name heading4 w-fit mt-1">{{ candidate.full_name }}</h4>
+                    <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                        {% if candidate.location %}
+                        <span class="flex items-center text-secondary">
+                            <span class="ph ph-map-pin text-lg"></span>
+                            <span class="candidates_address -style-1 pl-1">{{ candidate.location }}</span>
+                        </span>
+                        {% endif %}
+                        {% if candidate.user and candidate.user.trust_score %}
+                        <div class="candidates_review flex items-center gap-1">
+                            <span class="ph-fill ph-star text-lg text-yellow"></span>
+                            <strong class="text-button">{{ candidate.user.trust_score|floatformat:1 }}</strong>
+                            <span class="review text-secondary">({% trans "Verified" %})</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if candidate.current_title %}
+                    <p class="text-secondary mt-2">{{ candidate.current_title }}{% if candidate.current_company %} {% trans "at" %} {{ candidate.current_company }}{% endif %}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="breadcrumb_action flex flex-col max-lg:flex-col-reverse gap-4">
+                {% if candidate.resume %}
+                <a href="{{ candidate.resume.url }}" target="_blank" class="button-main w-fit whitespace-nowrap">
+                    <span class="ph ph-download text-xl mr-2"></span>
+                    {% trans "Download CV" %}
+                </a>
+                {% endif %}
+                <a href="{% url 'frontend:jobs:candidate_edit' candidate.id %}" class="button-main -border w-fit whitespace-nowrap">
+                    <span class="ph ph-pencil-simple text-xl mr-2"></span>
+                    {% trans "Edit Profile" %}
+                </a>
+                <button hx-get="{% url 'frontend:jobs:candidate_add_to_job' candidate.id %}"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML"
+                        class="button-main -border w-fit whitespace-nowrap">
+                    <span class="ph ph-briefcase text-xl mr-2"></span>
+                    {% trans "Add to Job" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex max-lg:flex-col gap-y-10">
+        <!-- Main Content -->
+        <div class="candidates_content w-full overflow-hidden lg:pr-15">
+            <!-- About -->
+            {% if candidate.summary %}
+            <div class="description">
+                <h5 class="heading5">{% trans "About" %}</h5>
+                <div class="flex flex-col gap-3 mt-3">
+                    <p class="body2 text-secondary">{{ candidate.summary|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Skills -->
+            {% if candidate.skills %}
+            <div class="skills md:mt-10 mt-7">
+                <h6 class="heading6">{% trans "Skills" %}</h6>
+                <div class="flex flex-wrap gap-2.5 mt-4">
+                    {% for skill in candidate.skills %}
+                    <span class="tag bg-surface caption1 hover:text-white hover:bg-primary">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Experience & Education -->
+            <div class="info grid sm:grid-cols-2 gap-5 md:mt-10 mt-7">
+                {% if candidate.experience %}
+                <div class="experience">
+                    <h6 class="heading6">{% trans "Experience" %}</h6>
+                    <div class="content mt-4 pl-5 border-l border-line prose max-w-none">
+                        {{ candidate.experience|sanitize_rich_html }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if candidate.education %}
+                <div class="education">
+                    <h6 class="heading6">{% trans "Education" %}</h6>
+                    <div class="content mt-4 pl-5 border-l border-line prose max-w-none">
+                        {{ candidate.education|sanitize_rich_html }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Contact Information -->
+            <div class="contact md:mt-10 mt-7 rounded-xl bg-white shadow-md p-6">
+                <h6 class="heading6">{% trans "Contact Information" %}</h6>
+                <div class="grid sm:grid-cols-2 gap-5 mt-4">
+                    {% if candidate.email %}
+                    <div class="flex items-center gap-3">
+                        <span class="ph ph-envelope flex-shrink-0 text-3xl text-primary"></span>
+                        <div>
+                            <span class="block text-secondary caption1">{% trans "Email:" %}</span>
+                            <a href="mailto:{{ candidate.email }}" class="text-button hover:text-primary">{{ candidate.email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if candidate.phone %}
+                    <div class="flex items-center gap-3">
+                        <span class="ph ph-phone flex-shrink-0 text-3xl text-primary"></span>
+                        <div>
+                            <span class="block text-secondary caption1">{% trans "Phone:" %}</span>
+                            <a href="tel:{{ candidate.phone }}" class="text-button hover:text-primary">{{ candidate.phone }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if candidate.linkedin_url %}
+                    <div class="flex items-center gap-3">
+                        <span class="icon-linkedin flex-shrink-0 text-3xl text-primary"></span>
+                        <div>
+                            <span class="block text-secondary caption1">{% trans "LinkedIn:" %}</span>
+                            <a href="{{ candidate.linkedin_url }}" target="_blank" rel="noopener" class="text-button hover:text-primary">{% trans "View Profile" %}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Applications -->
+            <div class="applications md:mt-10 mt-7 rounded-xl bg-white shadow-md p-6">
+                <h5 class="heading5">{% trans "Job Applications" %}</h5>
+                {% if applications %}
+                <ul class="flex flex-col gap-5 mt-5">
+                    {% for app in applications %}
+                    <li class="flex flex-wrap items-center justify-between gap-3 pb-5 {% if not forloop.last %}border-b border-line{% endif %}">
+                        <div>
+                            <a href="{% url 'frontend:jobs:application_detail' app.id %}" class="text-button hover:text-primary">{{ app.job.title }}</a>
+                            <div class="flex flex-wrap items-center gap-4 mt-1 text-secondary caption1">
+                                <span class="flex items-center gap-1">
+                                    <span class="ph ph-calendar-blank"></span>
+                                    {% trans "Applied" %} {{ app.created_at|date:"M d, Y" }}
+                                </span>
+                                {% if app.current_stage %}
+                                <span class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                                    {{ app.current_stage.name }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            {% if app.status == 'new' %}
+                            <span class="tag bg-blue-100 text-blue-800 caption1">{% trans "New" %}</span>
+                            {% elif app.status == 'in_review' %}
+                            <span class="tag bg-yellow-100 text-yellow-800 caption1">{% trans "In Review" %}</span>
+                            {% elif app.status == 'interviewing' %}
+                            <span class="tag bg-purple-100 text-purple-800 caption1">{% trans "Interviewing" %}</span>
+                            {% elif app.status == 'offer' %}
+                            <span class="tag bg-green-100 text-green-800 caption1">{% trans "Offer" %}</span>
+                            {% elif app.status == 'hired' %}
+                            <span class="tag bg-green-100 text-green-800 caption1">{% trans "Hired" %}</span>
+                            {% elif app.status == 'rejected' %}
+                            <span class="tag bg-red-100 text-red-800 caption1">{% trans "Rejected" %}</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center py-8">
+                    <span class="ph ph-briefcase text-6xl text-placehover block mb-3"></span>
+                    <p class="text-secondary">{% trans "No applications yet" %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="candidates_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit space-y-7">
+            <!-- Upcoming Interviews -->
+            <div class="interviews overflow-hidden rounded-xl bg-white shadow-md">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+                    <h6 class="heading6">{% trans "Upcoming Interviews" %}</h6>
+                </div>
+                <div class="interviews_list p-5">
+                    {% if upcoming_interviews %}
+                    <ul class="flex flex-col gap-4">
+                        {% for interview in upcoming_interviews %}
+                        <li class="flex flex-col gap-2 pb-4 {% if not forloop.last %}border-b border-line{% endif %}">
+                            <strong class="text-button">{{ interview.get_interview_type_display }}</strong>
+                            <span class="caption1 text-secondary">{{ interview.application.job.title }}</span>
+                            <span class="flex items-center gap-1 caption1 text-primary">
+                                <span class="ph ph-calendar-blank"></span>
+                                {{ interview.scheduled_start|date:"M d, g:i A" }}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-secondary caption1">{% trans "No upcoming interviews" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="tags overflow-hidden rounded-xl bg-white shadow-md">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+                    <h6 class="heading6">{% trans "Tags" %}</h6>
+                    <button hx-get="{% url 'frontend:jobs:candidate_edit_tags' candidate.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML"
+                            class="caption1 text-primary hover:underline">
+                        {% trans "Edit" %}
+                    </button>
+                </div>
+                <div class="tags_list p-5">
+                    {% if candidate.tags.all %}
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in candidate.tags.all %}
+                        <span class="tag caption1" style="background-color: {{ tag.color|default:'#e5e7eb' }}20; color: {{ tag.color|default:'#6b7280' }};">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-secondary caption1">{% trans "No tags added" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Notes -->
+            <div class="notes overflow-hidden rounded-xl bg-white shadow-md">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+                    <h6 class="heading6">{% trans "Quick Note" %}</h6>
+                </div>
+                <div class="notes_form p-5">
+                    <form hx-post="{% url 'frontend:jobs:candidate_add_note' candidate.id %}"
+                          hx-swap="none"
+                          hx-on::after-request="this.reset()">
+                        {% csrf_token %}
+                        <textarea name="content"
+                                  rows="3"
+                                  class="w-full px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-primary caption1"
+                                  placeholder="{% trans 'Add a note about this candidate...' %}"></textarea>
+                        <button type="submit" class="button-main w-full mt-3">
+                            {% trans "Add Note" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="details overflow-hidden rounded-xl bg-white shadow-md">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+                    <h6 class="heading6">{% trans "Details" %}</h6>
+                </div>
+                <div class="details_list p-5">
+                    <div class="flex items-center justify-between py-3 border-b border-line">
+                        <span class="text-secondary caption1">{% trans "Added:" %}</span>
+                        <strong class="text-button">{{ candidate.created_at|date:"M d, Y" }}</strong>
+                    </div>
+                    {% if candidate.created_by %}
+                    <div class="flex items-center justify-between py-3 border-b border-line">
+                        <span class="text-secondary caption1">{% trans "Added by:" %}</span>
+                        <strong class="text-button">{{ candidate.created_by.get_full_name|default:candidate.created_by.email }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if candidate.source %}
+                    <div class="flex items-center justify-between py-3 border-b border-line">
+                        <span class="text-secondary caption1">{% trans "Source:" %}</span>
+                        <strong class="text-button">{{ candidate.source.name }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if candidate.years_of_experience %}
+                    <div class="flex items-center justify-between py-3 border-b border-line">
+                        <span class="text-secondary caption1">{% trans "Experience:" %}</span>
+                        <strong class="text-button">{{ candidate.years_of_experience }} {% trans "years" %}</strong>
+                    </div>
+                    {% endif %}
+                    {% if candidate.expected_salary %}
+                    <div class="flex items-center justify-between py-3">
+                        <span class="text-secondary caption1">{% trans "Expected Salary:" %}</span>
+                        <strong class="text-button">${{ candidate.expected_salary|intcomma }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

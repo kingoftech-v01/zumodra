@@ -29,6 +29,6 @@ urlpatterns = [
     path('upcoming-interviews/', UpcomingInterviewsView.as_view(), name='upcoming_interviews'),
 
     # Sub-module includes (deprecated - redirects to main apps)
-    path('service/', include('dashboard_service.urls')),  # Deprecated, use /services/
+    # path('service/', include('dashboard_service.urls')),  # REMOVED: Use /services/ instead
     path('account/', include('custom_account_u.urls')),
 ]

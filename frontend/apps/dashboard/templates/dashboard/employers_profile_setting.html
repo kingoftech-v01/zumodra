@@ -1,0 +1,194 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_profile scrollbar_custom w-full bg-surface">
+                <form class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <div class="heading flex flex-wrap items-center justify-between gap-4">
+                        <h4 class="heading4 max-lg:mt-3">My profile</h4>
+                        <button class="button-main" type="submit">Save & Publish</button>
+                    </div>
+                    <div class="infomation p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <h5 class="heading5">Infomation</h5>
+                        <div class="grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="upload_image col-span-full">
+                                <label for="uploadImage">Upload a new avatar: <span class="text-red">*</span></label>
+                                <div class="flex flex-wrap items-center gap-5 mt-3">
+                                    <div class="bg_img flex-shrink-0 relative w-[7.5rem] h-[7.5rem] rounded-md overflow-hidden border border-dashed border-line bg-surface">
+                                        <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
+                                        <img src="#" alt="preview img" class="upload_img relative z-[1] w-full h-full object-cover hidden" />
+                                    </div>
+                                    <div>
+                                        <strong class="text-button">Upload Avatar</strong>
+                                        <p class="caption1 text-secondary mt-1">JPG 320x240px</p>
+                                        <div class="upload_file flex items-center gap-3 w-[220px] mt-3 px-3 py-2 border border-line rounded">
+                                            <label for="uploadImage" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
+                                            <input type="file" name="uploadImage" id="uploadImage" accept="image/*" class="caption2 cursor-pointer" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="employer_name">
+                                <label for="employerName">Employer Name: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg capitalize" id="employerName" type="text" placeholder="Employer Name..." value="Avitex Company" required />
+                            </div>
+                            <div class="email_address">
+                                <label for="emailAddress">Email address: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="emailAddress" type="email" placeholder="Email Address..." value="hi.avitex@gmail.com" required />
+                            </div>
+                            <div class="phone_number">
+                                <label for="phoneNumber">Phone number: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="phoneNumber" type="text" placeholder="Phone Number..." value="+12-345-678-910" required />
+                            </div>
+                            <div class="website">
+                                <label for="website">Website: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="website" type="text" placeholder="Website..." value="https://www.avitex.vn/" required />
+                            </div>
+                            <div class="founded_date">
+                                <label for="foundedDate">Founded Date: <span class="text-red">*</span></label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="foundedDate" type="text" placeholder="Founded Date..." value="2020" required />
+                            </div>
+                            <div class="company_size">
+                                <label>Company Size: <span class="text-red">*</span></label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="10 - 50">10 - 50</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="1 - 10">1 - 10</li>
+                                            <li class="capitalize" data-item="10 - 50">10 - 50</li>
+                                            <li class="capitalize" data-item="50 - 100">50 - 100</li>
+                                            <li class="capitalize" data-item="100 - 200">100 - 200</li>
+                                            <li class="capitalize" data-item="> 200">> 200</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="categories col-span-full">
+                                <label>Categories: <span class="text-red">*</span></label>
+                                <div class="category-selector relative flex flex-wrap items-center justify-between gap-y-2 w-full min-h-12 px-4 py-1 mt-2 border border-line rounded-lg">
+                                    <input class="categoryInput w-full min-h-8" type="text" placeholder="Type to search categories..." />
+                                    <div class="selectedCategories selected-categories w-fit flex-shrink-0"></div>
+                                    <ul class="categoryList category-list"></ul>
+                                </div>
+                            </div>
+                            <div class="desc col-span-full">
+                                <label>Decscription: <span class="text-red">*</span></label>
+                                <div class="form_editor mt-2">
+                                    <div id="editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery p-8 mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5">Gallery</h5>
+                        <div class="multiple-image-section mt-5">
+                            <div class="image-previews flex flex-wrap gap-5">
+                                <label for="multipleImages" class="flex flex-col items-center justify-center gap-2 sm:w-[248px] w-[116px] sm:h-[186px] h-[102px] rounded-lg bg-surface cursor-pointer">
+                                    <span class="ph ph-image sm:text-5xl text-3xl text-secondary"></span>
+                                    <span class="text-button text-secondary text-center">Upload file</span>
+                                    <input type="file" id="multipleImages" name="files[]" accept="image/*" hidden multiple />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="video_url mt-5">
+                            <label for="videoUrl">Video URL: <span class="text-red">*</span></label>
+                            <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="videoUrl" type="text" placeholder="Video URL..." required />
+                        </div>
+                    </div>
+                    <div class="social_network list_social p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <h5 class="heading5">Social Network</h5>
+                        <div class="list grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="flex items-center gap-4">
+                                <label for="facebookAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-facebook text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="facebookAddress" type="text" placeholder="Address..." value="https://www.facebook.com/candidates" />
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label for="linkedinAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-linkedin text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="linkedinAddress" type="text" placeholder="Address..." value="https://www.linkedin.com/candidates" />
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label for="twitterAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-twitter text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="twitterAddress" type="text" placeholder="Address..." value="https://www.twitter.com/candidates" />
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label for="pinterestAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-pinterest text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="pinterestAddress" type="text" placeholder="Address..." value="https://www.pinterest.com/candidates" />
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label for="instagramAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-instagram text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="instagramAddress" type="text" placeholder="Address..." value="https://www.instagram.com/candidates" />
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label for="youtubeAddress" class="w-12 h-12 flex flex-shrink-0 items-center justify-center border border-line rounded-full duration-300 hover:bg-primary cursor-pointer">
+                                    <span class="icon-youtube text-lg"></span>
+                                </label>
+                                <input class="w-full h-12 px-4 border-line rounded-lg" id="youtubeAddress" type="text" placeholder="Address..." value="https://www.youtube.com/candidates" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="map_location p-8 mt-7.5 rounded-lg bg-white shadow-sm">
+                        <h5 class="heading5">Map Location</h5>
+                        <div class="grid sm:grid-cols-2 gap-5 mt-5">
+                            <div class="address col-span-full">
+                                <label for="address">Address:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="address" type="text" placeholder="Address..." value="Block 637 HDB Veerasamy" />
+                            </div>
+                            <div class="location">
+                                <label>Location:</label>
+                                <div class="select_block flex items-center w-full h-12 pr-10 pl-4 mt-2 border border-line rounded-lg">
+                                    <div class="select">
+                                        <span class="selected capitalize" data-title="Singapore">Singapore</span>
+                                        <ul class="list_option scrollbar_custom w-full max-h-[200px] bg-white">
+                                            <li class="capitalize" data-item="Singapore">Singapore</li>
+                                            <li class="capitalize" data-item="Japan">Japan</li>
+                                            <li class="capitalize" data-item="South Korea">South Korea</li>
+                                            <li class="capitalize" data-item="United State">United State</li>
+                                            <li class="capitalize" data-item="France">France</li>
+                                            <li class="capitalize" data-item="Germany">Germany</li>
+                                            <li class="capitalize" data-item="United Kingdom">United Kingdom</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                            <div class="map_location">
+                                <label for="mapLocation">Map Location:</label>
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="mapLocation" type="text" placeholder="Map Location..." value="Block 637 HDB Veerasamy" />
+                            </div>
+                            <div class="map col-span-full h-[300px] overflow-hidden rounded-lg">
+                                <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1909.7091869357298!2d103.85507140013029!3d1.30702053658505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19b81a53a2cf%3A0xb073ded76264e6ec!2sBlock%20637%20HDB%20Veerasamy!5e1!3m2!1svi!2s!4v1722584665648!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                            <div class="lat_location">
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="latLocation" type="text" placeholder="Lat Location..." value="1.306833" />
+                            </div>
+                            <div class="lng_location">
+                                <input class="w-full h-12 px-4 mt-2 border-line rounded-lg" id="lngLocation" type="text" placeholder="Lng Location..." value="103.855534" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+
+{% endblock %}

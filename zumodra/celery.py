@@ -38,7 +38,7 @@ payments_exchange = Exchange('payments', type='direct')
 analytics_exchange = Exchange('analytics', type='direct')
 notifications_exchange = Exchange('notifications', type='direct')
 hr_exchange = Exchange('hr', type='direct')
-ats_exchange = Exchange('ats', type='direct')
+ats_exchange = Exchange('jobs', type='direct')
 
 # Define queues
 app.conf.task_queues = (
@@ -48,7 +48,7 @@ app.conf.task_queues = (
     Queue('analytics', analytics_exchange, routing_key='analytics'),
     Queue('notifications', notifications_exchange, routing_key='notifications'),
     Queue('hr', hr_exchange, routing_key='hr'),
-    Queue('ats', ats_exchange, routing_key='ats'),
+    Queue('jobs', ats_exchange, routing_key='jobs'),
     Queue('celery', default_exchange, routing_key='celery'),
 )
 
@@ -79,11 +79,11 @@ app.conf.task_routes = {
 
     # HR tasks
     'hr_core.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
-    'accounts.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
+    'tenant_profiles.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
 
     # ATS tasks
-    'ats.tasks.*': {'queue': 'ats', 'routing_key': 'ats'},
-    'careers.tasks.*': {'queue': 'ats', 'routing_key': 'ats'},
+    'jobs.tasks.*': {'queue': 'jobs', 'routing_key': 'jobs'},
+    'careers.tasks.*': {'queue': 'jobs', 'routing_key': 'jobs'},
 
     # Default shared tasks
     'zumodra.tasks.*': {'queue': 'default', 'routing_key': 'default'},
@@ -107,7 +107,7 @@ app.conf.task_annotations = {
     'analytics.tasks.generate_reports': {'rate_limit': '5/m'},
 
     # ATS tasks
-    'ats.tasks.calculate_match_scores': {'rate_limit': '20/m'},
+    'jobs.tasks.calculate_match_scores': {'rate_limit': '20/m'},
 
     # Cleanup tasks
     'zumodra.tasks.cleanup_expired_sessions': {'rate_limit': '1/h'},

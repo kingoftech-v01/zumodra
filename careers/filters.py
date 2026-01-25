@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .models import JobListing, PublicApplication, TalentPool, TalentPoolMember
-from ats.models import JobPosting, JobCategory
+from jobs.models import JobPosting, JobCategory
 
 
 class PublicJobListingFilter(django_filters.FilterSet):

@@ -1,0 +1,193 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner relative sm:mt-20 mt-16 lg:py-20 py-14">
+                <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                    <img src="{% static 'assets/images/components/breadcrumb_service.webp' %}" alt="breadcrumb_service" class="w-full h-full object-cover" />
+                </div>
+                <div class="container relative h-full">
+                    <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                        <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                            <a href="/" class="caption1 text-white">Home</a>
+                            <span class="caption1 text-white opacity-40">/</span>
+                            <span class="caption1 text-white opacity-60">Browse Services</span>
+                        </div>
+                        <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Browse Services</h3>
+                        <div class="form_search z-[1] w-full mt-5 animate animate_top" style="--i: 3">
+                            <form method="get" action="{% url 'services_public:service_list' %}" class="form_inner flex items-center justify-between max-sm:flex-wrap gap-6 gap-y-4 relative w-full p-3 rounded-lg bg-white">
+                                <div class="form_input relative w-full">
+                                    <span class="icon_search ph-bold ph-magnifying-glass absolute top-1/2 -translate-y-1/2 left-2 text-xl"></span>
+                                    <input type="text" name="q" class="input_search w-full h-full pl-10" placeholder="Search for services..." value="{{ active_filters.q }}" />
+                                </div>
+                                <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                                    <select name="city" class="w-full">
+                                        <option value="">All Cities</option>
+                                        {% for city in filter_options.cities %}
+                                        <option value="{{ city.location_city }}" {% if active_filters.city == city.location_city %}selected{% endif %}>{{ city.location_city }} ({{ city.count }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="select_block flex-shrink-0 max-sm:w-full sm:pr-16 pr-7 sm:pl-6 pl-3 sm:border-l border-line">
+                                    <select name="category" class="w-full">
+                                        <option value="">All Categories</option>
+                                        {% for category in filter_options.categories %}
+                                        <option value="{{ category.category_slug }}" {% if active_filters.category == category.category_slug %}selected{% endif %}>{{ category.category_name }} ({{ category.count }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="button-main max-sm:w-1/3 text-center flex-shrink-0">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- List services -->
+        <div class="services lg:py-20 sm:py-14 py-10">
+            <div class="container flex flex-col items-center">
+                <div class="filter flex flex-wrap items-center justify-between gap-8 gap-y-3 relative w-full">
+                    <button id="filter_btn" class="filter_btn inline-flex items-center gap-1.5 py-1.5 px-2.5 border border-line rounded-md duration-300 hover:bg-primary hover:text-white">
+                        <span class="ph ph-sliders-horizontal text-xl"></span>
+                        <span>Filters</span>
+                    </button>
+                    <ul class="list_layout flex items-center gap-2 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+                        <li class="max-xl:hidden">
+                            <button class="layout_btn cols_4 active"></button>
+                        </li>
+                        <li class="ml-1.5 max-xl:hidden">
+                            <button class="layout_btn cols_3"></button>
+                        </li>
+                        <li class="max-xl:hidden">
+                            <button class="layout_btn cols_2"></button>
+                        </li>
+                        <li class="xl:hidden">
+                            <a href="#!" class="layout_link cols_2 active"></a>
+                        </li>
+                        <li class="xl:hidden">
+                            <a href="services-list.html" class="layout_link list"></a>
+                        </li>
+                    </ul>
+                    <div class="select_filter flex items-center gap-3">
+                        <span class="caption1">Sort by:</span>
+                        <form method="get" action="" class="inline">
+                            {% for key, value in request.GET.items %}
+                                {% if key != 'sort' %}
+                                <input type="hidden" name="{{ key }}" value="{{ value }}" />
+                                {% endif %}
+                            {% endfor %}
+                            <select name="sort" onchange="this.form.submit()" class="sm:pr-16 pr-10 pl-3 py-1 border border-line rounded caption1 capitalize">
+                                {% for option in sort_options %}
+                                <option value="{{ option.value }}" {% if active_filters.sort == option.value %}selected{% endif %}>{{ option.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                </div>
+                <div class="list_filtered flex flex-wrap items-center gap-3 w-full mt-5">
+                    <span class="quantity pr-3 border-r border-line">{{ total_count }}{% if total_count != 1 %}+{% endif %} Result{% if total_count != 1 %}s{% endif %}</span>
+                    <div class="list flex flex-wrap items-center gap-3"></div>
+                    <button class="clear_all_btn inline-flex items-center gap-1 py-1 px-2 border border-red text-red rounded-full duration-300 hover:bg-red hover:text-white">
+                        <span class="ph ph-x text-sm"></span>
+                        <span class="caption1">Clear All</span>
+                    </button>
+                </div>
+                <ul class="list_layout_cols list_services grid xl:grid-cols-4 sm:grid-cols-2 md:gap-7.5 gap-5 w-full md:mt-10 mt-7">
+                    {% for service in services %}
+                    <li class="item h-full">
+                        <div class="service_item overflow-hidden relative h-full rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                            <button class="add_wishlist_btn">
+                                <span class="ph ph-heart text-xl"></span>
+                                <span class="ph-fill ph-heart text-xl"></span>
+                            </button>
+                            <a href="{% url 'services_public:service_detail' service.service_uuid %}" class="service_thumb">
+                                {% if service.thumbnail_url %}
+                                <img src="{{ service.thumbnail_url }}" alt="{{ service.name }}" class="w-full" />
+                                {% else %}
+                                <img src="{% static 'assets/images/service/default.webp' %}" alt="{{ service.name }}" class="w-full" />
+                                {% endif %}
+                            </a>
+                            <div class="service_info py-5 px-4">
+                                <div class="flex items-center justify-between">
+                                    <a href="?category={{ service.category_slug }}" class="tag caption2 bg-surface hover:bg-primary hover:text-white">{{ service.category_name|default:"Uncategorized" }}</a>
+                                    <div class="rate flex items-center gap-1">
+                                        <span class="ph-fill ph-star text-yellow text-xs"></span>
+                                        <strong class="service_rate text-button-sm">{{ service.rating_avg|default:"0.0" }}</strong>
+                                        <span class="service_rate_quantity caption1 text-secondary">({{ service.total_reviews|default:0 }})</span>
+                                    </div>
+                                </div>
+                                <a href="{% url 'services_public:service_detail' service.service_uuid %}" class="service_title text-title pt-2 duration-300 hover:text-primary">{{ service.name }}</a>
+                                <div class="service_more_info flex items-center justify-between gap-1 mt-4 pt-4 border-t border-line">
+                                    <a href="#" class="service_author flex items-center gap-2">
+                                        {% if service.provider_avatar_url %}
+                                        <img src="{{ service.provider_avatar_url }}" alt="{{ service.provider_name }}" class="service_author_avatar w-8 h-8 rounded-full" />
+                                        {% else %}
+                                        <img src="{% static 'assets/images/avatar/default-avatar.webp' %}" alt="{{ service.provider_name }}" class="service_author_avatar w-8 h-8 rounded-full" />
+                                        {% endif %}
+                                        <span class="service_author_name -style-1">{{ service.provider_name }}</span>
+                                    </a>
+                                    <div class="service_price whitespace-nowrap">
+                                        <span class="text-secondary">From </span>
+                                        <span class="price text-title">${{ service.price|default:"0" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="col-span-full text-center py-20">
+                        <div class="flex flex-col items-center gap-4">
+                            <span class="ph ph-magnifying-glass text-6xl text-secondary opacity-40"></span>
+                            <h4 class="heading4 text-secondary">No Services Found</h4>
+                            <p class="text-secondary">Try adjusting your filters or search terms</p>
+                            <a href="{% url 'services_public:service_list' %}" class="button-main mt-4">Clear All Filters</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if page_obj.has_other_pages %}
+                <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                    {% if page_obj.has_previous %}
+                    <li role="presentation">
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black"
+                           role="tab">&lt;</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li role="presentation">
+                            <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">{{ num }}</a>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li role="presentation">
+                            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                               class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black"
+                               role="tab" aria-selected="false">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li role="presentation">
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black"
+                           role="tab">&gt;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Modal -->
+        {% include 'includes/modals/modal-services-list.html' %}
+{% endblock %}

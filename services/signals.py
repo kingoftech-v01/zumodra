@@ -1,308 +1,249 @@
 """
-Service Marketplace Synchronization Signals
+Services Signals
 
-Automatically syncs tenant services to public catalog when is_public=True.
-Uses Django signals (post_save/post_delete) to maintain consistency between
-tenant schemas and the public catalog.
+Django signal handlers for services models.
 
-Architecture:
-- Service.post_save → sync to PublicServiceCatalog (if is_public=True)
-- Service.post_delete → remove from PublicServiceCatalog
-- ServiceProvider.post_save → remove all services if marketplace_enabled=False
+Handles:
+- Service sync to PublicService catalog when is_public=True
+- Service removal from catalog when deleted or is_public=False
+- Related model changes (images, pricing tiers) trigger parent service re-sync
 """
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
+from django.core.cache import cache
 from django.db import connection
-from django.utils import timezone
+from django_tenants.utils import get_public_schema_name
 import logging
-
-from .models import Service, ServiceProvider
-from tenants.models import PublicServiceCatalog
 
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=Service)
-def sync_service_to_public_catalog(sender, instance, created, **kwargs):
+# ==================== SERVICE PUBLIC CATALOG SYNC ====================
+
+
+@receiver(post_save, sender='services.Service')
+def sync_service_to_public_catalog_on_save(sender, instance, created, raw, **kwargs):
     """
-    Sync service to public catalog when is_public=True.
-    Remove from catalog when is_public=False or is_active=False.
+    Sync Service to PublicService catalog when is_public=True.
 
-    This signal ensures that the PublicServiceCatalog (in public schema) stays
-    in sync with Service models (in tenant schemas). It's triggered every time
-    a Service is saved.
+    Triggers:
+        - Service created with is_public=True → queue sync task
+        - Service updated and is_public=True → queue re-sync task
+        - Service updated and is_public=False → queue removal task
 
-    Synchronization Rules:
-    1. Service must have is_public=True AND is_active=True
-    2. Provider must have marketplace_enabled=True
-    3. Tenant schema must be valid (not 'public')
-    4. Service data is denormalized (name, price, category, etc.)
-
-    Args:
-        sender: Service model class
-        instance: Service instance being saved
-        created: Boolean indicating if this is a new record
-        **kwargs: Additional signal arguments
+    Security:
+        - Skip if in public schema (prevent circular signals)
+        - Skip if raw=True (fixtures/migrations)
+        - Only sync if is_public=True AND is_active=True
+        - Provider must have marketplace_enabled=True
     """
-
-    # Validate schema (prevent SSRF attacks)
-    if connection.schema_name == 'public':
-        logger.error("Cannot sync service from public schema - invalid operation")
+    # Prevent circular signals: skip if already in public schema
+    if connection.schema_name == get_public_schema_name():
+        logger.debug(f"Skipping service sync signal: already in public schema")
         return
 
-    # Validate tenant exists
+    # Skip during fixture loading or migrations
+    if raw:
+        logger.debug(f"Skipping service sync signal: raw=True (fixture/migration)")
+        return
+
+    # Import here to avoid circular imports
     from tenants.models import Tenant
+    from .tasks import sync_service_to_public_catalog_task, remove_service_from_public_catalog_task
+
     try:
+        # Get current tenant
         tenant = Tenant.objects.get(schema_name=connection.schema_name)
-        if instance.tenant_id != tenant.id:
-            logger.error(
-                f"Tenant mismatch: service.tenant_id={instance.tenant_id}, "
-                f"connection.tenant={tenant.id}"
+
+        # Determine action based on is_public flag
+        if instance.is_public and instance.is_active:
+            # Check provider conditions
+            if hasattr(instance, 'provider') and instance.provider:
+                if instance.provider.marketplace_enabled and instance.provider.is_active:
+                    # Queue sync task
+                    sync_service_to_public_catalog_task.delay(
+                        str(instance.uuid),
+                        tenant.schema_name,
+                        tenant.id
+                    )
+                    logger.info(
+                        f"Queued sync task for service {instance.uuid} "
+                        f"from tenant {tenant.schema_name}"
+                    )
+                else:
+                    logger.debug(
+                        f"Service {instance.uuid} provider not eligible for marketplace "
+                        f"(marketplace_enabled={instance.provider.marketplace_enabled}, "
+                        f"is_active={instance.provider.is_active})"
+                    )
+            else:
+                logger.warning(
+                    f"Service {instance.uuid} has no provider, cannot sync to catalog"
+                )
+        else:
+            # Service is not public or not active, remove from catalog if exists
+            remove_service_from_public_catalog_task.delay(
+                str(instance.uuid),
+                tenant.schema_name
             )
-            return
-    except Tenant.DoesNotExist:
-        logger.error(f"Invalid tenant schema: {connection.schema_name}")
-        return
-
-    # Skip if service is not public or not active
-    if not instance.is_public or not instance.is_active:
-        # Remove from catalog if exists
-        deleted_count, _ = PublicServiceCatalog.objects.filter(
-            tenant_schema_name=connection.schema_name,
-            service_uuid=instance.uuid
-        ).delete()
-
-        if deleted_count > 0:
             logger.info(
-                f"Removed service {instance.uuid} from catalog "
+                f"Queued removal task for service {instance.uuid} "
+                f"from tenant {tenant.schema_name} "
                 f"(is_public={instance.is_public}, is_active={instance.is_active})"
             )
 
-        # Update service sync status
-        Service.objects.filter(pk=instance.pk).update(
-            published_to_catalog=False,
-            catalog_synced_at=None
+    except Tenant.DoesNotExist:
+        logger.error(
+            f"Tenant not found for schema {connection.schema_name} "
+            f"when syncing service {instance.uuid}"
         )
+    except Exception as e:
+        logger.error(
+            f"Error in service sync signal for {instance.uuid}: {e}",
+            exc_info=True
+        )
+
+
+@receiver(pre_delete, sender='services.Service')
+def remove_service_from_public_catalog_on_delete(sender, instance, **kwargs):
+    """
+    Remove Service from PublicService catalog when deleted.
+
+    Triggers:
+        - Service deleted → queue removal task
+
+    Security:
+        - Skip if in public schema (prevent circular signals)
+        - Removal is idempotent (safe even if not in catalog)
+    """
+    # Prevent circular signals: skip if already in public schema
+    if connection.schema_name == get_public_schema_name():
+        logger.debug(f"Skipping service deletion signal: already in public schema")
         return
 
-    # Provider must have marketplace enabled
-    if not instance.provider.marketplace_enabled:
-        logger.warning(
-            f"Cannot publish service {instance.uuid} - "
-            f"provider {instance.provider.uuid} marketplace not enabled"
-        )
-        return
+    # Import here to avoid circular imports
+    from .tasks import remove_service_from_public_catalog_task
 
-    # Prepare denormalized catalog data
     try:
-        catalog_data = {
-            'uuid': instance.uuid,
-            'tenant_id': instance.tenant_id,
-            'service_uuid': instance.uuid,
-            'tenant_schema_name': connection.schema_name,
-            'name': instance.name,
-            'slug': instance.slug,
-            'description': instance.description or '',
-            'short_description': instance.short_description or '',
-            'category_name': instance.category.name if instance.category else '',
-            'category_slug': instance.category.slug if instance.category else '',
-            'provider_name': instance.provider.display_name or '',
-            'provider_uuid': instance.provider.uuid,
-            'service_type': instance.service_type,
-            'price': instance.price,
-            'price_min': instance.price_min,
-            'price_max': instance.price_max,
-            'currency': instance.currency,
-            'thumbnail_url': instance.thumbnail.url if instance.thumbnail else '',
-            'rating_avg': instance.provider.rating_avg,
-            'review_count': instance.provider.total_reviews,
-            'order_count': instance.order_count,
-            'is_active': instance.is_active,
-            'is_featured': instance.is_featured,
-            'synced_at': timezone.now(),
-        }
-
-        # Update or create catalog entry
-        catalog_entry, created_entry = PublicServiceCatalog.objects.update_or_create(
-            tenant_schema_name=connection.schema_name,
-            service_uuid=instance.uuid,
-            defaults=catalog_data
+        # Queue removal task (idempotent, safe even if not in catalog)
+        remove_service_from_public_catalog_task.delay(
+            str(instance.uuid),
+            connection.schema_name
         )
-
-        # Update service sync status
-        Service.objects.filter(pk=instance.pk).update(
-            published_to_catalog=True,
-            catalog_synced_at=timezone.now()
-        )
-
-        action = 'Created' if created_entry else 'Updated'
         logger.info(
-            f"{action} catalog entry for service {instance.uuid} "
-            f"from {connection.schema_name}"
+            f"Queued removal task for deleted service {instance.uuid} "
+            f"from tenant {connection.schema_name}"
         )
-
     except Exception as e:
         logger.error(
-            f"Failed to sync service {instance.uuid} to catalog: {e}",
+            f"Error in service deletion signal for {instance.uuid}: {e}",
             exc_info=True
         )
 
 
-@receiver(post_delete, sender=Service)
-def remove_service_from_catalog(sender, instance, **kwargs):
-    """
-    Remove service from public catalog when deleted from tenant schema.
+# ==================== RELATED MODEL CHANGES → RE-SYNC PARENT SERVICE ====================
 
-    Args:
-        sender: Service model class
-        instance: Service instance being deleted
-        **kwargs: Additional signal arguments
+
+@receiver(post_save, sender='services.ServiceImage')
+def resync_service_on_image_change(sender, instance, created, raw, **kwargs):
     """
+    Re-sync parent service when ServiceImage is added/updated.
+
+    Triggers:
+        - ServiceImage created → re-sync parent service
+        - ServiceImage updated → re-sync parent service
+
+    This ensures the public catalog reflects the latest images.
+    """
+    # Skip if in public schema or during fixture loading
+    if connection.schema_name == get_public_schema_name() or raw:
+        return
+
+    if not hasattr(instance, 'service') or not instance.service:
+        logger.debug(f"ServiceImage {instance.id} has no parent service, skipping re-sync")
+        return
+
+    # Import here to avoid circular imports
+    from tenants.models import Tenant
+    from .tasks import sync_service_to_public_catalog_task
+
     try:
-        deleted_count, _ = PublicServiceCatalog.objects.filter(
-            tenant_schema_name=connection.schema_name,
-            service_uuid=instance.uuid
-        ).delete()
+        service = instance.service
 
-        if deleted_count > 0:
+        # Only re-sync if service is public
+        if service.is_public and service.is_active:
+            tenant = Tenant.objects.get(schema_name=connection.schema_name)
+
+            sync_service_to_public_catalog_task.delay(
+                str(service.uuid),
+                tenant.schema_name,
+                tenant.id
+            )
             logger.info(
-                f"Removed service {instance.uuid} from public catalog "
-                f"(tenant deleted service from {connection.schema_name})"
+                f"Queued re-sync task for service {service.uuid} "
+                f"after image {'created' if created else 'updated'}"
             )
+
+    except Tenant.DoesNotExist:
+        logger.error(
+            f"Tenant not found for schema {connection.schema_name} "
+            f"when re-syncing service after image change"
+        )
     except Exception as e:
         logger.error(
-            f"Failed to remove service {instance.uuid} from catalog: {e}",
+            f"Error re-syncing service after image change: {e}",
             exc_info=True
         )
 
 
-@receiver(post_save, sender=ServiceProvider)
-def handle_provider_marketplace_change(sender, instance, **kwargs):
+@receiver(post_save, sender='services.ServicePricingTier')
+def resync_service_on_pricing_tier_change(sender, instance, created, raw, **kwargs):
     """
-    Remove all provider's services from catalog when marketplace_enabled=False.
+    Re-sync parent service when ServicePricingTier is added/updated.
 
-    When a provider disables marketplace access, all their public services
-    must be removed from the public catalog. This ensures that providers can
-    opt out of the public marketplace at any time.
+    Triggers:
+        - ServicePricingTier created → re-sync parent service
+        - ServicePricingTier updated → re-sync parent service
 
-    Args:
-        sender: ServiceProvider model class
-        instance: ServiceProvider instance being saved
-        **kwargs: Additional signal arguments
+    This ensures the public catalog reflects the latest pricing tiers.
     """
-    if not instance.marketplace_enabled:
-        try:
-            # Get all public services from this provider
-            public_services = instance.services.filter(is_public=True)
+    # Skip if in public schema or during fixture loading
+    if connection.schema_name == get_public_schema_name() or raw:
+        return
 
-            removed_count = 0
-            for service in public_services:
-                deleted, _ = PublicServiceCatalog.objects.filter(
-                    tenant_schema_name=connection.schema_name,
-                    service_uuid=service.uuid
-                ).delete()
+    if not hasattr(instance, 'service') or not instance.service:
+        logger.debug(f"ServicePricingTier {instance.id} has no parent service, skipping re-sync")
+        return
 
-                if deleted:
-                    removed_count += 1
+    # Import here to avoid circular imports
+    from tenants.models import Tenant
+    from .tasks import sync_service_to_public_catalog_task
 
-                # Update service sync status
-                Service.objects.filter(pk=service.pk).update(
-                    published_to_catalog=False,
-                    catalog_synced_at=None
-                )
+    try:
+        service = instance.service
 
-            if removed_count > 0:
-                logger.info(
-                    f"Removed {removed_count} services from catalog "
-                    f"(provider {instance.uuid} marketplace disabled in {connection.schema_name})"
-                )
+        # Only re-sync if service is public
+        if service.is_public and service.is_active:
+            tenant = Tenant.objects.get(schema_name=connection.schema_name)
 
-        except Exception as e:
-            logger.error(
-                f"Failed to remove provider {instance.uuid} services from catalog: {e}",
-                exc_info=True
+            sync_service_to_public_catalog_task.delay(
+                str(service.uuid),
+                tenant.schema_name,
+                tenant.id
+            )
+            logger.info(
+                f"Queued re-sync task for service {service.uuid} "
+                f"after pricing tier {'created' if created else 'updated'}"
             )
 
-
-# ==================== Public Provider Catalog Sync Signals ====================
-
-@receiver(post_save, sender=ServiceProvider)
-def sync_provider_to_public_catalog(sender, instance, created, **kwargs):
-    """
-    Trigger async Celery task to sync ServiceProvider to PublicProviderCatalog.
-
-    This signal fires every time a ServiceProvider is saved. It queues an async
-    task that will:
-    1. Check if provider meets sync conditions (marketplace_enabled, is_active)
-    2. Extract safe fields and denormalize data (categories, skills, stats)
-    3. Update or create entry in PublicProviderCatalog (public schema)
-
-    Args:
-        sender: ServiceProvider model class
-        instance: ServiceProvider instance being saved
-        created: Boolean indicating if this is a new record
-        **kwargs: Additional signal arguments
-    """
-    # Prevent infinite loops from update_fields
-    if kwargs.get('update_fields') and 'synced_at' in kwargs.get('update_fields', []):
-        return
-
-    # Validate schema (prevent triggering from public schema)
-    if connection.schema_name == 'public':
-        logger.warning(
-            "ServiceProvider signal fired in public schema - skipping sync. "
-            "This should not happen in normal operation."
-        )
-        return
-
-    # Import here to avoid circular imports
-    from services.tasks import sync_provider_to_catalog_task
-
-    # Queue async Celery task
-    try:
-        sync_provider_to_catalog_task.delay(
-            provider_uuid=str(instance.uuid),
-            tenant_schema=connection.schema_name,
-            tenant_id=instance.tenant_id,
-        )
-        logger.debug(
-            f"Queued provider sync task for {instance.uuid} from {connection.schema_name}"
+    except Tenant.DoesNotExist:
+        logger.error(
+            f"Tenant not found for schema {connection.schema_name} "
+            f"when re-syncing service after pricing tier change"
         )
     except Exception as e:
         logger.error(
-            f"Failed to queue provider sync task for {instance.uuid}: {e}",
-            exc_info=True
-        )
-
-
-@receiver(post_delete, sender=ServiceProvider)
-def remove_provider_from_catalog(sender, instance, **kwargs):
-    """
-    Trigger async Celery task to remove provider from PublicProviderCatalog.
-
-    Called when a ServiceProvider is deleted from tenant schema.
-    Ensures corresponding entry is removed from public catalog.
-
-    Args:
-        sender: ServiceProvider model class
-        instance: ServiceProvider instance being deleted
-        **kwargs: Additional signal arguments
-    """
-    # Import here to avoid circular imports
-    from services.tasks import remove_provider_from_catalog_task
-
-    # Queue async removal task
-    try:
-        remove_provider_from_catalog_task.delay(
-            provider_uuid=str(instance.uuid),
-            tenant_schema=connection.schema_name,
-        )
-        logger.debug(
-            f"Queued provider removal task for {instance.uuid} from {connection.schema_name}"
-        )
-    except Exception as e:
-        logger.error(
-            f"Failed to queue provider removal task for {instance.uuid}: {e}",
+            f"Error re-syncing service after pricing tier change: {e}",
             exc_info=True
         )

@@ -142,7 +142,7 @@ class Command(BaseCommand):
 
         if all_models:
             # Get all models from tenant-specific apps
-            tenant_apps = ['ats', 'hr_core', 'careers', 'accounts']
+            tenant_apps = ['jobs', 'hr_core', 'careers', 'accounts']
             for app_label in tenant_apps:
                 try:
                     app_config = apps.get_app_config(app_label)

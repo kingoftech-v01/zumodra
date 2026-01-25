@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">GDPR Compliance Statement</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub is committed to full compliance with the General Data Protection Regulation (GDPR) for all users in the European Union and European Economic Area. The GDPR applies to any processing of personal data of individuals located in the EU, regardless of where the processing occurs. We process your data lawfully, fairly, and transparently in accordance with GDPR requirements.</p>
+                            <p class="body2 text-secondary">As a data controller, FreelanHub determines the purposes and means of processing personal data collected through platform operations. We also act as a data processor when handling data on behalf of users conducting transactions through our platform. Our lawful bases for processing include contract performance, legal obligations, legitimate interests, and user consent where required.</p>
+                            <p class="body2 text-secondary">This GDPR Compliance Statement works alongside our Privacy Policy to provide EU users with comprehensive information about their data protection rights. Our Data Protection Officer (DPO) oversees GDPR compliance and can be contacted regarding data protection inquiries, complaints, or requests to exercise your rights.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We adhere to GDPR's core principles for data processing, ensuring that personal data is handled appropriately throughout its lifecycle:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Data minimization: We collect only personal data that is necessary and relevant for specified purposes. We do not collect excessive information beyond what is needed for platform functionality and service delivery.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Purpose limitation: Personal data is collected for specific, explicit, and legitimate purposes and not processed in ways incompatible with those purposes without obtaining new consent.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Storage limitation: We retain personal data only for as long as necessary to fulfill the purposes for which it was collected, including legal, accounting, or reporting requirements.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Our retention periods vary by data type: account information is retained while your account is active plus legal retention periods; transaction records are kept for tax and legal compliance; and marketing communications data is retained until you withdraw consent. You can request deletion of your data subject to legal exceptions.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Our Data Protection Officer (DPO) monitors GDPR compliance and serves as the primary contact for data protection matters. The DPO conducts regular audits, reviews data processing activities, and ensures our practices align with evolving GDPR interpretations and guidance from supervisory authorities.</p>
+                            <p class="body2 text-secondary">This GDPR Compliance Statement is reviewed and updated regularly to reflect changes in data processing activities, legal requirements, or guidance from data protection authorities. Material updates will be communicated through our standard notification procedures, and the effective date will be clearly indicated.</p>
+                            <p class="body2 text-secondary">We maintain records of processing activities as required by GDPR Article 30, documenting the purposes of processing, data categories, recipient categories, retention periods, and security measures. These records demonstrate our accountability and are available to supervisory authorities upon request.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Under GDPR, you have comprehensive rights regarding your personal data. You can exercise these rights by contacting our Data Protection Officer or using the data management tools in your account settings:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Right of access and portability: Request a copy of your personal data in a structured, machine-readable format. We will provide this data within one month of your verified request.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Right to rectification and erasure: Correct inaccurate data or request deletion of your personal data, subject to legal retention requirements and legitimate processing grounds.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Right to restriction and objection: Request restricted processing of your data or object to processing based on legitimate interests, including profiling and direct marketing.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">You also have the right to lodge a complaint with your national data protection authority if you believe your rights have been violated. We take all requests seriously and respond within GDPR timeframes. Identity verification may be required to protect your data security when processing requests.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">When transferring personal data outside the EU/EEA, we implement appropriate safeguards as required by GDPR Chapter V. Our service providers and partners in third countries operate under Standard Contractual Clauses approved by the European Commission or other legally recognized transfer mechanisms that ensure adequate protection.</p>
+                            <p class="body2 text-secondary">In the event of a personal data breach that poses risk to individuals' rights and freedoms, we will notify the relevant supervisory authority within 72 hours of becoming aware of the breach. Affected individuals will be notified without undue delay when the breach is likely to result in high risk to their rights and freedoms, along with information about mitigation measures.</p>
+                            <p class="body2 text-secondary">We conduct Data Protection Impact Assessments (DPIAs) for processing activities that may present high risks to individuals' rights and freedoms. These assessments help us identify and minimize data protection risks. Our security measures, incident response procedures, and accountability documentation demonstrate our commitment to GDPR compliance and data protection by design and by default.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

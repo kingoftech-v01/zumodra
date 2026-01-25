@@ -100,8 +100,8 @@ try:
     print("    ✓ Tenant prefix included")
 
     # Test 3: Model key
-    from ats.models import JobPosting
-    from accounts.models import CustomUser
+    from jobs.models import JobPosting
+    from tenant_profiles.models import CustomUser
 
     # Get or create test models
     try:

@@ -131,7 +131,7 @@ class LocationConsumer(AsyncWebsocketConsumer):
         qs = ServiceProvider.objects.filter(
             location__distance_lte=(user_location, D(km=radius)),
             is_private=False,
-            is_accepting_projects=True
+            is_accepting_work=True
         ).annotate(
             distance=Distance('location', user_location)
         ).order_by('distance')

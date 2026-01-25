@@ -1,0 +1,88 @@
+{% load static %}
+
+<!-- Job Application Modal -->
+<div class="modal_apply modal relative z-[999]" data-type="modal_apply">
+    <div class="modal_bg absolute top-0 left-0 w-full h-full bg-black/40"></div>
+    <div class="modal_inner relative lg:w-[600px] md:w-3/4 w-11/12 bg-white rounded-2xl">
+        <div class="modal_heading flex items-center justify-between p-5 border-b border-line">
+            <h5 class="heading5">Apply for this Job</h5>
+            <button class="close_modal_btn">
+                <span class="ph-bold ph-x text-2xl"></span>
+            </button>
+        </div>
+        <div class="modal_content p-5">
+            {% if job %}
+            <div class="job_summary mb-5 p-4 bg-surface rounded-lg">
+                <div class="flex items-start gap-3">
+                    {% if job.company_logo_url %}
+                    <img src="{{ job.company_logo_url }}" alt="{{ job.company_name }}" class="w-12 h-12 rounded flex-shrink-0" />
+                    {% else %}
+                    <div class="w-12 h-12 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span class="ph ph-briefcase text-2xl text-primary"></span>
+                    </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <strong class="text-title block">{{ job.title }}</strong>
+                        <span class="text-secondary caption1">{{ job.company_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info_box p-4 bg-blue-50 rounded-lg mb-5">
+                <div class="flex items-start gap-2">
+                    <span class="ph-bold ph-info text-xl text-blue-600 flex-shrink-0 mt-0.5"></span>
+                    <div class="text-sm">
+                        <p class="font-semibold text-blue-900 mb-1">You'll be redirected to complete your application</p>
+                        <p class="text-blue-700">Click "Continue to Application" below to apply on the company's application page. You may need to create an account or sign in.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="application_url mb-5">
+                <label class="text-button mb-2 block text-secondary">Application URL</label>
+                <div class="flex items-center gap-2 p-3 bg-surface rounded-lg">
+                    <span class="ph ph-link text-xl text-secondary"></span>
+                    <span class="text-sm text-secondary truncate">{{ job.application_url|default:"/apply/" }}</span>
+                </div>
+            </div>
+
+            <!-- Requirements Checklist -->
+            <div class="requirements mb-5">
+                <p class="text-button mb-3">Before you apply, make sure you have:</p>
+                <div class="space-y-2">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" class="w-5 h-5 rounded border-line mt-0.5 flex-shrink-0" />
+                        <span class="caption1">An updated resume/CV</span>
+                    </label>
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" class="w-5 h-5 rounded border-line mt-0.5 flex-shrink-0" />
+                        <span class="caption1">A cover letter (if required)</span>
+                    </label>
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" class="w-5 h-5 rounded border-line mt-0.5 flex-shrink-0" />
+                        <span class="caption1">Portfolio or work samples (if applicable)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal_footer flex items-center gap-3">
+                <a
+                    href="{{ job.application_url|default:'/apply/' }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="button-main flex-1 text-center"
+                >
+                    Continue to Application
+                    <span class="ph ph-arrow-square-out ml-2"></span>
+                </a>
+                <button type="button" class="close_modal_btn button-main -border flex-shrink-0">Cancel</button>
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <span class="ph ph-warning-circle text-6xl text-yellow-500 mb-4"></span>
+                <p class="text-secondary">Job information not available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

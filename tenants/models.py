@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
 from django_tenants.models import TenantMixin, DomainMixin
 from django.conf import settings
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 
 
@@ -149,7 +149,7 @@ class Tenant(TenantMixin):
 
     class TenantType(models.TextChoices):
         COMPANY = 'company', _('Company')
-        FREELANCER = 'freelancer', _('Freelancer')
+        # FREELANCER removed: Individual freelancers are now FreelancerProfile user profiles (not tenants)
 
     # Identity
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -197,6 +197,30 @@ class Tenant(TenantMixin):
         blank=True
     )
     website = models.URLField(blank=True)
+
+    # Company Details for Public Job Catalog
+    rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))],
+        help_text=_('Company rating (1.00-5.00)')
+    )
+    established_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text=_('Date company was established/founded')
+    )
+
+    # Social Media Links
+    linkedin_url = models.URLField(blank=True, help_text=_('LinkedIn company page URL'))
+    twitter_url = models.URLField(blank=True, help_text=_('Twitter/X company profile URL'))
+    facebook_url = models.URLField(blank=True, help_text=_('Facebook company page URL'))
+    instagram_url = models.URLField(blank=True, help_text=_('Instagram company profile URL'))
+    pinterest_url = models.URLField(blank=True, help_text=_('Pinterest company profile URL'))
+
+    # Company Logo
     logo = models.ImageField(
         upload_to='tenant_logos/',
         blank=True,
@@ -231,7 +255,7 @@ class Tenant(TenantMixin):
         choices=TenantType.choices,
         default=TenantType.COMPANY,
         db_index=True,
-        help_text=_('Company (jobs+services, employees) or Freelancer (services only, solo)')
+        help_text=_('Type of organization. Individual freelancers use FreelancerProfile instead.')
     )
     ein_number = models.CharField(
         max_length=50,
@@ -496,31 +520,16 @@ class Tenant(TenantMixin):
         return self.domains.filter(is_careers_domain=True).first()
 
     def can_create_jobs(self):
-        """Only COMPANY tenants can create job postings."""
-        return self.tenant_type == self.TenantType.COMPANY
+        """All tenants (COMPANY type only) can create job postings."""
+        return True  # All tenants are COMPANY type now
 
     def can_have_employees(self):
-        """Only COMPANY tenants can have multiple employees."""
-        return self.tenant_type == self.TenantType.COMPANY
+        """All tenants (COMPANY type only) can have multiple employees."""
+        return True  # All tenants are COMPANY type now
 
-    def switch_to_freelancer(self):
-        """
-        Convert company to freelancer (must have ≤1 member).
-
-        Raises:
-            ValidationError: If tenant has more than 1 active member.
-        """
-        if self.members.filter(is_active=True).count() > 1:
-            raise ValidationError(
-                _("Cannot switch to freelancer with multiple members.")
-            )
-        self.tenant_type = self.TenantType.FREELANCER
-        self.save(update_fields=['tenant_type'])
-
-    def switch_to_company(self):
-        """Convert freelancer to company."""
-        self.tenant_type = self.TenantType.COMPANY
-        self.save(update_fields=['tenant_type'])
+    # REMOVED: switch_to_freelancer() - FREELANCER tenant type deprecated
+    # REMOVED: switch_to_company() - All tenants are COMPANY type now
+    # Individual freelancers are now FreelancerProfile user profiles (accounts app)
 
 
 class TenantSettings(models.Model):
@@ -621,6 +630,63 @@ class TenantSettings(models.Model):
 
     def __str__(self):
         return f"Settings for {self.tenant.name}"
+
+    def save(self, *args, **kwargs):
+        """Override save to log configuration changes."""
+        from core.security.audit import AuditLogger, AuditAction
+
+        is_new = self.pk is None
+
+        if not is_new:
+            # Get old values
+            try:
+                old_instance = TenantSettings.objects.get(pk=self.pk)
+                old_data = {}
+                new_data = {}
+                changes = []
+
+                # Check for changes in all fields
+                for field in self._meta.fields:
+                    field_name = field.name
+                    if field_name in ['id', 'created_at', 'updated_at', 'tenant']:
+                        continue  # Skip meta fields
+
+                    old_value = getattr(old_instance, field_name)
+                    new_value = getattr(self, field_name)
+
+                    # Convert to string for comparison
+                    old_str = str(old_value) if old_value is not None else ''
+                    new_str = str(new_value) if new_value is not None else ''
+
+                    if old_str != new_str:
+                        old_data[field_name] = old_str
+                        new_data[field_name] = new_str
+                        changes.append({
+                            'field': field_name,
+                            'old': old_str,
+                            'new': new_str
+                        })
+
+                # Log changes if any
+                if changes:
+                    AuditLogger.log(
+                        action=AuditAction.TENANT_SETTING_CHANGED,
+                        user=None,  # Will be captured from middleware if available
+                        tenant_id=str(self.tenant.id) if self.tenant else None,
+                        resource_type='tenant_settings',
+                        resource_id=str(self.pk),
+                        old_value=old_data,
+                        new_value=new_data,
+                        changes=changes,
+                        extra_data={
+                            'tenant_name': self.tenant.name if self.tenant else None,
+                            'total_changes': len(changes),
+                        }
+                    )
+            except TenantSettings.DoesNotExist:
+                pass  # This is a new instance despite having pk
+
+        super().save(*args, **kwargs)
 
     def clean(self):
         super().clean()
@@ -753,7 +819,7 @@ class TenantInvitation(models.Model):
 
     def accept(self, user):
         """Accept invitation and create TenantUser with assigned role."""
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         # Create TenantUser with the assigned role
         TenantUser.objects.get_or_create(
@@ -1629,7 +1695,11 @@ class PublicProviderCatalog(models.Model):
         db_index=True,
         help_text=_('Featured providers shown prominently')
     )
-    is_accepting_projects = models.BooleanField(default=True, db_index=True)
+    is_accepting_work = models.BooleanField(
+        default=True,
+        db_index=True,
+        help_text=_('Provider is currently accepting new service requests')
+    )
     can_work_remotely = models.BooleanField(default=True)
     can_work_onsite = models.BooleanField(default=False)
 
@@ -1649,7 +1719,7 @@ class PublicProviderCatalog(models.Model):
         ordering = ['-is_featured', '-rating_avg', '-published_at']
         indexes = [
             models.Index(fields=['tenant', 'is_verified'], name='pcat_ten_verified'),
-            models.Index(fields=['provider_type', 'is_accepting_projects'], name='pcat_type_accept'),
+            models.Index(fields=['provider_type', 'is_accepting_work'], name='pcat_type_accept'),
             models.Index(fields=['country', 'city'], name='pcat_location'),
             models.Index(fields=['tenant_schema_name', 'provider_uuid'], name='pcat_sync_ref'),
             models.Index(fields=['-rating_avg', '-total_reviews'], name='pcat_rating'),

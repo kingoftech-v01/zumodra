@@ -53,7 +53,7 @@ def _calculate_storage_usage(tenant):
         with connection.cursor() as cursor:
             # Query ats.Candidate resume files
             try:
-                from ats.models import Candidate
+                from jobs.models import Candidate
                 candidates = Candidate.objects.filter(resume__isnull=False)
                 for candidate in candidates:
                     if candidate.resume and hasattr(candidate.resume, 'size'):
@@ -469,8 +469,8 @@ def calculate_tenant_usage(self):
         dict: Summary of usage calculations.
     """
     from tenants.models import Tenant, TenantUsage
-    from accounts.models import TenantUser
-    from ats.models import Application, JobPosting
+    from tenant_profiles.models import TenantUser
+    from jobs.models import Application, JobPosting
     from hr_core.models import Employee
 
     try:

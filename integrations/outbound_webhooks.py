@@ -320,7 +320,7 @@ WEBHOOK_EVENTS = {
         'tenant_user.deleted',
         'tenant_user.role_changed',
     ],
-    'ats': [
+    'jobs': [
         'job.created',
         'job.updated',
         'job.published',
@@ -441,7 +441,7 @@ def dispatch_webhook(
 
     Args:
         tenant_id: ID of the tenant
-        app_name: Name of the app (e.g., 'ats', 'hr_core')
+        app_name: Name of the app (e.g., 'jobs', 'hr_core')
         event_type: Type of event (e.g., 'job.created')
         data: Event data payload
         event_id: Optional unique event identifier

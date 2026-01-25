@@ -1,5 +1,60 @@
 """
-Blog Serializers - DRF serializers for Wagtail blog models.
+Blog Serializers Module - Django REST Framework Serializers
+============================================================
+
+Ce module définit les serializers DRF pour l'API REST du blog. Ces serializers
+convertissent les modèles Wagtail (BlogPostPage, CategoryPage, Comment) en JSON
+pour les endpoints API et gèrent la validation des données entrantes.
+
+Serializers Disponibles:
+-------------------------
+
+**Images & Media:**
+- WagtailImageSerializer: Images Wagtail avec renditions multiples (thumbnail, medium, large)
+
+**Tags:**
+- TagSerializer: Tags taggit avec name et slug
+
+**Commentaires:**
+- CommentSerializer: Lecture de commentaires avec threading (replies imbriquées)
+- CommentCreateSerializer: Création de commentaires avec sanitization HTML
+
+**Catégories:**
+- CategoryListSerializer: Liste des catégories avec post_count
+- CategoryDetailSerializer: Détail catégorie avec child_categories
+
+**Posts:**
+- BlogPostListSerializer: Liste des posts (compact, pour listings)
+- BlogPostDetailSerializer: Détail complet avec body StreamField, comments, related posts
+
+**Index & Stats:**
+- BlogIndexSerializer: Page index blog avec total_posts et categories
+- BlogSearchSerializer: Validation des paramètres de recherche
+- BlogStatsSerializer: Statistiques du blog (analytics)
+
+Features de Sécurité:
+---------------------
+- HTML Sanitization automatique via core.validators.sanitize_html
+- Validation des champs dans CommentCreateSerializer
+- Read-only fields pour les timestamps et IDs
+
+StreamField Handling:
+---------------------
+Le BlogPostDetailSerializer.get_body() convertit le StreamField Wagtail en
+structure JSON lisible pour les clients API. Chaque bloc (paragraph, heading,
+image, quote, table, list) est serialisé selon son type.
+
+Usage dans API:
+---------------
+Ces serializers sont utilisés dans blog/api/viewsets.py:
+- BlogPostViewSet utilise BlogPostListSerializer et BlogPostDetailSerializer
+- CategoryViewSet utilise CategoryListSerializer et CategoryDetailSerializer
+- CommentViewSet utilise CommentSerializer et CommentCreateSerializer
+
+OpenAPI Schema:
+---------------
+Les décorateurs @extend_schema_field assurent la génération correcte de la
+documentation OpenAPI (Swagger/Redoc) via drf-spectacular.
 """
 
 from rest_framework import serializers

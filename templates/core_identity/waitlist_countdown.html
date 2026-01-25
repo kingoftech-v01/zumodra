@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Platform Launching Soon{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .countdown-box {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1rem;
+        color: white;
+    }
+    .feature-card {
+        transition: transform 0.2s;
+    }
+    .feature-card:hover {
+        transform: translateY(-4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <img src="{% static 'images/logo-white.svg' %}" alt="Zumodra" class="h-16 mx-auto mb-4"
+                 onerror="this.style.display='none'">
+            <h1 class="text-5xl font-bold text-white mb-4">
+                Welcome to Zumodra! 🎉
+            </h1>
+            <p class="text-xl text-white opacity-90">
+                {{ waitlist_message }}
+            </p>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="countdown-box p-8 mb-8">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-6 text-center">
+                Platform Launches In:
+            </h2>
+
+            <div class="grid grid-cols-3 gap-6 mb-6" id="countdown">
+                <div class="stat-card p-6 text-center">
+                    <div class="text-6xl font-bold" id="days">{{ time_until_launch.days }}</div>
+                    <div class="text-sm uppercase mt-2 opacity-90">Days</div>
+                </div>
+                <div class="stat-card p-6 text-center">
+                    <div class="text-6xl font-bold" id="hours">{{ time_until_launch.hours }}</div>
+                    <div class="text-sm uppercase mt-2 opacity-90">Hours</div>
+                </div>
+                <div class="stat-card p-6 text-center">
+                    <div class="text-6xl font-bold" id="minutes">{{ time_until_launch.minutes }}</div>
+                    <div class="text-sm uppercase mt-2 opacity-90">Minutes</div>
+                </div>
+            </div>
+
+            {% if launch_date %}
+            <p class="text-center text-gray-600 text-lg">
+                Launch Date: <strong class="text-gray-900">{{ launch_date|date:"F j, Y \a\t g:i A" }}</strong>
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Waitlist Position -->
+        {% if waitlist_position %}
+        <div class="countdown-box p-6 mb-8">
+            <div class="text-center">
+                <p class="text-2xl text-gray-700 mb-4">
+                    You're <strong class="text-purple-600">#{{ waitlist_position }}</strong> of
+                    <strong class="text-purple-600">{{ total_waitlist_users }}</strong> early adopters!
+                </p>
+                <div class="bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+                         style="width: {{ progress_percentage }}%"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- What to Expect -->
+        <div class="countdown-box p-8">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                What to Expect:
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="feature-card bg-green-50 p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-gray-700">Full access to all platform features on launch day</span>
+                    </div>
+                </div>
+                <div class="feature-card bg-blue-50 p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-gray-700">Your account is ready - just waiting for launch</span>
+                    </div>
+                </div>
+                <div class="feature-card bg-purple-50 p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-purple-500 mr-3 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-gray-700">Email notification when the platform is live</span>
+                    </div>
+                </div>
+                <div class="feature-card bg-pink-50 p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-pink-500 mr-3 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-gray-700">Early adopter badge and recognition</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Button -->
+        <div class="text-center mt-8">
+            <a href="{% url 'account_logout' %}" class="text-white hover:text-gray-200 transition-colors">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live countdown update every minute
+setInterval(function() {
+    fetch('{% url "core_identity:waitlist_status_api" %}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.is_launched || !data.is_waitlisted) {
+                // Platform launched or user no longer waitlisted - reload page
+                window.location.reload();
+            } else if (data.time_until_launch) {
+                // Update countdown
+                document.getElementById('days').textContent = data.time_until_launch.days;
+                document.getElementById('hours').textContent = data.time_until_launch.hours;
+                document.getElementById('minutes').textContent = data.time_until_launch.minutes;
+            }
+        })
+        .catch(error => console.error('Error checking waitlist status:', error));
+}, 60000); // Check every minute
+</script>
+{% endblock %}

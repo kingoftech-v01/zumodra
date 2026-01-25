@@ -4,7 +4,7 @@ Hybrid Ranking Engine Service
 Implements features.md Section 4.1-4.3:
 - RuleScore: Deterministic ATS filters with knockout logic
 - AIScore: ML-based matching using embeddings
-- VerificationScore: Trust score integration from accounts.TrustScore
+- VerificationScore: Trust score integration from tenant_profiles.TrustScore
 
 This engine combines three scoring dimensions to provide transparent,
 explainable candidate rankings for job postings.
@@ -25,7 +25,7 @@ from django.db.models import QuerySet
 
 if TYPE_CHECKING:
     from tenants.models import Tenant
-    from accounts.models import TrustScore
+    from tenant_profiles.models import TrustScore
     from ai_matching.models import RankingProfile, RankingRule, CandidateRanking
 
 logger = logging.getLogger(__name__)
@@ -1128,7 +1128,7 @@ class HybridRankingEngine:
     def _load_job_data(self, job_id: int) -> Optional[Dict[str, Any]]:
         """Load job posting data for ranking."""
         try:
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
 
             job = JobPosting.objects.filter(
                 tenant=self.tenant,
@@ -1183,7 +1183,7 @@ class HybridRankingEngine:
         result = {}
 
         try:
-            from ats.models import Candidate
+            from jobs.models import Candidate
 
             candidates = Candidate.objects.filter(
                 tenant=self.tenant,

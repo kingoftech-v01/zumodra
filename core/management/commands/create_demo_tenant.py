@@ -172,7 +172,7 @@ class Command(BaseCommand):
 
         with schema_context('demo'):
             # Import tenant-specific models within schema context
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
 
             # Create admin user
             admin, created = User.objects.get_or_create(

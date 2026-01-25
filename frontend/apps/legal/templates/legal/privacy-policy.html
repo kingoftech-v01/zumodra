@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Privacy Policy</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">At FreelanHub, we are committed to protecting your privacy and handling your personal data with transparency and care. This Privacy Policy explains how we collect, use, store, and protect information when you use our freelance marketplace platform. By using FreelanHub, you consent to the practices described in this policy.</p>
+                            <p class="body2 text-secondary">This policy applies to all users of FreelanHub, including freelancers, clients, and visitors. "Personal data" refers to any information that can identify you as an individual, including but not limited to your name, email address, payment information, and professional details. We process your data in accordance with applicable privacy laws including GDPR and CCPA.</p>
+                            <p class="body2 text-secondary">FreelanHub acts as both a data controller and processor depending on the context. We control how we collect and use your account data, while we process data on behalf of users when facilitating transactions and communications between freelancers and clients.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We collect various types of information to provide and improve our services. The data we collect is limited to what is necessary for platform functionality and user experience enhancement. Data collection categories include:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Personal information such as name, email address, phone number, profile photo, professional credentials, and work history provided during account registration and profile creation.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Payment information including billing addresses, payment method details, and transaction history necessary for processing payments through our secure escrow system.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Usage data such as IP addresses, browser type, device information, pages visited, and interaction patterns to improve platform functionality and security.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">We limit data collection to what is necessary and proportionate to our legitimate business purposes. We do not sell your personal data to third parties. Data shared with service providers is strictly limited to what they need to perform their functions on our behalf.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, legal requirements, or business operations. When we make material changes to how we handle personal data, we will notify affected users through prominent notices on the platform or via email to the address associated with your account.</p>
+                            <p class="body2 text-secondary">The "Last Updated" date at the top of this policy indicates when the most recent changes were made. We encourage you to review this policy periodically to stay informed about how we protect your information. For minor changes that do not materially affect your rights, we may update the policy without individual notification but will update the effective date.</p>
+                            <p class="body2 text-secondary">If you do not agree with the updated Privacy Policy, you may close your account by contacting our support team. Continued use of FreelanHub after policy updates constitutes your acceptance of the revised terms. We will retain your data in accordance with applicable laws even after account closure for legitimate purposes.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">You have important rights regarding your personal data under applicable privacy laws including GDPR and CCPA. FreelanHub respects these rights and provides mechanisms for you to exercise them. You may exercise these rights by contacting our privacy team through the contact information provided below.</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Access and portability: You can request a copy of your personal data in a structured, commonly used format, and request that we transfer it to another service provider where technically feasible.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Rectification and deletion: You can update inaccurate information through your account settings or request deletion of your personal data, subject to legal retention requirements.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Restriction and objection: You can request that we restrict processing of your data or object to certain types of processing, including direct marketing communications.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">We will respond to your requests within the timeframes required by applicable law, typically within 30 days. Some requests may require identity verification to protect your data security. You also have the right to lodge a complaint with your local data protection authority if you believe we have violated your privacy rights.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We implement industry-standard security measures to protect your personal data from unauthorized access, disclosure, alteration, or destruction. These measures include encryption of data in transit and at rest, regular security audits, access controls, and secure payment processing through certified third-party providers. However, no method of transmission over the internet is completely secure.</p>
+                            <p class="body2 text-secondary">Despite our security efforts, you acknowledge that there are inherent risks in transmitting information over the internet. Third-party service providers we work with, including payment processors, cloud hosting services, and analytics providers, may have access to your data as necessary to perform their services. We carefully vet these providers and require them to maintain appropriate security standards.</p>
+                            <p class="body2 text-secondary">You are responsible for maintaining the security of your account credentials and should use a strong, unique password. Notify us immediately if you suspect unauthorized access to your account. We will never ask for your password via email or phone. For more information about our security practices, please review our GDPR Compliance Statement and contact our security team with specific concerns.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

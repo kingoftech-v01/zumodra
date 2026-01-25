@@ -324,11 +324,11 @@ The Zumodra Team
             usage.user_count = User.objects.count()
 
             # Count jobs (from ATS app)
-            from ats.models import JobPosting
+            from jobs.models import JobPosting
             usage.active_job_count = JobPosting.objects.filter(status='open').count()
 
             # Count candidates this month
-            from ats.models import Application
+            from jobs.models import Application
             month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
             usage.candidate_count_this_month = Application.objects.filter(
                 created_at__gte=month_start
@@ -484,7 +484,7 @@ class InvitationService:
         Returns:
             Accepted invitation or None if invalid
         """
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
         invitation = TenantInvitation.objects.filter(
             token=token,
@@ -528,7 +528,7 @@ class InvitationService:
 
         # Initial profile sync from PublicProfile to TenantProfile
         try:
-            from accounts.services import ProfileSyncService
+            from tenant_profiles.services import ProfileSyncService
             sync_result = ProfileSyncService.sync_on_invitation_acceptance(
                 user=user,
                 tenant=invitation.tenant

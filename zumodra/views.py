@@ -298,12 +298,12 @@ def redirect_dashboard(request):
 
 def redirect_ats_applications(request):
     """Redirect /ats/applications/ to /app/ats/pipeline/ (applications are in pipeline board)."""
-    return redirect('frontend:ats:pipeline_board', permanent=True)
+    return redirect('frontend:jobs:pipeline_board', permanent=True)
 
 
 def redirect_ats_pipeline(request):
     """Redirect /ats/pipeline/ to /app/ats/pipeline/ for backwards compatibility."""
-    return redirect('frontend:ats:pipeline_board', permanent=True)
+    return redirect('frontend:jobs:pipeline_board', permanent=True)
 
 
 def redirect_hr_timeoff(request):

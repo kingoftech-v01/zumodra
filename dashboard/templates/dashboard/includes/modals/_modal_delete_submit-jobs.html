@@ -1,0 +1,20 @@
+{% load static %}
+
+
+            <!-- modal_delete -->
+            <div class="modal_item modal_delete relative flex-shrink-0 sm:w-[600px] w-[90vw] rounded-lg bg-white" data-type="modal_delete">
+                <div class="heading flex items-center justify-between py-6 px-7 border-b border-line">
+                    <h5 class="heading5">Delete</h5>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl"></span>
+                    </button>
+                </div>
+                <div class="flex flex-col items-center py-7 md:px-10 px-6">
+                    <h5 class="heading5 text-center">Are you sure you want to delete?</h5>
+                    <p class="mt-3 text-secondary text-center">Do you really want to delete your these record? <br class="max-sm:hidden" />This process can't be undo.</p>
+                    <div class="flex items-center gap-5 mt-6">
+                        <button class="button-main bg-red btn_confirm_delete">Confirm</button>
+                        <button class="button-main -border close_popup_btn">Cancel</button>
+                    </div>
+                </div>
+            </div>

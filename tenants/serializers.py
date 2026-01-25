@@ -404,7 +404,7 @@ class TenantInvitationCreateSerializer(serializers.ModelSerializer):
         # Check if already a member
         tenant = self.context.get('tenant')
         if tenant:
-            from accounts.models import TenantUser
+            from tenant_profiles.models import TenantUser
             if TenantUser.objects.filter(
                 tenant=tenant,
                 user__email=email,

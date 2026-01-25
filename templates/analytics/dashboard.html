@@ -111,7 +111,7 @@
                     <li class="py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
-                                <a href="{% url 'frontend:ats:job_detail' job.id %}" class="caption1 font-medium text-title hover:text-primary truncate block">
+                                <a href="{% url 'frontend:jobs:job_detail' job.id %}" class="caption1 font-medium text-title hover:text-primary truncate block">
                                     {{ job.title }}
                                 </a>
                                 <p class="caption2 text-secondary">{{ job.applications_count }} {% trans "applications" %}</p>

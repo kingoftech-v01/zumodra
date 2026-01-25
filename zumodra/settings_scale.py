@@ -305,7 +305,7 @@ CELERY_TASK_ROUTES = {
 
     # Default queue
     'analytics.tasks.*': {'queue': 'default'},
-    'ats.tasks.*': {'queue': 'default'},
+    'jobs.tasks.*': {'queue': 'default'},
 
     # Low priority queue
     'zumodra.tasks.cleanup_*': {'queue': 'low'},

@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Terms of Use</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Welcome to FreelanHub, a freelance marketplace connecting skilled professionals with clients seeking quality services. By accessing or using our platform, you agree to be bound by these Terms of Use. These terms constitute a legally binding agreement between you and FreelanHub.</p>
+                            <p class="body2 text-secondary">You must be at least 18 years old and have the legal capacity to enter into binding contracts to use our services. By creating an account, you represent and warrant that all information provided is accurate, current, and complete. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+                            <p class="body2 text-secondary">FreelanHub provides a platform for freelancers and clients to connect, communicate, and conduct business transactions. We are not a party to any contracts between users and do not employ or supervise freelancers listed on our platform.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">When using FreelanHub, you agree to comply with all applicable laws and regulations. The following activities are strictly prohibited on our platform:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Posting false, misleading, or fraudulent information; engaging in any form of spam, harassment, or abusive behavior toward other users.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Violating intellectual property rights, sharing malicious software, or attempting to compromise platform security.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Circumventing platform fees, conducting transactions outside the platform, or using the service for illegal purposes.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Users must maintain professional standards in all interactions. Content posted on FreelanHub must be appropriate, accurate, and comply with our Community Guidelines and Acceptable Use Policy.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub reserves the right to modify, update, or revise these Terms of Use at any time. We will notify users of material changes through email notification or by posting a notice on the platform. The "Last Updated" date at the top of this document will reflect when changes were made.</p>
+                            <p class="body2 text-secondary">Your continued use of FreelanHub after any modifications to these terms constitutes your acceptance of the updated terms. If you do not agree with the revised terms, you must discontinue use of the platform. We encourage users to review these terms periodically to stay informed of any changes.</p>
+                            <p class="body2 text-secondary">For significant changes that materially affect user rights or obligations, we will provide at least 30 days' notice before the changes take effect. Users who do not accept the changes may close their accounts in accordance with our account termination procedures.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Either you or FreelanHub may terminate your account at any time for any reason. We reserve the right to suspend or terminate accounts that violate these terms or engage in prohibited activities. Termination may be immediate and without prior notice in cases of serious violations.</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Accounts may be suspended for violations of platform policies, pending investigation or resolution of disputes.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Users may appeal account termination decisions by contacting our support team within 30 days of termination.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Upon termination, access to the platform will cease, but obligations related to completed transactions remain in effect.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Following account termination, certain data may be retained as required by law or for legitimate business purposes. Users remain responsible for any outstanding fees, obligations, or liabilities incurred before termination.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">While we strive to provide a reliable and secure platform, FreelanHub cannot guarantee uninterrupted or error-free service. The platform may experience downtime for maintenance, technical issues, or circumstances beyond our control. We are not responsible for any losses resulting from service interruptions.</p>
+                            <p class="body2 text-secondary">User-generated content, including profiles, portfolios, and project descriptions, is provided by independent users. FreelanHub does not verify the accuracy of all user-submitted information and is not responsible for the quality, reliability, or conduct of users. You engage with other users at your own risk and should exercise due diligence.</p>
+                            <p class="body2 text-secondary">By using FreelanHub, you acknowledge that freelance engagements carry inherent risks including project disputes, payment issues, and varying quality of work. We provide tools to facilitate transactions but cannot guarantee outcomes. Please review our Dispute Resolution Process and Service Agreement for additional information on managing these risks.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

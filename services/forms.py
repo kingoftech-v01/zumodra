@@ -1,655 +1,102 @@
 """
-Services Forms - Input validation for Freelance Marketplace.
+Services App Forms
 
-This module provides secure forms for:
-- Services
-- Proposals
-- Contracts
-- Reviews
-- Client Requests
-
-All forms include:
-- Input sanitization
-- XSS/SQL injection prevention
-- File upload validation
-- Field-level validation
+Forms for service listings, proposals, and contracts.
 """
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from decimal import Decimal
-
-from core.validators import (
-    sanitize_html,
-    sanitize_plain_text,
-    NoSQLInjection,
-    NoXSS,
-    FileValidator,
-    SecureTextValidator,
-)
-
 from .models import (
-    Service, ServiceCategory, ServiceTag, ServiceImage,
-    ServiceProvider, ServiceProposal, ServiceContract,
-    ServiceReview, ClientRequest, ContractMessage,
-    CrossTenantServiceRequest,
+    Service,
+    ServiceProvider,
+    ClientRequest,
+    ServiceProposal,
+    ServiceContract,
 )
 
-
-# =============================================================================
-# SERVICE FORMS
-# =============================================================================
 
 class ServiceForm(forms.ModelForm):
-    """Secure form for creating/editing services."""
+    """Form for creating/editing services."""
 
     class Meta:
         model = Service
         fields = [
-            'name', 'description', 'category',
-            'price', 'service_type', 'duration_days',
-            'revisions_included', 'short_description',
+            'name',
+            'description',
+            'category',
+            'service_type',
+            'price',
+            'hourly_rate',
+            'marketplace_enabled',
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 6}),
-            'short_description': forms.Textarea(attrs={'rows': 4}),
+            'name': forms.TextInput(attrs={'class': 'form-input'}),
+            'description': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'service_type': forms.Select(attrs={'class': 'form-select'}),
+            'price': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'hourly_rate': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'marketplace_enabled': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
 
-    def clean_name(self):
-        name = self.cleaned_data.get('name', '')
-        NoXSS()(name)
-        NoSQLInjection()(name)
-        return sanitize_plain_text(name)
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        NoSQLInjection()(description)
-        return sanitize_html(description)
-
-    def clean_short_description(self):
-        short_description = self.cleaned_data.get('short_description', '')
-        if short_description:
-            NoSQLInjection()(short_description)
-            return sanitize_plain_text(short_description)
-        return short_description
-
-    def clean_price(self):
-        price = self.cleaned_data.get('price')
-        if price and price < 0:
-            raise ValidationError(_('Price must be a positive number.'))
-        return price
-
-    def clean_duration_days(self):
-        duration_days = self.cleaned_data.get('duration_days')
-        if duration_days and duration_days < 1:
-            raise ValidationError(_('Delivery time must be at least 1 day.'))
-        return duration_days
-
-
-class ServiceImageForm(forms.ModelForm):
-    """Form for uploading service images."""
-
-    image = forms.ImageField(
-        validators=[FileValidator('image')],
-    )
-
-    class Meta:
-        model = ServiceImage
-        fields = ['image', 'description', 'alt_text', 'sort_order']
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        if description:
-            NoXSS()(description)
-            return sanitize_plain_text(description)
-        return description
-
-    def clean_alt_text(self):
-        alt_text = self.cleaned_data.get('alt_text', '')
-        if alt_text:
-            NoXSS()(alt_text)
-            return sanitize_plain_text(alt_text)
-        return alt_text
-
-
-class ServiceSearchForm(forms.Form):
-    """Form for searching services with secure input."""
-
-    query = forms.CharField(
-        required=False,
-        max_length=200,
-        validators=[NoSQLInjection(), NoXSS()],
-    )
-    category = forms.IntegerField(required=False)
-    min_price = forms.DecimalField(required=False, min_value=0)
-    max_price = forms.DecimalField(required=False, min_value=0)
-    min_rating = forms.DecimalField(required=False, min_value=0, max_value=5)
-    provider_location = forms.CharField(
-        required=False,
-        max_length=100,
-        validators=[NoXSS()],
-    )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        min_price = cleaned_data.get('min_price')
-        max_price = cleaned_data.get('max_price')
-
-        if min_price and max_price and min_price > max_price:
-            raise ValidationError({
-                'max_price': _('Maximum price must be greater than minimum price.')
-            })
-
-        return cleaned_data
-
-
-# =============================================================================
-# PROPOSAL FORMS
-# =============================================================================
-
-class ProposalForm(forms.ModelForm):
-    """Secure form for creating service proposals."""
-
-    class Meta:
-        model = ServiceProposal
-        fields = [
-            'cover_letter', 'proposed_rate', 'rate_type',
-            'proposed_timeline_days', 'estimated_hours',
-        ]
-        widgets = {
-            'cover_letter': forms.Textarea(attrs={'rows': 6}),
-        }
-
-    def clean_cover_letter(self):
-        cover_letter = self.cleaned_data.get('cover_letter', '')
-        NoSQLInjection()(cover_letter)
-        return sanitize_html(cover_letter)
-
-    def clean_proposed_rate(self):
-        rate = self.cleaned_data.get('proposed_rate')
-        if rate and rate <= 0:
-            raise ValidationError(_('Rate must be a positive number.'))
-        return rate
-
-    def clean_proposed_timeline_days(self):
-        days = self.cleaned_data.get('proposed_timeline_days')
-        if days and days < 1:
-            raise ValidationError(_('Timeline must be at least 1 day.'))
-        return days
-
-
-class ProposalResponseForm(forms.Form):
-    """Form for client response to a proposal."""
-
-    ACTION_CHOICES = [
-        ('accept', _('Accept Proposal')),
-        ('reject', _('Reject Proposal')),
-        ('counter', _('Counter Offer')),
-    ]
-
-    action = forms.ChoiceField(choices=ACTION_CHOICES)
-    counter_price = forms.DecimalField(required=False, min_value=0)
-    counter_days = forms.IntegerField(required=False, min_value=1)
-    message = forms.CharField(
-        required=False,
-        max_length=2000,
-        widget=forms.Textarea(attrs={'rows': 4}),
-    )
-
-    def clean_message(self):
-        message = self.cleaned_data.get('message', '')
-        if message:
-            NoXSS()(message)
-            return sanitize_plain_text(message)
-        return message
-
-    def clean(self):
-        cleaned_data = super().clean()
-        action = cleaned_data.get('action')
-
-        if action == 'counter':
-            if not cleaned_data.get('counter_price'):
-                raise ValidationError({
-                    'counter_price': _('Please provide a counter price.')
-                })
-
-        return cleaned_data
-
-
-# =============================================================================
-# CONTRACT FORMS
-# =============================================================================
-
-class ContractForm(forms.ModelForm):
-    """Secure form for contract details."""
-
-    class Meta:
-        model = ServiceContract
-        fields = [
-            'title', 'description', 'agreed_rate',
-            'rate_type', 'currency', 'agreed_deadline',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 6}),
-            'agreed_deadline': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        NoXSS()(title)
-        NoSQLInjection()(title)
-        return sanitize_plain_text(title)
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        NoSQLInjection()(description)
-        return sanitize_html(description)
-
-    def clean_agreed_rate(self):
-        rate = self.cleaned_data.get('agreed_rate')
-        if rate and rate <= 0:
-            raise ValidationError(_('Rate must be a positive number.'))
-        return rate
-
-
-class ContractMilestoneForm(forms.Form):
-    """Form for adding/editing contract milestones."""
-
-    title = forms.CharField(
-        max_length=200,
-        validators=[NoXSS()],
-    )
-    description = forms.CharField(
-        required=False,
-        max_length=2000,
-        widget=forms.Textarea(attrs={'rows': 3}),
-    )
-    amount = forms.DecimalField(min_value=Decimal('0.01'))
-    due_date = forms.DateField(
-        required=False,
-        widget=forms.DateInput(attrs={'type': 'date'}),
-    )
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        return sanitize_plain_text(title)
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        if description:
-            NoSQLInjection()(description)
-            return sanitize_html(description)
-        return description
-
-
-class ContractDeliverableForm(forms.Form):
-    """Form for submitting contract deliverables."""
-
-    message = forms.CharField(
-        max_length=5000,
-        widget=forms.Textarea(attrs={'rows': 4}),
-    )
-    files = forms.FileField(
-        required=False,
-        validators=[FileValidator('document')],
-    )
-
-    def clean_message(self):
-        message = self.cleaned_data.get('message', '')
-        NoSQLInjection()(message)
-        return sanitize_html(message)
-
-
-class ContractRevisionRequestForm(forms.Form):
-    """Form for requesting revisions on deliverables."""
-
-    feedback = forms.CharField(
-        max_length=5000,
-        widget=forms.Textarea(attrs={'rows': 4}),
-    )
-
-    def clean_feedback(self):
-        feedback = self.cleaned_data.get('feedback', '')
-        NoXSS()(feedback)
-        NoSQLInjection()(feedback)
-        return sanitize_html(feedback)
-
-
-class ContractCompletionForm(forms.Form):
-    """Form for completing/approving a contract."""
-
-    rating = forms.IntegerField(min_value=1, max_value=5)
-    feedback = forms.CharField(
-        required=False,
-        max_length=2000,
-        widget=forms.Textarea(attrs={'rows': 4}),
-    )
-    tip_amount = forms.DecimalField(required=False, min_value=0)
-
-    def clean_feedback(self):
-        feedback = self.cleaned_data.get('feedback', '')
-        if feedback:
-            NoXSS()(feedback)
-            return sanitize_html(feedback)
-        return feedback
-
-
-class ContractDisputeForm(forms.Form):
-    """Form for raising a contract dispute."""
-
-    REASON_CHOICES = [
-        ('quality', _('Quality issues with deliverables')),
-        ('incomplete', _('Work incomplete')),
-        ('communication', _('Communication issues')),
-        ('deadline', _('Missed deadline')),
-        ('scope', _('Scope disagreement')),
-        ('other', _('Other')),
-    ]
-
-    reason = forms.ChoiceField(choices=REASON_CHOICES)
-    description = forms.CharField(
-        max_length=5000,
-        widget=forms.Textarea(attrs={'rows': 6}),
-    )
-    evidence = forms.FileField(
-        required=False,
-        validators=[FileValidator('document')],
-    )
-    desired_resolution = forms.CharField(
-        max_length=2000,
-        widget=forms.Textarea(attrs={'rows': 3}),
-    )
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        NoXSS()(description)
-        NoSQLInjection()(description)
-        return sanitize_html(description)
-
-    def clean_desired_resolution(self):
-        resolution = self.cleaned_data.get('desired_resolution', '')
-        NoXSS()(resolution)
-        return sanitize_plain_text(resolution)
-
-
-# =============================================================================
-# REVIEW FORMS
-# =============================================================================
-
-class ServiceReviewForm(forms.ModelForm):
-    """Secure form for submitting service reviews."""
-
-    class Meta:
-        model = ServiceReview
-        fields = [
-            'rating', 'rating_quality', 'rating_communication',
-            'rating_timeliness', 'title', 'content',
-        ]
-        widgets = {
-            'content': forms.Textarea(attrs={'rows': 5}),
-        }
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        if title:
-            NoXSS()(title)
-            return sanitize_plain_text(title)
-        return title
-
-    def clean_content(self):
-        content = self.cleaned_data.get('content', '')
-        NoXSS()(content)
-        NoSQLInjection()(content)
-        return sanitize_html(content)
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        # Validate all ratings are in range
-        rating_fields = [
-            'rating', 'rating_quality', 'rating_communication',
-            'rating_timeliness'
-        ]
-
-        for field in rating_fields:
-            rating = cleaned_data.get(field)
-            if rating is not None and (rating < 1 or rating > 5):
-                raise ValidationError({
-                    field: _('Rating must be between 1 and 5.')
-                })
-
-        return cleaned_data
-
-
-class ReviewResponseForm(forms.Form):
-    """Form for provider response to a review."""
-
-    response = forms.CharField(
-        max_length=2000,
-        widget=forms.Textarea(attrs={'rows': 4}),
-    )
-
-    def clean_response(self):
-        response = self.cleaned_data.get('response', '')
-        NoXSS()(response)
-        NoSQLInjection()(response)
-        return sanitize_html(response)
-
-
-# =============================================================================
-# CLIENT REQUEST FORMS
-# =============================================================================
-
-class ClientRequestForm(forms.ModelForm):
-    """Secure form for client service requests."""
-
-    class Meta:
-        model = ClientRequest
-        fields = [
-            'title', 'description', 'category',
-            'budget_min', 'budget_max', 'currency',
-            'deadline', 'remote_allowed',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 6}),
-            'deadline': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        NoXSS()(title)
-        NoSQLInjection()(title)
-        return sanitize_plain_text(title)
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        NoSQLInjection()(description)
-        return sanitize_html(description)
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        budget_min = cleaned_data.get('budget_min')
-        budget_max = cleaned_data.get('budget_max')
-
-        if budget_min and budget_max and budget_min > budget_max:
-            raise ValidationError({
-                'budget_max': _('Maximum budget must be greater than minimum budget.')
-            })
-
-        return cleaned_data
-
-
-# =============================================================================
-# CROSS-TENANT REQUEST FORMS
-# =============================================================================
-
-class CrossTenantServiceRequestForm(forms.ModelForm):
-    """
-    Secure form for cross-tenant service requests.
-
-    Supports both ORGANIZATIONAL and PERSONAL hiring contexts:
-    - ORGANIZATIONAL: User hiring on behalf of their tenant/company
-    - PERSONAL: User hiring for themselves
-    """
-
-    class Meta:
-        model = CrossTenantServiceRequest
-        fields = [
-            'title', 'description', 'budget',
-            'deadline', 'hiring_context',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={
-                'rows': 6,
-                'placeholder': _('Describe your project requirements, goals, and expectations...')
-            }),
-            'deadline': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-input'
-            }),
-            'hiring_context': forms.RadioSelect(attrs={
-                'class': 'form-radio'
-            }),
-            'budget': forms.NumberInput(attrs={
-                'placeholder': _('e.g., 5000'),
-                'class': 'form-input',
-                'min': '0',
-                'step': '0.01'
-            }),
-        }
-        labels = {
-            'hiring_context': _('Hiring For'),
-            'budget': _('Budget (CAD)'),
-            'deadline': _('Desired Completion Date'),
-        }
-        help_texts = {
-            'hiring_context': _('Choose whether this is a personal hire or on behalf of your organization'),
-            'budget': _('Your maximum budget for this project'),
-        }
-
-    def __init__(self, *args, user=None, tenant=None, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.tenant = kwargs.pop('tenant', None)
         super().__init__(*args, **kwargs)
-        self.user = user
-        self.tenant = tenant
-
-        # If user has no tenant, force PERSONAL context
-        if not tenant:
-            self.fields['hiring_context'].initial = CrossTenantServiceRequest.HiringContext.PERSONAL
-            self.fields['hiring_context'].widget = forms.HiddenInput()
-
-        # Add CSS classes for styling
-        for field_name, field in self.fields.items():
-            if field_name not in ['hiring_context']:
-                if 'class' not in field.widget.attrs:
-                    field.widget.attrs['class'] = 'form-input'
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title', '')
-        NoXSS()(title)
-        NoSQLInjection()(title)
-        return sanitize_plain_text(title)
-
-    def clean_description(self):
-        description = self.cleaned_data.get('description', '')
-        NoSQLInjection()(description)
-        return sanitize_html(description)
-
-    def clean_budget(self):
-        budget = self.cleaned_data.get('budget')
-        if budget and budget < 0:
-            raise ValidationError(_('Budget must be a positive number.'))
-        return budget
-
-    def clean(self):
-        cleaned_data = super().clean()
-        hiring_context = cleaned_data.get('hiring_context')
-
-        # Validate hiring context based on user's tenant status
-        if hiring_context == CrossTenantServiceRequest.HiringContext.ORGANIZATIONAL:
-            if not self.tenant:
-                raise ValidationError({
-                    'hiring_context': _('You must be part of an organization to hire on its behalf. '
-                                       'Please select "Personal" or join/create an organization.')
-                })
-
-        return cleaned_data
 
 
-# =============================================================================
-# MESSAGE FORMS
-# =============================================================================
-
-class ContractMessageForm(forms.ModelForm):
-    """Secure form for contract messages."""
-
-    attachment = forms.FileField(
-        required=False,
-        validators=[FileValidator('document')],
-    )
-
-    class Meta:
-        model = ContractMessage
-        fields = ['content', 'attachment']
-        widgets = {
-            'content': forms.Textarea(attrs={'rows': 3}),
-        }
-
-    def clean_content(self):
-        content = self.cleaned_data.get('content', '')
-        NoXSS()(content)
-        NoSQLInjection()(content)
-        return sanitize_html(content)
-
-
-# =============================================================================
-# PROVIDER FORMS
-# =============================================================================
-
-class ServiceProviderProfileForm(forms.ModelForm):
-    """Secure form for service provider profile."""
+class ServiceProviderForm(forms.ModelForm):
+    """Form for service provider profiles."""
 
     class Meta:
         model = ServiceProvider
-        fields = [
-            'display_name', 'bio', 'tagline',
-            'hourly_rate', 'minimum_budget', 'currency',
-            'provider_type', 'city', 'country',
-        ]
+        fields = ['user', 'bio', 'hourly_rate', 'availability']
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 6}),
+            'user': forms.Select(attrs={'class': 'form-select'}),
+            'bio': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
+            'hourly_rate': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'availability': forms.Select(attrs={'class': 'form-select'}),
         }
 
-    def clean_display_name(self):
-        display_name = self.cleaned_data.get('display_name', '')
-        if display_name:
-            NoXSS()(display_name)
-            return sanitize_plain_text(display_name)
-        return display_name
 
-    def clean_tagline(self):
-        tagline = self.cleaned_data.get('tagline', '')
-        if tagline:
-            NoXSS()(tagline)
-            return sanitize_plain_text(tagline)
-        return tagline
+class ClientRequestForm(forms.ModelForm):
+    """Form for creating client service requests."""
 
-    def clean_bio(self):
-        bio = self.cleaned_data.get('bio', '')
-        if bio:
-            NoSQLInjection()(bio)
-            return sanitize_html(bio)
-        return bio
+    class Meta:
+        model = ClientRequest
+        fields = ['title', 'description', 'budget', 'deadline']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input'}),
+            'description': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
+            'budget': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'deadline': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+        }
 
-    def clean_hourly_rate(self):
-        rate = self.cleaned_data.get('hourly_rate')
-        if rate and rate < 0:
-            raise ValidationError(_('Hourly rate must be a positive number.'))
-        return rate
 
-    def clean_minimum_budget(self):
-        budget = self.cleaned_data.get('minimum_budget')
-        if budget and budget < 0:
-            raise ValidationError(_('Minimum budget must be a positive number.'))
-        return budget
+class ServiceProposalForm(forms.ModelForm):
+    """Form for submitting service proposals."""
+
+    class Meta:
+        model = ServiceProposal
+        fields = ['client_request', 'proposed_price', 'estimated_hours', 'proposal_text']
+        widgets = {
+            'client_request': forms.Select(attrs={'class': 'form-select'}),
+            'proposed_price': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
+            'estimated_hours': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.5'}),
+            'proposal_text': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 6}),
+        }
+
+
+class ServiceContractForm(forms.ModelForm):
+    """Form for creating service contracts."""
+
+    class Meta:
+        model = ServiceContract
+        fields = ['service', 'client', 'provider', 'start_date', 'end_date', 'terms']
+        widgets = {
+            'service': forms.Select(attrs={'class': 'form-select'}),
+            'client': forms.Select(attrs={'class': 'form-select'}),
+            'provider': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'terms': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 8}),
+        }

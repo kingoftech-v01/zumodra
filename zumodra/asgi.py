@@ -23,6 +23,7 @@ django_asgi_app = get_asgi_application()
 import messages_sys.routing
 import notifications.routing
 import careers.routing
+import jobs_public.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
@@ -31,7 +32,8 @@ application = ProtocolTypeRouter({
             URLRouter(
                 messages_sys.routing.websocket_urlpatterns +
                 notifications.routing.websocket_urlpatterns +
-                careers.routing.websocket_urlpatterns
+                careers.routing.websocket_urlpatterns +
+                jobs_public.routing.websocket_urlpatterns
             )
         )
     ),

@@ -1,9 +1,8 @@
 """
-Bootstrap Two Demo Tenants Management Command
+Bootstrap Demo Tenant Management Command
 
-Creates TWO demo tenants with different tenant types:
-1. Demo Company (tenant_type=COMPANY) - can create jobs + services, have employees
-2. Demo Freelancer (tenant_type=FREELANCER) - services only, single-user
+Creates ONE demo company tenant (tenant_type=COMPANY).
+Individual freelancers are now FreelancerProfile user profiles (not tenants).
 
 This command is idempotent - running it multiple times will refresh the demo data
 without creating duplicates.
@@ -56,7 +55,7 @@ def _get_demo_email_domain():
 BASE_DOMAIN = _get_demo_domain()
 EMAIL_DOMAIN = _get_demo_email_domain()
 
-# Two demo tenant configurations
+# Demo tenant configuration (COMPANY type only)
 DEMO_TENANTS = [
     {
         'name': 'Demo Company',
@@ -67,15 +66,8 @@ DEMO_TENANTS = [
         'tenant_type': 'company',  # COMPANY type - can create jobs, have employees
         'ein_number': '12-3456789',  # Demo EIN
     },
-    {
-        'name': 'Demo Freelancer',
-        'slug': 'demo-freelancer',
-        'schema': 'demo_freelancer',
-        'domain': f'demo-freelancer.{BASE_DOMAIN}',
-        'owner_email': f'freelancer@{EMAIL_DOMAIN}',
-        'tenant_type': 'freelancer',  # FREELANCER type - services only, solo
-        'ein_number': '',  # Freelancers may not have EIN
-    },
+    # REMOVED: Demo Freelancer tenant
+    # Individual freelancers are now FreelancerProfile user profiles (not tenants)
 ]
 
 # Users for company tenant
@@ -111,17 +103,8 @@ COMPANY_USERS = {
     },
 }
 
-# User for freelancer tenant (single user only)
-FREELANCER_USER = {
-    'owner': {
-        'email': f'freelancer.owner@{EMAIL_DOMAIN}',
-        'password': 'Demo@2024!',
-        'first_name': 'Bob',
-        'last_name': 'Williams',
-        'role': 'OWNER',
-        'is_superuser': False,
-    },
-}
+# REMOVED: FREELANCER_USER
+# Individual freelancers are now FreelancerProfile user profiles (not tenants)
 
 JOB_CATEGORIES = [
     ('Engineering', 'ph-code', '#3B82F6'),
@@ -139,7 +122,7 @@ SERVICE_CATEGORIES = [
 
 
 class Command(BaseCommand):
-    help = 'Bootstrap two demo tenants (COMPANY and FREELANCER types)'
+    help = 'Bootstrap demo company tenant (COMPANY type only)'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -249,23 +232,19 @@ class Command(BaseCommand):
             connection.set_schema(tenant.schema_name)
 
             # Create users based on tenant type
-            if config['tenant_type'] == 'company':
-                self._log_info("   Creating company users (4 users)")
-                users = self._create_users(tenant, COMPANY_USERS)
+            # Create company users (all tenants are COMPANY type now)
+            self._log_info("   Creating company users (4 users)")
+            users = self._create_users(tenant, COMPANY_USERS)
 
-                # Create ATS data (jobs) - only for COMPANY tenants
-                self._log_info("   Creating ATS data (jobs, candidates)")
-                self._create_ats_data(tenant, users)
+            # Create ATS data (jobs)
+            self._log_info("   Creating ATS data (jobs, candidates)")
+            self._create_ats_data(tenant, users)
 
-                # Create HR data - only for COMPANY tenants
-                self._log_info("   Creating HR data (employees, time-off)")
-                self._create_hr_data(tenant, users)
-            else:
-                # Freelancer tenant - single user only
-                self._log_info("   Creating freelancer user (1 user)")
-                users = self._create_users(tenant, FREELANCER_USER)
+            # Create HR data (employees, time-off)
+            self._log_info("   Creating HR data (employees, time-off)")
+            self._create_hr_data(tenant, users)
 
-            # Create marketplace data for BOTH types
+            # Create marketplace data (services)
             self._log_info("   Creating marketplace data (services)")
             self._create_marketplace_data(tenant, users, config['tenant_type'])
 
@@ -350,7 +329,7 @@ class Command(BaseCommand):
 
     def _create_users(self, tenant, user_configs):
         """Create users for a tenant."""
-        from accounts.models import TenantUser, TenantProfile
+        from tenant_profiles.models import TenantUser, TenantProfile
         from custom_account_u.models import PublicProfile
 
         users = {}
@@ -430,7 +409,7 @@ class Command(BaseCommand):
 
     def _create_ats_data(self, tenant, users):
         """Create ATS data (jobs, candidates) - ONLY for COMPANY tenants."""
-        from ats.models import JobPosting, JobCategory, Pipeline, PipelineStage
+        from jobs.models import JobPosting, JobCategory, Pipeline, PipelineStage
 
         owner = users['owner']
 
@@ -610,28 +589,19 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('DEMO TENANTS BOOTSTRAP COMPLETE!'))
         self.stdout.write('=' * 60)
 
-        self.stdout.write('\n' + self.style.MIGRATE_HEADING('Demo Tenants Created:'))
+        self.stdout.write('\n' + self.style.MIGRATE_HEADING('Demo Tenant Created:'))
         for config in DEMO_TENANTS:
             self.stdout.write(f"\n  {config['name']} ({config['tenant_type'].upper()}):")
             self.stdout.write(f"    Domain: {config['domain']}")
             self.stdout.write(f"    Schema: {config['schema']}")
-
-            if config['tenant_type'] == 'company':
-                self.stdout.write(f"    Users: 4 (owner, hr_manager, recruiter, employee)")
-                self.stdout.write(f"    Features: Jobs (ATS), Services, HR, Marketplace")
-            else:
-                self.stdout.write(f"    Users: 1 (owner - freelancer)")
-                self.stdout.write(f"    Features: Services, Marketplace (no ATS, no employees)")
+            self.stdout.write(f"    Users: 4 (owner, hr_manager, recruiter, employee)")
+            self.stdout.write(f"    Features: Jobs (ATS), Services, HR, Marketplace")
 
         self.stdout.write('\n' + self.style.MIGRATE_HEADING('Login Credentials:'))
         self.stdout.write('-' * 40)
 
-        self.stdout.write(f"\n  COMPANY TENANT:")
+        self.stdout.write(f"\n  DEMO COMPANY:")
         for key, config in COMPANY_USERS.items():
-            self.stdout.write(f"    {key}: {config['email']} / {config['password']}")
-
-        self.stdout.write(f"\n  FREELANCER TENANT:")
-        for key, config in FREELANCER_USER.items():
             self.stdout.write(f"    {key}: {config['email']} / {config['password']}")
 
         self.stdout.write('\n' + '=' * 60)

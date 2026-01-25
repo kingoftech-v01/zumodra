@@ -64,7 +64,7 @@ class CompanySetupWizard(LoginRequiredMixin, SessionWizardView):
         """
         from tenants.services import TenantService
         from tenants.models import Plan
-        from accounts.models import TenantUser
+        from tenant_profiles.models import TenantUser
         from finance.stripe_service import StripeService, StripeNotConfiguredError
 
         # Get cleaned data from all steps

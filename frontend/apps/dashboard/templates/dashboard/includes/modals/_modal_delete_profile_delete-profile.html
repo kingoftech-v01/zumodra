@@ -1,0 +1,41 @@
+{% load static %}
+
+
+            <!-- modal_delete_profile -->
+            <div class="modal_item modal_delete_profile relative flex-shrink-0 sm:w-[600px] w-[90vw] rounded-lg bg-white" data-type="modal_delete_profile">
+                <div class="heading flex items-center justify-between py-6 px-7 border-b border-line">
+                    <h5 class="heading5">Why are you deleting your account?</h5>
+                    <button class="close_popup_btn">
+                        <span class="ph ph-x text-2xl"></span>
+                    </button>
+                </div>
+                <form class="choose_plan w-full py-7 md:px-8 px-6">
+                    <ul class="list_plan flex flex-col gap-3">
+                        <li class="item flex items-center gap-2 bg-transparent">
+                            <input type="radio" name="deleteReason" id="duplicate_account" class="w-6 h-6 flex-shrink-0 cursor-pointer" checked />
+                            <label for="duplicate_account" class="cursor-pointer">I have a duplicate account</label>
+                        </li>
+                        <li class="item flex items-center gap-2 bg-transparent">
+                            <input type="radio" name="deleteReason" id="many_emails" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                            <label for="many_emails" class="cursor-pointer">I am getting too many emails</label>
+                        </li>
+                        <li class="item flex items-center gap-2 bg-transparent">
+                            <input type="radio" name="deleteReason" id="membership_value" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                            <label for="membership_value" class="cursor-pointer">I am not getting any value from my membership</label>
+                        </li>
+                        <li class="item flex items-center gap-2 bg-transparent">
+                            <input type="radio" name="deleteReason" id="networking_sevice" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                            <label for="networking_sevice" class="cursor-pointer">I am using a different professional networking sevice</label>
+                        </li>
+                        <li class="item flex items-center gap-2 bg-transparent">
+                            <input type="radio" name="deleteReason" id="other" class="w-6 h-6 flex-shrink-0 cursor-pointer" />
+                            <label for="other" class="cursor-pointer">Other</label>
+                        </li>
+                    </ul>
+                    <div class="form_message mt-5">
+                        <label for="message" class="label_input text-button">How can we improve the product?</label>
+                        <textarea id="message" name="message" class="input_textarea w-full mt-2 p-4 border border-line rounded-lg" rows="3" placeholder="Message..." required></textarea>
+                    </div>
+                    <button class="btn_submit button-main w-full text-center mt-5">Submit</button>
+                </form>
+            </div>

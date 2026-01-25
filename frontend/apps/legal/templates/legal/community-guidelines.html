@@ -1,0 +1,121 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<!-- Breadcrumb -->
+        <section class="breadcrumb">
+            <div class="breadcrumb_inner sm:pt-20 pt-16">
+                <div class="content relative w-full h-full">
+                    <div class="breadcrumb_bg absolute top-0 left-0 w-full h-full">
+                        <img src="{% static 'assets/images/components/breadcrumb_candidate.webp' %}" alt="breadcrumb_candidate" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="container relative h-full lg:py-20 sm:py-14 py-10">
+                        <div class="breadcrumb_content flex flex-col items-start justify-center xl:w-[1000px] lg:w-[848px] md:w-5/6 w-full h-full">
+                            <div class="list_breadcrumb flex items-center gap-2 animate animate_top" style="--i: 1">
+                                <a href="index.html" class="caption1 text-white">Home</a>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white">Pages</span>
+                                <span class="caption1 text-white opacity-40">/</span>
+                                <span class="caption1 text-white opacity-60">Terms of use</span>
+                            </div>
+                            <h3 class="heading3 text-white mt-2 animate animate_top" style="--i: 2">Terms of use</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of use -->
+        <section class="terms_of_use lg:py-20 sm:py-14 py-10">
+            <div class="container flex max-lg:flex-col justify-between gap-15 gap-y-10">
+                <div class="list_link lg:sticky lg:top-24 lg:w-[360px] w-full h-fit">
+                    <ul class="menu_tab flex flex-col flex-shrink-0 gap-3 border-l border-line">
+                        <li>
+                            <a href="#term" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">1. Terms</a>
+                        </li>
+                        <li>
+                            <a href="#limitations" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">2. Limitations</a>
+                        </li>
+                        <li>
+                            <a href="#revisions" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">3. Revisions and errata</a>
+                        </li>
+                        <li>
+                            <a href="#modifications" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">4. Site terms of use modifications</a>
+                        </li>
+                        <li>
+                            <a href="#risks" class="tab_btn inline-block heading6 py-2.5 pl-4 border-l-4 border-transparent duration-300">5. Risks</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="term" class="content w-full">
+                    <h3 class="heading3">Community Guidelines</h3>
+                    <div id="limitations" class="section pt-10">
+                        <h5 class="heading5">1. Terms</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">FreelanHub is built on the foundation of trust, professionalism, and mutual respect. Our Community Guidelines establish the standards of behavior that create a positive environment where freelancers and clients can connect, collaborate, and succeed together.</p>
+                            <p class="body2 text-secondary">Our community values include integrity and honesty in all interactions, respect for diverse perspectives and backgrounds, professionalism in communications and work delivery, accountability for commitments and deadlines, and collaboration to achieve successful project outcomes. These values guide how we expect all users to conduct themselves on our platform.</p>
+                            <p class="body2 text-secondary">By joining FreelanHub, you become part of a global professional community. Your actions contribute to the overall reputation and trustworthiness of our marketplace. We expect every user to uphold these guidelines and help maintain the high standards that make FreelanHub a trusted platform for freelance work.</p>
+                        </div>
+                    </div>
+                    <div id="revisions" class="section pt-8">
+                        <h5 class="heading5">2. Limitations</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Professional conduct is essential for successful relationships on FreelanHub. We expect all users to maintain high standards of behavior in their interactions:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Communicate clearly, promptly, and respectfully with all users. Respond to messages within reasonable timeframes, provide constructive feedback, maintain professional language, and set clear expectations about availability, deliverables, and timelines.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Honor commitments and agreements. Deliver work as promised, meet agreed deadlines, respect payment terms, provide quality work that meets specifications, and communicate proactively if issues arise that may affect delivery.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Be honest and transparent in all representations. Accurately describe your skills and experience, provide truthful information in profiles and proposals, disclose conflicts of interest, and represent work samples authentically without plagiarism or misrepresentation.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">Professionalism extends to how you handle disputes and disagreements. Approach conflicts constructively, focus on solutions rather than blame, use our dispute resolution process when needed, and maintain respectful communication even when relationships become challenging.</p>
+                        </div>
+                    </div>
+                    <div id="modifications" class="section pt-8">
+                        <h5 class="heading5">3. Revisions and errata</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Certain behaviors are incompatible with our community values and are strictly prohibited on FreelanHub. These include harassment, discrimination, or hate speech based on race, gender, religion, nationality, disability, sexual orientation, or other protected characteristics. We have zero tolerance for such behavior.</p>
+                            <p class="body2 text-secondary">Additionally prohibited are fraud or deceptive practices including fake profiles, misrepresentation of credentials, bid manipulation, review fraud, or any attempts to game our systems. Also forbidden are abusive communications, threats, intimidation, doxxing, sharing private information without consent, spam, unsolicited commercial messages, or excessive self-promotion outside designated areas.</p>
+                            <p class="body2 text-secondary">Users must not engage in platform manipulation, create multiple accounts to evade restrictions, artificially inflate ratings or rankings, or circumvent our fee structure. Copyright infringement, sharing illegal content, and any activity that violates local or international law are strictly prohibited and will result in immediate action.</p>
+                        </div>
+                    </div>
+                    <div id="risks" class="section pt-8">
+                        <h5 class="heading5">4. Site terms of use modifications</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">Violations of our Community Guidelines are taken seriously and will result in enforcement actions proportional to the severity and frequency of the violation:</p>
+                            <ul class="flex flex-col gap-3 mt-4">
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Warnings and educational outreach for first-time minor violations. We may provide guidance on expected behavior and require acknowledgment of guidelines before account access is fully restored.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Temporary suspensions ranging from 7 to 30 days for repeated violations or more serious infractions. During suspension, access to bidding, messaging, and other platform features may be restricted.</p>
+                                </li>
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <p>Permanent account termination for severe violations including fraud, harassment, illegal activity, or persistent disregard for guidelines. Terminated users forfeit access to all platform features and may lose pending payments or earnings.</p>
+                                </li>
+                            </ul>
+                            <p class="body2 text-secondary">All enforcement decisions are made after thorough review by our Trust and Safety team. Users may appeal decisions through our support channels, except in cases of severe violations where termination is final and non-negotiable.</p>
+                        </div>
+                    </div>
+                    <div class="section pt-8">
+                        <h5 class="heading5">5. Risks</h5>
+                        <div class="desc flex flex-col gap-3 mt-3">
+                            <p class="body2 text-secondary">We provide multiple tools to help you report violations and protect yourself from misconduct. Every user profile, job posting, message, and project page includes a "Report" button that allows you to flag concerning behavior directly to our moderation team for immediate review.</p>
+                            <p class="body2 text-secondary">When reporting, provide as much detail as possible including specific examples, screenshots, message logs, or other evidence. Our team investigates all reports confidentially and takes appropriate action based on the severity of the violation. We protect reporters from retaliation and take additional action against users who target those who report violations in good faith.</p>
+                            <p class="body2 text-secondary">Building a positive community is a shared responsibility. By following these guidelines, reporting violations when you see them, treating others with respect, and contributing constructively to our marketplace, you help create an environment where everyone can thrive. Thank you for being part of the FreelanHub community and upholding the standards that make our platform a trusted place for professional collaboration.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

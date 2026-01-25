@@ -49,7 +49,7 @@ def process_public_applications(self):
         dict: Summary of processed applications.
     """
     from careers.models import PublicApplication
-    from ats.models import Application, JobPosting
+    from jobs.models import Application, JobPosting
     from django_tenants.utils import get_tenant_model
 
     # Skip if running in public schema
@@ -122,7 +122,7 @@ def _convert_to_ats_application(public_app):
     Returns:
         Application: Created ATS application or None
     """
-    from ats.models import Application, JobPosting, Candidate
+    from jobs.models import Application, JobPosting, Candidate
     from django.contrib.auth import get_user_model
 
     User = get_user_model()
@@ -153,7 +153,7 @@ def _convert_to_ats_application(public_app):
         )
 
         # Queue for match score calculation
-        from ats.tasks import calculate_single_match_score
+        from jobs.tasks import calculate_single_match_score
         calculate_single_match_score.delay(application.id)
 
         return application
@@ -407,7 +407,7 @@ def sync_job_listings(self):
         dict: Summary of sync operation.
     """
     from careers.models import JobListing, CareerPage
-    from ats.models import JobPosting
+    from jobs.models import JobPosting
     from django.db import connection
 
     # Skip if running in public schema

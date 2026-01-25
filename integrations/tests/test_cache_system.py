@@ -29,8 +29,8 @@ from django.db import connection
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
-from ats.models import JobPosting
-from accounts.models import CustomUser
+from jobs.models import JobPosting
+from tenant_profiles.models import CustomUser
 from core.cache import (
     CacheKeyBuilder, model_cache, view_cache, cache_invalidator,
     TenantCache, invalidate_permission_cache, get_cache_stats,
@@ -113,7 +113,7 @@ class TestCacheKeyGeneration:
         """Test model-specific cache key generation."""
         key = CacheKeyBuilder.model_key(JobPosting, test_job.pk)
         assert 'model' in key
-        assert 'ats.jobposting' in key.lower()
+        assert 'jobs.jobposting' in key.lower()
         assert str(test_job.pk) in key
 
     def test_cache_key_builder_model_key_with_tenant(self, test_job, tenant_id):

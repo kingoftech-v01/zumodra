@@ -1,6 +1,6 @@
 # Zumodra - Multi-Tenant HR & Freelance Services Platform
 
-**Enterprise-grade SaaS platform combining Applicant Tracking System (ATS), Freelance Marketplace with Escrow, HR Management, and CRM functionality.**
+**Enterprise-grade SaaS platform combining Jobs & Recruitment, Freelance Marketplace with Escrow, HR Management, and CRM functionality.**
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-5.2-green.svg)](https://djangoproject.com)
@@ -12,7 +12,7 @@
 
 Zumodra is a comprehensive multi-tenant platform that combines:
 
-- **Applicant Tracking System (ATS)** - Full hiring pipeline from job posting to offer
+- **Jobs & Recruitment** - Full hiring pipeline from job posting to offer
 - **Freelance Marketplace** - Service listings with proposals and escrow payments
 - **HR Core** - Employee management, time-off, onboarding, performance reviews
 - **Trust & Verification** - KYC verification and trust scoring
@@ -328,7 +328,7 @@ curl -X POST http://localhost:8002/api/token/ \
   -d '{"email": "user@example.com", "password": "password"}'
 
 # Use token
-curl http://localhost:8002/api/v1/ats/jobs/ \
+curl http://localhost:8002/api/v1/jobs/jobs/ \
   -H "Authorization: Bearer <access_token>"
 ```
 

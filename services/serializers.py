@@ -1,23 +1,13 @@
 """
-Services App Serializers - Zumodra Freelance Marketplace.
+Services API Serializers
 
-Provides serializers for:
-- Service categories and taxonomy
-- Provider profiles and skills
-- Services offered
-- Client requests and proposals
-- Contracts with escrow integration
-- Reviews and messaging
+Django REST Framework serializers for the services app API.
+These serializers are tenant-aware and used by authenticated providers/clients
+to manage services, bookings, reviews, etc.
 """
 
-from decimal import Decimal
 from rest_framework import serializers
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema_field
-
-from core.serializers import TenantAwareSerializer
-from core.validators import sanitize_html
-
+from decimal import Decimal
 from .models import (
     ServiceCategory,
     ServiceTag,
@@ -26,7 +16,10 @@ from .models import (
     ServiceProvider,
     Service,
     ServiceLike,
+    ServicePricingTier,
+    ProviderPortfolio,
     ClientRequest,
+    CrossTenantServiceRequest,
     ProviderMatch,
     ServiceProposal,
     ServiceContract,
@@ -35,679 +28,867 @@ from .models import (
 )
 
 
-# =============================================================================
-# USER MINIMAL SERIALIZER (for nested representations)
-# =============================================================================
-
-class UserMinimalSerializer(serializers.Serializer):
-    """Minimal user representation for nested serializers."""
-    id = serializers.IntegerField(read_only=True)
-    email = serializers.EmailField(read_only=True)
-    full_name = serializers.SerializerMethodField()
-    avatar_url = serializers.SerializerMethodField()
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_full_name(self, obj):
-        return obj.get_full_name() or obj.email.split('@')[0]
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_avatar_url(self, obj):
-        if hasattr(obj, 'avatar') and obj.avatar:
-            return obj.avatar.url
-        return None
+# ==================== CATEGORY & TAG SERIALIZERS ====================
 
 
-# =============================================================================
-# CATEGORY & TAXONOMY SERIALIZERS
-# =============================================================================
+class ServiceCategorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for service categories.
 
-class ServiceCategorySerializer(TenantAwareSerializer):
-    """Serializer for service categories."""
+    Includes hierarchy information and full path.
+    """
+    full_path = serializers.ReadOnlyField()
+    depth = serializers.ReadOnlyField()
     subcategories = serializers.SerializerMethodField()
-    full_path = serializers.CharField(read_only=True)
-    depth = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ServiceCategory
         fields = [
-            'id', 'name', 'slug', 'parent', 'description',
-            'icon', 'color', 'sort_order', 'subcategories',
-            'full_path', 'depth', 'created_at', 'updated_at'
+            'id',
+            'uuid',
+            'name',
+            'slug',
+            'parent',
+            'description',
+            'icon',
+            'color',
+            'sort_order',
+            'full_path',
+            'depth',
+            'subcategories',
         ]
-        read_only_fields = ['slug', 'created_at', 'updated_at']
+        read_only_fields = ['uuid', 'full_path', 'depth', 'subcategories']
 
-    @extend_schema_field(OpenApiTypes.STR)
     def get_subcategories(self, obj):
-        subcats = obj.subcategories.all()
-        if subcats.exists():
-            return ServiceCategoryListSerializer(subcats, many=True).data
-        return []
+        """Get immediate subcategories (non-recursive for performance)."""
+        subcats = obj.subcategories.all()[:10]  # Limit to prevent N+1
+        return ServiceCategorySerializer(subcats, many=True, read_only=True).data
 
 
-class ServiceCategoryListSerializer(TenantAwareSerializer):
-    """Lightweight category serializer for lists."""
-    class Meta:
-        model = ServiceCategory
-        fields = ['id', 'name', 'slug', 'icon', 'color', 'sort_order']
-
-
-class ServiceTagSerializer(TenantAwareSerializer):
+class ServiceTagSerializer(serializers.ModelSerializer):
     """Serializer for service tags."""
+
     class Meta:
         model = ServiceTag
-        fields = ['id', 'name', 'slug', 'created_at']
-        read_only_fields = ['slug', 'created_at']
+        fields = ['id', 'uuid', 'name', 'slug']
+        read_only_fields = ['uuid']
 
 
-class ServiceImageSerializer(TenantAwareSerializer):
+class ServiceImageSerializer(serializers.ModelSerializer):
     """Serializer for service images."""
+
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ServiceImage
-        fields = ['id', 'image', 'description', 'alt_text', 'sort_order']
+        fields = [
+            'id',
+            'uuid',
+            'image',
+            'image_url',
+            'description',
+            'alt_text',
+            'sort_order',
+        ]
+        read_only_fields = ['uuid', 'image_url']
+
+    def get_image_url(self, obj):
+        """Get absolute URL for image."""
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 
-# =============================================================================
-# PROVIDER SERIALIZERS
-# =============================================================================
+# ==================== PROVIDER SERIALIZERS ====================
 
-class ProviderSkillSerializer(TenantAwareSerializer):
-    """Serializer for provider skills with proficiency."""
+
+class ProviderSkillSerializer(serializers.ModelSerializer):
+    """Serializer for provider skills with proficiency levels."""
+
     skill_name = serializers.CharField(source='skill.name', read_only=True)
-    skill_category = serializers.CharField(source='skill.category', read_only=True)
 
     class Meta:
         model = ProviderSkill
         fields = [
-            'id', 'skill', 'skill_name', 'skill_category',
-            'level', 'years_experience', 'is_verified'
+            'id',
+            'uuid',
+            'skill',
+            'skill_name',
+            'level',
+            'years_experience',
+            'is_verified',
         ]
+        read_only_fields = ['uuid', 'skill_name']
 
 
-class ServiceProviderListSerializer(TenantAwareSerializer):
-    """Lightweight provider serializer for lists."""
-    categories = ServiceCategoryListSerializer(many=True, read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
+class ServiceProviderListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight provider serializer for list views.
+
+    Returns minimal fields for performance.
+    """
+
+    coordinates = serializers.ReadOnlyField()
+    full_address = serializers.ReadOnlyField()
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceProvider
         fields = [
-            'id', 'uuid', 'display_name', 'avatar', 'tagline',
-            'provider_type', 'city', 'country', 'hourly_rate',
-            'currency', 'rating_avg', 'total_reviews',
-            'completed_jobs_count', 'availability_status',
-            'is_verified', 'is_featured', 'categories', 'user_email'
+            'uuid',
+            'display_name',
+            'provider_type',
+            'tagline',
+            'avatar_url',
+            'city',
+            'state',
+            'country',
+            'coordinates',
+            'full_address',
+            'rating_avg',
+            'total_reviews',
+            'completed_jobs_count',
+            'availability_status',
+            'is_verified',
+            'is_featured',
         ]
+        read_only_fields = fields
+
+    def get_avatar_url(self, obj):
+        """Get absolute URL for avatar."""
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
 
 
-class ServiceProviderDetailSerializer(TenantAwareSerializer):
-    """Full provider serializer with all details."""
-    user = UserMinimalSerializer(read_only=True)
-    categories = ServiceCategoryListSerializer(many=True, read_only=True)
+class ServiceProviderDetailSerializer(serializers.ModelSerializer):
+    """
+    Complete provider serializer with all relations.
+
+    Used for provider profile detail views.
+    """
+
+    coordinates = serializers.ReadOnlyField()
+    full_address = serializers.ReadOnlyField()
+    avatar_url = serializers.SerializerMethodField()
+    cover_image_url = serializers.SerializerMethodField()
+    categories = ServiceCategorySerializer(many=True, read_only=True)
     provider_skills = ProviderSkillSerializer(many=True, read_only=True)
-    full_address = serializers.CharField(read_only=True)
-    coordinates = serializers.SerializerMethodField()
-    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
+    portfolio = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceProvider
         fields = [
-            'id', 'uuid', 'user', 'company', 'provider_type',
-            'display_name', 'bio', 'tagline', 'avatar', 'cover_image',
-            'categories', 'provider_skills',
-            'address', 'city', 'state', 'postal_code', 'country',
-            'full_address', 'coordinates', 'location_lat', 'location_lng',
-            'hourly_rate', 'minimum_budget', 'currency',
-            'rating_avg', 'total_reviews', 'completed_jobs_count',
-            'total_earnings', 'response_rate', 'avg_response_time_hours',
-            'availability_status', 'is_verified', 'is_featured',
-            'is_private', 'is_accepting_projects',
-            'can_work_remotely', 'can_work_onsite',
-            'stripe_onboarding_complete', 'stripe_payouts_enabled',
-            'last_active_at', 'created_at', 'updated_at', 'tenant_type'
+            'uuid',
+            'user',
+            'company',
+            'provider_type',
+            'display_name',
+            'bio',
+            'tagline',
+            'avatar_url',
+            'cover_image_url',
+            'categories',
+            'provider_skills',
+            'address',
+            'city',
+            'state',
+            'postal_code',
+            'country',
+            'coordinates',
+            'full_address',
+            'hourly_rate',
+            'minimum_budget',
+            'currency',
+            'rating_avg',
+            'total_reviews',
+            'completed_jobs_count',
+            'total_earnings',
+            'response_rate',
+            'avg_response_time_hours',
+            'availability_status',
+            'is_verified',
+            'is_featured',
+            'marketplace_enabled',
+            'is_accepting_work',
+            'can_work_remotely',
+            'can_work_onsite',
+            'last_active_at',
+            'portfolio',
         ]
         read_only_fields = [
-            'uuid', 'rating_avg', 'total_reviews', 'completed_jobs_count',
-            'total_earnings', 'stripe_onboarding_complete',
-            'stripe_payouts_enabled', 'created_at', 'updated_at'
+            'uuid', 'user', 'coordinates', 'full_address', 'avatar_url',
+            'cover_image_url', 'rating_avg', 'total_reviews',
+            'completed_jobs_count', 'total_earnings', 'portfolio'
         ]
 
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_coordinates(self, obj):
-        return obj.coordinates
+    def get_avatar_url(self, obj):
+        """Get absolute URL for avatar."""
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
 
-    def validate_bio(self, value):
-        return sanitize_html(value) if value else value
+    def get_cover_image_url(self, obj):
+        """Get absolute URL for cover image."""
+        if obj.cover_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.cover_image.url)
+            return obj.cover_image.url
+        return None
+
+    def get_portfolio(self, obj):
+        """Get portfolio items for this provider."""
+        portfolio_items = obj.portfolio.all()[:12]  # Limit for performance
+        return ProviderPortfolioSerializer(portfolio_items, many=True, context=self.context).data
 
 
-class ServiceProviderCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating a provider profile."""
+class ServiceProviderUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating provider profile.
+
+    Used by providers to update their own profile.
+    """
+
     class Meta:
         model = ServiceProvider
         fields = [
-            'provider_type', 'display_name', 'bio', 'tagline',
-            'address', 'city', 'state', 'postal_code', 'country',
-            'hourly_rate', 'minimum_budget', 'currency',
-            'can_work_remotely', 'can_work_onsite'
+            'provider_type',
+            'display_name',
+            'bio',
+            'tagline',
+            'avatar',
+            'cover_image',
+            'address',
+            'city',
+            'state',
+            'postal_code',
+            'country',
+            'hourly_rate',
+            'minimum_budget',
+            'currency',
+            'availability_status',
+            'marketplace_enabled',
+            'is_accepting_work',
+            'can_work_remotely',
+            'can_work_onsite',
         ]
 
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
+
+# ==================== SERVICE SERIALIZERS ====================
 
 
-# =============================================================================
-# SERVICE SERIALIZERS
-# =============================================================================
+class ServicePricingTierSerializer(serializers.ModelSerializer):
+    """Serializer for service pricing tiers/packages."""
 
-class ServiceListSerializer(TenantAwareSerializer):
-    """Lightweight service serializer for lists."""
+    features_list = serializers.SerializerMethodField()
+    currency = serializers.CharField(source='service.currency', read_only=True)
+
+    class Meta:
+        model = ServicePricingTier
+        fields = [
+            'id',
+            'uuid',
+            'service',
+            'name',
+            'price',
+            'currency',
+            'delivery_time_days',
+            'revisions',
+            'features',
+            'features_list',
+            'sort_order',
+            'is_recommended',
+        ]
+        read_only_fields = ['uuid', 'currency', 'features_list']
+
+    def get_features_list(self, obj):
+        """Convert features dict to list format for frontend."""
+        if not obj.features:
+            return []
+        return [
+            {'name': key, 'value': value, 'included': bool(value)}
+            for key, value in obj.features.items()
+        ]
+
+
+class ProviderPortfolioSerializer(serializers.ModelSerializer):
+    """Serializer for provider portfolio items."""
+
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProviderPortfolio
+        fields = [
+            'id',
+            'uuid',
+            'provider',
+            'image',
+            'image_url',
+            'title',
+            'description',
+            'sort_order',
+            'grid_col_span',
+            'grid_row_span',
+            'created_at',
+        ]
+        read_only_fields = ['uuid', 'image_url', 'created_at']
+
+    def get_image_url(self, obj):
+        """Get absolute URL for portfolio image."""
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+
+class ServiceListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight service serializer for list views.
+
+    Returns minimal fields for performance in list endpoints.
+    """
+
     provider_name = serializers.CharField(source='provider.display_name', read_only=True)
-    provider_rating = serializers.DecimalField(
-        source='provider.rating_avg', max_digits=3, decimal_places=2, read_only=True
-    )
+    provider_avatar_url = serializers.SerializerMethodField()
     category_name = serializers.CharField(source='category.name', read_only=True)
-    tags = ServiceTagSerializer(many=True, read_only=True)
+    category_slug = serializers.CharField(source='category.slug', read_only=True)
+    thumbnail_url = serializers.SerializerMethodField()
+    tags_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
         fields = [
-            'id', 'uuid', 'name', 'slug', 'short_description',
-            'thumbnail', 'service_type', 'price', 'price_min', 'price_max',
-            'currency', 'delivery_type', 'duration_days',
-            'provider', 'provider_name', 'provider_rating',
-            'category', 'category_name', 'tags',
-            'is_active', 'is_featured', 'view_count', 'order_count'
+            'uuid',
+            'name',
+            'slug',
+            'short_description',
+            'provider',
+            'provider_name',
+            'provider_avatar_url',
+            'category',
+            'category_name',
+            'category_slug',
+            'thumbnail_url',
+            'service_type',
+            'price',
+            'price_min',
+            'price_max',
+            'currency',
+            'delivery_type',
+            'duration_days',
+            'tags_list',
+            'is_active',
+            'is_featured',
+            'is_public',
+            'view_count',
+            'order_count',
+        ]
+        read_only_fields = [
+            'uuid', 'slug', 'provider_name', 'provider_avatar_url',
+            'category_name', 'category_slug', 'thumbnail_url', 'tags_list',
+            'view_count', 'order_count'
         ]
 
+    def get_provider_avatar_url(self, obj):
+        """Get provider avatar URL."""
+        if obj.provider and obj.provider.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.provider.avatar.url)
+            return obj.provider.avatar.url
+        return None
 
-class ServiceDetailSerializer(TenantAwareSerializer):
-    """Full service serializer with all details."""
+    def get_thumbnail_url(self, obj):
+        """Get thumbnail URL."""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+
+    def get_tags_list(self, obj):
+        """Get list of tag names."""
+        return [tag.name for tag in obj.tags.all()[:10]]  # Limit for performance
+
+
+class ServiceDetailSerializer(serializers.ModelSerializer):
+    """
+    Complete service serializer with all relations.
+
+    Includes images, pricing tiers, provider info, reviews, etc.
+    Used for service detail endpoints.
+    """
+
     provider = ServiceProviderListSerializer(read_only=True)
     category = ServiceCategorySerializer(read_only=True)
-    tags = ServiceTagSerializer(many=True, read_only=True)
     images = ServiceImageSerializer(many=True, read_only=True)
-    tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
-    provider_tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
+    pricing_tiers = ServicePricingTierSerializer(many=True, read_only=True)
+    tags = ServiceTagSerializer(many=True, read_only=True)
+    thumbnail_url = serializers.SerializerMethodField()
+    tags_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
         fields = [
-            'id', 'uuid', 'provider', 'category',
-            'name', 'slug', 'description', 'short_description',
-            'service_type', 'price', 'price_min', 'price_max', 'currency',
-            'delivery_type', 'duration_days', 'revisions_included',
-            'thumbnail', 'images', 'video_url', 'tags',
-            'is_active', 'is_featured', 'view_count', 'order_count',
-            'created_at', 'updated_at', 'tenant_type', 'provider_tenant_type'
+            'uuid',
+            'provider',
+            'category',
+            'name',
+            'slug',
+            'description',
+            'short_description',
+            'service_type',
+            'price',
+            'price_min',
+            'price_max',
+            'currency',
+            'delivery_type',
+            'duration_days',
+            'revisions_included',
+            'thumbnail',
+            'thumbnail_url',
+            'images',
+            'video_url',
+            'tags',
+            'tags_list',
+            'pricing_tiers',
+            'is_active',
+            'is_featured',
+            'is_public',
+            'published_to_catalog',
+            'catalog_synced_at',
+            'view_count',
+            'order_count',
+            'created_at',
+            'updated_at',
         ]
         read_only_fields = [
-            'uuid', 'slug', 'view_count', 'order_count',
-            'created_at', 'updated_at'
+            'uuid', 'slug', 'provider', 'thumbnail_url', 'tags_list',
+            'published_to_catalog', 'catalog_synced_at', 'view_count',
+            'order_count', 'created_at', 'updated_at'
         ]
 
+    def get_thumbnail_url(self, obj):
+        """Get thumbnail URL."""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
 
-class ServiceCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating services."""
-    tags = serializers.PrimaryKeyRelatedField(
-        queryset=ServiceTag.objects.all(), many=True, required=False
-    )
-
-    class Meta:
-        model = Service
-        fields = [
-            'category', 'name', 'description', 'short_description',
-            'service_type', 'price', 'price_min', 'price_max', 'currency',
-            'delivery_type', 'duration_days', 'revisions_included',
-            'thumbnail', 'video_url', 'tags', 'is_active'
-        ]
-
-    def validate_description(self, value):
-        return sanitize_html(value) if value else value
-
-    def create(self, validated_data):
-        tags = validated_data.pop('tags', [])
-        provider = ServiceProvider.objects.get(user=self.context['request'].user)
-        validated_data['provider'] = provider
-        service = super().create(validated_data)
-        service.tags.set(tags)
-        return service
+    def get_tags_list(self, obj):
+        """Get list of tag names."""
+        return [tag.name for tag in obj.tags.all()]
 
 
-class ServiceLikeSerializer(TenantAwareSerializer):
-    """Serializer for service likes."""
-    class Meta:
-        model = ServiceLike
-        fields = ['id', 'user', 'service', 'created_at']
-        read_only_fields = ['user', 'created_at']
+class ServiceCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating services.
 
+    Used by providers to create new services.
+    Provider is automatically set from request.user.
+    """
 
-# =============================================================================
-# CLIENT REQUEST SERIALIZERS
-# =============================================================================
-
-class ClientRequestListSerializer(TenantAwareSerializer):
-    """Lightweight client request serializer for lists."""
-    client_email = serializers.CharField(source='client.email', read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    proposals_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ClientRequest
-        fields = [
-            'id', 'uuid', 'title', 'category', 'category_name',
-            'budget_min', 'budget_max', 'currency',
-            'deadline', 'status', 'remote_allowed',
-            'client', 'client_email', 'proposals_count', 'created_at'
-        ]
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_proposals_count(self, obj):
-        return obj.proposals.count()
-
-
-class ClientRequestDetailSerializer(TenantAwareSerializer):
-    """Full client request serializer."""
-    client = UserMinimalSerializer(read_only=True)
-    category = ServiceCategoryListSerializer(read_only=True)
-    required_skills = serializers.SerializerMethodField()
-    proposals_count = serializers.SerializerMethodField()
-    matches_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ClientRequest
-        fields = [
-            'id', 'uuid', 'client', 'title', 'description',
-            'category', 'required_skills',
-            'budget_min', 'budget_max', 'currency',
-            'location_lat', 'location_lng', 'location_radius_km',
-            'remote_allowed', 'deadline', 'status',
-            'proposals_count', 'matches_count',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = ['uuid', 'created_at', 'updated_at']
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_required_skills(self, obj):
-        return list(obj.required_skills.values_list('name', flat=True))
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_proposals_count(self, obj):
-        return obj.proposals.count()
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_matches_count(self, obj):
-        return obj.matches.count()
-
-
-class ClientRequestCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating client requests."""
-    required_skills_ids = serializers.ListField(
+    tags_ids = serializers.ListField(
         child=serializers.IntegerField(),
         write_only=True,
         required=False,
-        default=list
+        help_text="List of tag IDs"
+    )
+
+    images_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,
+        help_text="List of image IDs"
     )
 
     class Meta:
-        model = ClientRequest
+        model = Service
         fields = [
-            'title', 'description', 'category', 'required_skills_ids',
-            'budget_min', 'budget_max', 'currency',
-            'location_lat', 'location_lng', 'location_radius_km',
-            'remote_allowed', 'deadline'
+            'name',
+            'category',
+            'description',
+            'short_description',
+            'service_type',
+            'price',
+            'price_min',
+            'price_max',
+            'currency',
+            'delivery_type',
+            'duration_days',
+            'revisions_included',
+            'thumbnail',
+            'video_url',
+            'tags_ids',
+            'images_ids',
+            'is_active',
+            'is_featured',
+            'is_public',
         ]
-
-    def validate_description(self, value):
-        return sanitize_html(value) if value else value
 
     def create(self, validated_data):
-        skill_ids = validated_data.pop('required_skills_ids', [])
-        validated_data['client'] = self.context['request'].user
-        request = super().create(validated_data)
-        if skill_ids:
-            from configurations.models import Skill
-            skills = Skill.objects.filter(id__in=skill_ids)
-            request.required_skills.set(skills)
-        return request
+        """Create service and handle many-to-many relationships."""
+        tags_ids = validated_data.pop('tags_ids', [])
+        images_ids = validated_data.pop('images_ids', [])
+
+        # Provider is set from request.user in view
+        service = Service.objects.create(**validated_data)
+
+        # Add tags
+        if tags_ids:
+            service.tags.set(ServiceTag.objects.filter(id__in=tags_ids))
+
+        # Add images
+        if images_ids:
+            service.images.set(ServiceImage.objects.filter(id__in=images_ids))
+
+        return service
 
 
-# =============================================================================
-# PROVIDER MATCH SERIALIZERS
-# =============================================================================
+class ServiceUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating services.
 
-class ProviderMatchSerializer(TenantAwareSerializer):
-    """Serializer for provider matches."""
-    provider = ServiceProviderListSerializer(read_only=True)
+    Used by providers to update their own services.
+    """
 
-    class Meta:
-        model = ProviderMatch
-        fields = [
-            'id', 'client_request', 'provider', 'score', 'score_breakdown',
-            'viewed_by_client', 'accepted_by_client', 'rejected_by_client',
-            'created_at'
-        ]
-        read_only_fields = ['score', 'score_breakdown', 'created_at']
-
-
-# =============================================================================
-# PROPOSAL SERIALIZERS
-# =============================================================================
-
-class ServiceProposalListSerializer(TenantAwareSerializer):
-    """Lightweight proposal serializer for lists."""
-    provider_name = serializers.CharField(source='provider.display_name', read_only=True)
-    provider_rating = serializers.DecimalField(
-        source='provider.rating_avg', max_digits=3, decimal_places=2, read_only=True
-    )
-
-    class Meta:
-        model = ServiceProposal
-        fields = [
-            'id', 'uuid', 'client_request', 'provider',
-            'provider_name', 'provider_rating',
-            'proposed_rate', 'rate_type', 'estimated_hours',
-            'proposed_timeline_days', 'status', 'created_at'
-        ]
-
-
-class ServiceProposalDetailSerializer(TenantAwareSerializer):
-    """Full proposal serializer."""
-    provider = ServiceProviderListSerializer(read_only=True)
-    client_request = ClientRequestListSerializer(read_only=True)
-    tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
-
-    class Meta:
-        model = ServiceProposal
-        fields = [
-            'id', 'uuid', 'client_request', 'provider',
-            'proposed_rate', 'rate_type', 'estimated_hours',
-            'cover_letter', 'proposed_timeline_days', 'attachments',
-            'status', 'created_at', 'updated_at', 'tenant_type'
-        ]
-        read_only_fields = ['uuid', 'created_at', 'updated_at']
-
-
-class ServiceProposalCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating proposals."""
-    class Meta:
-        model = ServiceProposal
-        fields = [
-            'client_request', 'proposed_rate', 'rate_type',
-            'estimated_hours', 'cover_letter', 'proposed_timeline_days'
-        ]
-
-    def validate_cover_letter(self, value):
-        return sanitize_html(value) if value else value
-
-    def create(self, validated_data):
-        provider = ServiceProvider.objects.get(user=self.context['request'].user)
-        validated_data['provider'] = provider
-        return super().create(validated_data)
-
-
-# =============================================================================
-# CONTRACT SERIALIZERS
-# =============================================================================
-
-class ServiceContractListSerializer(TenantAwareSerializer):
-    """Lightweight contract serializer for lists."""
-    client_email = serializers.CharField(source='client.email', read_only=True)
-    provider_name = serializers.CharField(source='provider.display_name', read_only=True)
-
-    class Meta:
-        model = ServiceContract
-        fields = [
-            'id', 'uuid', 'title', 'client', 'client_email',
-            'provider', 'provider_name',
-            'agreed_rate', 'rate_type', 'currency',
-            'agreed_deadline', 'status',
-            'started_at', 'completed_at', 'created_at'
-        ]
-
-
-class ServiceContractDetailSerializer(TenantAwareSerializer):
-    """Full contract serializer with all details."""
-    client = UserMinimalSerializer(read_only=True)
-    provider = ServiceProviderListSerializer(read_only=True)
-    service = ServiceListSerializer(read_only=True)
-    provider_payout_amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, read_only=True
-    )
-    client_tenant_type = serializers.CharField(source='tenant.tenant_type', read_only=True)
-    provider_tenant_type = serializers.CharField(source='provider.tenant.tenant_type', read_only=True)
-
-    class Meta:
-        model = ServiceContract
-        fields = [
-            'id', 'uuid', 'client', 'provider',
-            'proposal', 'service', 'client_request',
-            'title', 'description',
-            'agreed_rate', 'rate_type', 'currency',
-            'agreed_deadline', 'revisions_allowed', 'revisions_used',
-            'escrow_transaction', 'platform_fee_percent', 'provider_payout_amount',
-            'status', 'started_at', 'delivered_at', 'completed_at',
-            'cancelled_at', 'cancellation_reason',
-            'created_at', 'updated_at', 'client_tenant_type', 'provider_tenant_type'
-        ]
-        read_only_fields = [
-            'uuid', 'escrow_transaction', 'revisions_used',
-            'started_at', 'delivered_at', 'completed_at',
-            'cancelled_at', 'created_at', 'updated_at'
-        ]
-
-
-class ServiceContractCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating contracts."""
-    class Meta:
-        model = ServiceContract
-        fields = [
-            'provider', 'proposal', 'service', 'client_request',
-            'title', 'description', 'agreed_rate', 'rate_type',
-            'currency', 'agreed_deadline', 'revisions_allowed'
-        ]
-
-    def validate_description(self, value):
-        return sanitize_html(value) if value else value
-
-    def create(self, validated_data):
-        validated_data['client'] = self.context['request'].user
-        return super().create(validated_data)
-
-
-class ContractActionSerializer(serializers.Serializer):
-    """Serializer for contract actions (start, deliver, complete, cancel)."""
-    action = serializers.ChoiceField(
-        choices=['start', 'deliver', 'complete', 'cancel', 'request_revision']
-    )
-    reason = serializers.CharField(required=False, allow_blank=True)
-
-
-# =============================================================================
-# REVIEW SERIALIZERS
-# =============================================================================
-
-class ServiceReviewListSerializer(TenantAwareSerializer):
-    """Lightweight review serializer for lists."""
-    reviewer_name = serializers.SerializerMethodField()
-    provider_name = serializers.CharField(source='provider.display_name', read_only=True)
-
-    class Meta:
-        model = ServiceReview
-        fields = [
-            'id', 'contract', 'reviewer', 'reviewer_name',
-            'provider', 'provider_name',
-            'rating', 'title', 'created_at'
-        ]
-
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_reviewer_name(self, obj):
-        return obj.reviewer.get_full_name() or obj.reviewer.email.split('@')[0]
-
-
-class ServiceReviewDetailSerializer(TenantAwareSerializer):
-    """Full review serializer."""
-    reviewer = UserMinimalSerializer(read_only=True)
-    provider = ServiceProviderListSerializer(read_only=True)
-
-    class Meta:
-        model = ServiceReview
-        fields = [
-            'id', 'contract', 'reviewer', 'provider',
-            'rating', 'rating_communication', 'rating_quality', 'rating_timeliness',
-            'title', 'content',
-            'provider_response', 'provider_responded_at',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = [
-            'provider_response', 'provider_responded_at',
-            'created_at', 'updated_at'
-        ]
-
-
-class ServiceReviewCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating reviews."""
-    class Meta:
-        model = ServiceReview
-        fields = [
-            'contract', 'rating', 'rating_communication',
-            'rating_quality', 'rating_timeliness',
-            'title', 'content'
-        ]
-
-    def validate_content(self, value):
-        return sanitize_html(value) if value else value
-
-    def validate_contract(self, value):
-        if value.status != 'completed':
-            raise serializers.ValidationError(
-                "Reviews can only be submitted for completed contracts."
-            )
-        if hasattr(value, 'review'):
-            raise serializers.ValidationError(
-                "A review already exists for this contract."
-            )
-        return value
-
-    def create(self, validated_data):
-        validated_data['reviewer'] = self.context['request'].user
-        validated_data['provider'] = validated_data['contract'].provider
-        return super().create(validated_data)
-
-
-class ReviewResponseSerializer(serializers.Serializer):
-    """Serializer for provider response to reviews."""
-    response = serializers.CharField(max_length=5000)
-
-
-# =============================================================================
-# CONTRACT MESSAGE SERIALIZERS
-# =============================================================================
-
-class ContractMessageSerializer(TenantAwareSerializer):
-    """Serializer for contract messages."""
-    sender = UserMinimalSerializer(read_only=True)
-
-    class Meta:
-        model = ContractMessage
-        fields = [
-            'id', 'contract', 'sender', 'content',
-            'attachments', 'is_system_message', 'read_at', 'created_at'
-        ]
-        read_only_fields = ['sender', 'is_system_message', 'read_at', 'created_at']
-
-
-class ContractMessageCreateSerializer(TenantAwareSerializer):
-    """Serializer for creating contract messages."""
-    class Meta:
-        model = ContractMessage
-        fields = ['contract', 'content', 'attachments']
-
-    def validate_content(self, value):
-        return sanitize_html(value) if value else value
-
-    def create(self, validated_data):
-        validated_data['sender'] = self.context['request'].user
-        return super().create(validated_data)
-
-
-# =============================================================================
-# STATISTICS & ANALYTICS SERIALIZERS
-# =============================================================================
-
-class ProviderStatsSerializer(serializers.Serializer):
-    """Provider statistics serializer."""
-    total_services = serializers.IntegerField()
-    active_services = serializers.IntegerField()
-    total_contracts = serializers.IntegerField()
-    completed_contracts = serializers.IntegerField()
-    total_earnings = serializers.DecimalField(max_digits=12, decimal_places=2)
-    average_rating = serializers.DecimalField(max_digits=3, decimal_places=2)
-    total_reviews = serializers.IntegerField()
-    response_rate = serializers.IntegerField()
-
-
-class MarketplaceStatsSerializer(serializers.Serializer):
-    """Marketplace overview statistics serializer."""
-    total_providers = serializers.IntegerField()
-    verified_providers = serializers.IntegerField()
-    total_services = serializers.IntegerField()
-    active_requests = serializers.IntegerField()
-    completed_contracts = serializers.IntegerField()
-    total_gmv = serializers.DecimalField(max_digits=14, decimal_places=2)
-
-
-# =============================================================================
-# SEARCH & FILTER SERIALIZERS
-# =============================================================================
-
-class ServiceSearchSerializer(serializers.Serializer):
-    """Serializer for service search parameters."""
-    q = serializers.CharField(required=False, allow_blank=True)
-    category = serializers.IntegerField(required=False)
-    min_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
-    )
-    max_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
-    )
-    delivery_type = serializers.ChoiceField(
-        choices=['remote', 'onsite', 'hybrid'], required=False
-    )
-    rating_min = serializers.DecimalField(
-        max_digits=3, decimal_places=2, required=False
-    )
-    tags = serializers.ListField(
-        child=serializers.IntegerField(), required=False
-    )
-    sort_by = serializers.ChoiceField(
-        choices=['price_low', 'price_high', 'rating', 'newest', 'popular'],
-        required=False, default='rating'
-    )
-
-
-class ProviderSearchSerializer(serializers.Serializer):
-    """Serializer for provider search parameters."""
-    q = serializers.CharField(required=False, allow_blank=True)
-    category = serializers.IntegerField(required=False)
-    skill = serializers.IntegerField(required=False)
-    min_rate = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
-    )
-    max_rate = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
-    )
-    availability = serializers.ChoiceField(
-        choices=['available', 'busy', 'unavailable', 'on_vacation'],
+    tags_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
         required=False
     )
-    city = serializers.CharField(required=False)
-    country = serializers.CharField(required=False)
-    rating_min = serializers.DecimalField(
-        max_digits=3, decimal_places=2, required=False
+
+    images_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
     )
-    verified_only = serializers.BooleanField(required=False, default=False)
-    remote_ok = serializers.BooleanField(required=False)
-    sort_by = serializers.ChoiceField(
-        choices=['rating', 'reviews', 'price_low', 'price_high', 'newest'],
-        required=False, default='rating'
+
+    class Meta:
+        model = Service
+        fields = [
+            'name',
+            'category',
+            'description',
+            'short_description',
+            'service_type',
+            'price',
+            'price_min',
+            'price_max',
+            'currency',
+            'delivery_type',
+            'duration_days',
+            'revisions_included',
+            'thumbnail',
+            'video_url',
+            'tags_ids',
+            'images_ids',
+            'is_active',
+            'is_featured',
+            'is_public',
+        ]
+
+    def update(self, instance, validated_data):
+        """Update service and handle many-to-many relationships."""
+        tags_ids = validated_data.pop('tags_ids', None)
+        images_ids = validated_data.pop('images_ids', None)
+
+        # Update fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update tags if provided
+        if tags_ids is not None:
+            instance.tags.set(ServiceTag.objects.filter(id__in=tags_ids))
+
+        # Update images if provided
+        if images_ids is not None:
+            instance.images.set(ServiceImage.objects.filter(id__in=images_ids))
+
+        return instance
+
+
+# ==================== REVIEW SERIALIZERS ====================
+
+
+class ServiceReviewSerializer(serializers.ModelSerializer):
+    """Serializer for service reviews."""
+
+    reviewer_name = serializers.SerializerMethodField()
+    reviewer_avatar_url = serializers.SerializerMethodField()
+    provider_name = serializers.CharField(source='provider.display_name', read_only=True)
+
+    class Meta:
+        model = ServiceReview
+        fields = [
+            'id',
+            'uuid',
+            'contract',
+            'reviewer',
+            'reviewer_name',
+            'reviewer_avatar_url',
+            'provider',
+            'provider_name',
+            'rating',
+            'rating_communication',
+            'rating_quality',
+            'rating_timeliness',
+            'title',
+            'content',
+            'provider_response',
+            'provider_responded_at',
+            'created_at',
+        ]
+        read_only_fields = [
+            'uuid', 'reviewer', 'reviewer_name', 'reviewer_avatar_url',
+            'provider', 'provider_name', 'provider_response',
+            'provider_responded_at', 'created_at'
+        ]
+
+    def get_reviewer_name(self, obj):
+        """Get reviewer display name (anonymize if needed)."""
+        if obj.reviewer:
+            return obj.reviewer.get_full_name() or obj.reviewer.username
+        return "Anonymous"
+
+    def get_reviewer_avatar_url(self, obj):
+        """Get reviewer avatar URL."""
+        # In future, can link to user profile avatar
+        return None
+
+
+class ServiceReviewResponseSerializer(serializers.Serializer):
+    """Serializer for provider responding to a review."""
+
+    provider_response = serializers.CharField(
+        max_length=5000,
+        required=True,
+        help_text="Provider's response to the review"
     )
+
+
+# ==================== BOOKING/CONTRACT SERIALIZERS ====================
+
+
+class ServiceContractListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight contract serializer for list views.
+
+    Used in bookings lists, contract management dashboards.
+    """
+
+    client_name = serializers.SerializerMethodField()
+    provider_name = serializers.CharField(source='provider.display_name', read_only=True)
+    service_name = serializers.CharField(source='service.name', read_only=True)
+
+    class Meta:
+        model = ServiceContract
+        fields = [
+            'uuid',
+            'client',
+            'client_name',
+            'provider',
+            'provider_name',
+            'service',
+            'service_name',
+            'title',
+            'agreed_rate',
+            'rate_type',
+            'currency',
+            'agreed_deadline',
+            'status',
+            'started_at',
+            'delivered_at',
+            'completed_at',
+            'created_at',
+        ]
+        read_only_fields = fields
+
+    def get_client_name(self, obj):
+        """Get client display name."""
+        if obj.client:
+            return obj.client.get_full_name() or obj.client.username
+        return None
+
+
+class ServiceContractDetailSerializer(serializers.ModelSerializer):
+    """
+    Complete contract serializer with all details.
+
+    Includes escrow info, messages, reviews, etc.
+    """
+
+    client_name = serializers.SerializerMethodField()
+    provider = ServiceProviderListSerializer(read_only=True)
+    service = ServiceListSerializer(read_only=True)
+    proposal = serializers.PrimaryKeyRelatedField(read_only=True)
+    provider_payout_amount = serializers.ReadOnlyField()
+
+    class Meta:
+        model = ServiceContract
+        fields = [
+            'uuid',
+            'client',
+            'client_name',
+            'provider',
+            'service',
+            'proposal',
+            'client_request',
+            'title',
+            'description',
+            'agreed_rate',
+            'rate_type',
+            'currency',
+            'agreed_deadline',
+            'revisions_allowed',
+            'revisions_used',
+            'escrow_transaction',
+            'platform_fee_percent',
+            'provider_payout_amount',
+            'status',
+            'started_at',
+            'delivered_at',
+            'completed_at',
+            'cancelled_at',
+            'cancellation_reason',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'uuid', 'client', 'client_name', 'provider', 'service',
+            'proposal', 'provider_payout_amount', 'status', 'started_at',
+            'delivered_at', 'completed_at', 'cancelled_at', 'created_at',
+            'updated_at'
+        ]
+
+    def get_client_name(self, obj):
+        """Get client display name."""
+        if obj.client:
+            return obj.client.get_full_name() or obj.client.username
+        return None
+
+
+class ServiceContractCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating service contracts/bookings.
+
+    Used when client books a service directly (not through proposal).
+    """
+
+    class Meta:
+        model = ServiceContract
+        fields = [
+            'service',
+            'title',
+            'description',
+            'agreed_rate',
+            'rate_type',
+            'currency',
+            'agreed_deadline',
+            'revisions_allowed',
+        ]
+
+    def validate(self, data):
+        """Validate contract data."""
+        if data['agreed_rate'] <= 0:
+            raise serializers.ValidationError("Agreed rate must be positive.")
+
+        if data.get('agreed_deadline') and data['agreed_deadline'] < timezone.now().date():
+            raise serializers.ValidationError("Deadline cannot be in the past.")
+
+        return data
+
+    def create(self, validated_data):
+        """Create contract with client from request."""
+        # Client is set from request.user in view
+        # Provider is set from service.provider
+        contract = ServiceContract.objects.create(**validated_data)
+        return contract
+
+
+class ContractMessageSerializer(serializers.ModelSerializer):
+    """Serializer for contract messages."""
+
+    sender_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ContractMessage
+        fields = [
+            'id',
+            'uuid',
+            'contract',
+            'sender',
+            'sender_name',
+            'content',
+            'attachments',
+            'is_system_message',
+            'read_at',
+            'created_at',
+        ]
+        read_only_fields = ['uuid', 'sender', 'sender_name', 'is_system_message', 'created_at']
+
+    def get_sender_name(self, obj):
+        """Get sender display name."""
+        if obj.is_system_message:
+            return "System"
+        if obj.sender:
+            return obj.sender.get_full_name() or obj.sender.username
+        return "Unknown"
+
+
+# ==================== CROSS-TENANT REQUEST SERIALIZERS ====================
+
+
+class CrossTenantServiceRequestSerializer(serializers.ModelSerializer):
+    """
+    Serializer for cross-tenant service requests.
+
+    Used when a user from one tenant requests a service from another tenant.
+    """
+
+    class Meta:
+        model = CrossTenantServiceRequest
+        fields = [
+            'uuid',
+            'client',
+            'target_service_uuid',
+            'target_tenant_schema',
+            'target_provider_uuid',
+            'title',
+            'description',
+            'budget',
+            'currency',
+            'deadline',
+            'attachment_1',
+            'attachment_2',
+            'status',
+            'hiring_context',
+            'provider_response',
+            'responded_at',
+            'contract',
+            'created_at',
+        ]
+        read_only_fields = [
+            'uuid', 'client', 'status', 'provider_response',
+            'responded_at', 'contract', 'created_at'
+        ]
+
+
+# ==================== IMPORT TIMEZONE ====================
+from django.utils import timezone

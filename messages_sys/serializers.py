@@ -20,7 +20,7 @@ from .models import (
     Conversation, Message, MessageStatus, TypingStatus,
     Contact, FriendRequest, BlockList, UserStatus
 )
-from custom_account_u.models import CustomUser
+from core_identity.models import CustomUser  # Renamed from custom_account_u (Phase 10)
 
 
 # ==================== USER SERIALIZERS ====================

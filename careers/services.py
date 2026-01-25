@@ -265,7 +265,7 @@ class CareerSiteService:
     def get_departments(site: 'CareerSite') -> List[Dict]:
         """Get list of departments with active jobs."""
         from careers.models import JobListing
-        from ats.models import JobCategory
+        from jobs.models import JobCategory
 
         # Get categories that have active jobs on this site
         active_category_ids = JobListing.objects.filter(
@@ -675,7 +675,7 @@ class JobAlertService:
             Number of alerts sent
         """
         from careers.models import JobAlert, JobListing
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
 
         sent_count = 0
 
@@ -725,7 +725,7 @@ class JobAlertService:
             List of matching JobListing objects
         """
         from careers.models import JobListing
-        from ats.models import JobPosting
+        from jobs.models import JobPosting
 
         queryset = JobListing.objects.filter(
             career_site=alert.career_site,

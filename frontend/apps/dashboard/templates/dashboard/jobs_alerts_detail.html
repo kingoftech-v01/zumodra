@@ -1,0 +1,385 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_alert scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="alert_name heading4 max-lg:mt-3">UX/UI design Alerts</h4>
+                    <div class="alert_block p-6 mt-7.5 rounded-lg bg-white">
+                        <div class="flex flex-wrap items-center justify-between gap-5">
+                            <form class="relative w-[340px] h-12">
+                                <input type="text" class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden" placeholder="Search by keyword" required />
+                                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                                    <span class="ph ph-magnifying-glass text-xl block"></span>
+                                </button>
+                            </form>
+                            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                                <div class="select">
+                                    <span class="selected caption1 capitalize" data-title="sort by (default)">sort by (default)</span>
+                                    <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                                        <li class="capitalize" data-item="default">sort by (default)</li>
+                                        <li class="capitalize" data-item="title (a -> z)">title (a -> z)</li>
+                                        <li class="capitalize" data-item="title (z -> a)">title (z -> a)</li>
+                                        <li class="capitalize" data-item="jobs (high to low)">jobs (high to low)</li>
+                                        <li class="capitalize" data-item="jobs (low to high)">jobs (low to high)</li>
+                                        <li class="capitalize" data-item="times (daily)">times (daily)</li>
+                                        <li class="capitalize" data-item="times (weekly)">times (weekly)</li>
+                                        <li class="capitalize" data-item="times (monthly)">times (monthly)</li>
+                                        <li class="capitalize" data-item="status (on)">status (on)</li>
+                                        <li class="capitalize" data-item="status (off)">status (off)</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <ul class="list_jobs grid 2xl:grid-cols-3 md:grid-cols-2 grid-cols-1 lg:gap-6 gap-5 mt-5">
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/8.png' %}" alt="company/8" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                            <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$100 - $120</span>
+                                        <span class="text-secondary">/hour</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/7.png' %}" alt="company/7" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">GlobalTech Partners</span>
+                                            <strong class="jobs_name text-title -style-1">Senior DevOps Engineer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">California, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$60-$80</span>
+                                        <span class="text-secondary">/day</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/6.png' %}" alt="company/6" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
+                                            <strong class="jobs_name text-title -style-1">Senior UI/UX Designer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">California, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$850 - $900</span>
+                                        <span class="text-secondary">/month</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/5.png' %}" alt="company/5" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
+                                            <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">New York, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$10 - $15</span>
+                                        <span class="text-secondary">/hour</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/4.png' %}" alt="company/4" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                            <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$450 - $550</span>
+                                        <span class="text-secondary">/month</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/3.png' %}" alt="company/3" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">PrimeEdge Solutions</span>
+                                            <strong class="jobs_name text-title -style-1">Digital Marketing</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">California, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$10 - $15</span>
+                                        <span class="text-secondary">/hour</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/9.png' %}" alt="company/9" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                            <strong class="jobs_name text-title -style-1">Full Stack Developer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Brand</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$100 - $120</span>
+                                        <span class="text-secondary">/hour</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/12.png' %}" alt="company/12" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Stellar Enterprises</span>
+                                            <strong class="jobs_name text-title -style-1">Social Media Marketing </strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">New York, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UX/UI</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$10 - $15</span>
+                                        <span class="text-secondary">/hour</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="jobs-detail1.html" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        <img src="{% static 'assets/images/company/13.png' %}" alt="company/13" class="jobs_avatar w-full h-full object-cover" />
+                                    </a>
+                                    <div class="jobs_content flex items-start justify-between gap-2 w-full">
+                                        <a href="jobs-detail1.html" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">Rockstar Games New York</span>
+                                            <strong class="jobs_name text-title -style-1">Mobile App Developer</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">Las Vegas, USA</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">2 days ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="btn_action btn_open_popup btn_delete relative flex flex-shrink-0 items-center justify-center w-10 h-10 border border-line rounded-full duration-300 hover:text-red hover:border-red" data-type="modal_delete">
+                                            <span class="ph ph-trash text-xl"></span>
+                                            <span class="flag absolute -top-10 left-1/2 py-0.5 px-1.5 rounded border border-line bg-white caption1 capitalize text-black whitespace-nowrap">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">Parttime</a>
+                                        <a href="jobs-default.html" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">UI/UX</a>
+                                    </div>
+                                    <div class="jobs_price">
+                                        <span class="price text-title">$450 - $550</span>
+                                        <span class="text-secondary">/month</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+    {% include 'dashboard/includes/modals/_modal_delete_jobs_alerts_detail.html' %}
+{% endblock %}

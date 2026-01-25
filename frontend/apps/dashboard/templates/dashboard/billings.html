@@ -1,0 +1,158 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_content %}
+            <div class="dashboard_alert scrollbar_custom w-full bg-surface">
+                <div class="container h-fit lg:pt-15 lg:pb-30 max-lg:py-12 max-sm:py-8">
+                    <button class="btn_open_popup btn_menu_dashboard flex items-center gap-2 lg:hidden" data-type="menu_dashboard">
+                        <span class="ph ph-squares-four text-xl"></span>
+                        <strong class="text-button">Menu</strong>
+                    </button>
+                    <h4 class="heading4 max-lg:mt-3">Earnings</h4>
+                    <ul class="list_counter grid xl:grid-cols-4 grid-cols-2 xl:gap-7.5 gap-4 mt-7.5">
+                        <li class="item flex flex-col items-center gap-2 sm:p-6 p-[1.125rem] rounded-lg shadow-sm bg-white">
+                            <div class="flex items-center justify-center gap-1">
+                                <span class="whitespace-nowrap text-secondary">Work in progress</span>
+                                <span class="ph ph-info text-secondary"></span>
+                            </div>
+                            <strong class="heading4">$900.00</strong>
+                        </li>
+                        <li class="item flex flex-col items-center gap-2 sm:p-6 p-[1.125rem] rounded-lg shadow-sm bg-white">
+                            <div class="flex items-center justify-center gap-1">
+                                <span class="whitespace-nowrap text-secondary">Withdraw</span>
+                                <span class="ph ph-info text-secondary"></span>
+                            </div>
+                            <strong class="heading4">$100.00</strong>
+                        </li>
+                        <li class="item flex flex-col items-center gap-2 sm:p-6 p-[1.125rem] rounded-lg shadow-sm bg-white">
+                            <div class="flex items-center justify-center gap-1">
+                                <span class="whitespace-nowrap text-secondary">Total Spendings</span>
+                                <span class="ph ph-info text-secondary"></span>
+                            </div>
+                            <strong class="heading4">$3,400.00</strong>
+                        </li>
+                        <li class="item flex flex-col items-center gap-2 sm:p-6 p-[1.125rem] rounded-lg shadow-sm bg-white">
+                            <div class="flex items-center justify-center gap-1">
+                                <span class="whitespace-nowrap text-secondary">Your balance</span>
+                                <span class="ph ph-info text-secondary"></span>
+                            </div>
+                            <strong class="heading4">$2,100.00</strong>
+                        </li>
+                    </ul>
+                    <div class="earning_block mt-7.5 rounded-lg bg-white">
+                        <h5 class="heading5 pt-6 px-6">Payment History</h5>
+                        <div class="flex flex-wrap items-center justify-between gap-5 pt-5 px-6">
+                            <form class="relative w-[340px] h-12">
+                                <input type="text" class="w-full h-full pl-4 pr-12 border border-line rounded-lg overflow-hidden" placeholder="Search by keyword" required />
+                                <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
+                                    <span class="ph ph-magnifying-glass text-xl block"></span>
+                                </button>
+                            </form>
+                            <div class="select_block sm:pr-16 pr-10 pl-3 py-2 border border-line rounded">
+                                <div class="select">
+                                    <span class="selected caption1 capitalize" data-title="sort by (default)">sort by (default)</span>
+                                    <ul class="list_option scrollbar_custom max-h-[200px] p-0 bg-white">
+                                        <li class="capitalize" data-item="default">sort by (default)</li>
+                                        <li class="capitalize" data-item="date (newest)">date (newest)</li>
+                                        <li class="capitalize" data-item="date (oldest)">date (oldest)</li>
+                                        <li class="capitalize" data-item="amount (high to low)">amount (high to low)</li>
+                                        <li class="capitalize" data-item="amount (low to high)">amount (low to high)</li>
+                                        <li class="capitalize" data-item="status (progress)">status (progress)</li>
+                                        <li class="capitalize" data-item="status (pending)">status (pending)</li>
+                                        <li class="capitalize" data-item="status (completed)">status (completed)</li>
+                                    </ul>
+                                </div>
+                                <span class="icon_down ph ph-caret-down right-3"></span>
+                            </div>
+                        </div>
+                        <div class="list overflow-x-auto w-full py-5 px-6 rounded-xl">
+                            <table class="w-full max-md:w-[600px]">
+                                <thead class="border-b border-line">
+                                    <tr>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Date</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Type</th>
+                                        <th scope="col" class="px-5 py-4 text-left text-sm font-bold uppercase text-secondary whitespace-nowrap">Amount</th>
+                                        <th scope="col" class="px-5 py-4 text-right text-sm font-bold uppercase text-secondary whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 28, 2024</th>
+                                        <td class="p-5 heading6">Job assign</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$688</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-features text-features text-button">progress</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 25, 2024</th>
+                                        <td class="p-5 heading6">Buy Services</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$720</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">pending</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 22, 2024</th>
+                                        <td class="p-5 heading6">Job assign</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$900</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-yellow text-yellow text-button">in review</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 21, 2024</th>
+                                        <td class="p-5 heading6">Job assign</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$900</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">completed</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 20, 2024</th>
+                                        <td class="p-5 heading6">Buy Services</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$900</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">completed</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="item duration-300 hover:bg-background">
+                                        <th scope="row" class="p-5 text-left whitespace-nowrap">Mar 20, 2024</th>
+                                        <td class="p-5 heading6">Buy Services</td>
+                                        <td class="p-5 text-title whitespace-nowrap">$900</td>
+                                        <td class="p-5 text-right">
+                                            <span class="tag bg-opacity-10 bg-success text-success text-button">completed</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-4 p-6 border-t border-line">
+                            <ul class="list_pagination menu_tab flex items-center justify-center gap-2 w-full md:mt-10 mt-7" role="tablist">
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black active" role="tab" aria-selected="true">1</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">2</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">3</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" class="tab_btn -fill flex items-center justify-center w-10 h-10 rounded border border-line text-title duration-300 hover:border-black" role="tab" aria-selected="false">></a>
+                                </li>
+                            </ul>
+                            <p class="text-secondary whitespace-nowrap">Showing <span class="start">1</span> to <span class="end">6</span> of <span class="total">24</span> entries</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:fixed bottom-0 left-0 z-[1] lg:pl-[280px] flex items-center justify-center w-full h-15 bg-white duration-300 shadow-md">
+                    <span class="copyright caption1 text-secondary">©2024 FreelanHub. All Rights Reserved</span>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block modal_content %}
+
+{% endblock %}

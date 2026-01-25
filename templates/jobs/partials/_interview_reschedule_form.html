@@ -1,0 +1,133 @@
+{% load static i18n %}
+
+{% comment %} Interview Reschedule Modal {% endcomment %}
+<div class="zu-modal zu-modal--open" id="reschedule-interview-modal">
+    <div class="zu-modal__backdrop" onclick="document.getElementById('reschedule-interview-modal').remove()"></div>
+    <div class="zu-modal__content zu-modal__content--medium">
+        <div class="zu-modal__header">
+            <h3 class="zu-modal__title">{% trans "Reschedule Interview" %}</h3>
+            <button type="button"
+                    class="zu-modal__close"
+                    onclick="document.getElementById('reschedule-interview-modal').remove()"
+                    aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form hx-post="{% url 'frontend:jobs:interview_reschedule' interview.pk %}"
+              hx-target="#reschedule-interview-modal"
+              hx-swap="outerHTML"
+              class="zu-modal__body">
+
+            {% comment %} Current Interview Info {% endcomment %}
+            <div class="p-4 mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">{% trans "Current Interview" %}</h4>
+                <div class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                    <p><strong>{% trans "Candidate:" %}</strong> {{ interview.application.candidate.full_name }}</p>
+                    <p><strong>{% trans "Date:" %}</strong> {{ interview.scheduled_start|date:"F j, Y" }}</p>
+                    <p><strong>{% trans "Time:" %}</strong> {{ interview.scheduled_start|time:"g:i A" }} - {{ interview.scheduled_end|time:"g:i A" }}</p>
+                </div>
+            </div>
+
+            {% comment %} New Date Selection {% endcomment %}
+            <div class="zu-form-group">
+                <label for="reschedule-date" class="zu-label zu-label--required">
+                    {% trans "New Date" %}
+                </label>
+                <input type="date"
+                       id="reschedule-date"
+                       name="scheduled_date"
+                       class="zu-input"
+                       required
+                       min="{{ today|date:'Y-m-d' }}">
+            </div>
+
+            {% comment %} Start Time {% endcomment %}
+            <div class="grid grid-cols-2 gap-4">
+                <div class="zu-form-group">
+                    <label for="reschedule-start-time" class="zu-label zu-label--required">
+                        {% trans "Start Time" %}
+                    </label>
+                    <input type="time"
+                           id="reschedule-start-time"
+                           name="scheduled_start_time"
+                           class="zu-input"
+                           required>
+                </div>
+
+                {% comment %} End Time {% endcomment %}
+                <div class="zu-form-group">
+                    <label for="reschedule-end-time" class="zu-label zu-label--required">
+                        {% trans "End Time" %}
+                    </label>
+                    <input type="time"
+                           id="reschedule-end-time"
+                           name="scheduled_end_time"
+                           class="zu-input"
+                           required>
+                </div>
+            </div>
+
+            {% comment %} Available Slots (if any) {% endcomment %}
+            {% if available_slots %}
+            <div class="zu-form-group">
+                <label class="zu-label">{% trans "Or choose from available slots:" %}</label>
+                <div class="space-y-2 max-h-48 overflow-y-auto">
+                    {% for slot in available_slots %}
+                    <button type="button"
+                            class="w-full p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 dark:hover:border-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            onclick="selectSlot('{{ slot.start_time|date:'Y-m-d' }}', '{{ slot.start_time|time:'H:i' }}', '{{ slot.end_time|time:'H:i' }}')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ slot.start_time|date:"F j, Y" }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% comment %} Reason for Reschedule {% endcomment %}
+            <div class="zu-form-group">
+                <label for="reschedule-reason" class="zu-label">
+                    {% trans "Reason for Rescheduling" %}
+                </label>
+                <textarea id="reschedule-reason"
+                          name="reason"
+                          rows="3"
+                          class="zu-textarea"
+                          placeholder="{% trans 'Optional: Explain why you are rescheduling...' %}"></textarea>
+            </div>
+
+            {% comment %} Form Actions {% endcomment %}
+            <div class="zu-modal__footer">
+                <button type="button"
+                        class="zu-btn zu-btn--ghost"
+                        onclick="document.getElementById('reschedule-interview-modal').remove()">
+                    {% trans "Cancel" %}
+                </button>
+                <button type="submit" class="zu-btn zu-btn--primary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    {% trans "Reschedule Interview" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function selectSlot(date, startTime, endTime) {
+    document.getElementById('reschedule-date').value = date;
+    document.getElementById('reschedule-start-time').value = startTime;
+    document.getElementById('reschedule-end-time').value = endTime;
+}
+</script>

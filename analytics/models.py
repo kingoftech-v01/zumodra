@@ -509,7 +509,7 @@ class HiringFunnelMetric(models.Model):
 
     # Optional filters
     job = models.ForeignKey(
-        'ats.JobPosting',
+        'jobs.JobPosting',
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -1463,7 +1463,7 @@ class RecruitingFunnel(models.Model):
 
     # Pipeline association
     pipeline = models.ForeignKey(
-        'ats.Pipeline',
+        'jobs.Pipeline',
         on_delete=models.CASCADE,
         null=True, blank=True,
         related_name='funnel_analytics'

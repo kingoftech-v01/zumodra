@@ -64,40 +64,40 @@
                 </svg>
             </button>
             <div x-show="open && sidebarOpen" x-collapse class="zu-nav-submenu">
-                <a href="{% url 'frontend:ats:job_list' %}"
-                   hx-get="{% url 'frontend:ats:job_list' %}"
+                <a href="{% url 'frontend:jobs:job_list' %}"
+                   hx-get="{% url 'frontend:jobs:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="zu-nav-sublink"
                    :class="activeSection === 'ats-jobs' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Jobs" %}
                 </a>
-                <a href="{% url 'frontend:ats:candidate_list' %}"
-                   hx-get="{% url 'frontend:ats:candidate_list' %}"
+                <a href="{% url 'frontend:jobs:candidate_list' %}"
+                   hx-get="{% url 'frontend:jobs:candidate_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="zu-nav-sublink"
                    :class="activeSection === 'ats-candidates' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Candidates" %}
                 </a>
-                <a href="{% url 'frontend:ats:pipeline_board' %}"
-                   hx-get="{% url 'frontend:ats:pipeline_board' %}"
+                <a href="{% url 'frontend:jobs:pipeline_board' %}"
+                   hx-get="{% url 'frontend:jobs:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="zu-nav-sublink"
                    :class="activeSection === 'ats-applications' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Applications" %}
                 </a>
-                <a href="{% url 'frontend:ats:pipeline_board' %}"
-                   hx-get="{% url 'frontend:ats:pipeline_board' %}"
+                <a href="{% url 'frontend:jobs:pipeline_board' %}"
+                   hx-get="{% url 'frontend:jobs:pipeline_board' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="zu-nav-sublink"
                    :class="activeSection === 'ats-pipeline' ? 'zu-nav-sublink--active' : ''">
                     {% trans "Pipeline" %}
                 </a>
-                <a href="{% url 'frontend:ats:job_list' %}"
-                   hx-get="{% url 'frontend:ats:job_list' %}"
+                <a href="{% url 'frontend:jobs:job_list' %}"
+                   hx-get="{% url 'frontend:jobs:job_list' %}"
                    hx-target="#main-content"
                    hx-push-url="true"
                    class="zu-nav-sublink"
@@ -220,7 +220,7 @@
         </a>
 
         <!-- Appointments -->
-        <a href="{% url 'frontend:appointment:get_user_appointments' %}"
+        <a href="{% url 'frontend:interviews:get_user_appointments' %}"
            class="zu-nav-link"
            :class="activeSection === 'appointments' ? 'zu-nav-link--active' : ''">
             <svg class="zu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

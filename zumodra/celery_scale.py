@@ -53,7 +53,7 @@ payments_exchange = Exchange('payments', type='direct', durable=True)
 analytics_exchange = Exchange('analytics', type='direct', durable=True)
 notifications_exchange = Exchange('notifications', type='direct', durable=True)
 hr_exchange = Exchange('hr', type='direct', durable=True)
-ats_exchange = Exchange('ats', type='direct', durable=True)
+ats_exchange = Exchange('jobs', type='direct', durable=True)
 
 # Dead letter exchange for failed tasks
 dead_letter_exchange = Exchange('dead_letter', type='direct', durable=True)
@@ -133,9 +133,9 @@ app.conf.task_queues = (
         queue_arguments={'x-max-priority': 5}
     ),
     Queue(
-        'ats',
+        'jobs',
         ats_exchange,
-        routing_key='ats',
+        routing_key='jobs',
         queue_arguments={'x-max-priority': 5}
     ),
 
@@ -195,9 +195,9 @@ app.conf.task_routes = {
         'routing_key': 'notifications',
     },
     'hr_core.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
-    'ats.tasks.*': {'queue': 'ats', 'routing_key': 'ats'},
-    'careers.tasks.*': {'queue': 'ats', 'routing_key': 'ats'},
-    'accounts.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
+    'jobs.tasks.*': {'queue': 'jobs', 'routing_key': 'jobs'},
+    'careers.tasks.*': {'queue': 'jobs', 'routing_key': 'jobs'},
+    'tenant_profiles.tasks.*': {'queue': 'hr', 'routing_key': 'hr'},
 
     # LOW PRIORITY - Background operations
     'analytics.tasks.*': {'queue': 'analytics', 'routing_key': 'analytics'},
@@ -251,7 +251,7 @@ app.conf.task_annotations = {
     'core.tasks.maintenance_tasks.ssl_renewal_check_task': {'rate_limit': '4/d'},
 
     # ATS tasks
-    'ats.tasks.calculate_match_scores': {'rate_limit': '20/m'},
+    'jobs.tasks.calculate_match_scores': {'rate_limit': '20/m'},
 
     # Cleanup tasks
     'zumodra.tasks.cleanup_expired_sessions': {'rate_limit': '1/h'},
