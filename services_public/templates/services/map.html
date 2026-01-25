@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const popupContent = `<div class="max-w-xs"><h6 class="font-semibold">${props.name}</h6><div class="flex items-center gap-2 mt-2"><span class="ph-fill ph-star text-yellow"></span><strong>${props.rating_avg || '0.0'}</strong><span>(${props.total_reviews || 0})</span></div><div class="flex justify-between mt-3"><span class="font-bold text-primary">$${props.price || '0'}</span><a href="/browse-services/${props.service_uuid}/" class="button-main -small -border">View</a></div></div>`;
             marker.bindPopup(popupContent, { maxWidth: 300 });
             marker.on('click', function() {
-                const card = document.querySelector(`[data-service-id="${props.service_uuid}"]`);
+                const card = document.querySelector(`[data-service-uuid="${props.service_uuid}"]`);
                 if (card) {
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     card.classList.add('ring-2', 'ring-primary');

@@ -6,7 +6,6 @@ All serializers are read-only since the public catalog is not directly editable.
 """
 
 from rest_framework import serializers
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from .models import (
     PublicService,
     PublicServiceImage,
@@ -163,16 +162,16 @@ class PublicServiceDetailSerializer(serializers.ModelSerializer):
         read_only_fields = '__all__'
 
 
-class PublicServiceGeoSerializer(GeoFeatureModelSerializer):
+class PublicServiceGeoSerializer(serializers.ModelSerializer):
     """
     GeoJSON serializer for map views.
 
-    Returns services in GeoJSON format for map rendering.
+    Returns services in GeoJSON FeatureCollection format for map rendering.
+    Compatible with Leaflet.js and other mapping libraries.
     """
 
     class Meta:
         model = PublicService
-        geo_field = 'location'
         fields = [
             'service_uuid',
             'name',
@@ -187,8 +186,40 @@ class PublicServiceGeoSerializer(GeoFeatureModelSerializer):
             'location_city',
             'location_state',
             'location_country',
+            'location',
         ]
         read_only_fields = fields
+
+    def to_representation(self, instance):
+        """
+        Convert service to GeoJSON Feature format.
+
+        Returns:
+            dict: GeoJSON Feature with Point geometry and service properties
+        """
+        # Get standard serialized data (excluding location for now)
+        data = super().to_representation(instance)
+
+        # Remove location from properties (we'll use it as geometry)
+        data.pop('location', None)
+
+        # Extract coordinates from PostGIS Point
+        coordinates = None
+        if instance.location:
+            # PostGIS Point has x (longitude) and y (latitude)
+            coordinates = [instance.location.x, instance.location.y]
+
+        # Build GeoJSON Feature
+        feature = {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Point',
+                'coordinates': coordinates
+            } if coordinates else None,
+            'properties': data
+        }
+
+        return feature
 
 
 class PublicServiceSearchSerializer(serializers.ModelSerializer):
