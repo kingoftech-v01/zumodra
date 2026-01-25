@@ -296,7 +296,7 @@ urlpatterns += i18n_patterns(
     path('browse-services/', include('services_public.urls', namespace='services_public')),  # Public service catalog
 
     # Public Job Catalog (cross-tenant job board)
-    path('jobs/', include('jobs_public.urls', namespace='jobs_public')),  # Public job catalog with interactive map
+    path('jobs/', include('jobs_public.urls')),  # Public job catalog with interactive map
 
     # Notifications (web views)
     path('notifications/', include('notifications.api.urls', namespace='notifications')),  # In-app notifications

@@ -1,0 +1,380 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block page_content %}
+<section class="jobs_detail lg:pt-40 sm:pt-32 pt-24 lg:pb-20 sm:pb-14 pb-10">
+            <div class="container flex max-lg:flex-col gap-y-10">
+                <div class="jobs_inner w-full lg:pr-15">
+                    <div class="flex max-xl:flex-col xl:items-center justify-between gap-7 gap-y-4 pb-10 border-b border-line">
+                        <div class="jobs_info flex flex-wrap sm:gap-8 gap-4">
+                            <div class="overflow-hidden flex-shrink-0 sm:w-[100px] w-24 sm:h-[100px] h-24 rounded-full">
+                                {% if job.company_logo_url %}
+                                <img src="{{ job.company_logo_url }}" alt="{{ job.company_name }}" class="jobs_avatar w-full h-full object-cover" />
+                                {% else %}
+                                <img src="{% static 'assets/images/company/default.png' %}" alt="{{ job.company_name }}" class="jobs_avatar w-full h-full object-cover" />
+                                {% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="jobs_company text-button text-primary">{{ job.company_name }}</span>
+                                <h4 class="jobs_name heading4 -style-1">{{ job.title }}</h4>
+                                <div class="flex flex-wrap items-center gap-5 gap-y-1.5 mt-1">
+                                    <div class="jobs_address -style-1 text-secondary">
+                                        <span class="ph ph-map-pin text-xl"></span>
+                                        <span class="address align-top">{{ job.location_display }}</span>
+                                    </div>
+                                    <div class="jobs_date text-secondary">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="date align-top">{{ job.published_at|timesince }} ago</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2.5 mt-2">
+                                    <span class="jobs_tag caption1 tag bg-surface whitespace-nowrap">{{ job.get_employment_type_display|default:job.employment_type }}</span>
+                                    {% if job.category %}
+                                    <span class="jobs_tag caption1 tag bg-surface whitespace-nowrap">{{ job.category }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="breadcrumb_action flex flex-col xl:items-end max-lg:flex-col-reverse gap-3">
+                            <button class="button_share flex items-center justify-center w-12 h-12 border border-line rounded-full bg-white duration-300 hover:border-black">
+                                <span class="ph ph-share-network text-2xl"></span>
+                                <ul class="social">
+                                    <li class="social_item">
+                                        <a href="https://www.facebook.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                            <span class="icon-facebook"></span>
+                                        </a>
+                                    </li>
+                                    <li class="social_item">
+                                        <a href="https://www.linkedin.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                            <span class="icon-linkedin"></span>
+                                        </a>
+                                    </li>
+                                    <li class="social_item">
+                                        <a href="https://www.twitter.com/" target="_blank" class="social_link w-9 h-9 flex items-center justify-center border border-line text-white rounded-full duration-300 hover:bg-white hover:text-black">
+                                            <span class="icon-twitter"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </button>
+                            {% if job.salary_display %}
+                            <div class="jobs_price">
+                                <span class="price text-title">{{ job.salary_display }}</span>
+                                <span class="text-secondary">/{{ job.get_salary_period_display|default:job.salary_period }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="overview md:mt-10 mt-7">
+                        <h6 class="heading6">Job Overview</h6>
+                        <ul class="list_overview grid sm:grid-cols-3 grid-cols-2 gap-6 w-full mt-4">
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-calendar-blank flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">Date Posted:</span>
+                                    <strong class="text-button">{{ job.published_at|date:"F d, Y" }}</strong>
+                                </div>
+                            </li>
+                            {% if job.expiration_date %}
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-clock-countdown flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">Expiration date:</span>
+                                    <strong class="text-button">{{ job.expiration_date|date:"F d, Y" }}</strong>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-map-pin flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">Location:</span>
+                                    <strong class="text-button">{{ job.location_display }}</strong>
+                                </div>
+                            </li>
+                            {% if job.hours_per_week %}
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-hourglass flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">Hours:</span>
+                                    <strong class="text-button">{{ job.hours_per_week }}h /week</strong>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% if job.years_of_experience %}
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-chart-bar flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">Experience:</span>
+                                    <strong class="text-button">{{ job.years_of_experience }} Year{% if job.years_of_experience != 1 %}s{% endif %}</strong>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% if job.english_level %}
+                            <li class="flex items-center gap-3">
+                                <span class="ph ph-translate flex-shrink-0 text-4xl"></span>
+                                <div>
+                                    <span class="block text-secondary">English Level:</span>
+                                    <strong class="text-button">{{ job.get_english_level_display|default:job.english_level|title }}</strong>
+                                </div>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="description md:mt-10 mt-7">
+                        <h6 class="heading6">Full Job Description</h6>
+                        <div class="mt-3 body2 text-secondary">{{ job.description_html|safe }}</div>
+                    </div>
+                    {% if job.responsibilities_list %}
+                    <div class="work md:mt-10 mt-7">
+                        <h6 class="heading6">Responsibilities:</h6>
+                        <ul class="list_work w-full mt-3">
+                            {% for responsibility in job.responsibilities_list %}
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>{{ responsibility }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if job.requirements_list %}
+                    <div class="bring md:mt-10 mt-7">
+                        <h6 class="heading6">Requirements:</h6>
+                        <ul class="list_work w-full mt-3">
+                            {% for requirement in job.requirements_list %}
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>{{ requirement }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if job.qualifications_list %}
+                    <div class="qualifications md:mt-10 mt-7">
+                        <h6 class="heading6">Qualifications:</h6>
+                        <ul class="list_work w-full mt-3">
+                            {% for qualification in job.qualifications_list %}
+                            <li class="flex body2 text-secondary">
+                                <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                <p>{{ qualification }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if job.image_gallery or job.video_url %}
+                    <div class="images md:mt-10 mt-7">
+                        <ul class="list_images grid xl:grid-cols-3 grid-cols-2 sm:gap-5 gap-4 gap-y-5 w-full">
+                            {% if job.video_url %}
+                            <li class="max-xl:col-span-2 flex items-center justify-center relative overflow-hidden rounded-lg">
+                                {% if job.image_gallery %}
+                                <img src="{{ job.image_gallery.0 }}" alt="{{ job.title }}" class="w-full h-full object-cover" />
+                                {% else %}
+                                <img src="{% static 'assets/images/blog/1.webp' %}" alt="{{ job.title }}" class="w-full h-full object-cover" />
+                                {% endif %}
+                                <button class="btn_open_popup play_btn flex items-center justify-center absolute w-12 h-12 rounded-full bg-red text-white duration-300 hover:bg-white hover:text-red" data-type="modal_video">
+                                    <span class="ph-fill ph-play text-2xl"></span>
+                                </button>
+                            </li>
+                            {% endif %}
+                            {% for image_url in job.image_gallery %}
+                                {% if forloop.first and job.video_url %}
+                                    {# Skip first image if video exists (already used as video thumbnail) #}
+                                {% else %}
+                                <li class="relative overflow-hidden rounded-lg">
+                                    <img src="{{ image_url }}" alt="{{ job.title }} - Image {{ forloop.counter }}" class="w-full h-full object-cover" />
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if related_jobs %}
+                    <div class="related lg:mt-15 mt-8">
+                        <h5 class="heading5">Related Jobs</h5>
+                        <ul class="list_related flex flex-col md:gap-7.5 gap-6 w-full mt-5">
+                            {% for related_job in related_jobs %}
+                            <li class="jobs_item px-6 py-5 rounded-lg bg-white shadow-md duration-300 hover:shadow-xl">
+                                <div class="jobs_info flex gap-4 w-full pb-4 border-b border-line">
+                                    <a href="{% url 'frontend:jobs_public:job_detail' pk=related_job.jobposting_uuid %}" class="overflow-hidden flex-shrink-0 w-15 h-15">
+                                        {% if related_job.company_logo_url %}
+                                        <img src="{{ related_job.company_logo_url }}" alt="{{ related_job.company_name }}" class="jobs_avatar w-full h-full object-cover" />
+                                        {% else %}
+                                        <img src="{% static 'assets/images/company/default.png' %}" alt="{{ related_job.company_name }}" class="jobs_avatar w-full h-full object-cover" />
+                                        {% endif %}
+                                    </a>
+                                    <div class="jobs_content flex items-center justify-between gap-2 w-full">
+                                        <a href="{% url 'frontend:jobs_public:job_detail' pk=related_job.jobposting_uuid %}" class="jobs_detail flex flex-col gap-0.5 duration-300 hover:text-primary">
+                                            <span class="jobs_company text-sm font-semibold text-primary">{{ related_job.company_name }}</span>
+                                            <strong class="jobs_name text-title -style-1">{{ related_job.title }}</strong>
+                                            <div class="flex flex-wrap items-center gap-5 gap-y-1">
+                                                <div class="jobs_address -style-1 text-secondary">
+                                                    <span class="ph ph-map-pin text-lg"></span>
+                                                    <span class="address caption1 align-top">{{ related_job.location_display }}</span>
+                                                </div>
+                                                <div class="jobs_date text-secondary">
+                                                    <span class="ph ph-calendar-blank text-lg"></span>
+                                                    <span class="date caption1 align-top">{{ related_job.published_at|timesince }} ago</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <button class="add_wishlist_btn -relative -border">
+                                            <span class="ph ph-heart text-xl"></span>
+                                            <span class="ph-fill ph-heart text-xl"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="jobs_more_info flex flex-wrap items-center justify-between gap-3 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2.5">
+                                        <a href="{% url 'frontend:jobs_public:job_list' %}?employment_type={{ related_job.employment_type }}" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ related_job.get_employment_type_display|default:related_job.employment_type }}</a>
+                                        {% if related_job.category %}
+                                        <a href="{% url 'frontend:jobs_public:job_list' %}?category={{ related_job.category }}" class="jobs_tag caption1 tag bg-surface duration-300 hover:bg-primary hover:text-white">{{ related_job.category }}</a>
+                                        {% endif %}
+                                    </div>
+                                    {% if related_job.salary_display %}
+                                    <div class="jobs_price">
+                                        <span class="price text-title">{{ related_job.salary_display }}</span>
+                                        <span class="text-secondary">/{{ related_job.get_salary_period_display|default:related_job.salary_period }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="jobs_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[380px] w-full h-fit">
+                    <div class="apply overflow-hidden rounded-xl bg-white shadow-md duration-300">
+                        <div class="flex flex-wrap items-center justify-between gap-2.5 px-5 py-4 border-b border-line">
+                            <h6 class="heading6">Application ends:</h6>
+                            <div class="countdown_time flex items-center gap-1 text-red">
+                                <span class="ph ph-clock text-2xl"></span>
+                                <span class="hour heading6">40h</span>
+                                <span class="heading6">:</span>
+                                <span class="minute heading6">32m</span>
+                                <span class="heading6">:</span>
+                                <span class="second heading6">30s</span>
+                            </div>
+                        </div>
+                        <div class="group_btn p-5">
+                            <button class="btn_open_popup apply_btn button-main w-full text-center" data-type="modal_apply">Apply Now</button>
+                            <button class="add_bookmark_btn button-main -border w-full mt-3 text-center">add a bookmark</button>
+                        </div>
+                    </div>
+                    <div class="about overflow-hidden mt-7.5 rounded-xl bg-white shadow-md duration-300">
+                        <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+                            <h6 class="heading6">About the Employer</h6>
+                        </div>
+                        <div class="employer_info p-5">
+                            <div class="flex items-center gap-5 w-full">
+                                {% if job.company_logo_url %}
+                                <img src="{{ job.company_logo_url }}" alt="{{ job.company_name }}" class="flex-shrink-0 w-20 h-20" />
+                                {% else %}
+                                <img src="{% static 'assets/images/company/default.png' %}" alt="{{ job.company_name }}" class="flex-shrink-0 w-20 h-20" />
+                                {% endif %}
+                                <div>
+                                    {% if job.company_rating %}
+                                    <div class="rate flex items-center pb-1">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= job.company_rating %}
+                                            <span class="ph-fill ph-star text-yellow"></span>
+                                            {% else %}
+                                            <span class="ph-fill ph-star text-placehover"></span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <strong class="employers_name heading6">{{ job.company_name }}</strong>
+                                    {% if job.company_established_date %}
+                                    <span class="employers_establish text-secondary">Since {{ job.company_established_date|date:"F d, Y" }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if job.company_industry %}
+                            <div class="industry flex items-center justify-between w-full py-5 border-b border-line">
+                                <span class="text-secondary">Industry:</span>
+                                <strong class="text-button">{{ job.company_industry }}</strong>
+                            </div>
+                            {% endif %}
+                            {% if job.company_size %}
+                            <div class="size flex items-center justify-between w-full py-5 border-b border-line">
+                                <span class="text-secondary">Company size:</span>
+                                <strong class="text-button">{{ job.company_size }}</strong>
+                            </div>
+                            {% endif %}
+                            <div class="address flex items-center justify-between w-full py-5 border-b border-line">
+                                <span class="text-secondary">Location:</span>
+                                <strong class="text-button">{{ job.location_display }}</strong>
+                            </div>
+                            {% if job.company_linkedin or job.company_twitter or job.company_facebook or job.company_instagram or job.company_pinterest %}
+                            <div class="list_social flex flex-wrap items-center justify-between gap-4 w-full py-5">
+                                <span class="text-secondary">Socials:</span>
+                                <ul class="list flex flex-wrap items-center gap-3">
+                                    {% if job.company_facebook %}
+                                    <li>
+                                        <a href="{{ job.company_facebook }}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-facebook text-lg"></span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if job.company_linkedin %}
+                                    <li>
+                                        <a href="{{ job.company_linkedin }}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-linkedin text-lg"></span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if job.company_twitter %}
+                                    <li>
+                                        <a href="{{ job.company_twitter }}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-twitter text-lg"></span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if job.company_instagram %}
+                                    <li>
+                                        <a href="{{ job.company_instagram }}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-instagram text-lg"></span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if job.company_pinterest %}
+                                    <li>
+                                        <a href="{{ job.company_pinterest }}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-line rounded-full text-black duration-300 hover:bg-primary">
+                                            <span class="icon-pinterest text-lg"></span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            {% if job.company_website %}
+                            <a href="{{ job.company_website }}" target="_blank" class="button-main w-full text-center">Visit Website</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+
+        <!-- Toastify -->
+        <div class="toastify">
+            <div class="toastify_inner flex items-center gap-3 relative max-w-[90vw] p-3 rounded-l-lg bg-success">
+                <div class="toastify_message pr-11">
+                    <h6 class="text-title text-white">Added to bookmark successful</h6>
+                </div>
+            </div>
+            <button class="toastify_close_btn flex items-center justify-center absolute top-3 right-3 w-6 h-6 rounded-full bg-surface duration-300 hover:bg-black hover:text-white">
+                <span class="ph-bold ph-x"></span>
+            </button>
+        </div>        
+        
+
+        <!-- Modal -->
+        {% include 'includes/modals/modal-jobs-detail2-apply.html' %}
+        {% include 'includes/modals/modal-jobs-detail2-video.html' %}
+{% endblock %}

@@ -337,12 +337,9 @@ class JobCreateView(LoginRequiredMixin, TenantViewMixin, ATSPermissionMixin, Cre
         return super().form_valid(form)
 
     def get_success_url(self):
-        # TEST FINDING (2026-01-16): Potential namespace issue
-        # URL name 'jobs:job-detail' may not match urlpatterns namespace
-        # Expected: 'frontend:jobs:job_detail' based on urls_frontend.py:76
-        # TODO: Verify redirect works correctly after job creation
-        # If 404 occurs, change to: reverse('frontend:jobs:job_detail', kwargs={'pk': self.object.pk})
-        return reverse('jobs:job-detail', kwargs={'pk': self.object.pk})
+        # Redirect to job detail page after successful creation
+        # Using frontend namespace per URL_AND_VIEW_CONVENTIONS.md
+        return reverse('frontend:jobs:job_detail', kwargs={'pk': self.object.pk})
 
 
 # =============================================================================
@@ -829,11 +826,11 @@ class InterviewScheduleView(LoginRequiredMixin, TenantViewMixin, View):
                     'interviewId': str(interview.pk),
                 }
             })
-            response['HX-Redirect'] = reverse('jobs:application-detail', kwargs={'pk': application.pk})
+            response['HX-Redirect'] = reverse('frontend:jobs:application_detail', kwargs={'pk': application.pk})
             return response
 
         messages.success(request, 'Interview scheduled successfully!')
-        return redirect('jobs:application-detail', pk=application.pk)
+        return redirect('frontend:jobs:application_detail', pk=application.pk)
 
 
 @require_tenant_type('company')
@@ -901,7 +898,7 @@ class InterviewFeedbackView(LoginRequiredMixin, TenantViewMixin, View):
             return response
 
         messages.success(request, 'Feedback submitted successfully!')
-        return redirect('jobs:application-detail', pk=interview.application.pk)
+        return redirect('frontend:jobs:application_detail', pk=interview.application.pk)
 
 
 # =============================================================================
@@ -1016,7 +1013,7 @@ class ApplicationNoteView(LoginRequiredMixin, TenantViewMixin, View):
             return response
 
         messages.success(request, 'Note added successfully!')
-        return redirect('jobs:application-detail', pk=application.pk)
+        return redirect('frontend:jobs:application_detail', pk=application.pk)
 
 
 # =============================================================================
@@ -1124,7 +1121,7 @@ class OfferCreateView(LoginRequiredMixin, TenantViewMixin, View):
 
         if existing_offer:
             messages.warning(request, 'An offer already exists for this application.')
-            return redirect('jobs:offer-detail', pk=existing_offer.pk)
+            return redirect('frontend:jobs:offer_detail', pk=existing_offer.pk)
 
         context = {
             'application': application,
@@ -1164,7 +1161,7 @@ class OfferCreateView(LoginRequiredMixin, TenantViewMixin, View):
             base_salary_decimal = Decimal(base_salary) if base_salary else Decimal('0')
         except InvalidOperation:
             messages.error(request, 'Invalid salary amount')
-            return redirect('jobs:offer-create', application_pk=application_pk)
+            return redirect('frontend:jobs:offer_create', application_pk=application_pk)
 
         with transaction.atomic():
             offer = Offer.objects.create(
@@ -1206,10 +1203,10 @@ class OfferCreateView(LoginRequiredMixin, TenantViewMixin, View):
 
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=201)
-            response['HX-Redirect'] = reverse('jobs:offer-detail', kwargs={'pk': offer.pk})
+            response['HX-Redirect'] = reverse('frontend:jobs:offer_detail', kwargs={'pk': offer.pk})
             return response
 
-        return redirect('jobs:offer-detail', pk=offer.pk)
+        return redirect('frontend:jobs:offer_detail', pk=offer.pk)
 
 
 @require_tenant_type('company')
@@ -1250,7 +1247,7 @@ class OfferActionView(LoginRequiredMixin, TenantViewMixin, View):
         else:
             messages.error(request, message)
 
-        return redirect('jobs:offer-detail', pk=pk)
+        return redirect('frontend:jobs:offer_detail', pk=pk)
 
     def _send_offer(self, offer, user):
         if offer.status != 'draft':
@@ -1348,7 +1345,7 @@ class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
 
         if job.status != 'draft':
             messages.warning(request, 'Only draft jobs can be published')
-            return redirect('jobs:job-detail', pk=pk)
+            return redirect('frontend:jobs:job_detail', pk=pk)
 
         job.status = 'open'
         job.published_at = timezone.now()
@@ -1359,10 +1356,10 @@ class JobPublishView(LoginRequiredMixin, TenantViewMixin, View):
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=200)
             response['HX-Trigger'] = 'jobPublished'
-            response['HX-Redirect'] = reverse('jobs:job-detail', kwargs={'pk': pk})
+            response['HX-Redirect'] = reverse('frontend:jobs:job_detail', kwargs={'pk': pk})
             return response
 
-        return redirect('jobs:job-detail', pk=pk)
+        return redirect('frontend:jobs:job_detail', pk=pk)
 
 @require_tenant_type('company')
 class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
@@ -1387,7 +1384,7 @@ class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
 
         if job.status not in ['open', 'on_hold']:
             messages.warning(request, 'Only open/on-hold jobs can be closed')
-            return redirect('jobs:job-detail', pk=pk)
+            return redirect('frontend:jobs:job_detail', pk=pk)
 
         job.status = 'closed'
         job.closed_at = timezone.now()
@@ -1400,7 +1397,7 @@ class JobCloseView(LoginRequiredMixin, TenantViewMixin, View):
             response['HX-Trigger'] = 'jobClosed'
             return response
 
-        return redirect('jobs:job-detail', pk=pk)
+        return redirect('frontend:jobs:job_detail', pk=pk)
 
 
 # =============================================================================

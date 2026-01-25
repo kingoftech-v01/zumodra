@@ -26,7 +26,7 @@ urlpatterns = [
 
     # Jobs Views (Applicant Tracking System)
     # URL: /app/jobs/
-    path('jobs/', include('jobs.urls_frontend')),
+    path('jobs/', include('jobs.urls')),
 
     # HR Views (Human Resources)
     # URL: /app/hr/
