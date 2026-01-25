@@ -85,3 +85,7 @@ frontend_urlpatterns = [
 #
 # DO NOT define app_name here - namespaces are defined at inclusion point
 # ============================================================================
+
+# Default urlpatterns for backward compatibility
+# When included directly via include('blog.urls'), use frontend URLs
+urlpatterns = frontend_urlpatterns
