@@ -5,6 +5,10 @@ Script to obtain JWT authentication token
 import requests
 import json
 import sys
+from pathlib import Path
+
+# Build paths like Django does: BASE_DIR / 'file.ext'
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 BASE_URL = "http://localhost:8002"
 
@@ -42,9 +46,10 @@ try:
         print(f"Refresh Token: {token_data.get('refresh', 'N/A')}")
 
         # Save token to file
-        with open('/home/king/zumodra/auth_token.json', 'w') as f:
+        token_path = BASE_DIR / 'auth_token.json'
+        with open(token_path, 'w') as f:
             json.dump(token_data, f, indent=2)
-        print("\nToken saved to: auth_token.json")
+        print(f"\nToken saved to: {token_path}")
 
         sys.exit(0)
     else:

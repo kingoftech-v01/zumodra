@@ -9,6 +9,10 @@ import json
 import sys
 from datetime import datetime
 from typing import Dict, List, Tuple
+from pathlib import Path
+
+# Build paths like Django does: BASE_DIR / 'file.ext'
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Configuration
 BASE_URL = "http://localhost:8002"
@@ -299,7 +303,7 @@ def generate_report():
             print(f"  Error: {result['error']}")
 
     # Save detailed report to file
-    report_file = "/home/king/zumodra/api_test_report.json"
+    report_file = str(BASE_DIR / 'api_test_report.json')
     with open(report_file, 'w') as f:
         json.dump(test_results, f, indent=2)
     print(f"\n📄 Detailed report saved to: {report_file}")

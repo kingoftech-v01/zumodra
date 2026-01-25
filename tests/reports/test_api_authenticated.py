@@ -9,23 +9,28 @@ import json
 import sys
 from datetime import datetime
 from typing import Dict, List
+from pathlib import Path
+
+# Build paths like Django does: BASE_DIR / 'file.ext'
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Configuration
 BASE_URL = "http://localhost:8002"
 API_V1 = f"{BASE_URL}/api/v1"
 
 # Load authentication token
+TOKEN_PATH = BASE_DIR / 'auth_token.json'
+
 ACCESS_TOKEN = None
 try:
-    token_path = '/home/kingoftech/zumodra/auth_token.json'
-    with open(token_path, 'r') as f:
+    with open(TOKEN_PATH, 'r') as f:
         tokens = json.load(f)
         ACCESS_TOKEN = tokens['access']
-        print(f"✅ Loaded authentication token")
+        print(f"✅ Loaded authentication token from {TOKEN_PATH}")
 except Exception as e:
-    print(f"❌ Failed to load token: {e}")
-    print(f"⚠ Skipping authenticated API tests - token file not found")
-    # Don't exit - let pytest skip tests gracefully
+    print(f"❌ Failed to load token from {TOKEN_PATH}: {e}")
+    print(f"⚠ Tests will FAIL if authentication is required")
+    # Don't exit here - let individual test failures be visible
 
 if __name__ == '__main__':
     # Headers with authentication
@@ -187,9 +192,10 @@ if __name__ == '__main__':
         for r in results["failed"]:
             print(f"  {r['method']} {r['endpoint']} - {r['details'][:100]}")
 
-    # Save report
-    with open('/home/kingoftech/zumodra/api_authenticated_test_report.json', 'w') as f:
+    # Save report using proper path construction
+    report_path = BASE_DIR / 'api_authenticated_test_report.json'
+    with open(report_path, 'w') as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n📄 Full report saved to: api_authenticated_test_report.json")
+    print(f"\n📄 Full report saved to: {report_path}")
     print("="*80 + "\n")

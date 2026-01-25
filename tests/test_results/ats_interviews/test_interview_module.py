@@ -38,9 +38,7 @@ try:
     from selenium.common.exceptions import TimeoutException, NoSuchElementException
 except ImportError:
     print("ERROR: Selenium not installed. Install with: pip install selenium")
-    # Don't exit - let pytest skip tests that need selenium
-    # sys.exit(1)
-    pass
+    sys.exit(1)
 
 
 class InterviewModuleTester:
