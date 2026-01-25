@@ -36,6 +36,9 @@ from .viewsets import (
     CompanyViewSet,
 )
 
+# Blog API URLs (following URL_AND_VIEW_CONVENTIONS.md)
+from blog.urls import api_urlpatterns as blog_api_urls
+
 
 # ==================== Services Marketplace Router ====================
 # Original API endpoints for the services marketplace
@@ -175,7 +178,7 @@ urlpatterns = [
 
     # ==================== Blog ====================
     # /api/v1/blog/ - Blog posts, categories, comments, tags
-    path('blog/', include('blog.api.urls')),
+    path('blog/', include((blog_api_urls, 'blog'))),
 
     # ==================== Interview Scheduling ====================
     # /api/v1/appointment/ - Interview scheduling and appointment booking system

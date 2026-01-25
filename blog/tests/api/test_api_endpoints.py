@@ -43,7 +43,7 @@ class TestBlogPostViewSet:
     @pytest.mark.django_db
     def test_list_posts_public(self, api_client):
         """Test listing blog posts is public."""
-        url = reverse('blog-api:post-list')
+        url = reverse('api_v1:blog:post-list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -51,7 +51,7 @@ class TestBlogPostViewSet:
     @pytest.mark.django_db
     def test_featured_posts(self, api_client):
         """Test featured posts endpoint."""
-        url = reverse('blog-api:post-featured')
+        url = reverse('api_v1:blog:post-featured')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -63,7 +63,7 @@ class TestCategoryViewSet:
     @pytest.mark.django_db
     def test_list_categories_public(self, api_client):
         """Test listing categories is public."""
-        url = reverse('blog-api:category-list')
+        url = reverse('api_v1:blog:category-list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -75,7 +75,7 @@ class TestCommentViewSet:
     @pytest.mark.django_db
     def test_list_comments_public(self, api_client):
         """Test listing comments is public."""
-        url = reverse('blog-api:comment-list')
+        url = reverse('api_v1:blog:comment-list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -87,7 +87,7 @@ class TestTagViewSet:
     @pytest.mark.django_db
     def test_list_tags_public(self, api_client):
         """Test listing tags is public."""
-        url = reverse('blog-api:tag-list')
+        url = reverse('api_v1:blog:tag-list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -95,7 +95,7 @@ class TestTagViewSet:
     @pytest.mark.django_db
     def test_popular_tags(self, api_client):
         """Test popular tags endpoint."""
-        url = reverse('blog-api:tag-popular')
+        url = reverse('api_v1:blog:tag-popular')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -107,7 +107,7 @@ class TestBlogStatsView:
     @pytest.mark.django_db
     def test_stats_requires_admin(self, api_client):
         """Test stats requires admin authentication."""
-        url = reverse('blog-api:stats')
+        url = reverse('api_v1:blog:stats')
         response = api_client.get(url)
 
         # Should require admin
@@ -120,7 +120,7 @@ class TestBlogStatsView:
     def test_stats_with_admin(self, admin_client):
         """Test stats with admin authentication."""
         client, user = admin_client
-        url = reverse('blog-api:stats')
+        url = reverse('api_v1:blog:stats')
         response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK

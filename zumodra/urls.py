@@ -48,6 +48,9 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+# Blog URL imports (following URL_AND_VIEW_CONVENTIONS.md)
+from blog.urls import frontend_urlpatterns as blog_frontend_urls
+
 
 # ==================== Health Check Endpoint ====================
 
@@ -289,6 +292,12 @@ urlpatterns += i18n_patterns(
     # Services Marketplace (tenant-specific)
     path('services/', include('services.urls_frontend', namespace='services')),  # Services marketplace (Phase 12)
 
+    # Public Service Catalog (cross-tenant marketplace)
+    path('browse-services/', include('services_public.urls', namespace='services_public')),  # Public service catalog
+
+    # Public Job Catalog (cross-tenant job board)
+    path('jobs/', include('jobs_public.urls', namespace='jobs_public')),  # Public job catalog with interactive map
+
     # Notifications (web views)
     path('notifications/', include('notifications.api.urls', namespace='notifications')),  # In-app notifications
 
@@ -307,8 +316,9 @@ urlpatterns += i18n_patterns(
     # Wagtail documents
     path('documents/', include(wagtaildocs_urls)),
 
-    # Blog search (auxiliary)
-    path('blog/', include('blog.urls', namespace='blog')),
+    # Blog auxiliary routes (search, comments)
+    # Note: Main blog routing (/blog/, /blog/slug/) handled by Wagtail catch-all at line 364
+    path('blog/', include((blog_frontend_urls, 'blog'), namespace='frontend')),
 
     # Development/testing
     path('auth-test/', auth_test_view, name='auth_test'),
@@ -426,7 +436,10 @@ Application Features (with language prefix):
     /<lang>/app/dashboard/  - User dashboard
     /<lang>/app/appointments/- Interview Scheduling
     /<lang>/app/messages/   - Messaging system
-    /<lang>/services/       - Services marketplace
+    /<lang>/services/       - Services marketplace (tenant-specific)
+    /<lang>/browse-services/- Public service catalog (cross-tenant)
+    /<lang>/browse-services/map/ - Service map view
+    /<lang>/browse-services/<uuid>/ - Service detail
     /<lang>/notifications/  - Notifications
     /<lang>/analytics/      - Analytics
     /<lang>/finance/        - Finance (payments, subscriptions)

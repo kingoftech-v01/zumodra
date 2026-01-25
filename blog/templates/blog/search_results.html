@@ -107,7 +107,7 @@
                     {% endif %}
                 </div>
                 <div class="blog_sidebar flex-shrink-0 lg:w-[360px] md:w-1/3 w-full h-fit">
-                    <form method="GET" action="{% url 'blog:search' %}" class="form-search overflow-hidden relative w-full h-12 rounded-lg">
+                    <form method="GET" action="{% url 'frontend:blog:search' %}" class="form-search overflow-hidden relative w-full h-12 rounded-lg">
                         <input class="py-2 pl-4 pr-16 w-full h-full border border-line rounded-lg" type="text" name="q" placeholder="Search" value="{{ query }}" />
                         <button type="submit" class="flex items-center justify-center absolute top-0 right-0 h-full aspect-square rounded-r-lg bg-primary text-white duration-300 hover:bg-black">
                             <span class="ph ph-magnifying-glass text-lg"></span>
@@ -172,7 +172,7 @@
                         <ul class="list_category flex flex-col gap-3 mt-5" role="tablist">
                             {% for category in categories %}
                             <li role="presentation">
-                                <a href="{% url 'blog:search' %}?category={{ category.id }}" class="tab_btn text-button -before line-before line-black" role="tab">
+                                <a href="{% url 'frontend:blog:search' %}?category={{ category.id }}" class="tab_btn text-button -before line-before line-black" role="tab">
                                     {{ category.title }} ({{ category.get_children.live.count }})
                                 </a>
                             </li>
@@ -186,7 +186,7 @@
                         <ul class="list_tags menu_tab flex items-center flex-wrap gap-3 mt-5" role="tablist">
                             {% for tag in popular_tags %}
                             <li role="presentation">
-                                <a href="{% url 'blog:search' %}?tag={{ tag.slug }}" class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab">
+                                <a href="{% url 'frontend:blog:search' %}?tag={{ tag.slug }}" class="tag tab_btn -fill -border -rounded-sm caption1 capitalize hover:bg-black hover:text-white" role="tab">
                                     {{ tag.name }}
                                 </a>
                             </li>

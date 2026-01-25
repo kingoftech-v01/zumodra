@@ -1,175 +1,401 @@
-{% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% extends 'base_public.html' %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 
-{% block head_title %}{{ page.title }} - Zumodra{% endblock head_title %}
+{% block page_content %}
+        <!-- Blog Detail -->
+        <section class="blog_detail lg:pt-40 sm:pt-32 pt-24 lg:pb-20 sm:pb-14 pb-10">
+            <div class="container flex max-lg:flex-col gap-y-12">
+                <div class="blog_content lg:pr-20">
+                    <ul class="list_tags flex flex-wrap gap-3 gap-y-4">
+                        {% for tag in page.tags.all %}
+                        <li>
+                            <a href="{% url 'frontend:blog:search' %}?tag={{ tag.slug }}" class="tag -large block text-sm font-semibold bg-surface hover:bg-primary hover:text-white">{{ tag.name }}</a>
+                        </li>
+                        {% empty %}
+                        <li><span class="tag -large block text-sm font-semibold bg-surface">No tags</span></li>
+                        {% endfor %}
+                    </ul>
+                    <h2 class="heading2 title mt-4">{{ page.title }}</h2>
+                    <div class="flex flex-wrap items-center justify-between gap-8 gap-y-4 mt-4">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-3">
+                                {% if page.owner.profile.avatar %}
+                                    {% image page.owner.profile.avatar fill-48x48 as avatar_img %}
+                                    <img src="{{ avatar_img.url }}" alt="{{ page.owner.get_full_name }}" class="flex-shrink-0 w-12 h-12 rounded-full" />
+                                {% else %}
+                                    <img src="{% static 'assets/images/avatar/default.webp' %}" alt="Avatar" class="flex-shrink-0 w-12 h-12 rounded-full" />
+                                {% endif %}
+                                <span>
+                                    <span class="text-placehover">by </span>
+                                    <span class="blog_author">{{ page.owner.get_full_name|default:page.owner.username|default:"Anonymous" }}</span>
+                                </span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="date flex items-center gap-2">
+                                <span class="ph ph-calendar-blank text-xl"></span>
+                                <span class="blog_date caption1">{{ page.publishing_date|date:"F d, Y"|default:page.first_published_at|date:"F d, Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="comment flex items-center gap-2">
+                                <span class="ph ph-chats-circle text-2xl"></span>
+                                <span class="blog_comment">{{ comment_count }}</span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="view flex items-center gap-2">
+                                <span class="ph ph-eye text-2xl"></span>
+                                <span class="blog_view">{{ page.view_count }}</span>
+                            </div>
+                            <div class="line w-px h-4 bg-line"></div>
+                            <div class="view flex items-center gap-2">
+                                <span class="ph ph-clock text-2xl"></span>
+                                <span class="blog_min_read">{{ read_time }} Min Read</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if page.featured_image %}
+                        {% image page.featured_image fill-1200x600 as featured_img %}
+                        <img src="{{ featured_img.url }}" alt="{{ page.title }}" class="blog_img w-full md:mt-10 mt-7 rounded-xl" />
+                    {% endif %}
+                    {% for block in page.body %}
+                        {% if block.block_type == 'paragraph' %}
+                            <div class="body2 md:mt-10 mt-7">{{ block.value|safe }}</div>
 
-{% block content %}
+                        {% elif block.block_type == 'heading' %}
+                            <div class="heading2 md:mt-10 mt-7">{{ block.value|safe }}</div>
 
-{% include 'header.html' %}
+                        {% elif block.block_type == 'heading2' %}
+                            <h2 class="heading2 md:mt-10 mt-7">{{ block.value|safe }}</h2>
 
-<!-- Slider -->
-<section class="slider">
-    <!-- blog_img w-full h-full object-cover -->
-    <div class="slider_inner relative lg:h-[680px] md:h-[520px] h-[350px] sm:pt-20 pt-16 overflow-hidden">
-        {% image page.featured_image max-1920x1080 as img %}
-          <img src="{{ img.url }}" alt="{{ page.title }}" class="w-full h-full object-cover" />
-    </div>
-</section>
+                        {% elif block.block_type == 'heading3' %}
+                            <h3 class="heading3 md:mt-10 mt-7">{{ block.value|safe }}</h3>
 
-<section class="blog_detail lg:py-20 sm:py-14 py-10">
-  <div class="container flex justify-center">
-    <div class="blog_content lg:w-5/6 w-full">
+                        {% elif block.block_type == 'heading4' %}
+                            <h4 class="heading4 md:mt-10 mt-7">{{ block.value|safe }}</h4>
 
-    <!-- Rendu des tags -->
-    {% if page.tags.all %}
-      <ul class="list_tags flex flex-wrap gap-3 gap-y-4">
-        {% for tag in page.tags.all %}
-          <li>
-            <a href="{% url 'tagged_posts' tag.slug %}" class="tag -large block text-sm font-semibold bg-surface hover:bg-primary hover:text-white">
-              {{ tag.name }}
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+                        {% elif block.block_type == 'heading5' %}
+                            <h5 class="heading5 md:mt-10 mt-7">{{ block.value|safe }}</h5>
 
-      <!-- Titre de l'article -->
-      <h2 class="heading2 title mt-4">{{ page.title }}</h2>
+                        {% elif block.block_type == 'heading6' %}
+                            <h6 class="heading6 md:mt-10 mt-7">{{ block.value|safe }}</h6>
 
-      <!-- Meta infos -->
-      <div class="flex flex-wrap items-center justify-between gap-8 gap-y-4 mt-4">
-        <div class="flex flex-wrap items-center gap-4">
-          <div class="flex items-center gap-3">
-            <img src="{{ page.featured_image.url }}" alt="author image" class="flex-shrink-0 w-12 h-12 rounded-full" />
-            <span>
-              <span class="text-placehover">by </span>
-              <span class="blog_author">{{ page.owner.get_full_name }}</span>
-            </span>
-          </div>
-          <div class="line w-px h-4 bg-line"></div>
-          <div class="date flex items-center gap-2">
-            <span class="ph ph-calendar-blank text-xl"></span>
-            <span class="blog_date caption1">{{ page.publishing_date|date:"F j, Y" }}</span>
-          </div>
-        </div>
-        <!-- Ajoutez ici d'autres métadonnées comme commentaires, vue, temps lecture si disponibles -->
-      </div>
+                        {% elif block.block_type == 'unordered_list' %}
+                            <ul class="flex flex-col gap-3 md:mt-10 mt-7">
+                                {% for item in block.value %}
+                                <li class="flex body2">
+                                    <span class="ph-fill ph-dot-outline mt-1 mr-1"></span>
+                                    <div>{{ item|safe }}</div>
+                                </li>
+                                {% endfor %}
+                            </ul>
 
-<div class="prose max-w-none mt-6">
+                        {% elif block.block_type == 'ordered_list' %}
+                            <ol class="flex flex-col gap-3 md:mt-10 mt-7 list-decimal list-inside">
+                                {% for item in block.value %}
+                                <li class="body2">{{ item|safe }}</li>
+                                {% endfor %}
+                            </ol>
 
-  {% for block in page.body %}
-  
-    {% if block.block_type == "paragraph" %}
-      <p class="body2 md:mt-10 mt-7">{{ block.value|richtext }}</p>
+                        {% elif block.block_type == 'quote' %}
+                            <div class="qoute md:mt-10 mt-7 py-8 px-10 rounded-xl border-l-4 border-primary bg-surface">
+                                <h4 class="heading4">{{ block.value.quote|safe }}</h4>
+                                {% if block.value.author %}
+                                <h6 class="flex items-center gap-2 mt-2 heading6 text-secondary">
+                                    <span class="ph ph-minus"></span>
+                                    <span>{{ block.value.author|safe }}</span>
+                                </h6>
+                                {% endif %}
+                            </div>
 
-    {% elif block.block_type == "heading" %}
-      <h1 class="heading1 md:mt-10 mt-7">{{ block.value }}</h1>
-    {% elif block.block_type == "heading2" %}
-      <h2 class="heading2 md:mt-10 mt-7">{{ block.value }}</h2>
-    {% elif block.block_type == "heading3" %}
-      <h3 class="heading3 md:mt-10 mt-7">{{ block.value }}</h3>
-    {% elif block.block_type == "heading4" %}
-      <h4 class="heading4 md:mt-10 mt-7">{{ block.value }}</h4>
-    {% elif block.block_type == "heading5" %}
-      <h5 class="heading5 md:mt-10 mt-7">{{ block.value }}</h5>
-    {% elif block.block_type == "heading6" %}
-      <h6 class="heading6 md:mt-10 mt-7">{{ block.value }}</h6>
+                        {% elif block.block_type == 'image' %}
+                            {% image block.value fill-1000x750 as block_img %}
+                            <img src="{{ block_img.url }}" alt="{{ block.value.title }}" class="w-full md:mt-10 mt-7 rounded-xl" />
 
-    {% elif block.block_type == "quote" %}
-        <div class="qoute md:mt-10 mt-7 py-8 px-10 rounded-xl border-l-4 border-primary bg-surface">
-            <h4 class="heading4">" {{ block.value.quote }} "</h4>
-            <h6 class="flex items-center gap-2 mt-2 heading6 text-secondary">
-                <span class="ph ph-minus"></span>
-                {% if block.value.author %}
-                <span class="font-semibold">{{ block.value.author }}</span>
-                <span class="icon-slash text-5xl opacity-10 duration-300"></span>
-                {% endif %}
-                {% if block.value.source %}
-                <span>{{ block.value.source }}</span>
-                {% endif %}
-            </h6>
-        </div>
-
-    {% elif block.block_type == "image" %}
-      <div class="images grid sm:grid-cols-1 gap-7.5 md:mt-10 mt-7">
-        {% image block.value fill-1920x1080 as img %}
-        <img src="{{ img.url }}" alt="{{ block.value.title }}" class="rounded-xl" />
-      </div>
-
-    {% elif block.block_type == "code" %}
-      <pre class="bg-gray-900 text-green-400 p-4 rounded mt-6 overflow-auto"><code>{{ block.value }}</code></pre>
-
-    {% elif block.block_type == "unordered_list" %}
-        <ul class="list-none pl-5 mt-4 flex flex-col gap-3">
-            {% for item in block.value %}
-            <li class="flex items-start gap-3 body2">
-                <!-- Icône personnalisable ici -->
-                <span class="mt-[0.3rem] text-primary">
-                <!-- Placez ici votre icône SVG ou classe d'icône -->
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                    <circle cx="10" cy="10" r="5" />
-                </svg>
-                </span>
-                <p class="body2">{{ item }}</p>
-            </li>
-            {% endfor %}
-        </ul>
-
-    {% elif block.block_type == "ordered_list" %}
-        <ol class="list-none pl-5 mt-4 flex flex-col gap-3">
-            {% for item in block.value %}
-            <li class="flex items-start gap-3 body2">
-                <!-- Icône personnalisée avec numéro -->
-                <span class="mt-[0.3rem] font-semibold text-primary">
-                {{ forloop.counter }}.
-                </span>
-                <p class="body2">{{ item }}</p>
-            </li>
-            {% endfor %}
-        </ol>
-
-    {% elif block.block_type == "table" %}
-        <div class="overflow-x-auto rounded-lg border border-gray-300 shadow-sm mt-6">
-            <table class="min-w-full table-auto border-collapse text-left text-sm text-gray-700">
-            <caption class="sr-only">{{ block.value.caption }}</caption>
-            <thead class="bg-gray-100">
-                <tr>
-                {% for header_cell in block.value.header %}
-                    <th class="border border-gray-300 px-6 py-3 font-semibold text-gray-900 uppercase tracking-wide text-xs select-none">
-                    {{ header_cell }}
-                    </th>
-                {% endfor %}
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for row in block.value.rows %}
-                <tr class="even:bg-gray-50 hover:bg-gray-100 transition-colors">
-                    {% for cell in row.cells %}
-                    <td class="border border-gray-300 px-6 py-4 align-top whitespace-normal break-words">
-                        {{ cell|richtext }}
-                    </td>
+                        {% elif block.block_type == 'table' %}
+                            <div class="md:mt-10 mt-7 overflow-x-auto">
+                                <table class="w-full border-collapse border border-line">
+                                    <thead>
+                                        <tr>
+                                            {% for header in block.value.header %}
+                                            <th class="border border-line px-4 py-2 bg-surface font-semibold">{{ header }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in block.value.rows %}
+                                        <tr>
+                                            {% for cell in row.cells %}
+                                            <td class="border border-line px-4 py-2">{{ cell|safe }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-            </table>
-        </div>
+                    <div class="action flex flex-wrap items-center justify-between gap-5 md:mt-10 mt-7">
+                        <div class="list_tags flex flex-wrap items-center gap-3">
+                            <span>Tag:</span>
+                            <ul class="list flex flex-wrap items-center gap-3">
+                                {% for tag in page.tags.all %}
+                                <li>
+                                    <a href="{% url 'frontend:blog:search' %}?tag={{ tag.slug }}" class="tag -border -rounded-sm block caption1 hover:bg-primary hover:text-white">{{ tag.name }}</a>
+                                </li>
+                                {% empty %}
+                                <li><span class="caption1 text-secondary">No tags</span></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="list_social flex items-center gap-3 flex-wrap">
+                            <span>Share:</span>
+                            <ul class="list flex flex-wrap items-center gap-3">
+                                <li>
+                                    <a href="https://www.facebook.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-facebook duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.instagram.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-instagram duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.twitter.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-twitter duration-100"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full border border-line duration-300 text-black hover:bg-primary hover:text-white">
+                                        <span class="icon-youtube duration-100"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="next-pre grid sm:grid-cols-2 xl:gap-36 gap-20 gap-y-7 relative md:mt-10 mt-7 py-5 border-y border-line">
+                        {% if previous_post %}
+                        <a href="{{ previous_post.url }}" class="left">
+                            <span class="text-sm font-bold text-secondary uppercase">Previous</span>
+                            <strong class="heading6 inline-block prev mt-2 duration-300 hover:text-primary">{{ previous_post.title }}</strong>
+                        </a>
+                        {% else %}
+                        <div class="left"></div>
+                        {% endif %}
 
-    {% else %}
-      {{ block.value }}
-    {% endif %}
+                        {% if next_post %}
+                        <a href="{{ next_post.url }}" class="right sm:text-right">
+                            <span class="text-sm font-bold text-secondary uppercase">Next</span>
+                            <strong class="heading6 inline-block next mt-2 duration-300 hover:text-primary">{{ next_post.title }}</strong>
+                        </a>
+                        {% else %}
+                        <div class="right"></div>
+                        {% endif %}
+                    </div>
+                    <div class="review lg:mt-20 sm:mt-14 mt-10">
+                        <div class="heading flex flex-wrap items-center justify-between gap-4">
+                            <h4 class="heading4">{{ comment_count }} Comment{{ comment_count|pluralize }}</h4>
+                            <div class="flex items-center gap-2">
+                                <span>Sort By:</span>
+                                <div class="select_block sm:pr-8 pr-6 pl-3 py-1 border border-line rounded">
+                                    <div class="select">
+                                        <span class="selected caption1 capitalize" data-title="sort default">default</span>
+                                        <ul class="list_option w-full p-0 bg-white">
+                                            <li class="capitalize" data-item="default">default</li>
+                                            <li class="capitalize" data-item="newest">newest</li>
+                                            <li class="capitalize" data-item="oldest">oldest</li>
+                                            <li class="capitalize" data-item="random">random</li>
+                                        </ul>
+                                    </div>
+                                    <span class="icon_down ph ph-caret-down right-3"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list_review flex flex-col items-center md:mt-10 mt-7">
+                            {% if comments %}
+                            <ul class="list flex flex-col md:gap-10 gap-7">
+                                {% for comment in comments %}
+                                <li class="review_item flex gap-5 md:pb-10 pb-7 {% if not forloop.last %}border-b border-line{% endif %}">
+                                    <img src="{% static 'assets/images/avatar/default.webp' %}" alt="{{ comment.author_name }}" class="user_avatar w-15 h-15 flex-shrink-0 rounded-full" />
+                                    <div class="review_content w-full">
+                                        <div class="flex flex-wrap justify-between gap-6 gap-y-3 w-full">
+                                            <div class="user_info">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="name heading6">{{ comment.author_name }}</span>
+                                                </div>
+                                                <span class="date caption1 text-secondary">{{ comment.created_at|date:"F d, Y" }}</span>
+                                            </div>
+                                        </div>
+                                        <p class="desc mt-4">{{ comment.content|safe }}</p>
 
-  {% endfor %}
-</div>
+                                        {% if comment.replies.all %}
+                                        <div class="replies ml-8 mt-6 flex flex-col gap-6">
+                                            {% for reply in comment.replies.all %}
+                                            <div class="reply flex gap-4">
+                                                <img src="{% static 'assets/images/avatar/default.webp' %}" alt="{{ reply.author_name }}" class="w-12 h-12 flex-shrink-0 rounded-full" />
+                                                <div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="name text-button">{{ reply.author_name }}</span>
+                                                        <span class="date caption2 text-secondary">{{ reply.created_at|date:"F d, Y" }}</span>
+                                                    </div>
+                                                    <p class="caption1 mt-2">{{ reply.content|safe }}</p>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-secondary">No comments yet. Be the first to comment!</p>
+                            {% endif %}
+                        </div>
+                        <div id="form-review" class="form-review md:pt-10 pt-7">
+                            <h6 class="heading6">Leave A comment</h6>
 
+                            {% if messages %}
+                            <div class="mt-4">
+                                {% for message in messages %}
+                                <div class="p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ message }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
 
-      <!-- Extrait -->
-      {% if page.excerpt %}
-        <p class="body2 md:mt-10 mt-7">{{ page.excerpt }}</p>
-      {% endif %}
+                            <form method="POST" action="{% url 'frontend:blog:submit_comment' page.id %}" class="form grid gap-4 gap-y-5 mt-6">
+                                {% csrf_token %}
+                                <div class="name">
+                                    <label for="id_author_name">Name</label>
+                                    {{ comment_form.author_name }}
+                                    {% if comment_form.author_name.errors %}
+                                    <span class="text-red-600 text-sm">{{ comment_form.author_name.errors }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-span-full message">
+                                    <label for="id_content">Comment</label>
+                                    {{ comment_form.content }}
+                                    {% if comment_form.content.errors %}
+                                    <span class="text-red-600 text-sm">{{ comment_form.content.errors }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-span-full flex items-start gap-2">
+                                    <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
+                                    <label for="saveAccount">Save my name in this browser for the next time I comment.</label>
+                                </div>
+                                <div class="col-span-full">
+                                    <button type="submit" class="button-main">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog_sidebar lg:sticky lg:top-24 flex-shrink-0 lg:w-[360px] w-full h-fit">
+                    <div class="author">
+                        <div class="flex items-center gap-5">
+                            {% if page.owner.profile.avatar %}
+                                {% image page.owner.profile.avatar fill-100x100 as author_big_avatar %}
+                                <img src="{{ author_big_avatar.url }}" alt="{{ page.owner.get_full_name }}" class="flex-shrink-0 w-[100px] h-[100px] rounded-full" />
+                            {% else %}
+                                <img src="{% static 'assets/images/avatar/default.webp' %}" alt="Avatar" class="flex-shrink-0 w-[100px] h-[100px] rounded-full" />
+                            {% endif %}
+                            <div>
+                                <h6 class="blog_author heading6">{{ page.owner.get_full_name|default:page.owner.username }}</h6>
+                                <span class="follower block mt-1 caption1 text-secondary">{{ page.owner.profile.followers_count|default:0 }} Follower{{ page.owner.profile.followers_count|pluralize }}</span>
+                            </div>
+                        </div>
+                        {% if page.owner.profile.bio %}
+                        <p class="desc text-secondary mt-5">{{ page.owner.profile.bio }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="recent md:mt-10 mt-7">
+                        <h6 class="heading6">Recent Posts</h6>
+                        <ul class="list-recent mt-5">
+                            {% for post in recent_posts %}
+                            {% if forloop.first %}
+                            <li class="blog_item outstanding_blog">
+                                <a href="{{ post.url }}" class="blog_thumb block w-full rounded-lg overflow-hidden">
+                                    {% if post.featured_image %}
+                                        {% image post.featured_image fill-360x240 as thumb_img %}
+                                        <img src="{{ thumb_img.url }}" alt="{{ post.title }}" class="blog_img w-full" />
+                                    {% else %}
+                                        <img src="{% static 'assets/images/blog/default.webp' %}" alt="{{ post.title }}" class="blog_img w-full" />
+                                    {% endif %}
+                                </a>
+                                <div class="flex flex-wrap items-center gap-2 mt-5 mb-2">
+                                    <div class="date flex items-center gap-2">
+                                        <span class="ph ph-calendar-blank text-xl"></span>
+                                        <span class="blog_date caption1">{{ post.publishing_date|date:"F d, Y"|default:post.first_published_at|date:"F d, Y" }}</span>
+                                    </div>
+                                    {% if category %}
+                                    <div class="line w-px h-3 bg-line"></div>
+                                    <a href="{{ category.url }}" class="category flex items-center gap-2 duration-300 hover:text-primary">
+                                        <span class="ph ph-tag-simple text-xl"></span>
+                                        <span class="blog_category caption1">{{ category.title }}</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <a href="{{ post.url }}" class="blog_name heading6 duration-300 hover:text-primary">{{ post.title }}</a>
+                            </li>
+                            {% else %}
+                            <li class="blog_item flex gap-4 mt-5 pt-5 border-t border-line">
+                                <a href="{{ post.url }}" class="blog_thumb block flex-shrink-0 w-[100px] h-fit rounded overflow-hidden">
+                                    {% if post.featured_image %}
+                                        {% image post.featured_image fill-100x75 as small_thumb %}
+                                        <img src="{{ small_thumb.url }}" alt="{{ post.title }}" class="blog_img w-full" />
+                                    {% else %}
+                                        <img src="{% static 'assets/images/blog/default.webp' %}" alt="{{ post.title }}" class="blog_img w-full" />
+                                    {% endif %}
+                                </a>
+                                <div>
+                                    <a href="{{ post.url }}" class="blog_name text-button duration-300 hover:text-primary">{{ post.title }}</a>
+                                    <div class="flex flex-wrap items-center gap-2 gap-y-1 mt-1.5">
+                                        <span class="blog_date caption1">{{ post.publishing_date|date:"F d, Y"|default:post.first_published_at|date:"F d, Y" }}</span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% empty %}
+                            <li class="text-secondary">No recent posts available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    </div>
-  </div>
-</section>
+        <!-- Related Post -->
+        <section class="blog lg:pb-20 sm:pb-14 pb-10">
+            <div class="container">
+                <h3 class="heading3">Related Posts</h3>
+                <div class="list_blog grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 lg:gap-7.5 gap-6 md:mt-10 mt-7">
+                    {% for post in related_posts %}
+                    <div class="blog_item">
+                        <a href="{{ post.url }}" class="blog_thumb block overflow-hidden rounded-xl">
+                            {% if post.featured_image %}
+                                {% image post.featured_image fill-400x300 as related_img %}
+                                <img src="{{ related_img.url }}" alt="{{ post.title }}" class="blog_img w-full" />
+                            {% else %}
+                                <img src="{% static 'assets/images/blog/default.webp' %}" alt="{{ post.title }}" class="blog_img w-full" />
+                            {% endif %}
+                        </a>
+                        <div class="blog_info flex items-center gap-2 mt-5">
+                            <span class="blog_date caption1">{{ post.publishing_date|date:"F d, Y"|default:post.first_published_at|date:"F d, Y" }}</span>
+                            {% if post.tags.first %}
+                            <div class="line w-px h-3 bg-line"></div>
+                            <a href="{% url 'frontend:blog:search' %}?tag={{ post.tags.first.slug }}" class="caption1 duration-300 hover:text-primary">{{ post.tags.first.name }}</a>
+                            {% endif %}
+                        </div>
+                        <a href="{{ post.url }}" class="heading5 blog_title mt-3 hover:underline">{{ post.title }}</a>
+                        <p class="blog_desc mt-2 text-secondary">{{ post.excerpt|truncatewords:20 }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-secondary col-span-full">No related posts found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
 
-{% endblock content %}
+{% endblock %}

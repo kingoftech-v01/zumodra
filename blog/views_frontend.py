@@ -1,25 +1,21 @@
 """
-Blog Views Module - Wagtail CMS Integration
-============================================
+Blog Frontend Template Views
+==============================
 
-This module provides auxiliary views for the blog application. Most of the
-routing and rendering is handled automatically by Wagtail via the serve()
-methods of Page models (BlogIndexPage, BlogPostPage, CategoryPage).
+Frontend HTML views for the blog application following URL_AND_VIEW_CONVENTIONS.md.
 
-Available Views:
-----------------
-- blog_list_view: Alternative view to list articles (backup)
+Most blog routing is handled automatically by Wagtail via Page.serve() methods:
+- /blog/ → BlogIndexPage.serve()
+- /blog/<slug>/ → BlogPostPage.serve()
+- /blog/category/<slug>/ → CategoryPage.serve()
+
+This module provides auxiliary template views:
 - blog_search_view: Multi-criteria search (text, category, tag)
 - submit_comment: Comment submission with CSRF validation
 
-Main Routing:
--------------
-Wagtail handles URLs automatically via the page tree:
-- /blog/ → BlogIndexPage.serve() with get_context() for pagination
-- /blog/post-slug/ → BlogPostPage.serve() with view tracking
-- /blog/category/ → CategoryPage.serve()
+All views render HTML templates using Django's render().
 
-These views are complements for specific features (search, comments).
+URL Namespace: frontend:blog:*
 """
 
 from django.shortcuts import render
