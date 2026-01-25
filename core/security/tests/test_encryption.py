@@ -361,7 +361,7 @@ class TestDataAtRestEncryption:
         """
         Test: Sensitive fields are encrypted when stored in database.
         """
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser
         from core.db.fields import EncryptedCharField
 
         # Check that sensitive fields use EncryptedCharField
@@ -385,7 +385,7 @@ class TestDataAtRestEncryption:
         # Query raw database
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT * FROM custom_account_u_customuser WHERE id = %s",
+                "SELECT * FROM core_identity_customuser WHERE id = %s",
                 [user.id]
             )
             row = cursor.fetchone()

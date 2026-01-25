@@ -35,7 +35,7 @@ class TestFreelancerProfileModel:
     def test_one_to_one_relationship_with_user(self, user_factory):
         """Test that user can only have one freelancer profile."""
         from conftest import FreelancerProfileFactory
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser
 
         user = user_factory()
         profile1 = FreelancerProfileFactory(user=user)

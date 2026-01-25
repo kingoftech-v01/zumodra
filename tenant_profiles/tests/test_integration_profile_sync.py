@@ -7,7 +7,7 @@ import pytest
 from django.utils import timezone
 from django_tenants.utils import tenant_context
 
-from custom_account_u.models import CustomUser, PublicProfile, ProfileFieldSync
+from core_identity.models import CustomUser, PublicProfile, ProfileFieldSync
 from tenant_profiles.models import TenantProfile, TenantUser
 from tenants.models import Tenant, TenantInvitation
 from tenant_profiles.services import ProfileSyncService

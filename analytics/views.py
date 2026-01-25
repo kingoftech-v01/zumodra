@@ -62,7 +62,7 @@ def analytics_dashboard(request):
 
     # Lazy imports to avoid circular imports
     try:
-        from custom_account_u.models import CustomUser as User
+        from core_identity.models import CustomUser as User
         from services.models import DService, DServiceContract, DServiceProviderProfile
 
         # User metrics

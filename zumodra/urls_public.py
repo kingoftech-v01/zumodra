@@ -225,7 +225,7 @@ urlpatterns += i18n_patterns(
 
     # Custom Account & User Management
     # Public profile, KYC, and profile sync settings
-    path('user/', include('custom_account_u.urls', namespace='custom_account_u')),
+    path('user/', include('core_identity.urls', namespace='custom_account_u')),
 
     # Newsletter (simplified for public schema - tables only exist in tenant schemas)
     path('newsletter/', include(([

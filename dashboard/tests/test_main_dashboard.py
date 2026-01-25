@@ -469,7 +469,7 @@ def create_test_user():
     logger.info("="*80)
     logger.info("\nTo create this user, run on the server:")
     logger.info("  python manage.py shell")
-    logger.info("  >>> from custom_account_u.models import CustomUser")
+    logger.info("  >>> from core_identity.models import CustomUser")
     logger.info(f"  >>> user = CustomUser.objects.create_user('{TEST_USER_EMAIL}', '{TEST_USER_PASSWORD}')")
     logger.info("  >>> user.save()")
     logger.info("="*80 + "\n")

@@ -515,7 +515,7 @@ class TestFreelancerProfileOnboardingWorkflow:
         4. User updates skills
         5. Profile becomes searchable (when verified)
         """
-        from custom_account_u.models import CustomUser
+        from core_identity.models import CustomUser
         from tenant_profiles.models import FreelancerProfile
 
         # Step 1: User registers

@@ -66,7 +66,7 @@ class PublicProfileSetupView(LoginRequiredMixin, FormView):
         """
         Save profile data to PublicProfile.
         """
-        from custom_account_u.models import PublicProfile
+        from core_identity.models import PublicProfile
 
         # Get or create PublicProfile
         profile, created = PublicProfile.objects.get_or_create(

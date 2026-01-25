@@ -914,3 +914,63 @@ class PlatformLaunch(models.Model):
     def delete(self, *args, **kwargs):
         """Prevent deletion of singleton instance."""
         pass
+
+
+class ProfileFieldSync(models.Model):
+    """
+    User's privacy preferences for syncing their public profile to tenant profiles.
+    Controls which fields from MarketplaceProfile should sync to TenantProfile.
+
+    Default: All fields OFF except display_name and avatar (privacy-first)
+    """
+
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='profile_field_sync',
+        db_index=True
+    )
+    tenant = models.ForeignKey(
+        'tenants.Tenant',
+        on_delete=models.CASCADE,
+        related_name='profile_syncs'
+    )
+
+    # Field-level sync toggles (default: False for privacy)
+    sync_display_name = models.BooleanField(default=True)
+    sync_avatar = models.BooleanField(default=True)
+    sync_bio = models.BooleanField(default=False)
+    sync_email = models.BooleanField(default=False)  # Privacy sensitive
+    sync_phone = models.BooleanField(default=False)  # Privacy sensitive
+    sync_location = models.BooleanField(default=False)
+    sync_social_links = models.BooleanField(default=False)
+    sync_skills = models.BooleanField(default=False)
+    sync_languages = models.BooleanField(default=False)
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_synced_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = [('user', 'tenant')]
+        verbose_name = _('Profile Field Sync Settings')
+        verbose_name_plural = _('Profile Field Sync Settings')
+
+    @classmethod
+    def get_or_create_defaults(cls, user, tenant):
+        """Create sync settings with privacy-friendly defaults"""
+        return cls.objects.get_or_create(
+            user=user,
+            tenant=tenant,
+            defaults={
+                'sync_display_name': True,
+                'sync_avatar': True,
+                # All others default to False
+            }
+        )
+
+
+# Backward compatibility alias (Phase 10 migration incomplete)
+# DEPRECATED: Use MarketplaceProfile instead of PublicProfile
+PublicProfile = MarketplaceProfile

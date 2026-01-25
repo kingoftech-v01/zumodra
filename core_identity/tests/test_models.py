@@ -5,7 +5,7 @@ Unit tests for custom_account_u models (PublicProfile, ProfileFieldSync).
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from custom_account_u.models import CustomUser, PublicProfile, ProfileFieldSync
+from core_identity.models import CustomUser, PublicProfile, ProfileFieldSync
 
 
 @pytest.mark.django_db

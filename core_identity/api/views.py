@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db import models
-from custom_account_u.models import PublicProfile, ProfileFieldSync
+from core_identity.models import PublicProfile, ProfileFieldSync
 from .serializers import (
     PublicProfileSerializer,
     PublicProfileReadSerializer,

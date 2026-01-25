@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from custom_account_u.models import CustomUser, PublicProfile, ProfileFieldSync
+from core_identity.models import CustomUser, PublicProfile, ProfileFieldSync
 
 
 @pytest.mark.django_db

@@ -18,7 +18,7 @@ from notifications.models import (
     ScheduledNotification,
     NotificationDeliveryLog,
 )
-from custom_account_u.models import CustomUser
+from core_identity.models import CustomUser
 
 
 # ============================================================================

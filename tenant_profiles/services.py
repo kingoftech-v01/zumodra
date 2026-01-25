@@ -8,7 +8,7 @@ user-controlled field-level privacy settings.
 import logging
 from django.utils import timezone
 from django.db import transaction
-from custom_account_u.models import PublicProfile, ProfileFieldSync
+from core_identity.models import PublicProfile, ProfileFieldSync
 from tenant_profiles.models import TenantProfile
 
 logger = logging.getLogger(__name__)

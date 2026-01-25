@@ -3,7 +3,7 @@ API Serializers for PublicProfile and ProfileFieldSync
 """
 
 from rest_framework import serializers
-from custom_account_u.models import PublicProfile, ProfileFieldSync
+from core_identity.models import PublicProfile, ProfileFieldSync
 
 
 class PublicProfileSerializer(serializers.ModelSerializer):

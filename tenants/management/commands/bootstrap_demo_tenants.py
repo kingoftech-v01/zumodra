@@ -330,7 +330,7 @@ class Command(BaseCommand):
     def _create_users(self, tenant, user_configs):
         """Create users for a tenant."""
         from tenant_profiles.models import TenantUser, TenantProfile
-        from custom_account_u.models import PublicProfile
+        from core_identity.models import PublicProfile
 
         users = {}
 

@@ -422,7 +422,7 @@ class Command(BaseCommand):
     def _create_demo_users(self, tenant):
         """Create demo users with various roles."""
         from tenant_profiles.models import TenantUser, TenantProfile
-        from custom_account_u.models import PublicProfile
+        from core_identity.models import PublicProfile
 
         users = {}
 

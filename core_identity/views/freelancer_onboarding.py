@@ -28,7 +28,7 @@ class FreelancerOnboardingWizard(LoginRequiredMixin, SessionWizardView):
     template_name = 'custom_account_u/freelancer_onboarding.html'
 
     # Define form list as class attribute (required by SessionWizardView)
-    from custom_account_u.forms import (
+    from core_identity.forms import (
         FreelancerProfileForm,
         FreelancerPlanForm,
         StripeConnectForm
@@ -46,7 +46,7 @@ class FreelancerOnboardingWizard(LoginRequiredMixin, SessionWizardView):
         from tenants.services import TenantService
         from tenants.models import Plan
         from tenant_profiles.models import TenantUser
-        from custom_account_u.models import PublicProfile
+        from core_identity.models import PublicProfile
         from finance.stripe_service import StripeConnectService, StripeNotConfiguredError
 
         # Get cleaned data from all steps
