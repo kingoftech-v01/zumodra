@@ -39,7 +39,7 @@
             </div>
             <ul class="list_service grid grid-cols-1 md:gap-7.5 gap-5 md:mt-10 mt-7">
                 {% for service in services %}
-                <li class="service_item p-6 rounded-lg bg-white shadow-md hover:shadow-xl duration-300" data-service-id="{{ service.service_uuid }}">
+                <li class="service_item p-6 rounded-lg bg-white shadow-md hover:shadow-xl duration-300" data-service-uuid="{{ service.service_uuid }}">
                     <div class="flex justify-between gap-3 pb-4 border-b border-line">
                         <div class="service_content">
                             <a href="{% url 'services_public:service_detail' service.service_uuid %}" class="heading6 duration-300 hover:underline">{{ service.name }}</a>
@@ -84,24 +84,45 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Leaflet.js for Maps -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<!-- WebSocket and Map Components -->
+<script src="{% static 'services_public/js/websocket-client.js' %}"></script>
+<script src="{% static 'services_public/js/filter-handler.js' %}"></script>
+<script src="{% static 'services_public/js/map-viewer.js' %}"></script>
+<script src="{% static 'services_public/js/main.js' %}"></script>
+
+<!-- Map Data (GeoJSON) -->
+<script id="map-data" type="application/json">
+{
+    "center": [{{ map_center.lat }}, {{ map_center.lng }}],
+    "zoom": {{ map_zoom }},
+    "geojson": {{ geojson|safe }}
+}
+</script>
+
 <script>
+// Initialize map with fallback
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[Map] Page loaded, initializing...');
+
     const map = L.map('service-map').setView([{{ map_center.lat }}, {{ map_center.lng }}], {{ map_zoom }});
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '© OpenStreetMap'}).addTo(map);
     const geojson = {{ geojson|safe }};
     const markers = L.markerClusterGroup({maxClusterRadius: 50});
     const serviceIcon = L.divIcon({html: '<div class="custom-marker"><span class="ph-fill ph-map-pin text-primary text-3xl"></span></div>', className: 'custom-marker-wrapper', iconSize: [30, 30], iconAnchor: [15, 30]});
+
     if (geojson && geojson.features) {
         geojson.features.forEach(feature => {
             const coords = feature.geometry.coordinates;
             const props = feature.properties;
             const marker = L.marker([coords[1], coords[0]], { icon: serviceIcon });
-            const popupContent = `<div class="max-w-xs"><h6 class="font-semibold">${props.name}</h6><div class="flex items-center gap-2 mt-2"><span class="ph-fill ph-star text-yellow"></span><strong>${props.rating_avg || '0.0'}</strong><span>(${props.total_reviews || 0})</span></div><div class="flex justify-between mt-3"><span class="font-bold text-primary">$${props.price || '0'}</span><a href="/browse-services/${props.id}/" class="button-main -small -border">View</a></div></div>`;
+            const popupContent = `<div class="max-w-xs"><h6 class="font-semibold">${props.name}</h6><div class="flex items-center gap-2 mt-2"><span class="ph-fill ph-star text-yellow"></span><strong>${props.rating_avg || '0.0'}</strong><span>(${props.total_reviews || 0})</span></div><div class="flex justify-between mt-3"><span class="font-bold text-primary">$${props.price || '0'}</span><a href="/browse-services/${props.service_uuid}/" class="button-main -small -border">View</a></div></div>`;
             marker.bindPopup(popupContent, { maxWidth: 300 });
             marker.on('click', function() {
-                const card = document.querySelector(`[data-service-id="${props.id}"]`);
+                const card = document.querySelector(`[data-service-id="${props.service_uuid}"]`);
                 if (card) {
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     card.classList.add('ring-2', 'ring-primary');
@@ -113,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         map.addLayer(markers);
         if (geojson.features.length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });
     }
+
     document.getElementById('locate-me').addEventListener('click', function() {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(function(position) {

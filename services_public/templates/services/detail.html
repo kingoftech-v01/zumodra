@@ -428,3 +428,60 @@
             </div>
         </section>
 {% endblock %}
+
+{% block extra_js %}
+<!-- Main JavaScript for Detail Page Features -->
+<script src="{% static 'services_public/js/main.js' %}"></script>
+
+<script>
+// Add marker class to identify this as a detail page
+document.body.classList.add('service-detail-page');
+
+// Initialize image carousel (if Swiper is loaded)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[Detail] Page loaded');
+
+    // Pricing tier selection
+    const pricingTiers = document.querySelectorAll('[data-tier-id]');
+    pricingTiers.forEach(tier => {
+        tier.addEventListener('click', function() {
+            pricingTiers.forEach(t => t.classList.remove('active', 'ring-2', 'ring-primary'));
+            this.classList.add('active', 'ring-2', 'ring-primary');
+        });
+    });
+
+    // Review helpful buttons
+    const helpfulButtons = document.querySelectorAll('.review-helpful-btn');
+    helpfulButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reviewId = this.dataset.reviewId;
+            const countElement = this.querySelector('.helpful-count');
+            const currentCount = parseInt(countElement.textContent) || 0;
+
+            // Optimistic update
+            countElement.textContent = currentCount + 1;
+            this.disabled = true;
+
+            // TODO: Send AJAX request to mark review as helpful
+            console.log('[Detail] Marked review as helpful:', reviewId);
+        });
+    });
+
+    // Read more/less for long descriptions
+    const readMoreBtns = document.querySelectorAll('.read-more-btn');
+    readMoreBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const content = this.previousElementSibling;
+            if (content.classList.contains('line-clamp-3')) {
+                content.classList.remove('line-clamp-3');
+                this.textContent = 'Read less';
+            } else {
+                content.classList.add('line-clamp-3');
+                this.textContent = 'Read more';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

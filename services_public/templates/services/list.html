@@ -191,3 +191,20 @@
         <!-- Modal -->
         {% include 'includes/modals/modal-services-list.html' %}
 {% endblock %}
+
+{% block extra_js %}
+<!-- WebSocket and Filter Handler for Real-time Filtering -->
+<script src="{% static 'services_public/js/websocket-client.js' %}"></script>
+<script src="{% static 'services_public/js/filter-handler.js' %}"></script>
+<script src="{% static 'services_public/js/main.js' %}"></script>
+
+<script>
+// Add marker class to identify this as the list page
+document.body.classList.add('service-list-page');
+
+// Initialize WebSocket URL
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const wsUrl = `${protocol}//${window.location.host}/ws/services-catalog/`;
+console.log('WebSocket URL:', wsUrl);
+</script>
+{% endblock %}
