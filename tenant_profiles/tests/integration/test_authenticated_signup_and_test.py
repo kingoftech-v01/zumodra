@@ -16,7 +16,11 @@ import os
 import json
 import time
 from datetime import datetime
-from playwright.sync_api import sync_playwright, Page, Browser
+try:
+    from playwright.sync_api import sync_playwright, Page, Browser
+except ImportError:
+    import pytest
+    pytest.skip("playwright not installed", allow_module_level=True)
 
 # Configuration
 BASE_URL = "https://demo-company.zumodra.rhematek-solutions.com"

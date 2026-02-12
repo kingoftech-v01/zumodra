@@ -774,7 +774,7 @@ class Command(BaseCommand):
 
         # Create departments (at least 10)
         try:
-            from hr_core.models import Department
+            from configurations.models import Department
 
             departments_config = [
                 {'name': 'Engineering', 'code': 'ENG', 'description': 'Software Engineering and Development'},

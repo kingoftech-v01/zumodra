@@ -579,12 +579,10 @@ def main():
     tester = IntegrationTester()
     report = tester.run_all_tests()
 
-    # Exit with appropriate code
-    if report["summary"]["failed"] > 0:
-        sys.exit(1)
-    else:
-        sys.exit(0)
+    return report
 
 
 if __name__ == "__main__":
-    main()
+    report = main()
+    if report["summary"]["failed"] > 0:
+        sys.exit(1)

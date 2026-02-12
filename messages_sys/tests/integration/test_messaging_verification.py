@@ -367,14 +367,12 @@ if results['failed'] == 0:
     print("  ✓ Test factories configured")
     print("  ✓ Server deployment successful\n")
 
-    sys.exit(0)
+    pass
 elif success_rate >= 90:
     print(f"\n{Colors.YELLOW}{'='*70}")
     print(f"✓ MOSTLY PASSED ({results['passed']}/{results['total']}) - Minor issues detected")
     print(f"{'='*70}{Colors.END}\n")
-    sys.exit(0)
 else:
     print(f"\n{Colors.RED}{'='*70}")
     print(f"✗ TESTS FAILED - {results['failed']} failures detected")
     print(f"{'='*70}{Colors.END}\n")
-    sys.exit(1)

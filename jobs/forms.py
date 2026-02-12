@@ -46,8 +46,8 @@ class JobPostingForm(forms.ModelForm):
         model = JobPosting
         fields = [
             'title', 'description', 'requirements', 'responsibilities',
-            'category', 'employment_type', 'experience_level',
-            'location', 'remote_policy', 'salary_min', 'salary_max',
+            'category', 'job_type', 'experience_level',
+            'location_city', 'remote_policy', 'salary_min', 'salary_max',
             'application_deadline', 'pipeline',
         ]
         widgets = {
@@ -132,7 +132,7 @@ class CandidateForm(forms.ModelForm):
         model = Candidate
         fields = [
             'first_name', 'last_name', 'email', 'phone',
-            'headline', 'location', 'resume',
+            'headline', 'city', 'resume',
             'linkedin_url', 'portfolio_url',
             'current_company', 'current_title',
             'years_experience', 'source',
@@ -200,7 +200,7 @@ class ApplicationForm(forms.ModelForm):
 
     class Meta:
         model = Application
-        fields = ['cover_letter', 'resume']
+        fields = ['cover_letter']
 
     def clean_cover_letter(self):
         cover_letter = self.cleaned_data.get('cover_letter', '')
@@ -294,12 +294,12 @@ class InterviewScheduleForm(forms.ModelForm):
         model = Interview
         fields = [
             'title', 'interview_type', 'scheduled_start', 'scheduled_end',
-            'location', 'meeting_link', 'notes',
+            'location', 'meeting_link', 'preparation_notes',
         ]
         widgets = {
             'scheduled_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'scheduled_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'notes': forms.Textarea(attrs={'rows': 3}),
+            'preparation_notes': forms.Textarea(attrs={'rows': 3}),
         }
 
     def clean_title(self):
@@ -307,8 +307,8 @@ class InterviewScheduleForm(forms.ModelForm):
         NoXSS()(title)
         return sanitize_plain_text(title)
 
-    def clean_notes(self):
-        notes = self.cleaned_data.get('notes', '')
+    def clean_preparation_notes(self):
+        notes = self.cleaned_data.get('preparation_notes', '')
         NoXSS()(notes)
         return sanitize_html(notes)
 
@@ -374,15 +374,15 @@ class OfferForm(forms.ModelForm):
     class Meta:
         model = Offer
         fields = [
-            'job_title', 'base_salary', 'bonus', 'equity',
+            'job_title', 'base_salary', 'signing_bonus', 'equity',
             'start_date', 'expiration_date',
-            'benefits_summary', 'additional_terms',
+            'benefits_summary', 'terms_and_conditions',
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'expiration_date': forms.DateInput(attrs={'type': 'date'}),
             'benefits_summary': forms.Textarea(attrs={'rows': 3}),
-            'additional_terms': forms.Textarea(attrs={'rows': 4}),
+            'terms_and_conditions': forms.Textarea(attrs={'rows': 4}),
         }
 
     def clean_job_title(self):
@@ -395,8 +395,8 @@ class OfferForm(forms.ModelForm):
         NoXSS()(summary)
         return sanitize_html(summary)
 
-    def clean_additional_terms(self):
-        terms = self.cleaned_data.get('additional_terms', '')
+    def clean_terms_and_conditions(self):
+        terms = self.cleaned_data.get('terms_and_conditions', '')
         NoXSS()(terms)
         return sanitize_html(terms)
 

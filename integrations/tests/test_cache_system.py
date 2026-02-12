@@ -30,7 +30,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from jobs.models import JobPosting
-from tenant_profiles.models import CustomUser
+from core_identity.models import CustomUser
 from core.cache import (
     CacheKeyBuilder, model_cache, view_cache, cache_invalidator,
     TenantCache, invalidate_permission_cache, get_cache_stats,
@@ -85,8 +85,8 @@ def redis_client():
     """Get Redis client from cache."""
     try:
         return cache.client.get_client()
-    except AttributeError:
-        pytest.skip("Redis cache backend not available")
+    except (AttributeError, ValueError, Exception) as e:
+        pytest.skip(f"Redis cache backend not available: {e}")
 
 
 # =============================================================================

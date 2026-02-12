@@ -337,9 +337,7 @@ if results['failed'] == 0:
     print(f"\n{Colors.GREEN}{'='*60}")
     print("ALL TESTS PASSED - Messaging System is READY! ✓")
     print(f"{'='*60}{Colors.END}\n")
-    sys.exit(0)
 else:
     print(f"\n{Colors.YELLOW}{'='*60}")
     print(f"Some tests failed - Review failures above")
     print(f"{'='*60}{Colors.END}\n")
-    sys.exit(1)

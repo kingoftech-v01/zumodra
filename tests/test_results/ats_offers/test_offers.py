@@ -19,7 +19,11 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+try:
+    from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+except ImportError:
+    import pytest
+    pytest.skip("playwright not installed", allow_module_level=True)
 from typing import Dict, List, Optional
 
 # Configure logging

@@ -10,6 +10,16 @@ Usage:
     python manage.py test --settings=zumodra.settings_test
 """
 
+# Set default environment variables needed by settings.py before importing
+import os
+_test_env_defaults = {
+    'SECRET_KEY': 'test-secret-key-not-for-production-use-12345',
+    'DB_PASSWORD': 'test_password',
+    'EMAIL_HOST_PASSWORD': '',
+}
+for _key, _val in _test_env_defaults.items():
+    os.environ.setdefault(_key, _val)
+
 from .settings import *  # noqa: F401, F403
 
 # =============================================================================
@@ -18,14 +28,6 @@ from .settings import *  # noqa: F401, F403
 
 DEBUG = False
 TESTING = True
-
-# Ensure connection compatibility shim for code referencing connection.schema_name
-# (django-tenants has been removed, but many files still check connection.schema_name)
-from django.db import connection as _conn
-if not hasattr(_conn, 'schema_name'):
-    _conn.schema_name = 'public'
-if not hasattr(_conn, 'set_schema'):
-    _conn.set_schema = lambda name: None
 
 # Use a faster password hasher for tests
 PASSWORD_HASHERS = [

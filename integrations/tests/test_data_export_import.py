@@ -45,12 +45,15 @@ from jobs.models import (
     InterviewFeedback, Offer, Pipeline, JobCategory
 )
 from jobs.serializers import CandidateBulkImportSerializer
-from jobs.views import CandidateViewSet
-from hr_core.models import Employee, TimeOff
-from finance.models import Subscription
-from integrations.models import OutboundWebhook, WebhookEvent
-from analytics.models import AnalyticsEvent
-from core.audit_logging import audit_log
+from jobs.api.viewsets import CandidateViewSet
+from hr_core.models import Employee
+from integrations.models import WebhookEndpoint
+from analytics.models import PageView
+try:
+    from core.audit_logging import audit_log
+except ImportError:
+    from core.security.audit import AuditLogger as _AuditLogger
+    audit_log = _AuditLogger()
 
 User = get_user_model()
 

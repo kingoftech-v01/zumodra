@@ -65,6 +65,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.sitemaps',
 
+    # Organization Management (Tenant/Organization models)
+    'tenants',
+
     # Core Identity & Verification
     'core_identity',
 

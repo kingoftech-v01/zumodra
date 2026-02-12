@@ -47,7 +47,13 @@ from jobs.models import (
 )
 from jobs.serializers import CandidateBulkImportSerializer
 from hr_core.models import Employee
-from core.audit_logging import log_bulk_operation, get_audit_logs
+try:
+    from core.audit_logging import log_bulk_operation, get_audit_logs
+except ImportError:
+    from jobs.api.viewsets import log_bulk_operation
+    def get_audit_logs(**kwargs):
+        from core.security.audit import AuditLog
+        return AuditLog.objects.filter(**kwargs)
 
 User = get_user_model()
 

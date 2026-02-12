@@ -37,8 +37,8 @@ try:
     from selenium.webdriver.chrome.options import Options
     from selenium.common.exceptions import TimeoutException, NoSuchElementException
 except ImportError:
-    print("ERROR: Selenium not installed. Install with: pip install selenium")
-    sys.exit(1)
+    import pytest
+    pytest.skip("Required dependency not available", allow_module_level=True)
 
 
 class InterviewModuleTester:

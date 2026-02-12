@@ -28,10 +28,12 @@ from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework import status
 
 from jobs.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
-from hr_core.models import Employee, Department
+from hr_core.models import Employee
+from configurations.models import Department
 from tenant_profiles.models import UserProfile
-from services.models import Service, ServiceListing
-from tenants.models import Tenant, TenantUser, Domain
+from services.models import Service
+from tenants.models import Tenant, Domain
+from tenant_profiles.models import TenantUser
 from dashboard.views import SearchView
 
 User = get_user_model()

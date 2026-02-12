@@ -28,7 +28,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from tenants.models import Tenant
 from tenant_profiles.models import TenantUser
-from jobs.models import Job
+from jobs.models import JobPosting as Job
 
 
 User = get_user_model()

@@ -19,8 +19,8 @@ try:
     from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
     PLAYWRIGHT_AVAILABLE = True
 except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-    print("⚠️  Playwright not installed. Run: pip install playwright && playwright install")
+    import pytest
+    pytest.skip("playwright not installed", allow_module_level=True)
 
 # Test Configuration
 TEST_CONFIG = {

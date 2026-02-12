@@ -26,9 +26,14 @@ import sys
 import json
 import time
 import django
-import redis
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
+
+try:
+    import redis
+except ImportError:
+    import pytest
+    pytest.skip("redis not installed", allow_module_level=True)
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zumodra.settings')
@@ -42,11 +47,16 @@ from django.core.cache import cache
 from django.conf import settings
 from django.test import Client
 
+import pytest as _pytest
+
 User = get_user_model()
 
 # Redis connection
-REDIS_URL = settings.CACHES['default']['LOCATION']
-redis_conn = redis.from_url(REDIS_URL)
+try:
+    REDIS_URL = settings.CACHES['default']['LOCATION']
+    redis_conn = redis.from_url(REDIS_URL)
+except (KeyError, TypeError, ValueError, redis.exceptions.ConnectionError) as e:
+    _pytest.skip(f"Redis not configured: {e}", allow_module_level=True)
 
 
 class SessionRedisTest:

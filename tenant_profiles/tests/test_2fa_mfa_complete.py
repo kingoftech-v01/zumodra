@@ -21,8 +21,17 @@ Date: 2026-01-17
 import pytest
 import json
 import time
-import pyotp
-import qrcode
+
+try:
+    import pyotp
+except ImportError:
+    pytest.skip("pyotp not installed", allow_module_level=True)
+
+try:
+    import qrcode
+except ImportError:
+    qrcode = None
+
 from io import BytesIO
 from datetime import timedelta
 from unittest.mock import patch, MagicMock

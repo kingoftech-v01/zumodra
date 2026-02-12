@@ -34,8 +34,8 @@ django.setup()
 
 from tenants.models import Tenant, Plan, AuditLog
 from tenant_profiles.models import TenantUser, KYCVerification
-from jobs.models import Job, Candidate, Interview, Application
-from services.models import Service, Proposal
+from jobs.models import JobPosting as Job, Candidate, Interview, Application
+from services.models import Service
 from auditlog.models import LogEntry
 
 

@@ -27,8 +27,7 @@ from tenant_profiles.models import TenantUser, KYCVerification
 from tenants.models import Tenant
 from configurations.models import Department
 from jobs.models import JobPosting as Job, Candidate, Interview
-from hr_core.models import Employee, TimeOff
-from finance.models import Subscription, Payment
+from hr_core.models import Employee
 
 
 User = get_user_model()

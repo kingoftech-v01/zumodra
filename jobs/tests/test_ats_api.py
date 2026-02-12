@@ -767,7 +767,7 @@ def main():
     if not email or not password:
         print("❌ Email and password are required")
         print("Usage: python test_ats_api.py <email> <password>")
-        sys.exit(1)
+        return
 
     # Run tests that don't require authentication first
     test_unauthenticated_access()
@@ -778,7 +778,7 @@ def main():
         print("\n❌ Authentication failed. Testing will continue with unauthenticated tests only.")
         print("⚠️  SERVER ISSUE DETECTED: Database migration error (accounts_loginhistory table missing)")
         generate_report()
-        sys.exit(1)
+        return
 
     print(f"\n✅ Authentication successful! Token obtained.")
 

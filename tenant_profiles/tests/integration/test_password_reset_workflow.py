@@ -26,7 +26,7 @@ import django
 from django.test import Client, TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.core.mail import outbox
+from django.core import mail
 from django.utils import timezone
 from django.conf import settings
 from rest_framework.test import APIClient
@@ -37,8 +37,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zumodra.settings')
 django.setup()
 
 from allauth.account.models import EmailAddress, EmailConfirmation
-from tenant_profiles.models import User
-from tenant_profiles.security import FailedLoginAttempt
 from django.contrib.auth.tokens import default_token_generator
 
 User = get_user_model()
@@ -75,14 +73,14 @@ class TestPasswordResetWorkflow(TestCase):
     def tearDown(self):
         """Clean up."""
         # Clear email outbox after each test
-        outbox.clear()
+        mail.outbox.clear()
 
     # Test 1: Password Reset Request
     def test_password_reset_request_success(self):
         """Test successful password reset request."""
         print("\n[TEST 1] Testing password reset request (email sending)...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         # Request password reset
         response = self.client.post(
@@ -95,8 +93,8 @@ class TestPasswordResetWorkflow(TestCase):
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
         # Check email was sent
-        assert len(outbox) > 0, "No reset email sent"
-        reset_email = outbox[0]
+        assert len(mail.outbox) > 0, "No reset email sent"
+        reset_email = mail.outbox[0]
 
         assert self.test_email in reset_email.to, f"Email not sent to {self.test_email}"
         assert 'reset' in reset_email.subject.lower(), "Reset email subject missing 'reset'"
@@ -111,7 +109,7 @@ class TestPasswordResetWorkflow(TestCase):
         """Test password reset request with non-existent email."""
         print("\n[TEST 2] Testing password reset with non-existent email...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         # Request reset for non-existent email
         response = self.client.post(
@@ -124,7 +122,7 @@ class TestPasswordResetWorkflow(TestCase):
         assert response.status_code == 200, "Should return 200 for security"
 
         # No email should be sent
-        assert len(outbox) == 0, "Email should not be sent for non-existent user"
+        assert len(mail.outbox) == 0, "Email should not be sent for non-existent user"
 
         print("✓ Non-existent email handled securely")
         return True
@@ -134,7 +132,7 @@ class TestPasswordResetWorkflow(TestCase):
         """Test reset token is generated and valid."""
         print("\n[TEST 3] Testing reset token generation and validation...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         # Request password reset
         self.client.post(
@@ -142,8 +140,8 @@ class TestPasswordResetWorkflow(TestCase):
             {'email': self.test_email},
         )
 
-        assert len(outbox) > 0, "Reset email not sent"
-        reset_email = outbox[0]
+        assert len(mail.outbox) > 0, "Reset email not sent"
+        reset_email = mail.outbox[0]
 
         # Extract reset token from email body
         email_body = reset_email.body
@@ -291,7 +289,7 @@ class TestPasswordResetWorkflow(TestCase):
         """Test notification sent on password change."""
         print("\n[TEST 8] Testing notification on password change...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         # First, log in
         self.client.login(username=self.test_username, password=self.test_password)
@@ -323,7 +321,7 @@ class TestPasswordResetWorkflow(TestCase):
         """Test complete password reset workflow from request to completion."""
         print("\n[INTEGRATION] Testing complete password reset workflow...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         print("  Step 1: Request password reset...")
         response = self.client.post(
@@ -332,7 +330,7 @@ class TestPasswordResetWorkflow(TestCase):
             follow=True
         )
         assert response.status_code == 200
-        assert len(outbox) > 0
+        assert len(mail.outbox) > 0
         print("  ✓ Reset email sent")
 
         print("  Step 2: Verify reset token generated...")
@@ -427,7 +425,7 @@ class TestPasswordResetSecurity(TestCase):
         """Test that password reset doesn't reveal user existence."""
         print("\n[SECURITY] Testing email enumeration prevention...")
 
-        outbox.clear()
+        mail.outbox.clear()
 
         # Request reset for non-existent email
         response1 = self.client.post(

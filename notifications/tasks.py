@@ -184,3 +184,50 @@ def process_scheduled_notifications():
             'processed': processed_count,
             'errors': error_count
         }
+
+
+@shared_task(bind=True, max_retries=3)
+def send_notification_task(self, recipient_id, notification_type, **kwargs):
+    """
+    Send a notification to a specific recipient.
+
+    Args:
+        recipient_id: ID of the recipient user
+        notification_type: Type of notification to send
+        **kwargs: Additional notification parameters (title, message, channels, etc.)
+
+    Returns:
+        dict: Result of the notification send operation
+    """
+    try:
+        from .models import Notification
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        recipient = User.objects.get(id=recipient_id)
+
+        notification = Notification.objects.create(
+            recipient=recipient,
+            notification_type=notification_type,
+            title=kwargs.get('title', ''),
+            message=kwargs.get('message', ''),
+        )
+
+        logger.info(f"Sent notification {notification.id} to user {recipient_id}")
+
+        return {
+            'status': 'success',
+            'notification_id': notification.id,
+            'recipient_id': recipient_id,
+            'sent_at': timezone.now().isoformat()
+        }
+
+    except User.DoesNotExist:
+        logger.error(f"Recipient user {recipient_id} not found")
+        return {
+            'status': 'error',
+            'error': f'Recipient {recipient_id} not found'
+        }
+    except Exception as exc:
+        logger.error(f"Error sending notification to user {recipient_id}: {exc}")
+        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))

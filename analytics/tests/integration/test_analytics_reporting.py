@@ -29,7 +29,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from tenants.models import Tenant, TenantUser
+from tenants.models import Tenant
+from tenant_profiles.models import TenantUser
 from analytics.services import (
     DateRangeFilter,
     RecruitmentAnalyticsService,

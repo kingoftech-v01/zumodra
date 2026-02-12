@@ -25,12 +25,17 @@ from datetime import datetime
 from pathlib import Path
 
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.chrome.options import Options
+    from selenium.common.exceptions import TimeoutException, NoSuchElementException
+except ImportError:
+    import pytest
+    pytest.skip("selenium not installed", allow_module_level=True)
 
 # Configure logging
 logging.basicConfig(
@@ -747,12 +752,11 @@ def main():
     tester = HREmployeeTester()
     results = tester.run_all_tests()
 
-    # Exit with appropriate code
-    if results['failed'] > 0:
-        sys.exit(1)
-    else:
-        sys.exit(0)
+    # Return appropriate code
+    return results
 
 
 if __name__ == "__main__":
-    main()
+    result = main()
+    if result and result['failed'] > 0:
+        sys.exit(1)

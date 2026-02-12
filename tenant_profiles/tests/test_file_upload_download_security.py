@@ -32,7 +32,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from tenants.models import Tenant
-from tenant_profiles.models import PublicProfile, KYCVerification, Education
+from tenant_profiles.models import UserProfile as PublicProfile, KYCVerification
+from configurations.models import Education
 from jobs.models import Candidate, JobPosting as Job, Application
 
 User = get_user_model()

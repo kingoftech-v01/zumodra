@@ -22,8 +22,8 @@ from typing import Dict, Any, List, Optional, Tuple
 try:
     import requests
 except ImportError:
-    print("Error: requests library not installed. Install with: pip install requests")
-    sys.exit(1)
+    import pytest
+    pytest.skip("Required dependency not available", allow_module_level=True)
 
 
 class DocumentTestRunner:

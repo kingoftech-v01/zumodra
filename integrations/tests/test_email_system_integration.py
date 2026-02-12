@@ -48,11 +48,13 @@ from notifications.models import (
 )
 from notifications.services import EmailNotificationService, NotificationResult
 from integrations.models import Integration
-from tenant_profiles.models import User, UserProfile
+from tenant_profiles.models import UserProfile
 from tenants.models import Tenant
 from django.test.utils import override_settings
-from django.core.mail import outbox
+from django.core import mail
 from unittest.mock import patch, MagicMock
+
+User = get_user_model()
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -177,8 +179,8 @@ class EmailSystemIntegrationTests:
         """Test transactional email sending"""
         test_name = "Transactional Email Sending"
         try:
-            from django.core.mail import outbox
-            outbox.clear()
+            from django.core import mail
+            mail.outbox.clear()
 
             # Send test email
             send_mail(
@@ -189,16 +191,16 @@ class EmailSystemIntegrationTests:
                 fail_silently=False,
             )
 
-            if len(outbox) > 0:
-                email = outbox[0]
+            if len(mail.outbox) > 0:
+                email = mail.outbox[0]
                 self.log_test(test_name, 'passed', {
-                    'emails_sent': len(outbox),
+                    'emails_sent': len(mail.outbox),
                     'recipient': email.to[0],
                     'subject': email.subject,
                 })
                 return True
             else:
-                self.log_test(test_name, 'failed', error='No emails found in outbox')
+                self.log_test(test_name, 'failed', error='No emails found in mail.outbox')
                 return False
         except Exception as e:
             self.log_test(test_name, 'failed', error=str(e))

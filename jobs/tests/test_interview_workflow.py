@@ -30,9 +30,10 @@ from jobs.models import (
     InterviewType, MeetingProvider
 )
 from jobs.forms import InterviewScheduleForm, InterviewFeedbackForm
-from jobs.views import InterviewViewSet
-from jobs.services import InterviewSchedulingService
-from tenant_profiles.models import User
+from jobs.api.viewsets import InterviewViewSet
+from jobs.scheduling import InterviewSchedulingService
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 pytestmark = pytest.mark.integration

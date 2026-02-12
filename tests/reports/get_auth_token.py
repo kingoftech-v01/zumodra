@@ -50,12 +50,8 @@ try:
         with open(token_path, 'w') as f:
             json.dump(token_data, f, indent=2)
         print(f"\nToken saved to: {token_path}")
-
-        sys.exit(0)
     else:
         print(f"\n❌ Failed to get token")
-        sys.exit(1)
 
 except Exception as e:
     print(f"\n⚠️  Error: {e}")
-    sys.exit(1)

@@ -482,14 +482,16 @@ def main():
     tester = HREmployeeTester()
     results = tester.run_all_tests()
 
-    # Exit with appropriate code
+    # Report results
     if results['failed'] > 0:
         print(f"\n[WARN] Testing completed with {results['failed']} failures")
-        sys.exit(1)
     else:
         print(f"\n[PASS] All {results['passed']} tests passed!")
-        sys.exit(0)
+
+    return results
 
 
 if __name__ == "__main__":
-    main()
+    result = main()
+    if result and result['failed'] > 0:
+        sys.exit(1)

@@ -8,15 +8,23 @@ pip install selenium webdriver-manager pillow
 Run with: python test_public_dashboard_selenium.py
 """
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    from webdriver_manager.chrome import ChromeDriverManager
+except ImportError:
+    import pytest
+    pytest.skip("selenium not installed", allow_module_level=True)
+
 from datetime import datetime
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 import time
 import os
 import json

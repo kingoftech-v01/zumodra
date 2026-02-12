@@ -567,7 +567,7 @@ class TestJobPostingAPIPermissions:
         self.user = self.recruiter.user
 
         # Create a non-recruiter user
-        from tenant_profiles.models import User
+        from django.contrib.auth import get_user_model; User = get_user_model()
         self.regular_user = UserFactory()
 
         self.pipeline = PipelineFactory(tenant=self.tenant)

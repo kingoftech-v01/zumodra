@@ -27,10 +27,20 @@ import uuid
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from django.utils import timezone
+from django.db import connection
 
 import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
+
+# Ensure connection.schema_name compatibility for code that still references it
+# (django-tenants removed, but many files check connection.schema_name)
+if not hasattr(connection, 'schema_name'):
+    connection.schema_name = 'public'
+if not hasattr(connection, 'set_schema'):
+    connection.set_schema = lambda name: None
+if not hasattr(connection, 'set_schema_to_public'):
+    connection.set_schema_to_public = lambda: None
 
 
 # ============================================================================
@@ -1582,3 +1592,7 @@ class MockTenantRequest:
         for key, value in kwargs.items():
             if key not in ('META', 'session', 'data', 'query_params', 'FILES', 'tenant_features'):
                 setattr(self, key, value)
+
+
+# Alias for backward compatibility
+TenantRequestFactory = MockTenantRequest

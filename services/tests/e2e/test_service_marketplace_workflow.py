@@ -37,9 +37,16 @@ from services.models import (
     ServiceCategory, ServiceTag, Service, ServiceProvider,
     ClientRequest, ServiceProposal, ServiceContract, ServiceReview
 )
-from finance.models import Transaction, Escrow
+from payments.models import PaymentTransaction as Transaction
+from escrow.models import EscrowTransaction as Escrow
 from tenants.models import Tenant
-from core.test_helpers import create_test_tenant, create_test_user
+try:
+    from core.test_helpers import create_test_tenant, create_test_user
+except ImportError:
+    def create_test_tenant(**kwargs):
+        return Tenant.objects.create(**kwargs)
+    def create_test_user(**kwargs):
+        return User.objects.create_user(**kwargs)
 
 User = get_user_model()
 

@@ -28,9 +28,11 @@ from rest_framework import status
 from django.core.cache import cache
 
 from jobs.models import JobPosting, Candidate, Application, Pipeline, PipelineStage
-from hr_core.models import Employee, Department
+from hr_core.models import Employee
+from configurations.models import Department
 from tenant_profiles.models import UserProfile
-from tenants.models import Tenant, TenantUser, Domain
+from tenants.models import Tenant, Domain
+from tenant_profiles.models import TenantUser
 
 User = get_user_model()
 

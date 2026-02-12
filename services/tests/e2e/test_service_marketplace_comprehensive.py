@@ -32,7 +32,8 @@ from services.models import (
     ServiceCategory, ServiceTag, Service, ServiceProvider,
     ClientRequest, ServiceProposal, ServiceContract, ServiceReview
 )
-from finance.models import Transaction, Escrow
+from payments.models import PaymentTransaction as Transaction
+from escrow.models import EscrowTransaction as Escrow
 
 User = get_user_model()
 

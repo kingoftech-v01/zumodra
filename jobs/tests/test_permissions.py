@@ -26,7 +26,7 @@ from jobs.models import (
     Candidate, Application, ApplicationActivity, ApplicationNote,
     Interview, InterviewFeedback, Offer, SavedSearch
 )
-from jobs.views import IsOwnerOrReadOnly, IsRecruiterOrHiringManager
+from jobs.api.viewsets import IsOwnerOrReadOnly, IsRecruiterOrHiringManager
 
 
 # ============================================================================

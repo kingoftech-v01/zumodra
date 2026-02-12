@@ -33,10 +33,11 @@ from django.core.management import call_command
 from hr_core.models import (
     Employee,
     PerformanceReview,
-    Department,
     EmployeeCompensation
 )
-from tenant_profiles.models import Tenant, UserRole
+from configurations.models import Department
+from tenants.models import Tenant
+from tenant_profiles.models import TenantUser as UserRole
 from notifications.models import Notification
 from rest_framework.test import APIClient
 from rest_framework import status

@@ -17,7 +17,11 @@ Usage:
 """
 
 import asyncio
-from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+try:
+    from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+except ImportError:
+    import pytest
+    pytest.skip("playwright not installed", allow_module_level=True)
 from pathlib import Path
 from datetime import datetime
 import json

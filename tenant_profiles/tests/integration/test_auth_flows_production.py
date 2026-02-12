@@ -45,11 +45,8 @@ try:
     from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
     from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 except ImportError:
-    print("ERROR: Playwright is not installed.")
-    print("Please install it with:")
-    print("  pip install playwright pytest-playwright")
-    print("  playwright install chromium")
-    sys.exit(1)
+    import pytest
+    pytest.skip("Required dependency not available", allow_module_level=True)
 
 
 # ============================================================================

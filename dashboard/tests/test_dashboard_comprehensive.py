@@ -35,9 +35,8 @@ from typing import Dict, List, Optional
 try:
     from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
 except ImportError:
-    print("ERROR: Playwright not installed")
-    print("Install with: pip install playwright && playwright install")
-    sys.exit(1)
+    import pytest
+    pytest.skip("Required dependency not available", allow_module_level=True)
 
 # Configuration
 BASE_URL = "https://demo-company.zumodra.rhematek-solutions.com"
