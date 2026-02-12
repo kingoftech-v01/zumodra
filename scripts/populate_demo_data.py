@@ -13,7 +13,7 @@ django.setup()
 from django.utils import timezone
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from django_tenants.utils import schema_context
+from tenants.utils import schema_context
 from django.contrib.gis.geos import Point
 
 User = get_user_model()

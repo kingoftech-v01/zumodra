@@ -18,7 +18,7 @@ from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django_tenants.utils import schema_context, get_tenant_model
+from tenants.utils import schema_context, get_tenant_model
 
 
 class Command(BaseCommand):

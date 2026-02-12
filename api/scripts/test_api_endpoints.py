@@ -49,7 +49,7 @@ class EndpointTester:
         """Create or get test user with proper permissions."""
         try:
             from tenants.models import Tenant
-            from django_tenants.utils import schema_context
+            from tenants.utils import schema_context
 
             # Get or create public tenant
             tenant, _ = Tenant.objects.get_or_create(

@@ -50,7 +50,6 @@ def process_public_applications(self):
     """
     from careers.models import PublicApplication
     from jobs.models import Application, JobPosting
-    from django_tenants.utils import get_tenant_model
 
     # Skip if running in public schema
     from django.db import connection

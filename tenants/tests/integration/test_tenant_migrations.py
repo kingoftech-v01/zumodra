@@ -16,7 +16,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.db import OperationalError, ProgrammingError
 from django.test import RequestFactory
-from django_tenants.utils import schema_context, get_tenant_model
+from tenants.utils import schema_context, get_tenant_model
 
 from core.management.commands.verify_tenant_migrations import Command as VerifyCommand
 from core.management.commands.health_check import Command as HealthCheckCommand

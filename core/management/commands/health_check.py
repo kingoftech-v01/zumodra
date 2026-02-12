@@ -186,10 +186,9 @@ class Command(BaseCommand):
         result = {'status': 'healthy', 'message': '', 'details': {}}
 
         try:
-            from django_tenants.utils import get_tenant_model, schema_context
+            from tenants.models import Tenant
             from django.db.migrations.executor import MigrationExecutor
 
-            Tenant = get_tenant_model()
             tenants = Tenant.objects.exclude(schema_name='public')
 
             if not tenants.exists():
@@ -199,17 +198,16 @@ class Command(BaseCommand):
             tenants_with_issues = []
             for tenant in tenants:
                 try:
-                    with schema_context(tenant.schema_name):
-                        executor = MigrationExecutor(connection)
-                        targets = executor.loader.graph.leaf_nodes()
-                        pending = executor.migration_plan(targets)
+                    executor = MigrationExecutor(connection)
+                    targets = executor.loader.graph.leaf_nodes()
+                    pending = executor.migration_plan(targets)
 
-                        if pending:
-                            tenants_with_issues.append({
-                                'schema': tenant.schema_name,
-                                'pending_count': len(pending),
-                                'migrations': [str(m) for m in pending[:3]]
-                            })
+                    if pending:
+                        tenants_with_issues.append({
+                            'schema': tenant.schema_name,
+                            'pending_count': len(pending),
+                            'migrations': [str(m) for m in pending[:3]]
+                        })
                 except Exception as e:
                     tenants_with_issues.append({
                         'schema': tenant.schema_name,

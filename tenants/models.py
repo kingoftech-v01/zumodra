@@ -1,11 +1,13 @@
 """
-Tenants Models - Multi-tenant ATS/HR SaaS Platform
+Tenants Models - ATS/HR SaaS Platform (Organizational)
 
-This module defines the core multi-tenancy models for Zumodra:
+Multi-tenancy (django-tenants schema isolation) has been removed.
+This module now defines organizational models for Zumodra without
+schema-per-tenant isolation:
 - Plan: Subscription tiers with feature flags
-- Tenant: Enterprise/organization with schema isolation
+- Tenant: Enterprise/organization (plain Django model)
 - TenantSettings: Tenant-specific configuration
-- Domain: Custom domain mapping for tenants
+- Domain: Custom domain mapping for tenants (plain Django model)
 - TenantInvitation: Invite users to join tenant
 """
 
@@ -16,7 +18,6 @@ from django.contrib.gis.db import models as gis_models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
-from django_tenants.models import TenantMixin, DomainMixin
 from django.conf import settings
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
@@ -134,10 +135,11 @@ class Plan(models.Model):
         return features
 
 
-class Tenant(TenantMixin):
+class Tenant(models.Model):
     """
-    Multi-tenant organization with schema-per-tenant isolation.
-    Each tenant represents an enterprise/company using the platform.
+    Organization model for enterprise/company using the platform.
+    Previously used django-tenants TenantMixin for schema isolation;
+    now operates as a plain Django model without multi-tenancy.
     """
 
     class TenantStatus(models.TextChoices):
@@ -267,10 +269,6 @@ class Tenant(TenantMixin):
         help_text=_('Business number verified via API')
     )
     ein_verified_at = models.DateTimeField(null=True, blank=True)
-
-    # Settings Flags
-    auto_create_schema = True
-    auto_drop_schema = False  # Safety: don't auto-delete tenant data
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -710,16 +708,26 @@ class TenantSettings(models.Model):
         ]
 
 
-class Domain(DomainMixin):
+class Domain(models.Model):
     """
     Custom domain mapping for tenants.
     Supports multiple domains per tenant (e.g., careers.company.com).
+
+    Previously inherited from django-tenants DomainMixin; now a plain
+    Django model with domain and is_primary fields defined explicitly.
     """
 
     tenant = models.ForeignKey(
         Tenant,
         on_delete=models.CASCADE,
         related_name='domains'
+    )
+
+    # Domain fields (previously provided by DomainMixin)
+    domain = models.CharField(max_length=253, unique=True, db_index=True)
+    is_primary = models.BooleanField(
+        default=True,
+        help_text=_('Is this the primary domain for the tenant?')
     )
 
     # Domain Type

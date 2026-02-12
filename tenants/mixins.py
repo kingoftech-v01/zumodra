@@ -2,8 +2,7 @@
 Tenants Mixins - Reusable tenant-aware model and view mixins.
 
 This module provides mixins for:
-- TenantAwareModel: Base mixin for models that should be tenant-isolated
-- TenantQuerySetMixin: QuerySet filtering by current tenant
+- TenantAwareModel: Base mixin for models that should be tenant-scoped
 - TenantAdminMixin: Admin classes with tenant awareness
 - TenantViewMixin: View classes with tenant context
 - TenantSerializerMixin: DRF serializers with tenant handling
@@ -16,7 +15,6 @@ Usage:
         # tenant field added automatically
 
         class Meta:
-            # Will add tenant to unique_together constraints
             pass
 """
 
@@ -40,34 +38,12 @@ logger = logging.getLogger(__name__)
 
 class TenantAwareManager(models.Manager):
     """
-    Manager that automatically filters by current tenant.
+    Manager that provides tenant-scoped query helpers.
 
-    Use this as the default manager for tenant-isolated models.
+    Unlike a thread-local approach, this manager does NOT auto-filter by
+    a global tenant context. Use for_tenant() to explicitly scope queries,
+    or rely on view-level filtering via TenantViewMixin.
     """
-
-    def get_queryset(self) -> QuerySet:
-        """
-        Return queryset filtered by current tenant.
-
-        SECURITY: Returns empty queryset when no tenant context is set
-        to prevent data leakage. Use all_tenants() or for_tenant() for
-        cross-tenant operations.
-        """
-        from tenants.context import get_current_tenant
-
-        qs = super().get_queryset()
-        tenant = get_current_tenant()
-
-        if tenant is not None:
-            return qs.filter(tenant=tenant)
-
-        # CRITICAL: Fail-safe - return empty queryset when no tenant context
-        # to prevent accidental data exposure across tenants
-        logger.warning(
-            "TenantAwareManager.get_queryset() called without tenant context. "
-            "Returning empty queryset for security. Use all_tenants() for cross-tenant queries."
-        )
-        return qs.none()
 
     def for_tenant(self, tenant: 'Tenant') -> QuerySet:
         """
@@ -97,9 +73,11 @@ class TenantAwareModelMixin(models.Model):
 
     Provides:
     - Foreign key to Tenant model
-    - Automatic tenant assignment on save
-    - Manager that filters by current tenant
-    - Validation to prevent cross-tenant operations
+    - Manager with explicit tenant-scoping helpers
+    - Validation that tenant is set before save
+
+    The tenant must be assigned explicitly (e.g. in the view or serializer)
+    rather than being pulled from thread-local context.
 
     Usage:
         class Job(TenantAwareModelMixin, models.Model):
@@ -107,7 +85,7 @@ class TenantAwareModelMixin(models.Model):
             # tenant field is added automatically
 
             class Meta:
-                pass  # Can add additional meta options
+                pass
     """
 
     tenant = models.ForeignKey(
@@ -127,36 +105,28 @@ class TenantAwareModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Save with automatic tenant assignment.
+        Save with tenant validation.
 
-        If tenant is not set, attempts to get it from:
-        1. Thread-local context
-        2. Raises ValidationError if not found
+        Raises ValidationError if tenant is not set. The caller is
+        responsible for assigning the tenant before saving.
         """
         if not self.tenant_id:
-            from tenants.context import get_current_tenant
-            tenant = get_current_tenant()
-
-            if tenant is not None:
-                self.tenant = tenant
-            else:
-                raise ValidationError(
-                    _("Cannot save %(model)s without tenant context.") %
-                    {'model': self.__class__.__name__}
-                )
+            raise ValidationError(
+                _("Cannot save %(model)s without a tenant. "
+                  "Assign a tenant before saving.") %
+                {'model': self.__class__.__name__}
+            )
 
         super().save(*args, **kwargs)
 
     def clean(self):
-        """Validate tenant context."""
+        """Validate that tenant is set."""
         super().clean()
 
         if not self.tenant_id:
-            from tenants.context import get_current_tenant
-            if get_current_tenant() is None:
-                raise ValidationError(
-                    {'tenant': _('Tenant is required.')}
-                )
+            raise ValidationError(
+                {'tenant': _('Tenant is required.')}
+            )
 
     @classmethod
     def get_tenant_field_name(cls) -> str:
@@ -223,24 +193,31 @@ class TenantScopedModelMixin(TenantAwareModelMixin):
 
 
 class TenantScopedManager(TenantAwareManager):
-    """Manager that also filters out soft-deleted objects."""
+    """Manager that also filters out soft-deleted objects by default."""
 
     def get_queryset(self) -> QuerySet:
-        """Return queryset filtered by tenant and not deleted."""
+        """Return queryset excluding soft-deleted objects."""
         return super().get_queryset().filter(is_deleted=False)
 
+    def for_tenant(self, tenant: 'Tenant') -> QuerySet:
+        """Get non-deleted queryset for a specific tenant."""
+        return super().for_tenant(tenant).filter(is_deleted=False)
+
     def with_deleted(self) -> QuerySet:
-        """Include soft-deleted objects."""
-        from tenants.context import get_current_tenant
-        qs = models.Manager.get_queryset(self)
-        tenant = get_current_tenant()
-        if tenant is not None:
-            return qs.filter(tenant=tenant)
-        return qs
+        """Include soft-deleted objects (unfiltered by deletion status)."""
+        return models.Manager.get_queryset(self)
+
+    def with_deleted_for_tenant(self, tenant: 'Tenant') -> QuerySet:
+        """Include soft-deleted objects for a specific tenant."""
+        return models.Manager.get_queryset(self).filter(tenant=tenant)
 
     def only_deleted(self) -> QuerySet:
         """Only soft-deleted objects."""
         return self.with_deleted().filter(is_deleted=True)
+
+    def only_deleted_for_tenant(self, tenant: 'Tenant') -> QuerySet:
+        """Only soft-deleted objects for a specific tenant."""
+        return self.with_deleted_for_tenant(tenant).filter(is_deleted=True)
 
 
 class TimestampMixin(models.Model):
@@ -331,13 +308,12 @@ class TenantViewMixin:
     Mixin for Django views that need tenant context.
 
     Provides:
-    - Access to current tenant
+    - Access to current tenant via request.tenant
     - Tenant-scoped queryset filtering
-    - Permission checking based on tenant role
     """
 
     def get_tenant(self) -> Optional['Tenant']:
-        """Get the current tenant from request."""
+        """Get the current tenant from request, or None if not set."""
         return getattr(self.request, 'tenant', None)
 
     def get_tenant_or_fail(self) -> 'Tenant':

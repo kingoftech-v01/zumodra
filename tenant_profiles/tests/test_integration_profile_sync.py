@@ -5,7 +5,7 @@ Tests signals, invitation acceptance, and multi-tenant synchronization.
 
 import pytest
 from django.utils import timezone
-from django_tenants.utils import tenant_context
+from tenants.utils import tenant_context
 
 from core_identity.models import CustomUser, PublicProfile, ProfileFieldSync
 from tenant_profiles.models import TenantProfile, TenantUser

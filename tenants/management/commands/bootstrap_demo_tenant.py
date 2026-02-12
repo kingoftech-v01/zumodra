@@ -387,7 +387,7 @@ class Command(BaseCommand):
             f"   Running migrations for tenant schema: {tenant.schema_name}..."
         ))
 
-        from django_tenants.utils import schema_context
+        from tenants.utils import schema_context
 
         try:
             with schema_context(tenant.schema_name):

@@ -85,7 +85,7 @@ class TenantTestMixin:
             with self.tenant_context():
                 Job.objects.create(title='Test Job')
         """
-        from django_tenants.utils import schema_context, get_public_schema_name
+        from tenants.utils import schema_context, get_public_schema_name
 
         target_tenant = tenant or self.tenant
 

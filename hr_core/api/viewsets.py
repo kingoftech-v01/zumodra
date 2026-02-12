@@ -61,7 +61,7 @@ from ..filters import (
     EmployeeFilter, TimeOffRequestFilter,
     EmployeeDocumentFilter, PerformanceReviewFilter
 )
-from tenants.decorators import require_tenant_type_api
+
 
 
 # ==================== CUSTOM PERMISSIONS ====================
@@ -130,7 +130,6 @@ class IsEmployeeOrManager(permissions.BasePermission):
 
 # ==================== EMPLOYEE VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class EmployeeViewSet(viewsets.ModelViewSet):
     """
     API endpoint for employee management - COMPANY ONLY.
@@ -499,7 +498,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
 # ==================== TIME OFF VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class TimeOffTypeViewSet(viewsets.ModelViewSet):
     """
     API endpoint for time off types - COMPANY ONLY.
@@ -527,7 +525,6 @@ class TimeOffTypeViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-@require_tenant_type_api('company')
 class TimeOffRequestViewSet(viewsets.ModelViewSet):
     """
     API endpoint for time off requests - COMPANY ONLY.
@@ -726,7 +723,6 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
 
 # ==================== ONBOARDING VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class OnboardingChecklistViewSet(viewsets.ModelViewSet):
     """
     API endpoint for onboarding checklist templates - COMPANY ONLY.
@@ -761,7 +757,6 @@ class OnboardingChecklistViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@require_tenant_type_api('company')
 class OnboardingTaskViewSet(viewsets.ModelViewSet):
     """
     API endpoint for onboarding tasks.
@@ -776,7 +771,6 @@ class OnboardingTaskViewSet(viewsets.ModelViewSet):
     ordering = ['checklist', 'order']
 
 
-@require_tenant_type_api('company')
 class EmployeeOnboardingViewSet(viewsets.ModelViewSet):
     """
     API endpoint for employee onboarding progress.
@@ -870,7 +864,6 @@ class EmployeeOnboardingViewSet(viewsets.ModelViewSet):
 
 # ==================== DOCUMENT VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class DocumentTemplateViewSet(viewsets.ModelViewSet):
     """
     API endpoint for document templates - COMPANY ONLY.
@@ -949,7 +942,6 @@ class DocumentTemplateViewSet(viewsets.ModelViewSet):
         return Response(doc_serializer.data, status=status.HTTP_201_CREATED)
 
 
-@require_tenant_type_api('company')
 class EmployeeDocumentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for employee documents - COMPANY ONLY.
@@ -1087,7 +1079,6 @@ class EmployeeDocumentViewSet(viewsets.ModelViewSet):
 
 # ==================== OFFBOARDING VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class OffboardingViewSet(viewsets.ModelViewSet):
     """
     API endpoint for employee offboarding.
@@ -1188,7 +1179,6 @@ class OffboardingViewSet(viewsets.ModelViewSet):
 
 # ==================== PERFORMANCE REVIEW VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
     """
     API endpoint for performance reviews.
@@ -1401,7 +1391,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 
 # ==================== SPECIAL VIEWS ====================
 
-@require_tenant_type_api('company')
 class OrgChartView(APIView):
     """
     Dedicated view for organizational chart - COMPANY ONLY.
@@ -1438,7 +1427,6 @@ class OrgChartView(APIView):
         return Response(serializer.data)
 
 
-@require_tenant_type_api('company')
 class TeamCalendarView(APIView):
     """
     Team calendar view showing time-off, reviews, and other HR events - COMPANY ONLY.
@@ -1589,7 +1577,6 @@ class TeamCalendarView(APIView):
         })
 
 
-@require_tenant_type_api('company')
 class HRDashboardStatsView(APIView):
     """
     HR Dashboard statistics and metrics.
@@ -1705,7 +1692,6 @@ class HRDashboardStatsView(APIView):
 
 # ==================== HR REPORTS VIEW ====================
 
-@require_tenant_type_api('company')
 class HRReportsView(APIView):
     """
     HR reporting endpoints for headcount, turnover, and time off utilization.
@@ -1780,7 +1766,6 @@ class HRReportsView(APIView):
 
 # ==================== PIP (PERFORMANCE IMPROVEMENT PLAN) VIEWSETS ====================
 
-@require_tenant_type_api('company')
 class PerformanceImprovementPlanViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Performance Improvement Plans.
@@ -2105,7 +2090,6 @@ class PerformanceImprovementPlanViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-@require_tenant_type_api('company')
 class PIPMilestoneViewSet(viewsets.ModelViewSet):
     """
     API endpoint for PIP milestones - COMPANY ONLY.
@@ -2168,7 +2152,6 @@ class PIPMilestoneViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-@require_tenant_type_api('company')
 class PIPProgressNoteViewSet(viewsets.ModelViewSet):
     """
     API endpoint for PIP progress notes - COMPANY ONLY.

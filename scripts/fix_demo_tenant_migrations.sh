@@ -117,7 +117,7 @@ echo ""
 log_info "Step 5/5: Testing finance tables are accessible..."
 
 FINANCE_CHECK=$(python manage.py shell -c "
-from django_tenants.utils import schema_context, get_tenant_model
+from tenants.utils import schema_context, get_tenant_model
 Tenant = get_tenant_model()
 tenant = Tenant.objects.get(schema_name='demo')
 with schema_context(tenant.schema_name):

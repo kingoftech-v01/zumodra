@@ -19,7 +19,6 @@ import logging
 from django.db import connection
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django_tenants.utils import get_public_schema_name
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ def sync_job_to_public_catalog(sender, instance, created, **kwargs):
         **kwargs: Additional signal arguments (raw, using, update_fields)
     """
     # Skip if in public schema (avoid circular signals)
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         return
 
     # Skip raw saves (fixtures, migrations)
@@ -88,7 +87,7 @@ def remove_deleted_job_from_public(sender, instance, **kwargs):
         **kwargs: Additional signal arguments
     """
     # Skip if in public schema
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         return
 
     from .tasks import remove_job_from_public

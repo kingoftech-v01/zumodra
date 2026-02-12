@@ -15,7 +15,6 @@ from typing import Dict, Any, Optional
 from celery import shared_task
 from django.db import connection
 from django.utils import timezone
-from django_tenants.utils import get_tenant_model
 
 logger = logging.getLogger(__name__)
 
@@ -49,13 +48,11 @@ def sync_provider_to_public(self, provider_id: str, tenant_schema_name: str) -> 
     """
     from services.models import ServiceProvider
     from services_public.models import PublicServiceCatalog
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
     try:
-        # Step 1: Switch to tenant schema and fetch provider
-        Tenant = get_tenant_model()
+        # Step 1: Fetch tenant and provider
         tenant = Tenant.objects.get(schema_name=tenant_schema_name)
-        connection.set_tenant(tenant)
 
         provider = ServiceProvider.objects.get(id=provider_id)
 
@@ -94,12 +91,11 @@ def sync_provider_to_public(self, provider_id: str, tenant_schema_name: str) -> 
             'booking_url': f"https://{tenant.domain_url}/services/{provider.uuid}/book/",
         }
 
-        # Step 3: Switch to public schema and update catalog
-        with public_schema_context():
-            PublicServiceCatalog.objects.update_or_create(
-                provider_uuid=provider.uuid,
-                defaults=catalog_data
-            )
+        # Step 3: Update catalog
+        PublicServiceCatalog.objects.update_or_create(
+            provider_uuid=provider.uuid,
+            defaults=catalog_data
+        )
 
         logger.info(f"Synced provider {provider.uuid} to public catalog from {tenant_schema_name}")
         return {'status': 'success', 'provider_uuid': str(provider.uuid)}
@@ -129,13 +125,11 @@ def remove_provider_from_public(self, provider_id: str, tenant_schema_name: str)
     """
     from services.models import ServiceProvider
     from services_public.models import PublicServiceCatalog
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
     try:
-        # Switch to tenant to get UUID
-        Tenant = get_tenant_model()
+        # Get tenant
         tenant = Tenant.objects.get(schema_name=tenant_schema_name)
-        connection.set_tenant(tenant)
 
         try:
             provider = ServiceProvider.objects.get(id=provider_id)
@@ -145,10 +139,9 @@ def remove_provider_from_public(self, provider_id: str, tenant_schema_name: str)
             provider_uuid = provider_id
 
         # Remove from public catalog
-        with public_schema_context():
-            deleted_count, _ = PublicServiceCatalog.objects.filter(
-                provider_uuid=provider_uuid
-            ).delete()
+        deleted_count, _ = PublicServiceCatalog.objects.filter(
+            provider_uuid=provider_uuid
+        ).delete()
 
         logger.info(f"Removed provider {provider_uuid} from public catalog ({deleted_count} entries)")
         return {'status': 'success', 'deleted_count': deleted_count}
@@ -172,17 +165,14 @@ def bulk_sync_all_public_providers(self) -> Dict[str, Any]:
         Dict with sync stats
     """
     from services.models import ServiceProvider
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
-    Tenant = get_tenant_model()
     synced_count = 0
     error_count = 0
 
     # Iterate through all tenants
     for tenant in Tenant.objects.exclude(schema_name='public'):
         try:
-            connection.set_tenant(tenant)
-
             # Find all public providers
             public_providers = ServiceProvider.objects.filter(
                 marketplace_enabled=True,

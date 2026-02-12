@@ -154,7 +154,7 @@ fi
 # Test 8: Test finance tables exist in demo tenant
 test_start "Verify finance tables exist in demo tenant"
 FINANCE_TEST=$(python manage.py shell -c "
-from django_tenants.utils import schema_context, get_tenant_model
+from tenants.utils import schema_context, get_tenant_model
 Tenant = get_tenant_model()
 try:
     tenant = Tenant.objects.get(schema_name='demo')

@@ -188,32 +188,25 @@ class TenantAwareTask(Task):
             tenant_schema: Tenant schema name to switch to
         """
         try:
-            from django_tenants.utils import schema_context, get_tenant_model
+            from tenants.models import Tenant
             from django.db import connection
 
             # Store original schema for cleanup
-            self._original_schema = connection.schema_name
+            self._original_schema = getattr(connection, 'schema_name', None)
 
             if tenant_id:
                 # Load tenant by ID
-                Tenant = get_tenant_model()
                 self._tenant = Tenant.objects.get(id=tenant_id)
                 tenant_schema = self._tenant.schema_name
             elif tenant_schema:
                 # Load tenant by schema
-                Tenant = get_tenant_model()
                 self._tenant = Tenant.objects.get(schema_name=tenant_schema)
 
             if tenant_schema:
-                # Switch to tenant schema
-                connection.set_tenant(self._tenant)
                 logger.debug(
-                    f"Task {self.name} switched to tenant schema: {tenant_schema}"
+                    f"Task {self.name} tenant context: {tenant_schema}"
                 )
 
-        except ImportError:
-            # django-tenants not installed, skip tenant handling
-            logger.debug("django-tenants not installed, skipping tenant context")
         except Exception as e:
             logger.error(f"Failed to set up tenant context: {e}")
             raise
@@ -221,21 +214,9 @@ class TenantAwareTask(Task):
     def _teardown_tenant_context(self):
         """Clean up tenant context after task execution."""
         try:
-            from django_tenants.utils import schema_context
-            from django.db import connection
-
-            if self._original_schema:
-                # Reset to public schema
-                connection.set_schema(self._original_schema)
-                logger.debug(
-                    f"Task {self.name} restored schema to: {self._original_schema}"
-                )
-
             self._tenant = None
             self._original_schema = None
 
-        except ImportError:
-            pass
         except Exception as e:
             logger.error(f"Failed to teardown tenant context: {e}")
 
@@ -660,22 +641,12 @@ def with_tenant_context(func):
         if not tenant_id and not tenant_schema:
             return func(*args, **kwargs)
 
-        try:
-            from django_tenants.utils import schema_context, get_tenant_model
+        from tenants.models import Tenant
 
-            Tenant = get_tenant_model()
+        if tenant_id:
+            tenant = Tenant.objects.get(id=tenant_id)
 
-            if tenant_id:
-                tenant = Tenant.objects.get(id=tenant_id)
-                schema = tenant.schema_name
-            else:
-                schema = tenant_schema
-
-            with schema_context(schema):
-                return func(*args, **kwargs)
-
-        except ImportError:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper
 

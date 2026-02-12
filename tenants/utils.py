@@ -1,9 +1,13 @@
 """
-Tenants Utils - Helper functions and utilities for multi-tenant operations.
+Tenants Utils - Helper functions and utilities for organization management.
+
+Multi-tenancy (django-tenants) has been removed as of 2026-02-12.
+Schema-per-tenant isolation no longer exists. All data is in a single schema.
 
 This module provides:
-- Schema switching context managers
-- Tenant URL generation
+- No-op context managers (for backwards compatibility with code that used schema switching)
+- django-tenants compatibility shims (schema_context, get_tenant_model, etc.)
+- Tenant/Organization URL generation
 - Tenant resolution helpers
 - Cache utilities
 - Decorator helpers for tenant-aware views
@@ -40,22 +44,12 @@ TENANT_CACHE_TIMEOUT = getattr(settings, 'TENANT_CACHE_TIMEOUT', 300)
 @contextmanager
 def tenant_context(tenant):
     """
-    Context manager for executing code within a tenant's schema context.
+    Context manager for executing code within a tenant's context.
 
-    DEPRECATED: Use tenants.context.tenant_context() instead for full
-    thread-local and ContextVar support with async safety.
-
-    This is a simplified wrapper that only handles schema switching.
-    For complete tenant context management (including thread-local storage
-    and async support), use the implementation in tenants.context.
+    This is a no-op context manager since django_tenants has been removed.
+    Kept for API compatibility with existing code that uses it.
 
     Usage:
-        # Preferred approach:
-        from tenants.context import tenant_context
-        with tenant_context(tenant):
-            users = User.objects.all()
-
-        # Legacy approach (schema-only):
         from tenants.utils import tenant_context
         with tenant_context(tenant):
             users = User.objects.all()
@@ -63,17 +57,7 @@ def tenant_context(tenant):
     Args:
         tenant: Tenant instance or schema_name string
     """
-    from tenants.context import tenant_context as full_tenant_context
-
-    # If string schema name provided, just do schema switch
-    if isinstance(tenant, str):
-        from django_tenants.utils import schema_context
-        with schema_context(tenant):
-            yield
-    else:
-        # Use the full tenant_context from context.py for proper async safety
-        with full_tenant_context(tenant, activate_schema=True):
-            yield
+    yield
 
 
 @contextmanager
@@ -81,51 +65,61 @@ def public_schema_context():
     """
     Context manager for executing code in the public schema.
 
-    DEPRECATED: Use tenants.context.public_schema_context() instead for full
-    thread-local and ContextVar support with async safety.
+    This is a no-op context manager since django_tenants has been removed.
+    Kept for API compatibility with existing code that uses it.
 
     Usage:
-        # Preferred approach:
-        from tenants.context import public_schema_context
-        with public_schema_context():
-            tenants = Tenant.objects.all()
-
-        # Legacy approach:
         from tenants.utils import public_schema_context
         with public_schema_context():
             tenants = Tenant.objects.all()
     """
-    from tenants.context import public_schema_context as full_public_schema_context
-    with full_public_schema_context():
-        yield
+    yield
 
 
 @contextmanager
 def tenant_connection(tenant):
     """
-    Context manager that sets up the database connection for a tenant.
+    No-op context manager (django-tenants removed).
 
-    This is a lower-level context manager that directly manipulates
-    the database connection's tenant setting.
-
-    Usage:
-        with tenant_connection(tenant):
-            # Database connection is now set to tenant's schema
-            pass
+    Kept for API compatibility.
     """
-    previous_tenant = getattr(connection, 'tenant', None)
-    try:
-        connection.set_tenant(tenant)
-        yield
-    finally:
-        if previous_tenant:
-            connection.set_tenant(previous_tenant)
-        else:
-            # Reset to public schema
-            from tenants.models import Tenant
-            public_tenant = Tenant.objects.filter(schema_name='public').first()
-            if public_tenant:
-                connection.set_tenant(public_tenant)
+    yield
+
+
+# =============================================================================
+# django-tenants Compatibility Shims
+# =============================================================================
+# These functions replace django_tenants.utils imports that were used throughout
+# the codebase. They are no-ops since schema-per-tenant isolation is removed.
+
+@contextmanager
+def schema_context(schema_name):
+    """
+    No-op replacement for django_tenants.utils.schema_context.
+
+    Previously switched the DB connection to a specific schema.
+    Now a no-op since all data is in a single schema.
+    """
+    yield
+
+
+def get_tenant_model():
+    """
+    Replacement for django_tenants.utils.get_tenant_model.
+
+    Returns the Tenant model class directly.
+    """
+    from tenants.models import Tenant
+    return Tenant
+
+
+def get_public_schema_name():
+    """
+    Replacement for django_tenants.utils.get_public_schema_name.
+
+    Returns 'public' (the only schema now).
+    """
+    return 'public'
 
 
 def _is_valid_schema_name(schema_name: str) -> bool:
@@ -471,31 +465,23 @@ def get_tenant_by_domain(domain: str):
 
 def get_current_tenant():
     """
-    Get the current tenant from thread-local/ContextVar storage.
-
-    DEPRECATED: Use tenants.context.get_current_tenant() directly for consistency.
-
-    This function now delegates to tenants.context.get_current_tenant() which
-    provides async-safe tenant context via ContextVar.
+    Get the current tenant from the database connection.
 
     Returns:
         Tenant instance or None
     """
-    from tenants.context import get_current_tenant as ctx_get_current_tenant
-    return ctx_get_current_tenant()
+    tenant = getattr(connection, 'tenant', None)
+    return tenant
 
 
 def get_current_schema() -> str:
     """
     Get the current schema name.
 
-    DEPRECATED: Use tenants.context.get_current_schema() directly for consistency.
-
     Returns:
         Schema name string
     """
-    from tenants.context import get_current_schema as ctx_get_current_schema
-    return ctx_get_current_schema()
+    return getattr(connection, 'schema_name', 'public')
 
 
 # =============================================================================

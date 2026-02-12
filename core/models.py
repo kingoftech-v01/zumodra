@@ -43,7 +43,6 @@ class TenantAwareModel(models.Model):
         # Tenant should be set by the calling code
         # This is just a safety check
         if not self.tenant_id:
-            from django_tenants.utils import get_tenant_model
             from tenants.middleware import get_current_tenant
 
             # Try to get current tenant from thread-local storage

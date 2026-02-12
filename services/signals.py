@@ -13,7 +13,6 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 from django.db import connection
-from django_tenants.utils import get_public_schema_name
 import logging
 
 logger = logging.getLogger(__name__)
@@ -39,7 +38,7 @@ def sync_service_to_public_catalog_on_save(sender, instance, created, raw, **kwa
         - Provider must have marketplace_enabled=True
     """
     # Prevent circular signals: skip if already in public schema
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         logger.debug(f"Skipping service sync signal: already in public schema")
         return
 
@@ -118,7 +117,7 @@ def remove_service_from_public_catalog_on_delete(sender, instance, **kwargs):
         - Removal is idempotent (safe even if not in catalog)
     """
     # Prevent circular signals: skip if already in public schema
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         logger.debug(f"Skipping service deletion signal: already in public schema")
         return
 
@@ -157,7 +156,7 @@ def resync_service_on_image_change(sender, instance, created, raw, **kwargs):
     This ensures the public catalog reflects the latest images.
     """
     # Skip if in public schema or during fixture loading
-    if connection.schema_name == get_public_schema_name() or raw:
+    if connection.schema_name == 'public' or raw:
         return
 
     if not hasattr(instance, 'service') or not instance.service:
@@ -209,7 +208,7 @@ def resync_service_on_pricing_tier_change(sender, instance, created, raw, **kwar
     This ensures the public catalog reflects the latest pricing tiers.
     """
     # Skip if in public schema or during fixture loading
-    if connection.schema_name == get_public_schema_name() or raw:
+    if connection.schema_name == 'public' or raw:
         return
 
     if not hasattr(instance, 'service') or not instance.service:

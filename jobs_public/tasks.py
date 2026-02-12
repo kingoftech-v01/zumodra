@@ -22,7 +22,6 @@ from celery import shared_task
 from django.core.cache import cache
 from django.db import connection
 from django.utils import timezone
-from django_tenants.utils import get_tenant_model
 
 logger = logging.getLogger(__name__)
 
@@ -176,13 +175,11 @@ def sync_job_to_public(self, job_id: str, tenant_schema_name: str) -> Dict[str, 
     """
     from jobs.models import JobPosting
     from jobs_public.models import PublicJobCatalog
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
     try:
-        # Step 1: Switch to tenant schema and fetch job
-        Tenant = get_tenant_model()
+        # Step 1: Fetch tenant and job
         tenant = Tenant.objects.get(schema_name=tenant_schema_name)
-        connection.set_tenant(tenant)
 
         job = JobPosting.objects.get(id=job_id)
 
@@ -284,12 +281,11 @@ def sync_job_to_public(self, job_id: str, tenant_schema_name: str) -> Dict[str, 
         if catalog_data['expiration_date']:
             catalog_data['is_expired'] = timezone.now() > catalog_data['expiration_date']
 
-        # Step 3: Switch to public schema and update catalog
-        with public_schema_context():
-            catalog_entry, created = PublicJobCatalog.objects.update_or_create(
-                jobposting_uuid=job.uuid,
-                defaults=catalog_data
-            )
+        # Step 3: Update catalog
+        catalog_entry, created = PublicJobCatalog.objects.update_or_create(
+            jobposting_uuid=job.uuid,
+            defaults=catalog_data
+        )
 
         action = 'created' if created else 'updated'
         logger.info(f"Synced job {job.uuid} to public catalog from {tenant_schema_name} ({action})")
@@ -365,13 +361,11 @@ def remove_job_from_public(self, job_id: str, tenant_schema_name: str) -> Dict[s
     """
     from jobs.models import JobPosting
     from jobs_public.models import PublicJobCatalog
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
     try:
-        # Switch to tenant to get UUID
-        Tenant = get_tenant_model()
+        # Get tenant
         tenant = Tenant.objects.get(schema_name=tenant_schema_name)
-        connection.set_tenant(tenant)
 
         try:
             job = JobPosting.objects.get(id=job_id)
@@ -381,10 +375,9 @@ def remove_job_from_public(self, job_id: str, tenant_schema_name: str) -> Dict[s
             job_uuid = job_id
 
         # Remove from public catalog
-        with public_schema_context():
-            deleted_count, _ = PublicJobCatalog.objects.filter(
-                jobposting_uuid=job_uuid
-            ).delete()
+        deleted_count, _ = PublicJobCatalog.objects.filter(
+            jobposting_uuid=job_uuid
+        ).delete()
 
         logger.info(f"Removed job {job_uuid} from public catalog ({deleted_count} entries)")
 
@@ -429,17 +422,14 @@ def bulk_sync_all_public_jobs(self) -> Dict[str, Any]:
         Dict with sync stats
     """
     from jobs.models import JobPosting
-    from tenants.context import public_schema_context
+    from tenants.models import Tenant
 
-    Tenant = get_tenant_model()
     synced_count = 0
     error_count = 0
 
     # Iterate through all tenants
     for tenant in Tenant.objects.exclude(schema_name='public'):
         try:
-            connection.set_tenant(tenant)
-
             # Find all published jobs
             public_jobs = JobPosting.objects.filter(
                 published_on_career_page=True,

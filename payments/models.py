@@ -11,7 +11,6 @@ from django.core.validators import MinValueValidator
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-from django_tenants.models import TenantMixin
 from core_identity.models import CustomUser  # Renamed from custom_account_u (Phase 10)
 from core.models import TenantAwareModel  # Import from core.models instead of defining here
 

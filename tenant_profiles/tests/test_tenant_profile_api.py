@@ -4,7 +4,7 @@ API tests for TenantProfile endpoints.
 
 import pytest
 from django.utils import timezone
-from django_tenants.utils import tenant_context
+from tenants.utils import tenant_context
 from rest_framework import status
 from rest_framework.test import APIClient
 

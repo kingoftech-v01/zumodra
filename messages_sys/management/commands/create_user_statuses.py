@@ -2,7 +2,6 @@
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from django_tenants.utils import schema_context
 from tenants.models import Tenant
 from messages_sys.models import UserStatus
 
@@ -38,34 +37,33 @@ class Command(BaseCommand):
         for tenant in tenants:
             self.stdout.write(f'\nProcessing tenant: {tenant.name} ({tenant.schema_name})')
 
-            with schema_context(tenant.schema_name):
-                users = User.objects.all()
-                created_count = 0
-                existing_count = 0
+            users = User.objects.all()
+            created_count = 0
+            existing_count = 0
 
-                for user in users:
-                    user_status, created = UserStatus.objects.get_or_create(
-                        user=user,
-                        defaults={
-                            'is_online': False,
-                            'last_seen': None
-                        }
-                    )
-
-                    if created:
-                        created_count += 1
-                        self.stdout.write(f'  Created UserStatus for: {user.email}')
-                    else:
-                        existing_count += 1
-
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f'  Created: {created_count}, Already existed: {existing_count}'
-                    )
+            for user in users:
+                user_status, created = UserStatus.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'is_online': False,
+                        'last_seen': None
+                    }
                 )
 
-                total_created += created_count
-                total_existing += existing_count
+                if created:
+                    created_count += 1
+                    self.stdout.write(f'  Created UserStatus for: {user.email}')
+                else:
+                    existing_count += 1
+
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'  Created: {created_count}, Already existed: {existing_count}'
+                )
+            )
+
+            total_created += created_count
+            total_existing += existing_count
 
         self.stdout.write('\n' + '=' * 60)
         self.stdout.write(

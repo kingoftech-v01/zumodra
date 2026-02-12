@@ -26,7 +26,7 @@ from django.db import connection
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 
-from django_tenants.utils import tenant_context
+from tenants.utils import tenant_context
 
 User = get_user_model()
 

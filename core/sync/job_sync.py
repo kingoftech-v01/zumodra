@@ -6,7 +6,7 @@ Synchronizes JobPosting data from tenant schemas to PublicJobCatalog (public sch
 
 import logging
 from django.db import connection
-from django_tenants.utils import get_tenant_model
+from tenants.models import Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class JobCatalogSyncService:
 
         try:
             # Get current tenant
-            tenant = get_tenant_model().objects.get(schema_name=connection.schema_name)
+            tenant = Tenant.objects.get(schema_name=connection.schema_name)
 
             # Prepare denormalized data
             data = {
@@ -143,39 +143,37 @@ class JobCatalogSyncService:
             dict: Statistics (synced, failed, removed)
         """
         from jobs.models import JobPosting
-        from django_tenants.utils import schema_context
 
         stats = {'synced': 0, 'failed': 0, 'removed': 0}
 
         try:
-            with schema_context(tenant_schema_name):
-                # Get all jobs that should be in public catalog
-                active_jobs = JobPosting.objects.filter(
-                    status='open',
-                    published_on_career_page=True
-                )
+            # Get all jobs that should be in public catalog
+            active_jobs = JobPosting.objects.filter(
+                status='open',
+                published_on_career_page=True
+            )
 
-                for job in active_jobs:
-                    try:
-                        cls.sync_job(job)
-                        stats['synced'] += 1
-                    except Exception as e:
-                        logger.error(f"Failed to sync job {job.id}: {e}")
-                        stats['failed'] += 1
+            for job in active_jobs:
+                try:
+                    cls.sync_job(job)
+                    stats['synced'] += 1
+                except Exception as e:
+                    logger.error(f"Failed to sync job {job.id}: {e}")
+                    stats['failed'] += 1
 
-                # Get IDs of jobs that should be in catalog
-                active_job_ids = set(active_jobs.values_list('id', flat=True))
+            # Get IDs of jobs that should be in catalog
+            active_job_ids = set(active_jobs.values_list('id', flat=True))
 
-                # Remove jobs that are no longer active/published
-                from tenants.models import PublicJobCatalog
-                catalog_entries = PublicJobCatalog.objects.filter(
-                    tenant_schema_name=tenant_schema_name
-                )
+            # Remove jobs that are no longer active/published
+            from tenants.models import PublicJobCatalog
+            catalog_entries = PublicJobCatalog.objects.filter(
+                tenant_schema_name=tenant_schema_name
+            )
 
-                for entry in catalog_entries:
-                    if entry.job_id not in active_job_ids:
-                        entry.delete()
-                        stats['removed'] += 1
+            for entry in catalog_entries:
+                if entry.job_id not in active_job_ids:
+                    entry.delete()
+                    stats['removed'] += 1
 
             logger.info(
                 f"Sync complete for tenant {tenant_schema_name}: "

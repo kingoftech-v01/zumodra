@@ -25,8 +25,6 @@ from django.db import connection, models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
-from tenants.context import public_schema_context
-
 logger = logging.getLogger(__name__)
 
 
@@ -374,22 +372,21 @@ class PublicSyncService:
             if uuid_field_name in catalog_data:
                 lookup_fields[uuid_field_name] = instance.uuid
 
-        # Switch to public schema and perform sync
+        # Perform sync to public catalog
         try:
-            with public_schema_context():
-                catalog_entry, was_created = self.public_model.objects.update_or_create(
-                    **lookup_fields,
-                    defaults=catalog_data
-                )
+            catalog_entry, was_created = self.public_model.objects.update_or_create(
+                **lookup_fields,
+                defaults=catalog_data
+            )
 
-                action = 'Created' if was_created else 'Updated'
-                logger.info(
-                    f"{action} {self.public_model.__name__} entry for "
-                    f"{self.tenant_model.__name__} {instance.uuid if hasattr(instance, 'uuid') else instance.pk} "
-                    f"from {connection.schema_name}"
-                )
+            action = 'Created' if was_created else 'Updated'
+            logger.info(
+                f"{action} {self.public_model.__name__} entry for "
+                f"{self.tenant_model.__name__} {instance.uuid if hasattr(instance, 'uuid') else instance.pk} "
+                f"from {connection.schema_name}"
+            )
 
-                return catalog_entry
+            return catalog_entry
 
         except Exception as e:
             logger.error(
@@ -423,18 +420,17 @@ class PublicSyncService:
             uuid_field_name = f"{self.tenant_model.__name__.lower()}_uuid"
             filters[uuid_field_name] = instance.uuid
 
-        # Delete from public schema
+        # Delete from public catalog
         try:
-            with public_schema_context():
-                deleted_count, _ = self.public_model.objects.filter(**filters).delete()
+            deleted_count, _ = self.public_model.objects.filter(**filters).delete()
 
-                if deleted_count > 0:
-                    logger.info(
-                        f"Removed {deleted_count} {self.public_model.__name__} "
-                        f"entries for {instance}"
-                    )
+            if deleted_count > 0:
+                logger.info(
+                    f"Removed {deleted_count} {self.public_model.__name__} "
+                    f"entries for {instance}"
+                )
 
-                return deleted_count
+            return deleted_count
 
         except Exception as e:
             logger.error(

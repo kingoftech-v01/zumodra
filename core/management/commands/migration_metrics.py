@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
-from django_tenants.utils import get_tenant_model, schema_context
+from tenants.utils import get_tenant_model, schema_context
 from django.db.migrations.executor import MigrationExecutor
 
 

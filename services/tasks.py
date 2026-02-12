@@ -696,7 +696,6 @@ def notify_cross_tenant_request(self, target_schema, request_uuid, requesting_te
         Exception: If tenant not found or notification creation fails (retries 3 times)
     """
     from tenants.models import Tenant
-    from django_tenants.utils import schema_context
 
     try:
         # Get tenant models
@@ -708,67 +707,65 @@ def notify_cross_tenant_request(self, target_schema, request_uuid, requesting_te
             f"for request {request_uuid} from {requesting_tenant_schema}"
         )
 
-        # Switch to target tenant schema and create notification
-        with schema_context(target_schema):
-            # Import here to avoid circular imports
-            from notifications.models import Notification, NotificationChannel
-            from tenant_profiles.models import TenantUser
-            from django.contrib.auth import get_user_model
+        # Import here to avoid circular imports
+        from notifications.models import Notification, NotificationChannel
+        from tenant_profiles.models import TenantUser
+        from django.contrib.auth import get_user_model
 
-            User = get_user_model()
+        User = get_user_model()
 
-            # Get all admins and managers in the target tenant
-            admin_roles = ['owner', 'manager', 'hr_manager']
-            admin_users = TenantUser.objects.filter(
-                tenant=target_tenant,
-                role__in=admin_roles,
-                is_active=True
-            ).select_related('user')
+        # Get all admins and managers in the target tenant
+        admin_roles = ['owner', 'manager', 'hr_manager']
+        admin_users = TenantUser.objects.filter(
+            tenant=target_tenant,
+            role__in=admin_roles,
+            is_active=True
+        ).select_related('user')
 
-            # Get or create a default notification channel
-            channel, _ = NotificationChannel.objects.get_or_create(
-                name='System',
-                defaults={'slug': 'system', 'description': 'System notifications'}
+        # Get or create a default notification channel
+        channel, _ = NotificationChannel.objects.get_or_create(
+            name='System',
+            defaults={'slug': 'system', 'description': 'System notifications'}
+        )
+
+        notification_title = f"New service request from {requesting_tenant.name}"
+        notification_message = (
+            f"You have received a service request from {requesting_tenant.name}. "
+            f"Request ID: {request_uuid}. "
+            f"Please review and respond to this cross-organization request."
+        )
+        notification_metadata = {
+            'request_uuid': request_uuid,
+            'requesting_tenant_schema': requesting_tenant_schema,
+            'requesting_company_name': requesting_tenant.name,
+            'type': 'cross_tenant_service_request',
+        }
+
+        # Create notification for each admin/manager
+        notifications_created = []
+        for tenant_user in admin_users:
+            notification = Notification.objects.create(
+                recipient=tenant_user.user,
+                channel=channel,
+                notification_type='cross_tenant_request',
+                title=notification_title,
+                message=notification_message,
+                metadata=notification_metadata,
             )
+            notifications_created.append(notification.id)
 
-            notification_title = f"New service request from {requesting_tenant.name}"
-            notification_message = (
-                f"You have received a service request from {requesting_tenant.name}. "
-                f"Request ID: {request_uuid}. "
-                f"Please review and respond to this cross-organization request."
-            )
-            notification_metadata = {
-                'request_uuid': request_uuid,
-                'requesting_tenant_schema': requesting_tenant_schema,
-                'requesting_company_name': requesting_tenant.name,
-                'type': 'cross_tenant_service_request',
-            }
+        logger.info(
+            f"Created {len(notifications_created)} notifications in {target_schema} "
+            f"for cross-tenant request {request_uuid} (sent to all admins/managers)"
+        )
 
-            # Create notification for each admin/manager
-            notifications_created = []
-            for tenant_user in admin_users:
-                notification = Notification.objects.create(
-                    recipient=tenant_user.user,
-                    channel=channel,
-                    notification_type='cross_tenant_request',
-                    title=notification_title,
-                    message=notification_message,
-                    metadata=notification_metadata,
-                )
-                notifications_created.append(notification.id)
-
-            logger.info(
-                f"Created {len(notifications_created)} notifications in {target_schema} "
-                f"for cross-tenant request {request_uuid} (sent to all admins/managers)"
-            )
-
-            return {
-                'status': 'success',
-                'notification_ids': notifications_created,
-                'notification_count': len(notifications_created),
-                'target_tenant': target_schema,
-                'request_uuid': request_uuid
-            }
+        return {
+            'status': 'success',
+            'notification_ids': notifications_created,
+            'notification_count': len(notifications_created),
+            'target_tenant': target_schema,
+            'request_uuid': request_uuid
+        }
 
     except Tenant.DoesNotExist as e:
         error_msg = f"Tenant not found: {e}"
@@ -814,7 +811,6 @@ def sync_public_catalog_stats(self):
     """
     from tenants.models import Tenant, PublicServiceCatalog
     from services.models import Service
-    from django_tenants.utils import schema_context
 
     try:
         logger.info("Starting public catalog stats sync...")
@@ -825,32 +821,31 @@ def sync_public_catalog_stats(self):
         # Process each tenant
         for tenant in Tenant.objects.exclude(schema_name='public'):
             try:
-                with schema_context(tenant.schema_name):
-                    # Get all public services in this tenant
-                    public_services = Service.objects.filter(
-                        is_public=True,
-                        is_active=True,
-                        published_to_catalog=True
-                    ).select_related('provider')
+                # Get all public services in this tenant
+                public_services = Service.objects.filter(
+                    is_public=True,
+                    is_active=True,
+                    published_to_catalog=True
+                ).select_related('provider')
 
-                    for service in public_services:
-                        try:
-                            # Update catalog entry with latest stats
-                            PublicServiceCatalog.objects.filter(
-                                tenant_schema_name=tenant.schema_name,
-                                service_uuid=service.uuid
-                            ).update(
-                                order_count=service.order_count,
-                                rating_avg=service.provider.rating_avg,
-                                review_count=service.provider.total_reviews,
-                            )
-                            updated_count += 1
+                for service in public_services:
+                    try:
+                        # Update catalog entry with latest stats
+                        PublicServiceCatalog.objects.filter(
+                            tenant_schema_name=tenant.schema_name,
+                            service_uuid=service.uuid
+                        ).update(
+                            order_count=service.order_count,
+                            rating_avg=service.provider.rating_avg,
+                            review_count=service.provider.total_reviews,
+                        )
+                        updated_count += 1
 
-                        except Exception as e:
-                            logger.error(
-                                f"Failed to sync service {service.uuid} stats: {e}"
-                            )
-                            error_count += 1
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to sync service {service.uuid} stats: {e}"
+                        )
+                        error_count += 1
 
             except Exception as e:
                 logger.error(
@@ -892,7 +887,6 @@ def cleanup_expired_cross_tenant_requests(self):
     """
     from tenants.models import Tenant
     from services.models import CrossTenantServiceRequest
-    from django_tenants.utils import schema_context
 
     try:
         cutoff_date = timezone.now() - timedelta(days=30)
@@ -903,19 +897,18 @@ def cleanup_expired_cross_tenant_requests(self):
         # Process each tenant
         for tenant in Tenant.objects.exclude(schema_name='public'):
             try:
-                with schema_context(tenant.schema_name):
-                    # Find expired pending requests
-                    expired_requests = CrossTenantServiceRequest.objects.filter(
-                        status=CrossTenantServiceRequest.RequestStatus.PENDING,
-                        created_at__lt=cutoff_date
-                    )
+                # Find expired pending requests
+                expired_requests = CrossTenantServiceRequest.objects.filter(
+                    status=CrossTenantServiceRequest.RequestStatus.PENDING,
+                    created_at__lt=cutoff_date
+                )
 
-                    count = expired_requests.update(
-                        status=CrossTenantServiceRequest.RequestStatus.CANCELLED,
-                        provider_response='Request automatically cancelled after 30 days without response'
-                    )
+                count = expired_requests.update(
+                    status=CrossTenantServiceRequest.RequestStatus.CANCELLED,
+                    provider_response='Request automatically cancelled after 30 days without response'
+                )
 
-                    cancelled_count += count
+                cancelled_count += count
 
             except Exception as e:
                 logger.error(
@@ -937,7 +930,6 @@ def cleanup_expired_cross_tenant_requests(self):
 
 # ==================== Public Provider Catalog Sync Tasks ====================
 
-from tenants.context import tenant_context, public_schema_context
 from core.sync.provider_sync import ProviderPublicSyncService
 
 
@@ -980,60 +972,59 @@ def sync_provider_to_catalog_task(self, provider_uuid, tenant_schema, tenant_id)
         # Load tenant
         tenant = Tenant.objects.get(pk=tenant_id)
 
-        # Switch to tenant schema and load provider
-        with tenant_context(tenant):
-            try:
-                provider = ServiceProvider.objects.get(uuid=provider_uuid)
-            except ServiceProvider.DoesNotExist:
-                logger.warning(
-                    f"ServiceProvider {provider_uuid} not found in {tenant_schema}"
-                )
-                return {
-                    'status': 'not_found',
-                    'provider_uuid': provider_uuid,
-                    'tenant_schema': tenant_schema,
-                }
+        # Load provider
+        try:
+            provider = ServiceProvider.objects.get(uuid=provider_uuid)
+        except ServiceProvider.DoesNotExist:
+            logger.warning(
+                f"ServiceProvider {provider_uuid} not found in {tenant_schema}"
+            )
+            return {
+                'status': 'not_found',
+                'provider_uuid': provider_uuid,
+                'tenant_schema': tenant_schema,
+            }
 
-            # Initialize sync service
-            sync_service = ProviderPublicSyncService()
+        # Initialize sync service
+        sync_service = ProviderPublicSyncService()
 
-            # Check if provider should be synced
-            if not sync_service.should_sync(provider):
-                logger.info(
-                    f"Provider {provider_uuid} from {tenant_schema} does not meet sync conditions, "
-                    "removing from catalog if exists"
-                )
-                sync_service.remove_from_public(provider)
-                return {
-                    'status': 'skipped',
-                    'reason': 'conditions_not_met',
-                    'provider_uuid': provider_uuid,
-                    'tenant_schema': tenant_schema,
-                }
+        # Check if provider should be synced
+        if not sync_service.should_sync(provider):
+            logger.info(
+                f"Provider {provider_uuid} from {tenant_schema} does not meet sync conditions, "
+                "removing from catalog if exists"
+            )
+            sync_service.remove_from_public(provider)
+            return {
+                'status': 'skipped',
+                'reason': 'conditions_not_met',
+                'provider_uuid': provider_uuid,
+                'tenant_schema': tenant_schema,
+            }
 
-            # Sync to public catalog
-            try:
-                catalog_entry = sync_service.sync_to_public(provider, created=False)
+        # Sync to public catalog
+        try:
+            catalog_entry = sync_service.sync_to_public(provider, created=False)
 
-                logger.info(
-                    f"Successfully synced provider {provider_uuid} from {tenant_schema} "
-                    f"to PublicProviderCatalog (ID: {catalog_entry.id})"
-                )
+            logger.info(
+                f"Successfully synced provider {provider_uuid} from {tenant_schema} "
+                f"to PublicProviderCatalog (ID: {catalog_entry.id})"
+            )
 
-                return {
-                    'status': 'success',
-                    'catalog_id': catalog_entry.id,
-                    'provider_uuid': str(provider_uuid),
-                    'tenant_schema': tenant_schema,
-                    'display_name': catalog_entry.display_name,
-                }
+            return {
+                'status': 'success',
+                'catalog_id': catalog_entry.id,
+                'provider_uuid': str(provider_uuid),
+                'tenant_schema': tenant_schema,
+                'display_name': catalog_entry.display_name,
+            }
 
-            except Exception as e:
-                logger.error(
-                    f"Failed to sync provider {provider_uuid} from {tenant_schema} to catalog: {e}",
-                    exc_info=True
-                )
-                raise
+        except Exception as e:
+            logger.error(
+                f"Failed to sync provider {provider_uuid} from {tenant_schema} to catalog: {e}",
+                exc_info=True
+            )
+            raise
 
     except Tenant.DoesNotExist:
         logger.error(f"Tenant ID {tenant_id} not found")
@@ -1074,12 +1065,10 @@ def remove_provider_from_catalog_task(self, provider_uuid, tenant_schema):
     from tenants.models import PublicProviderCatalog
 
     try:
-        # Switch to public schema
-        with public_schema_context():
-            deleted_count, _ = PublicProviderCatalog.objects.filter(
-                tenant_schema_name=tenant_schema,
-                provider_uuid=provider_uuid
-            ).delete()
+        deleted_count, _ = PublicProviderCatalog.objects.filter(
+            tenant_schema_name=tenant_schema,
+            provider_uuid=provider_uuid
+        ).delete()
 
         if deleted_count > 0:
             logger.info(
@@ -1138,34 +1127,33 @@ def bulk_sync_tenant_providers(tenant_id):
         skipped_count = 0
         error_count = 0
 
-        with tenant_context(tenant):
-            # Get all providers that should be in catalog
-            providers = ServiceProvider.objects.filter(
-                marketplace_enabled=True,
-                is_active=True,
-                user__is_active=True,
-            ).select_related('user')
+        # Get all providers that should be in catalog
+        providers = ServiceProvider.objects.filter(
+            marketplace_enabled=True,
+            is_active=True,
+            user__is_active=True,
+        ).select_related('user')
 
-            total_count = providers.count()
+        total_count = providers.count()
 
-            logger.info(
-                f"Starting bulk provider sync for {tenant.name} "
-                f"({total_count} eligible providers)"
-            )
+        logger.info(
+            f"Starting bulk provider sync for {tenant.name} "
+            f"({total_count} eligible providers)"
+        )
 
-            for provider in providers:
-                try:
-                    if sync_service.should_sync(provider):
-                        sync_service.sync_to_public(provider)
-                        synced_count += 1
-                    else:
-                        skipped_count += 1
-                except Exception as e:
-                    logger.error(
-                        f"Error syncing provider {provider.uuid} in bulk sync: {e}",
-                        exc_info=True
-                    )
-                    error_count += 1
+        for provider in providers:
+            try:
+                if sync_service.should_sync(provider):
+                    sync_service.sync_to_public(provider)
+                    synced_count += 1
+                else:
+                    skipped_count += 1
+            except Exception as e:
+                logger.error(
+                    f"Error syncing provider {provider.uuid} in bulk sync: {e}",
+                    exc_info=True
+                )
+                error_count += 1
 
         result = {
             'status': 'completed',
@@ -1253,104 +1241,102 @@ def sync_service_to_public_catalog_task(self, service_uuid, tenant_schema, tenan
         # Load tenant
         tenant = Tenant.objects.get(pk=tenant_id)
 
-        # Switch to tenant schema and load service with related data
-        with tenant_context(tenant):
-            try:
-                service = Service.objects.select_related(
-                    'provider',
-                    'provider__user',
-                    'category'
-                ).prefetch_related(
-                    'images',
-                    'pricing_tiers',
-                    'provider__portfolio',
-                    'reviews'
-                ).get(uuid=service_uuid)
+        # Load service with related data
+        try:
+            service = Service.objects.select_related(
+                'provider',
+                'provider__user',
+                'category'
+            ).prefetch_related(
+                'images',
+                'pricing_tiers',
+                'provider__portfolio',
+                'reviews'
+            ).get(uuid=service_uuid)
 
-            except Service.DoesNotExist:
-                logger.warning(
-                    f"Service {service_uuid} not found in {tenant_schema}"
-                )
-                return {
-                    'status': 'not_found',
-                    'service_uuid': service_uuid,
-                    'tenant_schema': tenant_schema,
-                }
+        except Service.DoesNotExist:
+            logger.warning(
+                f"Service {service_uuid} not found in {tenant_schema}"
+            )
+            return {
+                'status': 'not_found',
+                'service_uuid': service_uuid,
+                'tenant_schema': tenant_schema,
+            }
 
-            # Initialize sync service
-            sync_service = ServicePublicSyncService()
+        # Initialize sync service
+        sync_service = ServicePublicSyncService()
 
-            # Check if service should be synced
-            if not sync_service.should_sync(service):
-                logger.info(
-                    f"Service {service_uuid} from {tenant_schema} does not meet sync conditions, "
-                    "removing from catalog if exists"
-                )
-                sync_service.remove_from_public(service)
+        # Check if service should be synced
+        if not sync_service.should_sync(service):
+            logger.info(
+                f"Service {service_uuid} from {tenant_schema} does not meet sync conditions, "
+                "removing from catalog if exists"
+            )
+            sync_service.remove_from_public(service)
 
-                # Update published flag
-                Service.objects.filter(uuid=service_uuid).update(
-                    published_to_catalog=False,
-                    catalog_synced_at=None
-                )
+            # Update published flag
+            Service.objects.filter(uuid=service_uuid).update(
+                published_to_catalog=False,
+                catalog_synced_at=None
+            )
 
-                return {
-                    'status': 'skipped',
-                    'reason': 'conditions_not_met',
-                    'service_uuid': service_uuid,
-                    'tenant_schema': tenant_schema,
-                }
+            return {
+                'status': 'skipped',
+                'reason': 'conditions_not_met',
+                'service_uuid': service_uuid,
+                'tenant_schema': tenant_schema,
+            }
 
-            # Sync to public catalog
-            try:
-                catalog_entry = sync_service.sync_to_public(service, created=False)
+        # Sync to public catalog
+        try:
+            catalog_entry = sync_service.sync_to_public(service, created=False)
 
-                # Update published flag in tenant schema
-                Service.objects.filter(uuid=service_uuid).update(
-                    published_to_catalog=True,
-                    catalog_synced_at=timezone.now()
-                )
+            # Update published flag in tenant schema
+            Service.objects.filter(uuid=service_uuid).update(
+                published_to_catalog=True,
+                catalog_synced_at=timezone.now()
+            )
 
-                logger.info(
-                    f"Successfully synced service {service_uuid} from {tenant_schema} "
-                    f"to PublicService catalog (ID: {catalog_entry.id})"
-                )
+            logger.info(
+                f"Successfully synced service {service_uuid} from {tenant_schema} "
+                f"to PublicService catalog (ID: {catalog_entry.id})"
+            )
 
-                # Get counts of synced related objects
-                from services_public.models import (
-                    PublicServiceImage,
-                    PublicServicePricingTier,
-                    PublicServicePortfolio
-                )
+            # Get counts of synced related objects
+            from services_public.models import (
+                PublicServiceImage,
+                PublicServicePricingTier,
+                PublicServicePortfolio
+            )
 
-                with public_schema_context():
-                    images_count = PublicServiceImage.objects.filter(
-                        service_id=catalog_entry.id
-                    ).count()
-                    tiers_count = PublicServicePricingTier.objects.filter(
-                        service_id=catalog_entry.id
-                    ).count()
-                    portfolio_count = PublicServicePortfolio.objects.filter(
-                        service_id=catalog_entry.id
-                    ).count()
+            images_count = PublicServiceImage.objects.filter(
+                service_id=catalog_entry.id
+            ).count()
+            tiers_count = PublicServicePricingTier.objects.filter(
+                service_id=catalog_entry.id
+            ).count()
+            portfolio_count = PublicServicePortfolio.objects.filter(
+                service_id=catalog_entry.id
+            ).count()
 
-                return {
-                    'status': 'success',
-                    'catalog_id': str(catalog_entry.id),
-                    'service_uuid': str(service_uuid),
-                    'tenant_schema': tenant_schema,
-                    'service_name': catalog_entry.name,
-                    'images_synced': images_count,
-                    'tiers_synced': tiers_count,
-                    'portfolio_synced': portfolio_count,
-                }
+            return {
+                'status': 'success',
+                'catalog_id': str(catalog_entry.id),
+                'service_uuid': str(service_uuid),
+                'tenant_schema': tenant_schema,
+                'service_name': catalog_entry.name,
+                'images_synced': images_count,
+                'tiers_synced': tiers_count,
+                'portfolio_synced': portfolio_count,
+            }
 
-            except Exception as e:
-                logger.error(
-                    f"Failed to sync service {service_uuid} from {tenant_schema} to catalog: {e}",
-                    exc_info=True
-                )
-                raise
+        except Exception as e:
+            logger.error(
+                f"Failed to sync service {service_uuid} from {tenant_schema} to catalog: {e}",
+                exc_info=True
+            )
+            raise
 
     except Tenant.DoesNotExist:
         logger.error(f"Tenant ID {tenant_id} not found")
@@ -1401,12 +1387,10 @@ def remove_service_from_public_catalog_task(self, service_uuid, tenant_schema):
     from services_public.models import PublicService
 
     try:
-        # Switch to public schema and delete service
-        with public_schema_context():
-            deleted_count, details = PublicService.objects.filter(
-                tenant_schema_name=tenant_schema,
-                service_uuid=service_uuid
-            ).delete()
+        deleted_count, details = PublicService.objects.filter(
+            tenant_schema_name=tenant_schema,
+            service_uuid=service_uuid
+        ).delete()
 
         if deleted_count > 0:
             logger.info(
@@ -1476,46 +1460,45 @@ def bulk_sync_tenant_services(tenant_id):
         queued_count = 0
         skipped_count = 0
 
-        with tenant_context(tenant):
-            # Get all services that should be in catalog
-            services = Service.objects.filter(
-                is_public=True,
-                is_active=True,
-            ).select_related('provider')
+        # Get all services that should be in catalog
+        services = Service.objects.filter(
+            is_public=True,
+            is_active=True,
+        ).select_related('provider')
 
-            total_count = services.count()
+        total_count = services.count()
 
-            logger.info(
-                f"Starting bulk service sync for {tenant.name} "
-                f"({total_count} eligible services)"
-            )
+        logger.info(
+            f"Starting bulk service sync for {tenant.name} "
+            f"({total_count} eligible services)"
+        )
 
-            for service in services:
-                try:
-                    # Check provider eligibility before queuing
-                    if (hasattr(service, 'provider') and service.provider and
-                        service.provider.marketplace_enabled and
-                        service.provider.is_active):
+        for service in services:
+            try:
+                # Check provider eligibility before queuing
+                if (hasattr(service, 'provider') and service.provider and
+                    service.provider.marketplace_enabled and
+                    service.provider.is_active):
 
-                        # Queue individual sync task for each service
-                        sync_service_to_public_catalog_task.delay(
-                            str(service.uuid),
-                            tenant.schema_name,
-                            tenant.id
-                        )
-                        queued_count += 1
-                    else:
-                        logger.debug(
-                            f"Skipping service {service.uuid}: provider not eligible"
-                        )
-                        skipped_count += 1
-
-                except Exception as e:
-                    logger.error(
-                        f"Error queuing sync for service {service.uuid}: {e}",
-                        exc_info=True
+                    # Queue individual sync task for each service
+                    sync_service_to_public_catalog_task.delay(
+                        str(service.uuid),
+                        tenant.schema_name,
+                        tenant.id
+                    )
+                    queued_count += 1
+                else:
+                    logger.debug(
+                        f"Skipping service {service.uuid}: provider not eligible"
                     )
                     skipped_count += 1
+
+            except Exception as e:
+                logger.error(
+                    f"Error queuing sync for service {service.uuid}: {e}",
+                    exc_info=True
+                )
+                skipped_count += 1
 
         result = {
             'status': 'completed',
@@ -1584,60 +1567,56 @@ def cleanup_orphaned_catalog_entries():
         checked_count = 0
 
         # Get all catalog entries
-        with public_schema_context():
-            catalog_services = PublicService.objects.all().values(
-                'id', 'service_uuid', 'tenant_schema_name', 'tenant_id'
-            )
+        catalog_services = PublicService.objects.all().values(
+            'id', 'service_uuid', 'tenant_schema_name', 'tenant_id'
+        )
 
-            for catalog_entry in catalog_services:
-                checked_count += 1
+        for catalog_entry in catalog_services:
+            checked_count += 1
 
-                try:
-                    # Check if tenant still exists
-                    tenant = Tenant.objects.filter(
-                        schema_name=catalog_entry['tenant_schema_name']
-                    ).first()
+            try:
+                # Check if tenant still exists
+                tenant = Tenant.objects.filter(
+                    schema_name=catalog_entry['tenant_schema_name']
+                ).first()
 
-                    if not tenant:
-                        # Tenant no longer exists, remove catalog entry
-                        PublicService.objects.filter(id=catalog_entry['id']).delete()
-                        removed_count += 1
-                        logger.info(
-                            f"Removed orphaned catalog entry {catalog_entry['id']} "
-                            f"(tenant {catalog_entry['tenant_schema_name']} not found)"
-                        )
-                        continue
-
-                    # Check if service still exists and is public in tenant schema
-                    with tenant_context(tenant):
-                        service = Service.objects.filter(
-                            uuid=catalog_entry['service_uuid']
-                        ).first()
-
-                        if not service:
-                            # Service no longer exists in tenant
-                            with public_schema_context():
-                                PublicService.objects.filter(id=catalog_entry['id']).delete()
-                            removed_count += 1
-                            logger.info(
-                                f"Removed orphaned catalog entry {catalog_entry['id']} "
-                                f"(service {catalog_entry['service_uuid']} not found in tenant)"
-                            )
-                        elif not (service.is_public and service.is_active):
-                            # Service exists but is no longer public/active
-                            with public_schema_context():
-                                PublicService.objects.filter(id=catalog_entry['id']).delete()
-                            removed_count += 1
-                            logger.info(
-                                f"Removed orphaned catalog entry {catalog_entry['id']} "
-                                f"(service no longer public/active)"
-                            )
-
-                except Exception as e:
-                    logger.error(
-                        f"Error checking catalog entry {catalog_entry['id']}: {e}",
-                        exc_info=True
+                if not tenant:
+                    # Tenant no longer exists, remove catalog entry
+                    PublicService.objects.filter(id=catalog_entry['id']).delete()
+                    removed_count += 1
+                    logger.info(
+                        f"Removed orphaned catalog entry {catalog_entry['id']} "
+                        f"(tenant {catalog_entry['tenant_schema_name']} not found)"
                     )
+                    continue
+
+                # Check if service still exists and is public in tenant schema
+                service = Service.objects.filter(
+                    uuid=catalog_entry['service_uuid']
+                ).first()
+
+                if not service:
+                    # Service no longer exists in tenant
+                    PublicService.objects.filter(id=catalog_entry['id']).delete()
+                    removed_count += 1
+                    logger.info(
+                        f"Removed orphaned catalog entry {catalog_entry['id']} "
+                        f"(service {catalog_entry['service_uuid']} not found in tenant)"
+                    )
+                elif not (service.is_public and service.is_active):
+                    # Service exists but is no longer public/active
+                    PublicService.objects.filter(id=catalog_entry['id']).delete()
+                    removed_count += 1
+                    logger.info(
+                        f"Removed orphaned catalog entry {catalog_entry['id']} "
+                        f"(service no longer public/active)"
+                    )
+
+            except Exception as e:
+                logger.error(
+                    f"Error checking catalog entry {catalog_entry['id']}: {e}",
+                    exc_info=True
+                )
 
         result = {
             'status': 'completed',
@@ -1693,28 +1672,27 @@ def resync_stale_catalog_entries(hours=24):
         checked_count = 0
 
         # Get all stale catalog entries
-        with public_schema_context():
-            stale_entries = PublicService.objects.filter(
-                synced_at__lt=cutoff_time
-            ).values('service_uuid', 'tenant_schema_name', 'tenant_id')
+        stale_entries = PublicService.objects.filter(
+            synced_at__lt=cutoff_time
+        ).values('service_uuid', 'tenant_schema_name', 'tenant_id')
 
-            for entry in stale_entries:
-                checked_count += 1
+        for entry in stale_entries:
+            checked_count += 1
 
-                try:
-                    # Queue re-sync task
-                    sync_service_to_public_catalog_task.delay(
-                        str(entry['service_uuid']),
-                        entry['tenant_schema_name'],
-                        entry['tenant_id']
-                    )
-                    resynced_count += 1
+            try:
+                # Queue re-sync task
+                sync_service_to_public_catalog_task.delay(
+                    str(entry['service_uuid']),
+                    entry['tenant_schema_name'],
+                    entry['tenant_id']
+                )
+                resynced_count += 1
 
-                except Exception as e:
-                    logger.error(
-                        f"Error queuing re-sync for service {entry['service_uuid']}: {e}",
-                        exc_info=True
-                    )
+            except Exception as e:
+                logger.error(
+                    f"Error queuing re-sync for service {entry['service_uuid']}: {e}",
+                    exc_info=True
+                )
 
         result = {
             'status': 'completed',

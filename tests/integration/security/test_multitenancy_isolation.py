@@ -30,7 +30,7 @@ from django.db import connection, connections
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django_tenants.utils import get_tenant_model, get_public_schema_name
+from tenants.utils import get_tenant_model, get_public_schema_name
 
 from tenants.models import Tenant, Domain, Plan
 from jobs.models import JobPosting, Candidate, Application, Interview, Offer

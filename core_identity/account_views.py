@@ -147,12 +147,10 @@ def profile_sync_settings_edit(request, tenant_uuid):
         messages.error(request, 'Tenant not found.')
         return redirect('custom_account_u:sync_settings_list')
 
-    # Verify user membership (check in tenant schema)
-    from django_tenants.utils import tenant_context
-    with tenant_context(tenant):
-        if not TenantUser.objects.filter(user=request.user, tenant=tenant).exists():
-            messages.error(request, 'You are not a member of this organization.')
-            return redirect('custom_account_u:sync_settings_list')
+    # Verify user membership
+    if not TenantUser.objects.filter(user=request.user, tenant=tenant).exists():
+        messages.error(request, 'You are not a member of this organization.')
+        return redirect('custom_account_u:sync_settings_list')
 
     # Get or create sync settings
     sync_settings, created = ProfileFieldSync.get_or_create_defaults(

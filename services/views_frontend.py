@@ -142,12 +142,11 @@ def service_detail(request, service_uuid):
     If accessed from public schema, redirects to the service's tenant subdomain.
     If accessed from tenant schema, displays the service detail.
     """
-    from django_tenants.utils import get_public_schema_name
     from tenants.models import PublicServiceCatalog
     from core.domain import get_tenant_url
 
     # Check if we're in the public schema
-    if hasattr(request, 'tenant') and request.tenant.schema_name == get_public_schema_name():
+    if hasattr(request, 'tenant') and request.tenant.schema_name == 'public':
         # Look up the service in PublicServiceCatalog to find its tenant
         catalog_entry = PublicServiceCatalog.objects.filter(
             uuid=service_uuid
@@ -434,12 +433,11 @@ def provider_profile_view(request, provider_uuid):
     If accessed from public schema, redirects to the provider's tenant subdomain.
     If accessed from tenant schema, displays the provider profile.
     """
-    from django_tenants.utils import get_public_schema_name
     from tenants.models import PublicServiceCatalog
     from core.domain import get_tenant_url
 
     # Check if we're in the public schema
-    if hasattr(request, 'tenant') and request.tenant.schema_name == get_public_schema_name():
+    if hasattr(request, 'tenant') and request.tenant.schema_name == 'public':
         # Look up the provider in PublicServiceCatalog to find their tenant
         catalog_entry = PublicServiceCatalog.objects.filter(
             provider_uuid=provider_uuid

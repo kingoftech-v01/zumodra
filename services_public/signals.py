@@ -9,7 +9,6 @@ import logging
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.db import connection
-from django_tenants.utils import get_public_schema_name
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ def sync_service_to_public_catalog(sender, instance, created, **kwargs):
         **kwargs: Additional signal arguments
     """
     # Skip if in public schema (avoid circular signals)
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         return
 
     # Only sync if service should be public
@@ -64,7 +63,7 @@ def remove_service_from_public_catalog(sender, instance, **kwargs):
         **kwargs: Additional signal arguments
     """
     # Skip if in public schema
-    if connection.schema_name == get_public_schema_name():
+    if connection.schema_name == 'public':
         return
 
     # Defer to Celery task for async processing

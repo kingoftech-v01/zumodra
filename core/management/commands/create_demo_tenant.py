@@ -165,41 +165,38 @@ class Command(BaseCommand):
     def _create_demo_data(self, tenant, base_domain='localhost'):
         """Create demo users and basic data."""
         from django.contrib.auth import get_user_model
-        from django_tenants.utils import schema_context
 
         User = get_user_model()
         demo_email = f'admin@demo.{base_domain}'
 
-        with schema_context('demo'):
-            # Import tenant-specific models within schema context
-            from tenant_profiles.models import TenantUser
+        from tenant_profiles.models import TenantUser
 
-            # Create admin user
-            admin, created = User.objects.get_or_create(
-                email=demo_email,
-                defaults={
-                    'first_name': 'Demo',
-                    'last_name': 'Admin',
-                    'is_active': True,
-                    'is_staff': True,
-                    'is_superuser': True,
-                }
-            )
-            if created:
-                admin.set_password('Demo@2024!')
-                admin.save()
-                self.stdout.write(f'   Created admin user: {admin.email}')
-            else:
-                self.stdout.write(f'   Admin user exists: {admin.email}')
+        # Create admin user
+        admin, created = User.objects.get_or_create(
+            email=demo_email,
+            defaults={
+                'first_name': 'Demo',
+                'last_name': 'Admin',
+                'is_active': True,
+                'is_staff': True,
+                'is_superuser': True,
+            }
+        )
+        if created:
+            admin.set_password('Demo@2024!')
+            admin.save()
+            self.stdout.write(f'   Created admin user: {admin.email}')
+        else:
+            self.stdout.write(f'   Admin user exists: {admin.email}')
 
-            # Create TenantUser relationship
-            TenantUser.objects.get_or_create(
-                user=admin,
-                tenant=tenant,
-                defaults={
-                    'role': 'OWNER',
-                    'is_active': True,
-                    'is_primary_tenant': True,
-                }
-            )
-            self.stdout.write('   Created tenant user relationship')
+        # Create TenantUser relationship
+        TenantUser.objects.get_or_create(
+            user=admin,
+            tenant=tenant,
+            defaults={
+                'role': 'OWNER',
+                'is_active': True,
+                'is_primary_tenant': True,
+            }
+        )
+        self.stdout.write('   Created tenant user relationship')

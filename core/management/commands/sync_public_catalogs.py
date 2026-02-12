@@ -8,7 +8,7 @@ Currently supports:
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
-from django_tenants.utils import get_tenant_model, schema_context
+from tenants.models import Tenant
 from core.sync.job_sync import JobCatalogSyncService
 
 
@@ -47,12 +47,12 @@ class Command(BaseCommand):
         # Get tenants to sync
         if tenant_schema:
             try:
-                tenants = [get_tenant_model().objects.get(schema_name=tenant_schema)]
+                tenants = [Tenant.objects.get(schema_name=tenant_schema)]
                 self.stdout.write(f"Syncing tenant: {tenant_schema}")
-            except get_tenant_model().DoesNotExist:
+            except Tenant.DoesNotExist:
                 raise CommandError(f"Tenant '{tenant_schema}' not found")
         else:
-            tenants = get_tenant_model().objects.exclude(schema_name='public')
+            tenants = Tenant.objects.exclude(schema_name='public')
             self.stdout.write(f"Syncing all tenants ({tenants.count()} found)")
 
         self.stdout.write('')
@@ -84,13 +84,12 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR(f"  ✗ Error: {str(e)}"))
             else:
                 # Dry run - just count
-                with schema_context(tenant.schema_name):
-                    from jobs.models import JobPosting
-                    job_count = JobPosting.objects.filter(
-                        status='open',
-                        published_on_career_page=True
-                    ).count()
-                    self.stdout.write(f"  Would sync {job_count} jobs")
+                from jobs.models import JobPosting
+                job_count = JobPosting.objects.filter(
+                    status='open',
+                    published_on_career_page=True
+                ).count()
+                self.stdout.write(f"  Would sync {job_count} jobs")
 
         self.stdout.write('')
         self.stdout.write('=' * 70)

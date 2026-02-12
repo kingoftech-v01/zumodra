@@ -10,7 +10,7 @@ Usage:
 
 from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
-from django_tenants.utils import schema_context, get_tenant_model
+from tenants.utils import schema_context, get_tenant_model
 
 
 class Command(BaseCommand):

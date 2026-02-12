@@ -8,7 +8,6 @@ Usage:
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django_tenants.utils import tenant_context
 
 from tenants.models import Tenant
 from tenant_profiles.models import TenantUser, TenantProfile
@@ -56,77 +55,76 @@ class Command(BaseCommand):
             self.stdout.write(f'\n--- Processing tenant: {tenant.name} ({tenant.schema_name}) ---')
 
             try:
-                with tenant_context(tenant):
-                    tenant_users = TenantUser.objects.select_related('user', 'department').all()
-                    self.stdout.write(f'Found {tenant_users.count()} TenantUser records')
+                tenant_users = TenantUser.objects.select_related('user', 'department').all()
+                self.stdout.write(f'Found {tenant_users.count()} TenantUser records')
 
-                    for tenant_user in tenant_users:
-                        try:
-                            # Check if TenantProfile already exists
-                            existing_profile = TenantProfile.objects.filter(
-                                user=tenant_user.user,
-                                tenant=tenant
-                            ).first()
+                for tenant_user in tenant_users:
+                    try:
+                        # Check if TenantProfile already exists
+                        existing_profile = TenantProfile.objects.filter(
+                            user=tenant_user.user,
+                            tenant=tenant
+                        ).first()
 
-                            if existing_profile:
-                                self.stdout.write(
-                                    self.style.WARNING(
-                                        f'  ⏭️  Skipped: {tenant_user.user.email} (profile already exists)'
-                                    )
-                                )
-                                continue
-
-                            if dry_run:
-                                self.stdout.write(
-                                    self.style.SUCCESS(
-                                        f'  ✓ Would create: {tenant_user.user.email} '
-                                        f'(job_title: {tenant_user.job_title or "Employee"})'
-                                    )
-                                )
-                                total_created += 1
-                                continue
-
-                            # Create TenantProfile (actual creation)
-                            with transaction.atomic():
-                                profile = TenantProfile.objects.create(
-                                    user=tenant_user.user,
-                                    tenant=tenant,
-                                    job_title=tenant_user.job_title or 'Employee',
-                                    department=tenant_user.department,
-                                )
-
-                                # Trigger initial sync from PublicProfile
-                                sync_result = ProfileSyncService.sync_on_invitation_acceptance(
-                                    user=tenant_user.user,
-                                    tenant=tenant
-                                )
-
-                                total_created += 1
-
-                                if sync_result.get('success'):
-                                    synced_fields = sync_result.get('synced_fields', [])
-                                    total_synced += 1
-                                    self.stdout.write(
-                                        self.style.SUCCESS(
-                                            f'  ✓ Created & Synced: {tenant_user.user.email} '
-                                            f'({len(synced_fields)} fields: {", ".join(synced_fields[:3])}...)'
-                                        )
-                                    )
-                                else:
-                                    self.stdout.write(
-                                        self.style.WARNING(
-                                            f'  ⚠️  Created but sync failed: {tenant_user.user.email} '
-                                            f'- {sync_result.get("error", "Unknown error")}'
-                                        )
-                                    )
-
-                        except Exception as e:
-                            total_errors += 1
+                        if existing_profile:
                             self.stdout.write(
-                                self.style.ERROR(
-                                    f'  ✗ Error processing {tenant_user.user.email}: {str(e)}'
+                                self.style.WARNING(
+                                    f'  Skipped: {tenant_user.user.email} (profile already exists)'
                                 )
                             )
+                            continue
+
+                        if dry_run:
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    f'  Would create: {tenant_user.user.email} '
+                                    f'(job_title: {tenant_user.job_title or "Employee"})'
+                                )
+                            )
+                            total_created += 1
+                            continue
+
+                        # Create TenantProfile (actual creation)
+                        with transaction.atomic():
+                            profile = TenantProfile.objects.create(
+                                user=tenant_user.user,
+                                tenant=tenant,
+                                job_title=tenant_user.job_title or 'Employee',
+                                department=tenant_user.department,
+                            )
+
+                            # Trigger initial sync from PublicProfile
+                            sync_result = ProfileSyncService.sync_on_invitation_acceptance(
+                                user=tenant_user.user,
+                                tenant=tenant
+                            )
+
+                            total_created += 1
+
+                            if sync_result.get('success'):
+                                synced_fields = sync_result.get('synced_fields', [])
+                                total_synced += 1
+                                self.stdout.write(
+                                    self.style.SUCCESS(
+                                        f'  Created & Synced: {tenant_user.user.email} '
+                                        f'({len(synced_fields)} fields: {", ".join(synced_fields[:3])}...)'
+                                    )
+                                )
+                            else:
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f'  Created but sync failed: {tenant_user.user.email} '
+                                        f'- {sync_result.get("error", "Unknown error")}'
+                                    )
+                                )
+
+                    except Exception as e:
+                        total_errors += 1
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f'  Error processing {tenant_user.user.email}: {str(e)}'
+                            )
+                        )
 
             except Exception as e:
                 total_errors += 1
