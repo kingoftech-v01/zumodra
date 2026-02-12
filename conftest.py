@@ -196,9 +196,8 @@ class TenantFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Override create to disable schema creation for tests."""
+        """Create tenant instance."""
         obj = model_class(*args, **kwargs)
-        obj.auto_create_schema = False
         obj.save()
         return obj
 
@@ -1551,3 +1550,35 @@ def mock_stripe():
             'account_link': mock_account_link,
             'payout': mock_payout
         }
+
+
+# ============================================================================
+# MOCK REQUEST
+# ============================================================================
+
+class MockTenantRequest:
+    """Mock request object with tenant context for testing views and permissions."""
+
+    def __init__(self, user=None, tenant=None, method='GET', path='/', **kwargs):
+        self.user = user
+        self.tenant = tenant
+        self.method = method
+        self.path = path
+        self.META = kwargs.get('META', {'REMOTE_ADDR': '127.0.0.1'})
+        self.session = kwargs.get('session', {})
+        self.data = kwargs.get('data', {})
+        self.query_params = kwargs.get('query_params', {})
+        self.FILES = kwargs.get('FILES', {})
+
+        # Set tenant-related attributes
+        if tenant:
+            self.tenant_settings = getattr(tenant, 'settings', None)
+            self.tenant_features = kwargs.get('tenant_features', {})
+        else:
+            self.tenant_settings = None
+            self.tenant_features = {}
+
+        # Apply any additional kwargs as attributes
+        for key, value in kwargs.items():
+            if key not in ('META', 'session', 'data', 'query_params', 'FILES', 'tenant_features'):
+                setattr(self, key, value)
