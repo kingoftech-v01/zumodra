@@ -8,6 +8,39 @@ This document tracks deprecated features, APIs, and code in the Zumodra codebase
 
 ## Removed in Current Version
 
+### Multi-Tenancy Architecture (Removed: v2.3.0)
+
+**Status**: **REMOVED**
+
+**Reason**: Schema-per-tenant isolation via `django-tenants` added unnecessary complexity. The platform now runs on a single database schema while preserving all business features (ATS, HR, Marketplace, etc.).
+
+**What Was Removed**:
+- `django-tenants>=3.5.0` dependency from `requirements.txt`
+- `django_tenants.middleware.main.TenantMainMiddleware` from middleware stack
+- `tenants.middleware.TenantURLConfMiddleware` from middleware stack
+- `DATABASE_ROUTERS` configuration (`django_tenants.routers.TenantSyncRouter`)
+- `SHARED_APPS` / `TENANT_APPS` split (replaced with flat `INSTALLED_APPS`)
+- `TENANT_MODEL`, `TENANT_DOMAIN_MODEL`, `PUBLIC_SCHEMA_URLCONF` settings
+- `settings_tenants.py` (replaced with deprecation stub)
+- `TenantMixin` / `DomainMixin` inheritance from Tenant and Domain models
+- `tenants/context.py` - Thread-local tenant context & schema switching
+- `tenants/middleware.py` - Tenant resolution & schema switching middleware
+- `tenants/router.py` - Database schema routing
+- `tenants/services.py` - Tenant lifecycle & provisioning
+- `tenants/tasks.py` - Celery tasks for tenant operations
+- `tenants/logging.py` - Tenant context logging
+- `tenants/validators.py` - Tenant type validators
+- `zumodra/urls_public.py` - Public schema URL routing
+- All `from django_tenants` imports across the entire codebase
+
+**What Was Kept**:
+- `tenants/models.py` - Tenant model preserved as Organization model (plain Django model)
+- `tenants/mixins.py` - Simplified (removed thread-local context auto-assignment)
+- `tenants/utils.py` - No-op compatibility shims: `schema_context()`, `get_tenant_model()`, `get_public_schema_name()`
+- All business features (ATS, HR, Marketplace, Finance apps, etc.)
+
+---
+
 ### FREELANCER Tenant Type (Removed: Phase 2)
 
 **Status**: ✅ **REMOVED**

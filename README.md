@@ -1,4 +1,4 @@
-# Zumodra - Multi-Tenant HR & Freelance Services Platform
+# Zumodra - HR & Freelance Services Platform
 
 **Enterprise-grade SaaS platform combining Jobs & Recruitment, Freelance Marketplace with Escrow, HR Management, and CRM functionality.**
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-Zumodra is a comprehensive multi-tenant platform that combines:
+Zumodra is a comprehensive platform that combines:
 
 - **Jobs & Recruitment** - Full hiring pipeline from job posting to offer
 - **Freelance Marketplace** - Service listings with proposals and escrow payments
@@ -45,7 +45,7 @@ docker compose up -d
 # Create superuser
 docker compose exec web python manage.py createsuperuser
 
-# (Optional) Create demo tenant with sample data
+# (Optional) Create demo organization with sample data
 docker compose exec web python manage.py bootstrap_demo_tenant
 
 # Access application
@@ -116,9 +116,9 @@ If you see this error:
 
 ---
 
-### Demo Tenant
+### Demo Organization
 
-For testing and exploration, create a demo tenant with rich sample data:
+For testing and exploration, create a demo organization with rich sample data:
 
 ```bash
 # Manual creation
@@ -190,34 +190,18 @@ celery -A zumodra beat --loglevel=info
 
 > See [docs/SECURITY.md](docs/SECURITY.md) for the complete security policy including CSP configuration.
 
-### Tenant Type System
+### Organization System
 
-Zumodra supports two distinct tenant types with different capabilities:
+Zumodra uses organizations (tenants) to group users and manage access:
 
-| Feature                  | COMPANY                | FREELANCER                   |
-|--------------------------|------------------------|------------------------------|
-| Create jobs (ATS)        | ✅ Yes                 | ❌ No                        |
-| Create services          | ✅ Yes                 | ✅ Yes                       |
-| Have employees (HR)      | ✅ Yes                 | ❌ No (single-user only)     |
-| Career page              | ✅ Yes                 | ❌ No                        |
-| Publish to marketplace   | ✅ Yes                 | ✅ Yes                       |
-| Switch tenant type       | ✅ Yes (if ≤1 member)  | ✅ Yes (always)              |
-
-**Key Concepts:**
-
-- **Freelancers are tenants** (not user states) - single-user organizations that provide services
-- **Tenants can switch types**: Company ↔ Freelancer
-- **Hiring contexts**: Users can hire services PERSONALLY or ON BEHALF of their tenant
-- **Verification levels**:
-  - User: CV verification + KYC verification (global, not tenant-specific)
-  - Tenant: EIN/business number verification (via API)
+- **Role-Based Access** - PDG, Supervisor, HR, Recruiter, Employee, Viewer
+- **Plan-Based Features** - Feature flags per subscription tier
+- **Verification** - KYC verification, EIN/business number verification
 
 **Documentation:**
 
-- [Tenant Type API Reference](docs/api/tenant_types.md) - Complete API guide
 - [Verification System](docs/verification.md) - CV/KYC/EIN verification workflows
-- [UI Components](docs/components.md) - 8 reusable components for tenant types
-- [Multi-Tenancy Logic](SAAS_MULTI_TENANCY_LOGIC.md) - Complete architecture documentation
+- [UI Components](docs/components.md) - Reusable UI components
 
 ---
 
@@ -262,7 +246,7 @@ zumodra/
 ├── careers/            # Public career pages
 ├── ai_matching/        # AI-powered matching
 ├── integrations/       # Third-party integrations
-├── tenants/            # Multi-tenant management
+├── tenants/            # Organization management
 ├── api/                # REST API infrastructure
 ├── core/               # Shared utilities & security middleware
 ├── templates/          # Django templates
@@ -362,33 +346,30 @@ reverse('api_v1:messages_sys:conversation-detail', args=[uuid])
 
 Zumodra includes several custom management commands for common operations:
 
-### Tenant Management
+### Organization Management
 
 ```bash
-# Bootstrap a demo tenant with comprehensive sample data
+# Bootstrap a demo organization with comprehensive sample data
 python manage.py bootstrap_demo_tenant
 python manage.py bootstrap_demo_tenant --reset      # Delete and recreate
 python manage.py bootstrap_demo_tenant --dry-run    # Preview changes
 
-# Create a beta tenant for early adopters
+# Create a beta organization for early adopters
 python manage.py setup_beta_tenant "Company Name" "owner@email.com"
 python manage.py setup_beta_tenant "Acme Corp" "admin@acme.com" --plan beta_enterprise --trial-days 90
 
-# Create a basic demo tenant with sample data
+# Create a basic demo organization with sample data
 python manage.py setup_demo_data
 python manage.py setup_demo_data --num-jobs 20 --num-candidates 100 --reset
 
-# Create a standard tenant
+# Create a standard organization
 python manage.py create_tenant
 
 # Set up subscription plans
 python manage.py setup_plans
 
-# Clean up inactive tenants
+# Clean up inactive organizations
 python manage.py cleanup_inactive_tenants --days 90 --dry-run
-
-# Migrate data between tenant schemas
-python manage.py migrate_tenant_data
 ```
 
 ### Infrastructure & Utilities
@@ -403,19 +384,6 @@ python manage.py health_check --json    # Output as JSON
 python manage.py generate_api_docs
 python manage.py generate_api_docs --format markdown
 python manage.py generate_api_docs --format html --output docs/api
-```
-
-### Django-Tenants Migrations
-
-```bash
-# Run migrations on all schemas
-python manage.py migrate_schemas
-
-# Run migrations only on shared (public) schema
-python manage.py migrate_schemas --shared
-
-# Run migrations only on tenant schemas
-python manage.py migrate_schemas --tenant
 ```
 
 ---
@@ -456,7 +424,7 @@ python manage.py check --deploy
 | **Deployment** | [Deployment Summary](docs/deployment/DEPLOYMENT_SUMMARY.md) - Latest fixes & deployment |
 | | [Migration Fix Guide](docs/deployment/MIGRATION_FIX_README.md) - Migration troubleshooting |
 | | [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - General deployment |
-| **Architecture** | [Multi-Tenancy Logic](docs/architecture/SAAS_MULTI_TENANCY_LOGIC.md) - Tenant architecture |
+| **Architecture** | [Platform Architecture](docs/architecture/SAAS_MULTI_TENANCY_LOGIC.md) - Platform architecture |
 | | [Domain Model](docs/domain_model.md) - Data model |
 | | [Features](docs/FEATURES.md) - Platform features |
 | **Security** | [Security Policy](docs/SECURITY.md) - Security documentation |
@@ -516,19 +484,18 @@ FEATURE_ENABLE_AI_MATCHING=False
 
 ---
 
-## Multi-Tenancy
+## Organization & Access Control
 
-Zumodra supports full multi-tenant architecture:
+Zumodra uses organizations to manage teams and access:
 
-- **Tenant Isolation** - Each tenant has isolated data
-- **Custom Domains** - Per-tenant domain support
-- **Role-Based Access** - PDG, Supervisor, HR, Recruiter, Employee, Viewer
+- **Role-Based Access** - PDG, Supervisor, HR Manager, Recruiter, Employee, Viewer
 - **Plan-Based Features** - Feature flags per subscription tier
+- **Custom Domains** - Per-organization domain support
 
 ```python
-# Tenant roles
-TENANT_ROLES = [
-    'pdg',          # Full tenant access
+# Organization roles
+ORGANIZATION_ROLES = [
+    'pdg',          # Full organization access
     'supervisor',   # Circusale + subordinates
     'hr_manager',   # HR operations
     'recruiter',    # ATS access
@@ -579,5 +546,5 @@ Proprietary - All Rights Reserved
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** January 2026
+**Version:** 2.3.0
+**Last Updated:** February 2026
