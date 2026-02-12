@@ -46,8 +46,6 @@ DATABASES = {
     }
 }
 
-# Disable django-tenants routers for unit testing (all tables in public schema)
-DATABASE_ROUTERS = []
 
 # =============================================================================
 # CACHING CONFIGURATION
@@ -181,7 +179,6 @@ OPENAI_API_KEY = 'sk-test-mock-key-for-testing'
 
 # Remove middleware that may interfere with tests
 MIDDLEWARE = [m for m in MIDDLEWARE if m not in [
-    'django_tenants.middleware.main.TenantMainMiddleware',
     'csp.middleware.CSPMiddleware',
     'axes.middleware.AxesMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
@@ -192,10 +189,6 @@ MIDDLEWARE = [m for m in MIDDLEWARE if m not in [
 # INSTALLED APPS ADJUSTMENTS
 # =============================================================================
 
-# Remove django_tenants for unit tests (all tables in single schema)
-INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
-    'django_tenants',
-]]
 
 # =============================================================================
 # REST FRAMEWORK TEST SETTINGS

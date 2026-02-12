@@ -47,25 +47,13 @@ DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.localhost'])
 
 # =============================================================================
-# MULTI-TENANT CONFIGURATION
+# APPLICATION CONFIGURATION
 # =============================================================================
-# django-tenants: Shared apps run on public schema, tenant apps on tenant schemas
-
-# =============================================================================
-# DJANGO-TENANTS APP CONFIGURATION
-# =============================================================================
-# IMPORTANT: django-tenants uses SHARED_APPS and TENANT_APPS to determine
-# which apps get migrated to which schemas:
-# - SHARED_APPS: Only migrated to PUBLIC schema (shared across all tenants)
-# - TENANT_APPS: Only migrated to TENANT schemas (isolated per tenant)
-# - INSTALLED_APPS: Computed from both lists (DO NOT define manually!)
+# All apps run in a single database schema (multi-tenancy removed 2026-02-12)
 # =============================================================================
 
-SHARED_APPS = [
-    # Django Tenants (MUST be first)
-    'django_tenants',
-
-    # Django Core - SHARED (public schema only)
+INSTALLED_APPS = [
+    # Django Core
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -73,34 +61,35 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',  # PostGIS for geographic fields in public schema
+    'django.contrib.gis',
+    'django.contrib.humanize',
+    'django.contrib.sitemaps',
 
-    # Core Identity & Verification - SHARED (users can belong to multiple tenants)
+    # Core Identity & Verification
     'core_identity',
 
-    # Tenant Management - SHARED
-    'tenants',
+    # Main app
     'main',
 
-    # Allauth Authentication - SHARED (users can belong to multiple tenants)
-    # Must be in SHARED to allow login/signup on public site
+    # Authentication (allauth with MFA)
     'allauth',
     'allauth.account',
-    'allauth.mfa',  # Built-in MFA support (TOTP, WebAuthn) in allauth 65.3.0+
+    'allauth.mfa',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.linkedin_oauth2',
 
-    # Celery Beat - SHARED (single scheduler for entire platform)
+    # Celery Beat
     'django_celery_beat',
 
-    # Security - SHARED (platform-wide)
+    # Security
     'axes',
     'admin_honeypot',
+    'csp',
 
-    # Wagtail CMS - SHARED (needed for public site, shared content across tenants)
+    # Wagtail CMS
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -117,45 +106,24 @@ SHARED_APPS = [
     'modelcluster',
     'taggit',
 
-    # PUBLIC CATALOG APPS (shared - cross-tenant browsing without tenant context)
-    'jobs_public',  # Public job catalog for browsing (renamed from ats_public 2026-01-18)
-    'services_public',  # Public service/provider catalog for marketplace
-    'projects_public',  # Public project catalog for mission-based opportunities
-
-    # Finance Apps - SHARED (PUBLIC schema)
-    'billing',  # Platform subscription management (Zumodra charges tenants) - Phase 11 (2026-01-18)
-]
-
-TENANT_APPS = [
-    # Django Core - TENANT-SPECIFIC
-    'django.contrib.contenttypes',  # Needed for auditlog, generic FKs in tenant schemas
-    'django.contrib.sites',  # Each tenant needs its own Site for allauth
-    'django.contrib.humanize',
-    'django.contrib.sitemaps',
-    'django.contrib.gis',
-
     # Third-Party UI/Forms
     'widget_tweaks',
     'tinymce',
     'leaflet',
     'crispy_forms',
 
-    # Analytics & Tracking - TENANT-SPECIFIC
+    # Analytics & Tracking
     'analytical',
-    # 'newsletter',  # REMOVED (2026-01-18): Merged into 'marketing_campaigns'
     'auditlog',
     'user_agents',
     'import_export',
     'sorl.thumbnail',
     'phonenumber_field',
 
-    # Security - TENANT-SPECIFIC
-    'csp',
-    'sslserver',
-
     # Task Scheduling
     'django_q',
     'django_extensions',
+    'sslserver',
 
     # REST API & Documentation
     'rest_framework',
@@ -167,24 +135,29 @@ TENANT_APPS = [
     # WebSockets
     'channels',
 
-    # Zumodra Core Apps - TENANT-SPECIFIC
-    'tenant_profiles',  # Renamed from 'accounts' (Phase 10 - 2026-01-18)
-    'jobs',  # Renamed from 'jobs' (2026-01-18)
+    # Public Catalog Apps
+    'jobs_public',
+    'services_public',
+    'projects_public',
+
+    # Finance & Billing
+    'billing',
+    'payments',
+    'escrow',
+    'payroll',
+    'expenses',
+    'subscriptions',
+    'stripe_connect',
+    'tax',
+    'accounting',
+    'finance_webhooks',
+
+    # Core Feature Apps
+    'tenant_profiles',
+    'jobs',
     'hr_core',
     'services',
-    'projects',  # Project missions (distinct from ongoing services)
-
-    # Finance Apps (Phase 11) - Split from monolithic 'finance' app (2026-01-18)
-    'payments',          # Payment transactions, multi-currency support
-    'escrow',           # Escrow management for marketplace
-    'payroll',          # Employee payroll processing
-    'expenses',         # Business expense tracking
-    'subscriptions',    # Tenant subscription products
-    'stripe_connect',   # Marketplace payment infrastructure
-    'tax',              # Tax calculation & Avalara integration
-    'accounting',       # QuickBooks/Xero integration
-    'finance_webhooks', # Webhook monitoring
-
+    'projects',
     'messages_sys',
     'notifications',
     'careers',
@@ -196,20 +169,10 @@ TENANT_APPS = [
     'configurations',
     'core',
     'security',
-    'marketing_campaigns',  # Phase 8: Merged from 'marketing' + 'newsletter' (2026-01-18)
+    'marketing_campaigns',
     'api',
-    'interviews',  # Changed from 'interviews.apps.InterviewsConfig' (2026-01-18)
+    'interviews',
 ]
-
-# INSTALLED_APPS: Computed from SHARED_APPS + TENANT_APPS (django-tenants standard)
-# This ensures proper migration behavior for multi-tenant schemas
-INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
-
-# Multi-tenant model configuration
-# NOTE: Models are defined in tenants.models but re-exported from main.models
-# for backwards compatibility. Either path works due to the re-export.
-TENANT_MODEL = "tenants.Tenant"
-TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 SITE_ID = 1
 
@@ -220,10 +183,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
-    # Multi-Tenancy (must be first)
-    'django_tenants.middleware.main.TenantMainMiddleware',
-    'tenants.middleware.TenantURLConfMiddleware',  # Fix URL conf for public schema
-
     # Security
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -303,8 +262,7 @@ ASGI_APPLICATION = 'zumodra.asgi.application'
 
 DATABASES = {
     'default': {
-        # Use django-tenants database backend wrapper for PostGIS
-        'ENGINE': 'django_tenants.postgresql_backend',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         # Support both DB_NAME and DB_DEFAULT_NAME (DB_NAME takes priority)
         'NAME': env('DB_NAME', default=env('DB_DEFAULT_NAME', default='zumodra')),
         'USER': env('DB_USER', default='postgres'),
@@ -314,14 +272,6 @@ DATABASES = {
         'PORT': env('DB_PORT', default=env('DB_DEFAULT_PORT', default='5432')),
     }
 }
-
-# Original backend for django-tenants to wrap (PostGIS for geospatial support)
-ORIGINAL_BACKEND = "django.contrib.gis.db.backends.postgis"
-
-# Database routers for multi-tenancy
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -341,10 +291,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# ROUTERS FOR TENANTS
-# DATABASE_ROUTERS = (
-#     'django_tenants.routers.TenantSyncRouter',
-# )
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -414,9 +360,6 @@ PRIMARY_DOMAIN = env('PRIMARY_DOMAIN', default=env('BASE_DOMAIN', default='local
 _default_site_url = f"http://localhost:{env('WEB_PORT', default='8002')}" if DEBUG else ''
 SITE_URL = env('SITE_URL', default=_default_site_url)
 
-# Base domain for tenant subdomains
-# Tenants are accessed at: {tenant-slug}.{TENANT_BASE_DOMAIN}
-TENANT_BASE_DOMAIN = env('TENANT_BASE_DOMAIN', default=PRIMARY_DOMAIN)
 
 # API base URL (optional, defaults to SITE_URL/api)
 API_BASE_URL = env('API_BASE_URL', default=f"{SITE_URL}/api" if SITE_URL else '')
@@ -580,7 +523,6 @@ CELERY_TASK_ROUTES = {
 
     # Payment tasks
     'finance.tasks.*': {'queue': 'payments'},
-    'tenants.tasks.process_subscription_*': {'queue': 'payments'},
 
     # Analytics tasks
     'analytics.tasks.*': {'queue': 'analytics'},
@@ -1004,14 +946,13 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Zumodra API',
     'DESCRIPTION': '''
-    Zumodra Multi-Tenant SaaS Platform REST API
+    Zumodra SaaS Platform REST API
 
     A comprehensive freelance services marketplace with integrated CRM tools,
     interview scheduling, escrow payments, real-time messaging, email marketing,
     and content management.
 
     ## Features
-    - Multi-tenant architecture for enterprise scalability
     - JWT and Session authentication
     - Role-based access control (RBAC)
     - Real-time WebSocket messaging
@@ -1067,7 +1008,6 @@ SPECTACULAR_SETTINGS = {
         {'name': 'HR', 'description': 'Human resources and talent management'},
         {'name': 'ATS', 'description': 'Applicant tracking system'},
         {'name': 'Analytics', 'description': 'Platform analytics and reporting'},
-        {'name': 'Tenants', 'description': 'Multi-tenant management'},
     ],
 
     # Component split for better organization
@@ -1210,22 +1150,6 @@ APNS_BUNDLE_ID = env('APNS_BUNDLE_ID', default='com.zumodra.app')
 APNS_CERT_PATH = env('APNS_CERT_PATH', default='')
 APNS_CERT_PASSWORD = env('APNS_CERT_PASSWORD', default='')
 
-# ==================== TENANT CONFIGURATION ====================
-
-# Public schema URL routing
-PUBLIC_SCHEMA_URLCONF = 'zumodra.urls_public'
-
-# Show public schema if no tenant found (required for health checks and public pages)
-SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
-
-# Default tenant schema
-DEFAULT_SCHEMA_NAME = 'public'
-
-# Auto-create public tenant
-AUTO_CREATE_PUBLIC_SCHEMA = True
-
-# Tenant subfolder prefix for static/media
-MULTITENANT_RELATIVE_MEDIA_ROOT = '%s/media'
 
 # ==================== SECURITY HEADERS ====================
 
