@@ -62,8 +62,7 @@ class CompanySetupWizard(LoginRequiredMixin, SessionWizardView):
         """
         Process complete signup and create tenant.
         """
-        from tenants.services import TenantService
-        from tenants.models import Plan
+        from tenants.models import Tenant, Plan, Domain
         from tenant_profiles.models import TenantUser
         from finance.stripe_service import StripeService, StripeNotConfiguredError
 
@@ -108,27 +107,31 @@ class CompanySetupWizard(LoginRequiredMixin, SessionWizardView):
 
         # Create tenant
         try:
-            tenant = TenantService.create_tenant(
+            from django.utils.text import slugify
+            tenant = Tenant.objects.create(
                 name=company_data['company_name'],
+                slug=slugify(company_data['company_name']),
                 owner_email=self.request.user.email,
                 plan=plan,
                 tenant_type='company',
-                stripe_customer_id=stripe_customer_id,
-                stripe_subscription_id=stripe_subscription_id,
-                metadata={
-                    'company_size': company_data['company_size'],
-                    'industry': company_data['industry'],
-                    'website': company_data.get('website', ''),
-                }
+                stripe_customer_id=stripe_customer_id or '',
+                stripe_subscription_id=stripe_subscription_id or '',
+                company_size=company_data.get('company_size', ''),
+                industry=company_data.get('industry', ''),
+                website=company_data.get('website', ''),
+            )
+
+            # Create primary domain
+            Domain.objects.create(
+                tenant=tenant,
+                domain=f"{tenant.slug}.zumodra.com",
+                is_primary=True,
             )
 
             logger.info(
-                f"Created tenant {tenant.schema_name} for company "
+                f"Created organization {tenant.slug} for company "
                 f"{company_data['company_name']}"
             )
-
-            # Provision tenant (run migrations, create default data)
-            TenantService.provision_tenant(tenant)
 
             # Add user as OWNER
             TenantUser.objects.create(

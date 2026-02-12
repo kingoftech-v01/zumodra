@@ -45,7 +45,7 @@ DATABASES['default'].update({
 # Add read replica for read-heavy operations
 if env.bool('USE_READ_REPLICA', default=False):
     DATABASES['replica'] = {
-        'ENGINE': 'django_tenants.postgresql_backend',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': env('DB_REPLICA_NAME', default=env('DB_DEFAULT_NAME', default='zumodra')),
         'USER': env('DB_REPLICA_USER', default=env('DB_USER', default='postgres')),
         'PASSWORD': env('DB_REPLICA_PASSWORD', default=env('DB_PASSWORD')),
@@ -60,7 +60,6 @@ if env.bool('USE_READ_REPLICA', default=False):
     # Database router for read/write splitting
     DATABASE_ROUTERS = [
         'core.db.routers.ReadReplicaRouter',
-        'django_tenants.routers.TenantSyncRouter',
     ]
 
 

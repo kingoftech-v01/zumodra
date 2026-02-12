@@ -157,6 +157,10 @@ class Tenant(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255, help_text=_('Organization name'))
     slug = models.SlugField(max_length=100, unique=True)
+    schema_name = models.CharField(
+        max_length=63, unique=True, db_index=True, blank=True, default='',
+        help_text=_('Internal identifier (legacy, auto-populated from slug)')
+    )
 
     # Status & Plan
     status = models.CharField(
@@ -283,6 +287,11 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.schema_name and self.slug:
+            self.schema_name = self.slug.replace('-', '_')
+        super().save(*args, **kwargs)
 
     def clean(self):
         super().clean()

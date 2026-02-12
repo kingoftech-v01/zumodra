@@ -1,15 +1,14 @@
 """
-Comprehensive Tests for Zumodra Tenants App
+Comprehensive Tests for Zumodra Tenants (Organization) App
 
 Tests cover:
 1. Model creation and validation
 2. Model relationships
 3. Signal handlers
-4. Tenant isolation (data doesn't leak between tenants)
+4. Organization isolation (data doesn't leak between organizations)
 5. Plan feature enforcement
 6. Domain routing
-7. Tenant lifecycle (trial, active, suspended)
-8. Middleware functionality
+7. Organization lifecycle (trial, active, suspended)
 """
 
 import pytest
@@ -21,18 +20,15 @@ from unittest.mock import MagicMock, patch, PropertyMock
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.http import HttpResponse, HttpRequest
-from django.contrib.sites.models import Site
 
 from conftest import (
     PlanFactory, FreePlanFactory, EnterprisePlanFactory,
     TenantFactory, TrialTenantFactory,
     TenantSettingsFactory, DomainFactory,
     TenantInvitationFactory, TenantUsageFactory, AuditLogFactory,
-    UserFactory, TenantUserFactory, MockTenantRequest,
-    tenant_context
+    UserFactory, TenantUserFactory,
 )
 
 from tenants.models import (
@@ -43,16 +39,6 @@ from tenants.models import (
 from tenants.signals import (
     create_tenant_settings, cleanup_tenant,
     set_invitation_token, generate_invitation_token
-)
-from tenants.middleware import (
-    TenantURLConfMiddleware, ZumodraTenantMiddleware,
-    TenantContextMiddleware, TenantUsageMiddleware,
-    TenantSecurityMiddleware, TenantResolutionError,
-    TenantNotFoundError, TenantInactiveError
-)
-from tenants.context import (
-    get_current_tenant, set_current_tenant, clear_tenant_context,
-    tenant_context as context_manager, TenantContext
 )
 
 
@@ -1050,7 +1036,6 @@ class TestTenantSignals:
         tenant = Tenant.objects.create(
             name='Signal Test Tenant',
             slug='signal-test-tenant',
-            schema_name='signal_test_tenant',
             plan=plan,
             owner_email='test@example.com'
         )
@@ -1064,7 +1049,6 @@ class TestTenantSignals:
         tenant = Tenant.objects.create(
             name='Usage Test Tenant',
             slug='usage-test-tenant',
-            schema_name='usage_test_tenant',
             plan=plan,
             owner_email='test@example.com'
         )
@@ -1078,7 +1062,6 @@ class TestTenantSignals:
         tenant = Tenant.objects.create(
             name='Trial Test Tenant',
             slug='trial-test-tenant',
-            schema_name='trial_test_tenant',
             plan=plan,
             owner_email='test@example.com',
             on_trial=True
@@ -1348,218 +1331,6 @@ class TestTenantLifecycle:
 # MIDDLEWARE TESTS
 # ============================================================================
 
-@pytest.mark.django_db
-class TestTenantMiddleware:
-    """Test tenant middleware functionality."""
-
-    def test_tenant_urlconf_middleware(self):
-        """Test TenantURLConfMiddleware applies urlconf."""
-        middleware = TenantURLConfMiddleware(lambda r: HttpResponse('OK'))
-
-        request = HttpRequest()
-        request.urlconf = 'tenant_urls'
-        request.method = 'GET'
-
-        response = middleware(request)
-
-        assert response.status_code == 200
-
-    def test_tenant_urlconf_middleware_no_urlconf(self):
-        """Test middleware handles missing urlconf gracefully."""
-        middleware = TenantURLConfMiddleware(lambda r: HttpResponse('OK'))
-
-        request = HttpRequest()
-        request.method = 'GET'
-
-        response = middleware(request)
-
-        assert response.status_code == 200
-
-    def test_zumodra_tenant_middleware_exempt_urls(self, tenant_factory):
-        """Test exempt URLs bypass tenant checks."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        exempt_paths = ['/admin/', '/accounts/', '/api/public/', '/static/']
-
-        for path in exempt_paths:
-            assert middleware._is_exempt_url(path) is True
-
-    def test_zumodra_tenant_middleware_extract_subdomain(self, tenant_factory):
-        """Test subdomain extraction."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        # Test with mock settings
-        with patch.object(middleware, '_extract_subdomain') as mock_extract:
-            mock_extract.return_value = 'acme'
-            result = middleware._extract_subdomain('acme.zumodra.com')
-            assert result == 'acme'
-
-    def test_tenant_context_middleware(self, tenant_factory, user_factory):
-        """Test TenantContextMiddleware adds context."""
-        middleware = TenantContextMiddleware(lambda r: HttpResponse('OK'))
-
-        plan = PlanFactory(feature_ats=True, feature_hr_core=False)
-        tenant = tenant_factory(plan=plan)
-        user = user_factory()
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.user = user
-        request.method = 'GET'
-        request.tenant_features = {'jobs': True, 'hr_core': False}
-
-        response = middleware(request)
-
-        assert response.status_code == 200
-        # Context should be cleared after response
-        assert get_current_tenant() is None
-
-    def test_tenant_security_middleware_ip_whitelist(self, tenant_factory, tenant_settings_factory, user_factory):
-        """Test IP whitelist enforcement."""
-        middleware = TenantSecurityMiddleware(lambda r: HttpResponse('OK'))
-
-        tenant = tenant_factory()
-        settings = tenant_settings_factory(
-            tenant=tenant,
-            ip_whitelist=['192.168.1.1']
-        )
-        user = user_factory(is_staff=True)
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.tenant_settings = settings
-        request.user = user
-        request._is_public_tenant = False
-        request.META = {'REMOTE_ADDR': '10.0.0.1'}
-        request.method = 'GET'
-
-        response = middleware(request)
-
-        # Should be forbidden due to IP not in whitelist
-        assert response.status_code == 403
-
-    def test_tenant_security_middleware_2fa_required(self, tenant_factory, tenant_settings_factory, user_factory):
-        """Test 2FA enforcement."""
-        middleware = TenantSecurityMiddleware(lambda r: HttpResponse('OK'))
-
-        tenant = tenant_factory()
-        settings = tenant_settings_factory(
-            tenant=tenant,
-            require_2fa=True,
-            ip_whitelist=[]  # Empty whitelist
-        )
-        user = user_factory()
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.tenant_settings = settings
-        request.user = user
-        request._is_public_tenant = False
-        request.session = {'2fa_verified': False}
-        request.path = '/dashboard/'
-        request.META = {'REMOTE_ADDR': '127.0.0.1'}
-        request.method = 'GET'
-
-        response = middleware(request)
-
-        # Should redirect to 2FA verification
-        assert response.status_code == 302
-
-    def test_tenant_security_middleware_security_headers(self, tenant_factory, tenant_settings_factory):
-        """Test security headers are added."""
-        middleware = TenantSecurityMiddleware(lambda r: HttpResponse('OK'))
-
-        tenant = tenant_factory()
-        settings = tenant_settings_factory(tenant=tenant, require_2fa=False, ip_whitelist=[])
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.tenant_settings = settings
-        request._is_public_tenant = True  # Bypass security checks
-        request.META = {'REMOTE_ADDR': '127.0.0.1'}
-        request.method = 'GET'
-
-        response = middleware(request)
-
-        assert response['X-Content-Type-Options'] == 'nosniff'
-        assert response['X-Frame-Options'] == 'SAMEORIGIN'
-
-
-# ============================================================================
-# TENANT CONTEXT TESTS
-# ============================================================================
-
-@pytest.mark.django_db
-class TestTenantContext:
-    """Test tenant context management."""
-
-    def test_set_and_get_current_tenant(self, tenant_factory):
-        """Test setting and getting current tenant."""
-        tenant = tenant_factory()
-
-        set_current_tenant(tenant)
-        assert get_current_tenant() == tenant
-
-        # Cleanup
-        clear_tenant_context()
-
-    def test_clear_tenant_context(self, tenant_factory):
-        """Test clearing tenant context."""
-        tenant = tenant_factory()
-        set_current_tenant(tenant)
-
-        clear_tenant_context()
-
-        assert get_current_tenant() is None
-
-    def test_tenant_context_manager(self, tenant_factory):
-        """Test tenant_context context manager."""
-        tenant = tenant_factory()
-
-        with context_manager(tenant, activate_schema=False):
-            assert get_current_tenant() == tenant
-
-        # Context should be cleared after exiting
-        # Note: May need cleanup depending on implementation
-        clear_tenant_context()
-
-    def test_nested_tenant_contexts(self, tenant_factory):
-        """Test nested tenant contexts."""
-        tenant1 = tenant_factory(slug='tenant-1')
-        tenant2 = tenant_factory(slug='tenant-2')
-
-        with context_manager(tenant1, activate_schema=False):
-            assert get_current_tenant() == tenant1
-
-            with context_manager(tenant2, activate_schema=False):
-                assert get_current_tenant() == tenant2
-
-            # Should return to tenant1
-            assert get_current_tenant() == tenant1
-
-        clear_tenant_context()
-
-    def test_tenant_context_class(self):
-        """Test TenantContext class."""
-        ctx = TenantContext()
-
-        assert ctx.tenant is None
-        assert ctx.is_public_schema is True
-
-    def test_tenant_context_push_pop(self, tenant_factory):
-        """Test TenantContext push/pop stack."""
-        tenant1 = tenant_factory(slug='ctx-tenant-1')
-        tenant2 = tenant_factory(slug='ctx-tenant-2')
-
-        ctx = TenantContext()
-        ctx.tenant = tenant1
-        ctx.push()
-
-        ctx.tenant = tenant2
-        assert ctx.tenant == tenant2
-
-        ctx.pop()
-        assert ctx.tenant == tenant1
 
 
 # ============================================================================
@@ -1707,116 +1478,6 @@ class TestTenantSubscriptionUpdates:
         assert expired_tenant.check_subscription_status() == 'expired'
 
 
-# ============================================================================
-# RATE LIMITING TESTS
-# ============================================================================
-
-@pytest.mark.django_db
-class TestTenantRateLimiting:
-    """Test tenant API rate limiting in middleware."""
-
-    def test_usage_tracking_middleware(self, tenant_factory, plan_factory):
-        """Test TenantUsageMiddleware tracks API calls."""
-        middleware = TenantUsageMiddleware(lambda r: HttpResponse('OK'))
-
-        plan = plan_factory()
-        tenant = tenant_factory(plan=plan)
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.tenant_plan = plan
-        request.path = '/api/v1/jobs/'
-        request.META = {'REMOTE_ADDR': '127.0.0.1'}
-        request.method = 'GET'
-
-        # Should track is called
-        assert middleware._should_track(request) is True
-
-    def test_rate_limit_check(self, tenant_factory, plan_factory):
-        """Test rate limit check in usage middleware."""
-        middleware = TenantUsageMiddleware(lambda r: HttpResponse('OK'))
-
-        plan = plan_factory()
-        tenant = tenant_factory(plan=plan)
-
-        request = HttpRequest()
-        request.tenant = tenant
-        request.tenant_plan = plan
-        request.path = '/api/v1/jobs/'
-        request.META = {'REMOTE_ADDR': '127.0.0.1'}
-        request.method = 'GET'
-
-        # Rate limit should not be exceeded initially
-        assert middleware._check_rate_limit(request) is False
-
-
-# ============================================================================
-# MIDDLEWARE RESPONSE TESTS
-# ============================================================================
-
-@pytest.mark.django_db
-class TestMiddlewareResponses:
-    """Test middleware response handling."""
-
-    def test_suspended_tenant_response(self):
-        """Test suspended tenant gets appropriate response."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        response = middleware._suspended_response(HttpRequest())
-
-        assert response.status_code == 403
-        assert 'suspended' in response.content.decode().lower()
-
-    def test_cancelled_tenant_response(self):
-        """Test cancelled tenant gets appropriate response."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        response = middleware._cancelled_response(HttpRequest())
-
-        assert response.status_code == 403
-        assert 'cancelled' in response.content.decode().lower()
-
-    def test_pending_tenant_redirect(self):
-        """Test pending tenant gets redirected to onboarding."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        response = middleware._pending_response(HttpRequest())
-
-        assert response.status_code == 302
-        assert '/onboarding/' in response.url
-
-    def test_trial_expired_redirect(self):
-        """Test expired trial gets redirected to billing."""
-        middleware = ZumodraTenantMiddleware(lambda r: HttpResponse('OK'))
-
-        response = middleware._trial_expired_response(HttpRequest())
-
-        assert response.status_code == 302
-        assert '/billing/' in response.url
-
-
-# ============================================================================
-# TENANT RESOLUTION ERROR TESTS
-# ============================================================================
-
-@pytest.mark.django_db
-class TestTenantResolutionErrors:
-    """Test tenant resolution error handling."""
-
-    def test_tenant_resolution_error(self):
-        """Test base TenantResolutionError."""
-        error = TenantResolutionError("Test error")
-        assert str(error) == "Test error"
-
-    def test_tenant_not_found_error(self):
-        """Test TenantNotFoundError."""
-        error = TenantNotFoundError("Tenant not found")
-        assert isinstance(error, TenantResolutionError)
-
-    def test_tenant_inactive_error(self):
-        """Test TenantInactiveError."""
-        error = TenantInactiveError("Tenant inactive")
-        assert isinstance(error, TenantResolutionError)
 
 
 # ============================================================================
@@ -1840,7 +1501,6 @@ class TestTenantIntegration:
         tenant = Tenant.objects.create(
             name='Integration Test Corp',
             slug='integration-test-corp',
-            schema_name='integration_test_corp',
             plan=plan,
             owner_email='owner@integration.test',
             on_trial=True
@@ -1881,7 +1541,6 @@ class TestTenantIntegration:
         tenant = Tenant.objects.create(
             name='Lifecycle Test',
             slug='lifecycle-test',
-            schema_name='lifecycle_test',
             plan=plan,
             owner_email='owner@lifecycle.test',
             status='trial',

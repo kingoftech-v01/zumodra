@@ -1,10 +1,10 @@
 """
-Management command to create a new tenant.
+Management command to create a new tenant (organization).
 """
 
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.text import slugify
 from tenants.models import Tenant, Plan, Domain
-from tenants.services import TenantService
 
 
 class Command(BaseCommand):
@@ -51,32 +51,41 @@ class Command(BaseCommand):
                     self.style.WARNING(f"Plan '{plan_slug}' not found, using default")
                 )
 
-        self.stdout.write(f"Creating tenant: {name}")
+        self.stdout.write(f"Creating organization: {name}")
 
         try:
-            tenant = TenantService.create_tenant(
+            slug = slugify(name)
+            tenant = Tenant.objects.create(
                 name=name,
+                slug=slug,
                 owner_email=owner_email,
                 plan=plan,
-                domain=domain
+                on_trial=not skip_trial,
             )
 
             if skip_trial:
                 tenant.activate()
                 self.stdout.write(self.style.SUCCESS("Trial skipped, tenant activated"))
 
+            # Create domain
+            domain_name = domain or f"{slug}.zumodra.local"
+            Domain.objects.create(
+                tenant=tenant,
+                domain=domain_name,
+                is_primary=True,
+            )
+
             self.stdout.write(self.style.SUCCESS(f"""
-Tenant created successfully!
+Organization created successfully!
 
 Name: {tenant.name}
 Slug: {tenant.slug}
-Schema: {tenant.schema_name}
 Status: {tenant.get_status_display()}
-Domain: {tenant.domains.first().domain if tenant.domains.exists() else 'N/A'}
+Domain: {domain_name}
 Owner: {tenant.owner_email}
 Plan: {tenant.plan.name if tenant.plan else 'None'}
 Trial ends: {tenant.trial_ends_at.strftime('%Y-%m-%d') if tenant.trial_ends_at else 'N/A'}
 """))
 
         except Exception as e:
-            raise CommandError(f"Failed to create tenant: {e}")
+            raise CommandError(f"Failed to create organization: {e}")

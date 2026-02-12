@@ -106,7 +106,6 @@ class Command(BaseCommand):
         try:
             # Import here to avoid circular imports
             from tenants.models import Tenant, Plan, Domain
-            from tenants.services import TenantService
 
             # Setup default plans
             if not skip_plans:
@@ -131,18 +130,17 @@ class Command(BaseCommand):
             self.stdout.write("\n2. Creating demo tenant...")
             plan = Plan.objects.filter(plan_type=Plan.PlanType.PROFESSIONAL).first()
 
-            tenant = TenantService.create_tenant(
+            from django.utils.text import slugify as _slugify
+            tenant = Tenant.objects.create(
                 name=tenant_name,
+                slug=_slugify(tenant_name),
                 owner_email=admin_email,
                 plan=plan,
             )
             tenant.activate()
 
-            self.stdout.write(self.style.SUCCESS(f"   Created tenant: {tenant.name}"))
-            self.stdout.write(f"   Schema: {tenant.schema_name}")
-
-            # Switch to tenant schema
-            connection.set_schema(tenant.schema_name)
+            self.stdout.write(self.style.SUCCESS(f"   Created organization: {tenant.name}"))
+            self.stdout.write(f"   Slug: {tenant.slug}")
 
             # Create admin user
             self.stdout.write("\n3. Creating admin user...")
@@ -170,7 +168,7 @@ class Command(BaseCommand):
         except Exception as e:
             raise CommandError(f"Failed to setup demo: {e}")
         finally:
-            connection.set_schema_to_public()
+            pass  # No schema switching needed (single schema)
 
     def _create_sample_data(self, tenant, admin, num_jobs, num_candidates, num_employees):
         """Create sample data for the demo tenant."""

@@ -39,17 +39,8 @@ class TenantAwareModel(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        """Ensure tenant is set on save"""
-        # Tenant should be set by the calling code
-        # This is just a safety check
-        if not self.tenant_id:
-            from tenants.middleware import get_current_tenant
-
-            # Try to get current tenant from thread-local storage
-            current_tenant = get_current_tenant()
-            if current_tenant:
-                self.tenant = current_tenant
-
+        """Ensure tenant is set on save."""
+        # Tenant must be set by the calling code explicitly.
         super().save(*args, **kwargs)
 
 

@@ -43,8 +43,7 @@ class FreelancerOnboardingWizard(LoginRequiredMixin, SessionWizardView):
         """
         Process complete onboarding and create freelancer resources.
         """
-        from tenants.services import TenantService
-        from tenants.models import Plan
+        from tenants.models import Tenant, Plan, Domain
         from tenant_profiles.models import TenantUser
         from core_identity.models import PublicProfile
         from finance.stripe_service import StripeConnectService, StripeNotConfiguredError
@@ -88,17 +87,21 @@ class FreelancerOnboardingWizard(LoginRequiredMixin, SessionWizardView):
             if not free_plan:
                 free_plan = Plan.objects.filter(price_monthly=0).first()
 
-            tenant = TenantService.create_tenant(
+            from django.utils.text import slugify
+            tenant = Tenant.objects.create(
                 name=f"{self.request.user.get_full_name()}'s Workspace",
+                slug=slugify(f"{self.request.user.username}-workspace"),
                 owner_email=self.request.user.email,
                 plan=free_plan,
-                tenant_type='freelancer'
             )
 
-            logger.info(f"Created freelancer tenant {tenant.schema_name}")
+            Domain.objects.create(
+                tenant=tenant,
+                domain=f"{tenant.slug}.zumodra.com",
+                is_primary=True,
+            )
 
-            # Provision tenant
-            TenantService.provision_tenant(tenant)
+            logger.info(f"Created freelancer organization {tenant.slug}")
 
             # Add user as OWNER
             TenantUser.objects.create(

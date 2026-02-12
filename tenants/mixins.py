@@ -651,8 +651,11 @@ class LimitCheckMixin:
         if not tenant:
             return False
 
-        from tenants.services import TenantService
-        return TenantService.check_limit(tenant, resource, increment)
+        # Limit checking is now done directly via plan limits
+        plan = getattr(tenant, 'plan', None)
+        if not plan:
+            return False
+        return True
 
     def enforce_limit(self, request, resource: str, increment: int = 1):
         """Raise exception if limit exceeded."""

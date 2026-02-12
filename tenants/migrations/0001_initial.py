@@ -4,7 +4,7 @@ import django.contrib.gis.db.models.fields
 import django.contrib.postgres.fields
 import django.core.validators
 import django.db.models.deletion
-import django_tenants.postgresql_backend.base
+import django.core.validators as _validators
 import uuid
 from decimal import Decimal
 from django.conf import settings
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
             name='Tenant',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('schema_name', models.CharField(db_index=True, max_length=63, unique=True, validators=[django_tenants.postgresql_backend.base._check_schema_name])),
+                ('schema_name', models.CharField(db_index=True, max_length=63, unique=True, validators=[_validators.RegexValidator(r'^[a-z][a-z0-9_]*$', 'Invalid schema name')])),
                 ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
                 ('name', models.CharField(help_text='Organization name', max_length=255)),
                 ('slug', models.SlugField(max_length=100, unique=True)),

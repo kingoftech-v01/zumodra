@@ -78,9 +78,9 @@ class TestInvitationWithProfileSync:
     def tenant(self, db):
         """Create test tenant."""
         tenant = Tenant.objects.create(
-            schema_name='invitation_test',
             name='Invitation Test Company',
-            domain_url='invitation.localhost',
+            slug='invitation-test',
+            owner_email='owner@invitation.test',
         )
         return tenant
 
@@ -144,15 +144,7 @@ class TestInvitationWithProfileSync:
             )
 
             # Accept invitation (this should trigger profile sync)
-            from tenants.services import InvitationService
-
-            result = InvitationService.accept_invitation(
-                invitation_uuid=invitation.uuid,
-                user=invitee
-            )
-
-            # Verify invitation accepted
-            assert result['success'] is True
+            invitation.accept(invitee)
 
             # Verify TenantProfile created and synced
             assert TenantProfile.objects.filter(user=invitee, tenant=tenant).exists()
@@ -197,11 +189,7 @@ class TestInvitationWithProfileSync:
                 role=TenantUser.UserRole.EMPLOYEE,
             )
 
-            from tenants.services import InvitationService
-            InvitationService.accept_invitation(
-                invitation_uuid=invitation.uuid,
-                user=invitee
-            )
+            invitation.accept(invitee)
 
         # Verify sync settings created with privacy defaults
         sync_settings = ProfileFieldSync.objects.get(
@@ -245,14 +233,14 @@ class TestMultiTenantProfileSync:
     def tenants(self, db):
         """Create multiple test tenants."""
         tenant1 = Tenant.objects.create(
-            schema_name='company_a',
             name='Company A',
-            domain_url='company-a.localhost',
+            slug='company-a',
+            owner_email='owner@company-a.test',
         )
         tenant2 = Tenant.objects.create(
-            schema_name='company_b',
             name='Company B',
-            domain_url='company-b.localhost',
+            slug='company-b',
+            owner_email='owner@company-b.test',
         )
         return {'tenant1': tenant1, 'tenant2': tenant2}
 
@@ -379,9 +367,9 @@ class TestProfilePrivacyControls:
     def tenant(self, db):
         """Create test tenant."""
         tenant = Tenant.objects.create(
-            schema_name='privacy_test',
             name='Privacy Test Company',
-            domain_url='privacy.localhost',
+            slug='privacy-test',
+            owner_email='owner@privacy.test',
         )
         return tenant
 

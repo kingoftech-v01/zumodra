@@ -122,6 +122,26 @@ def get_public_schema_name():
     return 'public'
 
 
+def ensure_connection_schema_compat():
+    """
+    Ensure Django's database connection has schema_name and set_schema for
+    backwards compatibility with code that checked connection.schema_name.
+
+    Since django-tenants has been removed, all code runs in the default (public)
+    schema. This patches the connection to avoid AttributeError.
+    """
+    if not hasattr(connection, 'schema_name'):
+        connection.schema_name = 'public'
+    if not hasattr(connection, 'set_schema'):
+        connection.set_schema = lambda name: None
+    if not hasattr(connection, 'set_schema_to_public'):
+        connection.set_schema_to_public = lambda: None
+
+
+# Apply patch at import time
+ensure_connection_schema_compat()
+
+
 def _is_valid_schema_name(schema_name: str) -> bool:
     """
     Validate that a schema name is safe for use in SQL queries.
