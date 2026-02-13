@@ -300,7 +300,7 @@ class TenantInvitationFactory(DjangoModelFactory):
     tenant = factory.SubFactory(TenantFactory)
     email = factory.Faker('email')
     invited_by = factory.SubFactory(UserFactory)
-    role = 'member'
+    assigned_role = 'member'
     status = 'pending'
     token = factory.LazyFunction(lambda: uuid.uuid4().hex)
     expires_at = factory.LazyFunction(lambda: timezone.now() + timedelta(days=7))
