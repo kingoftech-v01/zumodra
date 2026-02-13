@@ -47,7 +47,15 @@ pip3 install -q \
     redis channels-redis \
     tablib openpyxl python-docx PyPDF2 pdfplumber \
     qrcode phonenumbers python-dotenv \
+    bleach \
     2>&1 | tail -3
+
+echo "=== Creating test database ==="
+psql -U postgres -c "CREATE DATABASE zumodra_test OWNER root;" 2>/dev/null || true
+psql -U postgres -d zumodra_test -c "CREATE EXTENSION IF NOT EXISTS postgis;" 2>/dev/null || true
+
+echo "=== Running migrations ==="
+DJANGO_SETTINGS_MODULE=zumodra.settings_test python3 manage.py migrate --database=default --verbosity=0 2>&1 | tail -3
 
 echo "=== Fixing cryptography package ==="
 pip3 install --force-reinstall --ignore-installed cryptography 2>&1 | tail -1
