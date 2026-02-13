@@ -135,12 +135,33 @@ class Plan(models.Model):
         return features
 
 
+class TenantManager(models.Manager):
+    """Custom manager that handles legacy 'domain' kwarg in create()."""
+
+    def create(self, **kwargs):
+        domain_val = kwargs.pop('domain', None)
+        kwargs.pop('auto_create_schema', None)
+        kwargs.pop('auto_drop_schema', None)
+        obj = super().create(**kwargs)
+        if domain_val:
+            # Domain model is defined later in this file; resolve via relation
+            DomainModel = self.model.domains.rel.related_model
+            DomainModel.objects.get_or_create(
+                tenant=obj,
+                domain=domain_val,
+                defaults={'is_primary': True}
+            )
+        return obj
+
+
 class Tenant(models.Model):
     """
     Organization model for enterprise/company using the platform.
     Previously used django-tenants TenantMixin for schema isolation;
     now operates as a plain Django model without multi-tenancy.
     """
+
+    objects = TenantManager()
 
     class TenantStatus(models.TextChoices):
         PENDING = 'pending', _('Pending Setup')

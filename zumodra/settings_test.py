@@ -46,9 +46,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('TEST_DB_NAME', 'zumodra_test'),
-        'USER': os.environ.get('TEST_DB_USER', os.environ.get('DB_USER', 'postgres')),
-        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', os.environ.get('DB_PASSWORD', 'zumodra_dev_password')),
-        'HOST': os.environ.get('TEST_DB_HOST', os.environ.get('DB_HOST', 'localhost')),
+        'USER': os.environ.get('TEST_DB_USER', os.environ.get('DB_USER', 'root')),
+        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', os.environ.get('DB_PASSWORD', '')),
+        'HOST': os.environ.get('TEST_DB_HOST', os.environ.get('DB_HOST', '')),
         'PORT': os.environ.get('TEST_DB_PORT', os.environ.get('DB_PORT', '5432')),
         'TEST': {
             'NAME': 'zumodra_test',
@@ -193,6 +193,7 @@ MIDDLEWARE = [m for m in MIDDLEWARE if m not in [
     'axes.middleware.AxesMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'auditlog.middleware.AuditlogMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]]
 
 # =============================================================================

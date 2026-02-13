@@ -206,9 +206,17 @@ class TenantFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Create tenant instance."""
+        """Create tenant instance, handling legacy 'domain' kwarg."""
+        domain = kwargs.pop('domain', None)
+        kwargs.pop('auto_create_schema', None)
+        kwargs.pop('auto_drop_schema', None)
         obj = model_class(*args, **kwargs)
         obj.save()
+        if domain:
+            from tenants.models import Domain
+            Domain.objects.get_or_create(
+                tenant=obj, domain=domain, defaults={'is_primary': True}
+            )
         return obj
 
 
