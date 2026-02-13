@@ -1719,3 +1719,73 @@ def performance_review_factory(db):
 def document_template_factory(db):
     """Provide DocumentTemplateFactory for tests."""
     return DocumentTemplateFactory
+
+
+# ============================================================================
+# INSTANCE FIXTURES (for tests that use plain fixture names)
+# ============================================================================
+
+@pytest.fixture
+def job(db, tenant):
+    """Create a job posting."""
+    return JobPostingFactory(tenant=tenant)
+
+
+@pytest.fixture
+def candidate(db, tenant):
+    """Create a candidate."""
+    return CandidateFactory(tenant=tenant)
+
+
+@pytest.fixture
+def application(db, tenant, job, candidate):
+    """Create an application."""
+    return ApplicationFactory(tenant=tenant, job=job, candidate=candidate)
+
+
+@pytest.fixture
+def interview(db, application):
+    """Create an interview."""
+    return InterviewFactory(application=application)
+
+
+@pytest.fixture
+def employee(db, tenant):
+    """Create an employee."""
+    return EmployeeFactory(tenant=tenant)
+
+
+@pytest.fixture
+def pipeline(db, tenant):
+    """Create a pipeline."""
+    return PipelineFactory(tenant=tenant)
+
+
+@pytest.fixture
+def offer(db, application):
+    """Create an offer."""
+    return OfferFactory(application=application)
+
+
+@pytest.fixture
+def job_listing(db, job):
+    """Create a job listing."""
+    return JobListingFactory(job=job)
+
+
+@pytest.fixture
+def career_page(db):
+    """Create a career page."""
+    return CareerPageFactory()
+
+
+@pytest.fixture
+def conversation(db, user):
+    """Create a conversation."""
+    return ConversationFactory(participants=[user])
+
+
+@pytest.fixture
+def tenant_settings(db, tenant):
+    """Create tenant settings."""
+    return TenantSettingsFactory(tenant=tenant)
