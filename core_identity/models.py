@@ -17,11 +17,33 @@ Date: 2026-01-17
 """
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 import uuid
+
+
+class CustomUserManager(UserManager):
+    """Custom manager that strips non-User fields from create calls.
+
+    Many tests pass tenant/role kwargs which belong to TenantUser, not CustomUser.
+    This manager silently strips them to maintain backwards compatibility.
+    """
+
+    def create_user(self, username=None, email=None, password=None, **extra_fields):
+        extra_fields.pop('tenant', None)
+        extra_fields.pop('role', None)
+        extra_fields.pop('department', None)
+        extra_fields.pop('position', None)
+        return super().create_user(username, email, password, **extra_fields)
+
+    def create_superuser(self, username=None, email=None, password=None, **extra_fields):
+        extra_fields.pop('tenant', None)
+        extra_fields.pop('role', None)
+        extra_fields.pop('department', None)
+        extra_fields.pop('position', None)
+        return super().create_superuser(username, email, password, **extra_fields)
 
 
 class CustomUser(AbstractUser):
@@ -91,6 +113,9 @@ class CustomUser(AbstractUser):
         db_index=True
     )
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Custom manager that strips tenant/role kwargs
+    objects = CustomUserManager()
 
     # Use email as username
     USERNAME_FIELD = 'email'
