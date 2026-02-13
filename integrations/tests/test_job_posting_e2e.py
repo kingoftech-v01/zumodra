@@ -118,9 +118,9 @@ class TestJobPostingCreation:
                 requirements='Python, Django, PostgreSQL, 5+ years experience',
                 responsibilities='Design and implement scalable systems',
                 category=self.category,
-                employment_type='full_time',
+                job_type='full_time',
                 experience_level='senior',
-                location='Toronto, ON',
+                location_city='Toronto, ON',
                 remote_policy='hybrid',
                 salary_min=Decimal('100000.00'),
                 salary_max=Decimal('150000.00'),
@@ -576,7 +576,7 @@ class TestJobDuplication:
                 hiring_manager=self.job.hiring_manager,
                 recruiter=self.job.recruiter,
                 status='draft',
-                employment_type=self.job.employment_type,
+                job_type=self.job.job_type,
                 category=self.job.category
             )
 
@@ -614,18 +614,18 @@ class TestJobDuplication:
                 hiring_manager=self.job.hiring_manager,
                 recruiter=self.job.recruiter,
                 status='draft',
-                employment_type=self.job.employment_type,
+                job_type=self.job.job_type,
                 category=self.job.category,
                 salary_min=self.job.salary_min,
                 salary_max=self.job.salary_max,
                 remote_policy=self.job.remote_policy,
-                location=self.job.location
+                location_city=self.job.location_city
             )
 
             assert duplicate_job.salary_min == self.job.salary_min
             assert duplicate_job.salary_max == self.job.salary_max
             assert duplicate_job.remote_policy == self.job.remote_policy
-            assert duplicate_job.location == self.job.location
+            assert duplicate_job.location_city == self.job.location_city
 
             log_result("Job Duplication - Preserve Fields", True,
                       "All fields preserved in duplicated job")
@@ -759,7 +759,7 @@ class TestJobSearchAndFiltering:
             requirements='Python, Django',
             category=self.category,
             status='open',
-            location='Toronto'
+            location_city='Toronto'
         )
 
         self.java_job = JobPostingFactory(
@@ -769,7 +769,7 @@ class TestJobSearchAndFiltering:
             requirements='Java, Spring Boot',
             category=self.category,
             status='open',
-            location='Vancouver'
+            location_city='Vancouver'
         )
 
         self.remote_job = JobPostingFactory(

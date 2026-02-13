@@ -108,7 +108,7 @@ class TestSearchResponseTimeBaselines:
                 title=f"Developer Position {i}",
                 description="Job description",
                 requirements="Python, Django",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -135,7 +135,7 @@ class TestSearchResponseTimeBaselines:
                 title=f"Developer Position {i}",
                 description="Job description",
                 requirements="Python, Django",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             ))
 
@@ -164,7 +164,7 @@ class TestSearchResponseTimeBaselines:
                 title=f"Position {i}",
                 description="Job description",
                 requirements="Skills",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             ))
 
@@ -196,7 +196,7 @@ class TestSearchConsistency:
                 title=f"Developer {i}",
                 description="Test job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -232,7 +232,7 @@ class TestSearchConsistency:
                 title=f"Job {i}",
                 description="Test",
                 requirements="Skills",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -277,7 +277,7 @@ class TestSearchCachingEffectiveness:
                 title=f"Developer {i}",
                 description="Job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -317,7 +317,7 @@ class TestSearchMemoryUsage:
                 title="Developer",
                 description=f"Description {i}",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -343,7 +343,7 @@ class TestSearchMemoryUsage:
                 title="Developer",
                 description="Job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -372,7 +372,7 @@ class TestSearchConcurrency:
                 title=f"Developer {i}",
                 description="Job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -403,7 +403,7 @@ class TestSearchConcurrency:
                 title=f"Developer {i}",
                 description="Job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -444,7 +444,7 @@ class TestSearchDatabasePerformance:
                 title=f"Developer {i}",
                 description="Job description",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
@@ -471,7 +471,7 @@ class TestSearchDatabasePerformance:
                 title=f"Developer {i % 10}",
                 description=f"Description {i}",
                 requirements="Various skills",
-                location=["Remote", "On-site", "Hybrid"][i % 3],
+                location_city=["Remote", "On-site", "Hybrid"][i % 3],
                 pipeline=pipeline
             )
 
@@ -516,7 +516,7 @@ class TestSearchScalability:
                         title="Developer",
                         description=f"Job {i}",
                         requirements="Python",
-                        location="Remote",
+                        location_city="Remote",
                         pipeline=pipeline
                     ))
                 JobPosting.objects.bulk_create(jobs, batch_size=100)
@@ -564,7 +564,7 @@ class TestSearchOptimizationOpportunities:
                 title=f"Developer {i}",
                 description="Job",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 

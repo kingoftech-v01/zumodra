@@ -1282,6 +1282,18 @@ def job_posting_factory(db):
 
 
 @pytest.fixture
+def job_factory(db):
+    """Alias for job_posting_factory. Provide JobPostingFactory for tests."""
+    return JobPostingFactory
+
+
+@pytest.fixture
+def free_plan_factory(db):
+    """DEPRECATED: Provide FreePlanFactory for tests."""
+    return FreePlanFactory
+
+
+@pytest.fixture
 def candidate_factory(db):
     """Provide CandidateFactory for tests."""
     return CandidateFactory

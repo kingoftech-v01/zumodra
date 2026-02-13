@@ -34,8 +34,8 @@ def test_webhook_dispatches_on_job_created(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Senior Developer',
             description='Test job',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Verify webhook was called
@@ -53,8 +53,8 @@ def test_webhook_includes_correct_payload(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Verify payload structure
@@ -79,8 +79,8 @@ def test_webhook_filters_by_event_type(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         assert m.call_count == 1
@@ -103,8 +103,8 @@ def test_webhook_includes_timestamp(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         request_data = json.loads(m.last_request.body)
@@ -125,8 +125,8 @@ def test_webhook_does_not_fire_when_inactive(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Webhook should not be called
@@ -147,8 +147,8 @@ def test_webhook_includes_hmac_signature(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Verify signature header exists
@@ -165,8 +165,8 @@ def test_webhook_signature_is_correct(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Extract signature and payload
@@ -193,8 +193,8 @@ def test_webhook_signature_verification_method(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Simulate receiver verification
@@ -229,8 +229,8 @@ def test_webhook_retries_on_failure(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Should be retried
@@ -247,8 +247,8 @@ def test_webhook_retry_exponential_backoff(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Initial attempt
@@ -277,8 +277,8 @@ def test_webhook_max_retry_attempts(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Should attempt: initial + 3 retries = 4 total
@@ -295,8 +295,8 @@ def test_webhook_does_not_retry_on_4xx_errors(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Should only attempt once (no retries for 4xx)
@@ -313,8 +313,8 @@ def test_webhook_logs_delivery_attempt(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Verify delivery was logged
@@ -343,8 +343,8 @@ def test_webhook_suspended_after_failures(tenant, webhook_subscription):
             job = JobPosting.objects.create(
                 title=f'Test Job {i}',
                 description='Description',
-                location='Remote',
-                employment_type='full_time'
+                location_city='Remote',
+                job_type='full_time'
             )
 
         webhook_subscription.refresh_from_db()
@@ -364,8 +364,8 @@ def test_suspended_webhook_does_not_fire(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         assert not m.called
@@ -397,8 +397,8 @@ def test_webhook_isolated_to_tenant(two_tenants, plan):
         job1 = JobPosting.objects.create(
             title='Tenant 1 Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         assert m.call_count == 1
@@ -407,8 +407,8 @@ def test_webhook_isolated_to_tenant(two_tenants, plan):
         job2 = JobPosting.objects.create(
             title='Tenant 2 Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         # Should still be 1 (no cross-tenant firing)
@@ -445,15 +445,15 @@ def test_webhook_delivery_logs_isolated(two_tenants, plan):
         job1 = JobPosting.objects.create(
             title='Job 1',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         job2 = JobPosting.objects.create(
             title='Job 2',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
     # Each webhook should only see its own deliveries
@@ -478,8 +478,8 @@ def test_webhook_delivery_tracks_response_time(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         delivery = WebhookDelivery.objects.filter(
@@ -500,8 +500,8 @@ def test_webhook_delivery_stores_error_message(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         delivery = WebhookDelivery.objects.filter(
@@ -522,8 +522,8 @@ def test_webhook_delivery_includes_request_payload(tenant, webhook_subscription)
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         delivery = WebhookDelivery.objects.filter(
@@ -555,8 +555,8 @@ def test_webhook_custom_headers(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         assert 'X-Custom-Header' in m.last_request.headers
@@ -582,8 +582,8 @@ def test_webhook_multiple_event_subscriptions(tenant, webhook_subscription):
         job = JobPosting.objects.create(
             title='Test Job',
             description='Description',
-            location='Remote',
-            employment_type='full_time'
+            location_city='Remote',
+            job_type='full_time'
         )
 
         assert m.call_count == 1

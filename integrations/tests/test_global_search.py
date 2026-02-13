@@ -140,7 +140,7 @@ def test_jobs(db, tenant):
             title=title,
             description=f"We are looking for a {title} professional.",
             requirements=requirements,
-            location=location,
+            location_city=location,
             status=status,
             pipeline=pipeline,
             experience_level=level
@@ -468,7 +468,7 @@ class TestSearchPerformance:
                 title=f"Developer Position {i}",
                 description="Test job posting",
                 requirements="Python, Django",
-                location="Remote",
+                location_city="Remote",
                 status="open",
                 pipeline=pipeline
             )
@@ -651,7 +651,7 @@ class TestSearchSecurityAndValidation:
             title="Python Developer",
             description="Job in tenant 1",
             requirements="Python",
-            location="Remote",
+            location_city="Remote",
             pipeline=pipeline1
         )
 
@@ -660,7 +660,7 @@ class TestSearchSecurityAndValidation:
             title="Python Developer",
             description="Job in other tenant",
             requirements="Python",
-            location="Remote",
+            location_city="Remote",
             pipeline=pipeline2
         )
 
@@ -827,7 +827,7 @@ class TestSearchPagination:
                 title=f"Developer {i}",
                 description="Test",
                 requirements="Python",
-                location="Remote",
+                location_city="Remote",
                 pipeline=pipeline
             )
 
