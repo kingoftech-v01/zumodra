@@ -9,6 +9,10 @@ from interviews.models import Config, DayOff, Service, StaffMember, WorkingHours
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class StaffMemberCreationTests(BaseTest):
     @classmethod
     def setUpTestData(cls):

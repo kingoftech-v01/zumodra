@@ -12,6 +12,10 @@ from interviews.utils.json_context import (
 )
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class ConvertAppointmentToJsonTests(BaseTest):
     @classmethod
     def setUpClass(cls):

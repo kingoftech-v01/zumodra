@@ -40,6 +40,9 @@ SCREENSHOTS_DIR.mkdir(exist_ok=True)
 test_results = []
 
 
+
+pytestmark = pytest.mark.django_db
+
 class ProfileTest:
     """Enhanced profile testing with Playwright"""
 

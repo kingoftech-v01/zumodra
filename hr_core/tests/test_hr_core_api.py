@@ -19,6 +19,10 @@ import sys
 from urllib.parse import urljoin
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     """ANSI color codes for terminal output"""
     GREEN = '\033[92m'

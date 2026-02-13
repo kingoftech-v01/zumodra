@@ -30,6 +30,10 @@ import base64
 
 User = get_user_model()
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     GREEN = '\033[92m'
     RED = '\033[91m'

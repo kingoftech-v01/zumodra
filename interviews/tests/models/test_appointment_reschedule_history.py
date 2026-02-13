@@ -7,6 +7,10 @@ from interviews.models import AppointmentRescheduleHistory
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class AppointmentRescheduleHistoryCreationTests(BaseTest):
     @classmethod
     def setUpTestData(cls):

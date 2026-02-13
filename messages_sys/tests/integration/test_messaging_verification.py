@@ -11,6 +11,10 @@ import re
 import requests
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     GREEN = '\033[92m'
     RED = '\033[91m'

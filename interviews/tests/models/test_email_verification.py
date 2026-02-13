@@ -6,6 +6,10 @@ from interviews.models import EmailVerificationCode
 from interviews.tests.mixins.base_mixin import UserMixin
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class EmailVerificationCodeBasicTestCase(TestCase, UserMixin):
     def setUp(self):
         self.user = self.create_user_()

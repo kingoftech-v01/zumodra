@@ -25,6 +25,9 @@ from django.test import TestCase, RequestFactory, override_settings
 # TEST FIXTURES
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def file_validator():
     """Create FileUploadValidator instance."""

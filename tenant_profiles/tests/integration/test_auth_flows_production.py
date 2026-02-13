@@ -65,6 +65,9 @@ TEST_FIRST_NAME = "Test"
 TEST_LAST_NAME = "User"
 
 # Color codes for terminal output
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

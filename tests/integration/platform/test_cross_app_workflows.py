@@ -36,6 +36,9 @@ from tests.base import (
 # 1. FULL HIRING WORKFLOW INTEGRATION TESTS
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestFullHiringWorkflowIntegration(TenantTransactionTestCase):
     """
     Integration tests for the complete hiring workflow:

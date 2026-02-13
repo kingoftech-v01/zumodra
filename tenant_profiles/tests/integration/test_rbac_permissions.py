@@ -41,6 +41,10 @@ from tenants.models import Tenant, Plan
 User = get_user_model()
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class RBACTester:
     """Comprehensive RBAC testing suite."""
 

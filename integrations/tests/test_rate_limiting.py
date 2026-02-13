@@ -34,6 +34,9 @@ from jobs.models import JobPosting as Job
 User = get_user_model()
 
 
+
+pytestmark = pytest.mark.django_db
+
 class RateLimitingTestCase(APITestCase):
     """Base test case for rate limiting tests"""
 

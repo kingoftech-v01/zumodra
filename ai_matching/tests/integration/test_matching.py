@@ -15,6 +15,9 @@ from unittest.mock import Mock, patch, MagicMock
 from decimal import Decimal
 
 
+
+pytestmark = pytest.mark.django_db
+
 class TestEmbeddingService:
     """Tests for the EmbeddingService class."""
 

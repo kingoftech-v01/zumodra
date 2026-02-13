@@ -8,6 +8,10 @@ from interviews.models import DayOff
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class DayOffCreationTestCase(BaseTest):
     @classmethod
     def tearDownClass(cls):

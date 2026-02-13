@@ -33,6 +33,9 @@ from hr_core.forms import TimeOffRequestForm, TimeOffApprovalForm
 User = get_user_model()
 
 
+
+pytestmark = pytest.mark.django_db
+
 class TestTimeOffSubmission:
     """Test the process of employees submitting time-off requests."""
 

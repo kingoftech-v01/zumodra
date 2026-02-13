@@ -9,6 +9,10 @@ from interviews.models import Service
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class ServiceCreationAndBasicAttributesTests(BaseTest):
     @classmethod
     def setUpTestData(cls):

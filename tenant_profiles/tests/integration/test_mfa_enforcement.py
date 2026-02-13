@@ -18,6 +18,10 @@ from bs4 import BeautifulSoup
 import re
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class MFATestSuite:
     """Comprehensive MFA testing suite for production environment."""
 

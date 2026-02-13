@@ -33,6 +33,9 @@ User = get_user_model()
 # TEST FIXTURES
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def password_validator():
     """Create PasswordValidator instance."""

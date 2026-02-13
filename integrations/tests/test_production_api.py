@@ -30,6 +30,10 @@ TEST_CREDENTIALS = {
 }
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class APITester:
     """API endpoint testing class"""
 

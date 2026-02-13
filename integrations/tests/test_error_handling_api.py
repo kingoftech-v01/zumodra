@@ -10,6 +10,10 @@ from datetime import datetime
 from pathlib import Path
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class APIErrorTester:
     def __init__(self):
         self.base_url = "https://demo-company.zumodra.rhematek-solutions.com"

@@ -9,6 +9,10 @@ from interviews.tasks import send_email_reminder
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class SendEmailReminderTest(BaseTest):
 
     @classmethod

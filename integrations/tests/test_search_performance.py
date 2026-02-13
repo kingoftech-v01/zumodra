@@ -39,6 +39,9 @@ User = get_user_model()
 pytestmark = pytest.mark.integration
 
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def performance_tenant(db):
     """Create a tenant for performance testing."""

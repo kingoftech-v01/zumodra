@@ -72,6 +72,9 @@ SCREENSHOTS_DIR = RESULTS_DIR / "screenshots"
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+
+pytestmark = pytest.mark.django_db
+
 @dataclass
 class TestResult:
     """Test result for a single test scenario"""

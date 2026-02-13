@@ -7,6 +7,10 @@ from django.utils import timezone
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class AppointmentRequestCreationAndBasicAttributesTests(BaseTest):
     @classmethod
     def setUpTestData(cls):

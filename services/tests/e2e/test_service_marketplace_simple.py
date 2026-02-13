@@ -34,6 +34,9 @@ from tenants.models import Tenant
 
 User = get_user_model()
 
+
+pytestmark = pytest.mark.django_db
+
 def main():
     print("\n" + "=" * 80)
     print("SERVICE MARKETPLACE WORKFLOW TEST")

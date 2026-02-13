@@ -53,6 +53,9 @@ from conftest import (
 # EMPLOYEE LIFECYCLE TESTS
 # ============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestEmployeeLifecycle(TenantTestCase):
     """Tests for employee lifecycle management (pending -> probation -> active -> terminated)."""
 

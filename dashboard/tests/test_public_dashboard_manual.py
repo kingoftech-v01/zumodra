@@ -34,6 +34,10 @@ TEST_USERS = {
 }
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class DashboardTester:
     """Test harness for public user dashboard."""
 

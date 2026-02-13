@@ -38,6 +38,9 @@ from escrow.models import EscrowTransaction as Escrow
 User = get_user_model()
 
 
+
+pytestmark = pytest.mark.django_db
+
 class ServiceMarketplaceSetupMixin:
     """Mixin for common setup across marketplace tests"""
 

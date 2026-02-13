@@ -77,6 +77,9 @@ except ImportError:
 # TEST CONFIGURATION
 # ============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestConfig:
     """Centralized test configuration"""
     # Base URLs

@@ -40,6 +40,9 @@ from tests.base import TenantTestCase, APITenantTestCase, PermissionTestMixin
 # MODEL TESTS
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestTenantUserModel(TenantTestCase):
     """Tests for TenantUser model creation and validation."""
 

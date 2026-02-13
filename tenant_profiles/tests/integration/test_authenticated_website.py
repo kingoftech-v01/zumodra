@@ -81,6 +81,9 @@ SCREENSHOTS_DIR = RESULTS_DIR / "screenshots"
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+
+pytestmark = pytest.mark.django_db
+
 class TestResult:
     """Store test results for a single page"""
     def __init__(self, page_name: str, url: str):

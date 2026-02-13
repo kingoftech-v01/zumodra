@@ -133,6 +133,9 @@ DASHBOARD_TESTS = [
 ]
 
 
+
+pytestmark = pytest.mark.django_db
+
 class DashboardTester:
     """Comprehensive dashboard testing using Playwright."""
 

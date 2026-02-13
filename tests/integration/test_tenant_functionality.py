@@ -37,6 +37,10 @@ BASE_URL_NONEXISTENT = "https://nonexistent-tenant.zumodra.rhematek-solutions.co
 # Disable SSL warnings for development
 requests.packages.urllib3.disable_warnings()
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class TenantTester:
     """Test Zumodra tenant functionality"""
 

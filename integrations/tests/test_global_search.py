@@ -41,6 +41,9 @@ User = get_user_model()
 pytestmark = pytest.mark.integration
 
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def tenant(db):
     """Create a test tenant."""

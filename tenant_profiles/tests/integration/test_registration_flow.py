@@ -31,6 +31,10 @@ DASHBOARD_URL = f"{BASE_URL}/app/dashboard/"
 test_results = []
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 def generate_random_email():
     """Generate a random email address for testing."""
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))

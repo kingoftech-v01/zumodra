@@ -81,6 +81,9 @@ RESULTS_DIR = Path("./test_results/messages")
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+
+pytestmark = pytest.mark.django_db
+
 class MessageTestResult:
     """Store test results for a single messaging page"""
     def __init__(self, page_name: str, url: str):

@@ -35,6 +35,9 @@ except ImportError:
     pytest.skip("selenium not installed", allow_module_level=True)
 
 
+
+pytestmark = pytest.mark.django_db
+
 class DashboardWidgetTester:
     """Test dashboard widgets and statistics."""
 

@@ -22,6 +22,10 @@ from typing import Dict, List, Tuple
 from datetime import datetime
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class SearchTester:
     """Test suite for search functionality across Zumodra platform."""
 

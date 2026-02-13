@@ -25,6 +25,9 @@ from django.http import HttpRequest, HttpResponse
 # 1. HEADER TRUST TESTS - Verify forged headers are rejected
 # ============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestHeaderTrustSecurity:
     """
     Tests that authentication/authorization NEVER relies on client headers.

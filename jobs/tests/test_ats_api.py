@@ -29,6 +29,10 @@ HEADERS = {
 test_results = []
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class TestResult:
     def __init__(self, name: str, passed: bool, response_time: float = 0,
                  status_code: int = 0, details: str = "", response_data: Any = None):

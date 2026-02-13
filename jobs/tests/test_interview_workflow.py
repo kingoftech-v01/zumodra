@@ -43,6 +43,9 @@ pytestmark = pytest.mark.integration
 # FIXTURES
 # ============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def interview_context(tenant_factory, user_factory, job_factory, candidate_factory, application_factory):
     """Create base context for interview tests."""

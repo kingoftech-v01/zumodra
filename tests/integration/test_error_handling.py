@@ -23,6 +23,9 @@ except ImportError:
     pytest.skip("selenium not installed", allow_module_level=True)
 
 
+
+pytestmark = pytest.mark.django_db
+
 class ErrorHandlingTester:
     def __init__(self):
         self.base_url = "https://demo-company.zumodra.rhematek-solutions.com"

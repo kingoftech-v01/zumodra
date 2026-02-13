@@ -10,6 +10,10 @@ from interviews.utils.db_helpers import Config, WorkingHours, get_staff_member_b
     get_staff_member_end_time, get_staff_member_slot_duration, get_staff_member_start_time
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class BaseStaffMemberTimeTestSetup(BaseTest, TransactionTestCase):
     """Base setup class for staff member time function tests."""
 

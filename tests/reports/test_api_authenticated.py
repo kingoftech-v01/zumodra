@@ -47,6 +47,10 @@ if __name__ == '__main__':
         "created_resources": {}
     }
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 def log_test(category, endpoint, method, expected, actual, details=""):
     """Log test result"""
     result = {

@@ -54,6 +54,9 @@ TEST_CONFIG = {
 issues_found = []
 
 
+
+pytestmark = pytest.mark.django_db
+
 class ResponsiveTestRunner:
     """Automated responsive design testing"""
 

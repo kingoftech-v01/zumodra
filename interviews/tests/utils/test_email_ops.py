@@ -18,6 +18,10 @@ from interviews.utils.email_ops import (
 )
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class SendResetLinkToStaffMemberTests(BaseTest):
     @classmethod
     def setUpClass(cls):

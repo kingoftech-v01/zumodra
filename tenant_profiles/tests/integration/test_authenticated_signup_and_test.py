@@ -34,6 +34,9 @@ TEST_LAST_NAME = "User"
 # Ensure directories exist
 os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
+
+pytestmark = pytest.mark.django_db
+
 def log(message):
     """Print timestamped log message"""
     timestamp = datetime.now().strftime("%H:%M:%S")

@@ -35,6 +35,10 @@ TEST_EMAIL = f"test_applicant_{int(time.time())}@example.com"
 TEST_RESUME_PATH = "test_resume.pdf"
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     """ANSI color codes for terminal output"""
     GREEN = '\033[92m'

@@ -42,6 +42,9 @@ TEST_USER = {
 }
 
 
+
+pytestmark = pytest.mark.django_db
+
 class PublicDashboardSeleniumTests:
     """Selenium-based automated tests for public user dashboard."""
 

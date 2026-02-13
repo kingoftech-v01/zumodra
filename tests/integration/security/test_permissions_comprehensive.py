@@ -33,6 +33,9 @@ from conftest import (
 # 1. TENANT ISOLATION TESTS
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.mark.security
 class TestTenantIsolation:
     """Tests for multi-tenant data isolation."""

@@ -36,6 +36,9 @@ from rest_framework.test import APIClient
 # 1. ROLE-BASED ACCESS CONTROL (RBAC) TESTS
 # ============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 class TestPermissionMatrix:
     """
     Tests the permission matrix for all roles across all resources.

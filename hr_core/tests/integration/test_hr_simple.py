@@ -45,6 +45,10 @@ test_results = {
 }
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class HREmployeeTester:
     """Test class for HR Employee module functionality."""
 

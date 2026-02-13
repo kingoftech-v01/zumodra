@@ -11,6 +11,10 @@ from interviews.utils.permissions import (
 )
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class CheckEntityOwnershipTests(BaseTest):
     @classmethod
     def setUpClass(cls):

@@ -116,6 +116,10 @@ DASHBOARD_URLS = [
 ]
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class DashboardTester:
     """Main dashboard testing class."""
 

@@ -17,6 +17,10 @@ from datetime import datetime
 BASE_URL = "https://zumodra.rhematek-solutions.com"
 API_BASE = f"{BASE_URL}/api/v1/messages"
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Colors:
     GREEN = '\033[92m'
     RED = '\033[91m'

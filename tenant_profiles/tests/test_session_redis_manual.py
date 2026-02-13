@@ -59,6 +59,9 @@ except (KeyError, TypeError, ValueError, redis.exceptions.ConnectionError) as e:
     _pytest.skip(f"Redis not configured: {e}", allow_module_level=True)
 
 
+
+pytestmark = pytest.mark.django_db
+
 class SessionRedisTest:
     """Direct Redis session testing."""
 

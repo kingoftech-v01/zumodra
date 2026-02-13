@@ -27,6 +27,10 @@ if sys.platform == 'win32':
 
 
 # Configuration
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Config:
     BASE_URL = "https://zumodra.rhematek-solutions.com"
     DEMO_TENANT_URL = "https://demo-company.zumodra.rhematek-solutions.com"

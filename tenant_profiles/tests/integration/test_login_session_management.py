@@ -25,6 +25,10 @@ try:
 except ImportError:
     HAS_COLOR = False
     # Fallback if colorama not installed
+import pytest
+
+pytestmark = pytest.mark.django_db
+
     class Fore:
         GREEN = RED = YELLOW = CYAN = WHITE = MAGENTA = BLUE = ''
     class Back:

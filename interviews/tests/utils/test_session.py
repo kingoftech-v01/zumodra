@@ -14,6 +14,10 @@ from interviews.utils.session import (
 )
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 class HandleExistingEmailTests(BaseTest):
     @classmethod

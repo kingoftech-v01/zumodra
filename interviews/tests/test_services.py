@@ -28,6 +28,10 @@ from interviews.utils.db_helpers import Config, DayOff, EmailVerificationCode, S
 from interviews.views import get_appointments_and_slots
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class GetAvailableSlotsTests(BaseTest):
     """Test cases for get_available_slots"""
 

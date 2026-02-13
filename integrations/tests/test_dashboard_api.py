@@ -24,6 +24,10 @@ if sys.platform == 'win32':
     sys.stderr.reconfigure(encoding='utf-8')
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class DashboardAPITester:
     """Test dashboard endpoints via HTTP requests."""
 

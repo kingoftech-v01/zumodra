@@ -7,6 +7,10 @@ from interviews.models import PasswordResetToken
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class PasswordResetTokenCreationTests(BaseTest):
 
     def setUp(self):

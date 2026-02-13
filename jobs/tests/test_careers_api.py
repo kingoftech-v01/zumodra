@@ -25,6 +25,10 @@ PASS_MARK = "[PASS]"
 FAIL_MARK = "[FAIL]"
 INFO_MARK = "[INFO]"
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class TestResults:
     """Track test results"""
     def __init__(self):

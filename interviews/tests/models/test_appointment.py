@@ -10,6 +10,10 @@ from interviews.tests.base.base_test import BaseTest
 from interviews.utils.date_time import get_weekday_num
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class AppointmentCreationTestCase(BaseTest):
     @classmethod
     def setUpClass(cls):

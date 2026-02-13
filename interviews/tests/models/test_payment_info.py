@@ -2,6 +2,10 @@ from interviews.models import PaymentInfo
 from interviews.tests.base.base_test import BaseTest
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class PaymentInfoBasicTestCase(BaseTest):
     @classmethod
     def setUpTestData(cls):

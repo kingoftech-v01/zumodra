@@ -25,6 +25,10 @@ from typing import Dict, List, Any
 BASE_URL = "https://zumodra.rhematek-solutions.com"
 TEST_RESULTS_FILE = "test_results/marketplace_test_results.json"
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Color:
     """ANSI color codes for terminal output"""
     GREEN = '\033[92m'

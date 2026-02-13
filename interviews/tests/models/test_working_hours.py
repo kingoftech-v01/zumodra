@@ -9,6 +9,10 @@ from interviews.models import WorkingHours
 from interviews.tests.mixins.base_mixin import ServiceMixin, StaffMemberMixin, UserMixin
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class WorkingHoursModelTestCase(TestCase, UserMixin, ServiceMixin, StaffMemberMixin):
     def setUp(self):
         self.user = self.create_user_()

@@ -34,6 +34,10 @@ from interviews.views import (
 )
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class SlotTestCase(BaseTest):
     @classmethod
     def setUpClass(cls):

@@ -41,6 +41,10 @@ User = get_user_model()
 TenantModel = get_tenant_model()
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class MultiTenancyIsolationTest:
     """Main test class for multi-tenancy isolation"""
 

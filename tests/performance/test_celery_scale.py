@@ -34,6 +34,9 @@ from django.core.cache import cache
 # TEST FIXTURES
 # =============================================================================
 
+
+pytestmark = pytest.mark.django_db
+
 @pytest.fixture
 def celery_app():
     """Get configured Celery app for testing."""

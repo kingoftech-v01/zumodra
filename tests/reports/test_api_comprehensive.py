@@ -25,6 +25,10 @@ test_results = {
     "errors": []
 }
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 def log_result(category: str, endpoint: str, method: str, status_code: int, expected: int, response: dict = None, error: str = None):
     """Log test result"""
     result = {

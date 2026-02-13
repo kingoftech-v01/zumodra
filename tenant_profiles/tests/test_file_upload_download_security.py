@@ -39,6 +39,9 @@ from jobs.models import Candidate, JobPosting as Job, Application
 User = get_user_model()
 
 
+
+pytestmark = pytest.mark.django_db
+
 class FileSecurityTestConfig:
     """Configuration for file security tests."""
 

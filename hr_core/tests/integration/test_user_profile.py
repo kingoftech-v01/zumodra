@@ -27,6 +27,10 @@ test_results = []
 screenshots_data = []
 
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class ProfileTester:
     """Test suite for user profile functionality"""
 

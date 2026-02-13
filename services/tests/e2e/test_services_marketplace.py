@@ -9,6 +9,10 @@ BASE_URL = "https://demo-company.zumodra.rhematek-solutions.com"
 SCREENSHOT_DIR = Path("test_results/services")
 SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
+import pytest
+
+pytestmark = pytest.mark.django_db
+
 class Tester:
     def __init__(self):
         self.session = requests.Session()

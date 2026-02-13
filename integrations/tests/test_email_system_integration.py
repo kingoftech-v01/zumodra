@@ -81,6 +81,9 @@ test_results = {
 }
 
 
+
+pytestmark = pytest.mark.django_db
+
 class EmailSystemIntegrationTests:
     """Email system integration tests"""
 
