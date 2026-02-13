@@ -17,6 +17,7 @@ import os
 import sys
 import django
 import json
+import pytest
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -40,10 +41,8 @@ from tenant_profiles.models import UserProfile
 User = get_user_model()
 TenantModel = get_tenant_model()
 
-
-import pytest
-
 pytestmark = pytest.mark.django_db
+
 
 class MultiTenancyIsolationTest:
     """Main test class for multi-tenancy isolation"""

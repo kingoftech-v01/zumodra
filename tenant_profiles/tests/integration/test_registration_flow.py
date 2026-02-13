@@ -14,12 +14,15 @@ Author: Claude Code
 Date: 2026-01-16
 """
 
+import pytest
 import requests
 import time
 import random
 import string
 from bs4 import BeautifulSoup
 from datetime import datetime
+
+pytestmark = pytest.mark.django_db
 
 # Configuration
 BASE_URL = "https://zumodra.rhematek-solutions.com"
@@ -30,10 +33,6 @@ DASHBOARD_URL = f"{BASE_URL}/app/dashboard/"
 # Test Results Storage
 test_results = []
 
-
-import pytest
-
-pytestmark = pytest.mark.django_db
 
 def generate_random_email():
     """Generate a random email address for testing."""

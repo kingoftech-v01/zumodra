@@ -35,13 +35,12 @@ from tenant_profiles.models import (
 )
 from tests.base import TenantTestCase, APITenantTestCase, PermissionTestMixin
 
+pytestmark = pytest.mark.django_db
+
 
 # =============================================================================
 # MODEL TESTS
 # =============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 class TestTenantUserModel(TenantTestCase):
     """Tests for TenantUser model creation and validation."""

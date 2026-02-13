@@ -47,6 +47,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.test import Client
 
+import pytest
 import pytest as _pytest
 
 User = get_user_model()
@@ -58,9 +59,8 @@ try:
 except (KeyError, TypeError, ValueError, redis.exceptions.ConnectionError) as e:
     _pytest.skip(f"Redis not configured: {e}", allow_module_level=True)
 
-
-
 pytestmark = pytest.mark.django_db
+
 
 class SessionRedisTest:
     """Direct Redis session testing."""

@@ -31,13 +31,12 @@ from tests.base import (
     FactoryHelper,
 )
 
+pytestmark = pytest.mark.django_db
+
 
 # =============================================================================
 # 1. FULL HIRING WORKFLOW INTEGRATION TESTS
 # =============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 class TestFullHiringWorkflowIntegration(TenantTransactionTestCase):
     """

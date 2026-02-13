@@ -23,6 +23,7 @@ Usage:
     python test_tenant_functionality.py  # Only tests company tenant and 404 page
 """
 
+import pytest
 import requests
 import json
 from datetime import datetime
@@ -37,9 +38,8 @@ BASE_URL_NONEXISTENT = "https://nonexistent-tenant.zumodra.rhematek-solutions.co
 # Disable SSL warnings for development
 requests.packages.urllib3.disable_warnings()
 
-import pytest
-
 pytestmark = pytest.mark.django_db
+
 
 class TenantTester:
     """Test Zumodra tenant functionality"""

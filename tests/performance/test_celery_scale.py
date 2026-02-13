@@ -29,13 +29,12 @@ from celery.result import AsyncResult, GroupResult
 from django.test import TestCase, override_settings
 from django.core.cache import cache
 
+pytestmark = pytest.mark.django_db
+
 
 # =============================================================================
 # TEST FIXTURES
 # =============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def celery_app():

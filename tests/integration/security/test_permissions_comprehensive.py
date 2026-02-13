@@ -28,13 +28,12 @@ from conftest import (
     ViewerTenantUserFactory,
 )
 
+pytestmark = [pytest.mark.django_db, pytest.mark.security]
+
 
 # =============================================================================
 # 1. TENANT ISOLATION TESTS
 # =============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 @pytest.mark.security
 class TestTenantIsolation:
@@ -909,6 +908,3 @@ class TestViewSecurityIntegration:
 # =============================================================================
 # PYTEST CONFIGURATION
 # =============================================================================
-
-# Mark all tests in this module with 'security' marker
-pytestmark = pytest.mark.security

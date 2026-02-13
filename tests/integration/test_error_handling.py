@@ -7,6 +7,7 @@ on demo-company.zumodra.rhematek-solutions.com
 
 import time
 import json
+import pytest
 import requests
 from datetime import datetime
 from pathlib import Path
@@ -19,12 +20,10 @@ try:
     from selenium.webdriver.chrome.options import Options
     from selenium.common.exceptions import TimeoutException, NoSuchElementException
 except ImportError:
-    import pytest
     pytest.skip("selenium not installed", allow_module_level=True)
 
-
-
 pytestmark = pytest.mark.django_db
+
 
 class ErrorHandlingTester:
     def __init__(self):

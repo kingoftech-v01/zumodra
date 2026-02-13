@@ -31,13 +31,12 @@ from django.core.cache import cache
 from rest_framework import status
 from rest_framework.test import APIClient
 
+pytestmark = pytest.mark.django_db
+
 
 # ============================================================================
 # 1. ROLE-BASED ACCESS CONTROL (RBAC) TESTS
 # ============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 class TestPermissionMatrix:
     """

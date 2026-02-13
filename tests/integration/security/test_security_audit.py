@@ -20,13 +20,12 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 
+pytestmark = pytest.mark.django_db
+
 
 # ============================================================================
 # 1. HEADER TRUST TESTS - Verify forged headers are rejected
 # ============================================================================
-
-
-pytestmark = pytest.mark.django_db
 
 class TestHeaderTrustSecurity:
     """

@@ -8,6 +8,7 @@ import os
 import sys
 import django
 import json
+import pytest
 from pathlib import Path
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -34,8 +35,8 @@ from tenants.models import Tenant
 
 User = get_user_model()
 
-
 pytestmark = pytest.mark.django_db
+
 
 def main():
     print("\n" + "=" * 80)

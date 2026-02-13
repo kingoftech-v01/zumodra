@@ -18,6 +18,8 @@ from conftest import (
     UserFactory, TenantFactory, PlanFactory, TenantUserFactory
 )
 
+pytestmark = pytest.mark.django_db
+
 
 # ============================================================================
 # TEST FIXTURES - Service Marketplace Factories

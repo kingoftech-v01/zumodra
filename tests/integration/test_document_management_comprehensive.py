@@ -33,9 +33,8 @@ API_BASE = f"{BASE_URL}/api/v1"
 
 User = get_user_model()
 
-
-
 pytestmark = pytest.mark.django_db
+
 
 class DocumentManagementTestSuite:
     """Main test suite for document management system."""

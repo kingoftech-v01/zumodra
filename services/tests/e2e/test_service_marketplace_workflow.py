@@ -15,6 +15,7 @@ import os
 import sys
 import django
 import json
+import pytest
 import requests
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -42,10 +43,6 @@ from escrow.models import EscrowTransaction as Escrow
 from tenants.models import Tenant
 try:
     from core.test_helpers import create_test_tenant, create_test_user
-import pytest
-
-pytestmark = pytest.mark.django_db
-
 except ImportError:
     def create_test_tenant(**kwargs):
         return Tenant.objects.create(**kwargs)
