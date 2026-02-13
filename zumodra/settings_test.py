@@ -71,6 +71,14 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'axes-cache',
     },
+    'warm': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'warm-cache',
+    },
+    'cold': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'cold-cache',
+    },
 }
 
 # =============================================================================

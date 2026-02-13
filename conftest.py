@@ -1616,3 +1616,40 @@ class MockTenantRequest:
 
 # Alias for backward compatibility
 TenantRequestFactory = MockTenantRequest
+
+
+# ============================================================================
+# ADDITIONAL FIXTURES FOR TEST COMPATIBILITY
+# ============================================================================
+
+@pytest.fixture
+def token(db, user):
+    """Provide a JWT or session token for authenticated API tests."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+    refresh = RefreshToken.for_user(user)
+    return str(refresh.access_token)
+
+
+@pytest.fixture
+def headers(db, token):
+    """Provide authorization headers for API tests."""
+    return {'HTTP_AUTHORIZATION': f'Bearer {token}'}
+
+
+@pytest.fixture
+def job_listing_id(db):
+    """Provide a job listing ID for tests."""
+    listing = JobListingFactory()
+    return listing.id
+
+
+@pytest.fixture
+def category(db):
+    """Provide a job category for tests."""
+    return JobCategoryFactory()
+
+
+@pytest.fixture
+def freelancer_profile_factory(db):
+    """Provide FreelancerProfileFactory for tests."""
+    return FreelancerProfileFactory
