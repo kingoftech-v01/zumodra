@@ -4,6 +4,7 @@ Comprehensive API Testing Script for Zumodra Platform
 Tests all major API endpoints and generates a detailed report
 """
 
+import pytest
 import requests
 import json
 import sys
@@ -18,16 +19,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 BASE_URL = "http://localhost:8002"
 API_BASE = f"{BASE_URL}/api/v1"
 
+pytestmark = pytest.mark.django_db
+
 # Test results storage
 test_results = {
     "passed": [],
     "failed": [],
     "errors": []
 }
-
-import pytest
-
-pytestmark = pytest.mark.django_db
 
 def log_result(category: str, endpoint: str, method: str, status_code: int, expected: int, response: dict = None, error: str = None):
     """Log test result"""

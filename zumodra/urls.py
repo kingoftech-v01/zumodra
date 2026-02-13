@@ -320,6 +320,9 @@ urlpatterns += i18n_patterns(
     # Note: Main blog routing (/blog/, /blog/slug/) handled by Wagtail catch-all at line 364
     path('blog/', include((blog_frontend_urls, 'blog'), namespace='frontend')),
 
+    # Interview Scheduling (standalone)
+    path('interviews/', include('interviews.urls', namespace='interviews')),
+
     # Development/testing
     path('auth-test/', auth_test_view, name='auth_test'),
     # SECURITY: js_dir URL pattern removed (2026-01-16) - path traversal vulnerability

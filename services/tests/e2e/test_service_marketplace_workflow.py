@@ -51,6 +51,8 @@ except ImportError:
 
 User = get_user_model()
 
+pytestmark = pytest.mark.django_db
+
 
 class ServiceMarketplaceTest:
     def __init__(self):

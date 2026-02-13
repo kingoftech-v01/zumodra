@@ -65,12 +65,24 @@ class UserFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Override create to handle password properly."""
+        """Override create to handle password and strip non-User fields."""
         password = kwargs.pop('password', None)
+        # Strip fields that belong to TenantUser, not CustomUser
+        tenant = kwargs.pop('tenant', None)
+        role = kwargs.pop('role', None)
+        kwargs.pop('department', None)
+        kwargs.pop('position', None)
         user = super()._create(model_class, *args, **kwargs)
         if password:
             user.set_password(password)
             user.save()
+        # If tenant/role provided, create TenantUser association
+        if tenant:
+            from tenant_profiles.models import TenantUser
+            TenantUser.objects.get_or_create(
+                user=user, tenant=tenant,
+                defaults={'role': role or 'employee', 'is_active': True}
+            )
         return user
 
 
@@ -1653,3 +1665,57 @@ def category(db):
 def freelancer_profile_factory(db):
     """Provide FreelancerProfileFactory for tests."""
     return FreelancerProfileFactory
+
+
+@pytest.fixture
+def tenant_settings_factory(db):
+    """DEPRECATED: Provide TenantSettingsFactory for tests."""
+    return TenantSettingsFactory
+
+
+@pytest.fixture
+def tenant_invitation_factory(db):
+    """DEPRECATED: Provide TenantInvitationFactory for tests."""
+    return TenantInvitationFactory
+
+
+@pytest.fixture
+def domain_factory(db):
+    """DEPRECATED: Provide DomainFactory for tests."""
+    return DomainFactory
+
+
+@pytest.fixture
+def enterprise_plan_factory(db):
+    """DEPRECATED: Provide EnterprisePlanFactory for tests."""
+    return EnterprisePlanFactory
+
+
+@pytest.fixture
+def tenant_usage_factory(db):
+    """DEPRECATED: Provide TenantUsageFactory for tests."""
+    return TenantUsageFactory
+
+
+@pytest.fixture
+def audit_log_factory(db):
+    """DEPRECATED: Provide AuditLogFactory for tests."""
+    return AuditLogFactory
+
+
+@pytest.fixture
+def onboarding_checklist_factory(db):
+    """Provide OnboardingChecklistFactory for tests."""
+    return OnboardingChecklistFactory
+
+
+@pytest.fixture
+def performance_review_factory(db):
+    """Provide PerformanceReviewFactory for tests."""
+    return PerformanceReviewFactory
+
+
+@pytest.fixture
+def document_template_factory(db):
+    """Provide DocumentTemplateFactory for tests."""
+    return DocumentTemplateFactory

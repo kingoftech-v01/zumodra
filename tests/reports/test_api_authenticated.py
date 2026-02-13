@@ -4,6 +4,7 @@ Comprehensive Authenticated API Testing Script
 Tests all CRUD operations on all major endpoints
 """
 
+import pytest
 import requests
 import json
 import sys
@@ -32,6 +33,8 @@ except Exception as e:
     print(f"⚠ Tests will FAIL if authentication is required")
     # Don't exit here - let individual test failures be visible
 
+pytestmark = pytest.mark.django_db
+
 if __name__ == '__main__':
     # Headers with authentication
     headers = {
@@ -46,10 +49,6 @@ if __name__ == '__main__':
         "errors": [],
         "created_resources": {}
     }
-
-import pytest
-
-pytestmark = pytest.mark.django_db
 
 def log_test(category, endpoint, method, expected, actual, details=""):
     """Log test result"""
