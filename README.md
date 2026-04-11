@@ -225,11 +225,12 @@ Zumodra supports two distinct tenant types with different capabilities:
 
 ### Backend
 - Python 3.11+
-- Django 5.2 with GeoDjango
-- Django REST Framework
-- PostgreSQL 16 + PostGIS
+- Django **5.2.7** with GeoDjango
+- Django REST Framework + SimpleJWT
+- PostgreSQL **15** + PostGIS 3.4 (`postgis/postgis:15-3.4`)
+- django-tenants for multi-schema SaaS isolation
 - Redis 7 (cache, sessions, Celery)
-- RabbitMQ (message broker)
+- RabbitMQ 3.12 (Celery broker)
 - Celery 5.x (async tasks)
 - Django Channels (WebSockets)
 
@@ -250,28 +251,77 @@ Zumodra supports two distinct tenant types with different capabilities:
 
 ## Project Structure
 
+The codebase is a large Django monorepo with ~40+ apps at the repository root (flat layout, not under `apps/`). The main functional groups are:
+
 ```
 zumodra/
-├── accounts/           # User accounts, KYC, trust scores
-├── ats/                # Applicant Tracking System
-├── hr_core/            # HR management, onboarding
-├── services/           # Freelance marketplace
-├── finance/            # Payments, escrow, subscriptions
-├── messages_sys/       # Real-time messaging
-├── notifications/      # Notification system
-├── careers/            # Public career pages
-├── ai_matching/        # AI-powered matching
-├── integrations/       # Third-party integrations
-├── tenants/            # Multi-tenant management
-├── api/                # REST API infrastructure
-├── core/               # Shared utilities & security middleware
-├── templates/          # Django templates
-├── templates_auth/     # Allauth & MFA templates
-├── staticfiles/        # Static assets (CSS, JS, fonts, icons)
-├── tests/              # Test suite
-├── docker/             # Docker configurations
-├── docs/               # Documentation
-└── zumodra/            # Django project settings
+├── # Identity & tenants
+├── accounts/               # User accounts, KYC, trust scores
+├── accounting/             # Chart of accounts, ledger entries
+├── core/                   # Shared utilities + security middleware
+├── core_identity/          # Identity & profile core
+├── tenants/                # Multi-tenant (django-tenants) management
+├── tenant_profiles/        # Per-tenant profile data
+├── custom_account_u/       # Custom account extensions
+├── admin_honeypot/         # Fake admin for attacker honeypot
+├── security/               # Security controls, audit trail
+│
+├── # Jobs & ATS
+├── jobs/                   # Job postings (tenant-scoped)
+├── jobs_public/            # Public careers pages
+├── careers/                # Careers marketing
+├── ats/                    # Applicant Tracking System
+├── interviews/             # Interview scheduling
+│
+├── # HR & payroll
+├── hr_core/                # HR management, onboarding
+├── payroll/                # Payroll processing
+├── expenses/               # Expense reports
+│
+├── # Freelance marketplace
+├── services/               # Freelance service listings (tenant-scoped)
+├── services_public/        # Public marketplace
+├── projects/               # Projects & milestones
+├── projects_public/        # Public project listings
+├── escrow/                 # Escrow for project payments
+│
+├── # Finance, billing, payments
+├── billing/                # Invoice + billing
+├── finance/                # Payments, subscriptions
+├── finance_webhooks/       # Payment webhook handlers
+├── payments/               # Payment processing
+├── stripe_connect/         # Stripe Connect marketplace payouts
+├── subscriptions/          # SaaS subscription plans
+├── tax/                    # Tax calculation (VAT/GST/region)
+│
+├── # Communication & content
+├── messages_sys/           # Real-time messaging
+├── notifications/          # Notification system
+├── blog/                   # Blog / Wagtail CMS content
+├── marketing/              # Marketing pages
+├── marketing_campaigns/    # Campaign management
+├── media/                  # Media files
+│
+├── # AI, analytics, integrations
+├── ai_matching/            # AI-powered candidate/job matching
+├── agents/                 # Agent workflows
+├── analytics/              # Analytics & reporting
+├── integrations/           # Third-party integrations
+├── configurations/         # Runtime configuration
+├── logs/                   # Audit logs
+│
+├── # Infrastructure
+├── api/                    # REST API infrastructure
+├── dashboard/              # Tenant dashboard
+├── main/                   # Main app (landing, shared views)
+├── frontend/               # Frontend assets app
+├── templates/              # Django templates (unified_base, auth, emails, errors)
+├── staticfiles/             # Local static assets (Alpine, HTMX, Chart.js, fonts)
+├── tests/                  # Cross-app test suite
+├── docker/                 # Docker configurations
+├── scripts/                # Operational scripts
+├── docs_project/           # Documentation
+└── zumodra/                # Django project settings (settings.py, urls.py, asgi.py, celery.py)
 ```
 
 ### Template Structure
